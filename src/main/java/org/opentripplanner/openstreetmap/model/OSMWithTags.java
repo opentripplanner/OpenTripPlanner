@@ -136,6 +136,9 @@ public class OSMWithTags {
      * {@link org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule}
      */
     public I18NString getAssumedName() {
+        if (tags == null) {
+            return null;
+        }
         if (tags.containsKey("name")) {
             return TranslatedString.getI18NString(TemplateLibrary.generateI18N("{name}", this));
         }
@@ -287,8 +290,10 @@ public class OSMWithTags {
         String parkingType = getTag("parking");
         String parkAndRide = getTag("park_ride");
         return isTag("amenity", "parking")
-                && (parkingType != null && parkingType.contains("park_and_ride"))
-                || (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"));
+                && (
+                        (parkingType != null && parkingType.contains("park_and_ride"))
+                     || (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"))
+        );
     }
 
     /**
@@ -301,5 +306,9 @@ public class OSMWithTags {
 
     public void setCreativeName(I18NString creativeName) {
         this.creativeName = creativeName;
+    }
+
+    public String getOpenStreetMapLink() {
+        return null;
     }
 }

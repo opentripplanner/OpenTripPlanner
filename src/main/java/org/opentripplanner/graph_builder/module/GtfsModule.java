@@ -42,7 +42,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -57,12 +57,6 @@ public class GtfsModule implements GraphBuilderModule {
     private EntityHandler counter = new EntityCounter();
 
     private FareServiceFactory fareServiceFactory;
-
-    /** will be applied to all bundles which do not have the cacheDirectory property set */
-    private File cacheDirectory;
-
-    /** will be applied to all bundles which do not have the useCached property set */
-    private Boolean useCached;
 
     private Set<String> agencyIdsSeen = Sets.newHashSet();
 
@@ -114,15 +108,6 @@ public class GtfsModule implements GraphBuilderModule {
 
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
-                // apply global defaults to individual GTFSBundles (if globals have been set)
-                if (cacheDirectory != null && gtfsBundle.cacheDirectory == null) {
-                    gtfsBundle.cacheDirectory = cacheDirectory;
-                }
-
-                if (useCached != null && gtfsBundle.useCached == null) {
-                    gtfsBundle.useCached = useCached;
-                }
-
                 GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
                 GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
                         gtfsBundle.getFeedId().getId(),

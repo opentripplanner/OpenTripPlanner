@@ -39,7 +39,7 @@ pages:
     - Codestyle: 'Codestyle.md'
     - Sandbox development: 'SandboxExtension.md'
 - Sandbox:
-    - Health API: 'sandbox/HealthAPI.md'
+    - Actuator API: 'sandbox/ActuatorAPI.md'
     - Direct transfer analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
     - HSL Legacy GraphQL API: 'sandbox/LegacyGraphQLApi.md'

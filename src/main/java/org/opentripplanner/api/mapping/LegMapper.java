@@ -2,31 +2,25 @@ package org.opentripplanner.api.mapping;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiAlert;
-import org.opentripplanner.api.model.ApiBookingInfo;
-import org.opentripplanner.api.model.ApiBookingTime;
-import org.opentripplanner.api.model.ApiContactInfo;
 import org.opentripplanner.api.model.ApiLeg;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.BookingTime;
-import org.opentripplanner.model.ContactInfo;
 import org.opentripplanner.model.plan.Leg;
 
 public class LegMapper {
     private final WalkStepMapper walkStepMapper;
     private final StreetNoteMaperMapper streetNoteMaperMapper;
     private final AlertMapper alertMapper;
+    private final PlaceMapper placeMapper;
+    private final boolean addIntermediateStops;
 
-    public LegMapper(Locale locale) {
+    public LegMapper(Locale locale, boolean addIntermediateStops) {
         this.walkStepMapper = new WalkStepMapper(locale);
         this.streetNoteMaperMapper = new StreetNoteMaperMapper(locale);
         this.alertMapper = new AlertMapper(locale);
+        this.placeMapper = new PlaceMapper(locale);
+        this.addIntermediateStops = addIntermediateStops;
     }
 
     public List<ApiLeg> mapLegs(List<Leg> domain) {
@@ -53,8 +47,8 @@ public class LegMapper {
         api.endTime = domain.endTime;
 
         // Set the arrival and departure times, even if this is redundant information
-        api.from = PlaceMapper.mapPlace(domain.from, arrivalTimeFromPlace, api.startTime);
-        api.to = PlaceMapper.mapPlace(domain.to, api.endTime, departureTimeToPlace);
+        api.from = placeMapper.mapPlace(domain.from, arrivalTimeFromPlace, api.startTime);
+        api.to = placeMapper.mapPlace(domain.to, api.endTime, departureTimeToPlace);
 
         api.departureDelay = domain.departureDelay;
         api.arrivalDelay = domain.arrivalDelay;
@@ -101,7 +95,9 @@ public class LegMapper {
         api.headsign = domain.headsign;
         api.serviceDate = ServiceDateMapper.mapToApi(domain.serviceDate);
         api.routeBrandingUrl = domain.routeBrandingUrl;
-        api.intermediateStops = PlaceMapper.mapStopArrivals(domain.intermediateStops);
+        if(addIntermediateStops) {
+            api.intermediateStops = placeMapper.mapStopArrivals(domain.intermediateStops);
+        }
         api.legGeometry = domain.legGeometry;
         api.steps = walkStepMapper.mapWalkSteps(domain.walkSteps);
         api.alerts = concatenateAlerts(

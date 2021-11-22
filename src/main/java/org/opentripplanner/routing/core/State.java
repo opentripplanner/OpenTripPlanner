@@ -210,12 +210,11 @@ public class State implements Cloneable {
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
         if (options.parkAndRide) {
-            this.stateData.carParked = options.arriveBy;
-            this.stateData.currentMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
-        } else if (options.bikeParkAndRide) {
-            this.stateData.bikeParked = options.arriveBy;
-            this.stateData.currentMode = this.stateData.bikeParked ? TraverseMode.WALK
-                    : TraverseMode.BICYCLE;
+            this.stateData.vehicleParked = options.arriveBy;
+            this.stateData.currentMode = this.stateData.vehicleParked ?
+                TraverseMode.WALK
+                : options.streetSubRequestModes.getBicycle() ?
+                    TraverseMode.BICYCLE : TraverseMode.CAR;
         }
         this.walkDistance = 0;
         this.time = timeSeconds * 1000;
@@ -249,7 +248,7 @@ public class State implements Cloneable {
 
     public String toString() {
         return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] "
-                + (isRentingVehicle() ? "VEHICLE_RENT " : "") + (isCarParked() ? "CAR_PARKED " : "")
+                + (isRentingVehicle() ? "VEHICLE_RENT " : "") + (isVehicleParked() ? "VEHICLE_PARKED " : "")
                 + vertex + ">";
     }
     
@@ -257,9 +256,9 @@ public class State implements Cloneable {
         return "<State " + new Date(getTimeInMillis()) + 
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
-                " d=" + this.getWalkDistance() + 
-                " br=" + this.isRentingVehicle() +
-                " pr=" + this.isCarParked() + ">";
+                " d=" + this.getWalkDistance() +
+                " r=" + this.isRentingVehicle() +
+                " pr=" + this.isVehicleParked() + ">";
     }
 
     public CarPickupState getCarPickupState() {
@@ -312,13 +311,9 @@ public class State implements Cloneable {
     public VehicleRentalState getVehicleRentalState() {
         return stateData.vehicleRentalState;
     }
-    
-    public boolean isCarParked() {
-        return stateData.carParked;
-    }
 
-    public boolean isBikeParked() {
-        return stateData.bikeParked;
+    public boolean isVehicleParked() {
+        return stateData.vehicleParked;
     }
 
     /**
@@ -327,20 +322,16 @@ public class State implements Cloneable {
     public boolean isFinal() {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
         boolean parkAndRide = stateData.opt.parkAndRide;
-        boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
         boolean vehicleRentingOk;
-        boolean bikeParkAndRideOk;
-        boolean carParkAndRideOk;
+        boolean vehicleParkAndRideOk;
         if (stateData.opt.arriveBy) {
             vehicleRentingOk = !stateData.opt.vehicleRental || !isRentingVehicle();
-            bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
-            carParkAndRideOk = !parkAndRide || !isCarParked();
+            vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
         } else {
             vehicleRentingOk = !stateData.opt.vehicleRental || (vehicleRentalNotStarted() || vehicleRentalIsFinished());
-            bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
-            carParkAndRideOk = !parkAndRide || isCarParked();
+            vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
         }
-        return vehicleRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return vehicleRentingOk && vehicleParkAndRideOk;
     }
 
     public double getWalkDistance() {
@@ -466,8 +457,7 @@ public class State implements Cloneable {
         State newState = new State(this.vertex, getTimeSeconds(), stateData.opt.reversedClone());
         // TODO Check if those two lines are needed:
         newState.stateData.vehicleRentalState = stateData.vehicleRentalState;
-        newState.stateData.carParked = stateData.carParked;
-        newState.stateData.bikeParked = stateData.bikeParked;
+        newState.stateData.vehicleParked = stateData.vehicleParked;
         newState.stateData.carPickupState = stateData.carPickupState;
         return newState;
     }
@@ -595,11 +585,8 @@ public class State implements Cloneable {
                     );
                 }
             }
-            if (orig.isCarParked() != orig.getBackState().isCarParked()) {
-                editor.setCarParked(!orig.isCarParked());
-            }
-            if (orig.isBikeParked() != orig.getBackState().isBikeParked()) {
-                editor.setBikeParked(!orig.isBikeParked());
+            if (orig.isVehicleParked() != orig.getBackState().isVehicleParked()) {
+                editor.setVehicleParked(true, orig.getNonTransitMode());
             }
 
             ret = editor.makeState();

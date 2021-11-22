@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex.template;
 
+import com.google.common.base.MoreObjects;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -168,4 +169,18 @@ public abstract class FlexAccessEgressTemplate {
     );
   }
 
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+            .add("accessEgress", accessEgress)
+            .add("trip", trip)
+            .add("fromStopIndex", fromStopIndex)
+            .add("toStopIndex", toStopIndex)
+            .add("transferStop", transferStop)
+            .add("secondsFromStartOfTime", secondsFromStartOfTime)
+            .add("serviceDate", serviceDate)
+            .add("calculator", calculator)
+            .add("flexParams", flexParams)
+            .toString();
+  }
 }

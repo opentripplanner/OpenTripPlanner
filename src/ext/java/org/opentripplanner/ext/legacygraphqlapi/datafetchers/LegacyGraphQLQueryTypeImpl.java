@@ -9,6 +9,18 @@ import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.parameter.QualifiedMode;
@@ -35,7 +47,7 @@ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
@@ -43,22 +55,10 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.ResourceBundleSingleton;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class LegacyGraphQLQueryTypeImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLQueryType {
@@ -70,6 +70,7 @@ public class LegacyGraphQLQueryTypeImpl
       String type = args.getLegacyGraphQLId().getType();
       String id = args.getLegacyGraphQLId().getId();
       RoutingService routingService = environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+      VehicleParkingService vehicleParkingService = routingService.getVehicleParkingService();
       VehicleRentalStationService vehicleRentalStationService = routingService.getVehicleRentalStationService();
 
       switch (type) {
@@ -78,10 +79,10 @@ public class LegacyGraphQLQueryTypeImpl
         case "Alert":
           return null; //TODO
         case "BikePark":
-          return vehicleRentalStationService == null ? null : vehicleRentalStationService
+          var bikeParkId = FeedScopedId.parseId(id);
+          return vehicleParkingService == null ? null : vehicleParkingService
               .getBikeParks()
-              .stream()
-              .filter(bikePark -> bikePark.id.equals(id))
+              .filter(bikePark -> bikePark.getId().equals(bikeParkId))
               .findAny()
               .orElse(null);
         case "BikeRentalStation":
@@ -94,7 +95,12 @@ public class LegacyGraphQLQueryTypeImpl
           return vehicleRentalStationService == null ? null :
               vehicleRentalStationService.getVehicleRentalVehicle(FeedScopedId.parseId(id));
         case "CarPark":
-          return null; //TODO
+          var carParkId = FeedScopedId.parseId(id);
+          return vehicleParkingService == null ? null : vehicleParkingService
+              .getCarParks()
+              .filter(carPark -> carPark.getId().equals(carParkId))
+              .findAny()
+              .orElse(null);
         case "Cluster":
           return null; //TODO
         case "DepartureRow":
@@ -131,6 +137,13 @@ public class LegacyGraphQLQueryTypeImpl
           return null; //TODO
         case "Trip":
           return routingService.getTripForId().get(FeedScopedId.parseId(id));
+        case "VehicleParking":
+          var vehicleParkingId = FeedScopedId.parseId(id);
+          return vehicleParkingService == null ? null : vehicleParkingService
+                  .getVehicleParkings()
+                  .filter(bikePark -> bikePark.getId().equals(vehicleParkingId))
+                  .findAny()
+                  .orElse(null);
         default:
           return null;
       }
@@ -649,47 +662,127 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<BikePark>> bikeParks() {
+  public DataFetcher<Iterable<VehicleParking>> bikeParks() {
     return environment -> {
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
-          .getVehicleRentalStationService();
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
 
-      if (vehicleRentalStationService == null) { return null; }
+      if (vehicleParkingService == null) { return null; }
 
-      return vehicleRentalStationService.getBikeParks();
+      return vehicleParkingService.getBikeParks().collect(Collectors.toList());
     };
   }
 
   @Override
-  public DataFetcher<BikePark> bikePark() {
+  public DataFetcher<VehicleParking> bikePark() {
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeParkArgs(environment.getArguments());
 
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
-          .getVehicleRentalStationService();
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
 
-      if (vehicleRentalStationService == null) { return null; }
+      if (vehicleParkingService == null) { return null; }
 
-      return vehicleRentalStationService
+      return vehicleParkingService
               .getBikeParks()
-              .stream()
-              .filter(bikepark -> bikepark.id.equals(args.getLegacyGraphQLId()))
+              .filter(bikePark -> bikePark.getId().getId().equals(args.getLegacyGraphQLId()))
               .findAny()
               .orElse(null);
     };
   }
 
-  //TODO
   @Override
-  public DataFetcher<Iterable<Object>> carParks() {
-    return environment -> Collections.EMPTY_LIST;
+  public DataFetcher<Iterable<VehicleParking>> carParks() {
+    return environment -> {
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
+
+      if (vehicleParkingService == null) { return null; }
+
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeCarParksArgs(
+          environment.getArguments());
+
+      if (args.getLegacyGraphQLIds() != null) {
+        var idList = ((List<String>) args.getLegacyGraphQLIds());
+
+        if (!idList.isEmpty()) {
+          Map<String, VehicleParking> carParkMap = vehicleParkingService.getCarParks()
+                  .collect(Collectors.toMap(station -> station.getId().getId(), station -> station));
+
+          return idList.stream()
+              .map(carParkMap::get)
+              .collect(Collectors.toList());
+        }
+      }
+
+      return vehicleParkingService
+          .getCarParks().collect(Collectors.toList());
+    };
   }
 
-  //TODO
   @Override
-  public DataFetcher<Object> carPark() {
+  public DataFetcher<VehicleParking> carPark() {
     return environment -> {
-      return null;
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeCarParkArgs(environment.getArguments());
+
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
+
+      if (vehicleParkingService == null) { return null; }
+
+      return vehicleParkingService
+          .getCarParks()
+          .filter(carPark -> carPark.getId().getId().equals(args.getLegacyGraphQLId()))
+          .findAny()
+          .orElse(null);
+    };
+  }
+
+  @Override
+  public DataFetcher<Iterable<VehicleParking>> vehicleParkings() {
+    return environment -> {
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
+
+      if (vehicleParkingService == null) { return null; }
+
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeVehicleParkingsArgs(
+          environment.getArguments());
+
+      if (args.getLegacyGraphQLIds() != null) {
+        var idList = ((List<String>) args.getLegacyGraphQLIds());
+
+        if (!idList.isEmpty()) {
+          Map<String, VehicleParking> vehicleParkingMap = vehicleParkingService.getVehicleParkings()
+                  .collect(Collectors.toMap(station -> station.getId().toString(), station -> station));
+
+          return idList.stream()
+              .map(vehicleParkingMap::get)
+              .collect(Collectors.toList());
+        }
+      }
+
+      return vehicleParkingService
+          .getVehicleParkings().collect(Collectors.toList());
+    };
+  }
+
+  @Override
+  public DataFetcher<VehicleParking> vehicleParking() {
+    return environment -> {
+      var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeVehicleParkingArgs(environment.getArguments());
+
+      VehicleParkingService vehicleParkingService = getRoutingService(environment)
+          .getVehicleParkingService();
+
+      if (vehicleParkingService == null) { return null; }
+
+      var vehicleParkingId = FeedScopedId.parseId(args.getLegacyGraphQLId());
+      return vehicleParkingService
+          .getVehicleParkings()
+          .filter(vehicleParking -> vehicleParking.getId().equals(vehicleParkingId))
+          .findAny()
+          .orElse(null);
     };
   }
 

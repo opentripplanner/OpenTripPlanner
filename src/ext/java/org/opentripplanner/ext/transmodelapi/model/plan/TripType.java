@@ -6,8 +6,10 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
+import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 import java.util.stream.Collectors;
 
@@ -16,6 +18,7 @@ public class TripType {
       GraphQLObjectType placeType,
       GraphQLObjectType tripPatternType,
       GraphQLObjectType tripMetadataType,
+      GraphQLObjectType routingErrorType,
       GqlUtil gqlUtil
 
   ) {
@@ -55,21 +58,30 @@ public class TripType {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("messageEnums")
             .description("A list of possible error messages as enum")
+            .deprecate("Use routingErrors instead")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages
-                .stream().map(Enum::name).collect(Collectors.toList()))
+            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages.stream()
+                    .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
+                    .map(Enum::name)
+                    .collect(Collectors.toList()))
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("messageStrings")
+            .deprecate("Use routingErrors instead")
             .description("A list of possible error messages in cleartext")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-            .dataFetcher(
-                env -> ((PlanResponse) env.getSource())
-                    .listErrorMessages(env.getArgument("locale"))
+            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages.stream()
+                    .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
+                    .map(message -> message.get(ResourceBundleSingleton.INSTANCE.getLocale(env.getArgument("locale"))))
+                    .collect(Collectors.toList())
             )
             .build())
-        // TODO OTP2 - Next version: Wrap errors, include data like witch parameter
-        //           - is causing a problem (like from/to not found).
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name("routingErrors")
+            .description("A list of routing errors, and fields which caused them")
+            .type(new GraphQLNonNull(new GraphQLList(routingErrorType)))
+            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages)
+            .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("debugOutput")
             .description("Information about the timings for the trip generation")

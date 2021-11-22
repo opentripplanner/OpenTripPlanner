@@ -7,10 +7,8 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
@@ -81,9 +79,9 @@ public class PlanPlaceType {
             .name("bikeRentalStation")
             .type(bikeRentalStationType)
             .description("The bike rental station related to the place")
-            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
-                    && ((Place) environment.getSource()).vehicleRentalStation instanceof VehicleRentalStation
-                ? ((Place) environment.getSource()).vehicleRentalStation
+            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.VEHICLERENTAL)
+                    && ((Place) environment.getSource()).vehicleRentalPlace instanceof VehicleRentalStation
+                ? ((Place) environment.getSource()).vehicleRentalPlace
                 : null)
             .build())
         .field(GraphQLFieldDefinition
@@ -91,9 +89,9 @@ public class PlanPlaceType {
             .name("rentalVehicle")
             .type(rentalVehicleType)
             .description("The rental vehicle related to the place")
-            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
-                    && ((Place) environment.getSource()).vehicleRentalStation instanceof VehicleRentalVehicle
-                ? ((Place) environment.getSource()).vehicleRentalStation
+            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.VEHICLERENTAL)
+                    && ((Place) environment.getSource()).vehicleRentalPlace instanceof VehicleRentalVehicle
+                ? ((Place) environment.getSource()).vehicleRentalPlace
                 : null)
             .build())
         //                .field(GraphQLFieldDefinition.newFieldDefinition()

@@ -43,18 +43,11 @@ public class GtfsBundle {
      */
     public boolean linkStopsToParentStations = false;
 
-    private Map<String, String> agencyIdMappings = new HashMap<String, String>();
-
     public int subwayAccessTime;
 
     private double maxStopToShapeSnapDistance = 150;
 
     public int maxInterlineDistance;
-
-    public Boolean useCached = null; // null means use global default from GtfsGB || true
-
-    public File cacheDirectory = null; // null means use default from GtfsGB || system temp dir 
-
 
     /** Used by unit tests */
     public GtfsBundle(File gtfsFile) {

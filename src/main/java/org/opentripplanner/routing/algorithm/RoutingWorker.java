@@ -2,7 +2,9 @@ package org.opentripplanner.routing.algorithm;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
@@ -58,7 +60,7 @@ public class RoutingWorker {
         this.debugTimingAggregator.finishedPrecalculating();
 
         var itineraries = Collections.synchronizedList(new ArrayList<Itinerary>());
-        var routingErrors = Collections.synchronizedList(new ArrayList<RoutingError>());
+        var routingErrors = Collections.synchronizedSet(new HashSet<RoutingError>());
 
         if (OTPFeature.ParallelRouting.isOn()) {
             CompletableFuture.allOf(
@@ -80,10 +82,16 @@ public class RoutingWorker {
         debugTimingAggregator.finishedRouting();
 
         // Filter itineraries
-        var filteredItineraries = filterItineraries(
-                itineraries,
-                filterOnLatestDepartureTime
+        ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
+            request,
+            filterOnLatestDepartureTime,
+            emptyDirectModeHandler.removeWalkAllTheWayResults(),
+            it -> firstRemovedItinerary = it
         );
+
+        List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
+
+        routingErrors.addAll(filterChain.getRoutingErrors());
 
         LOG.debug("Return TripPlan with {} filtered itineraries out of {} total.", filteredItineraries.size(), itineraries.size());
 
@@ -95,14 +103,14 @@ public class RoutingWorker {
         return new RoutingResponse(
             TripPlanMapper.mapTripPlan(request, filteredItineraries),
             createTripSearchMetadata(),
-            routingErrors,
+            new ArrayList<>(routingErrors),
             debugTimingAggregator
         );
     }
 
     private void routeDirectStreet(
             List<Itinerary> itineraries,
-            List<RoutingError> routingErrors
+            Collection<RoutingError> routingErrors
     ) {
         debugTimingAggregator.startedDirectStreetRouter();
         try {
@@ -116,7 +124,7 @@ public class RoutingWorker {
 
     private void routeDirectFlex(
             List<Itinerary> itineraries,
-            List<RoutingError> routingErrors
+            Collection<RoutingError> routingErrors
     ) {
         if (!OTPFeature.FlexRouting.isOn()) {
             return;
@@ -134,7 +142,7 @@ public class RoutingWorker {
 
     private void routeTransit(
             List<Itinerary> itineraries,
-            List<RoutingError> routingErrors
+            Collection<RoutingError> routingErrors
     ) {
         debugTimingAggregator.startedTransitRouting();
         try {
@@ -147,19 +155,6 @@ public class RoutingWorker {
         } finally {
             debugTimingAggregator.finishedTransitRouter();
         }
-    }
-
-    private List<Itinerary> filterItineraries(
-            List<Itinerary> itineraries,
-            Instant filterOnLatestDepartureTime
-    ) {
-        ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
-            request,
-            filterOnLatestDepartureTime,
-            emptyDirectModeHandler.removeWalkAllTheWayResults(),
-            it -> firstRemovedItinerary = it
-        );
-        return filterChain.filter(itineraries);
     }
 
     @Nullable

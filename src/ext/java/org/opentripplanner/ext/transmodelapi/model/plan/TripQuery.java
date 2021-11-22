@@ -29,6 +29,7 @@ public class TripQuery {
             + "trip patterns describing suggested alternatives for the trip."
         )
         .type(tripType)
+        .withDirective(gqlUtil.timingData)
         .argument(GraphQLArgument.newArgument()
             .name("dateTime")
             .description(

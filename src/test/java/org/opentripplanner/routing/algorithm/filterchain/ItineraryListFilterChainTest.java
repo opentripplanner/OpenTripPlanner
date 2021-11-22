@@ -6,7 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -187,6 +191,36 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertTrue(i3.isFlaggedForDeletion());
   }
 
+  @Test void testRoutingErrorsOriginDestinationTooCloseTest() {
+    ItineraryListFilterChain chain = createBuilder(false, false, 20)
+            .withRemoveWalkAllTheWayResults(true)
+            .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
+            .build();
+
+    Itinerary walk = newItinerary(A, T11_06).walk(D10m, E).build();
+    Itinerary bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
+
+    assertTrue(chain.filter(List.of(walk, bus)).isEmpty());
+
+    final List<RoutingError> routingErrors = chain.getRoutingErrors();
+    assertEquals(1, routingErrors.size());
+    assertEquals(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, routingErrors.get(0).code);
+  }
+
+  @Test void routingErrorsOutsideWindowTest() {
+    var chain = createBuilder(false, false, 20)
+            .withRemoveWalkAllTheWayResults(true)
+            .withLatestDepartureTimeLimit(Instant.from(newTime(T11_00)))
+            .build();
+
+    Itinerary bus = newItinerary(A).bus(21, T11_06, T11_23, E).build();
+
+    assertTrue(chain.filter(List.of(bus)).isEmpty());
+
+    final List<RoutingError> routingErrors = chain.getRoutingErrors();
+    assertEquals(1, routingErrors.size());
+    assertEquals(RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, routingErrors.get(0).code);
+  }
 
   /* private methods */
 
