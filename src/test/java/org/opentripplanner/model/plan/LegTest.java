@@ -1,11 +1,11 @@
 package org.opentripplanner.model.plan;
 
-import org.junit.Test;
-import org.opentripplanner.model.calendar.ServiceDate;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+import org.opentripplanner.model.calendar.ServiceDate;
 
 public class LegTest implements PlanTestConstants {
 
@@ -91,9 +91,7 @@ public class LegTest implements PlanTestConstants {
   }
 
   private static Leg createLegIgnoreTime(int tripId, int fromStopIndex, int toStopIndex, ServiceDate service) {
-    Leg leg = TestItineraryBuilder.newItinerary(A, 99).bus(tripId, 99, 99, B).build().firstLeg();
-    leg.from.stopIndex = fromStopIndex;
-    leg.to.stopIndex = toStopIndex;
+    Leg leg = TestItineraryBuilder.newItinerary(A, 99).bus(tripId, 99, 99, fromStopIndex, toStopIndex, B).build().firstLeg();
     leg.serviceDate = service;
     return leg;
   }

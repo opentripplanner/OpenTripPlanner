@@ -236,7 +236,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
-    // TODO OTP2 Maybe this should be up to the API?
     public boolean showIntermediateStops = false;
 
     /** max walk/bike speed along streets, in meters per second */
@@ -349,11 +348,29 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /** Cost of dropping-off a rented bike */
     public int bikeRentalDropoffCost = 30;
 
+    /** The vehicle rental networks which may be used. If empty all networks may be used. */
+    public Set<String> allowedVehicleRentalNetworks = Set.of();
+
+    /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+    public Set<String> bannedVehicleRentalNetworks = Set.of();
+
     /** Time to park a bike */
     public int bikeParkTime = 60;
 
     /** Cost of parking a bike. */
     public int bikeParkCost = 120;
+
+    /** Time to park a car */
+    public int carParkTime = 60;
+
+    /** Cost of parking a car. */
+    public int carParkCost = 120;
+
+    /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
+    public Set<String> requiredVehicleParkingTags = Set.of();
+
+    /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
+    public Set<String> bannedVehicleParkingTags = Set.of();
 
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
@@ -648,7 +665,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
     */
     public boolean bikeRental = false;
-    public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean carPickup = false;
 
@@ -1008,7 +1024,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
                     break;
                 case BIKE_TO_PARK:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
-                    streetRequest.bikeParkAndRide = true;
+                    streetRequest.parkAndRide = true;
                     break;
                 case BIKE_RENTAL:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
@@ -1050,6 +1066,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         try {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.streetSubRequestModes = streetSubRequestModes.clone();
+
+            clone.allowedVehicleRentalNetworks = Set.copyOf(allowedVehicleRentalNetworks);
+            clone.bannedVehicleRentalNetworks = Set.copyOf(bannedVehicleRentalNetworks);
+
+            clone.requiredVehicleParkingTags = Set.copyOf(requiredVehicleParkingTags);
+            clone.bannedVehicleParkingTags = Set.copyOf(bannedVehicleParkingTags);
 
             clone.preferredAgencies = Set.copyOf(preferredAgencies);
             clone.unpreferredAgencies = Set.copyOf(unpreferredAgencies);

@@ -5,10 +5,15 @@ import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
+import graphql.execution.instrumentation.ChainedInstrumentation;
+import graphql.execution.instrumentation.Instrumentation;
 import graphql.schema.GraphQLSchema;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
+import org.opentripplanner.ext.actuator.ActuatorAPI;
+import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +45,14 @@ class TransmodelGraph {
             String operationName,
             int maxResolves
     ) {
-        MaxQueryComplexityInstrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
+        Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
+        if (OTPFeature.ActuatorAPI.isOn()) {
+            instrumentation = new ChainedInstrumentation(
+                    new MicrometerGraphQLInstrumentation(ActuatorAPI.prometheusRegistry),
+                    instrumentation
+            );
+        }
+
         GraphQL graphQL = GraphQL.newGraphQL(indexSchema).instrumentation(instrumentation).build();
 
         if (variables == null) {

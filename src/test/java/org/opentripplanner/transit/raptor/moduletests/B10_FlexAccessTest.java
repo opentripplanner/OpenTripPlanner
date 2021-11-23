@@ -25,7 +25,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * With FLEX access Raptor must support access paths with more then one leg.
+ * With FLEX access Raptor must support access paths with more than one leg.
  * These access paths have more transfers that regular paths, hence should not dominate
  * access walking, but only get accepted when they are better on time and/or cost.
  */

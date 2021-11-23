@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -250,16 +249,6 @@ public class Leg {
         streetNotes.add(streetNote);
     }
 
-    public void setTimeZone(TimeZone timeZone) {
-        Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTime(startTime.getTime());
-        startTime = calendar;
-        calendar = Calendar.getInstance(timeZone);
-        calendar.setTime(endTime.getTime());
-        endTime = calendar;
-        agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
-    }
-
     public void addAlert(TransitAlert alert) {
       transitAlerts.add(alert);
     }
@@ -301,10 +290,10 @@ public class Leg {
     return isTransitLeg() ? trip.getOperator() : null;
   }
 
-  /** For transit legs, the the route. For non-transit legs, null. */
+  /** For transit legs, the route. For non-transit legs, null. */
   public Route getRoute() { return isTransitLeg() ? trip.getRoute() : null; }
 
-  /** For transit legs, the the trip. For non-transit legs, null. */
+  /** For transit legs, the trip. For non-transit legs, null. */
   public Trip getTrip() {  return trip; }
 
   /** Should be used for debug logging only */

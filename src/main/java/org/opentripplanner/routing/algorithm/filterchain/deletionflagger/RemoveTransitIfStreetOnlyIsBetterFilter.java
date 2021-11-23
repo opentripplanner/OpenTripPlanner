@@ -14,9 +14,20 @@ import java.util.Optional;
  */
 public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletionFlagger {
 
+    /**
+     *  Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
+     *  to know which filters removed
+     */
+    public static final String TAG = "transit-vs-street-filter";
+
     @Override
     public String name() {
-        return "transit-vs-street-filter";
+        return TAG;
+    }
+
+    @Override
+    public boolean skipAlreadyFlaggedItineraries() {
+        return false;
     }
 
     @Override

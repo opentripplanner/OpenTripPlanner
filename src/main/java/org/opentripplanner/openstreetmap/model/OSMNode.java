@@ -71,4 +71,9 @@ public class OSMNode extends OSMWithTags {
                 || isMotorVehicleExplicitlyDenied()
                 || isGeneralAccessDenied());
     }
+
+    @Override
+    public String getOpenStreetMapLink() {
+        return String.format("https://www.openstreetmap.org/node/%d", getId());
+    }
 }

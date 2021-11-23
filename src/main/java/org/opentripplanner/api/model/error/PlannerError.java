@@ -11,18 +11,14 @@ public class PlannerError {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlannerError.class);
 
-    public int    id;
-    public String msg;
-    public Message message;
-    private List<String> missing = null;
-    private boolean noPath = false;
+    public final int id;
+    public final String msg;
+    public final Message message;
+    public List<String> missing = null;
 
     /** An error where no path has been found, but no points are missing */
-    public PlannerError() {
-        noPath = true;
-    }
-
-    public void setMsg(Message msg) {
+    public PlannerError(Message msg) {
+        this.message = msg;
         this.msg = msg.get();
         this.id  = msg.getId();
     }

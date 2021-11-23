@@ -25,7 +25,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
-import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -36,16 +35,17 @@ import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
@@ -199,10 +199,18 @@ public abstract class GraphPathToItineraryMapper {
 
             var modeChange = lastMode != forwardMode && lastMode != null && forwardMode != null;
             var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
-            var parkingChange = backState.isBikeParked() != forwardState.isBikeParked()
-                    || backState.isCarParked() != forwardState.isCarParked();
+            var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
 
-            if (modeChange || rentalChange || parkingChange) {
+            if (parkingChange) {
+                /* Remove the state for actually parking (traversing VehicleParkingEdge) from the
+                 * states so that the leg from/to edges correspond to the actual entrances.
+                 * The actual time for parking is added to the walking leg in generateLeg().
+                 */
+                legIndexPairs[1] = i;
+                legsIndexes.add(legIndexPairs);
+                legIndexPairs = new int[] {i + 1, states.length - 1};
+            }
+            else if (modeChange || rentalChange) {
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
                 legIndexPairs = new int[] {i, states.length - 1};
@@ -277,7 +285,11 @@ public abstract class GraphPathToItineraryMapper {
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
-        addPlaces(leg, states, requestedLocale);
+        if (flexEdge != null) {
+            FlexLegMapper.addFlexPlaces(leg, flexEdge, requestedLocale);
+        } else {
+            addPlaces(leg, states, requestedLocale);
+        }
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
@@ -301,6 +313,17 @@ public abstract class GraphPathToItineraryMapper {
 
         if (flexEdge != null) {
             FlexLegMapper.fixFlexTripLeg(leg, flexEdge);
+        }
+
+        /* For the from/to vertices to be in the correct place for vehicle parking
+         * the state for actually parking (traversing the VehicleParkEdge) is excluded
+         * from the list of states.
+         * This add the time for parking to the walking leg.
+         */
+        var previousStateIsVehicleParking = states[0].getBackState() != null
+                && states[0].getBackEdge() instanceof VehicleParkingEdge;
+        if (previousStateIsVehicleParking) {
+            leg.startTime = makeCalendar(states[0].getBackState());
         }
 
         return leg;
@@ -452,10 +475,6 @@ public abstract class GraphPathToItineraryMapper {
      * @return The resulting {@link Place} object.
      */
     private static Place makePlace(Vertex vertex, Locale requestedLocale) {
-        if (vertex instanceof TransitStopVertex) {
-            return new Place(((TransitStopVertex) vertex).getStop());
-        }
-
         String name = vertex.getName(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
@@ -464,24 +483,16 @@ public abstract class GraphPathToItineraryMapper {
         if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
             name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
         }
-        Place place = new Place(
-                vertex.getLat(),
-                vertex.getLon(),
-                name
-        );
 
-
-        if (vertex instanceof VehicleRentalStationVertex) {
-            place.vehicleRentalStation = ((VehicleRentalStationVertex) vertex).getStation();
-            LOG.trace("Added bike share Id {} to place", place.vehicleRentalStation.getId());
-            place.vertexType = VertexType.BIKESHARE;
-        } else if (vertex instanceof BikeParkVertex) {
-            place.vertexType = VertexType.BIKEPARK;
+        if (vertex instanceof TransitStopVertex) {
+            return Place.forStop((TransitStopVertex) vertex, name);
+        } else if(vertex instanceof VehicleRentalStationVertex) {
+            return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex, name);
+        } else if (vertex instanceof VehicleParkingEntranceVertex) {
+            return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, name);
         } else {
-            place.vertexType = VertexType.NORMAL;
+            return Place.normal(vertex, name);
         }
-
-        return place;
     }
 
     /**

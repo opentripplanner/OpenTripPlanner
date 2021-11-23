@@ -88,6 +88,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
@@ -111,9 +112,6 @@ public class Graph implements Serializable {
         = new SimpleIntersectionTraversalCostModel(DEFAULT_DRIVING_DIRECTION);
 
     private final OtpProjectInfo projectInfo = projectInfo();
-
-    // TODO Remove this field, use Router.routerId ?
-    public String routerId;
 
     private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
@@ -972,6 +970,10 @@ public class Graph implements Serializable {
 
     public VehicleRentalStationService getVehicleRentalStationService() {
         return getService(VehicleRentalStationService.class);
+    }
+
+    public VehicleParkingService getVehicleParkingService() {
+        return getService(VehicleParkingService.class);
     }
 
     public Collection<Notice> getNoticesByEntity(TransitEntity entity) {

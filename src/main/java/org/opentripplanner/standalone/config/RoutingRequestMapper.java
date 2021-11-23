@@ -24,10 +24,12 @@ public class RoutingRequestMapper {
         // mapping or duplicate exist.
         request.alightSlack = c.asInt("alightSlack", dft.alightSlack);
         request.alightSlackForMode = c.asEnumMap("alightSlackForMode", TransitMode.class, NodeAdapter::asInt);
+        request.allowedVehicleRentalNetworks = c.asTextSet("allowedVehicleRentalNetworks", dft.allowedVehicleRentalNetworks);
         request.bikeRental = c.asBoolean("allowBikeRental", dft.bikeRental);
         request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
+        request.bannedVehicleParkingTags = c.asTextSet("bannedVehicleParkingTags", dft.bannedVehicleParkingTags);
+        request.bannedVehicleRentalNetworks = c.asTextSet("bannedVehicleRentalNetworks", dft.bannedVehicleRentalNetworks);
         request.bikeBoardCost = c.asInt("bikeBoardCost", dft.bikeBoardCost);
-        request.bikeParkAndRide = c.asBoolean("bikeParkAndRide", dft.bikeParkAndRide);
         request.bikeParkTime = c.asInt("bikeParkTime", dft.bikeParkTime);
         request.bikeParkCost = c.asInt("bikeParkCost", dft.bikeParkCost);
         request.bikeReluctance = c.asDouble("bikeReluctance", dft.bikeReluctance);
@@ -51,6 +53,8 @@ public class RoutingRequestMapper {
         request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
         request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
         request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
+        request.carParkCost = c.asInt("carParkCost", dft.carParkCost);
+        request.carParkTime = c.asInt("carParkTime", dft.carParkTime);
         request.carPickupCost = c.asInt("carPickupCost", dft.carPickupCost);
         request.carPickupTime = c.asInt("carPickupTime", dft.carPickupTime);
         request.carReluctance = c.asDouble("carReluctance", dft.carReluctance);
@@ -77,6 +81,7 @@ public class RoutingRequestMapper {
         request.otherThanPreferredRoutesPenalty = c.asInt("otherThanPreferredRoutesPenalty", dft.otherThanPreferredRoutesPenalty);
         request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
         request.pathComparator = c.asText("pathComparator", dft.pathComparator);
+        request.requiredVehicleParkingTags = c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
         request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
         request.stairsReluctance = c.asDouble("stairsReluctance", dft.stairsReluctance);
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
@@ -106,5 +111,6 @@ public class RoutingRequestMapper {
                 "optimizeTransferWaitTime", p.optimizeTransferWaitTime
         );
         p.minSafeWaitTimeFactor = c.asDouble("minSafeWaitTimeFactor", p.minSafeWaitTimeFactor);
+        p.backTravelWaitTimeFactor = c.asDouble("backTravelWaitTimeFactor", p.backTravelWaitTimeFactor);
     }
 }
