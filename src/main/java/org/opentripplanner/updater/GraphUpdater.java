@@ -18,26 +18,26 @@ public interface GraphUpdater {
      * Graph updaters must be aware of their manager to be able to execute GraphWriterRunnables.
      * GraphUpdaterConfigurator should take care of calling this function.
      */
-    void setGraphUpdaterManager (GraphUpdaterManager updaterManager);
+    void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph);
 
     /**
      * Here the updater can be initialized. If it throws, the updater won't be started (i.e. the run
      * method won't be called). All updaters' setup methods will be run sequentially in a single-threaded manner
      * before updates begin, in order to avoid concurrent reads/writes.
      */
-    void setup (Graph graph) throws Exception;
+    void setup(Graph graph) throws Exception;
 
     /**
      * This method will run in its own thread. It pulls or receives updates and applies them to the graph.
      * It must perform any writes to the graph by passing GraphWriterRunnables to GraphUpdaterManager.execute().
      * This queues up the write operations, ensuring that only one updater performs writes at a time.
      */
-    void run () throws Exception;
+    void run() throws Exception;
 
     /**
      * Here the updater can clean up after itself.
      */
-    void teardown ();
+    void teardown();
 
     /**
      * Allow clients to wait for all realtime data to be loaded before submitting any travel plan requests.
@@ -45,7 +45,7 @@ public interface GraphUpdater {
      * TODO OTP2 This is really a bit backward. We should just run() the updaters once before scheduling them to poll,
      *           and not bring the router online until they have finished.
      */
-    default boolean isPrimed () {
+    default boolean isPrimed() {
         return true;
     }
 
