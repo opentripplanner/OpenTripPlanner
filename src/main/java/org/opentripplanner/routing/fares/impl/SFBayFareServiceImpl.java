@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.routing.fares.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +62,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
                     bartBlock = new ArrayList<Ride>();
                 }
                 bartBlock.add(ride);
-                alightedBart = ride.endTime;
+                alightedBart = ride.endTime.toEpochSecond();
                 alightedBartStop = ride.lastStop.getId().getId();
             } else { // non-BART agency
                 if (bartBlock != null) {
@@ -75,10 +75,10 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
                         // no transfers issued or accepted
                         cost += CABLE_CAR_FARE;
                     } else if (sfmtaTransferIssued == null || 
-                        sfmtaTransferIssued + SFMTA_TRANSFER_DURATION < ride.endTime) {
-                        sfmtaTransferIssued = ride.startTime;
+                        sfmtaTransferIssued + SFMTA_TRANSFER_DURATION < ride.endTime.toEpochSecond()) {
+                        sfmtaTransferIssued = ride.startTime.toEpochSecond();
                         if (alightedBart != null &&
-                            alightedBart + BART_TRANSFER_DURATION > ride.startTime &&
+                            alightedBart + BART_TRANSFER_DURATION > ride.startTime.toEpochSecond() &&
                             SFMTA_BART_TRANSFER_STOPS.contains(alightedBartStop)) {
                             // discount for BART to Muni transfer
                             if (alightedBartStop.equals(SFMTA_BART_FREE_TRANSFER_STOP)) {

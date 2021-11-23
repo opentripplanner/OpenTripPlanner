@@ -2,8 +2,8 @@ package org.opentripplanner.ext.flex;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import java.util.Locale;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
@@ -13,6 +13,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
@@ -26,7 +27,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -67,8 +67,17 @@ public class FlexRouter {
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = graph.index.getFlexIndex();
-    this.accessFlexPathCalculator = new StreetFlexPathCalculator(graph, false);
-    this.egressFlexPathCalculator = new StreetFlexPathCalculator(graph, true);
+
+    if(graph.hasStreets) {
+      this.accessFlexPathCalculator = new StreetFlexPathCalculator(graph, false);
+      this.egressFlexPathCalculator = new StreetFlexPathCalculator(graph, true);
+    } else {
+      // this is only really useful in tests. in real world scenarios you're unlikely to get useful
+      // results if you don't have streets
+      this.accessFlexPathCalculator = new DirectFlexPathCalculator(graph);
+      this.egressFlexPathCalculator = new DirectFlexPathCalculator(graph);
+    }
+
 
     ZoneId tz = graph.getTimeZone().toZoneId();
     LocalDate searchDate = LocalDate.ofInstant(searchInstant, tz);
@@ -99,8 +108,6 @@ public class FlexRouter {
     Multimap<StopLocation, NearbyStop> streetEgressByStop = HashMultimap.create();
     streetEgresses.forEach(it -> streetEgressByStop.put(it.stop, it));
 
-    Set<StopLocation> egressStops = streetEgressByStop.keySet();
-
     Collection<Itinerary> itineraries = new ArrayList<>();
 
     for (FlexAccessTemplate template : this.flexAccessTemplates) {
@@ -109,6 +116,11 @@ public class FlexRouter {
         for(NearbyStop egress : streetEgressByStop.get(transferStop)) {
           Itinerary itinerary = template.createDirectItinerary(egress, arriveBy, departureTime, startOfTime);
           if (itinerary != null) {
+            var fareService = graph.getService(FareService.class);
+            if(fareService != null) {
+              var fare = fareService.getCost(itinerary);
+              itinerary.fare = fare;
+            }
             itineraries.add(itinerary);
           }
         }

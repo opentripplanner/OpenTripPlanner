@@ -1,20 +1,8 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.routing.fares.impl;
 
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.FareComponent;
-import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +12,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareComponent;
+import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.routing.core.WrappedCurrency;
+import org.opentripplanner.routing.fares.FareService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Holds information for doing the graph search on fares */
 class FareSearch {
@@ -89,9 +89,9 @@ public class DefaultFareServiceImpl implements FareService {
     }
 
     @Override
-    public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
+    public Fare getCost(Itinerary itinerary) {
 
-        List<Ride> rides = RideMapper.ridesForRaptorPath(path, transitLayer);
+        List<Ride> rides = RideMapper.ridesForItinerary(itinerary);
 
         // If there are no rides, there's no fare.
         if (rides.size() == 0) {
@@ -236,13 +236,13 @@ public class DefaultFareServiceImpl implements FareService {
         int transfersUsed = -1;
         
         Ride firstRide = rides.get(0);
-        long   startTime = firstRide.startTime;
+        ZonedDateTime startTime = firstRide.startTime;
         String startZone = firstRide.startZone;
         String endZone = firstRide.endZone;
         // stops don't really have an agency id, they have the per-feed default id
         String feedId = firstRide.firstStop.getId().getFeedId();
-        long lastRideStartTime = firstRide.startTime;
-        long lastRideEndTime = firstRide.endTime;
+        ZonedDateTime lastRideStartTime = firstRide.startTime;
+        ZonedDateTime lastRideEndTime = firstRide.endTime;
         for (Ride ride : rides) {
             if ( ! ride.firstStop.getId().getFeedId().equals(feedId)) {
                 LOG.debug("skipped multi-feed ride sequence {}", rides);
@@ -259,8 +259,8 @@ public class DefaultFareServiceImpl implements FareService {
         
         FareAttribute bestAttribute = null;
         float bestFare = Float.POSITIVE_INFINITY;
-        long tripTime = lastRideStartTime - startTime;
-        long journeyTime = lastRideEndTime - startTime;
+        Duration tripTime = Duration.between(startTime, lastRideStartTime);
+        Duration journeyTime = Duration.between(startTime, lastRideEndTime);
         	
         // find the best fare that matches this set of rides
         for (FareRuleSet ruleSet : fareRules) {
@@ -278,11 +278,11 @@ public class DefaultFareServiceImpl implements FareService {
                 // assume transfers are evaluated at boarding time,
                 // as trimet does
                 if (attribute.isTransferDurationSet() && 
-                    tripTime > attribute.getTransferDuration()) {
+                    tripTime.getSeconds() > attribute.getTransferDuration()) {
                     continue;
                 }
                 if (attribute.isJourneyDurationSet() && 
-                    journeyTime > attribute.getJourneyDuration()) {
+                    journeyTime.getSeconds() > attribute.getJourneyDuration()) {
                     continue;
                 }
                 float newFare = getFarePrice(attribute, fareType);

@@ -1,20 +1,17 @@
-package org.opentripplanner.routing.impl;
-
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.opentripplanner.routing.fares.impl;
 
 import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.Money;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
@@ -193,13 +190,13 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     @Override
-    public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
+    public Fare getCost(Itinerary itinerary) {
         Currency euros = Currency.getInstance("EUR");
         // Use the usual process from the default fare service, but force the currency to Euros.
         // The default process assumes there is only one currency per set of fare rules and looks at any old rule to
         // guess what the currency is. This doesn't work on the Dutch data which has distances mixed in with Euros to
         // account for distance-derived fares.
-        Fare fare = super.getCost(path, transitLayer);
+        Fare fare = super.getCost(itinerary);
         if (fare != null) {
             for (Money money : fare.fare.values()) {
                 money.setCurrency(euros);
@@ -247,7 +244,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 }
 
         		/* The entrance Fee applies if the transfer time ends before the new trip starts. */
-                if ((alightedTariefEenheden + TRANSFER_DURATION) < ride.startTime) {
+                if ((alightedTariefEenheden + TRANSFER_DURATION) < ride.startTime.toEpochSecond()) {
                     LOG.trace("3. Exceeded Transfer Time");
                     cost += getCostByUnits(lastFareZone, units, prevSumUnits, fareRules);
                     if (cost == Float.POSITIVE_INFINITY) { return cost; }
@@ -268,7 +265,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                     startTariefEenheden = ride.startZone;
                 }
 
-                alightedTariefEenheden = ride.endTime;
+                alightedTariefEenheden = ride.endTime.toEpochSecond();
                 endTariefEenheden = ride.endZone;
                 lastAgencyId = ride.agency;
 
@@ -279,13 +276,13 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
                 mustHaveCheckedOut = (startTariefEenheden != null);
 
                 /* The entranceFee applies if the transfer time ends before the new trip starts. */
-                boolean entranceFee = ((alightedEasyTrip + TRANSFER_DURATION) < ride.startTime);
+                boolean entranceFee = ((alightedEasyTrip + TRANSFER_DURATION) < ride.startTime.toEpochSecond());
 
                 /* EasyTrip will always calculate its price per leg */
                 cost += getEasyTripFareByLineFromTo(ride.route.getId(), ride.startZone, ride.endZone, entranceFee, fareRules);
                 if (cost == Float.POSITIVE_INFINITY) { return cost; }
 
-                alightedEasyTrip = ride.endTime;
+                alightedEasyTrip = ride.endTime.toEpochSecond();
             }
         }
 

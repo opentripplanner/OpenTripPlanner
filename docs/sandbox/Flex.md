@@ -16,6 +16,7 @@
 - Fix performance issues with the StreetFlexPathCalculator [#3460](https://github.com/opentripplanner/OpenTripPlanner/pull/3460)
 - Improve performance of flex access/egress routing [#3661](https://github.com/opentripplanner/OpenTripPlanner/pull/3661)
 - Allow getting on and off at the same flex stop time [#3720](https://github.com/opentripplanner/OpenTripPlanner/pull/3720)
+- Calculate fare for flex routes [#3743](https://github.com/opentripplanner/OpenTripPlanner/pull/3743)
 
 ## Documentation
 To enable this turn on `FlexRouting` as a feature in `otp-config.json`. 
