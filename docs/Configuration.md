@@ -674,7 +674,7 @@ Any public field or setter method in this class can be given a default value usi
 
 ### Tuning transfer optimization
 
-The main purpose of transfer optimization is to handle cases where it is possible to transfer between two routes at more than one point (pair of stops). The transfer optimization ensure that transfers occur at the best possible location. By post-processing all paths returned by the router, OTP can apply sophisticated calculations that are too slow or not algorithmically valid within Raptor. Transfers are optimized before the paths are passed are forwarded to the itinerary-filter-chain.
+The main purpose of transfer optimization is to handle cases where it is possible to transfer between two routes at more than one point (pair of stops). The transfer optimization ensures that transfers occur at the best possible location. By post-processing all paths returned by the router, OTP can apply sophisticated calculations that are too slow or not algorithmically valid within Raptor. Transfers are optimized before the paths are passed to the itinerary-filter-chain.
 
 For a detailed description of the design and the optimization calculations see the [design documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md) (dev-2.x latest).
 

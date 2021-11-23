@@ -67,7 +67,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
         stopNameResolver,
         transferService,
         transitDataProvider,
-            stopBoardAlightCosts,
+        stopBoardAlightCosts,
         raptorRequest,
         config
     ).createOptimizeTransferService();
