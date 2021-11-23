@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.api.resource.TransitTimingOutput;
-import org.opentripplanner.ext.actuator.ActuatorAPI;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,6 +94,7 @@ public class DebugTimingAggregator {
    * Record the time when the worker initialization is done, and the direct street router starts.
    */
   public void finishedPrecalculating() {
+    if (startedCalculating == null) { return; }
     precalculationTime = startedCalculating.stop(preCalculationTimer);
     log("┌  Routing initialization", precalculationTime);
   }
@@ -107,6 +106,7 @@ public class DebugTimingAggregator {
 
   /** Record the time when we finished the direct street router search. */
   public void finishedDirectStreetRouter() {
+    if (startedDirectStreetRouter == null) { return; }
     directStreetRouterTime = startedDirectStreetRouter.stop(directStreetRouterTimer);
   }
 
@@ -117,6 +117,7 @@ public class DebugTimingAggregator {
 
   /** Record the time when we finished the direct flex router search. */
   public void finishedDirectFlexRouter() {
+    if (startedDirectFlexRouter == null) { return; }
     directFlexRouterTime = startedDirectFlexRouter.stop(directFlexRouterTimer);
   }
 
@@ -130,6 +131,7 @@ public class DebugTimingAggregator {
    */
   public void finishedPatternFiltering() {
     finishedPatternFiltering = Timer.start(clock);
+    if (startedTransitRouterTime == null) { return; }
     tripPatternFilterTime = startedTransitRouterTime.stop(tripPatternFilterTimer);
   }
 
@@ -138,6 +140,7 @@ public class DebugTimingAggregator {
   }
 
   public void finishedAccessCalculating() {
+    if (startedAccessCalculating == null) { return; }
     accessTime = startedAccessCalculating.stop(accessTimer);
   }
 
@@ -146,6 +149,7 @@ public class DebugTimingAggregator {
   }
 
   public void finishedEgressCalculating() {
+    if (startedEgressCalculating == null) { return; }
     egressTime = startedEgressCalculating.stop(egressTimer);
   }
 
@@ -154,6 +158,7 @@ public class DebugTimingAggregator {
    */
   public void finishedAccessEgress(int numAccesses, int numEgresses) {
     finishedAccessEgress = Timer.start(clock);
+    if (finishedPatternFiltering == null) { return; }
     accessEgressTime = finishedPatternFiltering.stop(accessEgressTimer);
     this.numAccesses = numAccesses;
     numAccessesDistribution.record(numAccesses);
@@ -166,6 +171,7 @@ public class DebugTimingAggregator {
    */
   public void finishedRaptorSearch() {
     finishedRaptorSearch = Timer.start(clock);
+    if (finishedAccessEgress == null) { return; }
     raptorSearchTime = finishedAccessEgress.stop(raptorSearchTimer);
   }
 
@@ -173,15 +179,18 @@ public class DebugTimingAggregator {
    * Record the time when we have created internal itinerary objects from the raptor responses.
    */
   public void finishedItineraryCreation() {
+    if (finishedRaptorSearch == null) { return; }
     itineraryCreationTime = finishedRaptorSearch.stop(itineraryCreationTimer);
   }
 
   /** Record the time when we finished the transit router search */
   public void finishedTransitRouter() {
+    if (startedTransitRouterTime == null) { return; }
     transitRouterTime = startedTransitRouterTime.stop(transitRouterTimer);
   }
 
   public void finishedRouting() {
+    if (startedCalculating == null) { return; }
     long routingTotalTime = startedCalculating.stop(routingTotalTimer);
 
     finishedRouters = Timer.start(clock);
@@ -207,6 +216,7 @@ public class DebugTimingAggregator {
   /** Record the time when we finished filtering the paths for this request. */
   public void finishedFiltering() {
     finishedFiltering = Timer.start(clock);
+    if (finishedRouters == null) { return; }
     filteringTime = finishedRouters.stop(filteringTimer);
     log("├  Filtering itineraries", filteringTime);
   }
@@ -214,6 +224,7 @@ public class DebugTimingAggregator {
   /** Record the time when we finished converting the internal model to API classes */
   @SuppressWarnings("Convert2MethodRef")
   public DebugOutput finishedRendering() {
+    if (finishedFiltering == null || startedCalculating == null) { return null; }
     renderingTime =  finishedFiltering.stop(renderingTimer);
     requestTotalTime = startedCalculating.stop(requestTotalTimer);
     log("├  Converting model objects", renderingTime);
