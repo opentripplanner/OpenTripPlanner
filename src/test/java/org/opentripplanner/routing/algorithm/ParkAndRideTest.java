@@ -1,9 +1,11 @@
 package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -11,6 +13,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 
 public abstract class ParkAndRideTest extends GraphRoutingTest {
 
@@ -26,6 +29,16 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
                         s.getElapsedTimeSeconds()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    protected void assertPathWithParking(StreetVertex fromVertex, StreetVertex toVertex, StreetMode streetMode, Set<String> bannedTags, Set<String> requiredTags) {
+        assertNotEquals(List.of(), runStreetSearchAndCreateDescriptor(fromVertex, toVertex, streetMode, false, bannedTags, requiredTags, false));
+        assertNotEquals(List.of(), runStreetSearchAndCreateDescriptor(fromVertex, toVertex, streetMode, false, bannedTags, requiredTags, true));
+    }
+
+    protected void assertNoPathWithParking(StreetVertex fromVertex, StreetVertex toVertex, StreetMode streetMode, Set<String> bannedTags, Set<String> requiredTags) {
+        assertEquals(List.of(), runStreetSearchAndCreateDescriptor(fromVertex, toVertex, streetMode, false, bannedTags, requiredTags, false));
+        assertEquals(List.of(), runStreetSearchAndCreateDescriptor(fromVertex, toVertex, streetMode, false, bannedTags, requiredTags, true));
     }
 
     protected void assertEmptyPath(
@@ -72,8 +85,8 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
             List<String> departAtDescriptor,
             List<String> arriveByDescriptor
     ) {
-        List<String> departAt = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, streetMode, requireWheelChairAccessible, false);
-        List<String> arriveBy = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, streetMode, requireWheelChairAccessible, true);
+        var departAt = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, streetMode, requireWheelChairAccessible, Set.of(), Set.of(), false);
+        var arriveBy = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, streetMode, requireWheelChairAccessible, Set.of(), Set.of(), true);
 
         assertEquals(departAtDescriptor, departAt, "departAt path");
         assertEquals(arriveByDescriptor, arriveBy, "arriveBy path");
@@ -84,6 +97,8 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
             Vertex toVertex,
             StreetMode streetMode,
             boolean requireWheelChairAccessible,
+            Set<String> bannedTags,
+            Set<String> requiredTags,
             boolean arriveBy
     ) {
         var options = new RoutingRequest().getStreetSearchRequest(streetMode);
@@ -92,6 +107,8 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
         options.carParkCost = 240;
         options.carParkTime = 180;
         options.wheelchairAccessible = requireWheelChairAccessible;
+        options.bannedVehicleParkingTags = bannedTags;
+        options.requiredVehicleParkingTags = requiredTags;
         options.arriveBy = arriveBy;
         options.setRoutingContext(graph, fromVertex, toVertex);
 

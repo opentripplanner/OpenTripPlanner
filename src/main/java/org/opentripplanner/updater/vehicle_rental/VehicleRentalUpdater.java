@@ -1,25 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental;
 
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
-import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
-import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +7,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Dynamic vehicle-rental station updater which updates the Graph with vehicle rental stations from one VehicleRentalDataSource.
@@ -35,7 +34,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
 
-    private GraphUpdaterManager updaterManager;
+    private WriteToGraphCallback saveResultOnGraph;
 
     Map<FeedScopedId, VehicleRentalStationVertex> verticesByStation = new HashMap<>();
 
@@ -63,8 +62,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+        this.saveResultOnGraph = saveResultOnGraph;
     }
 
     @Override
@@ -88,7 +87,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         // Create graph writer runnable to apply these stations to the graph
         VehicleRentalGraphWriterRunnable graphWriterRunnable = new VehicleRentalGraphWriterRunnable(stations);
-        updaterManager.execute(graphWriterRunnable);
+        saveResultOnGraph.execute(graphWriterRunnable);
     }
 
     @Override

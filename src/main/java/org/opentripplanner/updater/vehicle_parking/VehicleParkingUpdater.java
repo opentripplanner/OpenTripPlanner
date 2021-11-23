@@ -1,24 +1,5 @@
 package org.opentripplanner.updater.vehicle_parking;
 
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
-import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.PollingGraphUpdater;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +8,24 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
+import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.WriteToGraphCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Graph updater that dynamically sets availability information on vehicle parking lots.
@@ -36,7 +35,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(VehicleParkingUpdater.class);
 
-    private GraphUpdaterManager updaterManager;
+    private WriteToGraphCallback saveResultOnGraph;
 
     private final Map<VehicleParking, List<VehicleParkingEntranceVertex>> verticesByPark = new HashMap<>();
 
@@ -57,8 +56,8 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+        this.saveResultOnGraph = saveResultOnGraph;
     }
 
     @Override
@@ -80,7 +79,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
 
         // Create graph writer runnable to apply these stations to the graph
         VehicleParkingGraphWriterRunnable graphWriterRunnable = new VehicleParkingGraphWriterRunnable(vehicleParkings, verticesByPark.keySet());
-        updaterManager.execute(graphWriterRunnable);
+        saveResultOnGraph.execute(graphWriterRunnable);
     }
 
     @Override

@@ -16,7 +16,6 @@ import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import javax.ws.rs.GET;
@@ -128,13 +127,13 @@ public class ActuatorAPI {
     @Path("/health")
     public Response health() {
         if (router.graph.updaterManager != null) {
-            Collection<String> waitingUpdaters = router.graph.updaterManager.waitingUpdaters();
+            var listUnprimedUpdaters = router.graph.updaterManager.listUnprimedUpdaters();
 
-            if (!waitingUpdaters.isEmpty()) {
-                LOG.info("Graph ready, waiting for updaters: {}", waitingUpdaters);
+            if (!listUnprimedUpdaters.isEmpty()) {
+                LOG.info("Graph ready, waiting for updaters: {}", listUnprimedUpdaters);
                 throw new WebApplicationException(Response
                     .status(Response.Status.NOT_FOUND)
-                    .entity("Graph ready, waiting for updaters: " + waitingUpdaters + "\n")
+                    .entity("Graph ready, waiting for updaters: " + listUnprimedUpdaters + "\n")
                     .type("text/plain")
                     .build());
             }

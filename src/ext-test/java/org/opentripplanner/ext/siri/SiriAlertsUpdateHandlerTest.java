@@ -1,5 +1,11 @@
 package org.opentripplanner.ext.siri;
 
+import java.math.BigInteger;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.model.FeedScopedId;
@@ -13,14 +19,27 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import uk.org.ifopt.siri20.StopPlaceRef;
-import uk.org.siri.siri20.*;
-
-import java.math.BigInteger;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import uk.org.siri.siri20.AffectedLineStructure;
+import uk.org.siri.siri20.AffectedRouteStructure;
+import uk.org.siri.siri20.AffectedStopPlaceStructure;
+import uk.org.siri.siri20.AffectedStopPointStructure;
+import uk.org.siri.siri20.AffectedVehicleJourneyStructure;
+import uk.org.siri.siri20.AffectsScopeStructure;
+import uk.org.siri.siri20.DataFrameRefStructure;
+import uk.org.siri.siri20.DefaultedTextStructure;
+import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
+import uk.org.siri.siri20.HalfOpenTimestampOutputRangeStructure;
+import uk.org.siri.siri20.InfoLinkStructure;
+import uk.org.siri.siri20.LineRef;
+import uk.org.siri.siri20.PtSituationElement;
+import uk.org.siri.siri20.RoutePointTypeEnumeration;
+import uk.org.siri.siri20.ServiceDelivery;
+import uk.org.siri.siri20.SeverityEnumeration;
+import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
+import uk.org.siri.siri20.SituationNumber;
+import uk.org.siri.siri20.StopPointRef;
+import uk.org.siri.siri20.VehicleJourneyRef;
+import uk.org.siri.siri20.WorkflowStatusEnumeration;
 
 public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   private static final String FEED_ID = "FEED";
@@ -52,7 +71,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         createAffectsStop(stopConditions, stopId.getId())
     );
 
-    Integer priorityValue = Integer.valueOf(3);
+    Integer priorityValue = 3;
     ptSituation.setPriority(BigInteger.valueOf(priorityValue));
 
     InfoLinkStructure infoLink = new InfoLinkStructure();
@@ -107,7 +126,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void init() {
     if (routingService == null) {
       routingService = new RoutingService(graph);
-      graph.updaterManager = new GraphUpdaterManager(graph);
+      graph.updaterManager = new GraphUpdaterManager(graph, List.of());
 
     }
     else {
