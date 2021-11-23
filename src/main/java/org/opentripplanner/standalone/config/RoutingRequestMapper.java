@@ -24,8 +24,11 @@ public class RoutingRequestMapper {
         // mapping or duplicate exist.
         request.alightSlack = c.asInt("alightSlack", dft.alightSlack);
         request.alightSlackForMode = c.asEnumMap("alightSlackForMode", TransitMode.class, NodeAdapter::asInt);
+        request.allowedVehicleRentalNetworks = c.asTextSet("allowedVehicleRentalNetworks", dft.allowedVehicleRentalNetworks);
         request.bikeRental = c.asBoolean("allowBikeRental", dft.bikeRental);
         request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
+        request.bannedVehicleParkingTags = c.asTextSet("bannedVehicleParkingTags", dft.bannedVehicleParkingTags);
+        request.bannedVehicleRentalNetworks = c.asTextSet("bannedVehicleRentalNetworks", dft.bannedVehicleRentalNetworks);
         request.bikeBoardCost = c.asInt("bikeBoardCost", dft.bikeBoardCost);
         request.bikeParkTime = c.asInt("bikeParkTime", dft.bikeParkTime);
         request.bikeParkCost = c.asInt("bikeParkCost", dft.bikeParkCost);
@@ -78,6 +81,7 @@ public class RoutingRequestMapper {
         request.otherThanPreferredRoutesPenalty = c.asInt("otherThanPreferredRoutesPenalty", dft.otherThanPreferredRoutesPenalty);
         request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
         request.pathComparator = c.asText("pathComparator", dft.pathComparator);
+        request.requiredVehicleParkingTags = c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
         request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
         request.stairsReluctance = c.asDouble("stairsReluctance", dft.stairsReluctance);
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);

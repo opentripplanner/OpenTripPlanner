@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -20,7 +21,6 @@ import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
@@ -173,7 +173,7 @@ public class NodeAdapter {
 
     public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
         if(!exist(paramName)) return defaultValue;
-        return arrayAsList(paramName, JsonNode::asText).stream().collect(Collectors.toSet());
+        return new HashSet<>(arrayAsList(paramName, JsonNode::asText));
     }
 
     public RequestModes asRequestModes(String paramName, RequestModes defaultValue) {

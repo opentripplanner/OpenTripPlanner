@@ -2,12 +2,14 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.Locale;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 
 /**
  * This represents the connection between a street vertex and a vehicle parking vertex.
@@ -47,6 +49,8 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     public State traverse(State s0) {
+        final var options = s0.getOptions();
+
         // Disallow traversing two StreetBikeParkLinks in a row.
         // Prevents router using bike rental stations as shortcuts to get around
         // turn restrictions.
@@ -64,10 +68,31 @@ public class StreetVehicleParkingLink extends Edge {
             return null;
         }
 
+        var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
+        if (hasMissingRequiredTags(options, vehicleParking) || hasBannedTags(options, vehicleParking)) {
+            return null;
+        }
+
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(1);
         s1.setBackMode(null);
         return s1.makeState();
+    }
+
+    private boolean hasBannedTags(RoutingRequest options, VehicleParking vehicleParking) {
+        if (options.bannedVehicleParkingTags.isEmpty()) {
+            return false;
+        }
+
+        return vehicleParking.getTags().stream().anyMatch(options.bannedVehicleParkingTags::contains);
+    }
+
+    private boolean hasMissingRequiredTags(RoutingRequest options, VehicleParking vehicleParking) {
+        if (options.requiredVehicleParkingTags.isEmpty()) {
+            return false;
+        }
+
+        return !vehicleParking.getTags().containsAll(options.requiredVehicleParkingTags);
     }
 
     public String toString() {
