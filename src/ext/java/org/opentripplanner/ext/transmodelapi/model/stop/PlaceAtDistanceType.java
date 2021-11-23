@@ -7,6 +7,7 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -72,17 +73,21 @@ public class PlaceAtDistanceType {
           ), p.distance))
           .collect(Collectors.toList());
 
-      List<PlaceAtDistance> parentStations = stations.stream()
+      if ("parent".equals(multiModalMode)) {
+        // Replace monomodal children with their multimodal parents, if it exists
+        stations = stations.stream()
+          .map(p -> {
+            MultiModalStation parent = routingService.getMultiModalStationForStations().get(p.place);
+            return parent != null ? new PlaceAtDistance(parent, p.distance) : p;
+          })
+          .collect(Collectors.toList());
+      } else if ("all".equals(multiModalMode)) {
+        // Add multimodal parents in addition to their monomodal children
+        List<PlaceAtDistance> parentStations = stations.stream()
           .filter(p -> routingService.getMultiModalStationForStations().containsKey(p.place))
           .map(p -> new PlaceAtDistance( routingService.getMultiModalStationForStations().get(p.place), p.distance))
           .collect(Collectors.toList());
 
-      if ("parent".equals(multiModalMode)) {
-        // Replace monomodal children with their multimodal parents
-        stations = parentStations;
-      }
-      else if ("all".equals(multiModalMode)) {
-        // Add multimodal parents in addition to their monomodal children
         places.addAll(parentStations);
       }
 
