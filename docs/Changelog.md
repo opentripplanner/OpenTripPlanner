@@ -84,6 +84,7 @@
 - Add cost to maximize wait-time and avoid back-travel in optimize transfers [#3654](https://github.com/opentripplanner/OpenTripPlanner/pull/3654)
 - Calculate fares from itineraries not Raptor paths, calculate flex fares [#3743](https://github.com/opentripplanner/OpenTripPlanner/pull/3743)
 - Logging first time instance reports it is ready to use [#3733](https://github.com/opentripplanner/OpenTripPlanner/pull/3733)
+- Allow limiting the used vehicle rentals and parkings [#3746](https://github.com/opentripplanner/OpenTripPlanner/pull/3746)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
