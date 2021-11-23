@@ -288,6 +288,8 @@ public abstract class GraphPathToTripPlanConverter {
                         computeAccessibilityScore(trip, currentLeg, nextLeg, request);
             }
             else if (currentLeg.mode.equals("WALK") && request.wheelchairAccessible) {
+                // at the moment we don't compute the walking score at all and add a dummy value instead
+                // in the future we will take the slope into account
                 currentLeg.accessibilityScore = 0.5f;
             }
         }
