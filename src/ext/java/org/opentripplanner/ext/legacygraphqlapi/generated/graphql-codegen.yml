@@ -23,7 +23,7 @@ config:
     ID: graphql.relay.Relay.ResolvedGlobalId
     Long: Long
     Polyline: String
-    GeoJson: org.locationtech.jts.geom.GeometryCollection
+    GeoJson: org.locationtech.jts.geom.Geometry
   mappers:
     Agency: org.opentripplanner.model.Agency#Agency
     Alert: org.opentripplanner.routing.alertpatch.TransitAlert#TransitAlert
