@@ -10,7 +10,7 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
-import org.opentripplanner.ext.readiness_endpoint.ActuatorAPI;
+import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 

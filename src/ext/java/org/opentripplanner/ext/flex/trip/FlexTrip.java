@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.flex.trip;
 
+import java.util.Set;
+import java.util.stream.Stream;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
@@ -9,10 +12,6 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-
-import java.util.Collection;
-import java.util.stream.Stream;
-import org.opentripplanner.ext.flex.FlexParameters;
 
 /**
  * This class represents the different variations of what is considered flexible transit, and its
@@ -40,7 +39,15 @@ public abstract class FlexTrip extends TransitEntity {
 
   public abstract int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime);
 
-  public abstract Collection<StopLocation> getStops();
+  /**
+   * Returns all the stops that are in this trip.
+   *
+   * Note that they are in no specific order and don't correspond 1-to-1 to the stop times of the
+   * trip.
+   *
+   * Location groups are expanded into their constituent stops.
+   */
+  public abstract Set<StopLocation> getStops();
 
   public Trip getTrip() {
     return trip;

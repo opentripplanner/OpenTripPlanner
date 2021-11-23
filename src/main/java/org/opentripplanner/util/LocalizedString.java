@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -34,9 +35,9 @@ public class LocalizedString implements I18NString, Serializable {
         key_tag_names = ArrayListMultimap.create();
     }
     //Key which specifies translation
-    private String key;
+    private final String key;
     //Values with which tagNames are replaced in translations.
-    private String[] params;
+    private final String[] params;
 
     /**
      * Creates String which can be localized
@@ -114,6 +115,13 @@ public class LocalizedString implements I18NString, Serializable {
         return other instanceof LocalizedString &&
                 key.equals(((LocalizedString) other).key) &&
                 Arrays.equals(params, ((LocalizedString) other).params);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(key);
+        result = 31 * result + Arrays.hashCode(params);
+        return result;
     }
 
     /**

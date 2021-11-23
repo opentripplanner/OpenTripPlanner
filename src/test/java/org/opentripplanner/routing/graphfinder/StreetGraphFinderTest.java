@@ -16,19 +16,15 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
 class StreetGraphFinderTest extends GraphRoutingTest {
 
     private TransitStopVertex S1, S2, S3;
     private IntersectionVertex A, B, C, D;
     private VehicleRentalStationVertex BR1, BR2;
-    private BikeParkVertex BP1;
-    private ParkAndRideVertex PR1, PR2;
     private RoutingService routingService;
     private StreetGraphFinder graphFinder;
     private Route R1, R2;
@@ -51,24 +47,34 @@ class StreetGraphFinderTest extends GraphRoutingTest {
                 BR1 = vehicleRentalStation("BR1", 47.500, 18.999);
                 BR2 = vehicleRentalStation("BR2", 47.520, 18.999);
 
-                BP1 = bikePark("BP1", 47.520, 18.999);
-
-                PR1 = carPark("PR1", 47.510, 18.999);
-                PR2 = carPark("PR2", 47.530, 18.999);
-
                 A = intersection("A", 47.500, 19.00);
                 B = intersection("B", 47.510, 19.00);
                 C = intersection("C", 47.520, 19.00);
                 D = intersection("D", 47.530, 19.00);
 
+                vehicleParking("BP1", 47.520, 18.999, true, false,
+                        List.of(
+                                vehicleParkingEntrance(C, "BP1 Entrance", false, true)
+                        )
+                );
+
+                vehicleParking("PR1", 47.510, 18.999, false, true,
+                        List.of(
+                                vehicleParkingEntrance(B, "PR1 Entrance", true, true)
+                        )
+                );
+
+                vehicleParking("PR2", 47.530, 18.999, false, true,
+                        List.of(
+                                vehicleParkingEntrance(D, "PR2 Entrance", true, true)
+                        )
+                );
+
                 biLink(A, S1);
                 biLink(A, BR1);
                 biLink(B, S2);
-                biLink(B, PR1);
                 biLink(C, S3);
-                biLink(C, BP1);
                 biLink(C, BR2);
-                biLink(D, PR2);
 
                 street(A, B, 100, StreetTraversalPermission.ALL);
                 street(B, C, 100, StreetTraversalPermission.ALL);

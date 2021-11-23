@@ -77,7 +77,7 @@ public class PlannerResource extends RoutingResource {
             res = routingService.route(request, router);
 
             // Map to API
-            TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale);
+            TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale, request.showIntermediateStops);
             response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
             response.setMetadata(TripSearchMetadataMapper.mapTripSearchMetadata(res.getMetadata()));
             if (!res.getRoutingErrors().isEmpty()) {
@@ -94,8 +94,7 @@ public class PlannerResource extends RoutingResource {
         }
         catch (Exception e) {
             LOG.error("System error", e);
-            PlannerError error = new PlannerError();
-            error.setMsg(Message.SYSTEM_ERROR);
+            PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
             response.setError(error);
         }
 

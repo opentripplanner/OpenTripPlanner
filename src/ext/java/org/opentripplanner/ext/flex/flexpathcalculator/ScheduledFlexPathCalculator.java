@@ -4,7 +4,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
- * Calculate the driving times based on the shcheduled timetable for the route.
+ * Calculate the driving times based on the scheduled timetable for the route.
  */
 public class ScheduledFlexPathCalculator implements FlexPathCalculator {
   private final FlexPathCalculator flexPathCalculator;

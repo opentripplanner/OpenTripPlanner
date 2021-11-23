@@ -731,7 +731,6 @@ config key | description | value type | value default
 `groupSimilarityKeepOne` | Pick ONE itinerary from each group after putting itineraries that is 85% similar together. | double | `0.85` (85%)
 `groupSimilarityKeepThree` | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
 `groupedOtherThanSameLegsMaxCostMultiplier` | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.  | double | `2.0` (2x cost)
-`minSafeTransferTimeFactor` | Add an additional cost for short transfers on long transit itineraries. See javaDoc on `AddMinSafeTransferCostFilter` details. | double | `0.0`
 `transitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher than the max-limit is dropped from the result set. None transit itineraries is excluded from the filter. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`  | linear function | `3600 + 2.0 x`
 `nonTransitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for non-transit itineraries. The max limit is calculated using ALL itineraries, but only non-transit itineraries will be filtered out. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Non-transit itineraries with a cost higher than the max-limit is dropped from the result set. To set a filter to be _1 hour plus 2 times the best cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`  | linear function | `3600 + 2.0 x`
 `bikeRentalDistanceRatio` | For routes that consist only of bike rental and walking what is the minimum fraction of _distance_ of the bike rental leg. This filters out results that consist of a long walk plus a relatively short bike rental leg. A value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order for the result to be included. | double | `0.0`
@@ -758,17 +757,6 @@ The grouped itineraries can be further reduced by using `groupedOtherThanSameLeg
 This parameter filters out itineraries, where the legs that are not common for all the grouped 
 itineraries have a much higher cost, than the lowest in the group. By default, it filters out 
 itineraries that are at least double in cost for the non-grouped legs.
-
-
-#### Minimum Safe Transfer Time Additional Cost
-
-Setting the `minSafeTransferTimeFactor` will enable the `add-min-safe-transfer-cost-filter`. The
-filter adds a cost the itinerary _generalized-cost_ if for each "unsafe" transfers to better 
-reflect the "human-experienced-cost". The filter calculates a _min-safe-transfer-time_ based on the
-total-travel-time. The _min-safe-transfer-time_ is set to 6.67% of the total travel time with an 
-upper bound of 40 minutes for a 10 hours journey. Then for each transfer the difference between the 
-actual-transfer-time and the min-safe-transfer-time is multiplied with the 
-`minSafeTransferTimeFactor`.
 
 
 ### Drive-to-transit routing defaults
@@ -1003,9 +991,9 @@ connect to a network resource is the `url` field.
           "url": "http://coast.socialbicycles.com/opendata/gbfs.json"
         },
 
-        // Bike parking availability
+        // Vehicle parking availability
         {
-            "type": "bike-park"
+            "type": "vehicle-parking"
         },
 
         // Polling for GTFS-RT TripUpdates)

@@ -8,6 +8,8 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.execution.AbortExecutionException;
+import graphql.execution.instrumentation.ChainedInstrumentation;
+import graphql.execution.instrumentation.Instrumentation;
 import graphql.scalars.ExtendedScalars;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
@@ -16,8 +18,11 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.*;
+import org.opentripplanner.ext.actuator.ActuatorAPI;
+import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +62,9 @@ class LegacyGraphQLIndex {
           .type(IntrospectionTypeWiring.build(LegacyGraphQLAgencyImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLAlertImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLBikeParkImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLVehicleParkingImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLBikeRentalStationImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLCarParkImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLCoordinatesImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLdebugOutputImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLDepartureRowImpl.class))
@@ -103,8 +110,16 @@ class LegacyGraphQLIndex {
       String query, Router router, Map<String, Object> variables, String operationName,
       int maxResolves, int timeoutMs, Locale locale
   ) {
-    MaxQueryComplexityInstrumentation instrumentation = new MaxQueryComplexityInstrumentation(
+    Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(
         maxResolves);
+
+    if (OTPFeature.ActuatorAPI.isOn()) {
+      instrumentation = new ChainedInstrumentation(
+              new MicrometerGraphQLInstrumentation(ActuatorAPI.prometheusRegistry),
+              instrumentation
+      );
+    }
+
     GraphQL graphQL = GraphQL.newGraphQL(indexSchema).instrumentation(instrumentation).build();
 
     if (variables == null) {

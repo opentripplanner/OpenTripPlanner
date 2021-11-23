@@ -22,9 +22,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should return a path if it exist when a transfer is only possible because it is
+ * Raptor should return a path if it exists when a transfer is only possible because it is
  * guaranteed/stay-seated. A guarantied transfer should be able even if there is zero time to do the transfer.
- * In these cases the transfer-slack should be ignored and the connection should be possible. .
+ * In these cases the transfer-slack should be ignored and the connection should be possible.
  */
 public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
