@@ -115,15 +115,16 @@ public class TransitAlert implements Serializable {
     /**
      * Finds the first validity startTime from all timePeriods for this alert.
      *
-     * @return First endDate for this Alert
+     * @return First startDate for this Alert, <code>null</code> if 0 (not set)
      */
     public Date getEffectiveStartDate() {
         return timePeriods
-            .stream()
-            .map(timePeriod -> timePeriod.startTime)
-            .min(Comparator.naturalOrder())
-            .map(startTime -> new Date(startTime * 1000))
-            .orElse(null);
+                .stream()
+                .map(timePeriod -> timePeriod.startTime)
+                .min(Comparator.naturalOrder())
+                .filter(startTime -> startTime > 0) //If 0, null should be returned
+                .map(startTime -> new Date(startTime * 1000))
+                .orElse(null);
     }
 
     /**
