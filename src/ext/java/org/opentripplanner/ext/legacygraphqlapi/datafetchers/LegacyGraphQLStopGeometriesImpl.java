@@ -11,11 +11,8 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 public class LegacyGraphQLStopGeometriesImpl implements LegacyGraphQLStopGeometries {
 
     @Override
-    public DataFetcher<String> geoJson() {
-        return env -> {
-            var geoms = getSource(env);
-            return geoms.toString();
-        };
+    public DataFetcher<GeometryCollection> geoJson() {
+        return this::getSource;
     }
 
     @Override

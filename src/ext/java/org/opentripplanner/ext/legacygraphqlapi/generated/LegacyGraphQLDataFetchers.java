@@ -741,7 +741,7 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLStopGeometries {
-    public DataFetcher<String> geoJson();
+    public DataFetcher<org.locationtech.jts.geom.GeometryCollection> geoJson();
     public DataFetcher<Iterable<EncodedPolylineBean>> polylines();
     }
 
