@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import java.util.Collection;
 import java.util.List;
 import java.util.TimeZone;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 
 /**
@@ -72,7 +73,7 @@ public interface StopLocation {
    *
    * For flex stops this will return the geometries of the stop or group of stops.
    */
-  GeometryCollection getGeometries();
+  Geometry getGeometry();
 
   default TimeZone getTimeZone() { return null; }
 

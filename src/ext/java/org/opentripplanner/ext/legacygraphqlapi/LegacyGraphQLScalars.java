@@ -2,7 +2,6 @@ package org.opentripplanner.ext.legacygraphqlapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer;
 import graphql.language.StringValue;
 import graphql.relay.Relay;
 import graphql.schema.Coercing;
@@ -10,15 +9,15 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.common.geometry.GeoJsonModule;
 
 public class LegacyGraphQLScalars {
 
-  public static GraphQLScalarType polylineScalar = GraphQLScalarType
+    private static final ObjectMapper geoJsonMapper = new ObjectMapper()
+            .registerModule(new GeoJsonModule());
+
+    public static GraphQLScalarType polylineScalar = GraphQLScalarType
       .newScalar()
       .name("Polyline")
       .description(
@@ -50,19 +49,9 @@ public class LegacyGraphQLScalars {
                 @Override
                 public JsonNode serialize(Object dataFetcherResult)
                 throws CoercingSerializeException {
-                    if(dataFetcherResult instanceof Geometry) {
+                    if (dataFetcherResult instanceof Geometry) {
                         var geom = (Geometry) dataFetcherResult;
-                        var geoJson = new GeometryJSON();
-                        try {
-                            var stream = new ByteArrayOutputStream();
-                            geoJson.write(geom, stream);
-                            var s = stream.toString(StandardCharsets.UTF_8);
-                            ObjectMapper mapper = new ObjectMapper();
-                            return mapper.readTree(s);
-                        }
-                        catch (IOException e) {
-                            throw new CoercingSerializeException(e);
-                        }
+                        return geoJsonMapper.valueToTree(geom);
                     }
                     return null;
                 }

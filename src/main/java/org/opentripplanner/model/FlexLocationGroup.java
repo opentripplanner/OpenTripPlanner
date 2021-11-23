@@ -69,7 +69,7 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
   }
 
   @Override
-  public GeometryCollection getGeometries() {
+  public Geometry getGeometry() {
     return geometry;
   }
 

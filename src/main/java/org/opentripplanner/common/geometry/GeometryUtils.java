@@ -55,15 +55,6 @@ public class GeometryUtils {
         return factory.createLineString(coordinates);
     }
 
-    public static GeometryCollection makeCollection(WgsCoordinate coordinate) {
-        var point = gf.createPoint(coordinate.asJtsCoordinate());
-        return new GeometryCollection(new Point[]{point}, gf);
-    }
-
-    public static GeometryCollection makeCollection(Geometry geometry) {
-        return new GeometryCollection(new Geometry[]{geometry}, gf);
-    }
-
     public static LineString concatenateLineStrings(List<LineString> lineStrings) {
         GeometryFactory factory = getGeometryFactory();
         return factory.createLineString(

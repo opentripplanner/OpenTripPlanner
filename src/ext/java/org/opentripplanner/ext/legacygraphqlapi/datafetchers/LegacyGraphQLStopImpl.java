@@ -135,7 +135,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Object> geometries() {
-    return environment -> getValue(environment, StopLocation::getGeometries, station -> null);
+    return environment -> getValue(environment, StopLocation::getGeometry, station -> null);
   }
 
   @Override

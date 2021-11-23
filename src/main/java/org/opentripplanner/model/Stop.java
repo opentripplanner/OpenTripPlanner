@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
 
 /**
@@ -130,7 +132,7 @@ public final class Stop extends StationElement implements StopLocation {
   }
 
   @Override
-  public GeometryCollection getGeometries() {
-    return GeometryUtils.makeCollection(getCoordinate());
+  public Geometry getGeometry() {
+    return GeometryUtils.getGeometryFactory().createPoint(getCoordinate().asJtsCoordinate());
   }
 }

@@ -67,6 +67,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   /**
    * Returns the geometry of this location, can be any type of geometry.
    */
+  @Override
   public Geometry getGeometry() {
     return geometry;
   }
@@ -82,11 +83,6 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   public WgsCoordinate getCoordinate() {
     Point centroid = geometry.getCentroid();
     return new WgsCoordinate(centroid.getY(), centroid.getX());
-  }
-
-  @Override
-  public GeometryCollection getGeometries() {
-    return GeometryUtils.makeCollection(geometry);
   }
 
   @Override
