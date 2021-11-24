@@ -585,7 +585,16 @@ otp.modules.planner.PlannerModule =
                 	//this.resetStationMarkers();
                 }
             }
-            //FIXME: CAR is missing
+            else if(leg.mode === 'SCOOTER') {
+                //TRANSLATORS: Text which is shown when clicking scooter route in a map
+                polyline.bindPopup(_tr('Your route using the scooter'));
+                //this.resetStationMarkers();
+            }
+            else if(leg.mode === 'CAR') {
+                //TRANSLATORS: Text which is shown when clicking driving route in a map
+                polyline.bindPopup(_tr('Your driving route'));
+                //this.resetStationMarkers();
+            }
         }
         if (otp.config.zoomToFitResults) this.webapp.map.lmap.fitBounds(itin.getBoundsArray());
     },
@@ -628,6 +637,7 @@ otp.modules.planner.PlannerModule =
     getModeColor : function(mode) {
         if(mode === "WALK") return '#444';
         if(mode === "BICYCLE") return '#0073e5';
+        if(mode === "SCOOTER") return '#88f';
         if(mode === "SUBWAY") return '#f00';
         if(mode === "RAIL") return '#b00';
         if(mode === "BUS") return '#080';
