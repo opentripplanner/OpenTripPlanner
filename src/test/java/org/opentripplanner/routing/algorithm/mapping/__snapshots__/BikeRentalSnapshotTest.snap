@@ -7106,7 +7106,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "length": 2,
             "points": "qb{tGn|{kVWA"
           },
-          "mode": "BICYCLE",
+          "mode": "WALK",
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
@@ -7179,7 +7179,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             }
           ],
           "walkingBike": false,
-          "walkingLeg": false
+          "walkingLeg": true
         },
         {
           "agencyTimeZoneOffset": -25200000,
@@ -9701,7 +9701,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "length": 2,
             "points": "qb{tGn|{kVWA"
           },
-          "mode": "BICYCLE",
+          "mode": "WALK",
           "onStreetNonTransit": true,
           "pathway": false,
           "realTime": false,
@@ -9774,7 +9774,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             }
           ],
           "walkingBike": false,
-          "walkingLeg": false
+          "walkingLeg": true
         },
         {
           "agencyTimeZoneOffset": -25200000,
