@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +40,8 @@ public class BikeRentalTest extends GraphRoutingTest {
     private StreetVertex A, B, C, D;
     private VehicleRentalStationVertex B1, B2;
     private StreetEdge SE1, SE2, SE3;
+
+    private String NON_NETWORK = "non network";
 
     @BeforeEach
     public void setUp() {
@@ -356,6 +360,79 @@ public class BikeRentalTest extends GraphRoutingTest {
         );
     }
 
+    @Test
+    public void noPathIfNoAllowedNetworks() {
+        assertNoRental(B, C, Set.of(), Set.of(NON_NETWORK));
+    }
+
+    @Test
+    public void noPathIfBannedAndAllowedNetwork() {
+        assertNoRental(B, C, Set.of(TEST_VEHICLE_RENTAL_NETWORK), Set.of(TEST_VEHICLE_RENTAL_NETWORK));
+    }
+
+    @Test
+    public void pathIfWithOnlyAllowedNetworks() {
+        assertPathWithNetwork(B, C, Set.of(), Set.of(TEST_VEHICLE_RENTAL_NETWORK), Set.of(TEST_VEHICLE_RENTAL_NETWORK));
+    }
+
+    @Test
+    public void noPathIfNetworkIsBanned() {
+        assertNoRental(B, C, Set.of(TEST_VEHICLE_RENTAL_NETWORK), Set.of());
+    }
+
+    @Test
+    public void pathIfWithoutBannedNetworks() {
+        assertPathWithNetwork(B, C, Set.of(NON_NETWORK), Set.of(), Set.of(TEST_VEHICLE_RENTAL_NETWORK));
+    }
+
+    private void assertNoRental(StreetVertex fromVertex, StreetVertex toVertex, Set<String> bannedNetworks, Set<String> allowedNetworks) {
+        Consumer<RoutingRequest> setter = options -> {
+            options.allowedVehicleRentalNetworks = allowedNetworks;
+            options.bannedVehicleRentalNetworks = bannedNetworks;
+        };
+
+        assertEquals(
+                List.of(
+                        "WALK - BEFORE_RENTING - BC street (1,503.76, 752)"
+                ),
+                runStreetSearchAndCreateDescriptor(fromVertex, toVertex, false, setter),
+                "departAt"
+        );
+
+        assertEquals(
+                List.of(
+                        "WALK - HAVE_RENTED - BC street (1,503.76, 752)"
+                ),
+                runStreetSearchAndCreateDescriptor(fromVertex, toVertex, true, setter),
+                "arriveBy"
+        );
+    }
+
+    private void assertPathWithNetwork(StreetVertex fromVertex, StreetVertex toVertex, Set<String> bannedNetworks, Set<String> allowedNetworks, Set<String> usedNetworks) {
+        Consumer<RoutingRequest> setter = options -> {
+            options.allowedVehicleRentalNetworks = allowedNetworks;
+            options.bannedVehicleRentalNetworks = bannedNetworks;
+        };
+
+        assertEquals(
+                List.of(
+                        "BICYCLE - RENTING_FROM_STATION - BC street (464.00, 242)",
+                        "null - HAVE_RENTED - B2 (499.00, 257)"
+                ),
+                runStreetSearchAndCreateDescriptor(fromVertex, toVertex, false, setter),
+                "departAt"
+        );
+
+        assertEquals(
+                List.of(
+                        "BICYCLE - RENTING_FROM_STATION - BC street (464.00, 242)",
+                        "null - HAVE_RENTED - B2 (499.00, 257)"
+                ),
+                runStreetSearchAndCreateDescriptor(fromVertex, toVertex, true, setter),
+                "arriveBy"
+        );
+    }
+
     private void assertPath(Vertex fromVertex, Vertex toVertex, String... descriptor) {
         assertPath(fromVertex, toVertex, true, List.of(descriptor), List.of(descriptor));
     }
@@ -428,15 +505,27 @@ public class BikeRentalTest extends GraphRoutingTest {
             boolean useAvailabilityInformation,
             int keepRentedBicycleCost
     ) {
+        return runStreetSearchAndCreateDescriptor(fromVertex, toVertex, arriveBy, options -> {
+            options.useVehicleRentalAvailabilityInformation = useAvailabilityInformation;
+            options.allowKeepingRentedVehicleAtDestination = keepRentedBicycleCost > 0;
+            options.keepingRentedVehicleAtDestinationCost = keepRentedBicycleCost;
+        });
+    }
+
+    private List<String> runStreetSearchAndCreateDescriptor(
+            Vertex fromVertex,
+            Vertex toVertex,
+            boolean arriveBy,
+            Consumer<RoutingRequest> optionsSetter
+    ) {
         var options = new RoutingRequest();
         options.arriveBy = arriveBy;
         options.vehicleRentalPickupTime = 42;
         options.vehicleRentalPickupCost = 62;
         options.vehicleRentalDropoffCost = 33;
         options.vehicleRentalDropoffTime = 15;
-        options.useVehicleRentalAvailabilityInformation = useAvailabilityInformation;
-        options.allowKeepingRentedVehicleAtDestination = keepRentedBicycleCost > 0;
-        options.keepingRentedVehicleAtDestinationCost = keepRentedBicycleCost;
+
+        optionsSetter.accept(options);
 
         return runStreetSearchAndCreateDescriptor(
                 fromVertex, toVertex, arriveBy, options, StreetMode.BIKE_RENTAL);

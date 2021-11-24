@@ -24,8 +24,10 @@ public class RoutingRequestMapper {
         // mapping or duplicate exist.
         request.alightSlack = c.asInt("alightSlack", dft.alightSlack);
         request.alightSlackForMode = c.asEnumMap("alightSlackForMode", TransitMode.class, NodeAdapter::asInt);
-        request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
+        request.allowedVehicleRentalNetworks = c.asTextSet("allowedVehicleRentalNetworks", dft.allowedVehicleRentalNetworks);
         request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
+        request.bannedVehicleParkingTags = c.asTextSet("bannedVehicleParkingTags", dft.bannedVehicleParkingTags);
+        request.bannedVehicleRentalNetworks = c.asTextSet("bannedVehicleRentalNetworks", dft.bannedVehicleRentalNetworks);
         request.bikeBoardCost = c.asInt("bikeBoardCost", dft.bikeBoardCost);
         request.bikeParkTime = c.asInt("bikeParkTime", dft.bikeParkTime);
         request.bikeParkCost = c.asInt("bikeParkCost", dft.bikeParkCost);
@@ -78,6 +80,7 @@ public class RoutingRequestMapper {
         request.otherThanPreferredRoutesPenalty = c.asInt("otherThanPreferredRoutesPenalty", dft.otherThanPreferredRoutesPenalty);
         request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
         request.pathComparator = c.asText("pathComparator", dft.pathComparator);
+        request.requiredVehicleParkingTags = c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
         request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
         request.stairsReluctance = c.asDouble("stairsReluctance", dft.stairsReluctance);
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
@@ -87,6 +90,7 @@ public class RoutingRequestMapper {
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useVehicleRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useVehicleRentalAvailabilityInformation);
         request.useUnpreferredRoutesPenalty = c.asInt("useUnpreferredRoutesPenalty", dft.useUnpreferredRoutesPenalty);
+        request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
         request.waitAtBeginningFactor = c.asDouble("waitAtBeginningFactor", dft.waitAtBeginningFactor);
         request.waitReluctance = c.asDouble("waitReluctance", dft.waitReluctance);
         request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);

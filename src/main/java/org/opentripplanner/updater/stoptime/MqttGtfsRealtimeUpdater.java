@@ -2,6 +2,9 @@ package org.opentripplanner.updater.stoptime;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -12,14 +15,10 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class starts an Paho MQTT client which opens a connection to a GTFS-RT data source.
@@ -43,7 +42,7 @@ import java.util.List;
 public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(MqttGtfsRealtimeUpdater.class);
 
-    private GraphUpdaterManager updaterManager;
+    private WriteToGraphCallback saveResultOnGraph;
 
     private final String url;
 
@@ -73,8 +72,8 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+        this.saveResultOnGraph = saveResultOnGraph;
     }
 
     @Override
@@ -167,7 +166,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
             if (updates != null) {
                 // Handle trip updates via graph writer runnable
-                updaterManager.execute(new TripUpdateGraphWriterRunnable(
+                saveResultOnGraph.execute(new TripUpdateGraphWriterRunnable(
                     fullDataset,
                     updates,
                     feedId

@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Locale;
-
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -43,6 +42,10 @@ public class VehicleRentalEdge extends Edge {
         VehicleRentalPlace station = stationVertex.getStation();
         String network = station.getNetwork();
         boolean realtimeAvailability = options.useVehicleRentalAvailabilityInformation;
+
+        if (station.networkIsNotAllowed(s0.getOptions())) {
+            return null;
+        }
 
         boolean pickedUp;
         if (options.arriveBy) {
