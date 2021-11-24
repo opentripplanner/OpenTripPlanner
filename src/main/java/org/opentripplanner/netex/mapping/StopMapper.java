@@ -3,19 +3,16 @@ package org.opentripplanner.netex.mapping;
 import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.StopPlace;
 
 class StopMapper {
-
-  private final StopPlaceTypeMapper stopPlaceTypeMapper = new StopPlaceTypeMapper();
 
   private final DataImportIssueStore issueStore;
 
@@ -37,7 +34,7 @@ class StopMapper {
           Quay quay,
           Station parentStation,
           Collection<FareZone> fareZones,
-          StopPlace stopPlace
+          TransitMode transitMode
   ) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
@@ -58,7 +55,7 @@ class StopMapper {
         fareZones,
         null,
         null,
-        TransitModeMapper.mapMode(stopPlaceTypeMapper.getTransportMode(stopPlace))
+        transitMode
     );
     stop.setParentStation(parentStation);
 
