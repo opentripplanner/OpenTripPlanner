@@ -17,7 +17,9 @@ import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 /**
  * This class is responsible for wiring up various metrics to micrometer, which we use for
@@ -38,9 +40,11 @@ public class MetricsLogging {
         new ProcessorMetrics().bindTo(Metrics.globalRegistry);
         new UptimeMetrics().bindTo(Metrics.globalRegistry);
 
+        Router router = otpServer.getRouter();
+        Graph graph = router.graph;
+
         new GuavaCacheMetrics(
-                otpServer.getRouter().graph
-                        .getTransitLayer().getTransferCache().getTransferCache(),
+                graph.getTransitLayer().getTransferCache().getTransferCache(),
                 "raptorTransfersCache",
                 List.of(Tag.of("cache", "raptorTransfers"))
         ).bindTo(Metrics.globalRegistry);
@@ -51,23 +55,23 @@ public class MetricsLogging {
                 List.of(Tag.of("pool", "commonPool"))
         ).bindTo(Metrics.globalRegistry);
 
-        if (otpServer.getRouter().graph.updaterManager != null) {
+        if (graph.updaterManager != null) {
             new ExecutorServiceMetrics(
-                    otpServer.getRouter().graph.updaterManager.getUpdaterPool(),
+                    graph.updaterManager.getUpdaterPool(),
                     "graphUpdaters",
                     List.of(Tag.of("pool", "graphUpdaters"))
             ).bindTo(Metrics.globalRegistry);
 
             new ExecutorServiceMetrics(
-                    otpServer.getRouter().graph.updaterManager.getScheduler(),
+                    graph.updaterManager.getScheduler(),
                     "graphUpdateScheduler",
                     List.of(Tag.of("pool", "graphUpdateScheduler"))
             ).bindTo(Metrics.globalRegistry);
         }
 
-        if (otpServer.getRouter().raptorConfig.isMultiThreaded()) {
+        if (router.raptorConfig.isMultiThreaded()) {
             new ExecutorServiceMetrics(
-                    otpServer.getRouter().raptorConfig.threadPool(),
+                    router.raptorConfig.threadPool(),
                     "raptorHeuristics",
                     List.of(Tag.of("pool", "raptorHeuristics"))
             ).bindTo(Metrics.globalRegistry);

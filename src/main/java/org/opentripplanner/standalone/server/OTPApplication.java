@@ -5,7 +5,10 @@ import com.google.common.collect.Sets;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.jersey2.server.DefaultJerseyTagsProvider;
 import io.micrometer.jersey2.server.MetricsApplicationEventListener;
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import org.glassfish.jersey.CommonProperties;
+import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
@@ -87,16 +90,30 @@ public class OTPApplication extends Application {
             // Serialize POJOs (unannotated) JSON using Jackson
             new JSONObjectMapperProvider(),
             // Allow injecting the OTP server object into Jersey resource classes
-            server.makeBinder()
+            server.makeBinder(),
+            // Add performance logging to micrometer
+            new MetricsApplicationEventListener(
+                Metrics.globalRegistry,
+                new DefaultJerseyTagsProvider(),
+                "http.server.requests",
+                true
+            )
         );
 
+        // Instantiate and add the prometheus micrometer registry to the global composite registry
         if (OTPFeature.ActuatorAPI.isOn()) {
-            singletons.add(new MetricsApplicationEventListener(
-                    Metrics.globalRegistry,
-                    new DefaultJerseyTagsProvider(),
-                    "http.server.requests",
-                    true
-            ));
+            PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
+                    PrometheusConfig.DEFAULT
+            );
+
+            Metrics.globalRegistry.add(prometheusRegistry);
+
+            singletons.add(new AbstractBinder() {
+                @Override
+                protected void configure() {
+                    bind(prometheusRegistry).to(PrometheusMeterRegistry.class);
+                }
+            });
         }
 
         return singletons;

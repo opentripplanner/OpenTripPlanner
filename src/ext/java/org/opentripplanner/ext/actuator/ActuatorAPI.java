@@ -28,8 +28,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,20 +41,6 @@ import org.slf4j.LoggerFactory;
 public class ActuatorAPI {
 
     private static final Logger LOG = LoggerFactory.getLogger(ActuatorAPI.class);
-
-    private static final PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
-            PrometheusConfig.DEFAULT
-    );
-
-    static {
-        Metrics.globalRegistry.add(prometheusRegistry);
-    }
-
-    private final Router router;
-
-    public ActuatorAPI(@Context OTPServer otpServer) {
-        this.router = otpServer.getRouter();
-    }
 
     /**
      * List the actuator endpoints available
@@ -84,9 +72,10 @@ public class ActuatorAPI {
      */
     @GET
     @Path("/health")
-    public Response health() {
-        if (router.graph.updaterManager != null) {
-            Collection<String> waitingUpdaters = router.graph.updaterManager.waitingUpdaters();
+    public Response health(@Context OTPServer otpServer) {
+        GraphUpdaterManager updaterManager = otpServer.getRouter().graph.updaterManager;
+        if (updaterManager != null) {
+            Collection<String> waitingUpdaters = updaterManager.waitingUpdaters();
 
             if (!waitingUpdaters.isEmpty()) {
                 LOG.info("Graph ready, waiting for updaters: {}", waitingUpdaters);
@@ -110,7 +99,7 @@ public class ActuatorAPI {
      */
     @GET
     @Path("/prometheus")
-    public Response prometheus() {
+    public Response prometheus(@Context PrometheusMeterRegistry prometheusRegistry) {
         return Response.status(Response.Status.OK)
             .entity(prometheusRegistry.scrape())
             .type("text/plain")
