@@ -1189,6 +1189,9 @@ enum Mode {
     """RAIL"""
     RAIL
 
+    """SCOOTER"""
+    SCOOTER
+
     """SUBWAY"""
     SUBWAY
 
