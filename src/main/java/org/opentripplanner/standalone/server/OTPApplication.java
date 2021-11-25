@@ -91,32 +91,43 @@ public class OTPApplication extends Application {
             new JSONObjectMapperProvider(),
             // Allow injecting the OTP server object into Jersey resource classes
             server.makeBinder(),
-            // Add performance logging to micrometer
-            new MetricsApplicationEventListener(
+            // Add performance instrumentation of Jersey requests to micrometer
+            getMetricsApplicationEventListener()
+        );
+
+        if (OTPFeature.ActuatorAPI.isOn()) {
+            singletons.add(getBoundPrometheusRegistry());
+        }
+
+        return singletons;
+    }
+
+    private MetricsApplicationEventListener getMetricsApplicationEventListener() {
+        return new MetricsApplicationEventListener(
                 Metrics.globalRegistry,
                 new DefaultJerseyTagsProvider(),
                 "http.server.requests",
                 true
-            )
+        );
+    }
+
+    /**
+     * Instantiate and add the prometheus micrometer registry to the global composite registry.
+     * @return A AbstractBinder, which can be used to inject the registry into the Actuator API calls
+     */
+    private AbstractBinder getBoundPrometheusRegistry() {
+        PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
+                PrometheusConfig.DEFAULT
         );
 
-        // Instantiate and add the prometheus micrometer registry to the global composite registry
-        if (OTPFeature.ActuatorAPI.isOn()) {
-            PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
-                    PrometheusConfig.DEFAULT
-            );
+        Metrics.globalRegistry.add(prometheusRegistry);
 
-            Metrics.globalRegistry.add(prometheusRegistry);
-
-            singletons.add(new AbstractBinder() {
-                @Override
-                protected void configure() {
-                    bind(prometheusRegistry).to(PrometheusMeterRegistry.class);
-                }
-            });
-        }
-
-        return singletons;
+        return new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(prometheusRegistry).to(PrometheusMeterRegistry.class);
+            }
+        };
     }
 
     /**
