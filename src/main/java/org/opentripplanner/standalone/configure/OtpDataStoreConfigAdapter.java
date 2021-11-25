@@ -64,9 +64,6 @@ class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
     }
 
     @Override
-    public List<URI> settingsFiles() { return config.settings; }
-
-    @Override
     public URI graph() {
         return config.graph;
     }
@@ -96,6 +93,4 @@ class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
         return config.localFileNamePatterns.dem;
     }
 
-    @Override
-    public Pattern settingsLocalFilePattern() { return  config.localFileNamePatterns.settings; }
 }

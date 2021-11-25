@@ -1,7 +1,7 @@
-package fi.metatavu.airquality;
+package org.opentripplanner.ext.airquality;
 
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
-import fi.metatavu.airquality.configuration_parsing.TimeUnit;
+import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
+import org.opentripplanner.ext.airquality.configuration.TimeUnit;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -26,6 +26,7 @@ public class GenericEdgeUpdater {
 
     private final GenericDataFile dataFile;
     private final Collection<StreetEdge> streetEdges;
+    private final DavaOverlayConfig davaOverlayConfig;
 
     private final Map<String, Array> genericVariablesData;
     private int edgesUpdated;
@@ -38,11 +39,11 @@ public class GenericEdgeUpdater {
      * @param fileConfiguration configuration for data file
      * @param streetEdges collection of all street edges to be updated
      */
-    public GenericEdgeUpdater(GenericDataFile dataFile, GenericFileConfiguration fileConfiguration, Collection<StreetEdge> streetEdges){
+    public GenericEdgeUpdater(GenericDataFile dataFile, DavaOverlayConfig fileConfiguration, Collection<StreetEdge> streetEdges){
         super();
         this.dataFile = dataFile;
         this.streetEdges = streetEdges;
-
+        this.davaOverlayConfig = fileConfiguration;
         this.edgesUpdated = 0;
 
         this.dataStartTime = calculateDataStartTime(fileConfiguration);
@@ -51,12 +52,12 @@ public class GenericEdgeUpdater {
     }
 
     /**
-     * Returns ms from epoch for the first data point of the file
+     * Returns ms from epoch for the first data point of the file, by default data format is assumed to be hours
      *
      * @param configuration configuration
      * @return epoch milliseconds
      */
-    private long calculateDataStartTime(GenericFileConfiguration configuration) {
+    private long calculateDataStartTime(DavaOverlayConfig configuration) {
         TimeUnit timeFormat = configuration.getTimeFormat();
         Array timeArray = dataFile.getTimeArray();
         Class dataType = timeArray.getDataType().getPrimitiveClassType();
@@ -68,12 +69,10 @@ public class GenericEdgeUpdater {
         } else if (timeFormat == TimeUnit.MS_EPOCH && dataType.equals(Long.TYPE)) {
             return timeArray.getLong(0);
         } else {
-            //default option is hours
             long addSeconds = 0;
             if  (dataType.equals(Double.TYPE)) {
                 addSeconds = (long) (timeArray.getDouble(0) * 3600);
-            }
-            else if (dataType.equals(Float.TYPE)) {
+            } else if (dataType.equals(Float.TYPE)) {
                 addSeconds = (long) (timeArray.getFloat(0) * 3600);
             }
 
@@ -106,8 +105,8 @@ public class GenericEdgeUpdater {
             edgeGenericDataValues.put(variableValues.getKey(), averageDataValue);
         }
 
-        EdgeDataFromGenericFile edgeGenData = new EdgeDataFromGenericFile(dataStartTime, edgeGenericDataValues);
-        streetEdge.getExtraData().add(edgeGenData);
+        EdgeDataFromGenericFile edgeGenData = new EdgeDataFromGenericFile(dataStartTime, edgeGenericDataValues, davaOverlayConfig.getTimeFormat());
+        streetEdge.setExtraData(edgeGenData);
 
         edgesUpdated++;
 
@@ -142,7 +141,7 @@ public class GenericEdgeUpdater {
     }
 
     /**
-     * Returns closest property value samples for given line
+     * Returns the closest property value samples for given line
      *
      * Each list cell represent an average of grid data in time
      *
@@ -175,7 +174,7 @@ public class GenericEdgeUpdater {
      *
      * @param samplePoint point
      * @param propertyName propertyName
-     * @return result closest value for selected property for given point
+     * @return result the closest value for selected property for given point
      */
     private <E> List<E> getClosestPropertyValue(Point2D samplePoint, String propertyName) {
         double lon = samplePoint.getX();

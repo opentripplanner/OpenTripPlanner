@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
-import fi.metatavu.airquality.EdgeDataFromGenericFile;
-import fi.metatavu.airquality.configuration_parsing.RequestParameters;
-import fi.metatavu.airquality.configuration_parsing.TimeUnit;
+import org.opentripplanner.ext.airquality.EdgeDataFromGenericFile;
+import org.opentripplanner.ext.airquality.configuration.RequestParameters;
+import org.opentripplanner.ext.airquality.configuration.TimeUnit;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
@@ -34,6 +34,7 @@ import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ import java.util.*;
 public class StreetEdge extends Edge implements Cloneable {
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-    private List<EdgeDataFromGenericFile> extraData = new ArrayList<>();
+    private EdgeDataFromGenericFile extraData;
 
     private static final long serialVersionUID = 1L;
 
@@ -151,14 +152,6 @@ public class StreetEdge extends Edge implements Cloneable {
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
 
-    /**
-     * Gets extra data added to the edge from the .nc data file according to the settings.json configuration
-     *
-     * @return the extra data
-     */
-    public List<EdgeDataFromGenericFile> getExtraData() {
-        return extraData;
-    }
 
     /**
      * Instantiates a new Street edge.
@@ -598,59 +591,60 @@ public class StreetEdge extends Edge implements Cloneable {
         s1.incrementWeight(weight);
 
         /*
-         * If traverse mode is WALK or BICYCLE and the request contains the parameters from settings.json
+         * If traverse mode is WALK or BICYCLE and the request contains the parameters from data-settings.json
          * then the weight is updated based on additional parameters (like air quality)
          * Weight is increased for each quality parameter defined in the request.
          */
         boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
 
 
-        if (walkingOrBiking && options.genericGridDataRequestParam != null) {
-            double totalPenalty = 0d;
-            Instant requestInstant = options.getDateTime().toInstant();
-            for (Map.Entry<RequestParameters, RequestParameters> thresholdPenaltyPair : options.genericGridDataRequestParam.entrySet()) {
-                String indexVariableName = thresholdPenaltyPair.getKey().getVariable();
+        if (walkingOrBiking && OTPFeature.DataOverlay.isOn()) {
+            if (extraData != null && extraData.getVariableValues() != null) {
+                double totalPenalty = 0d;
+                Instant requestInstant = options.getDateTime().toInstant();
+                for (Map.Entry<RequestParameters, RequestParameters> thresholdPenaltyPair : options.genericGridDataRequestParam.entrySet()) {
+                    String indexVariableName = thresholdPenaltyPair.getKey().getVariable();
 
-                long dataStartTime = 0;
-                float[] genDataValuesForTime = new float[0];
+                    long dataStartTime = 0;
+                    float[] genDataValuesForTime = new float[0];
 
-                for (EdgeDataFromGenericFile edgeDataFile : extraData) {
-                    Map<String, float[]> variableValues = edgeDataFile.getVariableValues();
-                    if (variableValues.containsKey(indexVariableName)) {
-                        dataStartTime = edgeDataFile.getDataStartTime();
-                        genDataValuesForTime = variableValues.get(indexVariableName);
-                        break;
+                    if (extraData.getVariableValues() != null && extraData.getVariableValues().containsKey(indexVariableName)) {
+                        dataStartTime = extraData.getDataStartTime();
+                        genDataValuesForTime = extraData.getVariableValues().get(indexVariableName);
                     }
-                }
 
-                //calculate time format based on the input file settings
-                TimeUnit selectedTimeUnit = options.genericFileConfiguration.getTimeFormat();
-                Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
-                int dataQualityRequestedTime;
-                if (selectedTimeUnit == TimeUnit.SECONDS) {
-                    dataQualityRequestedTime = (int) ChronoUnit.SECONDS.between(aqiTimeInstant, requestInstant);
-                } else if (selectedTimeUnit == TimeUnit.MS_EPOCH) {
-                    dataQualityRequestedTime = (int) ChronoUnit.MILLIS.between(aqiTimeInstant, requestInstant);
-                } else {
-                    dataQualityRequestedTime = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
-                }
 
-                if (dataQualityRequestedTime >= 0) {
-                    if (dataQualityRequestedTime < genDataValuesForTime.length) {
-                        float value = genDataValuesForTime[dataQualityRequestedTime];
-                        String penaltyFormulaString = thresholdPenaltyPair.getValue().getFormula();
+                    //calculate time format based on the input file settings
+                    TimeUnit selectedTimeUnit = extraData.getTimeFormat();
+                    Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
+                    int dataQualityRequestedTime;
+                    if (selectedTimeUnit == TimeUnit.SECONDS) {
+                        dataQualityRequestedTime = (int) ChronoUnit.SECONDS.between(aqiTimeInstant, requestInstant);
+                    } else if (selectedTimeUnit == TimeUnit.MS_EPOCH) {
+                        dataQualityRequestedTime = (int) ChronoUnit.MILLIS.between(aqiTimeInstant, requestInstant);
+                    } else {
+                        dataQualityRequestedTime = (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
+                    }
 
-                        if (penaltyFormulaString.isEmpty()) {
-                            throw new IllegalArgumentException(String.format("Formula for %s should not be empty", thresholdPenaltyPair.getValue().getName()));
-                        }
+                    if (dataQualityRequestedTime >= 0) {
+                        if (dataQualityRequestedTime < genDataValuesForTime.length) {
+                            float value = genDataValuesForTime[dataQualityRequestedTime];
+                            String penaltyFormulaString = thresholdPenaltyPair.getValue().getFormula();
 
-                        totalPenalty += calculatePenaltyFromParameters(penaltyFormulaString, value, thresholdPenaltyPair.getKey(),
+                            if (penaltyFormulaString.isEmpty()) {
+                                throw new IllegalArgumentException(String.format("Formula for %s should not be empty", thresholdPenaltyPair.getValue().getName()));
+                            }
+
+                            totalPenalty += calculatePenaltyFromParameters(penaltyFormulaString, value, thresholdPenaltyPair.getKey(),
                                 thresholdPenaltyPair.getValue());
+                        } else {
+                            LOG.warn("No available data overlay for the given time");
+                        }
                     }
                 }
-            }
 
-            s1.incrementWeight(totalPenalty);
+                s1.incrementWeight(totalPenalty);
+            }
         }
 
         return s1;
@@ -666,16 +660,14 @@ public class StreetEdge extends Edge implements Cloneable {
      * @return penalty
      */
     private double calculatePenaltyFromParameters (String formula, float value, RequestParameters threshold, RequestParameters penalty){
+        if (threshold == null || penalty == null || threshold.getValue() == null || penalty.getValue() == null) {
+            return 0.0;
+        }
+
         Map<String, Double> variables = new HashMap<>();
 
-        if (threshold != null && threshold.getValue() != null) {
-            variables.put("THRESHOLD", Double.parseDouble(threshold.getValue()));
-        }
-
-        if (penalty != null && penalty.getValue() != null) {
-            variables.put("PENALTY", Double.parseDouble(penalty.getValue()));
-        }
-
+        variables.put("THRESHOLD", Double.parseDouble(threshold.getValue()));
+        variables.put("PENALTY", Double.parseDouble(penalty.getValue()));
         variables.put("VALUE", (double) value);
 
         try {
@@ -1082,6 +1074,10 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
         return graph.getTurnRestrictions(this);
+    }
+
+    public void setExtraData(EdgeDataFromGenericFile extraData) {
+        this.extraData = extraData;
     }
 
     /**

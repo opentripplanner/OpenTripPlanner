@@ -1,4 +1,4 @@
-package fi.metatavu.airquality.configuration_parsing;
+package org.opentripplanner.ext.airquality.configuration;
 
 /**
  * This class describes the expected routing request parameters for the generic data

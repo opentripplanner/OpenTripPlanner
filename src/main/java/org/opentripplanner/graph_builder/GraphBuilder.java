@@ -1,11 +1,10 @@
 package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import fi.metatavu.airquality.EdgeUpdaterModule;
-import fi.metatavu.airquality.GenericDataFile;
-import fi.metatavu.airquality.GenericFileConfigurationParser;
-import fi.metatavu.airquality.configuration_parsing.GenericFileConfiguration;
+import org.opentripplanner.ext.airquality.EdgeUpdaterModule;
+import org.opentripplanner.ext.airquality.GenericDataFile;
+import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
+import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
@@ -36,6 +35,7 @@ import java.util.List;
 
 import static org.opentripplanner.datastore.FileType.*;
 import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
+import static org.opentripplanner.util.OTPFeature.DataOverlay;
 
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.
@@ -93,16 +93,16 @@ public class GraphBuilder implements Runnable {
      * build a graph from the given data source and configuration directory.
      */
     public static GraphBuilder create(
-            BuildConfig config,
-            GraphBuilderDataSources dataSources,
-            Graph baseGraph
+        BuildConfig config,
+        DavaOverlayConfig davaOverlayConfig,
+        GraphBuilderDataSources dataSources,
+        Graph baseGraph
     ) {
 
         boolean hasOsm  = dataSources.has(OSM);
         boolean hasDem  = dataSources.has(DEM);
         boolean hasGtfs = dataSources.has(GTFS);
         boolean hasNetex = dataSources.has(NETEX);
-        boolean hasSettings = dataSources.has(SETTINGS_GRAPH_API_CONFIGURATION_JSON);
         boolean hasTransitData = hasGtfs || hasNetex;
         GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
 
@@ -235,13 +235,14 @@ public class GraphBuilder implements Runnable {
             );
         }
 
-        if (hasSettings) {
-            DataSource settingsSource = dataSources.getDataSettings();
-            GenericFileConfiguration configuration = GenericFileConfigurationParser.parse(settingsSource);
-            if (configuration != null) {
-                GenericDataFile genericDataFile = new GenericDataFile(new File(configuration.getFileName()), configuration);
-                EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, configuration);
+        if (DataOverlay.isOn()) {
+            File dataFile = new File(davaOverlayConfig.getFileName());
+            if (dataFile.exists()) {
+                GenericDataFile genericDataFile = new GenericDataFile(dataFile, davaOverlayConfig);
+                EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, davaOverlayConfig);
                 graphBuilder.addModule(edgeUpdaterModule);
+            } else {
+                LOG.error("No data file "+dataFile+" found!");
             }
         }
 

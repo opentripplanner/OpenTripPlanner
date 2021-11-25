@@ -32,22 +32,19 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     private final Pattern netexLocalFilePattern;
     private final Pattern osmLocalFilePattern;
     private final Pattern demLocalFilePattern;
-    private final Pattern settingsLocalFilePattern;
 
     public FileDataSourceRepository(
         File baseDir,
         Pattern gtfsLocalFilePattern,
         Pattern netexLocalFilePattern,
         Pattern osmLocalFilePattern,
-        Pattern demLocalFilePattern,
-        Pattern settingsLocalFilePattern
+        Pattern demLocalFilePattern
     ) {
         this.baseDir = baseDir;
         this.gtfsLocalFilePattern = gtfsLocalFilePattern;
         this.netexLocalFilePattern = netexLocalFilePattern;
         this.osmLocalFilePattern = osmLocalFilePattern;
         this.demLocalFilePattern = demLocalFilePattern;
-        this.settingsLocalFilePattern = settingsLocalFilePattern;
     }
 
     /**
@@ -147,7 +144,6 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
         if (isTransitFile(file, gtfsLocalFilePattern)) { return GTFS; }
         if (isTransitFile(file, netexLocalFilePattern)) { return NETEX; }
         if (osmLocalFilePattern.matcher(name).find()) { return OSM; }
-        if (settingsLocalFilePattern.matcher(name).find()) { return SETTINGS_GRAPH_API_CONFIGURATION_JSON; }
         // Digital elevation model (elevation raster)
         if (demLocalFilePattern.matcher(name).find()) { return DEM; }
         if (name.matches("(streetG|g)raph.obj")) { return GRAPH; }
