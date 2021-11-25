@@ -11,6 +11,11 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.Assert.*;
+
 public class TripTimesTest {
 
   private static final FeedScopedId TRIP_ID = new FeedScopedId("agency", "testTripId");
@@ -100,6 +105,16 @@ public class TripTimesTest {
   }
 
   @Test
+    public void testNonIncreasingUpdateCrossingMidnight() {
+        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+
+        updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
+        updatedTripTimesA.updateDepartureTime(0, 50);
+
+        assertTrue(updatedTripTimesA.timesIncreasing());
+    }
+
+    @Test
   public void testDelay() {
     TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
     updatedTripTimesA.updateDepartureDelay(0, 10);
