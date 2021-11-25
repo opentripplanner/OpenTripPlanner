@@ -8,7 +8,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -468,7 +468,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             for (Edge e : v.getOutgoing()) {
                 if (e.getGeometry() == null)
                     continue;
-                if (e instanceof StreetTransitLink
+                if (e instanceof StreetTransitStopLink
                         || e instanceof StreetEdge || e instanceof PathwayEdge) {
                     env = e.getGeometry().getEnvelopeInternal();
                     edgeIndex.insert(env, e);
@@ -486,7 +486,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         visibleLinkEdges.clear();
         visibleTransitEdges.clear();
         for (Edge de : (Iterable<Edge>) edgeIndex.query(modelBounds)) {
-            if (de instanceof PathwayEdge || de instanceof StreetTransitLink) {
+            if (de instanceof PathwayEdge || de instanceof StreetTransitStopLink) {
                 visibleLinkEdges.add(de);
             }
             else if (de instanceof StreetEdge) {
@@ -500,8 +500,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             return 0; // do not attempt to draw geometry-less edges
         Coordinate[] coords = e.getGeometry().getCoordinates();
         beginShape();
-        for (int i = 0; i < coords.length; i++)
+        for (int i = 0; i < coords.length; i++) {
             vertex((float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
+        }
         endShape();
         return coords.length; // should be used to count segments, not edges drawn
     }
@@ -792,8 +793,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		        drawEdge(e);
 		        drawOffset += 1;
 		        if (drawOffset % BLOCK_SIZE == 0) {
-		            if (millis() - startMillis > FRAME_TIME)
-		                return false;
+		            if (millis() - startMillis > FRAME_TIME) {
+                        return false;
+                    }
 		        }
 		    }
 		}
@@ -811,8 +813,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		        drawEdge(e);
 		        drawOffset += 1;
 		        if (drawOffset % BLOCK_SIZE == 0) {
-		            if (millis() - startMillis > FRAME_TIME)
-		                return false;
+		            if (millis() - startMillis > FRAME_TIME) {
+                        return false;
+                    }
 		        }
 		    }
 		}
@@ -832,8 +835,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		        drawEdge(visibleStreetEdges.get(drawOffset));
 		        drawOffset += 1;
 		        if (drawOffset % BLOCK_SIZE == 0) {
-		            if (millis() - startMillis > FRAME_TIME)
-		                return false;
+		            if (millis() - startMillis > FRAME_TIME) {
+                        return false;
+                    }
 		        }
 		    }
 		}

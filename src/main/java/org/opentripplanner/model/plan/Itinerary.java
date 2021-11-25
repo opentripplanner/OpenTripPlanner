@@ -1,16 +1,17 @@
 package org.opentripplanner.model.plan;
 
 
-import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+import static java.util.Locale.ROOT;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -46,11 +47,6 @@ public class Itinerary {
     public final double nonTransitDistanceMeters;
 
     /**
-     * Indicates that the walk/bike/drive limit distance has been exceeded for this itinerary.
-     */
-    public boolean nonTransitLimitExceeded = false;
-
-    /**
      * How much elevation is lost, in total, over the course of the trip, in meters. As an example,
      * a trip that went from the top of Mount Everest straight down to sea level, then back up K2,
      * then back down again would have an elevationLost of Everest + K2.
@@ -74,10 +70,37 @@ public class Itinerary {
     public int generalizedCost = -1;
 
     /**
+     * This is the transfer-wait-time-cost. The aim is to distribute wait-time and adding a high penalty
+     * on short transfers. Do not use this to compare or filter itineraries.
+     * The filtering on this parameter is done on paths, before mapping to itineraries and is
+     * provided here as reference information.
+     * <p>
+     * -1 indicate that the cost is not set/computed.
+     */
+    public int waitTimeOptimizedCost = -1;
+
+    /**
+     * This is the transfer-priority-cost. If two paths ride the same trips with different
+     * transfers, this cost is used to pick the one with the best transfer constraints (guaranteed,
+     * stay-seated, not-allowed ...). Do not use this to compare or filter itineraries.
+     * The filtering on this parameter is done on paths, before mapping to itineraries and is
+     * provided here as reference information.
+     * <p>
+     * -1 indicate that the cost is not set/computed.
+     */
+    public int transferPriorityCost = -1;
+
+    /**
      * This itinerary has a greater slope than the user requested (but there are no possible
      * itineraries with a good slope).
      */
     public boolean tooSloped = false;
+
+    /**
+     * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedVehicleAtDestination}
+     * is set than it is possible to end a trip without dropping off the rented bicycle.
+     */
+    public boolean arrivedAtDestinationWithRentedVehicle = false;
 
      /** TRUE if mode is WALK from start ot end (all legs are walking). */
     public final boolean walkOnly;
@@ -202,30 +225,33 @@ public class Itinerary {
     }
 
     /**
-     * A itinerary can be tagged with a system notice. System notices should only be added to a
-     * response if explicit asked for in the request.
+     * An itinerary can be flagged for removal with a system notice.
      * <p>
      * For example when tuning or manually testing the itinerary-filter-chain it you can enable
-     * the {@link org.opentripplanner.routing.api.request.RoutingRequest#debugItineraryFilter} and instead
-     * of removing itineraries from the result the itineraries would be tagged by the filters
-     * instead. This enable investigating, why an expected itinerary is missing from the result
-     * set.
+     * {@link org.opentripplanner.routing.api.request.ItineraryFilterParameters#debug} and instead
+     * of removing itineraries from the result the itineraries will be tagged by the filters
+     * instead. This enables investigating, why an expected itinerary is missing from the result
+     * set. It can be also used by other filters to see the already filtered itineraries.
      */
-    public void addSystemNotice(SystemNotice notice) {
+    public void flagForDeletion(SystemNotice notice) {
         systemNotices.add(notice);
+    }
+
+    public boolean isFlaggedForDeletion() {
+        return !systemNotices.isEmpty();
     }
 
     public void timeShiftToStartAt(Calendar afterTime) {
         Calendar startTimeFirstLeg = firstLeg().startTime;
-        int adjustmentMilliSeconds =
-            (int)(afterTime.getTimeInMillis() - startTimeFirstLeg.getTimeInMillis());
+        long adjustmentMilliSeconds =
+            afterTime.getTimeInMillis() - startTimeFirstLeg.getTimeInMillis();
         timeShift(adjustmentMilliSeconds);
     }
 
-    private void timeShift(int adjustmentMilliSeconds) {
+    private void timeShift(long adjustmentMilliSeconds) {
         for (Leg leg : this.legs) {
-            leg.startTime.add(Calendar.MILLISECOND, adjustmentMilliSeconds);
-            leg.endTime.add(Calendar.MILLISECOND, adjustmentMilliSeconds);
+            leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + adjustmentMilliSeconds);
+            leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + adjustmentMilliSeconds);
         }
     }
 
@@ -259,7 +285,6 @@ public class Itinerary {
                 .addDurationSec("transitTime", transitTimeSeconds)
                 .addDurationSec("waitingTime", waitingTimeSeconds)
                 .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
-                .addBool("nonTransitLimitExceeded", nonTransitLimitExceeded)
                 .addBool("tooSloped", tooSloped)
                 .addNum("elevationLost", elevationLost, 0.0)
                 .addNum("elevationGained", elevationGained, 0.0)
@@ -293,7 +318,8 @@ public class Itinerary {
      * 12:14 ...
      */
     public String toStr() {
-        PathStringBuilder buf = new PathStringBuilder();
+        // No translater needed, stop indexes are never passed to the builder
+        PathStringBuilder buf = new PathStringBuilder(null);
         buf.stop(firstLeg().from.name);
 
         for (Leg leg : legs) {
@@ -302,7 +328,7 @@ public class Itinerary {
                 buf.walk((int)leg.getDuration());
             }
             else if(leg.isTransitLeg()) {
-              buf.transit(leg.mode, leg.getTrip().getId().getId(), leg.startTime, leg.endTime);
+              buf.transit(leg.mode, leg.getTrip().logInfo(), leg.startTime, leg.endTime);
             }
             else {
                 buf.other(leg.mode, leg.startTime, leg.endTime);
@@ -311,6 +337,9 @@ public class Itinerary {
             buf.sep();
             buf.stop(leg.to.name);
         }
-        return buf.toString() + " [cost: " + generalizedCost + "]";
+
+        buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));
+
+        return buf.toString();
     }
 }

@@ -52,20 +52,28 @@ public class OSMNode extends OSMWithTags {
     }
 
     /**
-     * TODO Maybe all those methods (isSomething...) in OSMXxx should be moved to a dedicated OSM
-     * filtering class.
-     * 
-     * @return True if this node is a bike rental station.
-     */
-    public boolean isBikeRental() {
-        return isTag("amenity", "bicycle_rental");
-    }
-
-    /**
      * Checks if this node is bollard
      * @return true if it is
      */
     public boolean isBollard() {
         return isTag("barrier", "bollard");
+    }
+
+    /**
+     * Checks if this node blocks traversal in any way
+     * @return true if it does
+     */
+    public boolean isBarrier() {
+        return (isBollard()
+                || isPedestrianExplicitlyDenied()
+                || isBicycleExplicitlyDenied()
+                || isMotorcarExplicitlyDenied()
+                || isMotorVehicleExplicitlyDenied()
+                || isGeneralAccessDenied());
+    }
+
+    @Override
+    public String getOpenStreetMapLink() {
+        return String.format("https://www.openstreetmap.org/node/%d", getId());
     }
 }

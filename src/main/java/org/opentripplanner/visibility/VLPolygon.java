@@ -82,40 +82,48 @@ public class VLPolygon {
                 return false;
 
         // Make sure nonadjacent edges do not intersect.
-        for (int i = 0; i < n() - 2; i++)
-            for (int j = i + 2; j <= n() - 1; j++)
-                if (0 != (j + 1) % vertices.size()
-                        && new LineSegment(get(i), get(i + 1)).distance(new LineSegment(get(j),
-                                get(j + 1))) <= epsilon)
+        for (int i = 0; i < n() - 2; i++) {
+            for (int j = i + 2; j <= n() - 1; j++) {
+                if (
+                        0 != (j + 1) % vertices.size()
+                        && new LineSegment(get(i), get(i + 1)).distance(new LineSegment(get(j), get(j + 1))) <= epsilon
+                ) {
                     return false;
-
+                }
+            }
+        }
         return true;
     }
 
     public boolean is_in_standard_form() {
-        if (vertices.size() > 1) // if more than one point in the polygon.
-            for (int i = 1; i < vertices.size(); i++)
-                if (vertices.get(0).compareTo(vertices.get(i)) > 0)
+        // if more than one point in the polygon.
+        if (vertices.size() > 1) {
+            for (int i = 1; i < vertices.size(); i++) {
+                if (vertices.get(0).compareTo(vertices.get(i)) > 0) {
                     return false;
+                }
+            }
+        }
         return true;
     }
 
     public double boundary_length() {
         double length_temp = 0;
-        if (n() == 0 || n() == 1)
-            return 0;
-        for (int i = 0; i < n() - 1; i++)
+        if (n() == 0 || n() == 1) { return 0; }
+
+        for (int i = 0; i < n() - 1; i++) {
             length_temp += vertices.get(i).distance(vertices.get(i + 1));
+        }
         length_temp += vertices.get(n() - 1).distance(vertices.get(0));
         return length_temp;
     }
 
     public double area() {
         double area_temp = 0;
-        if (n() == 0)
-            return 0;
-        for (int i = 0; i <= n() - 1; i++)
+        if (n() == 0) { return 0; }
+        for (int i = 0; i <= n() - 1; i++) {
             area_temp += get(i).x * get(i + 1).y - get(i + 1).x * get(i).y;
+        }
         return area_temp / 2.0;
     }
 
@@ -125,13 +133,15 @@ public class VLPolygon {
         double area_temp = area();
         assert (area_temp != 0);
         double x_temp = 0;
-        for (int i = 0; i <= n() - 1; i++)
+        for (int i = 0; i <= n() - 1; i++) {
             x_temp += (get(i).x + get(i + 1).x)
                     * (get(i).x * get(i + 1).y - get(i + 1).x * get(i).y);
+        }
         double y_temp = 0;
-        for (int i = 0; i <= n() - 1; i++)
+        for (int i = 0; i <= n() - 1; i++) {
             y_temp += (get(i).y + get(i + 1).y)
                     * (get(i).x * get(i + 1).y - get(i + 1).x * get(i).y);
+        }
         return new VLPoint(x_temp / (6 * area_temp), y_temp / (6 * area_temp));
     }
 
@@ -142,8 +152,9 @@ public class VLPolygon {
         double running_max = 0;
         for (int i = 0; i < n() - 1; i++) {
             for (int j = i + 1; j < n(); j++) {
-                if (get(i).distance(get(j)) > running_max)
+                if (get(i).distance(get(j)) > running_max) {
                     running_max = get(i).distance(get(j));
+                }
             }
         }
         return running_max;
@@ -273,11 +284,14 @@ public class VLPolygon {
             return false;
         }
         VLPolygon polygon2 = (VLPolygon) o;
-        if (n() != polygon2.n() || n() == 0 || polygon2.n() == 0)
+        if (n() != polygon2.n() || n() == 0 || polygon2.n() == 0) {
             return false;
-        for (int i = 0; i < n(); i++)
-            if (!get(i).equals(polygon2.get(i)))
+        }
+        for (int i = 0; i < n(); i++) {
+            if (!get(i).equals(polygon2.get(i))) {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -290,10 +304,12 @@ public class VLPolygon {
     }
 
     boolean equivalent(VLPolygon polygon2, double epsilon) {
-        if (n() == 0 || polygon2.n() == 0)
+        if (n() == 0 || polygon2.n() == 0) {
             return false;
-        if (n() != polygon2.n())
+        }
+        if (n() != polygon2.n()) {
             return false;
+        }
         // Try all cyclic matches
         int n = n();// =polygon2.n()
         for (int offset = 0; offset < n; offset++) {
@@ -304,8 +320,9 @@ public class VLPolygon {
                     break;
                 }
             }
-            if (successful_match)
+            if (successful_match) {
                 return true;
+            }
         }
         return false;
     }
@@ -314,10 +331,12 @@ public class VLPolygon {
         assert (n() > 0 && polygon2.n() > 0);
 
         // Handle single point degeneracy.
-        if (n() == 1)
+        if (n() == 1) {
             return get(0).boundary_distance(polygon2);
-        else if (polygon2.n() == 1)
+        }
+        else if (polygon2.n() == 1) {
             return polygon2.get(0).boundary_distance(this);
+        }
         // Handle cases where each polygon has at least 2 points.
         // Initialize to an upper bound.
         double running_min = get(0).boundary_distance(polygon2);
@@ -327,8 +346,9 @@ public class VLPolygon {
             for (int j = 0; j <= polygon2.n() - 1; j++) {
                 distance_temp = new LineSegment(get(i), get(i + 1)).distance(new LineSegment(
                         polygon2.get(j), polygon2.get(j + 1)));
-                if (distance_temp < running_min)
+                if (distance_temp < running_min) {
                     running_min = distance_temp;
+                }
             }
         }
         return running_min;

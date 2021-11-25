@@ -11,8 +11,8 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.util.OTPFeature;
 
@@ -67,8 +67,7 @@ public class NetexModule implements GraphBuilderModule {
     ) {
 
         graph.clearTimeZone();
-        CalendarServiceData calendarServiceData = new CalendarServiceData();
-
+        CalendarServiceData calendarServiceData = graph.getCalendarDataService();
         try {
             for (NetexBundle netexBundle : netexBundles) {
                 netexBundle.checkInputs();
@@ -111,6 +110,7 @@ public class NetexModule implements GraphBuilderModule {
             throw new RuntimeException(e);
         }
 
+        graph.clearCachedCalenderService();
         graph.putService(CalendarServiceData.class, calendarServiceData);
         graph.updateTransitFeedValidity(calendarServiceData, issueStore);
 

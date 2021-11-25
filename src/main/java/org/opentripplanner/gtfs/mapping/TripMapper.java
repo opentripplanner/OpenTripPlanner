@@ -1,14 +1,14 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.Nullable;
+import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /** Responsible for mapping GTFS TripMapper into the OTP model. */
 class TripMapper {
@@ -31,6 +31,10 @@ class TripMapper {
         return orginal == null ? null : mappedTrips.computeIfAbsent(orginal, this::doMap);
     }
 
+    Collection<Trip> mappedTrips() {
+        return mappedTrips.values();
+    }
+
     private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
         Trip lhs = new Trip(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
@@ -39,28 +43,27 @@ class TripMapper {
         lhs.setTripShortName(rhs.getTripShortName());
         lhs.setTripHeadsign(rhs.getTripHeadsign());
         lhs.setRouteShortName(rhs.getRouteShortName());
-        lhs.setDirectionId(mapDirectionId(rhs));
+        lhs.setDirection(Direction.valueOfGtfsCode(mapDirectionId(rhs)));
         lhs.setBlockId(rhs.getBlockId());
         lhs.setShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));
         lhs.setWheelchairAccessible(rhs.getWheelchairAccessible());
-        lhs.setTripBikesAllowed(rhs.getTripBikesAllowed());
-        lhs.setBikesAllowed(rhs.getBikesAllowed());
+        lhs.setBikesAllowed(BikeAccessMapper.mapForTrip(rhs));
         lhs.setFareId(rhs.getFareId());
 
         return lhs;
     }
 
     @Nullable
-    private static Integer mapDirectionId(org.onebusaway.gtfs.model.Trip trip) {
+    private static int mapDirectionId(org.onebusaway.gtfs.model.Trip trip) {
         try {
             String directionId = trip.getDirectionId();
             if(directionId == null || directionId.isBlank()) {
-                return null;
+                return -1;
             }
             return Integer.parseInt(directionId);
         } catch (NumberFormatException e) {
             LOG.debug("Trip {} does not have direction id, defaults to -1", trip);
         }
-        return null;
+        return -1;
     }
 }

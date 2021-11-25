@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 import java.util.Set;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 
 /**
  * StateData contains the components of search state that are unlikely to be changed as often as
@@ -16,19 +17,21 @@ public class StateData implements Cloneable {
 
     // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
 
-    protected boolean usingRentedBike;
+    protected boolean vehicleParked;
 
-    protected boolean carParked;
+    protected VehicleRentalState vehicleRentalState;
 
-    protected boolean bikeParked;
-
-    protected boolean hasUsedRentedBike;
+    protected boolean mayKeepRentedVehicleAtDestination;
 
     protected CarPickupState carPickupState;
 
     protected RoutingRequest opt;
 
-    protected TraverseMode nonTransitMode;
+    /**
+     * The preferred mode, which may differ from backMode when for example walking with a bike.
+     * It may also change during traversal when switching between modes as in the case of Park & Ride or Kiss & Ride.
+     */
+    protected TraverseMode currentMode;
 
     /**
      * The mode that was used to traverse the backEdge
@@ -37,7 +40,9 @@ public class StateData implements Cloneable {
 
     protected boolean backWalkingBike;
 
-    public Set<String> bikeRentalNetworks;
+    public String vehicleRentalNetwork;
+
+    public FormFactor rentalVehicleFormFactor;
 
     /* This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
     protected boolean enteredNoThroughTrafficArea;
@@ -45,13 +50,13 @@ public class StateData implements Cloneable {
     public StateData(RoutingRequest options) {
         TraverseModeSet modes = options.streetSubRequestModes;
         if (modes.getCar())
-            nonTransitMode = TraverseMode.CAR;
+            currentMode = TraverseMode.CAR;
         else if (modes.getWalk())
-            nonTransitMode = TraverseMode.WALK;
+            currentMode = TraverseMode.WALK;
         else if (modes.getBicycle())
-            nonTransitMode = TraverseMode.BICYCLE;
+            currentMode = TraverseMode.BICYCLE;
         else
-            nonTransitMode = null;
+            currentMode = null;
     }
 
     protected StateData clone() {

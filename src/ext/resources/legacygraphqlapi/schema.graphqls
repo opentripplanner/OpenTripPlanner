@@ -233,6 +233,123 @@ type BikePark implements Node & PlaceInterface {
     lat: Float
 }
 
+"""Vehicle parking represents a location where bicycles or cars can be parked."""
+type VehicleParking implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the park"""
+    vehicleParkingId: String
+
+    """Name of the park"""
+    name: String!
+
+    """
+    If true, value of `spacesAvailable` is updated from a real-time source.
+    """
+    realtime: Boolean
+
+    """Longitude of the bike park (WGS 84)"""
+    lon: Float
+
+    """Latitude of the bike park (WGS 84)"""
+    lat: Float
+
+    """
+    URL which contains details of this vehicle parking.
+    """
+    detailsUrl: String
+
+    """
+    URL of an image which may be displayed to the user showing the vehicle parking.
+    """
+    imageUrl: String
+
+    """
+    Source specific tags of the vehicle parking, which describe the available features. For example
+    park_and_ride, bike_lockers, or static_osm_data.
+    """
+    tags: [String]
+
+    """
+    A short translatable note containing details of this vehicle parking.
+    """
+    note: String
+
+    """
+    The state of this vehicle parking.
+    Only ones in an OPERATIONAL state may be used for Park and Ride.
+    """
+    state: VehicleParkingState
+
+    """
+    Does this vehicle parking have spaces (capacity) for bicycles.
+    """
+    bicyclePlaces: Boolean
+
+    """
+    Does this vehicle parking have spaces (capacity) for either wheelchair accessible (disabled)
+    or normal cars.
+    """
+    anyCarPlaces: Boolean
+
+    """
+    Does this vehicle parking have spaces (capacity) for cars excluding wheelchair accessible spaces.
+    Use anyCarPlaces to check if any type of car may use this vehicle parking.
+    """
+    carPlaces: Boolean
+
+    """
+    Does this vehicle parking have wheelchair accessible (disabled) car spaces (capacity).
+    """
+    wheelchairAccessibleCarPlaces: Boolean
+
+    """
+    The capacity (maximum available spaces) of this vehicle parking.
+    """
+    capacity: VehicleParkingSpaces
+
+    """
+    The currently available spaces at this vehicle parking.
+    """
+    availability: VehicleParkingSpaces
+}
+
+"""
+The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that they
+may be represented differently to the user.
+"""
+enum VehicleParkingState {
+    """May be used for park and ride."""
+    OPERATIONAL
+    """Can't be used for park and ride."""
+    TEMPORARILY_CLOSED
+    """Can't be used for park and ride."""
+    CLOSED
+}
+
+"""
+The number of spaces by type. null if unknown.
+"""
+type VehicleParkingSpaces {
+    """
+    The number of bicycle spaces.
+    """
+    bicycleSpaces: Int
+
+    """
+    The number of car spaces.
+    """
+    carSpaces: Int
+
+    """
+    The number of wheelchair accessible (disabled) car spaces.
+    """
+    wheelchairAccessibleCarSpaces: Int
+}
+
 """
 Bike rental station represents a location where users can rent bicycles for a fee.
 """
@@ -249,27 +366,24 @@ type BikeRentalStation implements Node & PlaceInterface {
     name: String!
 
     """
-    Number of bikes currently available on the rental station. The total capacity
-    of this bike rental station is the sum of fields `bikesAvailable` and
-    `spacesAvailable`.
+    Number of bikes currently available on the rental station.
+    See field `allowPickupNow` to know if is currently possible to pick up a bike.
     """
     bikesAvailable: Int
 
     """
-    Number of free spaces currently available on the rental station. The total
-    capacity of this bike rental station is the sum of fields `bikesAvailable` and
-    `spacesAvailable`.
-    Note that this value being 0 does not necessarily indicate that bikes cannot
-    be returned to this station, as it might be possible to leave the bike in the
-    vicinity of the rental station, even if the bike racks don't have any spaces
-    available (see field `allowDropoff`).
+    Number of free spaces currently available on the rental station.
+    Note that this value being 0 does not necessarily indicate that bikes cannot be returned
+    to this station, as for example it might be possible to leave the bike in the vicinity of
+    the rental station, even if the bike racks don't have any spaces available.
+    See field `allowDropoffNow` to know if is currently possible to return a bike.
     """
     spacesAvailable: Int
 
     """
     A description of the current state of this bike rental station, e.g. "Station on"
-  """
-    state: String
+    """
+    state: String @deprecated(reason: "Use operative instead")
 
     """
     If true, values of `bikesAvailable` and `spacesAvailable` are updated from a
@@ -278,8 +392,23 @@ type BikeRentalStation implements Node & PlaceInterface {
     """
     realtime: Boolean
 
-    """If true, bikes can be returned to this station."""
+    """
+    If true, bikes can be returned to this station if the station has spaces available
+    or allows overloading.
+    """
     allowDropoff: Boolean
+
+    """
+    If true, bikes can be picked up from this station if the station has bikes available.
+    """
+    allowPickup: Boolean
+
+    """If true, bikes can be currently returned to this station."""
+    allowDropoffNow: Boolean
+
+    """If true, bikes can be currently picked up from this station."""
+    allowPickupNow: Boolean
+
     networks: [String]
 
     """Longitude of the bike rental station (WGS 84)"""
@@ -287,6 +416,177 @@ type BikeRentalStation implements Node & PlaceInterface {
 
     """Latitude of the bike rental station (WGS 84)"""
     lat: Float
+
+    """Nominal capacity (number of racks) of the rental station."""
+    capacity: Int
+
+    """If true, bikes can be returned even if spacesAvailable is zero or bikes > capacity."""
+    allowOverloading: Boolean
+
+    """Platform-specific URLs to begin renting a bike from this station."""
+    rentalUris: BikeRentalStationUris
+
+    """
+    If true, station is on and in service.
+    """
+    operative: Boolean
+}
+
+"""
+Vehicle rental station represents a location where users can rent bicycles etc. for a fee.
+"""
+type VehicleRentalStation implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the vehicle in the format of network:id"""
+    stationId: String
+
+    """Name of the vehicle rental station"""
+    name: String!
+
+    """
+    Number of vehicles currently available on the rental station.
+    See field `allowPickupNow` to know if is currently possible to pick up a vehicle.
+    """
+    vehiclesAvailable: Int
+
+    """
+    Number of free spaces currently available on the rental station.
+    Note that this value being 0 does not necessarily indicate that vehicles cannot be returned
+    to this station, as for example it might be possible to leave the vehicle in the vicinity of
+    the rental station, even if the vehicle racks don't have any spaces available.
+    See field `allowDropoffNow` to know if is currently possible to return a vehicle.
+    """
+    spacesAvailable: Int
+
+    """
+    If true, values of `vehiclesAvailable` and `spacesAvailable` are updated from a
+    real-time source. If false, values of `vehiclesAvailable` and `spacesAvailable`
+    are always the total capacity divided by two.
+    """
+    realtime: Boolean
+
+    """
+    If true, vehicles can be returned to this station if the station has spaces available
+    or allows overloading.
+    """
+    allowDropoff: Boolean
+
+    """
+    If true, vehicles can be picked up from this station if the station has vehicles available.
+    """
+    allowPickup: Boolean
+
+    """If true, vehicles can be currently returned to this station."""
+    allowDropoffNow: Boolean
+
+    """If true, vehicles can be currently picked up from this station."""
+    allowPickupNow: Boolean
+
+    """ID of the rental network."""
+    network: String
+
+    """Longitude of the vehicle rental station (WGS 84)"""
+    lon: Float
+
+    """Latitude of the vehicle rental station (WGS 84)"""
+    lat: Float
+
+    """Nominal capacity (number of racks) of the rental station."""
+    capacity: Int
+
+    """If true, vehicles can be returned even if spacesAvailable is zero or vehicles > capacity."""
+    allowOverloading: Boolean
+
+    """Platform-specific URLs to begin renting a vehicle from this station."""
+    rentalUris: VehicleRentalUris
+
+    """
+    If true, station is on and in service.
+    """
+    operative: Boolean
+}
+
+"""
+Rental vehicle represents a vehicle that belongs to a rental network.
+"""
+type RentalVehicle implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the vehicle in the format of network:id"""
+    vehicleId: String
+
+    """Name of the vehicle"""
+    name: String!
+
+    """If true, vehicle is currently available for renting."""
+    allowPickupNow: Boolean
+
+    """ID of the rental network."""
+    network: String
+
+    """Longitude of the vehicle (WGS 84)"""
+    lon: Float
+
+    """Latitude of the vehicle (WGS 84)"""
+    lat: Float
+
+    """Platform-specific URLs to begin the vehicle."""
+    rentalUris: VehicleRentalUris
+
+    """
+    If true, vehicle is not disabled.
+    """
+    operative: Boolean
+}
+
+type BikeRentalStationUris {
+    """
+    A URI that can be passed to an Android app with an {@code android.intent.action.VIEW} Android
+    intent to support Android Deep Links.
+    May be null if a rental URI does not exist.
+    """
+    android: String
+
+    """
+    A URI that can be used on iOS to launch the rental app for this station.
+    May be {@code null} if a rental URI does not exist.
+    """
+    ios: String
+
+    """
+    A URL that can be used by a web browser to show more information about renting a vehicle at
+    this station.
+    May be {@code null} if a rental URL does not exist.
+    """
+    web: String
+}
+
+type VehicleRentalUris {
+    """
+    A URI that can be passed to an Android app with an {@code android.intent.action.VIEW} Android
+    intent to support Android Deep Links.
+    May be null if a rental URI does not exist.
+    """
+    android: String
+
+    """
+    A URI that can be used on iOS to launch the rental app for this rental network.
+    May be {@code null} if a rental URI does not exist.
+    """
+    ios: String
+
+    """
+    A URL that can be used by a web browser to show more information about renting a vehicle.
+    May be {@code null} if a rental URL does not exist.
+    """
+    web: String
 }
 
 enum BikesAllowed {
@@ -552,7 +852,7 @@ input InputFilters {
     """Routes to include by GTFS id."""
     routes: [String]
 
-    """Bike rentals to include by id."""
+    """Bike rentals to include by id (without network identifier)."""
     bikeRentalStations: [String]
 
     """Bike parks to include by id."""
@@ -699,6 +999,19 @@ type Itinerary {
     How much elevation is lost, in total, over the course of the itinerary, in meters.
     """
     elevationLost: Float
+
+    """
+    Does the itinerary end without dropping off the rented bicycle:
+    """
+    arrivedAtDestinationWithRentedBicycle: Boolean
+
+    """
+    A list of system notices. Contains debug information for itineraries.
+    One use-case is to run a routing search with 'debugItineraryFilter: true'.
+    This will then tag itineraries instead of removing them from the result.
+    This make it possible to inspect the itinerary-filter-chain.
+    """
+    systemNotices: [SystemNotice]!
 }
 
 type Leg {
@@ -754,6 +1067,9 @@ type Leg {
 
     """Whether this leg is a transit leg or not."""
     transitLeg: Boolean
+
+    "Whether this leg is walking with a bike."
+    walkingBike: Boolean
 
     """Whether this leg is traversed with a rented bike."""
     rentedBike: Boolean
@@ -814,6 +1130,10 @@ type Leg {
     and passenger can stay inside the vehicle.
     """
     interlineWithPreviousLeg: Boolean
+
+    dropOffBookingInfo: BookingInfo
+
+    pickupBookingInfo: BookingInfo
 }
 
 """Identifies whether this stop represents a stop or station."""
@@ -845,11 +1165,17 @@ enum Mode {
     """CAR"""
     CAR
 
+    """COACH"""
+    COACH
+
     """FERRY"""
     FERRY
 
     """Enables flexible transit for access and egress legs"""
-    FLEXIBLE
+    FLEX
+
+    """Enables flexible transit for access and egress legs"""
+    FLEXIBLE   @deprecated(reason: "Use FLEX instead")
 
     """FUNICULAR"""
     FUNICULAR
@@ -862,6 +1188,9 @@ enum Mode {
 
     """RAIL"""
     RAIL
+
+    """SCOOTER"""
+    SCOOTER
 
     """SUBWAY"""
     SUBWAY
@@ -994,6 +1323,32 @@ enum PickupDropoffType {
     COORDINATE_WITH_DRIVER
 }
 
+type ContactInfo {
+    contactPerson: String
+    phoneNumber: String
+    eMail: String
+    faxNumber: String
+    infoUrl: String
+    bookingUrl: String
+    additionalDetails: String
+}
+
+type BookingTime {
+    time: String
+    daysPrior: Int
+}
+
+type BookingInfo {
+    contactInfo: ContactInfo
+    earliestBookingTime: BookingTime
+    latestBookingTime: BookingTime
+    minimumBookingNoticeSeconds: Long
+    maximumBookingNoticeSeconds: Long
+    message: String
+    pickupMessage: String
+    dropOffMessage: String
+}
+
 type Place {
     """
     For transit stops, the name of the stop. For points of interest, the name of the POI.
@@ -1026,13 +1381,22 @@ type Place {
     stop: Stop
 
     """The bike rental station related to the place"""
-    bikeRentalStation: BikeRentalStation
+    bikeRentalStation: BikeRentalStation @deprecated(reason: "Use vehicleRentalStation and rentalVehicle instead")
+
+    """The vehicle rental station related to the place"""
+    vehicleRentalStation: VehicleRentalStation
+
+    """The rental vehicle related to the place"""
+    rentalVehicle: RentalVehicle
 
     """The bike parking related to the place"""
-    bikePark: BikePark
+    bikePark: BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """The car parking related to the place"""
-    carPark: CarPark
+    carPark: CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
+
+    """The vehicle parking related to the place"""
+    vehicleParking: VehicleParking
 }
 
 type placeAtDistance implements Node {
@@ -1134,7 +1498,7 @@ enum Qualifier {
     ~~HAVE~~
     **Currently not used**
     """
-    HAVE
+    HAVE    @deprecated(reason: "Currently not used")
 
     """
     The vehicle used must be left to a parking area before continuing the journey.
@@ -1149,13 +1513,22 @@ enum Qualifier {
     ~~KEEP~~
     **Currently not used**
     """
-    KEEP
+    KEEP    @deprecated(reason: "Currently not used")
 
     """The user can be picked up by someone else riding a vehicle"""
     PICKUP
 
     """The user can be dropped off by someone else riding a vehicle"""
     DROPOFF
+
+    """The mode is used for the access part of the search."""
+    ACCESS,
+
+    """The mode is used for the egress part of the search."""
+    EGRESS,
+
+    """The mode is used for the direct street search."""
+    DIRECT
 }
 
 type QueryType {
@@ -1442,20 +1815,57 @@ type QueryType {
     serviceTimeRange: serviceTimeRange
 
     """Get all bike rental stations"""
-    bikeRentalStations: [BikeRentalStation]
+    bikeRentalStations(
+        """
+        Return bike rental stations with these ids.
+        **Note:** if an id is invalid (or the bike rental station service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [BikeRentalStation] @deprecated(reason: "Use rentalVehicles or vehicleRentalStations instead")
 
     """
     Get a single bike rental station based on its ID, i.e. value of field `stationId`
     """
-    bikeRentalStation(id: String!): BikeRentalStation
+    bikeRentalStation(id: String!): BikeRentalStation @deprecated(reason: "Use rentalVehicle or vehicleRentalStation instead")
+
+    """Get all rental vehicles"""
+    rentalVehicles(
+        """
+        Return rental vehicles with these ids, i.e. value of field `vehicleId`.
+        **Note:** if an id is invalid (or the rental service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [RentalVehicle]
+
+    """
+    Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`
+    """
+    rentalVehicle(id: String!): RentalVehicle
+
+    """Get all vehicle rental stations"""
+    vehicleRentalStations(
+        """
+        Return vehicle rental stations with these ids, i.e. value of field `stationId`.
+        **Note:** if an id is invalid (or the rental service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [VehicleRentalStation]
+
+    """
+    Get a single vehicle rental station based on its ID, i.e. value of field `stationId`
+    """
+    vehicleRentalStation(id: String!): VehicleRentalStation
 
     """Get all bike parks"""
-    bikeParks: [BikePark]
+    bikeParks: [BikePark] @deprecated(reason: "bikeParks is deprecated. Use vehicleParkings instead.")
 
     """
     Get a single bike park based on its ID, i.e. value of field `bikeParkId`
     """
-    bikePark(id: String!): BikePark
+    bikePark(id: String!): BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """Get all car parks"""
     carParks(
@@ -1464,10 +1874,25 @@ type QueryType {
         **Note:** if an id is invalid (or the car park service is unavailable) the returned list will contain `null` values.
         """
         ids: [String]
-    ): [CarPark]
+    ): [CarPark] @deprecated(reason: "carParks is deprecated. Use vehicleParkings instead.")
 
     """Get a single car park based on its ID, i.e. value of field `carParkId`"""
-    carPark(id: String!): CarPark
+    carPark(id: String!): CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
+
+    """Get all vehicle parkings"""
+    vehicleParkings(
+        """
+        Return vehicle parkings with these ids.
+        **Note:** if an id is invalid (or the vehicle parking service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [VehicleParking]
+
+    """
+    Get a single vehicle parking based on its ID
+    """
+    vehicleParking(id: String!): VehicleParking
 
     """Needed until https://github.com/facebook/relay/issues/112 is resolved"""
     viewer: QueryType
@@ -1543,12 +1968,16 @@ type QueryType {
         transport modes are allowed (e.g. `WALK` and `RAIL`), it is possible to get
         an itinerary which has (useless) back and forth public transport legs to
         avoid walking too long distances.
+
+        DEPRECATED - Use walkReluctance instead
         """
         maxWalkDistance: Float
 
         """
         The maximum time (in seconds) of pre-transit travel when using
         drive-to-transit (park and ride or kiss and ride). Default value: 1800.
+
+        DEPRECATED - Use walkReluctance or future reluctance parameters for other modes
         """
         maxPreTransitTime: Int
 
@@ -1566,6 +1995,24 @@ type QueryType {
         argument (e.g. `itineraryFiltering = 0.5` → 200% worse itineraries are filtered).
         """
         itineraryFiltering: Float
+
+        """
+        A multiplier for how bad biking is, compared to being in transit for equal
+        lengths of time. Default value: 2.0
+        """
+        bikeReluctance: Float
+
+        """
+        A multiplier for how bad walking with a bike is, compared to being in transit for equal
+        lengths of time. Default value: 5.0
+        """
+        bikeWalkingReluctance: Float
+
+        """
+        A multiplier for how bad driving is, compared to being in transit for equal
+        lengths of time. Default value: 3.0
+        """
+        carReluctance: Float
 
         """
         A multiplier for how bad walking is, compared to being in transit for equal
@@ -1696,8 +2143,25 @@ type QueryType {
         """
         modeWeight: InputModeWeight
 
+        """
+        Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, but does NOT delete them when this is enabled.
+        """
+        debugItineraryFilter: Boolean
+
         """Is bike rental allowed? Default value: false"""
-        allowBikeRental: Boolean
+        allowBikeRental: Boolean @deprecated(reason: "Rental is specified by modes")
+
+        """
+        Whether arriving at the destination with a rented (station) bicycle is allowed without
+        dropping it off. Default: false.
+        """
+        allowKeepingRentedBicycleAtDestination: Boolean
+
+        """
+        The cost of arriving at the destination with the rented bicycle, to discourage doing so.
+        Default value: 0.
+        """
+        keepingRentedBicycleAtDestinationCost: Int
 
         """
         Invariant: `boardSlack + alightSlack <= transferSlack`. Default value: 0
@@ -2338,6 +2802,21 @@ type Trip implements Node {
 
     """List of alerts which have an effect on this trip"""
     alerts: [Alert]
+}
+
+"""
+A system notice is used to tag elements with system information for debugging
+or other system related purpose. One use-case is to run a routing search with
+'debugItineraryFilter: true'. This will then tag itineraries instead of removing
+them from the result. This make it possible to inspect the itinerary-filter-chain.
+A SystemNotice only has english text,
+because the primary user are technical staff, like testers and developers.
+"""
+type SystemNotice {
+    """Notice's tag"""
+    tag: String
+    """Notice's description"""
+    text: String
 }
 
 enum VertexType {

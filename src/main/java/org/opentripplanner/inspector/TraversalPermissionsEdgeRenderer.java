@@ -26,9 +26,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
 
     private static final Color TRANSIT_STOP_COLOR_VERTEX = new Color(0.0f, 0.0f, 0.8f);
 
-    private static final Color TRANSIT_STATION_COLOR_VERTEX = new Color(0.4f, 0.0f, 0.8f);
-
-    private static final Color BIKE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
+    private static final Color VEHICLE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
 
     private static final Color PARK_AND_RIDE_COLOR_VERTEX = Color.RED;
 
@@ -46,17 +44,18 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
                 attrs.color = getColor(pse.getPermission());
                 attrs.label = getLabel(pse.getPermission());
             }
-        } else if (e instanceof StreetTransitLink) {
-            attrs.color = LINK_COLOR_EDGE;
-            attrs.label = "link";
-        } else if (e instanceof StreetBikeRentalLink) {
-            attrs.color = LINK_COLOR_EDGE;
-            attrs.label = "link";
-        } else if (e instanceof ParkAndRideLinkEdge) {
-            attrs.color = LINK_COLOR_EDGE;
-            attrs.label = "link";
+            if (pse.isMotorVehicleNoThruTraffic()) {
+                attrs.label += " car NTT";
+            }
+            if (pse.isBicycleNoThruTraffic()) {
+                attrs.label += " bike NTT";
+            }
+            if (pse.isWalkNoThruTraffic()) {
+                attrs.label += " walk NTT";
+            }
         } else {
-            return false;
+            attrs.color = LINK_COLOR_EDGE;
+            attrs.label = "link";
         }
         return true;
     }
@@ -68,13 +67,13 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
             if (v instanceof BarrierVertex) {
                 attrs.color = BARRIER_COLOR_VERTEX;
             }
-        } else if (v instanceof TransitStopVertex) {
+        } else if (v instanceof TransitStopVertex || v instanceof TransitEntranceVertex || v instanceof TransitPathwayNodeVertex || v instanceof TransitBoardingAreaVertex) {
             attrs.color = TRANSIT_STOP_COLOR_VERTEX;
             attrs.label = v.getName();
-        } else if (v instanceof BikeRentalStationVertex) {
-            attrs.color = BIKE_RENTAL_COLOR_VERTEX;
+        } else if (v instanceof VehicleRentalStationVertex) {
+            attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
             attrs.label = v.getName();
-        } else if (v instanceof ParkAndRideVertex) {
+        } else if (v instanceof VehicleParkingEntranceVertex) {
             attrs.color = PARK_AND_RIDE_COLOR_VERTEX;
             attrs.label = v.getName();
         } else {
@@ -91,12 +90,15 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
         float r = 0.2f;
         float g = 0.2f;
         float b = 0.2f;
-        if (permissions.allows(StreetTraversalPermission.PEDESTRIAN))
+        if (permissions.allows(StreetTraversalPermission.PEDESTRIAN)) {
             g += 0.5f;
-        if (permissions.allows(StreetTraversalPermission.BICYCLE))
+        }
+        if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
             b += 0.5f;
-        if (permissions.allows(StreetTraversalPermission.CAR))
+        }
+        if (permissions.allows(StreetTraversalPermission.CAR)) {
             r += 0.5f;
+        }
         // TODO CUSTOM_VEHICLE (?)
         return new Color(r, g, b);
     }

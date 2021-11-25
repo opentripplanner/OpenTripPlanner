@@ -1,8 +1,9 @@
 package org.opentripplanner.model.base;
 
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class ValueObjectToStringBuilderTest {
     private enum  AEnum { A }
@@ -32,6 +33,13 @@ public class ValueObjectToStringBuilderTest {
         assertEquals("3.0", subject().addNum(3.0000f).toString());
         assertEquals("3,000", subject().addNum(3000).toString());
         assertEquals("3", subject().addNum(3L).toString());
+        assertEquals(
+                "(-null)",
+                subject().addText("(")
+                        .skipNull().addNum(null).addText("-")
+                        .includeNull().addNum(null)
+                        .addText(")").toString()
+        );
     }
 
     @Test
@@ -41,6 +49,8 @@ public class ValueObjectToStringBuilderTest {
                 subject()
                         .addNum(3, " minutes")
                         .addNum(7000, " seconds")
+                        .skipNull()
+                        .addNum(null, "cows")
                         .toString()
         );
     }
@@ -48,10 +58,13 @@ public class ValueObjectToStringBuilderTest {
     @Test
     public void addBool() {
         assertEquals(
-                "include nothing",
+                "include nothing null",
                 subject()
                         .addBool(true, "include", "skip")
                         .addBool(false, "everything", "nothing")
+                        .addBool(null, "all", "nothing")
+                        .skipNull()
+                        .addBool(null, "to skip", "or not to skip")
                         .toString()
         );
     }
@@ -59,18 +72,23 @@ public class ValueObjectToStringBuilderTest {
     @Test
     public void addStr() {
         assertEquals("'text'", subject().addStr("text").toString());
+        assertEquals(
+                "null-",
+                subject().addStr(null).addText("-").skipNull().addStr(null).toString()
+        );
     }
 
     @Test
-    public void addLbl() {
-        assertEquals("abba", subject().addLbl("ab").addLbl("ba").toString());
-        assertEquals("a_2_b", subject().addLbl("a_").addNum(2).addLbl("_b").toString());
+    public void addText() {
+        assertEquals("abba", subject().addText("ab").addText("ba").toString());
+        assertEquals("a_2_b", subject().addText("a_").addNum(2).addText("_b").toString());
     }
 
     @Test
     public void addEnum() {
         assertEquals("A", subject().addEnum(AEnum.A).toString());
         assertEquals("null", subject().addEnum(null).toString());
+        assertEquals("", subject().skipNull().addEnum(null).toString());
     }
 
     @Test
@@ -83,6 +101,10 @@ public class ValueObjectToStringBuilderTest {
                 "null",
                 subject().addObj(null).toString()
         );
+        assertEquals(
+                "",
+                subject().skipNull().addObj(null).toString()
+        );
     }
 
     @Test
@@ -91,20 +113,28 @@ public class ValueObjectToStringBuilderTest {
                 "(60.98766, 11.98)",
                 subject().addCoordinate(60.9876599999999d, 11.98d).toString()
         );
+        assertEquals(
+                "(null, null)",
+                subject().addCoordinate(null, null).toString()
+        );
+        assertEquals(
+                "",
+                subject().skipNull().addCoordinate(null, null).toString()
+        );
     }
 
     @Test
     public void addSecondsPastMidnight() {
         assertEquals(
-                "00:00:35",
+                "0:00:35",
                 subject().addServiceTime(35).toString()
         );
         assertEquals(
-                "26:50:45",
+                "2:50:45+1d",
                 subject().addServiceTime((26 * 60 + 50) * 60 + 45).toString()
         );
         assertEquals(
-                "-00:00:01",
+                "23:59:59-1d",
                 subject().addServiceTime(-1).toString()
         );
     }
@@ -119,5 +149,26 @@ public class ValueObjectToStringBuilderTest {
                 "1d2h50m45s",
                 subject().addDuration((26 * 60 + 50) * 60 + 45).toString()
         );
+        assertEquals(
+                "",
+                subject().skipNull().addDuration(null).toString()
+        );
     }
+
+    @Test
+    public void addCost() {
+        assertEquals("null", subject().addCost(null).toString());
+        assertEquals("", subject().skipNull().addCost(null).toString());
+        assertEquals("$-0.01", subject().addCost(-1).toString());
+        assertEquals("$0", subject().addCost(0).toString());
+        assertEquals("$0.01", subject().addCost(1).toString());
+        assertEquals("$1", subject().addCost(100).toString());
+        assertEquals("$100.01", subject().addCost(10001).toString());
+
+        assertEquals("null", subject().addCost(null, "pip").toString());
+        assertEquals("", subject().skipNull().addCost(null, "pip").toString());
+        assertEquals("$-0.01pip", subject().addCost(-1, "pip").toString());
+        assertEquals("$1pip", subject().addCost(100, "pip").toString());
+    }
+
 }

@@ -18,14 +18,14 @@ public final class BitSetIterator implements IntIterator {
     }
 
     @Override
-    public final int next() {
+    public int next() {
         int index = nextIndex;
         nextIndex = set.nextSetBit(index + 1);
         return index;
     }
 
     @Override
-    public final boolean hasNext() {
+    public boolean hasNext() {
         return nextIndex != -1;
     }
 }

@@ -42,12 +42,13 @@ public class ShortestPathTree {
     /** @return a list of GraphPaths, sometimes empty but never null. */
     public List<GraphPath> getPaths(Vertex dest, boolean optimize) {
         List<? extends State> stateList = getStates(dest);
-        if (stateList == null)
+        if (stateList == null) {
             return Collections.emptyList();
-        List<GraphPath> ret = new LinkedList<GraphPath>();
+        }
+        List<GraphPath> ret = new LinkedList<>();
         for (State s : stateList) {
             if (s.isFinal()) {
-                ret.add(new GraphPath(s, optimize));
+                ret.add(new GraphPath(s));
             }
         }
         return ret;
@@ -68,7 +69,7 @@ public class ShortestPathTree {
         if (s == null) {
             return null;
         } else {
-            return new GraphPath(s, optimize);
+            return new GraphPath(s);
         }
     }
 
@@ -134,10 +135,12 @@ public class ShortestPathTree {
             State oldState = it.next();
             // order is important, because in the case of a tie
             // we want to reject the new state
-            if (dominanceFunction.betterOrEqualAndComparable(oldState, newState))
+            if (dominanceFunction.betterOrEqualAndComparable(oldState, newState)) {
                 return false;
-            if (dominanceFunction.betterOrEqualAndComparable(newState, oldState))
+            }
+            if (dominanceFunction.betterOrEqualAndComparable(newState, oldState)) {
                 it.remove();
+            }
         }
 
         // any states remaining are co-dominant with the new state
@@ -153,8 +156,9 @@ public class ShortestPathTree {
      */
     public State getState(Vertex dest) {
         Collection<State> states = stateSets.get(dest);
-        if (states == null)
+        if (states == null) {
             return null;
+        }
         State ret = null;
         // TODO are we only checking path parser acceptance when we fetch states via this specific method?
         for (State s : states) {

@@ -25,6 +25,13 @@ import java.util.function.IntConsumer;
 public interface WorkerLifeCycle {
 
     /**
+     * Subscribe to 'routing search' events by register a boolean consumer. The route search
+     * subscriber is notified before each routing search is done and the search direction
+     * is passed in as a boolean flag to subscriber.
+     */
+    void onRouteSearch(Consumer<Boolean> routeSearchWithDirectionSubscriber);
+
+    /**
      * Subscribe to 'setup iteration' events by register a int consumer. Every time
      * an iteration start the listener(the input parameter) is notified with
      * the {@code iterationDepartureTime} passed in as an argument.

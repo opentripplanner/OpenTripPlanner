@@ -37,7 +37,7 @@ public class StopsAlerts implements GraphBuilderModule {
         try {
             PrintWriter pw = new PrintWriter(new File(logFile));
             pw.printf("%s,%s,%s,%s\n","stopId","lon","lat","types");
-            for (TransitStopVertex ts : Iterables.filter(graph.getVertices(), TransitStopVertex.class)) {
+            for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
                 StringBuilder types = new StringBuilder();
                 for(IStopTester stopTester:stopTesters){
                     if(stopTester.fulfillDemands(ts,graph)){

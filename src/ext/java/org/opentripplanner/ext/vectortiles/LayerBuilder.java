@@ -12,6 +12,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
 
 import java.util.List;
+import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters;
 
 public abstract class LayerBuilder<T> {
   static private final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
@@ -24,11 +25,11 @@ public abstract class LayerBuilder<T> {
     this.layerBuilder = MvtLayerBuild.newLayerBuilder(layerName, MvtLayerParams.DEFAULT);
   }
 
-  VectorTile.Tile.Layer build(Envelope envelope) {
+  VectorTile.Tile.Layer build(Envelope envelope, LayerParameters params) {
     Envelope query = new Envelope(envelope);
     query.expandBy(
-        envelope.getWidth() * getExpansionFactor(),
-        envelope.getHeight() * getExpansionFactor());
+        envelope.getWidth() * params.expansionFactor(),
+        envelope.getHeight() * params.expansionFactor());
 
     TileGeomResult tileGeom = JtsAdapter.createTileGeom(
         getGeometries(query),
@@ -51,10 +52,4 @@ public abstract class LayerBuilder<T> {
    * an object of type T as their userData.
    */
   abstract protected List<Geometry> getGeometries(Envelope query);
-
-  /**
-   * How far outside its boundaries should the tile contain information. The value is a fraction of
-   * the tile size.
-   */
-  abstract protected double getExpansionFactor();
 }

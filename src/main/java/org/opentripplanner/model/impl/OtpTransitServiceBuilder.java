@@ -2,6 +2,11 @@ package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
@@ -26,7 +31,6 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -36,14 +40,10 @@ import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.TransferPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class is responsible for building a {@link OtpTransitService}. The instance returned by the
@@ -99,7 +99,7 @@ public class OtpTransitServiceBuilder {
 
     private final EntityById<FareZone> fareZonesById = new EntityById<>();
 
-    private final List<Transfer> transfers = new ArrayList<>();
+    private final List<ConstrainedTransfer> transfers = new ArrayList<>();
 
     private final EntityById<Trip> tripsById = new EntityById<>();
 
@@ -206,7 +206,7 @@ public class OtpTransitServiceBuilder {
 
     public EntityById<FareZone> getFareZonesById() { return fareZonesById; }
 
-    public List<Transfer> getTransfers() {
+    public List<ConstrainedTransfer> getTransfers() {
         return transfers;
     }
 
@@ -332,13 +332,19 @@ public class OtpTransitServiceBuilder {
     /** Remove all transfers witch reference none existing trips */
     private void removeTransfersForNoneExistingTrips() {
         int orgSize = transfers.size();
-        transfers.removeIf(it -> noTripExist(it.getFromTrip()) || noTripExist(it.getToTrip()));
+        transfers.removeIf(this::transferTripsDoesNotExist);
         logRemove("Trip", orgSize, transfers.size(), "Transfer to/from trip does not exist.");
     }
 
+    /** Return {@code true} if the from/to trip reference is none null, but do not exist. */
+    private boolean transferTripsDoesNotExist(ConstrainedTransfer t) {
+        return transferTripPointDoesNotExist(t.getFrom())
+            || transferTripPointDoesNotExist(t.getTo());
+    }
+
     /** Return true if the trip is a valid reference; {@code null} or exist. */
-    private boolean noTripExist(Trip t) {
-        return t != null && !tripsById.containsKey(t.getId());
+    private boolean transferTripPointDoesNotExist(TransferPoint p) {
+        return p.getTrip() != null && !tripsById.containsKey(p.getTrip().getId());
     }
 
     private static void logRemove(String type, int orgSize, int newSize, String reason) {

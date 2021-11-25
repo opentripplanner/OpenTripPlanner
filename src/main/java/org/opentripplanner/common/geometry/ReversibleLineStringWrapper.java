@@ -13,23 +13,28 @@ public class ReversibleLineStringWrapper {
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof ReversibleLineStringWrapper))
+        if (!(other instanceof ReversibleLineStringWrapper)) {
             return false;
+        }
         ReversibleLineStringWrapper that = (ReversibleLineStringWrapper) other;
         CoordinateSequence cs0 = this.ls.getCoordinateSequence();
         CoordinateSequence cs1 = that.ls.getCoordinateSequence();
-        if (cs0.equals(cs1))
+        if (cs0.equals(cs1)) {
             return true;
+        }
         return matchesBackward(cs0, cs1);
     }
 
     public boolean matchesBackward(CoordinateSequence cs0, CoordinateSequence cs1) {
-        if (cs0.size() != cs1.size())
+        if (cs0.size() != cs1.size()) {
             return false;
+        }
         int maxIdx = cs0.size() - 1;
-        for (int i = 0; i <= maxIdx; i++)
-            if (!cs0.getCoordinate(i).equals(cs1.getCoordinate(maxIdx - i)))
+        for (int i = 0; i <= maxIdx; i++) {
+            if (!cs0.getCoordinate(i).equals(cs1.getCoordinate(maxIdx - i))) {
                 return false;
+            }
+        }
         return true;
     }
 

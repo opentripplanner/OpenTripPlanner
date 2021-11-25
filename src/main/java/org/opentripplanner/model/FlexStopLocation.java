@@ -15,6 +15,8 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   private Geometry geometry;
 
+  private String zoneId;
+
   public FlexStopLocation(FeedScopedId id) {
     super(id);
   }
@@ -44,22 +46,20 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   }
 
   /**
-   * Short text or a number that identifies the location for riders. These codes are often used in
-   * phone-based reservation systems to make it easier for riders to specify a particular location.
-   * The stop_code can be the same as id if it is public facing. This field should be left empty for
-   * locations without a code presented to riders.
-   */
-  @Override
-  public String getCode() {
-    return null;
-  }
-
-  /**
    * Returns the centroid of this location.
    */
   @Override
   public WgsCoordinate getCoordinate() {
     Point centroid = geometry.getCentroid();
     return new WgsCoordinate(centroid.getY(), centroid.getX());
+  }
+
+  @Override
+  public String getFirstZoneAsString() {
+    return zoneId;
+  }
+
+  public void setZoneId(String zoneId) {
+    this.zoneId = zoneId;
   }
 }

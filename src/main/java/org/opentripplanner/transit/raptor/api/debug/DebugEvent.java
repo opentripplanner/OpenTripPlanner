@@ -102,7 +102,7 @@ public class DebugEvent<E> {
     public String toString() {
         return ToStringBuilder.of(DebugEvent.class)
             .addEnum("action", action)
-            .addServiceTime("iterationStartTime", iterationStartTime, -9_999)
+            .addServiceTime("iterationStartTime", iterationStartTime)
             .addObj("element", element)
             .addObj("rejectedDroppedByElement", rejectedDroppedByElement)
             .addStr("reason", reason)

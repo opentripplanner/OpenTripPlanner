@@ -173,10 +173,12 @@ public class RecursiveGridIsolineBuilder {
         }
 
         private final int cut(long z0) {
-            if (A.z < z0 && z0 <= B.z)
+            if (A.z < z0 && z0 <= B.z) {
                 return 1;
-            if (B.z < z0 && z0 <= A.z)
+            }
+            if (B.z < z0 && z0 <= A.z) {
                 return -1;
+            }
             return 0;
         }
 

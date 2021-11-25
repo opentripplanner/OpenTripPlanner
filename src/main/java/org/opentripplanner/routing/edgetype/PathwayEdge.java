@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -14,7 +15,9 @@ import java.util.Locale;
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge extends Edge {
+public class PathwayEdge extends Edge implements BikeWalkableEdge {
+
+    private static final long serialVersionUID = -3311099256178798982L;
 
     private int traversalTime;
     private double distance;
@@ -23,6 +26,7 @@ public class PathwayEdge extends Edge {
     private String name = "pathway";
 
     private boolean wheelchairAccessible = true;
+    private FeedScopedId id;
 
     public PathwayEdge(Vertex fromv, Vertex tov, String name) {
         super(fromv, tov);
@@ -32,6 +36,7 @@ public class PathwayEdge extends Edge {
     public PathwayEdge(
         Vertex fromv,
         Vertex tov,
+        FeedScopedId id,
         String name,
         int traversalTime,
         double distance,
@@ -40,6 +45,7 @@ public class PathwayEdge extends Edge {
         boolean wheelchairAccessible
     ) {
         super(fromv, tov);
+        this.id = id;
         this.traversalTime = traversalTime;
         this.distance = distance;
         this.steps = steps;
@@ -52,8 +58,6 @@ public class PathwayEdge extends Edge {
         }
     }
 
-    private static final long serialVersionUID = -3311099256178798982L;
-
     public String getDirection() {
         return null;
     }
@@ -62,8 +66,18 @@ public class PathwayEdge extends Edge {
         return this.distance;
     }
 
-    public TraverseMode getMode() {
-       return TraverseMode.WALK;
+    @Override
+    public double getEffectiveWalkDistance() {
+        if (traversalTime > 0) {
+            return 0;
+        } else {
+            return distance;
+        }
+    }
+
+    @Override
+    public int getDistanceIndependentTime() {
+        return traversalTime;
     }
 
     public LineString getGeometry() {
@@ -86,7 +100,14 @@ public class PathwayEdge extends Edge {
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
+    public FeedScopedId getId( ){ return id; }
+
     public State traverse(State s0) {
+        StateEditor s1 = createEditorForWalking(s0, this);
+        if (s1 == null) {
+            return null;
+        }
+
         /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
         int time = traversalTime;
         if (s0.getOptions().wheelchairAccessible) {
@@ -97,6 +118,7 @@ public class PathwayEdge extends Edge {
                 return null;
             }
         }
+
         if (time == 0) {
             if (distance > 0) {
                 time = (int) (distance * s0.getOptions().walkSpeed);
@@ -106,10 +128,15 @@ public class PathwayEdge extends Edge {
                 time = (int) (0.4 * Math.abs(steps) * s0.getOptions().walkSpeed);
             }
         }
-        StateEditor s1 = s0.edit(this);
+
+        if (time <= 0) {
+            return null;
+        }
+
+        double weight = time * s0.getOptions().getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
+
         s1.incrementTimeInSeconds(time);
-        s1.incrementWeight(time);
-        s1.setBackMode(getMode());
+        s1.incrementWeight(weight);
         return s1.makeState();
     }
 }

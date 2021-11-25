@@ -1,22 +1,26 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.IntUtils;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
- * This class main purpose is to hold data for a given arrival at a stop and raptor round. It should be as light
- * weight as possible to minimize memory consumption and cheap to create and garbage collect.
+ * This class main purpose is to hold data for a given arrival at a stop and raptor round. It should
+ * be as light weight as possible to minimize memory consumption and cheap to create and garbage
+ * collect.
  * <p/>
- * This class holds both the best transit and the best transfer to a stop if they exist for a given round and stop.
- * The normal case is that this class represent either a transit arrival or a transfer arrival. We only keep both
- * if the transfer is better, arriving before the transit.
+ * This class holds both the best transit and the best transfer to a stop if they exist for a given
+ * round and stop. The normal case is that this class represent either a transit arrival or a
+ * transfer arrival. We only keep both if the transfer is better, arriving before the transit.
  * <p/>
- * The reason we need to keep both the best transfer and the best transit for a given stop and round is that
- * we may arrive at a stop by transit, then in the same or later round we may arrive by transit. If the transfer
- * arrival is better then the transit arrival it might be tempting to remove the transit arrival, but this
- * transit might be the best way (or only way) to get to another stop by transfer.
+ * The reason we need to keep both the best transfer and the best transit for a given stop and round
+ * is that we may arrive at a stop by transit, then in the same or later round we may arrive by
+ * transit. If the transfer arrival is better then the transit arrival it might be tempting to
+ * remove the transit arrival, but this transit might be the best way (or only way) to get to
+ * another stop by transfer.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -39,14 +43,30 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
 
     // Transfer (and access)
     private int transferFromStop = NOT_SET;
-    private int accessOrTransferDuration = NOT_SET;
+    private RaptorTransfer accessOrTransferPath = null;
+
+    StopArrivalState(StopArrivalState<T> other) {
+        this.bestArrivalTime = other.bestArrivalTime;
+        this.transitArrivalTime = other.transitArrivalTime;
+        this.trip = other.trip;
+        this.boardTime = other.boardTime;
+        this.boardStop = other.boardStop;
+        this.transferFromStop = other.transferFromStop;
+        this.accessOrTransferPath = other.accessOrTransferPath;
+    }
+
+    public StopArrivalState() { }
 
     public final int time() {
         return bestArrivalTime;
     }
 
+    public RaptorTransfer accessPath() {
+        return accessOrTransferPath;
+    }
+
     public final int accessDuration() {
-        return accessOrTransferDuration;
+        return accessOrTransferPath.durationInSeconds();
     }
 
     public final int transitTime() {
@@ -70,20 +90,34 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
     }
 
     public final int transferDuration() {
-        return accessOrTransferDuration;
+        return accessOrTransferPath.durationInSeconds();
     }
 
+    public boolean arrivedByAccess() {
+        return false;
+    }
+
+    /**
+     * A transit arrival exist, but it might be a better transfer arrival as well.
+     */
     public final boolean arrivedByTransit() {
         return transitArrivalTime != NOT_SET;
     }
 
+    /**
+     * The best arrival is by transfer.
+     */
     public final boolean arrivedByTransfer() {
         return transferFromStop != NOT_SET;
     }
 
-    void setAccessTime(int time, int accessDuration) {
+    public final RaptorTransfer transferPath() {
+        return accessOrTransferPath;
+    }
+
+    void setAccessTime(int time, RaptorTransfer accessPath) {
         this.bestArrivalTime = time;
-        this.accessOrTransferDuration = accessDuration;
+        this.accessOrTransferPath = accessPath;
     }
 
     final boolean reached() {
@@ -104,12 +138,13 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
+     * Set the time at a transit index iff it is optimal. This sets both the best time and the
+     * transfer time
      */
-    public final void transferToStop(int fromStop, int arrivalTime, int transferTime) {
+    public final void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
         this.bestArrivalTime = arrivalTime;
         this.transferFromStop = fromStop;
-        this.accessOrTransferDuration = transferTime;
+        this.accessOrTransferPath = transferPath;
     }
 
     public AccessStopArrivalState<T> asAccessStopArrivalState() {
@@ -118,14 +153,14 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
 
     @Override
     public String toString() {
-        return String.format("Arrival { time: %s, Transit: %s %s-%s, trip: %s, Transfer from: %s %s }",
+      return String.format("Arrival { time: %s, Transit: %s %s-%s, trip: %s, Transfer from: %s %s }",
                 TimeUtils.timeToStrCompact(bestArrivalTime, NOT_SET),
                 IntUtils.intToString(boardStop, NOT_SET),
                 TimeUtils.timeToStrCompact(boardTime, NOT_SET),
                 TimeUtils.timeToStrCompact(transitArrivalTime, NOT_SET),
                 trip == null ? "" : trip.pattern().debugInfo(),
                 IntUtils.intToString(transferFromStop, NOT_SET),
-                TimeUtils.durationToStr(accessOrTransferDuration, NOT_SET)
+          accessOrTransferPath != null ? DurationUtils.durationToStr(accessOrTransferPath.durationInSeconds(), NOT_SET) : ""
         );
     }
 }

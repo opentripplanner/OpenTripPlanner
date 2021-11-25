@@ -77,8 +77,9 @@ class Angle implements Comparable<Angle>, Cloneable {
     double geodesic_distance(Angle angle2) {
         double distance1 = Math.abs(get() - angle2.get());
         double distance2 = 2 * Math.PI - distance1;
-        if (distance1 < distance2)
+        if (distance1 < distance2) {
             return distance1;
+        }
         return distance2;
     }
 
@@ -87,18 +88,19 @@ class Angle implements Comparable<Angle>, Cloneable {
         double distance1 = Math.abs(get() - angle2.get());
         double distance2 = 2 * Math.PI - distance1;
         if (get() <= angle2.get()) {
-            if (distance1 < distance2)
+            if (distance1 < distance2) {
                 return 1.0;
+            }
             return -1.0;
         }
         // Otherwise angle1 > angle2.
-        if (distance1 < distance2)
+        if (distance1 < distance2) {
             return -1.0;
+        }
         return 1.0;
     }
 
     public String toString() {
-
         return "" + angle_radians;
     }
 

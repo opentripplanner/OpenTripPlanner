@@ -5,6 +5,7 @@ import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.opentripplanner.datastore.FileType.*;
+import static org.opentripplanner.datastore.FileType.CONFIG;
+import static org.opentripplanner.datastore.FileType.DEM;
+import static org.opentripplanner.datastore.FileType.GRAPH;
+import static org.opentripplanner.datastore.FileType.GTFS;
+import static org.opentripplanner.datastore.FileType.NETEX;
+import static org.opentripplanner.datastore.FileType.OSM;
+import static org.opentripplanner.datastore.FileType.REPORT;
+import static org.opentripplanner.datastore.FileType.UNKNOWN;
 import static org.opentripplanner.datastore.OtpDataStore.BUILD_REPORT_DIR;
 import static org.opentripplanner.datastore.base.LocalDataSourceRepository.isCurrentDir;
 import static org.opentripplanner.standalone.config.ConfigLoader.isConfigFile;
@@ -32,6 +40,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     private final Pattern netexLocalFilePattern;
     private final Pattern osmLocalFilePattern;
     private final Pattern demLocalFilePattern;
+
 
     public FileDataSourceRepository(
         File baseDir,
@@ -66,7 +75,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
     @Override
     public DataSource findSource(URI uri, FileType type) {
-        return new FileDataSource(new File(uri), type);
+        return new FileDataSource(openFile(uri, type), type);
     }
 
     @Override
@@ -76,7 +85,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
     @Override
     public CompositeDataSource findCompositeSource(URI uri, FileType type) {
-        return createCompositeSource(new File(uri), type);
+        return createCompositeSource(openFile(uri, type), type);
     }
 
     @Override
@@ -137,7 +146,17 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
                 + "directory. Unable to create composite data source for file type " + type + ".");
     }
 
-
+    public File openFile(URI uri, FileType type) {
+        try {
+            return uri.isAbsolute() ? new File(uri) : new File(baseDir, uri.getPath());
+        }
+        catch (IllegalArgumentException e) {
+            throw new OtpAppException(
+                "The file URI is invalid for file type " + type + ". "
+                    + "URI: '" + uri + "', details: " + e.getMessage()
+            );
+        }
+    }
 
     private FileType resolveFileType(File file) {
         String name = file.getName();
@@ -146,8 +165,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
         if (osmLocalFilePattern.matcher(name).find()) { return OSM; }
         // Digital elevation model (elevation raster)
         if (demLocalFilePattern.matcher(name).find()) { return DEM; }
-        if (name.matches("(streetG|g)raph.obj")) { return GRAPH; }
-        if (name.matches("otp-status.(inProgress|ok|failed)")) { return OTP_STATUS; }
+        if (name.matches("(?i)(street)?graph.*\\.obj")) { return GRAPH; }
         if (name.equals(BUILD_REPORT_DIR)) { return REPORT; }
         if (isConfigFile(name)) { return CONFIG;}
         return UNKNOWN;

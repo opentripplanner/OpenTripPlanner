@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.graph;
 
+import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.GtfsTest;
@@ -12,8 +13,6 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
-import java.util.List;
-
 /**
  * Check that the graph index is created, that GTFS elements can be found in the index, and that
  * the indexes are coherent with one another.
@@ -24,7 +23,7 @@ public class RoutingServiceTest extends GtfsTest {
 
     @Override
     public String getFeedName() {
-        return "testagency.zip";
+        return "testagency";
     }
 
     public void testIdLookup() {
@@ -66,12 +65,12 @@ public class RoutingServiceTest extends GtfsTest {
         /* This one depends on a feed where each TripPattern appears on only one route. */
         for (Route route : graph.index.getAllRoutes()) {
             for (TripPattern pattern : graph.index.getPatternsForRoute().get(route)) {
-                assertEquals(pattern.route, route);
+                assertEquals(pattern.getRoute(), route);
             }
         }
         for (Stop stop : graph.index.getAllStops()) {
             for (TripPattern pattern : graph.index.getPatternsForStop(stop)) {
-                assertTrue(pattern.stopPattern.containsStop(stop.getId().toString()));
+                assertTrue(pattern.getStopPattern().containsStop(stop.getId().toString()));
             }
         }
     }

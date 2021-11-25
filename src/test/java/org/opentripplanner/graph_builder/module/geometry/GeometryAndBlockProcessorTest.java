@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;

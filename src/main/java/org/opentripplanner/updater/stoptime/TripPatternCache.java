@@ -54,7 +54,7 @@ public class TripPatternCache {
             tripPattern.setServiceCodes(graph.getServiceCodes());
             
             // Finish scheduled time table
-            tripPattern.scheduledTimetable.finish();
+            tripPattern.getScheduledTimetable().finish();
 
             TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
 
@@ -79,7 +79,7 @@ public class TripPatternCache {
      */
     private FeedScopedId generateUniqueTripPatternCode(Trip trip) {
         FeedScopedId routeId = trip.getRoute().getId();
-        String directionId = trip.getDirectionIdAsString("");
+        String directionId = trip.getGtfsDirectionIdAsString("");
         if (counter == Integer.MAX_VALUE) {
             counter = 0;
         } else {

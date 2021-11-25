@@ -58,11 +58,12 @@ public class Properties {
         String retVal = null;
         try {
             retVal = get(name, l);
-        } catch (Exception ex) {
         }
+        catch (Exception ex) { }
 
-        if (retVal == null || retVal.length() < 1)
+        if (retVal == null || retVal.length() < 1) {
             retVal = def;
+        }
 
         return retVal;
     }

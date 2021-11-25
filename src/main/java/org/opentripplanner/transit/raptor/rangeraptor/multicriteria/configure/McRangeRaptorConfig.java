@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure;
 
+import java.util.function.BiFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
@@ -12,8 +13,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic.He
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
-
-import java.util.function.BiFunction;
 
 
 /**
@@ -50,8 +49,8 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         return new McTransitWorker<>(
                 state,
                 context.slackProvider(),
-                context.calculator(),
-                context.costCalculator()
+                context.costCalculator(),
+                context.debugFactory()
         );
     }
 
@@ -69,11 +68,9 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     private Stops<T> createStops() {
         return new Stops<>(
                 context.nStops(),
-                context.egressLegs(),
+                context.egressPaths(),
                 createDestinationArrivalPaths(),
-                context.costCalculator(),
-                context.debugFactory(),
-                context.debugLogger()
+                context.debugFactory()
         );
     }
 

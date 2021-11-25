@@ -6,12 +6,18 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 public class TransferWithDuration implements RaptorTransfer {
 
     private final int durationSeconds;
+    private final int cost;
 
     private final Transfer transfer;
 
-    public TransferWithDuration(Transfer transfer, double walkSpeed) {
+    public TransferWithDuration(Transfer transfer, int durationSeconds, int cost) {
         this.transfer = transfer;
-        this.durationSeconds = (int) Math.round(transfer.getEffectiveWalkDistanceMeters() / walkSpeed);
+        this.durationSeconds = durationSeconds;
+        this.cost = cost;
+    }
+
+    public Transfer transfer() {
+        return transfer;
     }
 
     @Override
@@ -20,7 +26,17 @@ public class TransferWithDuration implements RaptorTransfer {
     }
 
     @Override
+    public int generalizedCost() {
+        return cost;
+    }
+
+    @Override
     public int durationInSeconds() {
         return this.durationSeconds;
+    }
+
+    @Override
+    public String toString() {
+        return asString();
     }
 }

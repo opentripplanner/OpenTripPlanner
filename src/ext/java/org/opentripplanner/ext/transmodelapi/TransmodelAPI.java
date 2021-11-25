@@ -1,7 +1,9 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import graphql.ExecutionResult;
 import graphql.schema.GraphQLSchema;
+import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -29,8 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -124,10 +124,9 @@ public class TransmodelAPI {
     @Path("/graphql/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphQLBatch(List<HashMap<String, Object>> queries, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
-        List<Map<String, Object>> responses = new ArrayList<>();
-        List<Callable<Map>> futures = new ArrayList();
+        List<Callable<ExecutionResult>> futures = new ArrayList<>();
 
-        for (HashMap<String, Object> query : queries) {
+        for (Map<String, Object> query : queries) {
             Map<String, Object> variables;
             if (query.get("variables") instanceof Map) {
                 variables = (Map) query.get("variables");
@@ -147,17 +146,11 @@ public class TransmodelAPI {
         }
 
         try {
-            List<Future<Map>> results = index.threadPool.invokeAll(futures);
-
-            for (int i = 0; i < queries.size(); i++) {
-                HashMap<String, Object> response = new HashMap<>();
-                response.put("id", queries.get(i).get("id"));
-                response.put("payload", results.get(i).get());
-                responses.add(response);
-            }
-        } catch (CancellationException | ExecutionException | InterruptedException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            List<Future<ExecutionResult>> results = index.threadPool.invokeAll(futures);
+            return Response.status(Response.Status.OK).entity(GraphQLResponseSerializer.serializeBatch(queries, results)).build();
+        } catch (InterruptedException e) {
+            LOG.error("Batch query interrupted", e);
+            throw new RuntimeException(e);
         }
-        return Response.status(Response.Status.OK).entity(responses).build();
     }
 }

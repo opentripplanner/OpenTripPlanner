@@ -2,7 +2,7 @@
 
 This package contains a router, which produces access and egress legs for the RAPTOR algorithm, as well as flex-only itineraries 
 
-The data format is based on the [GTFS-Flex v2.1 draft](https://docs.google.com/document/d/1PyYK6JVzz52XEx3FXqAJmoVefHFqZTHS4Mpn20dTuKE/).
+The data format is based on the [GTFS-Flex v2.1 draft](https://github.com/MobilityData/gtfs-flex/blob/master/spec/reference.md).
 
 ## Algorithm
 

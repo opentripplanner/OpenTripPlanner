@@ -134,8 +134,9 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
         Matcher matcher = PATTERN.matcher(value);
 
-        if (!matcher.matches())
+        if (!matcher.matches()) {
             throw new ParseException("error parsing date: " + value, 0);
+        }
 
         int year = Integer.parseInt(matcher.group(1));
         int month = Integer.parseInt(matcher.group(2));

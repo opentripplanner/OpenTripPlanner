@@ -1,26 +1,30 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.D1m;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_A;
+import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_B;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.util.time.TimeUtils.hm2time;
+
+import org.junit.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 public class ReverseTransitCalculatorTest {
     private static final int TRIP_SEARCH_BINARY_SEARCH_THRESHOLD = 7;
 
-    private int slackInSeconds = 30;
     private int latestArrivalTime = hm2time(8, 0);
     private int searchWindowSizeInSeconds = 2 * 60 * 60;
     private int earliestAcceptableDepartureTime = hm2time(16, 0);
     private int iterationStep = 60;
 
 
-    private TransitCalculator create() {
-        return new ReverseTransitCalculator(
+    private TransitCalculator<TestTripSchedule> create() {
+        return new ReverseTransitCalculator<>(
                 TRIP_SEARCH_BINARY_SEARCH_THRESHOLD,
                 latestArrivalTime,
                 searchWindowSizeInSeconds,
@@ -31,7 +35,7 @@ public class ReverseTransitCalculatorTest {
 
     @Test
     public void isBest() {
-        TransitCalculator subject = create();
+        var subject = create();
 
         assertTrue(subject.isBest(11, 10));
         assertFalse(subject.isBest(10, 11));
@@ -41,7 +45,7 @@ public class ReverseTransitCalculatorTest {
     @Test
     public void exceedsTimeLimit() {
         earliestAcceptableDepartureTime = 1200;
-        TransitCalculator subject = create();
+        var subject = create();
 
         assertFalse(subject.exceedsTimeLimit(200_000));
         assertFalse(subject.exceedsTimeLimit(1200));
@@ -62,7 +66,7 @@ public class ReverseTransitCalculatorTest {
 
     @Test
     public void oneIterationOnly() {
-        TransitCalculator subject = create();
+        var subject = create();
 
         assertFalse(subject.oneIterationOnly());
 
@@ -87,8 +91,8 @@ public class ReverseTransitCalculatorTest {
     @Test
     public void latestArrivalTime() {
         // Ignore board slack for reverse search, boardSlack is added to alight times.
-        slackInSeconds = 75;
-        TestRaptorTripSchedule s = TestRaptorTripSchedule.create("T1").withBoardTimes(500).build();
+        int slackInSeconds = 75;
+        TestTripSchedule s = TestTripSchedule.schedule().departures(500).build();
         assertEquals(425, create().stopArrivalTime(s, 0, slackInSeconds));
     }
 
@@ -106,6 +110,20 @@ public class ReverseTransitCalculatorTest {
         assertIntIterator(create().patternStopIterator(2), 1, 0);
     }
 
+    @Test
+    public void getTransfers() {
+        var subject = create();
+        var transitData = new TestTransitData()
+                        .withTransfer(STOP_A, walk(STOP_B, D1m));
+
+        // Expect transfer from stop A to stop B (reversed)
+        var transfersFromStopB = subject.getTransfers(transitData, STOP_B);
+        assertTrue(transfersFromStopB.hasNext());
+        assertEquals(STOP_A, transfersFromStopB.next().stop());
+
+        // No transfer form stop A expected
+        assertFalse(subject.getTransfers(transitData, STOP_A).hasNext());
+    }
 
     private void assertIntIterator(IntIterator it, int ... values) {
         for (int v : values) {

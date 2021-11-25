@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.flex.edgetype;
 
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
@@ -49,6 +47,10 @@ public class FlexTripEdge extends Edge {
 
   @Override
   public State traverse(State s0) {
+    if(this.flexPath == null) {
+       // not routable
+       return null;
+    }
     StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.BUS);
     // TODO: decide good value
@@ -71,10 +73,7 @@ public class FlexTripEdge extends Edge {
 
   @Override
   public LineString getGeometry() {
-    return GeometryUtils.makeLineString(new Coordinate[] {
-        fromv.getCoordinate(),
-        tov.getCoordinate()
-    });
+    return flexPath.getGeometry();
   }
 
   @Override
@@ -90,5 +89,9 @@ public class FlexTripEdge extends Edge {
   @Override
   public Trip getTrip() {
     return trip.getTrip();
+  }
+
+  public FlexTrip getFlexTrip() {
+    return trip;
   }
 }

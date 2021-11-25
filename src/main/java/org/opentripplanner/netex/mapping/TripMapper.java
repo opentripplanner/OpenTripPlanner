@@ -6,6 +6,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.rutebanken.netex.model.DirectionTypeEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.Route;
@@ -86,7 +87,22 @@ class TripMapper {
         trip.setTripShortName(serviceJourney.getPublicCode());
         trip.setTripOperator(findOperator(serviceJourney));
 
+        trip.setDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
+
+        trip.setAlteration(
+            TripServiceAlterationMapper.mapAlteration(serviceJourney.getServiceAlteration())
+        );
+
         return trip;
+    }
+
+    private DirectionTypeEnumeration resolveDirectionType(ServiceJourney serviceJourney) {
+        Route netexRoute = lookUpNetexRoute(serviceJourney);
+        if (netexRoute != null && netexRoute.getDirectionType() != null) {
+            return netexRoute.getDirectionType();
+        } else {
+            return null;
+        }
     }
 
     @Nullable
@@ -99,6 +115,20 @@ class TripMapper {
             : null;
 
     return shapePointIds.contains(serviceLinkId) ? serviceLinkId : null;
+    }
+
+    private Route lookUpNetexRoute(ServiceJourney serviceJourney) {
+        if(serviceJourney.getJourneyPatternRef() != null) {
+            JourneyPattern journeyPattern = journeyPatternsById.lookup(serviceJourney
+                .getJourneyPatternRef()
+                .getValue()
+                .getRef());
+            if (journeyPattern != null && journeyPattern.getRouteRef() != null) {
+                String routeRef = journeyPattern.getRouteRef().getRef();
+                return routeById.lookup(routeRef);
+            }
+        }
+        return null;
     }
 
     private org.opentripplanner.model.Route resolveRoute(ServiceJourney serviceJourney) {

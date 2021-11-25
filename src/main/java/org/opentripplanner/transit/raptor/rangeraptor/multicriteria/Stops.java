@@ -1,23 +1,20 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 
-import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.util.BitSetIterator;
+import static java.util.Collections.emptyList;
 
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
+import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
+import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
+import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 
 /**
@@ -39,25 +36,23 @@ public final class Stops<T extends RaptorTripSchedule> {
      */
     public Stops(
             int nStops,
-            Collection<RaptorTransfer> egressLegs,
+            Collection<RaptorTransfer> egressPath,
             DestinationArrivalPaths<T> paths,
-            CostCalculator<T> costCalculator,
-            DebugHandlerFactory<T> debugHandlerFactory,
-            DebugLogger debugLogger
+            DebugHandlerFactory<T> debugHandlerFactory
     ) {
         //noinspection unchecked
         this.stops = (StopArrivalParetoSet<T>[]) new StopArrivalParetoSet[nStops];
         this.touchedStops = new BitSet(nStops);
         this.debugHandlerFactory = debugHandlerFactory;
-        this.debugStats = new DebugStopArrivalsStatistics(debugLogger);
+        this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
-        Collection<Map.Entry<Integer, List<RaptorTransfer>>> groupedEgressLegs = egressLegs
+        Collection<Map.Entry<Integer, List<RaptorTransfer>>> groupedEgressPaths = egressPath
             .stream()
             .collect(Collectors.groupingBy(RaptorTransfer::stop))
             .entrySet();
 
-        for (Map.Entry<Integer, List<RaptorTransfer>> it : groupedEgressLegs) {
-            glueTogetherEgressStopWithDestinationArrivals(it, costCalculator, paths);
+        for (Map.Entry<Integer, List<RaptorTransfer>> it : groupedEgressPaths) {
+            glueTogetherEgressStopWithDestinationArrivals(it, paths);
         }
     }
 
@@ -112,15 +107,13 @@ public final class Stops<T extends RaptorTripSchedule> {
      * stop, the "glue" make sure new destination arrivals is added to the destination arrivals.
      */
     private void glueTogetherEgressStopWithDestinationArrivals(
-            Map.Entry<Integer, List<RaptorTransfer>> egressLegs,
-            CostCalculator<T> costCalculator,
+            Map.Entry<Integer, List<RaptorTransfer>> egressPaths,
             DestinationArrivalPaths<T> paths
     ) {
-        int stop = egressLegs.getKey();
+        int stop = egressPaths.getKey();
         // The factory is creating the actual "glue"
         this.stops[stop] = StopArrivalParetoSet.createEgressStopArrivalSet(
-                egressLegs,
-                costCalculator,
+                egressPaths,
                 paths,
                 debugHandlerFactory
         );

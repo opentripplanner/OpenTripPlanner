@@ -1,14 +1,30 @@
 package org.opentripplanner.graph_builder;
 
+import static org.opentripplanner.datastore.FileType.DEM;
+import static org.opentripplanner.datastore.FileType.GTFS;
+import static org.opentripplanner.datastore.FileType.NETEX;
+import static org.opentripplanner.datastore.FileType.OSM;
+import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
+
 import com.google.common.collect.Lists;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import org.opentripplanner.ext.airquality.EdgeUpdaterModule;
 import org.opentripplanner.ext.airquality.GenericDataFile;
 import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
 import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.graph_builder.module.*;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
@@ -21,6 +37,7 @@ import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.S3BucketConfig;
@@ -68,11 +85,7 @@ public class GraphBuilder implements Runnable {
         // Check all graph builder inputs, and fail fast to avoid waiting until the build process
         // advances.
         for (GraphBuilderModule builder : graphBuilderModules) {
-            try {
-                builder.checkInputs();
-            } catch (Exception exception) {
-                LOG.error("A builder module failed: " + exception.getMessage(), exception);
-            }
+            builder.checkInputs();
         }
 
         DataImportIssueStore issueStore = new DataImportIssueStore(true);
@@ -104,6 +117,7 @@ public class GraphBuilder implements Runnable {
         boolean hasGtfs = dataSources.has(GTFS);
         boolean hasNetex = dataSources.has(NETEX);
         boolean hasTransitData = hasGtfs || hasNetex;
+
         GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
 
         if ( hasOsm ) {
@@ -121,16 +135,12 @@ public class GraphBuilder implements Runnable {
             osmModule.setDefaultWayPropertySetSource(config.osmWayPropertySet);
             osmModule.skipVisibility = !config.areaVisibility;
             osmModule.platformEntriesLinking = config.platformEntriesLinking;
-            osmModule.staticBikeRental = config.staticBikeRental;
             osmModule.staticBikeParkAndRide = config.staticBikeParkAndRide;
             osmModule.staticParkAndRide = config.staticParkAndRide;
             osmModule.banDiscouragedWalking = config.banDiscouragedWalking;
             osmModule.banDiscouragedBiking = config.banDiscouragedBiking;
+            osmModule.maxAreaNodes = config.maxAreaNodes;
             graphBuilder.addModule(osmModule);
-            PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
-            pruneFloatingIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-            pruneFloatingIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-            graphBuilder.addModule(pruneFloatingIslands);
         }
         if ( hasGtfs ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
@@ -174,6 +184,17 @@ public class GraphBuilder implements Runnable {
         StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
         streetLinkerModule.setAddExtraEdgesToAreas(config.areaVisibility);
         graphBuilder.addModule(streetLinkerModule);
+
+        // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
+        // existence of stops in islands. If an island has a stop, it actually may be a real island and should
+        // not be removed quite as easily
+        if ( hasOsm ) {
+            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
+            pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+            pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+            graphBuilder.addModule(pruneNoThruIslands);
+        }
+
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
         List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
@@ -218,11 +239,13 @@ public class GraphBuilder implements Runnable {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! config.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDistance));
+                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds, config.transferRequests));
             }
             // Analyze routing between stops to generate report
             if (OTPFeature.TransferAnalyzer.isOn()) {
-                graphBuilder.addModule(new DirectTransferAnalyzer(config.maxTransferDistance));
+                graphBuilder.addModule(new DirectTransferAnalyzer(
+                    config.maxTransferDurationSeconds * new RoutingRequest().walkSpeed)
+                );
             }
         }
 
@@ -249,4 +272,3 @@ public class GraphBuilder implements Runnable {
         return graphBuilder;
     }
 }
-

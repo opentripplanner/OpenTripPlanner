@@ -8,13 +8,17 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is an object representation of the 'build-config.json'.
@@ -158,11 +162,6 @@ public class BuildConfig {
     public final boolean osmCacheDataInMem;
 
     /**
-     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
-     */
-    public boolean staticBikeRental;
-
-    /**
      * Whether we should create car P+R stations from OSM data.
      */
     public boolean staticParkAndRide;
@@ -202,9 +201,10 @@ public class BuildConfig {
     public final boolean banDiscouragedBiking;
 
     /**
-     * Transfers up to this length in meters will be pre-calculated and included in the Graph.
+     * Transfers up to this duration with the default walk speed value will be pre-calculated and
+     * included in the Graph.
      */
-    public final double maxTransferDistance;
+    public final double maxTransferDurationSeconds;
 
     /**
      * This will add extra edges when linking a stop to a platform, to prevent detours along the platform edge.
@@ -300,6 +300,13 @@ public class BuildConfig {
      */
     public final StorageConfig storage;
 
+    public final List<RoutingRequest> transferRequests;
+
+    /**
+     * Visibility calculations for an area will not be done if there are more nodes than this limit.
+     */
+    public final int maxAreaNodes;
+
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
@@ -329,7 +336,7 @@ public class BuildConfig {
         matchBusRoutesToStreets = c.asBoolean("matchBusRoutesToStreets", false);
         maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
         maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
-        maxTransferDistance = c.asDouble("maxTransferDistance", 2000d);
+        maxTransferDurationSeconds = c.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
         multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
         osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
         osmWayPropertySet = WayPropertySetSource.fromConfig(c.asText("osmWayPropertySet", "default"));
@@ -337,7 +344,6 @@ public class BuildConfig {
         platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
         readCachedElevations = c.asBoolean("readCachedElevations", true);
         staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
-        staticBikeRental = c.asBoolean("staticBikeRental", false);
         staticParkAndRide = c.asBoolean("staticParkAndRide", true);
         stationTransfers = c.asBoolean("stationTransfers", false);
         streets = c.asBoolean("streets", true);
@@ -347,12 +353,24 @@ public class BuildConfig {
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
         useTransfersTxt = c.asBoolean("useTransfersTxt", false);
         writeCachedElevations = c.asBoolean("writeCachedElevations", false);
+        maxAreaNodes = c.asInt("maxAreaNodes", 500);
 
         // List of complex parameters
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
         netex = new NetexConfig(c.path("netex"));
         storage = new StorageConfig(c.path("storage"));
+
+        if (c.path("transferRequests") != null && !c.path("transferRequests").asList().isEmpty()) {
+            transferRequests = c
+                .path("transferRequests")
+                .asList()
+                .stream()
+                .map(RoutingRequestMapper::mapRoutingRequest)
+                .collect(Collectors.toUnmodifiableList());
+        } else {
+            transferRequests = List.of(new RoutingRequest());
+        }
 
         if(logUnusedParams) {
             c.logAllUnusedParameters(LOG);

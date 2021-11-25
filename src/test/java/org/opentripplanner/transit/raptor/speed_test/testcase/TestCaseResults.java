@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
+import org.opentripplanner.routing.util.DiffTool;
 import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
 
 import java.util.ArrayList;
@@ -18,13 +19,15 @@ import java.util.List;
  */
 class TestCaseResults {
     private final String testCaseId;
-    private final List<Result> matchedResults = new ArrayList<>();
+    private final List<DiffTool.Entry<Result>> matchedResults = new ArrayList<>();
     private final List<Result> expected = new ArrayList<>();
     private final List<Result> actual = new ArrayList<>();
     private TestStatus status = TestStatus.NA;
+    private final boolean skipCost;
 
-    TestCaseResults(String testCaseId) {
+    TestCaseResults(String testCaseId, boolean skipCost) {
         this.testCaseId = testCaseId;
+        this.skipCost  = skipCost;
     }
 
     void addExpectedResult(Result expectedResult) {
@@ -32,24 +35,10 @@ class TestCaseResults {
     }
 
     void matchItineraries(Collection<Itinerary> itineraries) {
-        actual.addAll(ItineraryResultMapper.map(testCaseId, itineraries));
-        boolean[] resultsOk = new boolean[actual.size()];
-
-        for (Result exp : expected) {
-            int i = actual.indexOf(exp);
-            if (i == -1) {
-                failed(exp);
-            } else {
-                ok(actual.get(i));
-                resultsOk[i] = true;
-            }
-        }
-        // Log all results not matched
-        for (int i = 0; i < resultsOk.length; ++i) {
-            if (!resultsOk[i]) {
-                notExpected(actual.get(i));
-            }
-        }
+        actual.addAll(ItineraryResultMapper.map(testCaseId, itineraries, skipCost));
+        matchedResults.clear();
+        matchedResults.addAll(DiffTool.diff(expected, actual, Result.comparator(skipCost)));
+        status = resolveStatus();
     }
 
     List<Result> actualResults() {
@@ -78,35 +67,16 @@ class TestCaseResults {
         return matchedResults.isEmpty();
     }
 
+    private TestStatus resolveStatus() {
+        if(matchedResults.isEmpty()) { return TestStatus.NA; }
+        if(matchedResults.stream().anyMatch(DiffTool.Entry::leftOnly)) { return TestStatus.FAILED; }
+        if(matchedResults.stream().anyMatch(DiffTool.Entry::rightOnly)) { return TestStatus.WARN; }
+        return TestStatus.OK;
+    }
+
     @Override
     public String toString() {
         return TableTestReport.report(matchedResults);
     }
 
-
-    /* private methods */
-
-    private void failed(Result result) {
-        addResult(TestStatus.FAILED, result);
-    }
-
-    private void ok(Result result) {
-        addResult(TestStatus.OK, result);
-    }
-
-    private void notExpected(Result result) {
-        addResult(TestStatus.WARN, result);
-    }
-
-    private void addResult(TestStatus status, Result result) {
-        updateStatus(status);
-        result.setStatus(status);
-        matchedResults.add(result);
-    }
-
-    private void updateStatus(TestStatus newStatus) {
-        if (status.ordinal() < newStatus.ordinal()) {
-            status = newStatus;
-        }
-    }
 }

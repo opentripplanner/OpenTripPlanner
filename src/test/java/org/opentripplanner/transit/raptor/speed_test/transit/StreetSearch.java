@@ -1,27 +1,36 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
+import static org.opentripplanner.graph_builder.linking.LinkingDirection.INCOMING;
+import static org.opentripplanner.graph_builder.linking.LinkingDirection.OUTGOING;
+
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 /**
@@ -32,7 +41,7 @@ class StreetSearch {
 
     private final TransitLayer transitLayer;
     private final Graph graph;
-    private final SimpleStreetSplitter splitter;
+    private final VertexLinker linker;
     private final NearbyStopFinder nearbyStopFinder;
     final TIntIntMap resultTimesSecByStopIndex = new TIntIntHashMap();
     final Map<Integer, NearbyStop> pathsByStopIndex = new HashMap<>();
@@ -40,12 +49,12 @@ class StreetSearch {
     StreetSearch(
             TransitLayer transitLayer,
             Graph graph,
-            SimpleStreetSplitter splitter,
+            VertexLinker splitter,
             NearbyStopFinder nearbyStopFinder
     ) {
         this.transitLayer = transitLayer;
         this.graph = graph;
-        this.splitter = splitter;
+        this.linker = splitter;
         this.nearbyStopFinder = nearbyStopFinder;
     }
 
@@ -63,11 +72,32 @@ class StreetSearch {
                     new NonLocalizedString(place.name),
                     !fromOrigin
             );
-            splitter.link(vertex);
+
+            LinkingDirection direction;
+            BiFunction<Vertex, StreetVertex, List<Edge>> createEdgeOp;
+
+            if(fromOrigin) {
+                direction = INCOMING;
+                createEdgeOp = (t, v) -> List.of(
+                        new TemporaryFreeEdge((TemporaryStreetLocation) t, v)
+                );
+            }
+            else {
+                direction = OUTGOING;
+                createEdgeOp = (t, v) -> List.of(
+                        new TemporaryFreeEdge(v, (TemporaryStreetLocation) t)
+                );
+            }
+            linker.linkVertexForRequest(
+                vertex,
+                new TraverseModeSet(TraverseMode.WALK),
+                direction,
+                createEdgeOp
+            );
         }
 
         List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
-                Set.of(vertex), !fromOrigin, true
+                Set.of(vertex), !fromOrigin, true, new RoutingRequest(TraverseMode.WALK)
         );
 
         if(nearbyStopList.isEmpty()) {

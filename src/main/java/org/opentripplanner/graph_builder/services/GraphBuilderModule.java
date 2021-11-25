@@ -23,6 +23,6 @@ public interface GraphBuilderModule {
     }
 
     /** Check that all inputs to the graphbuilder are valid; throw an exception if not. */
-    public void checkInputs() throws Exception;
+    public void checkInputs();
 
 }

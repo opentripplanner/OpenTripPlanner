@@ -42,27 +42,13 @@ public class DefaultRoutingRequestType {
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
-                        .name("maxWalkDistance")
+                        .name("maxDirectStreetDuration")
                         .description(
-                                "The maximum distance (in meters) the user is willing to walk for access/egress legs.")
+                                "This is the maximum duration in seconds for a direct street search. "
+                                    + "This is a performance limit and should therefore be set high. "
+                                    + "Use filters to limit what is presented to the client.")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(env -> request.maxWalkDistance)
-                        .build())
-                .field(GraphQLFieldDefinition
-                        .newFieldDefinition()
-                        .name("maxTransferWalkDistance")
-                        .description(
-                                "The maximum distance (in meters) the user is willing to walk for transfer legs.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(env -> request.maxTransferWalkDistance)
-                        .build())
-                .field(GraphQLFieldDefinition
-                        .newFieldDefinition()
-                        .name("maxPreTransitTime")
-                        .description(
-                                "The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride or kiss and ride).")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(env -> request.maxPreTransitTime)
+                        .dataFetcher(env -> request.maxDirectStreetDurationSeconds)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
@@ -164,28 +150,28 @@ public class DefaultRoutingRequestType {
                         .name("bikeRentalPickupTime")
                         .description("Time to rent a bike.")
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(env -> request.bikeRentalPickupTime)
+                        .dataFetcher(env -> request.vehicleRentalPickupTime)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
                         .name("bikeRentalPickupCost")
                         .description("Cost to rent a bike.")
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(env -> request.bikeRentalPickupCost)
+                        .dataFetcher(env -> request.vehicleRentalPickupCost)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
                         .name("bikeRentalDropOffTime")
                         .description("Time to drop-off a rented bike.")
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(env -> request.bikeRentalDropoffTime)
+                        .dataFetcher(env -> request.vehicleRentalDropoffTime)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
                         .name("bikeRentalDropOffCost")
                         .description("Cost to drop-off a rented bike.")
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(env -> request.bikeRentalDropoffCost)
+                        .dataFetcher(env -> request.vehicleRentalDropoffCost)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
@@ -288,12 +274,12 @@ public class DefaultRoutingRequestType {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("reverseOptimizeOnTheFly")
-                        .description("DEPRECATED - NOT IN USE IN OTP2.")
+                        .deprecate("NOT IN USE IN OTP2.")
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(e -> false).build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("compactLegsByReversedSearch")
-                        .description("DEPRECATED - NOT IN USE IN OTP2.")
+                        .deprecate("NOT IN USE IN OTP2.")
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(e -> false).build())
                 .field(GraphQLFieldDefinition
@@ -319,14 +305,12 @@ public class DefaultRoutingRequestType {
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(env -> request.ignoreRealtimeUpdates)
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("includedPlannedCancellations")
                         .description("When true, service journeys cancelled in scheduled route data will be included during this search.")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> defaults.includePlannedCancellations)
+                        .dataFetcher(env -> request.includePlannedCancellations)
                         .build())
-                 */
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
                         .name("disableRemainingWeightHeuristic")
@@ -339,13 +323,8 @@ public class DefaultRoutingRequestType {
                         .name("allowBikeRental")
                         .description("")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.bikeRental)
-                        .build())
-                .field(GraphQLFieldDefinition
-                        .newFieldDefinition()
-                        .name("bikeParkAndRide")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.bikeParkAndRide)
+                        .deprecate("Rental is specified by modes")
+                        .dataFetcher(env -> request.vehicleRental)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
@@ -363,7 +342,7 @@ public class DefaultRoutingRequestType {
                         .newFieldDefinition()
                         .name("debugItineraryFilter")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.debugItineraryFilter)
+                        .dataFetcher(env -> request.itineraryFilters.debug)
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -400,12 +379,6 @@ public class DefaultRoutingRequestType {
                                 "Whether to apply the ellipsoid->geoid offset to all elevations in the response.")
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(env -> request.geoidElevation)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("transitGeneralizedCostLimit")
-                        .description("A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost.")
-                        .type(Scalars.GraphQLString)
-                        .dataFetcher(env -> request.transitGeneralizedCostLimit)
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()

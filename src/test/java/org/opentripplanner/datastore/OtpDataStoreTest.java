@@ -30,7 +30,6 @@ import static org.opentripplanner.datastore.FileType.GRAPH;
 import static org.opentripplanner.datastore.FileType.GTFS;
 import static org.opentripplanner.datastore.FileType.NETEX;
 import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.datastore.FileType.OTP_STATUS;
 import static org.opentripplanner.datastore.FileType.REPORT;
 import static org.opentripplanner.datastore.FileType.UNKNOWN;
 import static org.opentripplanner.standalone.config.CommandLineParameters.createCliForTest;
@@ -80,7 +79,6 @@ public class OtpDataStoreTest {
         assertEquals("[]", store.listExistingSourcesFor(GRAPH).toString());
         assertEquals("[]", store.listExistingSourcesFor(REPORT).toString());
         assertEquals("[]", store.listExistingSourcesFor(UNKNOWN).toString());
-        assertEquals("[]", store.listExistingSourcesFor(OTP_STATUS).toString());
     }
 
     @Test

@@ -13,7 +13,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,9 +79,9 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<String> bikesAllowed() {
     return environment -> {
       switch (getSource(environment).getBikesAllowed()) {
-        case 0: return "NO_INFORMATION";
-        case 1: return "POSSIBLE";
-        case 2: return "NOT_POSSIBLE";
+        case UNKNOWN: return "NO_INFORMATION";
+        case ALLOWED: return "POSSIBLE";
+        case NOT_ALLOWED: return "NOT_POSSIBLE";
         default: return null;
       }
     };
