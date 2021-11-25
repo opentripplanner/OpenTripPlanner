@@ -62,7 +62,6 @@ public class GenericFileConfigurationParser {
 		}
 
 		return configuration;
-
 	}
 
 	/**
