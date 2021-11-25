@@ -1189,6 +1189,9 @@ enum Mode {
     """RAIL"""
     RAIL
 
+    """SCOOTER"""
+    SCOOTER
+
     """SUBWAY"""
     SUBWAY
 
@@ -2146,7 +2149,7 @@ type QueryType {
         debugItineraryFilter: Boolean
 
         """Is bike rental allowed? Default value: false"""
-        allowBikeRental: Boolean
+        allowBikeRental: Boolean @deprecated(reason: "Rental is specified by modes")
 
         """
         Whether arriving at the destination with a rented (station) bicycle is allowed without

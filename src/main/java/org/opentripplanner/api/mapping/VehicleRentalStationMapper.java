@@ -19,7 +19,7 @@ public class VehicleRentalStationMapper {
         api.bikesAvailable = domain.getVehiclesAvailable();
         api.spacesAvailable = domain.getSpacesAvailable();
         api.allowDropoff = domain.isAllowDropoff();
-        api.isFloatingBike = domain.isFloatingBike();
+        api.isFloatingBike = domain.isFloatingVehicle();
         api.isCarStation = domain.isCarStation();
         api.networks = List.of(domain.getNetwork());
         api.realTimeData = domain.isRealTimeData();

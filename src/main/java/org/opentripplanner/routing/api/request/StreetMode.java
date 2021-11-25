@@ -26,6 +26,11 @@ public enum StreetMode {
    */
   BIKE_RENTAL(true, true, true, true, true,false),
   /**
+   * Walk to a scooter rental point, ride a scooter to a scooter rental drop-off point, and walk the
+   * rest of the way. This can include scooter rental at fixed locations or free-floating services.
+   */
+  SCOOTER_RENTAL(true, true, true, true, true,false),
+  /**
    * Car only
    *
    * Direct mode only.
@@ -46,7 +51,6 @@ public enum StreetMode {
    * Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
    * This can include car rental at fixed locations or free-floating services.
    */
-  // TODO OTP2 Not implemented
   CAR_RENTAL(true, true, true, true, false, true),
 
   /**

@@ -378,6 +378,7 @@ public class LegacyGraphQLTypes {
     Gondola("GONDOLA"),
     LegSwitch("LEG_SWITCH"),
     Rail("RAIL"),
+    Scooter("SCOOTER"),
     Subway("SUBWAY"),
     Tram("TRAM"),
     Transit("TRANSIT"),

@@ -30,6 +30,8 @@ import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.datastore.DataSource;
@@ -170,10 +172,15 @@ public class SerializedGraphObject implements Serializable {
         kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
         kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
 
-        // Add support for the package local java.util.ImmutableCollections, use List.of() to
-        // access. Not supported in the current com.conveyal:kryo-tools:1.3.0.
-        // This provide support for List.of, Set.of and Collectors.toUnmodifiable(Set|List)
+        // Add support for the package local java.util.ImmutableCollections.
+        // Not supported in the current com.conveyal:kryo-tools:1.3.0.
+        // This provide support for List.of, Set.of, Map.of and Collectors.toUnmodifiable(Set|List|Map)
         kryo.register(List.of().getClass(), new JavaSerializer());
+        kryo.register(List.of(1).getClass(), new JavaSerializer());
+        kryo.register(Map.of().getClass(), new JavaSerializer());
+        kryo.register(Map.of(1, 1).getClass(), new JavaSerializer());
+        kryo.register(Set.of().getClass(), new JavaSerializer());
+        kryo.register(Set.of(1).getClass(), new JavaSerializer());
 
         // Kryo's default instantiation and deserialization of BitSets leaves them empty.
         // The Kryo BitSet serializer in magro/kryo-serializers naively writes out a dense stream of booleans.

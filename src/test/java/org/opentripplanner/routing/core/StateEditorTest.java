@@ -44,6 +44,6 @@ public class StateEditorTest {
         State updatedState = se.makeState();
         assertEquals(TraverseMode.WALK, updatedState.getNonTransitMode());
         assertTrue(updatedState.isVehicleParked());
-        assertFalse(updatedState.isBikeRenting());
+        assertFalse(updatedState.isRentingVehicle());
     }
 }
