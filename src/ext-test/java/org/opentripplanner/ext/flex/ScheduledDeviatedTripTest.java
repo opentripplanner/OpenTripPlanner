@@ -16,15 +16,22 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.WrappedCurrency;
+import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.TestUtils;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service
@@ -114,9 +121,66 @@ public class ScheduledDeviatedTripTest extends FlexTest {
         var itinerary = itineraries.iterator().next();
         assertFalse(itinerary.fare.fare.isEmpty());
 
-        assertEquals(new Money(new WrappedCurrency("USD"), 250), itinerary.fare.getFare(FareType.regular));
+        assertEquals(
+                new Money(new WrappedCurrency("USD"), 250),
+                itinerary.fare.getFare(FareType.regular)
+        );
 
         OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
+    }
+
+
+    /**
+     * Trips which consist of flex and fixed-schedule stops should work in transit mode.
+     * <p>
+     * The flex stops will show up as intermediate stops (without a departure/arrival time) but you
+     * cannot board or alight.
+     */
+    @Test
+    public void flexTripInTransitMode() {
+        var feedId = graph.getFeedIds().iterator().next();
+
+        var router = new Router(graph, RouterConfig.DEFAULT);
+        router.startup();
+
+        // from zone 3 to zone 2
+        var from = GenericLocation.fromStopId(
+                "Transfer Point for Route 30",
+                feedId,
+                "cujv"
+        );
+        var to = GenericLocation.fromStopId(
+                "Zone 1 - PUBLIX Super Market,Zone 1 Collection Point",
+                feedId,
+                "yz85"
+        );
+
+        var itineraries = getItineraries(from, to, router);
+
+        assertEquals(1, itineraries.size());
+
+        var itin = itineraries.get(0);
+        var leg = itin.legs.get(0);
+        var intermediateStops = leg.intermediateStops;
+        assertEquals(1, intermediateStops.size());
+        assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
+
+        assertEquals("cujv", leg.from.stop.getId().getId());
+        assertEquals("yz85", leg.to.stop.getId().getId());
+    }
+
+    private static List<Itinerary> getItineraries(
+            GenericLocation from,
+            GenericLocation to,
+            Router router
+    ) {
+        RoutingRequest request = new RoutingRequest();
+        request.dateTime = TestUtils.dateInSeconds("America/Atlanta", 2021, 11, 25, 12, 0, 0);
+        request.from = from;
+        request.to = to;
+
+        var result = TransitRouter.route(request, router, new DebugTimingAggregator());
+        return result.getItineraries();
     }
 
     @BeforeAll
