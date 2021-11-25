@@ -1072,9 +1072,9 @@ otp.widgets.tripoptions.AdditionalTripParameters =
                 var params = {};
 
                 keyvalues.forEach(function(keyvalue) {
-                    var split = keyvalue.trim().split('=');
-                    if (!split[0].startsWith('#')) {
-                        params[split[0]] = split[1];
+                    var split = keyvalue.trim().match(/^((?!#)[^=]+)=(.*)$/);
+                    if (split) {
+                        params[split[1]] = split[2];
                     }
                 })
 

@@ -1,25 +1,6 @@
 package org.opentripplanner.ext.actuator;
 
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.binder.cache.GuavaCacheMetrics;
-import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics;
-import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmCompilationMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmHeapPressureMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmInfoMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
-import io.micrometer.core.instrument.binder.logging.LogbackMetrics;
-import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
-import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
-import io.micrometer.core.instrument.binder.system.UptimeMetrics;
-import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ForkJoinPool;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -28,9 +9,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,13 +54,13 @@ public class ActuatorAPI {
     public Response health(@Context OTPServer otpServer) {
         GraphUpdaterManager updaterManager = otpServer.getRouter().graph.updaterManager;
         if (updaterManager != null) {
-            Collection<String> waitingUpdaters = updaterManager.waitingUpdaters();
+            var listUnprimedUpdaters = updaterManager.listUnprimedUpdaters();
 
-            if (!waitingUpdaters.isEmpty()) {
-                LOG.info("Graph ready, waiting for updaters: {}", waitingUpdaters);
+            if (!listUnprimedUpdaters.isEmpty()) {
+                LOG.info("Graph ready, waiting for updaters: {}", listUnprimedUpdaters);
                 throw new WebApplicationException(Response
                     .status(Response.Status.NOT_FOUND)
-                    .entity("Graph ready, waiting for updaters: " + waitingUpdaters + "\n")
+                    .entity("Graph ready, waiting for updaters: " + listUnprimedUpdaters + "\n")
                     .type("text/plain")
                     .build());
             }

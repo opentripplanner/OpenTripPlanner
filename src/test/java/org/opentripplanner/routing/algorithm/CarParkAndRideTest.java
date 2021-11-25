@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -41,7 +42,8 @@ public class CarParkAndRideTest extends ParkAndRideTest {
                         List.of(
                                 vehicleParkingEntrance(A, "CarPark #1 Entrance A", false, true),
                                 vehicleParkingEntrance(B, "CarPark #1 Entrance B", true, false)
-                        )
+                        ),
+                        "tag1", "tag2", "tag3"
                 );
 
                 vehicleParking("AllPark", 47.520, 19.001, true, true,
@@ -128,5 +130,30 @@ public class CarParkAndRideTest extends ParkAndRideTest {
                 "WALK (parked) - DE street (372.83, 246)",
                 "WALK (parked) - EF street (503.65, 312)"
         );
+    }
+
+    @Test
+    public void noPathIfContainsBannedTags() {
+        assertNoPathWithParking(A, B, StreetMode.CAR_TO_PARK, Set.of("tag1"), Set.of());
+    }
+
+    @Test
+    public void pathIfNoBannedTagsPresent() {
+        assertPathWithParking(A, B, StreetMode.CAR_TO_PARK, Set.of("no-such-tag"), Set.of());
+    }
+
+    @Test
+    public void noPathIfContainsMissingRequiredTags() {
+        assertNoPathWithParking(A, B, StreetMode.CAR_TO_PARK, Set.of(), Set.of("no-such-tag"));
+    }
+
+    @Test
+    public void pathWithRequiredTags() {
+        assertPathWithParking(A, B, StreetMode.CAR_TO_PARK, Set.of(), Set.of("tag2"));
+    }
+
+    @Test
+    public void bannedTagsTakePrecedence() {
+        assertNoPathWithParking(A, B, StreetMode.CAR_TO_PARK, Set.of("tag1"), Set.of("tag2"));
     }
 }

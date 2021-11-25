@@ -1,19 +1,18 @@
 package org.opentripplanner.ext.siri.updater;
 
+import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
-
-import java.util.List;
 
 /**
  * Update OTP stop time tables from some (realtime) source
@@ -35,12 +34,12 @@ public class SiriVMUpdater extends PollingGraphUpdater {
     /**
      * Parent update manager. Is used to execute graph writer runnables.
      */
-    protected GraphUpdaterManager updaterManager;
+    protected WriteToGraphCallback saveResultOnGraph;
 
     /**
      * Update streamer
      */
-    private VehicleMonitoringSource updateSource;
+    private final VehicleMonitoringSource updateSource;
 
     /**
      * Property to set on the RealtimeDataSnapshotSource
@@ -55,19 +54,19 @@ public class SiriVMUpdater extends PollingGraphUpdater {
     /**
      * Property to set on the RealtimeDataSnapshotSource
      */
-    private Boolean purgeExpiredData;
+    private final Boolean purgeExpiredData;
 
     /**
      * Feed id that is used for the trip ids in the TripUpdates
      */
-    private String feedId;
+    private final String feedId;
 
     /**
      * Set only if we should attempt to match the trip_id from other data in TripDescriptor
      */
     private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
-    private boolean fuzzyTripMatching;
+    private final boolean fuzzyTripMatching;
 
     /**
      * The place where we'll record the incoming realtime timetables to make them available to the router in a thread
@@ -99,8 +98,8 @@ public class SiriVMUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+        this.saveResultOnGraph = saveResultOnGraph;
     }
 
     @Override
@@ -149,7 +148,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
                 final boolean markPrimed = !moreData;
                 List<VehicleMonitoringDeliveryStructure> vmds = serviceDelivery.getVehicleMonitoringDeliveries();
                 if (vmds != null) {
-                    updaterManager.execute(graph -> {
+                    saveResultOnGraph.execute(graph -> {
                         snapshotSource.applyVehicleMonitoring(graph, feedId, fullDataset, vmds);
                         if (markPrimed) primed = true;
                     });
