@@ -169,6 +169,27 @@ public class ScheduledDeviatedTripTest extends FlexTest {
         assertEquals("yz85", leg.to.stop.getId().getId());
     }
 
+    /**
+     * We add flex trips, that can potentially not have a departure and arrival time, to the trip.
+     *
+     * Normally these trip times are interpolated/repaired during the graph build but this is exactly
+     * what we don't want.
+     *
+     * @see org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation#interpolateStopTimes(List)
+     */
+    @Test
+    public void shouldNotInterpolateFlexTimes() {
+        var feedId = graph.getFeedIds().iterator().next();
+        var pattern = graph.tripPatternForId.get(new FeedScopedId(feedId, "090z:0:01"));
+
+        assertEquals(3, pattern.getStops().size());
+
+        var tripTimes = pattern.getScheduledTimetable().getTripTimes(0);
+        var arrivalTime = tripTimes.getArrivalTime(1);
+
+        assertEquals(-999, arrivalTime);
+    }
+
     private static List<Itinerary> getItineraries(
             GenericLocation from,
             GenericLocation to,
