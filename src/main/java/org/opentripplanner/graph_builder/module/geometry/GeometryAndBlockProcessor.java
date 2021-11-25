@@ -18,6 +18,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
@@ -352,6 +353,7 @@ public class GeometryAndBlockProcessor {
     }
 
     private List<LinearLocation> getLinearLocations(List<StopTime> stopTimes, LineString shape) {
+        var isFlexTrip = FlexTrip.isFlexTrip(stopTimes);
         // This trip does not have shape_dist in stop_times, but does have an associated shape.
         ArrayList<IndexedLineSegment> segments = new ArrayList<>();
         for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
@@ -375,7 +377,7 @@ public class GeometryAndBlockProcessor {
                     continue;
                 }
                 double distance = segment.distance(coord);
-                if (distance < maxStopToShapeSnapDistance) {
+                if (distance < maxStopToShapeSnapDistance || isFlexTrip) {
                     stopSegments.add(segment);
                     maxSegmentIndex = index;
                     if (minSegmentIndexForThisStop == -1)

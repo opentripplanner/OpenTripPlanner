@@ -2,6 +2,7 @@ package org.opentripplanner.ext.flex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
@@ -12,11 +13,13 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.PolylineAssert;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -161,12 +164,19 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
         var itin = itineraries.get(0);
         var leg = itin.legs.get(0);
+
+        assertEquals("cujv", leg.from.stop.getId().getId());
+        assertEquals("yz85", leg.to.stop.getId().getId());
+
         var intermediateStops = leg.intermediateStops;
         assertEquals(1, intermediateStops.size());
         assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
-        assertEquals("cujv", leg.from.stop.getId().getId());
-        assertEquals("yz85", leg.to.stop.getId().getId());
+        assertThatPolylinesAreEqual(
+                leg.legGeometry.getPoints(),
+                "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"
+        );
+
     }
 
     /**
@@ -187,7 +197,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
         var tripTimes = pattern.getScheduledTimetable().getTripTimes(0);
         var arrivalTime = tripTimes.getArrivalTime(1);
 
-        assertEquals(-999, arrivalTime);
+        assertEquals(StopTime.MISSING_VALUE, arrivalTime);
     }
 
     private static List<Itinerary> getItineraries(
