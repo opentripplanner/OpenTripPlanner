@@ -21,7 +21,7 @@ import java.util.Map;
 
 
 /**
- * Printing stuff clutter up the code, so it is convenient to put printing anf formating output into
+ * Printing stuff clutters up the code, so it is convenient to put printing and formatting output into
  * a separate class - this makes the SpeedTest more readable.
  *
 
