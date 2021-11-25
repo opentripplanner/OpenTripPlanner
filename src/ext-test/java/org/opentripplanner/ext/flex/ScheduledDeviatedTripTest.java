@@ -182,8 +182,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     /**
      * We add flex trips, that can potentially not have a departure and arrival time, to the trip.
      *
-     * Normally these trip times are interpolated/repaired during the graph build but this is exactly
-     * what we don't want.
+     * Normally these trip times are interpolated/repaired during the graph build but for flex
+     * this is exactly what we don't want. Here we check that the interpolation process is skipped.
      *
      * @see org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation#interpolateStopTimes(List)
      */
