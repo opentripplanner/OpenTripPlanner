@@ -205,12 +205,12 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
     /** Returns whether passengers can alight at a given stop */
     public boolean canAlight(int stopIndex) {
-        return (!stopPattern.isFlexStop(stopIndex)) && stopPattern.getDropoff(stopIndex).isRoutable();
+        return stopPattern.getDropoff(stopIndex).isRoutable();
     }
 
     /** Returns whether passengers can board at a given stop */
     public boolean canBoard(int stopIndex) {
-        return (!stopPattern.isFlexStop(stopIndex)) && stopPattern.getPickup(stopIndex).isRoutable();
+        return stopPattern.getPickup(stopIndex).isRoutable();
     }
 
     /** Returns whether a given stop is wheelchair-accessible. */

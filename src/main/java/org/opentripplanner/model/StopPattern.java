@@ -58,8 +58,8 @@ public class StopPattern implements Serializable {
             stops[i] = stopTime.getStop();
             // should these just be booleans? anything but 1 means pick/drop is allowed.
             // pick/drop messages could be stored in individual trips
-            pickups[i] = stopTime.getPickupType();
-            dropoffs[i] = stopTime.getDropOffType();
+            pickups[i] = computePickDrop(stopTime.getStop(), stopTime.getPickupType());
+            dropoffs[i] = computePickDrop(stopTime.getStop(), stopTime.getDropOffType());
         }
         /*
          * TriMet GTFS has many trips that differ only in the pick/drop status of their initial and
@@ -71,6 +71,19 @@ public class StopPattern implements Serializable {
          */
         dropoffs[0] = PickDrop.SCHEDULED;
         pickups[size - 1] = PickDrop.SCHEDULED;
+    }
+
+    /**
+     * Raptor should not be allowed to board or alight flex stops because they have fake
+     * coordinates (centroids) and might not have times.
+     */
+    private static PickDrop computePickDrop(StopLocation stop, PickDrop pickDrop) {
+        if(stop instanceof FlexStopLocation) {
+            return PickDrop.NONE;
+        }
+        else {
+            return pickDrop;
+        }
     }
 
     /**
@@ -156,9 +169,5 @@ public class StopPattern implements Serializable {
 
     public PickDrop getDropoff(int i) {
         return dropoffs[i];
-    }
-
-    public boolean isFlexStop(int i) {
-        return stops[i] instanceof FlexStopLocation;
     }
 }
