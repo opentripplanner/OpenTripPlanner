@@ -9,6 +9,7 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
@@ -64,8 +65,6 @@ public abstract class FlexTrip extends TransitEntity {
   public abstract boolean isAlightingPossible(NearbyStop stop);
 
   public static boolean isFlexTrip(List<StopTime> stopTimes) {
-    return UnscheduledTrip.isUnscheduledTrip(stopTimes) ||
-            ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes);
-
+    return stopTimes.stream().map(StopTime::getStop).anyMatch(FlexStopLocation.class::isInstance);
   }
 }

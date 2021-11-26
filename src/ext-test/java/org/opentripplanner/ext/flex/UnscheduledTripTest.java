@@ -85,7 +85,7 @@ public class UnscheduledTripTest extends FlexTest {
     }
 
     @BeforeAll
-    static void setup() throws URISyntaxException {
+    static void setup() {
         graph = FlexTest.buildFlexGraph(ASPEN_GTFS);
     }
 

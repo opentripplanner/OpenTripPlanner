@@ -2,9 +2,9 @@ package org.opentripplanner.ext.flex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
-import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.PolylineAssert;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.model.FeedScopedId;
@@ -46,6 +45,7 @@ import org.opentripplanner.util.TestUtils;
 public class ScheduledDeviatedTripTest extends FlexTest {
 
     static final String COBB_COUNTY_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
+    static final String LINCOLN_COUNTY = "/flex/lincoln-county-flex.gtfs.zip";
 
     static Graph graph;
 
@@ -181,9 +181,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
     /**
      * We add flex trips, that can potentially not have a departure and arrival time, to the trip.
-     *
-     * Normally these trip times are interpolated/repaired during the graph build but for flex
-     * this is exactly what we don't want. Here we check that the interpolation process is skipped.
+     * <p>
+     * Normally these trip times are interpolated/repaired during the graph build but for flex this
+     * is exactly what we don't want. Here we check that the interpolation process is skipped.
      *
      * @see org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation#interpolateStopTimes(List)
      */
@@ -198,6 +198,15 @@ public class ScheduledDeviatedTripTest extends FlexTest {
         var arrivalTime = tripTimes.getArrivalTime(1);
 
         assertEquals(StopTime.MISSING_VALUE, arrivalTime);
+    }
+
+    /**
+     * Checks that trips which have continuous pick up/drop off set are parsed correctly.
+     */
+    @Test
+    public void parseContinuousPickup() {
+        var lincolnGraph = FlexTest.buildFlexGraph(LINCOLN_COUNTY);
+        assertNotNull(lincolnGraph);
     }
 
     private static List<Itinerary> getItineraries(
@@ -215,7 +224,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     }
 
     @BeforeAll
-    static void setup() throws URISyntaxException {
+    static void setup() {
         graph = FlexTest.buildFlexGraph(COBB_COUNTY_GTFS);
     }
 

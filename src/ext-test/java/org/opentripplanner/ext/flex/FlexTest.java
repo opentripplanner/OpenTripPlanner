@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex;
 import static graphql.Assert.assertFalse;
 
 import gnu.trove.set.hash.TIntHashSet;
+import java.io.File;
 import java.net.URISyntaxException;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -27,8 +28,14 @@ abstract public class FlexTest {
     static final FlexParameters params = new FlexParameters(300);
 
 
-    static Graph buildFlexGraph(String fileName) throws URISyntaxException {
-        var file = FakeGraph.getFileForResource(fileName);
+    static Graph buildFlexGraph(String fileName) {
+        File file = null;
+        try {
+            file = FakeGraph.getFileForResource(fileName);
+        }
+        catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
 
         var graph = new Graph();
         GtfsBundle gtfsBundle = new GtfsBundle(file);
