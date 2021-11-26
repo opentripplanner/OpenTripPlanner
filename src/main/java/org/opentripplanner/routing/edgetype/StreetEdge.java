@@ -523,8 +523,11 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                                 throw new IllegalArgumentException(String.format("Formula for %s should not be empty", thresholdPenaltyPair.getValue().getName()));
                             }
 
-                            totalPenalty += calculatePenaltyFromParameters(penaltyFormulaString, value, thresholdPenaltyPair.getKey(),
-                                thresholdPenaltyPair.getValue());
+                            double penaltyForParameters = calculatePenaltyFromParameters(penaltyFormulaString, value, thresholdPenaltyPair.getKey(), thresholdPenaltyPair.getValue());
+
+                            if (penaltyForParameters >= 0) {
+                                totalPenalty += penaltyForParameters;
+                            }
                         } else {
                             LOG.warn("No available data overlay for the given time");
                         }
