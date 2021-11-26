@@ -3,6 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import java.util.BitSet;
 
 import java.util.Locale;
+import org.opentripplanner.gtfs.WheelchairAccess;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -129,11 +130,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             return null;
         }
 
-        /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
-        if (options.wheelchairAccessible && ! getPattern().wheelchairAccessible(stopIndex)) {
-            return null;
-        }
-
         // if eligibility-restricted services are disallowed, check this route. Only supports 0/1 values.
         if (!options.flexUseEligibilityServices) {
             Route route = getPattern().route;
@@ -160,6 +156,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 return null;
             }
             StateEditor s1 = s0.edit(this);
+
+            addStopWheelchairPenalty(options, s1);
+
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(s0.getTimeSeconds());
             // Store the stop we are alighting at, for computing stop-to-stop transfer times,
@@ -285,6 +284,10 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             /* Found a trip to board. Now make the child state. */
             StateEditor s1 = s0.edit(this);
+
+            addStopWheelchairPenalty(options, s1);
+            addTripWheelchairPenalty(options, trip, s1);
+
             s1.setBackMode(getMode());
             s1.setServiceDay(bestServiceDay);
             // Save the trip times in the State to ensure that router has a consistent view 
@@ -348,6 +351,38 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             /* If we didn't return an optimized path, return an unoptimized one. */
             return s1.makeState();
+        }
+    }
+
+    /**
+     * If in wheelchair mode add penalties for boarding a trip when the accessibility
+     * information is not known or when it's known to be inaccessible.
+     */
+    private void addTripWheelchairPenalty(RoutingRequest options, Trip trip, StateEditor s1) {
+        if (options.wheelchairAccessible) {
+            final WheelchairAccess wa = WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible());
+            if (wa == WheelchairAccess.NOT_ALLOWED) {
+                s1.incrementWeight(options.noWheelchairAccessAtTripPenalty);
+            }
+            else if (wa == WheelchairAccess.UNKNOWN) {
+                s1.incrementWeight(options.unknownWheelchairAccessAtTripPenalty);
+            }
+        }
+    }
+
+    /**
+     * If in wheelchair mode add penalties for traversing the stop when the accessibility
+     * information is not known or when it's known to be inaccessible.
+     */
+    private void addStopWheelchairPenalty(RoutingRequest options, StateEditor s1) {
+        if (options.wheelchairAccessible) {
+            final WheelchairAccess stopWa = getPattern().wheelchairAccessible(stopIndex);
+            if(stopWa == WheelchairAccess.NOT_ALLOWED) {
+                s1.incrementWeight(options.noWheelchairAccessAtStopPenalty);
+            }
+            else if(stopWa == WheelchairAccess.UNKNOWN) {
+                s1.incrementWeight(options.unknownWheelchairAccessAtStopPenalty);
+            }
         }
     }
 

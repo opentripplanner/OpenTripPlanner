@@ -468,13 +468,13 @@ public class TestPatternHopFactory extends TestCase {
         path = spt.getPath(near_b, false);
         assertNotNull(path);
 
-        // stop C is not accessible, so there should be no path.
+        // stop C is not accessible, but we still allow to traverse it
         options.setRoutingContext(graph, near_a, near_c);
         spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(near_c, false);
-        assertNull(path);
-        
+        assertNotNull(path);
+
         // stop E has no accessibility information, but we should still be able to route to it.
         options.setRoutingContext(graph, near_a, near_e);
         spt = aStar.getShortestPathTree(options);

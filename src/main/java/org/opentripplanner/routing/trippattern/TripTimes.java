@@ -467,9 +467,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             return false;
         }
 
-        if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
-            return false;
-        }
         // Establish whether we have a rented _or_ owned bicycle.
         final boolean bicycle = state0.getNonTransitMode() == TraverseMode.BICYCLE;
         if (bicycle && BikeAccess.fromTrip(trip) != BikeAccess.ALLOWED) {

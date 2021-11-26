@@ -159,8 +159,7 @@ public class GraphPathBuilder {
                     TransitStop transitStop = new TransitStop(graph, makeNewStop());
                     StreetTransitLink streetTransitLink = new StreetTransitLink(
                         (StreetVertex) currentVertex,
-                        transitStop,
-                        false
+                        transitStop
                     );
 
                     // traverse to the transit stop
@@ -377,8 +376,7 @@ public class GraphPathBuilder {
         IntersectionVertex streetVertex = makeNewIntersectionVertex(graph);
         StreetTransitLink streetTransitLink = new StreetTransitLink(
             (TransitStop) currentVertex,
-            streetVertex,
-            false
+            streetVertex
         );
 
         // traverse to the street network

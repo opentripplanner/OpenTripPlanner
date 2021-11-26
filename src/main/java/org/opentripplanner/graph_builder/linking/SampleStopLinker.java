@@ -93,7 +93,7 @@ public class SampleStopLinker {
                                 SphericalDistanceLibrary.distance(ts0.getLat(), ts0.getLon(), ts1.getLat(), ts1.getLon());
 
                         // building unidirectional edge, we'll hit this again in the opposite direction
-                        new SimpleTransfer(ts1, ts1, dist, geom);
+                        new SimpleTransfer(ts1, ts1, dist, geom, false);
                     }
                 }
             }

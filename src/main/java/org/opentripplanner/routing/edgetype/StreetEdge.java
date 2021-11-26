@@ -48,7 +48,7 @@ import java.util.Set;
  * @author novalis
  * 
  */
-public class StreetEdge extends Edge implements Cloneable {
+public class StreetEdge extends Edge implements Cloneable, WheelchairEdge {
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
     private static final long serialVersionUID = 2L;
@@ -226,9 +226,6 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (options.wheelchairAccessible) {
-            if (!isWheelchairAccessible()) {
-                return false;
-            }
             if (getMaxSlope() > options.maxSlope) {
                 return false;
             }
@@ -660,7 +657,21 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
-        if (isStairs()) {
+        if (options.wheelchairAccessible && isStairs()) {
+            weight *= options.wheelchairStairsReluctance;
+            // Apply a time penalty, in addition to the cost penalty, so that accessible transfers
+            // work. When we compute transfers we only look at the time and hence increasing just
+            // the cost would not work:
+            // https://github.com/ibi-group/OpenTripPlanner/blob/f2b375364985b8dd83f791950d955e3ec5c9cb34/src/main/java/org/opentripplanner/routing/algorithm/EarliestArrivalSearch.java#L76
+            time *= options.wheelchairStairsReluctance;
+        } else if (options.wheelchairAccessible && !isWheelchairAccessible()) {
+            weight *= options.noWheelchairAccessOnStreetReluctance;
+            // Apply a time penalty, in addition to the cost penalty, so that accessible transfers
+            // work. When we compute transfers we only look at the time and hence increasing just
+            // the cost would not work:
+            // https://github.com/ibi-group/OpenTripPlanner/blob/f2b375364985b8dd83f791950d955e3ec5c9cb34/src/main/java/org/opentripplanner/routing/algorithm/EarliestArrivalSearch.java#L76
+            time *= options.noWheelchairAccessOnStreetReluctance;
+        } else if (isStairs()) {
             weight *= options.stairsReluctance;
         } else {
             // TODO: this is being applied even when biking or driving.

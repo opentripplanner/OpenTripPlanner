@@ -104,6 +104,7 @@ config key | description | value type | value default | notes
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
 `micromobilityTravelRestrictionsUrlOrFile` | Loads in a GeoJSON file that represents areas where it is forbidden to traverse a StreetEdge with the `MICROMOBILITY` mode. | string | null | see [Micromobility Restrictions](#micromobility-restrictions)
 `micromobilityDropoffRestrictionsUrlOrFile` | Loads in a GeoJSON file that represents areas where it is forbidden to dropoff a rented micromobility vehicle. | string | null | see [Micromobility Restrictions](#micromobility-restrictions)  
+`generateWheelchairAccessibleTransfers` | If a wheelchair-accessible transfer should be generated if the regular one is not accessible. | boolean | false |
 
 This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215) for `GraphBuilderParameters`.
 

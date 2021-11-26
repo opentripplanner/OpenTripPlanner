@@ -367,7 +367,7 @@ public abstract class GtfsFlexGraphModifier {
     private TransitStopDepart createTransitStopDepart(RoutingRequest rr, TemporaryTransitStop transitStop) {
         TransitStopDepart transitStopDepart;
         if (transitStop.departVertex == null) {
-            new TemporaryStreetTransitLink(transitStop.getStreetVertex(), transitStop, true);
+            new TemporaryStreetTransitLink(transitStop.getStreetVertex(), transitStop);
 
             transitStopDepart = new TemporaryTransitStopDepart(transitStop.getStop(), transitStop);
             rr.rctx.temporaryVertices.add(transitStopDepart);
@@ -403,7 +403,7 @@ public abstract class GtfsFlexGraphModifier {
     private TransitStopArrive createTransitStopArrive(RoutingRequest rr, TemporaryTransitStop transitStop) {
         TransitStopArrive transitStopArrive;
         if (transitStop.arriveVertex == null) {
-            new TemporaryStreetTransitLink(transitStop, transitStop.getStreetVertex(), true);
+            new TemporaryStreetTransitLink(transitStop, transitStop.getStreetVertex());
 
             transitStopArrive = new TemporaryTransitStopArrive(transitStop.getStop(), transitStop);
             rr.rctx.temporaryVertices.add(transitStopArrive);

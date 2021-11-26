@@ -160,7 +160,7 @@ public class SimpleIsochrone extends RoutingResource {
             shpName = stops.get(0).getName().split(" ")[0];   
         StreetVertex origin = new IntersectionVertex(graph, "iso_temp", originCoord.x, originCoord.y);
         for (TransitStop stop : stops) {
-            new StreetTransitLink(origin, stop, false);
+            new StreetTransitLink(origin, stop);
             LOG.debug("linked to stop {}", stop.getName());
         }
         request.setRoutingContext(graph, origin, null);

@@ -125,6 +125,46 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether the trip must be wheelchair accessible. */
     public boolean wheelchairAccessible = false;
 
+    /**
+     * When in wheelchair-accessible mode we add some penalties when traversing places where we don't
+     * have accessibility information or we know to be wheelchair inaccessible.
+     *
+     * This is the cost of traversing a stop without accessibility information.
+     */
+    public int unknownWheelchairAccessAtStopPenalty = 600;
+    /**
+     * The cost of traversing a stop which is wheelchair-inaccessible.
+     */
+    public int noWheelchairAccessAtStopPenalty = 3 * unknownWheelchairAccessAtStopPenalty;
+    /**
+     * The cost of boarding a trip without accessibility information.
+     */
+    public int unknownWheelchairAccessAtTripPenalty = 1200;
+    /**
+     * The cost of boarding a trip which we know to be wheelchair-inaccessible.
+     */
+    public int noWheelchairAccessAtTripPenalty = 3 * unknownWheelchairAccessAtTripPenalty;
+    /**
+     * The reluctance of using stairs in a wheelchair. This value will be multiplied with the
+     * regular cost of traversing the stairs which depends on its length.
+     *
+     * In other words, a 100 meter long stairs would now seems like a 2,000 meter long stairs after applying this reluctance factor.
+     */
+    public int wheelchairStairsReluctance = 20;
+    /**
+     * The cost of using an elevator which is not wheelchair-accessible.
+     */
+    public int noWheelchairAccessOnElevatorPenalty = 600;
+    /**
+     * The cost of traversing a street which we know to be wheelchair-inaccessible as it is
+     * tagged with wheelchair=no (eg. https://www.openstreetmap.org/way/128366294).
+     *
+     * This is called a reluctance rather than a penalty because we multiply it with the length
+     * of the street. This means traversing a 100 meter street (without wheelchair access) 
+     * would now seem like a 1,500 meter long street after applying this reluctance factor.
+     */
+    public int noWheelchairAccessOnStreetReluctance = 15;
+
     /** The maximum number of itineraries to return. */
     public int numItineraries = 3;
 

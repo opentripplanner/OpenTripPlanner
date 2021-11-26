@@ -75,8 +75,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
             // only connect transit stops that (a) are entrances, or (b) have no associated
             // entrances
             if (ts.isEntrance() || !ts.hasEntrances()) {
-                boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-                if (!connectVertexToStop(ts, wheelchairAccessible)) {
+                if (!connectVertexToStop(ts)) {
                     LOG.debug("Could not connect " + ts.getStopCode() + " at " + ts.getCoordinate().toString());
                     //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                 }
@@ -84,7 +83,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         }
     }
 
-    private boolean connectVertexToStop(TransitStop ts, boolean wheelchairAccessible) {
+    private boolean connectVertexToStop(TransitStop ts) {
         String stopCode = ts.getStopCode();
         if (stopCode == null){
             return false;
@@ -103,8 +102,8 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
             // Only use stop codes for linking TODO: find better method to connect stops without stop code
             if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
-                new StreetTransitLink(ts, tsv, wheelchairAccessible);
-                new StreetTransitLink(tsv, ts, wheelchairAccessible);
+                new StreetTransitLink(ts, tsv);
+                new StreetTransitLink(tsv, ts);
                 LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
                 return true;
             }

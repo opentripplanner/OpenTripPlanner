@@ -1,5 +1,16 @@
 package org.opentripplanner.api.resource;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -8,7 +19,6 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.RentalInfo;
 import org.opentripplanner.api.model.TransportationNetworkCompanySummary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
@@ -17,6 +27,7 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.gtfs.WheelchairAccess;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -24,8 +35,6 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.car_rental.CarRentalStationService;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -48,9 +57,9 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
 import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
+import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -62,7 +71,6 @@ import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.CarRentalStationVertex;
@@ -71,25 +79,9 @@ import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
-import org.opentripplanner.updater.RentalUpdaterError;
-import org.opentripplanner.updater.vehicle_rental.GBFSMappings.SystemInformation;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
@@ -133,7 +125,12 @@ public abstract class GraphPathToTripPlanConverter {
         long bestNonTransitTime = Long.MAX_VALUE;
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
+            Itinerary itinerary = generateItinerary(
+                    path,
+                    request.showIntermediateStops,
+                    request.disableAlertFiltering,
+                    requestedLocale
+            );
             itinerary = adjustItinerary(request, itinerary);
             if(itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
                 bestNonTransitTime = itinerary.walkTime;
@@ -218,7 +215,12 @@ public abstract class GraphPathToTripPlanConverter {
      * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
      * @return The generated itinerary
      */
-    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
+    public static Itinerary generateItinerary(
+            GraphPath path,
+            boolean showIntermediateStops,
+            boolean disableAlertFiltering,
+            Locale requestedLocale
+    ) {
         Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
@@ -243,7 +245,10 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale);
+
         fixupLegs(itinerary.legs, legsStates);
+
+        addAccessibilityScore(itinerary.legs, legsStates);
 
         itinerary.duration = lastState.getElapsedTimeSeconds();
         itinerary.startTime = makeCalendar(states[0]);
@@ -261,6 +266,33 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         return itinerary;
+    }
+
+    /**
+     * Iterates over the legs and computes the accessibility scores for transit and walk
+     * legs.
+     */
+    private static void addAccessibilityScore(List<Leg> legs, State[][] states) {
+        RoutingRequest request = states[0][0].getOptions();
+        for (int i = 0; i < legs.size(); i++) {
+            Leg currentLeg = legs.get(i);
+            if (currentLeg.isTransitLeg()) {
+                State[] legStates = states[i];
+                Trip trip = legStates[legStates.length - 1].getBackTrip();
+                Leg nextLeg = null;
+                int nextIndex = i + 1;
+                if(nextIndex < legs.size()){
+                    nextLeg = legs.get(nextIndex);
+                }
+                currentLeg.accessibilityScore =
+                        computeAccessibilityScore(trip, currentLeg, nextLeg, request);
+            }
+            else if (currentLeg.mode.equals("WALK") && request.wheelchairAccessible) {
+                // at the moment we don't compute the walking score at all and add a dummy value instead
+                // in the future we will take the slope into account
+                currentLeg.accessibilityScore = 0.5f;
+            }
+        }
     }
 
     private static Calendar makeCalendar(State state) {
@@ -883,6 +915,65 @@ public abstract class GraphPathToTripPlanConverter {
     }
 
     /**
+     * Computes how easy a leg is to use for a wheelchair user on a scale from 0 to 1 where
+     * 0 is bad and 1 is good.
+     *
+     * The score is computed as follows: each the trip and the board and alight stops count
+     * 1/3 of the score.
+     *
+     * If there are interlined transfers then the alight/board stop pairs are not taken into account
+     * as the passengers don't leave the vehicle.
+     */
+    private static Float computeAccessibilityScore(
+            Trip trip,
+            Leg currentLeg,
+            Leg nextLeg,
+            RoutingRequest options
+    ) {
+        if (options.wheelchairAccessible) {
+            List<Float> scores = new ArrayList<>();
+
+            if(currentLeg.interlineWithPreviousLeg == null || !currentLeg.interlineWithPreviousLeg) {
+                float fromScore = computeAccessibilityScore(currentLeg.from.wheelchairBoarding);
+                scores.add(fromScore);
+            }
+
+            if(nextLeg == null || nextLeg.interlineWithPreviousLeg == null || !nextLeg.interlineWithPreviousLeg) {
+                float toScore = computeAccessibilityScore(currentLeg.to.wheelchairBoarding);
+                scores.add(toScore);
+            }
+
+            float tripScore = computeAccessibilityScore(
+                    WheelchairAccess.fromGtfsValue(trip.getWheelchairAccessible()));
+            scores.add(tripScore);
+
+            // sadly there doesn't seem to be a mapToFloat, so we have to convert
+            double sum = scores.stream().mapToDouble(Float::doubleValue).sum();
+
+            return (float) sum / scores.size();
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * Converts a WheelchairAccess value into a numeric score between 0 and 1. These individual
+     * score (for stops for example) can then be added up to compute a compound score for a leg
+     * or an itinerary.
+     */
+    private static float computeAccessibilityScore(WheelchairAccess access) {
+        switch(access) {
+            case ALLOWED: // is accessible
+                return 1;
+            case NOT_ALLOWED: // not accessible
+                return 0;
+            default: // don't know
+                return 0.5f;
+        }
+    }
+
+    /**
      * Add {@link Place} fields to a {@link Leg}.
      * There is some code duplication because of subtle differences between departure, arrival and
      * intermediate stops.
@@ -979,6 +1070,7 @@ public abstract class GraphPathToTripPlanConverter {
         // share (or other vehicle rental types) will get information about the vehicle ID and networks served.
         if (vertex instanceof TransitVertex && edge instanceof OnboardEdge) {
             place.stopId = stop.getId();
+            place.wheelchairBoarding = WheelchairAccess.fromGtfsValue(stop.getWheelchairBoarding());
             place.stopCode = stop.getCode();
             place.platformCode = stop.getPlatformCode();
             place.zoneId = stop.getZoneId();

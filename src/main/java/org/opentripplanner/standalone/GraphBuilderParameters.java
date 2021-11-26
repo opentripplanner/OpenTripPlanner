@@ -176,6 +176,13 @@ public class GraphBuilderParameters {
      */
     public final double maxTransferDistance;
 
+    /**
+     * Whether a second transfer should be generated for wheelchair users when the regular one
+     * is found to be inaccessible.
+     */
+    public final boolean generateWheelchairAccessibleTransfers;
+
+
     public final boolean includeOsmTags;
 
     /**
@@ -258,6 +265,7 @@ public class GraphBuilderParameters {
         banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
+        generateWheelchairAccessibleTransfers = config.path("generateWheelchairAccessibleTransfers").asBoolean(false);
         includeOsmTags = config.path("includeOsmTags").asBoolean(false);
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
         micromobilityTravelRestrictionsUrlOrFile = config.path("micromobilityTravelRestrictionsUrlOrFile").asText();

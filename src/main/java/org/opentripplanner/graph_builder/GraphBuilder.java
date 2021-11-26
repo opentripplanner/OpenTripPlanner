@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -307,7 +306,10 @@ public class GraphBuilder implements Runnable {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addModule(new DirectTransferGenerator(builderParams.maxTransferDistance));
+                graphBuilder.addModule(new DirectTransferGenerator(
+                        builderParams.maxTransferDistance,
+                        builderParams.generateWheelchairAccessibleTransfers
+                ));
             }
         }
         graphBuilder.addModule(new EmbedConfig(builderConfig, routerConfig));

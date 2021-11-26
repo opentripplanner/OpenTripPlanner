@@ -3,7 +3,6 @@ package org.opentripplanner;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.HashMap;
 
 import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -35,6 +34,15 @@ public class ConstantsForTests {
     public static final String VERMONT_GTFS = "/vermont/ruralcommunity-flex-vt-us.zip";
 
     public static final String VERMONT_OSM = "/vermont/vermont-rct.osm.pbf";
+
+    // contains central Atlanta with two streets being patched to fake them to be wheelchair-inaccessible
+    // - https://www.openstreetmap.org/way/9254841
+    // - https://www.openstreetmap.org/way/849819590
+    public static final String CENTRAL_ATLANTA_OSM = "/atlanta/central-atlanta-filtered.osm.pbf";
+    // contains the MARTA Blue and Green lines and a single trip of bus 21
+    // the Green line and the bus are set to be wheelchair accessible but the Blue line is not
+    // only Georgia State and Ashby Station are wheelchair accessible
+    public static final String ATLANTA_BLUE_GREEN_LINE = "/atlanta/atlanta-blue-green-line.gtfs.zip";
 
     private static ConstantsForTests instance = null;
 
@@ -100,7 +108,7 @@ public class ConstantsForTests {
         return vermontGraph;
     }
 
-    private Graph getGraph(String osmFile, String gtfsFile) {
+    public static Graph getGraph(String osmFile, String gtfsFile) {
         try {
             Graph g = new Graph();
             OpenStreetMapModule loader = new OpenStreetMapModule();
@@ -108,7 +116,7 @@ public class ConstantsForTests {
             AnyFileBasedOpenStreetMapProviderImpl provider = new AnyFileBasedOpenStreetMapProviderImpl();
 
             File file = new File(
-                    URLDecoder.decode(this.getClass().getResource(osmFile).getFile(),
+                    URLDecoder.decode(ConstantsForTests.class.getResource(osmFile).getFile(),
                             "UTF-8"));
 
             provider.setPath(file);
@@ -117,7 +125,7 @@ public class ConstantsForTests {
             loader.buildGraph(g, new GraphBuilderModuleSummary(loader));
 
             GtfsContext ctx = GtfsLibrary.readGtfs(new File(
-                    URLDecoder.decode(this.getClass().getResource(gtfsFile).getFile(),
+                    URLDecoder.decode(ConstantsForTests.class.getResource(gtfsFile).getFile(),
                             "UTF-8")));
             PatternHopFactory factory = new PatternHopFactory(ctx);
             factory.run(g);
@@ -127,11 +135,11 @@ public class ConstantsForTests {
             g.updateTransitFeedValidity(csd);
             g.hasTransit = true;
 
-            DirectTransferGenerator dtg = new DirectTransferGenerator(2000);
-            dtg.buildGraph(g, new GraphBuilderModuleSummary(dtg));
-
             StreetLinkerModule slm = new StreetLinkerModule();
             slm.buildGraph(g, new GraphBuilderModuleSummary(slm));
+
+            DirectTransferGenerator dtg = new DirectTransferGenerator(2000, true);
+            dtg.buildGraph(g, new GraphBuilderModuleSummary(dtg));
 
             g.index(true);
 

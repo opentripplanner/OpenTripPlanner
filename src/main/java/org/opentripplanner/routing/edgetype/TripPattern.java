@@ -9,6 +9,7 @@ import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.gtfs.WheelchairAccess;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -56,6 +57,7 @@ public class TripPattern implements Cloneable, Serializable {
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
+
     public static final int MASK_PICKUP = 2|4;
     public static final int SHIFT_PICKUP = 1;
     public static final int MASK_DROPOFF = 8|16;
@@ -252,8 +254,8 @@ public class TripPattern implements Cloneable, Serializable {
     }
 
     /** Returns whether a given stop is wheelchair-accessible. */
-    public boolean wheelchairAccessible(int stopIndex) {
-        return (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) != 0;
+    public WheelchairAccess wheelchairAccessible(int stopIndex) {
+        return WheelchairAccess.fromGtfsValue(stopPattern.stops[stopIndex].getWheelchairBoarding());
     }
 
     /** Returns the zone of a given stop */

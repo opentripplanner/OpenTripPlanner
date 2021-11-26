@@ -279,6 +279,15 @@ public class Leg {
     public String flexFlagStopDropOffMessage;
 
     /**
+     * How easy is it to use this leg when using a wheelchair.
+     *
+     * 0 = terrible accessibility
+     * 1 = great accessibility
+     */
+    @JsonSerialize
+    public Float accessibilityScore;
+
+    /**
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg
      */

@@ -15,7 +15,7 @@ import java.util.Locale;
  * @author mattwigway
  *
  */
-public class ElevatorHopEdge extends Edge implements ElevatorEdge {
+public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
@@ -32,10 +32,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
 
-        if (options.wheelchairAccessible && !wheelchairAccessible) {
-            return null;
-        }
-        
         TraverseMode mode = s0.getNonTransitMode();
 
         if (mode == TraverseMode.WALK && 
@@ -59,9 +55,21 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
         }
 
         StateEditor s1 = s0.edit(this);
+
         s1.setBackMode(TraverseMode.WALK);
+
+        if (options.wheelchairAccessible && !wheelchairAccessible) {
+            // Apply a time penalty, in addition to the cost penalty, so that accessible transfers
+            // work. When we compute transfers we only look at the time and hence increasing just
+            // the cost would not work:
+            // https://github.com/ibi-group/OpenTripPlanner/blob/f2b375364985b8dd83f791950d955e3ec5c9cb34/src/main/java/org/opentripplanner/routing/algorithm/EarliestArrivalSearch.java#L76
+            s1.incrementWeight(options.noWheelchairAccessOnElevatorPenalty);
+            s1.incrementTimeInSeconds(options.noWheelchairAccessOnElevatorPenalty);
+        }
+
         s1.incrementWeight(options.elevatorHopCost);
         s1.incrementTimeInSeconds(options.elevatorHopTime);
+
         return s1.makeState();
     }
 
@@ -87,5 +95,10 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     @Override
     public String getName(Locale locale) {
         return this.getName();
+    }
+
+    @Override
+    public boolean isWheelchairAccessible() {
+        return wheelchairAccessible;
     }
 }
