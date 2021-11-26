@@ -258,7 +258,7 @@ public class GraphBuilder implements Runnable {
             );
         }
 
-        if (DataOverlay.isOn()) {
+        if (DataOverlay.isOn() && davaOverlayConfig != null) {
             File dataFile = new File(davaOverlayConfig.getFileName());
             if (dataFile.exists()) {
                 GenericDataFile genericDataFile = new GenericDataFile(dataFile, davaOverlayConfig);
