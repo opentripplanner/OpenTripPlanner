@@ -258,14 +258,18 @@ public class GraphBuilder implements Runnable {
             );
         }
 
-        if (DataOverlay.isOn() && davaOverlayConfig != null) {
-            File dataFile = new File(davaOverlayConfig.getFileName());
-            if (dataFile.exists()) {
-                GenericDataFile genericDataFile = new GenericDataFile(dataFile, davaOverlayConfig);
-                EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, davaOverlayConfig);
-                graphBuilder.addModule(edgeUpdaterModule);
+        if (DataOverlay.isOn()) {
+            if (davaOverlayConfig == null) {
+                LOG.error("No data overlay configuration file found!");
             } else {
-                LOG.error("No data file "+dataFile+" found!");
+                File dataFile = new File(davaOverlayConfig.getFileName());
+                if (dataFile.exists()) {
+                    GenericDataFile genericDataFile = new GenericDataFile(dataFile, davaOverlayConfig);
+                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, davaOverlayConfig);
+                    graphBuilder.addModule(edgeUpdaterModule);
+                } else {
+                    LOG.error("No data file " + dataFile + " found!");
+                }
             }
         }
 
