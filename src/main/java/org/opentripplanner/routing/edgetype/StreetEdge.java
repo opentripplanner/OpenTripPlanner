@@ -486,7 +486,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
          */
         boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
 
-
         if (walkingOrBiking && OTPFeature.DataOverlay.isOn()) {
             if (extraData != null && extraData.getVariableValues() != null) {
                 double totalPenalty = 0d;
