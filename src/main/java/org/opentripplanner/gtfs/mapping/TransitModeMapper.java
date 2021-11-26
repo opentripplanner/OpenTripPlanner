@@ -1,13 +1,16 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TransitModeMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TransitModeMapper.class);
-
+    /**
+     * Return an OTP TransitMode matching a routeType. If no good match is found, it returns null.
+     *
+     * @param routeType  Route type to be mapped into a mode
+     */
     public static TransitMode mapMode(int routeType) {
         // Should really be reference to org.onebusaway.gtfs.model.Stop.MISSING_VALUE, but it is private.
         if (routeType == -999) { return null; }
@@ -46,12 +49,11 @@ public class TransitModeMapper {
         } else if (routeType >= 1400 && routeType < 1500) { //Funicalar Service
             return TransitMode.FUNICULAR;
         } else if (routeType >= 1500 && routeType < 1600) { //Taxi Service
-            LOG.warn("Treating taxi extended route type {} as a bus.", routeType);
-            return TransitMode.BUS;
+            return null;
         } else if (routeType >= 1600 && routeType < 1700) { //Self drive
             return TransitMode.BUS;
         } else if (routeType >= 1700 && routeType < 1800) { //Miscellaneous Service
-            return TransitMode.BUS;
+            return null;
         }
         /* Original GTFS route types. Should these be checked before TPEG types? */
         switch (routeType) {
@@ -78,5 +80,29 @@ public class TransitModeMapper {
             default:
                 throw new IllegalArgumentException("unknown gtfs route type " + routeType);
         }
+    }
+
+    /**
+     * For routes a mode must be set. If {@link #mapMode} returns it as null, we use BUS as
+     * default.
+     *
+     * @param routeType  Original route type that was mapped into a mode
+     * @param route      The route for which the mode is for
+     * @param issueStore Issue store
+     */
+    public static TransitMode mapModeForRoute(
+            int routeType,
+            Route route,
+            DataImportIssueStore issueStore
+    ) {
+        TransitMode mode = mapMode(routeType);
+        if (mode == null) {
+            issueStore.add(
+                    "TransitModeMapper", "Treating %s route type for route %s as BUS.", routeType,
+                    route.getId().getId()
+            );
+            return TransitMode.BUS;
+        }
+        return mode;
     }
 }

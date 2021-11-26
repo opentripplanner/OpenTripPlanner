@@ -8,7 +8,6 @@ import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -66,8 +65,7 @@ class RouteMapper {
                 line.getTransportSubmode()
         );
         otpRoute.setType(transportType);
-        TransitMode mode = TransitModeMapper.mapMode(transportType);
-        otpRoute.setMode(mode);
+        otpRoute.setMode(TransitModeMapper.mapModeForRoute(transportType, otpRoute, issueStore));
         if (line instanceof FlexibleLine_VersionStructure) {
             otpRoute.setFlexibleLineType(((FlexibleLine_VersionStructure) line)
                 .getFlexibleLineType().value());
