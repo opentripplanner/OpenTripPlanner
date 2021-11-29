@@ -64,10 +64,7 @@ public class OTPConfiguration {
         this.otpConfig = configLoader.loadOtpConfig();
         this.buildConfig = configLoader.loadBuildConfig();
         this.routerConfig = configLoader.loadRouterConfig();
-
-        if (OTPFeature.DataOverlay.isOn()) {
-            dataOverlayConfig = configLoader.loadDataOverlayConfig();
-        }
+        this.dataOverlayConfig = configLoader.loadDataOverlayConfig();
     }
 
     /**
