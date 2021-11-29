@@ -10,7 +10,8 @@ RUN apt update && \
 COPY target/*-shaded.jar /opt/java/app.jar
 COPY run-otp.sh /opt/run-otp.sh
 
-COPY settings.json /opt/otp/settings.json
+COPY data-settings.json /opt/otp/data-settings.json
+COPY otp-config.json /opt/otp/otp-config.json
 COPY *.osm.pbf /opt/otp/map.osm.pbf
 # COPY graphs /opt/otp/graphs
 
