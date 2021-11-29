@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.response;
 
 import java.util.List;
-import java.util.StringJoiner;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 
@@ -39,11 +39,10 @@ public class RoutingResponse {
 
     @Override
     public String toString() {
-        return new StringJoiner(
-                ", ", RoutingResponse.class.getSimpleName() + "[", "]"
-        )
-                .add("tripPlan=" + tripPlan)
-                .add("metadata=" + metadata)
+        return ToStringBuilder.of(RoutingResponse.class)
+                .addObj("tripPlan", tripPlan)
+                .addObj("metadata", metadata)
+                .addObj("routingErrors", routingErrors)
                 .toString();
     }
 }
