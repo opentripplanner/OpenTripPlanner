@@ -99,7 +99,7 @@ public class TransitModeMapper {
         if (mode == null) {
             issueStore.add(
                     "TransitModeMapper", "Treating %s route type for route %s as BUS.", routeType,
-                    route.getId().getId()
+                    route.getId().toString()
             );
             return TransitMode.BUS;
         }
