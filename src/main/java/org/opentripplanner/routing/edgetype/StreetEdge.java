@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
+import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
@@ -107,7 +110,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     protected float bicycleSafetyFactor;
 
     private byte[] compactGeometry;
-
+    
     private I18NString name;
 
     private StreetTraversalPermission permission;
@@ -116,7 +119,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     public long wayId;
 
     private int streetClass = CLASS_OTHERPATH;
-
+    
     /**
      * The speed (meters / sec) at which an automobile can traverse
      * this street segment.
@@ -476,7 +479,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         }
 
         s1.incrementTimeInSeconds(roundedTime);
-
+        
         s1.incrementWeight(weight);
 
         /*
