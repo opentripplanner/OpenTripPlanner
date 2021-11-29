@@ -379,6 +379,19 @@ public class AlertsUpdateHandlerTest {
         assertEquals(1l, routeSelectorCount);
     }
 
+    @Test
+    public void testUnknownSelector() {
+        GtfsRealtime.Alert alert = Alert.newBuilder().build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        long unknownSelectorCount = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
+                .count();
+        assertEquals(1l, unknownSelectorCount);
+    }
+
     private TransitAlert processOneAlert(GtfsRealtime.Alert alert) {
         GtfsRealtime.FeedMessage message = GtfsRealtime.FeedMessage.newBuilder()
                 .setHeader(GtfsRealtime.FeedHeader.newBuilder().setGtfsRealtimeVersion("2.0"))

@@ -1147,6 +1147,31 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
   }
 
+  @Test
+  public void testSiriSxUpdateForUnknownEntity() {
+    init();
+    assertTrue(transitAlertService.getAllAlerts().isEmpty());
+
+    final String situationNumber = "TST:SituationNumber:1234";
+    PtSituationElement ptSituation = createPtSituationElement(situationNumber,
+            ZonedDateTime.parse("2014-01-01T00:00:00+01:00"),
+            ZonedDateTime.parse("2014-01-01T23:59:59+01:00"),
+            null
+    );
+
+    final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
+    alertsUpdateHandler.update(serviceDelivery);
+
+    Collection<TransitAlert> alerts = transitAlertService.getAllAlerts();
+    assertEquals(1, alerts.size());
+    TransitAlert transitAlert = alerts.iterator().next();
+    long unknownSelectorCount = transitAlert.getEntities()
+            .stream()
+            .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
+            .count();
+    assertEquals(1l, unknownSelectorCount);
+  }
+
   private AffectsScopeStructure createAffectsLineWithExternallyDefinedStopPlaces(
       String line, String... stopIds
   ) {

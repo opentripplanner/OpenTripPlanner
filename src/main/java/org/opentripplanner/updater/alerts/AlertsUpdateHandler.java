@@ -135,6 +135,10 @@ public class AlertsUpdateHandler {
             }
         }
 
+        if (alertText.getEntities().isEmpty()) {
+            alertText.addEntity(new EntitySelector.Unknown());
+        }
+
         alertText.severity = getAlertSeverityForGtfsRtSeverity(alert.getSeverityLevel());
         alertText.cause = getAlertCauseForGtfsRtCause(alert.getCause());
         alertText.effect = getAlertEffectForGtfsRtEffect(alert.getEffect());

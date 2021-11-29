@@ -164,6 +164,22 @@ public interface EntitySelector {
     }
   }
 
+  class Unknown implements EntitySelector {
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o || getClass() == o.getClass()) {
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return 100000007;
+    }
+  }
+
   class StopAndRouteOrTripKey {
     public final FeedScopedId stop;
     public final FeedScopedId routeOrTrip;
