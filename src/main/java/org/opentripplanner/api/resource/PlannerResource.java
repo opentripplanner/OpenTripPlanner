@@ -77,6 +77,7 @@ public class PlannerResource extends RoutingResource {
             // Map to API
             TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale, request.showIntermediateStops);
             response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
+            response.setPageCursor(res.getPageCursor().encode());
             response.setMetadata(TripSearchMetadataMapper.mapTripSearchMetadata(res.getMetadata()));
             if (!res.getRoutingErrors().isEmpty()) {
                 // The api can only return one error message, so the first one is mapped

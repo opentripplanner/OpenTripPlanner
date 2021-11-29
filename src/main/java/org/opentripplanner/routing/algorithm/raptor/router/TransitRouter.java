@@ -143,6 +143,10 @@ public class TransitRouter {
 
         var raptorSearchParamsUsed = transitResponse.requestUsed().searchParams();
 
+        LOG.debug("RoutingWorker routeTransit()");
+        LOG.debug("searchParam input : " + raptorRequest.searchParams());
+        LOG.debug("searchParam used  : " + raptorSearchParamsUsed);
+
         debugTimingAggregator.finishedItineraryCreation();
 
         return new TransitRouterResult(itineraries, raptorSearchParamsUsed);

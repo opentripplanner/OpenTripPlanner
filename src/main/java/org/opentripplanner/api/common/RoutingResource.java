@@ -14,6 +14,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -87,6 +88,20 @@ public abstract class RoutingResource {
      */
     @QueryParam("searchWindow")
     protected Integer searchWindow;
+
+    /**
+     * Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last
+     * response and keep the original request as is. This will enable you to search for itineraries
+     * int the next time-window if arriveBy is false and the previous time-window if arrive-by is
+     * true.
+     * <p>
+     * The cursor based paging only support stepping to the next page, it does not support going
+     * back to the previous page or jumping.
+     * <p>
+     * This is an optional parameter.
+     */
+    @QueryParam("pageCursor")
+    public String pageCursor;
 
     /**
      * Search for the best trip options within a time window. If {@code true} two itineraries are
@@ -723,6 +738,9 @@ public abstract class RoutingResource {
 
         if(searchWindow != null) {
             request.searchWindow = Duration.ofSeconds(searchWindow);
+        }
+        if(pageCursor != null) {
+            request.pageCursor = PageCursor.decode(pageCursor);
         }
         if(timetableView != null) {
             request.timetableView = timetableView;

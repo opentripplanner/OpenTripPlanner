@@ -159,7 +159,7 @@ public class ItineraryListFilterChainBuilder {
 
     /**
      * Max departure time. This is a absolute filter on the itinerary departure time from the
-     * origin.
+     * origin. The filter is ignored if the value is {@code null}.
      */
     public ItineraryListFilterChainBuilder withLatestDepartureTimeLimit(Instant latestDepartureTimeLimit) {
         this.latestDepartureTimeLimit = latestDepartureTimeLimit;

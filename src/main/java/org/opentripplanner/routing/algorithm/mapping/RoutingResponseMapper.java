@@ -30,12 +30,22 @@ public class RoutingResponseMapper {
     ) {
         // Create response
         var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
+        var pageCursor = PageCursorMapper.map(
+                request.arriveBy,
+                startOfTimeTransit,
+                searchParams,
+                firstRemovedItinerary
+        );
+
+        LOG.debug("PageCursor in:  " + request.pageCursor);
+        LOG.debug("PageCursor out: " + pageCursor);
 
         var metadata = createTripSearchMetadata(
                 request, searchParams, firstRemovedItinerary
         );
         return new RoutingResponse(
                 tripPlan,
+                pageCursor,
                 metadata,
                 new ArrayList<>(routingErrors),
                 debugTimingAggregator

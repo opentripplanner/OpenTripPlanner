@@ -49,13 +49,27 @@ public class RaptorRequestMapper {
     ) {
         var builder = new RaptorRequestBuilder<TripSchedule>();
         var searchParams = builder.searchParams();
-        int time = relativeTime(request.getDateTimeCurrentPage());
 
-        if (request.arriveBy) {
-            searchParams.latestArrivalTime(time);
+        if(request.pageCursor ==  null) {
+            int time = relativeTime(request.getDateTimeCurrentPage());
+            if (request.arriveBy) {
+                searchParams.latestArrivalTime(time);
+            }
+            else {
+                searchParams.earliestDepartureTime(time);
+            }
+            searchParams.searchWindow(request.searchWindow);
         }
         else {
-            searchParams.earliestDepartureTime(time);
+            var c = request.pageCursor;
+
+            if (c.earliestDepartureTime != null) {
+                searchParams.earliestDepartureTime(relativeTime(c.earliestDepartureTime));
+            }
+            if (c.latestArrivalTime != null) {
+                searchParams.latestArrivalTime(relativeTime(c.latestArrivalTime));
+            }
+            searchParams.searchWindow(c.searchWindow);
         }
 
         if(request.maxTransfers != null) {
@@ -75,7 +89,6 @@ public class RaptorRequestMapper {
 
         builder
                 .searchParams()
-                .searchWindow(request.searchWindow)
                 .timetableEnabled(request.timetableView)
                 .constrainedTransfersEnabled(OTPFeature.TransferConstraints.isOn())
                 .addAccessPaths(accessPaths)

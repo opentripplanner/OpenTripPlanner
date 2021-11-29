@@ -34,6 +34,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
+import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -184,8 +185,23 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * you may use a fixed value, like 60 minutes. If you have a mixture of high frequency cities
      * routes and infrequent long distant journeys, the best option is normally to use the dynamic
      * auto assignment.
+     * <p>
+     * There is no need to set this when going to the next/previous page any more.
      */
     public Duration searchWindow;
+
+    /**
+     * Use the cursor to go to the next "page" of trips. You should pass in the original request as
+     * is.
+     * <p>
+     * At the moment we only support paging to the next page. If arriveBy is false, then page to
+     * the itineraries witch depart AFTER the current result. If arriveBy is true, then page to
+     * the itineraries witch arrive BEFORE the current result.
+     * <p>
+     * The paging do not support timeTableView=false and arriveBy=true, this will result in
+     * none pareto-optimal results.
+     */
+    public PageCursor pageCursor;
 
     /**
      * Search for the best trip options within a time window. If {@code true} two itineraries are
@@ -959,7 +975,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * the time-window used.
      */
     public Instant getDateTimeCurrentPage() {
-        return Instant.ofEpochSecond(dateTime);
+        return pageCursor == null ? Instant.ofEpochSecond(dateTime) : pageCursor.nextDateTime();
     }
 
     public void setDateTime(Instant dateTime) {
@@ -983,6 +999,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     public int getNumItineraries() {
         return 1;
+    }
+
+    public void setPageCursor(String pageCursor) {
+        this.pageCursor = PageCursor.decode(pageCursor);
     }
 
     public void setNumItineraries(int numItineraries) {

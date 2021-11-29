@@ -56,6 +56,21 @@ public class RoutingWorker {
     }
 
     public RoutingResponse route() {
+        LOG.debug("RoutingWorker input");
+        LOG.debug("PageCursor        : " + request.pageCursor);
+        LOG.debug("Request sw        : " + request.searchWindow);
+        LOG.debug("Request org. time : " + request.getDateTimeOriginalSearch());
+        LOG.debug("Request page time : " + request.getDateTimeCurrentPage());
+
+        // Adjust the 'dateTime' if "goto next page"(the page cursor is set)
+        // The date-time is used for many thing like finding the days to search,
+        // but the transit search is using the cursor[if exist], not the datetime.
+        if(request.pageCursor != null) {
+            Instant dateTimeCurrentPage = request.getDateTimeCurrentPage();
+            request.setDateTime(dateTimeCurrentPage);
+            LOG.debug("Request dateTime={} set from pageCursor.", dateTimeCurrentPage);
+        }
+
         // If no direct mode is set, then we set one.
         // See {@link FilterTransitWhenDirectModeIsEmpty}
         request.modes.directMode = emptyDirectModeHandler.resolveDirectMode();

@@ -1,13 +1,12 @@
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.api.model.ApiTripPlan;
-import org.opentripplanner.api.model.ApiTripSearchMetadata;
-import org.opentripplanner.api.model.error.PlannerError;
-
-import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import javax.ws.rs.core.UriInfo;
+import org.opentripplanner.api.model.ApiTripPlan;
+import org.opentripplanner.api.model.ApiTripSearchMetadata;
+import org.opentripplanner.api.model.error.PlannerError;
 
 /** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
 public class TripPlannerResponse {
@@ -16,6 +15,8 @@ public class TripPlannerResponse {
     public HashMap<String, String> requestParameters;
     private ApiTripPlan plan;
     private ApiTripSearchMetadata metadata;
+    private String pageCursor;
+
     private PlannerError error = null;
 
     /** Debugging and profiling information */
@@ -53,12 +54,25 @@ public class TripPlannerResponse {
         this.plan = plan;
     }
 
-    public ApiTripSearchMetadata getMetadata() {
-        return metadata;
+    /**
+     * Use the cursor to get the next page of results. Insert this cursor into the
+     * request and get post it to get the next page.
+     * <p>
+     * If arriveBy=false the next page is a set of itineraries departing AFTER the last
+     * itinerary in this result.
+     * <p>
+     * If arriveBy=true the next page is a set of itineraries departing BEFORE the first
+     * itinerary in this result.
+     * <p>
+     * Note! The behavior is undefined if timetableView is off. This is possible to support,
+     * but require more information to be included in the cursor.
+     */
+    public String getPageCursor() {
+        return pageCursor;
     }
 
-    public void setMetadata(ApiTripSearchMetadata metadata) {
-        this.metadata = metadata;
+    public void setPageCursor(String pageCursor) {
+        this.pageCursor = pageCursor;
     }
 
     /** The error (if any) that this response raised. */
@@ -69,5 +83,14 @@ public class TripPlannerResponse {
     public void setError(PlannerError error) {
         this.error = error;
     }
-    
+
+    public ApiTripSearchMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(ApiTripSearchMetadata metadata) {
+        this.metadata = metadata;
+    }
+
+
 }
