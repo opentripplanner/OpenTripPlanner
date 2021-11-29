@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -579,7 +580,8 @@ public class Graph implements Serializable {
     }
 
     // Check to see if we have transit information for a given date
-    public boolean transitFeedCovers(long t) {
+    public boolean transitFeedCovers(Instant time) {
+        long t = time.getEpochSecond();
         return t >= this.transitServiceStarts && t < this.transitServiceEnds;
     }
 

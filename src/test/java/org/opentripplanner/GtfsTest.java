@@ -3,6 +3,13 @@ package org.opentripplanner;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import junit.framework.TestCase;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -17,20 +24,13 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest extends TestCase {
@@ -108,7 +108,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setNumItineraries(1);
         
         routingRequest.setArriveBy(dateTime < 0);
-        routingRequest.dateTime = Math.abs(dateTime);
+        routingRequest.setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
         if (fromVertex != null && !fromVertex.isEmpty()) {
             routingRequest.from = LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex);
         }

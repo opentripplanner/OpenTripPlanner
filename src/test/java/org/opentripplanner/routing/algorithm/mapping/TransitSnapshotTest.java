@@ -55,7 +55,7 @@ public class TransitSnapshotTest
 
     @Test
     public void test_trip_planning_with_walk_only() {
-        RoutingRequest request = createTestRequest(2009, 10, 17, 10, 0, 0);
+        RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
                 emptySet()
@@ -68,7 +68,7 @@ public class TransitSnapshotTest
 
     @Test
     public void test_trip_planning_with_walk_only_stop() {
-        RoutingRequest request = createTestRequest(2009, 10, 17, 10, 0, 0);
+        RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
                 emptySet()
@@ -81,7 +81,7 @@ public class TransitSnapshotTest
 
     @Test
     public void test_trip_planning_with_walk_only_stop_collection() {
-        RoutingRequest request = createTestRequest(2009, 10, 17, 10, 0, 0);
+        RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
                 emptySet()
@@ -95,7 +95,7 @@ public class TransitSnapshotTest
 
     @Test
     public void test_trip_planning_with_transit() {
-        RoutingRequest request = createTestRequest(2009, 10, 17, 10, 0, 0);
+        RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
                 Set.of(TransitMode.values())
@@ -108,7 +108,7 @@ public class TransitSnapshotTest
 
     @Test
     public void test_trip_planning_with_transit_stop() {
-        RoutingRequest request = createTestRequest(2009, 10, 17, 10, 0, 0);
+        RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
                 Set.of(TransitMode.values())
@@ -121,7 +121,7 @@ public class TransitSnapshotTest
 
     @Ignore
     public void test_trip_planning_with_transit_stop_collection() {
-        RoutingRequest request = createTestRequest(2009, 10, 17, 10, 0, 0);
+        RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
                 Set.of(TransitMode.values())

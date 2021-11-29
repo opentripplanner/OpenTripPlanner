@@ -1,6 +1,5 @@
 package org.opentripplanner.api.resource;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import javax.ws.rs.GET;
@@ -117,7 +116,7 @@ public class PlannerResource extends RoutingResource {
             sb.append(' ');
             sb.append(request.arriveBy ? "ARRIVE" : "DEPART");
             sb.append(' ');
-            sb.append(LocalDateTime.ofInstant(Instant.ofEpochSecond(request.dateTime), ZoneId.systemDefault()));
+            sb.append(LocalDateTime.ofInstant(request.getDateTimeOriginalSearch(), ZoneId.systemDefault()));
             sb.append(' ');
             sb.append(request.streetSubRequestModes.getAsStr());
             sb.append(' ');

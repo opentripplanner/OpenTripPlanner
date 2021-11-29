@@ -24,7 +24,7 @@ public class RaptorRequestMapper {
 
         int time = DateMapper.secondsSinceStartOfTime(
                 startOfTime,
-                request.getDateTime().toInstant()
+                request.getDateTimeCurrentPage()
         );
 
         if (request.arriveBy) {

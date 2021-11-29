@@ -84,7 +84,7 @@ public abstract class SnapshotTestBase {
         Router router = getRouter();
 
         RoutingRequest request = router.defaultRoutingRequest.clone();
-        request.dateTime = TestUtils.dateInSeconds(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second);
+        request.setDateTime(TestUtils.dateInstant(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second));
         request.maxTransfers = 6;
         request.numItineraries = 6;
         request.searchWindow = Duration.ofHours(5);
@@ -172,7 +172,7 @@ public abstract class SnapshotTestBase {
 
         RoutingRequest arriveBy = request.clone();
         arriveBy.setArriveBy(true);
-        arriveBy.dateTime = departByItineraries.get(0).lastLeg().endTime.toInstant().getEpochSecond();
+        arriveBy.setDateTime(departByItineraries.get(0).lastLeg().endTime.toInstant());
 
         List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy, router);
         sanitizeItinerariesForSnapshot(arriveByItineraries);

@@ -62,7 +62,7 @@ public class TransitRouter {
             return new TransitRouterResult(List.of(), null, NOT_SET);
         }
 
-        if (!router.graph.transitFeedCovers(request.dateTime)) {
+        if (!router.graph.transitFeedCovers(request.getDateTimeOriginalSearch())) {
             throw new RoutingValidationException(List.of(
                     new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME)
             ));
@@ -145,7 +145,7 @@ public class TransitRouter {
         Instant filterOnLatestDepartureTime = null;
         var searchWindowUsedInSeconds = transitResponse.requestUsed().searchParams().searchWindowInSeconds();
         if(!request.arriveBy && searchWindowUsedInSeconds > 0) {
-            filterOnLatestDepartureTime = Instant.ofEpochSecond(request.dateTime + searchWindowUsedInSeconds);
+            filterOnLatestDepartureTime = request.getDateTimeCurrentPage().plusSeconds(searchWindowUsedInSeconds);
         }
 
         debugTimingAggregator.finishedItineraryCreation();
@@ -245,7 +245,7 @@ public class TransitRouter {
             return new RaptorRoutingRequestTransitData(
                     graph.getTransferService(),
                     transitLayer,
-                    request.getDateTime().toInstant(),
+                    request.getDateTimeOriginalSearch(),
                     request.arriveBy ? request.additionalSearchDaysBeforeToday : 0,
                     request.arriveBy ? 0 : request.additionalSearchDaysAfterToday,
                     createRequestTransitDataProviderFilter(graph.index),

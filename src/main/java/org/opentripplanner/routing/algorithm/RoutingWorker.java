@@ -161,7 +161,7 @@ public class RoutingWorker {
     private TripSearchMetadata createTripSearchMetadata() {
         if(searchWindowUsedInSeconds == TransitRouter.NOT_SET) { return null; }
 
-        Instant reqTime = Instant.ofEpochSecond(request.dateTime);
+        Instant reqTime = request.getDateTimeCurrentPage();
 
         if (request.arriveBy) {
             return TripSearchMetadata.createForArriveBy(

@@ -2,7 +2,6 @@ package org.opentripplanner.api.common;
 
 import java.util.Set;
 import java.time.Duration;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -713,8 +712,7 @@ public abstract class RoutingResource {
                     if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
                         gregCal.setTimeZone(tz);
                     }
-                    Date d2 = gregCal.getTime();
-                    request.setDateTime(d2);
+                    request.setDateTime(gregCal.toInstant());
                 } catch (DatatypeConfigurationException e) {
                     request.setDateTime(date, time, tz);
                 }
