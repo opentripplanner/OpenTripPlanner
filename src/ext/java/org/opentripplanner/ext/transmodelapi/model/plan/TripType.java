@@ -34,6 +34,7 @@ public class TripType {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("metadata")
             .description("The trip request metadata.")
+            .deprecate("Use pageCursor instead")
             .type(tripMetadataType)
             .dataFetcher(env -> ((PlanResponse) env.getSource()).metadata)
             .build())
@@ -94,6 +95,18 @@ public class TripType {
                 .build()))
             .dataFetcher(env -> ((PlanResponse) env.getSource()).debugOutput)
             .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("pageCursor")
+                .description("Use the cursor to get the next page of results. Use this cursor for "
+                    + "the pageCursor parameter in the trip query in order to get the next page.\n"
+                    + "If arriveBy=false the next page is a set of itineraries departing AFTER the "
+                    + "last itinerary in this result.\n"
+                    + "If arriveBy=true the next page is a set of itineraries departing BEFORE the "
+                    + "first itinerary in this result.")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(env -> ((PlanResponse) env.getSource()).pageCursor.encode())
+                .build()
+            )
         .build();
   }
 }

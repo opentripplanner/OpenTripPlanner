@@ -58,6 +58,7 @@ public class TransmodelGraphQLPlanner {
             response.metadata = res.getMetadata();
             response.messages = res.getRoutingErrors();
             response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
+            response.pageCursor = res.getPageCursor();
         }
         catch (ParameterException e) {
             var msg = e.message.get();
@@ -103,6 +104,7 @@ public class TransmodelGraphQLPlanner {
 
         callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long)millisSinceEpoch)), Date::new);
         callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
+        callWith.argument("pageCursor", request::setPageCursor);
         callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);

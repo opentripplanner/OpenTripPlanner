@@ -6,6 +6,7 @@ import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
@@ -52,6 +53,19 @@ public class TripQuery {
                 + "realtime changes."
             )
             .type(Scalars.GraphQLInt)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
+            .name("pageCursor")
+            .description(
+                "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from "
+                + "the last response and keep the original request as is. This will enable you to "
+                + "search for itineraries in the next time-window if arriveBy is false and the "
+                + "previous time-window if arriveBy is true.\n"
+                + "The cursor based paging only support stepping to the next page, it does not "
+                + "support going to back(previous page) or jumping."
+            )
+            .type(Scalars.GraphQLString)
             .build()
         )
         .argument(GraphQLArgument.newArgument()
