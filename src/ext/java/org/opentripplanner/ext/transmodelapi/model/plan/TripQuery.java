@@ -12,7 +12,7 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 public class TripQuery {
 
@@ -29,6 +29,7 @@ public class TripQuery {
             + "trip patterns describing suggested alternatives for the trip."
         )
         .type(tripType)
+        .withDirective(gqlUtil.timingData)
         .argument(GraphQLArgument.newArgument()
             .name("dateTime")
             .description(
@@ -54,6 +55,37 @@ public class TripQuery {
             .build()
         )
         .argument(GraphQLArgument.newArgument()
+            .name("timetableView")
+            .description(
+                "Search for the best trip options within a time window. If `true` two "
+                + "TripPatterns are considered optimal if one is better on arrival time"
+                + "(earliest wins) and the other is better on departure time(latest wins)."
+                + "In combination with `arriveBy` this parameter cover the following 3 use "
+                + "cases:\n\n"
+                + "\n"
+                + "  - Traveler want to find the best alternative within a time window. Set "
+                + "    `timetableView=true` and `arriveBy=false`. This is the default, and if "
+                + "    the intention of the traveler is unknown it gives the best result, "
+                + "    because it includes the two next use-cases. This option also work well "
+                + "    with paging. Setting the `arriveBy=true`, covers the same use-case, but "
+                + "    the input time is interpreted as latest-arrival-time, and not "
+                + "    earliest-departure-time.\n"
+                + "\n"
+                + "  - Traveler want to find the best alternative with departure after a "
+                + "    specific time. For example: I am at the station now and want to get "
+                + "    home as quickly as possible. Set `timetableView=false` and "
+                + "    `arriveBy=false`. Do not support paging.\n"
+                + "\n"
+                + "  - Traveler want to find the best alternative with arrival before a"
+                + "    specific time. For example going to a meeting. Set `timetableView=false` "
+                + "    and `arriveBy=true`. Do not support paging.\n"
+                + "\n"
+                + "Default: `true`"
+            )
+            .type(Scalars.GraphQLBoolean)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
             .name("from")
             .description("The start location")
             .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
@@ -67,7 +99,10 @@ public class TripQuery {
         )
         .argument(GraphQLArgument.newArgument()
             .name("arriveBy")
-            .description("Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.")
+            .description(
+                "Whether the trip should depart at dateTime (false, the default), or arrive at "
+                + "dateTime. See `timetableView` for use-cases where this parameter is relevant."
+            )
             .type(Scalars.GraphQLBoolean)
             .defaultValue(routing.request.arriveBy)
             .build()
@@ -87,6 +122,13 @@ public class TripQuery {
             .description("When true, realtime updates are ignored during this search.")
             .type(Scalars.GraphQLBoolean)
             .defaultValue(routing.request.ignoreRealtimeUpdates)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
+            .name("includePlannedCancellations")
+            .description("When true, service journeys cancelled in scheduled route data will be included during this search.")
+            .type(Scalars.GraphQLBoolean)
+            .defaultValue(routing.request.includePlannedCancellations)
             .build()
         )
         .argument(GraphQLArgument.newArgument()
@@ -159,10 +201,30 @@ public class TripQuery {
             .description(
                 "The set of characteristics that the user wants to optimise for during bicycle "
                 + "searches -- defaults to "
-                + enumValAsString(EnumTypes.BICYCLE_OPTIMISATION_METHOD, routing.request.optimize)
+                + enumValAsString(EnumTypes.BICYCLE_OPTIMISATION_METHOD, routing.request.bicycleOptimizeType)
             )
             .type(EnumTypes.BICYCLE_OPTIMISATION_METHOD)
-            .defaultValue(routing.request.optimize)
+            .defaultValue(routing.request.bicycleOptimizeType)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
+                .name("triangleFactors")
+                .description(
+                        "When setting the " + EnumTypes.BICYCLE_OPTIMISATION_METHOD.getName() + " to '" + enumValAsString(EnumTypes.BICYCLE_OPTIMISATION_METHOD,
+                                BicycleOptimizeType.TRIANGLE
+                        )+ "', use these values to tell the routing engine how important each of the factors is compared to the others. All values should add up to 1."
+                )
+                .type(TriangleFactorsInputType.INPUT_TYPE)
+                .build()
+        )
+        .argument(GraphQLArgument.newArgument()
+            .name("useBikeRentalAvailabilityInformation")
+            .description(
+                "Whether or not bike rental availability information will be used to plan bike "
+                    + "rental trips."
+            )
+            .type(Scalars.GraphQLBoolean)
+            .defaultValue(routing.request.useVehicleRentalAvailabilityInformation)
             .build()
         )
         .argument(GraphQLArgument.newArgument()
@@ -249,29 +311,27 @@ public class TripQuery {
         )
         .argument(GraphQLArgument.newArgument()
             .name("transitGeneralizedCostLimit")
-            .description("Set a relative limit for all transit itineraries. The limit "
-                + "is calculated based on the best transit itinerary generalized-cost. "
-                + "Itineraries without transit legs are excluded from this filter. "
-                + "Example: f(x) = 3600 + 2.0 x. If the lowest cost returned is 10 000, "
-                + "then the limit is set to: 3 600 + 2 * 10 000 = 26 600. Then all "
-                + "itineraries with at least one transit leg and a cost above 26 600 "
-                + "is removed from the result. Default: "
-                + RequestFunctions.serialize(routing.request.transitGeneralizedCostLimit)
-            )
+            .description("DEPRECATED. REPLACED BY 'itineraryFilters.transitGeneralizedCostLimit'")
             .type(gqlUtil.doubleFunctionScalar)
-            // There is a bug in the GraphQL lib. The default value is shown as a `boolean`
-            // with value `false`, not the actual value. Hence; The default is added to the
-            // description above instead. .defaultValue(routing.request.transitGeneralizedCostLimit)
             .build()
         )
         .argument(GraphQLArgument.newArgument()
             .name("debugItineraryFilter")
             .description(
-                "Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, "
-                + "but NOT delete them when this is enabled."
+                "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries "
+                + "instead of removing them. This is very convenient when tuning the filters."
             )
             .type(Scalars.GraphQLBoolean)
-            .defaultValue(routing.request.debugItineraryFilter)
+            .defaultValue(routing.request.itineraryFilters.debug)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
+            .name("itineraryFilters")
+            .description(
+                "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED "
+                + "FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
+            )
+            .type(ItineraryFiltersInputType.create(gqlUtil, routing.request.itineraryFilters))
             .build()
         )
         .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))

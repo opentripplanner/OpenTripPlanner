@@ -4,6 +4,8 @@ import org.opentripplanner.model.base.ToStringBuilder;
 
 import java.io.Serializable;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.UNKNOWN;
+
 public class VersionControlInfo implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -13,6 +15,9 @@ public class VersionControlInfo implements Serializable {
   public final String buildTime;
   public final boolean dirty;
 
+  public VersionControlInfo() {
+    this(UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, true);
+  }
 
   public VersionControlInfo(
       String commit,

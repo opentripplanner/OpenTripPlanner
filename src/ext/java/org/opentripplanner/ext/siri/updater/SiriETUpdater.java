@@ -1,17 +1,16 @@
 package org.opentripplanner.ext.siri.updater;
 
+import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
-
-import java.util.List;
 
 /**
  * Update OTP stop time tables from some (realtime) source
@@ -33,7 +32,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     /**
      * Parent update manager. Is used to execute graph writer runnables.
      */
-    protected GraphUpdaterManager updaterManager;
+    protected WriteToGraphCallback saveResultOnGraph;
 
     /**
      * Update streamer
@@ -89,8 +88,8 @@ public class SiriETUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+        this.saveResultOnGraph = saveResultOnGraph;
     }
 
     @Override
@@ -133,7 +132,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
                 final boolean markPrimed = !moreData;
                 List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
                 if (etds != null) {
-                    updaterManager.execute(graph -> {
+                    saveResultOnGraph.execute(graph -> {
                         snapshotSource.applyEstimatedTimetable(graph, feedId, fullDataset, etds);
                         if (markPrimed) primed = true;
                     });

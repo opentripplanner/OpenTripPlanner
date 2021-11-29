@@ -13,27 +13,27 @@ import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.PushConfig;
 import com.google.pubsub.v1.Subscription;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.entur.protobuf.mapper.SiriMapper;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.Siri;
 import uk.org.siri.www.siri.SiriType;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class starts a Google PubSub subscription
@@ -71,7 +71,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     /**
      * Parent update manager. Is used to execute graph writer runnables.
      */
-    private GraphUpdaterManager updaterManager;
+    private WriteToGraphCallback saveResultOnGraph;
 
     private SiriTimetableSnapshotSource snapshotSource;
 
@@ -157,8 +157,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     }
 
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+        this.saveResultOnGraph = saveResultOnGraph;
     }
 
     @Override
@@ -271,7 +271,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
             LOG.info("Fetching initial data from " + dataInitializationUrl);
             final long t1 = System.currentTimeMillis();
 
-            final InputStream data = HttpUtils.getData(dataInitializationUrl, "Content-Type", "application/x-protobuf", 30000);
+            final InputStream data = HttpUtils.getData(
+                dataInitializationUrl, 30000, Map.of("Content-Type", "application/x-protobuf"));
             ByteString value = ByteString.readFrom(data);
 
             final long t2 = System.currentTimeMillis();
@@ -338,7 +339,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
                             getTimeSinceStartupString());
                 }
 
-                updaterManager.execute(graph -> {
+                saveResultOnGraph.execute(graph -> {
                     snapshotSource.applyEstimatedTimetable(graph, feedId, false, estimatedTimetableDeliveries);
                 });
             }

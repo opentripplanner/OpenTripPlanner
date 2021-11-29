@@ -83,8 +83,9 @@ public class ConfigLoader {
      */
     public static boolean isConfigFile(String filename) {
         return OTP_CONFIG_FILENAME.equals(filename)
-                || BUILD_CONFIG_FILENAME.equals(filename)
-                || ROUTER_CONFIG_FILENAME.equals(filename);
+            || BUILD_CONFIG_FILENAME.equals(filename)
+            || ROUTER_CONFIG_FILENAME.equals(filename)
+            || DATA_OVERLAY_CONFIG_FILENAME.equals(filename);
     }
 
     /**
@@ -154,9 +155,11 @@ public class ConfigLoader {
      * Load the router configuration file as a JsonNode three. An empty node is
      * returned if the given {@code configDir}  is {@code null} or config file is NOT found.
      * <p>
+     * This is public to allow loading configuration files from tests like the SpeedTest.
+     *
      * @see #loadJsonFile for more details.
      */
-    private JsonNode loadJsonByFilename(String filename) {
+    public JsonNode loadJsonByFilename(String filename) {
         // Use default parameters if no configDir is available.
         if (configDir == null) {
             if(jsonFallback != null) {

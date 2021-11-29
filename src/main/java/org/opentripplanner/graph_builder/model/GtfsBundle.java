@@ -29,8 +29,6 @@ public class GtfsBundle {
 
     private CsvInputSource csvInputSource;
 
-    private Boolean defaultBikesAllowed = true;
-
     private boolean transfersTxtDefinesStationPaths = false;
 
     /** 
@@ -45,18 +43,11 @@ public class GtfsBundle {
      */
     public boolean linkStopsToParentStations = false;
 
-    private Map<String, String> agencyIdMappings = new HashMap<String, String>();
-
     public int subwayAccessTime;
 
     private double maxStopToShapeSnapDistance = 150;
 
     public int maxInterlineDistance;
-
-    public Boolean useCached = null; // null means use global default from GtfsGB || true
-
-    public File cacheDirectory = null; // null means use default from GtfsGB || system temp dir 
-
 
     /** Used by unit tests */
     public GtfsBundle(File gtfsFile) {
@@ -120,20 +111,6 @@ public class GtfsBundle {
 
     public void setFeedId(GtfsFeedId feedId) {
         this.feedId = feedId;
-    }
-
-    /**
-     * When a trip doesn't contain any bicycle accessibility information, should taking a bike
-     * along a transit trip be permitted?
-     * A trip doesn't contain bicycle accessibility information if both route_short_name and
-     * trip_short_name contain missing/0 values.
-     */
-    public Boolean getDefaultBikesAllowed() {
-        return defaultBikesAllowed;
-    }
-
-    public void setDefaultBikesAllowed(Boolean defaultBikesAllowed) {
-        this.defaultBikesAllowed = defaultBikesAllowed;
     }
 
     /**

@@ -1,8 +1,19 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
@@ -11,6 +22,7 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -21,14 +33,6 @@ import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 
 /**
  * Links unconnected entries to platforms. The entries may be stairs or walk paths in OSM
@@ -79,14 +83,31 @@ public class PlatformLinker {
         for (Area area : platforms) {
             List<OsmVertex> endpointsWithin = new ArrayList<>();
             List<Ring> rings = area.outermostRings;
-            AreaEdgeList edgeList = new AreaEdgeList();
             for (Ring ring : rings) {
                 endpointsWithin.addAll(endpoints.stream().filter(t -> contains(ring, t)).collect(Collectors.toList()));
 
                 for (OSMNode node : ring.nodes) {
                     Vertex vertexById = graph.getVertex("osm:node:" + node.getId());
                     if (vertexById != null) {
-                        endpointsWithin.forEach(e -> makePlatformEdges(area, e, (OsmVertex) vertexById, edgeList));
+                        // TODO: This shouldn't be happening. As it is, something is wrong with isEndpoint
+                        if (endpoints.contains(vertexById)) {
+                            continue;
+                        }
+
+                        Polygon polygon = ring.toJtsPolygon();
+                        // Find the original AreaEdgeList, to which add the edges to.
+                        Optional<AreaEdgeList> edgeList = vertexById.getOutgoing().stream()
+                            .filter(AreaEdge.class::isInstance)
+                            .map(AreaEdge.class::cast)
+                            .map(AreaEdge::getArea)
+                            .filter(areaEdgeList -> areaEdgeList.getOriginalEdges().covers(polygon))
+                            .findAny();
+
+                        if (edgeList.isEmpty()) {
+                            continue;
+                        }
+
+                        endpointsWithin.forEach(e -> makePlatformEdges(area, e, (OsmVertex) vertexById, edgeList.get()));
                     }
                 }
 
@@ -175,24 +196,29 @@ public class PlatformLinker {
         boolean inside = false;
         int len = shape.length;
         for (int i = 0; i < len; i++) {
-            if (intersects(shape[i], shape[(i + 1) % len], pnt))
+            if (intersects(shape[i], shape[(i + 1) % len], pnt)) {
                 inside = !inside;
+            }
         }
         return inside;
     }
 
     private static boolean intersects(double[] a, double[] b, double[] P) {
-        if (a[1] > b[1])
+        if (a[1] > b[1]) {
             return intersects(b, a, P);
+        }
 
-        if (P[1] == a[1] || P[1] == b[1])
+        if (P[1] == a[1] || P[1] == b[1]) {
             P[1] += 0.000000000000010;
+        }
 
-        if (P[1] > b[1] || P[1] < a[1] || P[0] > max(a[0], b[0]))
+        if (P[1] > b[1] || P[1] < a[1] || P[0] > max(a[0], b[0])) {
             return false;
+        }
 
-        if (P[0] < min(a[0], b[0]))
+        if (P[0] < min(a[0], b[0])) {
             return true;
+        }
 
         double red = (P[1] - a[1]) / (P[0] - a[0]);
         double blue = (b[1] - a[1]) / (b[0] - a[0]);

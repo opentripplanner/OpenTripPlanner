@@ -32,6 +32,7 @@ public class FlexServiceDate {
   }
 
   boolean isFlexTripRunning(FlexTrip flexTrip, Graph graph) {
-    return servicesRunning.contains(graph.getServiceCodes().get(flexTrip.getTrip().getServiceId()));
+    return servicesRunning != null
+        && servicesRunning.contains(graph.getServiceCodes().get(flexTrip.getTrip().getServiceId()));
   }
 }

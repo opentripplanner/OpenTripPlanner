@@ -181,6 +181,10 @@ otp.modules.planner.PlannerModule =
 
         this.noTripWidget = new otp.widgets.Widget('otp-noTripWidget', this);
         this.addWidget(this.noTripWidget);*/
+
+        window.onpopstate = function (event) {
+            this_.restoreTrip(event.state);
+        };
     },
 
     restore : function() {
@@ -339,9 +343,9 @@ otp.modules.planner.PlannerModule =
                 time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format("h:mma"),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
                 date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
-                mode: this.mode,
-                maxWalkDistance: this.maxWalkDistance
+                mode: this.mode
             };
+            if(this.mode !== "CAR") _.extend(queryParams, { maxWalkDistance: this.maxWalkDistance} );
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.wheelchair !== null) _.extend(queryParams, { wheelchair : this.wheelchair });
             if(this.preferredRoutes !== null) {
@@ -368,11 +372,20 @@ otp.modules.planner.PlannerModule =
             if(otp.config.routerId !== undefined) {
                 queryParams.routerId = otp.config.routerId;
             }
+
+            if(this.additionalParameters) {
+                _.extend(queryParams, this.additionalParameters);
+            }
         }
         $('#otp-spinner').show();
 
         //sends wanted translation to server
         _.extend(queryParams, {locale : otp.config.locale.config.locale_short} );
+
+        // Only save the state if 1) we are not loading from an existing state and 2) it differs from the previous state
+        if (window.history.pushState && !existingQueryParams && !_.isEqual(this.lastQueryParams, queryParams)) {
+          window.history.pushState(queryParams, null, this.constructLink(queryParams, {}));
+        }
 
         this.lastQueryParams = queryParams;
 
@@ -485,6 +498,12 @@ otp.modules.planner.PlannerModule =
         otp.widgets.Dialogs.showOkDialog(msg, _tr('No Trip Found'));
     },
 
+    constructLink : function(queryParams, additionalParams) {
+        additionalParams = additionalParams ||  { };
+        return otp.config.siteUrl + '?module=' + this.id + "&" +
+            otp.util.Text.constructUrlParamString(_.extend(_.clone(queryParams), additionalParams));
+    },
+
     drawItinerary : function(itin) {
         var this_ = this;
 
@@ -566,7 +585,16 @@ otp.modules.planner.PlannerModule =
                 	//this.resetStationMarkers();
                 }
             }
-            //FIXME: CAR is missing
+            else if(leg.mode === 'SCOOTER') {
+                //TRANSLATORS: Text which is shown when clicking scooter route in a map
+                polyline.bindPopup(_tr('Your route using the scooter'));
+                //this.resetStationMarkers();
+            }
+            else if(leg.mode === 'CAR') {
+                //TRANSLATORS: Text which is shown when clicking driving route in a map
+                polyline.bindPopup(_tr('Your driving route'));
+                //this.resetStationMarkers();
+            }
         }
         if (otp.config.zoomToFitResults) this.webapp.map.lmap.fitBounds(itin.getBoundsArray());
     },
@@ -609,6 +637,7 @@ otp.modules.planner.PlannerModule =
     getModeColor : function(mode) {
         if(mode === "WALK") return '#444';
         if(mode === "BICYCLE") return '#0073e5';
+        if(mode === "SCOOTER") return '#88f';
         if(mode === "SUBWAY") return '#f00';
         if(mode === "RAIL") return '#b00';
         if(mode === "BUS") return '#080';

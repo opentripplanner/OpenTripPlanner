@@ -48,8 +48,9 @@ public class TemplateLibrary {
      */
     public static Map<String, String> generateI18N(String pattern, OSMWithTags way) {
 
-        if (pattern == null)
+        if (pattern == null) {
             return null;
+        }
 
         Map<String, StringBuffer> i18n = new HashMap<String, StringBuffer>();
         i18n.put(null, new StringBuffer());

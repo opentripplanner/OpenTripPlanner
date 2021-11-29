@@ -1,18 +1,21 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path.configure;
 
 
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandard;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandardAndLatestDepature;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCost;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCostAndLatestDeparture;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCost;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCostAndLatestDeparture;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetable;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndCost;
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndRelaxedCost;
+
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
-
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandard;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCost;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCost;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetable;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndCost;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndRelaxedCost;
 
 /**
  * This class is responsible for creating a a result collector - the
@@ -40,8 +43,10 @@ public class PathConfig<T extends RaptorTripSchedule> {
                 paretoComparator(includeCost),
                 ctx.calculator(),
                 ctx.costCalculator(),
+                ctx.slackProvider(),
                 ctx.pathMapper(),
                 ctx.debugFactory(),
+                ctx.stopNameResolver(),
                 ctx.lifeCycle()
         );
     }
@@ -50,6 +55,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
         double relaxedCost = ctx.searchParams().relaxCostAtDestination();
         boolean includeRelaxedCost = includeCost && relaxedCost > 0.0;
         boolean includeTimetable = ctx.searchParams().timetableEnabled();
+        boolean preferLateArrival = ctx.searchParams().preferLateArrival();
 
 
         if(includeTimetable && includeRelaxedCost) {
@@ -61,11 +67,20 @@ public class PathConfig<T extends RaptorTripSchedule> {
         if(includeTimetable) {
             return comparatorWithTimetable();
         }
+        if(includeRelaxedCost && preferLateArrival) {
+            return comparatorWithRelaxedCostAndLatestDeparture(relaxedCost);
+        }
         if(includeRelaxedCost) {
             return comparatorWithRelaxedCost(relaxedCost);
         }
+        if(includeCost && preferLateArrival) {
+            return comparatorWithCostAndLatestDeparture();
+        }
         if(includeCost) {
             return comparatorWithCost();
+        }
+        if(preferLateArrival) {
+            return comparatorStandardAndLatestDepature();
         }
         return comparatorStandard();
     }

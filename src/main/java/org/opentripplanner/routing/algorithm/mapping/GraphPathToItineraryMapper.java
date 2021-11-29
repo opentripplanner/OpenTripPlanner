@@ -1,5 +1,13 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -10,15 +18,13 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexLegMapper;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
-import org.opentripplanner.model.BikeRentalStationInfo;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
-import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -28,32 +34,23 @@ import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.stream.Stream;
 
 // TODO OTP2 There is still a lot of transit-related logic here that should be removed. We also need
 //      to decide where real-time updates should be applied to the itinerary.
@@ -78,26 +75,10 @@ public abstract class GraphPathToItineraryMapper {
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.locale);
             if (itinerary.legs.isEmpty()) { continue; }
-            itinerary = adjustItinerary(request, itinerary);
             itineraries.add(itinerary);
         }
 
         return itineraries;
-    }
-
-    /**
-     * Check whether itinerary needs adjustments based on the request.
-     * @param itinerary is the itinerary
-     * @param request is the request containing the original trip planning options
-     * @return the (adjusted) itinerary
-     */
-    private static Itinerary adjustItinerary(RoutingRequest request, Itinerary itinerary) {
-        // Check walk limit distance
-        if (itinerary.nonTransitDistanceMeters > request.maxWalkDistance) {
-            itinerary.nonTransitLimitExceeded = true;
-        }
-        // Return itinerary
-        return itinerary;
     }
 
     /**
@@ -131,17 +112,18 @@ public abstract class GraphPathToItineraryMapper {
 
         boolean first = true;
         for (Leg leg : legs) {
-            AlertToLegMapper.addAlertPatchesToLeg(graph, leg, first, requestedLocale);
+            AlertToLegMapper.addTransitAlertPatchesToLeg(graph, leg, first, requestedLocale);
             first = false;
         }
 
-        setLegPathwayFlag(legs, legsStates);
+        setPathwayInfo(legs, legsStates);
 
         Itinerary itinerary = new Itinerary(legs);
 
         calculateElevations(itinerary, edges);
 
         itinerary.generalizedCost = (int) lastState.weight;
+        itinerary.arrivedAtDestinationWithRentedVehicle = lastState.isRentingVehicleFromStation();
 
         return itinerary;
     }
@@ -204,16 +186,40 @@ public abstract class GraphPathToItineraryMapper {
         int[] legIndexPairs = {0, states.length - 1};
         List<int[]> legsIndexes = new ArrayList<int[]>();
 
+        TraverseMode lastMode = null;
         for (int i = 1; i < states.length - 1; i++) {
-            TraverseMode backMode = states[i].getBackMode();
-            TraverseMode forwardMode = states[i + 1].getBackMode();
+            var backState = states[i];
+            var forwardState = states[i + 1];
+            var backMode = backState.getBackMode();
+            var forwardMode = forwardState.getBackMode();
 
-            if (backMode == null || forwardMode == null) continue;
+            if (backMode != null) {
+                lastMode = backMode;
+            }
 
-            if (backMode != forwardMode) {
+            var modeChange = lastMode != forwardMode && lastMode != null && forwardMode != null;
+            var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
+            var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
+
+            if (parkingChange) {
+                /* Remove the state for actually parking (traversing VehicleParkingEdge) from the
+                 * states so that the leg from/to edges correspond to the actual entrances.
+                 * The actual time for parking is added to the walking leg in generateLeg().
+                 */
+                legIndexPairs[1] = i;
+                legsIndexes.add(legIndexPairs);
+                legIndexPairs = new int[] {i + 1, states.length - 1};
+            }
+            else if (modeChange || rentalChange) {
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
                 legIndexPairs = new int[] {i, states.length - 1};
+            }
+
+            if (rentalChange || parkingChange) {
+                /* Clear the lastMode, so that switching modes doesn't re-trigger a mode change
+                 * a few states latter. */
+                lastMode = null;
             }
         }
 
@@ -226,9 +232,11 @@ public abstract class GraphPathToItineraryMapper {
         for (int i = 0; i < legsStates.length; i++) {
             legIndexPairs = legsIndexes.get(i);
             legsStates[i] = new State[legIndexPairs[1] - legIndexPairs[0] + 1];
-            for (int j = 0; j <= legIndexPairs[1] - legIndexPairs[0]; j++) {
-                legsStates[i][j] = states[legIndexPairs[0] + j];
-            }
+            if (legIndexPairs[1] - legIndexPairs[0] + 1 >= 0)
+                System.arraycopy(
+                        states, legIndexPairs[0], legsStates[i], 0,
+                        legIndexPairs[1] - legIndexPairs[0] + 1
+                );
         }
 
         return legsStates;
@@ -277,23 +285,45 @@ public abstract class GraphPathToItineraryMapper {
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
-        addPlaces(leg, states, requestedLocale);
+        if (flexEdge != null) {
+            FlexLegMapper.addFlexPlaces(leg, flexEdge, requestedLocale);
+        } else {
+            addPlaces(leg, states, requestedLocale);
+        }
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
 
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
 
-        // Interlining information is now in a separate field in Graph, not in edges.
-        // But in any case, with Raptor this method is only being used to translate non-transit legs of paths.
-        leg.interlineWithPreviousLeg = false;
+        leg.generalizedCost = (int) (states[states.length - 1].getWeight() - states[0].getWeight());
 
-        leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
+        leg.walkingBike = states[states.length - 1].isBackWalkingBike();
 
-        addAlerts(graph, leg, states);
+        leg.rentedVehicle = states[0].isRentingVehicle();
+
+        if (leg.rentedVehicle) {
+            String vehicleRentalNetwork = states[0].getVehicleRentalNetwork();
+            if (vehicleRentalNetwork != null) {
+                leg.setVehicleRentalNetwork(vehicleRentalNetwork);
+            }
+        }
+
+        addStreetNotes(graph, leg, states);
 
         if (flexEdge != null) {
             FlexLegMapper.fixFlexTripLeg(leg, flexEdge);
+        }
+
+        /* For the from/to vertices to be in the correct place for vehicle parking
+         * the state for actually parking (traversing the VehicleParkEdge) is excluded
+         * from the list of states.
+         * This add the time for parking to the walking leg.
+         */
+        var previousStateIsVehicleParking = states[0].getBackState() != null
+                && states[0].getBackEdge() instanceof VehicleParkingEdge;
+        if (previousStateIsVehicleParking) {
+            leg.startTime = makeCalendar(states[0].getBackState());
         }
 
         return leg;
@@ -345,11 +375,13 @@ public abstract class GraphPathToItineraryMapper {
         }
     }
 
-    private static void setLegPathwayFlag(List<Leg> legs, State[][] legsStates) {
+    private static void setPathwayInfo(List<Leg> legs, State[][] legsStates) {
         OUTER:
         for (int i = 0; i < legsStates.length; i++) {
             for (int j = 1; j < legsStates[i].length; j++) {
                 if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
+                    PathwayEdge pe = (PathwayEdge) legsStates[i][j].getBackEdge();
+                    legs.get(i).pathwayId = pe.getId();
                     legs.get(i).pathway = true;
                     break OUTER;
                 }
@@ -397,6 +429,22 @@ public abstract class GraphPathToItineraryMapper {
             TraverseMode mode = state.getBackMode();
 
             if (mode != null) {
+                // Resolve correct mode if renting vehicle, and is not walking with it
+                if (state.isRentingVehicle() && !state.isBackWalkingBike()) {
+                    switch (state.stateData.rentalVehicleFormFactor) {
+                        case BICYCLE:
+                        case OTHER:
+                            returnMode = TraverseMode.BICYCLE;
+                            continue;
+                        case SCOOTER:
+                        case MOPED:
+                            returnMode = TraverseMode.SCOOTER;
+                            continue;
+                        case CAR:
+                            returnMode = TraverseMode.CAR;
+                            continue;
+                    }
+                }
                 returnMode = mode;
             }
         }
@@ -409,7 +457,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addAlerts(Graph graph, Leg leg, State[] states) {
+    private static void addStreetNotes(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
             Set<StreetNote> streetNotes = graph.streetNotesService.getNotes(state);
 
@@ -431,24 +479,18 @@ public abstract class GraphPathToItineraryMapper {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
 
-        Stop firstStop = firstVertex instanceof TransitStopVertex ?
-                ((TransitStopVertex) firstVertex).getStop(): null;
-        Stop lastStop = lastVertex instanceof TransitStopVertex ?
-                ((TransitStopVertex) lastVertex).getStop(): null;
-
-        leg.from = makePlace(firstVertex, firstStop, requestedLocale);
-        leg.to = makePlace(lastVertex, lastStop, requestedLocale);
+        leg.from = makePlace(firstVertex, requestedLocale);
+        leg.to = makePlace(lastVertex, requestedLocale);
     }
 
     /**
      * Make a {@link Place} to add to a {@link Leg}.
      *
      * @param vertex The {@link Vertex} at the {@link State}.
-     * @param stop The {@link Stop} associated with the {@link Vertex}.
      * @param requestedLocale The locale to use for all text attributes.
      * @return The resulting {@link Place} object.
      */
-    private static Place makePlace(Vertex vertex, Stop stop, Locale requestedLocale) {
+    private static Place makePlace(Vertex vertex, Locale requestedLocale) {
         String name = vertex.getName(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
@@ -457,29 +499,16 @@ public abstract class GraphPathToItineraryMapper {
         if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
             name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
         }
-        Place place = new Place(
-                vertex.getLat(),
-                vertex.getLon(),
-                name
-        );
 
         if (vertex instanceof TransitStopVertex) {
-            place.stopId = stop.getId();
-            place.stopCode = stop.getCode();
-            place.platformCode = stop.getCode();
-            place.zoneId = stop.getFirstZoneAsString();
-            place.vertexType = VertexType.TRANSIT;
-        } else if(vertex instanceof BikeRentalStationVertex) {
-            place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
-            LOG.trace("Added bike share Id {} to place", place.bikeShareId);
-            place.vertexType = VertexType.BIKESHARE;
-        } else if (vertex instanceof BikeParkVertex) {
-            place.vertexType = VertexType.BIKEPARK;
+            return Place.forStop((TransitStopVertex) vertex, name);
+        } else if(vertex instanceof VehicleRentalStationVertex) {
+            return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex, name);
+        } else if (vertex instanceof VehicleParkingEntranceVertex) {
+            return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, name);
         } else {
-            place.vertexType = VertexType.NORMAL;
+            return Place.normal(vertex, name);
         }
-
-        return place;
     }
 
     /**
@@ -494,15 +523,19 @@ public abstract class GraphPathToItineraryMapper {
         int roundaboutExit = 0; // track whether we are in a roundabout, and if so the exit number
         String roundaboutPreviousStreet = null;
 
-        State onBikeRentalState = null, offBikeRentalState = null;
+        State onVehicleRentalState = null, offVehicleRentalState = null;
+
+        if (isRentalPickUp(states[states.length - 1])) {
+            onVehicleRentalState = states[states.length - 1];
+        }
+        if (isRentalDropOff(states[0])) {
+            offVehicleRentalState = states[0];
+        }
 
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];
             State forwardState = states[i + 1];
             Edge edge = forwardState.getBackEdge();
-
-            if(edge instanceof RentABikeOnEdge) onBikeRentalState = forwardState;
-            if(edge instanceof RentABikeOffEdge) offBikeRentalState = forwardState;
 
             boolean createdNewStep = false, disableZagRemovalForThisStep = false;
             if (edge instanceof FreeEdge) {
@@ -521,7 +554,7 @@ public abstract class GraphPathToItineraryMapper {
             // before or will come after
             if (edge instanceof ElevatorAlightEdge) {
                 // don't care what came before or comes after
-                step = createWalkStep(graph, forwardState, requestedLocale);
+                step = createWalkStep(graph, forwardState, backState, requestedLocale);
                 createdNewStep = true;
                 disableZagRemovalForThisStep = true;
 
@@ -549,7 +582,7 @@ public abstract class GraphPathToItineraryMapper {
 
             if (step == null) {
                 // first step
-                step = createWalkStep(graph, forwardState, requestedLocale);
+                step = createWalkStep(graph, forwardState, backState, requestedLocale);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -577,7 +610,7 @@ public abstract class GraphPathToItineraryMapper {
                     roundaboutExit = 0;
                 }
                 /* start a new step */
-                step = createWalkStep(graph, forwardState, requestedLocale);
+                step = createWalkStep(graph, forwardState, backState, requestedLocale);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -664,7 +697,7 @@ public abstract class GraphPathToItineraryMapper {
 
                     if (shouldGenerateContinue) {
                         // turn to stay on same-named street
-                        step = createWalkStep(graph, forwardState, requestedLocale);
+                        step = createWalkStep(graph, forwardState, backState, requestedLocale);
                         createdNewStep = true;
                         steps.add(step);
                         step.setDirections(lastAngle, thisAngle, false);
@@ -767,17 +800,26 @@ public abstract class GraphPathToItineraryMapper {
             step.edges.add(edge);
         }
 
-        // add bike rental information if applicable
-        if(onBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(steps.size()-1).bikeRentalOnStation = 
-                    new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getBackEdge().getToVertex());
+        // add vehicle rental information if applicable
+        if(onVehicleRentalState != null && !steps.isEmpty()) {
+            steps.get(steps.size()-1).vehicleRentalOnStation =
+                    new VehicleRentalStationInfo((VehicleRentalStationVertex) onVehicleRentalState.getVertex());
         }
-        if(offBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(0).bikeRentalOffStation = 
-                    new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getBackEdge().getFromVertex());
+        if(offVehicleRentalState != null && !steps.isEmpty()) {
+            steps.get(0).vehicleRentalOffStation =
+                    new VehicleRentalStationInfo((VehicleRentalStationVertex) offVehicleRentalState.getVertex());
         }
 
         return steps;
+    }
+
+    private static boolean isRentalPickUp(State state) {
+        return state.getBackEdge() instanceof VehicleRentalEdge && (state.getBackState() == null || !state.getBackState()
+                .isRentingVehicle());
+    }
+
+    private static boolean isRentalDropOff(State state) {
+        return state.getBackEdge() instanceof VehicleRentalEdge && state.getBackState().isRentingVehicle();
     }
 
     private static boolean isLink(Edge edge) {
@@ -796,21 +838,21 @@ public abstract class GraphPathToItineraryMapper {
         return angleDiff;
     }
 
-    private static WalkStep createWalkStep(Graph graph, State s, Locale wantedLocale) {
-        Edge en = s.getBackEdge();
+    private static WalkStep createWalkStep(Graph graph, State forwardState, State backState, Locale wantedLocale) {
+        Edge en = forwardState.getBackEdge();
         WalkStep step;
         step = new WalkStep();
         step.streetName = en.getName(wantedLocale);
         step.startLocation = new WgsCoordinate(
-                en.getFromVertex().getLat(),
-                en.getFromVertex().getLon()
+                backState.getVertex().getLat(),
+                backState.getVertex().getLon()
         );
-        step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
-                s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
+        step.elevation = encodeElevationProfile(forwardState.getBackEdge(), 0,
+                forwardState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();
-        step.addStreetNotes(graph.streetNotesService.getNotes(s));
-        step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
-        if (s.getBackEdge() instanceof AreaEdge) {
+        step.addStreetNotes(graph.streetNotesService.getNotes(forwardState));
+        step.angle = DirectionUtils.getFirstAngle(forwardState.getBackEdge().getGeometry());
+        if (forwardState.getBackEdge() instanceof AreaEdge) {
             step.area = true;
         }
         return step;

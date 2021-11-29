@@ -5,7 +5,8 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
 public class BikeParkType {
 
@@ -18,32 +19,40 @@ public class BikeParkType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLID))
-                    .dataFetcher(environment -> ((BikePark) environment.getSource()).id)
+                    .dataFetcher(environment -> TransitIdMapper.mapIDToApi(((VehicleParking) environment.getSource()).getId()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("name")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
-                    .dataFetcher(environment -> ((BikePark) environment.getSource()).name)
+                    .dataFetcher(environment -> ((VehicleParking) environment.getSource()).getName().toString())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("spacesAvailable")
                     .type(Scalars.GraphQLInt)
-                    .dataFetcher(environment -> ((BikePark) environment.getSource()).spacesAvailable)
+                    .dataFetcher(environment -> {
+                      var vehicleParking = ((VehicleParking) environment.getSource());
+                      var availability = vehicleParking.getAvailability();
+                      if (availability != null) {
+                        return availability.getBicycleSpaces();
+                      } else {
+                        return Integer.MAX_VALUE;
+                      }
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("realtime")
                     .type(Scalars.GraphQLBoolean)
-                    .dataFetcher(environment -> ((BikePark) environment.getSource()).realTimeData)
+                    .dataFetcher(environment -> ((VehicleParking) environment.getSource()).hasRealTimeData())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("longitude")
                     .type(Scalars.GraphQLFloat)
-                    .dataFetcher(environment -> ((BikePark) environment.getSource()).x)
+                    .dataFetcher(environment -> ((VehicleParking) environment.getSource()).getX())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("latitude")
                     .type(Scalars.GraphQLFloat)
-                    .dataFetcher(environment -> ((BikePark) environment.getSource()).y)
+                    .dataFetcher(environment -> ((VehicleParking) environment.getSource()).getY())
                     .build())
             .build();
   }

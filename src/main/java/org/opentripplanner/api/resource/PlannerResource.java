@@ -77,7 +77,7 @@ public class PlannerResource extends RoutingResource {
             res = routingService.route(request, router);
 
             // Map to API
-            TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale);
+            TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale, request.showIntermediateStops);
             response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
             response.setMetadata(TripSearchMetadataMapper.mapTripSearchMetadata(res.getMetadata()));
             if (!res.getRoutingErrors().isEmpty()) {
@@ -94,12 +94,22 @@ public class PlannerResource extends RoutingResource {
         }
         catch (Exception e) {
             LOG.error("System error", e);
-            PlannerError error = new PlannerError();
-            error.setMsg(Message.SYSTEM_ERROR);
+            PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
             response.setError(error);
         }
 
         /* Log this request if such logging is enabled. */
+        logRequest(grizzlyRequest, request, router, res);
+
+        return response;
+    }
+
+    private void logRequest(
+        Request grizzlyRequest,
+        RoutingRequest request,
+        Router router,
+        RoutingResponse res
+    ) {
         if (request != null && router != null && router.requestLogger != null) {
             StringBuilder sb = new StringBuilder();
             String clientIpAddress = grizzlyRequest.getRemoteAddr();
@@ -128,7 +138,5 @@ public class PlannerResource extends RoutingResource {
             }
             router.requestLogger.info(sb.toString());
         }
-
-        return response;
     }
 }

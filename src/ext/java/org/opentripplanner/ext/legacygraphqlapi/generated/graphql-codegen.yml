@@ -29,10 +29,17 @@ config:
     AlertCauseType: String
     AlertEffectType: String
     AlertSeverityLevelType: String
-    BikePark: org.opentripplanner.routing.bike_park.BikePark#BikePark
-    BikeRentalStation: org.opentripplanner.routing.bike_rental.BikeRentalStation#BikeRentalStation
+    BikePark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
+    BikeRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace#VehicleRentalPlace
+    BikeRentalStationUris: org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris#VehicleRentalStationUris
+    VehicleRentalStation: org.opentripplanner.routing.vehicle_rental.VehicleRentalStation#VehicleRentalStation
+    RentalVehicle: org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle#VehicleRentalVehicle
+    VehicleRentalUris: org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris#VehicleRentalStationUris
     BikesAllowed: String
-    CarPark: Object
+    BookingInfo: org.opentripplanner.model.BookingInfo
+    BookingTime: org.opentripplanner.model.BookingTime
+    CarPark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
+    ContactInfo: org.opentripplanner.model.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
@@ -61,9 +68,13 @@ config:
     stopAtDistance: org.opentripplanner.routing.graphfinder.NearbyStop#NearbyStop
     stopAtDistanceConnection: graphql.relay.Connection#Connection<NearbyStop>
     stopAtDistanceEdge: graphql.relay.Edge#Edge<NearbyStop>
-    Stoptime: org.opentripplanner.model.TripTimeShort#TripTimeShort
+    Stoptime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
     TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.model.Trip#Trip
+    VehicleParking: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
+    VehicleParkingSpaces: org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces#VehicleParkingSpaces
+    VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParkingState#VehicleParkingState
     VertexType: String
+    SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice

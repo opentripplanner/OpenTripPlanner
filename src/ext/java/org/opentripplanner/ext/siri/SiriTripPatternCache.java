@@ -67,7 +67,7 @@ public class SiriTripPatternCache {
             tripPattern.setServiceCodes(graph.getServiceCodes());
             
             // Finish scheduled time table
-            tripPattern.scheduledTimetable.finish();
+            tripPattern.getScheduledTimetable().finish();
             
             // Create vertices and edges for new TripPattern
             // TODO: purge these vertices and edges once in a while?
@@ -128,7 +128,9 @@ public class SiriTripPatternCache {
              * Remove previously added TripPatterns for the trip currently being updated - if the stopPattern does not match
              */
             TripPattern cachedTripPattern = updatedTripPatternsForTripCache.get(tripServiceDateKey);
-            if (cachedTripPattern != null && !tripPattern.stopPattern.equals(cachedTripPattern.stopPattern)) {
+            if (cachedTripPattern != null && !tripPattern
+                .getStopPattern()
+                .equals(cachedTripPattern.getStopPattern())) {
                 int sizeBefore = patternsForStop.values().size();
                 long t1 = System.currentTimeMillis();
                 patternsForStop.values().removeAll(Arrays.asList(cachedTripPattern));
@@ -181,7 +183,7 @@ class StopPatternServiceDateKey {
 
     @Override
     public boolean equals(Object thatObject) {
-        if (!(thatObject instanceof StopPatternServiceDateKey)) return false;
+        if (!(thatObject instanceof StopPatternServiceDateKey)) { return false; }
         StopPatternServiceDateKey that = (StopPatternServiceDateKey) thatObject;
         return (this.stopPattern.equals(that.stopPattern) & this.serviceDate.equals(that.serviceDate));
     }
@@ -202,7 +204,7 @@ class TripServiceDateKey {
 
     @Override
     public boolean equals(Object thatObject) {
-        if (!(thatObject instanceof TripServiceDateKey)) return false;
+        if (!(thatObject instanceof TripServiceDateKey)) { return false; }
         TripServiceDateKey that = (TripServiceDateKey) thatObject;
         return (this.trip.equals(that.trip) & this.serviceDate.equals(that.serviceDate));
     }

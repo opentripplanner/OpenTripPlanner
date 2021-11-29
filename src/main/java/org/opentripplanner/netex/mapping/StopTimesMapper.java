@@ -1,5 +1,18 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.SCHEDULED;
+
+import java.math.BigInteger;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nullable;
+import javax.xml.bind.JAXBElement;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
@@ -7,27 +20,18 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
+import org.rutebanken.netex.model.Route;
+import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.math.BigInteger;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
-import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
 
 /**
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the StopTime has a reference
@@ -37,7 +41,7 @@ import static org.opentripplanner.model.StopPattern.PICKDROP_SCHEDULED;
  */
 class StopTimesMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TripPatternMapper.class);
+    private final DataImportIssueStore issueStore;
 
     private static final int DAY_IN_SECONDS = 3600 * 24;
 
@@ -49,39 +53,54 @@ class StopTimesMapper {
 
     private final EntityById<FlexStopLocation> flexibleStopLocationsById;
 
+    private final EntityById<FlexLocationGroup> flexLocationGroupsByid;
+
     private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
 
     private final ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef;
 
+    private final ReadOnlyHierarchicalMap<String, Route> routeByid;
+
+    private final ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById;
+
     private String currentHeadSign;
 
-
     StopTimesMapper(
+            DataImportIssueStore issueStore,
             FeedScopedIdFactory idFactory,
             EntityById<Stop> stopsById,
             EntityById<FlexStopLocation> flexStopLocationsById,
+            EntityById<FlexLocationGroup> flexLocationGroupsById,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-            ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef
+            ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
+            ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
+            ReadOnlyHierarchicalMap<String, Route> routeById
     ) {
+        this.issueStore = issueStore;
         this.idFactory = idFactory;
         this.destinationDisplayById = destinationDisplayById;
         this.stopsById = stopsById;
         this.flexibleStopLocationsById = flexStopLocationsById;
+        this.flexLocationGroupsByid = flexLocationGroupsById;
         this.quayIdByStopPointRef = quayIdByStopPointRef;
         this.flexibleStopPlaceIdByStopPointRef = flexibleStopPlaceIdByStopPointRef;
+        this.flexibleLinesById = flexibleLinesById;
+        this.routeByid = routeById;
     }
 
     /**
      * @return a map of stop-times indexed by the TimetabledPassingTime id.
      */
     @Nullable
-    MappedStopTimes mapToStopTimes(
+    StopTimesMapperResult mapToStopTimes(
             JourneyPattern journeyPattern,
             Trip trip,
-            List<TimetabledPassingTime> passingTimes
+            List<TimetabledPassingTime> passingTimes,
+            ServiceJourney serviceJourney
     ) {
-        MappedStopTimes result = new MappedStopTimes();
+        StopTimesMapperResult result = new StopTimesMapperResult();
+        List<String> scheduledStopPointIds = new ArrayList<>();
 
         for (int i = 0; i < passingTimes.size(); i++) {
 
@@ -90,26 +109,42 @@ class StopTimesMapper {
             String pointInJourneyPattern = currentPassingTime.getPointInJourneyPatternRef().getValue().getRef();
 
             StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
+
             StopLocation stop = lookUpStopLocation(stopPoint);
             if (stop == null) {
-                LOG.warn("Stop with id {} not found for StopPoint {} in JourneyPattern {}. "
-                        + "Trip {} will not be mapped.",
-                    stopPoint != null && stopPoint.getScheduledStopPointRef() != null
-                        ? stopPoint.getScheduledStopPointRef().getValue().getRef()
-                        : "null"
-                    , stopPoint != null ? stopPoint.getId() : "null"
-                    , journeyPattern.getId()
-                    , trip.getId());
+                issueStore.add(
+                        "JourneyPatternStopNotFound",
+                        "Stop with id {} not found for StopPoint {} in JourneyPattern {}. "
+                                + "Trip {} will not be mapped.",
+                        stopPoint != null && stopPoint.getScheduledStopPointRef() != null
+                                ? stopPoint.getScheduledStopPointRef().getValue().getRef()
+                                : "null"
+                        , stopPoint != null ? stopPoint.getId() : "null"
+                        , journeyPattern.getId()
+                        , trip.getId()
+                );
                 return null;
             }
+
+            scheduledStopPointIds.add(stopPoint.getScheduledStopPointRef().getValue().getRef());
 
             StopTime stopTime = mapToStopTime(trip, stopPoint, stop, currentPassingTime, i);
             if (stopTime == null) {
                 return null;
             }
 
-            result.add(currentPassingTime.getId(), stopTime);
+
+            BookingInfo bookingInfo = new BookingInfoMapper(issueStore).map(
+                    stopPoint,
+                    serviceJourney,
+                    lookUpFlexibleLine(serviceJourney, journeyPattern)
+            );
+            stopTime.setDropOffBookingInfo(bookingInfo);
+            stopTime.setPickupBookingInfo(bookingInfo);
+
+            result.addStopTime(currentPassingTime.getId(), stopTime);
         }
+        result.setScheduledStopPointIds(scheduledStopPointIds);
 
         if (OTPFeature.FlexRouting.isOn()) {
             // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
@@ -118,16 +153,6 @@ class StopTimesMapper {
         }
 
         return result;
-    }
-
-    static class MappedStopTimes {
-        Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
-        List<StopTime> stopTimes = new ArrayList<>();
-
-        void add(String netexId, StopTime stopTime) {
-            stopTimeByNetexId.put(netexId, stopTime);
-            stopTimes.add(stopTime);
-        }
     }
 
     private StopTime mapToStopTime(
@@ -155,19 +180,19 @@ class StopTimesMapper {
 
         if (stopPoint != null) {
             if (isFalse(stopPoint.isForAlighting())) {
-                stopTime.setDropOffType(PICKDROP_NONE);
+                stopTime.setDropOffType(NONE);
             } else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
-                stopTime.setDropOffType(PICKDROP_COORDINATE_WITH_DRIVER);
+                stopTime.setDropOffType(COORDINATE_WITH_DRIVER);
             } else {
-                stopTime.setDropOffType(PICKDROP_SCHEDULED);
+                stopTime.setDropOffType(SCHEDULED);
             }
 
             if (isFalse(stopPoint.isForBoarding())) {
-                stopTime.setPickupType(PICKDROP_NONE);
+                stopTime.setPickupType(NONE);
             } else if (Boolean.TRUE.equals(stopPoint.isRequestStop())) {
-                stopTime.setPickupType(PICKDROP_COORDINATE_WITH_DRIVER);
+                stopTime.setPickupType(COORDINATE_WITH_DRIVER);
             } else {
-                stopTime.setPickupType(PICKDROP_SCHEDULED);
+                stopTime.setPickupType(SCHEDULED);
             }
 
             if (stopPoint.getDestinationDisplayRef() != null) {
@@ -180,13 +205,12 @@ class StopTimesMapper {
         }
 
         if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
-            LOG.warn("Time missing for trip " + trip.getId());
+            issueStore.add("TripWithoutTime","Time missing for trip %s", trip.getId());
         }
 
         if (currentHeadSign != null) {
             stopTime.setStopHeadsign(currentHeadSign);
         }
-
         return stopTime;
     }
 
@@ -200,7 +224,11 @@ class StopTimesMapper {
         String flexibleStopPlaceId = flexibleStopPlaceIdByStopPointRef.lookup(stopPointRef);
 
         if (stopId == null && flexibleStopPlaceId == null) {
-            LOG.warn("No passengerStopAssignment found for " + stopPointRef);
+            issueStore.add(
+                    "PassengerStopAssignmentNotFound",
+                    "No passengerStopAssignment found for %s",
+                    stopPointRef
+            );
             return null;
         }
 
@@ -208,22 +236,35 @@ class StopTimesMapper {
         if (stopId != null) {
             stopLocation = stopsById.get(idFactory.createId(stopId));
         } else {
-            stopLocation = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
+            FlexStopLocation flexStopLocation = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
+            FlexLocationGroup flexLocationGroup = flexLocationGroupsByid.get(idFactory.createId(flexibleStopPlaceId));
+
+            if (flexStopLocation != null) {
+                stopLocation = flexStopLocation;
+            } else
+                stopLocation = flexLocationGroup;
         }
 
         if (stopLocation == null) {
-            LOG.warn("No Quay or FlexibleStopPlace found for " + stopPointRef);
+            issueStore.add(
+                    "StopPointInJourneyPatternMissingStopLocation",
+                    "No Quay or FlexibleStopPlace found for %s",
+                    stopPointRef
+            );
         }
 
         return stopLocation;
     }
 
     @Nullable
-    private static StopPointInJourneyPattern findStopPoint(String pointInJourneyPatterRef,
-                                                    JourneyPattern journeyPattern) {
-        List<PointInLinkSequence_VersionedChildStructure> points = journeyPattern
+    private static StopPointInJourneyPattern findStopPoint(
+            String pointInJourneyPatterRef,
+            JourneyPattern journeyPattern
+    ) {
+        var points = journeyPattern
                 .getPointsInSequence()
                 .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern();
+
         for (PointInLinkSequence_VersionedChildStructure point : points) {
             if (point instanceof StopPointInJourneyPattern) {
                 StopPointInJourneyPattern stopPoint = (StopPointInJourneyPattern) point;
@@ -256,11 +297,12 @@ class StopTimesMapper {
 
     // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
     //      this should be harmonized between GTFS and NeTEx
-    private static void modifyDataForUnscheduledFlexTrip(MappedStopTimes result) {
+    private static void modifyDataForUnscheduledFlexTrip(StopTimesMapperResult result) {
         List<StopTime> stopTimes = result.stopTimes;
         if (stopTimes.size() == 2 && stopTimes
             .stream()
-            .allMatch(s -> s.getStop() instanceof FlexStopLocation)) {
+            .allMatch(s -> s.getStop() instanceof FlexStopLocation
+                || s.getStop() instanceof FlexLocationGroup)) {
 
             int departureTime = stopTimes.get(0).getDepartureTime();
             int arrivalTime = stopTimes.get(1).getArrivalTime();
@@ -272,5 +314,22 @@ class StopTimesMapper {
                 stopTime.setFlexWindowEnd(arrivalTime);
             }
         }
+    }
+
+    private FlexibleLine lookUpFlexibleLine(ServiceJourney serviceJourney, JourneyPattern journeyPattern) {
+        if (serviceJourney == null) { return null; }
+        String lineRef = null;
+        // Check for direct connection to Line
+        JAXBElement<? extends LineRefStructure> lineRefStruct = serviceJourney.getLineRef();
+
+        if (lineRefStruct != null){
+            // Connect to Line referenced directly from ServiceJourney
+            lineRef = lineRefStruct.getValue().getRef();
+        } else if(serviceJourney.getJourneyPatternRef() != null){
+            // Connect to Line referenced through JourneyPattern->Route
+            String routeRef = journeyPattern.getRouteRef().getRef();
+            lineRef = routeByid.lookup(routeRef).getLineRef().getValue().getRef();
+        }
+        return flexibleLinesById.lookup(lineRef);
     }
 }

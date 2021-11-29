@@ -45,7 +45,6 @@ public class GenericLocation {
 
     /**
      * Returns this as a Coordinate object.
-     * @return
      */
     public Coordinate getCoordinate() {
         if (this.lat == null || this.lng == null) {
@@ -54,11 +53,24 @@ public class GenericLocation {
         return new Coordinate(this.lng, this.lat);
     }
 
+    public boolean isSpecified() {
+        return stopId != null || (lat != null && lng != null);
+    }
+
+    public static GenericLocation fromStopId(String name, String feedId, String stopId) {
+        return new GenericLocation(name,
+                new FeedScopedId(feedId, stopId), null, null
+        );
+    }
+
     @Override
     public String toString() {
-        return ValueObjectToStringBuilder.of()
-                .addStr(label)
-                .addObj(stopId)
-                .addCoordinate(lat, lng).toString();
+        ValueObjectToStringBuilder buf = ValueObjectToStringBuilder.of().skipNull();
+        if(label != null && !label.isBlank()) {
+            buf.addText(label);
+        }
+        buf.addObj(stopId);
+        buf.addCoordinate(lat, lng);
+        return buf.toString();
     }
 }

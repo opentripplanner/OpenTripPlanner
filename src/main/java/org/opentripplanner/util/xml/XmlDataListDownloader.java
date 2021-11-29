@@ -142,8 +142,9 @@ public class XmlDataListDownloader<T> {
             }
 
             T t = dataFactory.build(attributes);
-            if (t != null)
+            if (t != null) {
                 out.add(t);
+            }
         }
         return out;
     }

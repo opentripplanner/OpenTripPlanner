@@ -76,6 +76,10 @@ public class OTPMain {
                 System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
                 System.exit(0);
             }
+            if (params.serializationVersionId) {
+                System.out.println(projectInfo().getOtpSerializationVersionId());
+                System.exit(0);
+            }
             if (params.help) {
                 System.out.println("OpenTripPlanner " + projectInfo().getVersionString());
                 jc.setProgramName("java -Xmx4G -jar otp.jar");
@@ -139,6 +143,8 @@ public class OTPMain {
             // with using the embedded router config.
             new SerializedGraphObject(graph, app.config().buildConfig(), app.config().routerConfig())
                     .save(app.graphOutputDataSource());
+            // Log size info for the deduplicator
+            LOG.info("Memory optimized {}", graph.deduplicator.toString());
         }
 
         if(graph == null) {

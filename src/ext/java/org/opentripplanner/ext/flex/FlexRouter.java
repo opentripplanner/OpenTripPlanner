@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -12,6 +13,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
@@ -25,7 +27,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,10 +34,12 @@ public class FlexRouter {
 
   /* Transit data */
   private final Graph graph;
+  private final FlexParameters config;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
-  private final FlexPathCalculator flexPathCalculator;
+  private final FlexPathCalculator accessFlexPathCalculator;
+  private final FlexPathCalculator egressFlexPathCalculator;
 
   /* Request data */
   private final ZonedDateTime startOfTime;
@@ -51,6 +54,7 @@ public class FlexRouter {
 
   public FlexRouter(
       Graph graph,
+      FlexParameters config,
       Instant searchInstant,
       boolean arriveBy,
       int additionalPastSearchDays,
@@ -59,10 +63,21 @@ public class FlexRouter {
       Collection<NearbyStop> egressTransfers
   ) {
     this.graph = graph;
+    this.config = config;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = graph.index.getFlexIndex();
-    this.flexPathCalculator = new DirectFlexPathCalculator(graph);
+
+    if(graph.hasStreets) {
+      this.accessFlexPathCalculator = new StreetFlexPathCalculator(graph, false);
+      this.egressFlexPathCalculator = new StreetFlexPathCalculator(graph, true);
+    } else {
+      // this is only really useful in tests. in real world scenarios you're unlikely to get useful
+      // results if you don't have streets
+      this.accessFlexPathCalculator = new DirectFlexPathCalculator(graph);
+      this.egressFlexPathCalculator = new DirectFlexPathCalculator(graph);
+    }
+
 
     ZoneId tz = graph.getTimeZone().toZoneId();
     LocalDate searchDate = LocalDate.ofInstant(searchInstant, tz);
@@ -93,16 +108,19 @@ public class FlexRouter {
     Multimap<StopLocation, NearbyStop> streetEgressByStop = HashMultimap.create();
     streetEgresses.forEach(it -> streetEgressByStop.put(it.stop, it));
 
-    Set<StopLocation> egressStops = streetEgressByStop.keySet();
-
     Collection<Itinerary> itineraries = new ArrayList<>();
 
     for (FlexAccessTemplate template : this.flexAccessTemplates) {
       StopLocation transferStop = template.getTransferStop();
-      if (egressStops.contains(transferStop)) {
+      if (this.flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))) {
         for(NearbyStop egress : streetEgressByStop.get(transferStop)) {
           Itinerary itinerary = template.createDirectItinerary(egress, arriveBy, departureTime, startOfTime);
           if (itinerary != null) {
+            var fareService = graph.getService(FareService.class);
+            if(fareService != null) {
+              var fare = fareService.getCost(itinerary);
+              itinerary.fare = fare;
+            }
             itineraries.add(itinerary);
           }
         }
@@ -134,13 +152,18 @@ public class FlexRouter {
     if (this.flexAccessTemplates != null) { return; }
 
     // Fetch the closest flexTrips reachable from the access stops
-    this.flexAccessTemplates = getClosestFlexTrips(streetAccesses)
+    this.flexAccessTemplates = getClosestFlexTrips(streetAccesses, true)
         // For each date the router has data for
         .flatMap(t2 -> Arrays.stream(dates)
             // Discard if service is not running on date
             .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
             // Create templates from trip, boarding at the nearbyStop
-            .flatMap(date -> t2.second.getFlexAccessTemplates(t2.first, date, flexPathCalculator)))
+            .flatMap(date -> t2.second.getFlexAccessTemplates(
+                t2.first,
+                date,
+                accessFlexPathCalculator,
+                config
+            )))
         .collect(Collectors.toList());
   }
 
@@ -148,22 +171,28 @@ public class FlexRouter {
     if (this.flexEgressTemplates != null) { return; }
 
     // Fetch the closest flexTrips reachable from the egress stops
-    this.flexEgressTemplates = getClosestFlexTrips(streetEgresses)
+    this.flexEgressTemplates = getClosestFlexTrips(streetEgresses, false)
         // For each date the router has data for
         .flatMap(t2 -> Arrays.stream(dates)
             // Discard if service is not running on date
             .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
             // Create templates from trip, alighting at the nearbyStop
-            .flatMap(date -> t2.second.getFlexEgressTemplates(t2.first, date, flexPathCalculator)))
+            .flatMap(date -> t2.second.getFlexEgressTemplates(
+                t2.first, 
+                date,
+                egressFlexPathCalculator,
+                config
+            )))
         .collect(Collectors.toList());;
   }
 
-  private Stream<T2<NearbyStop, FlexTrip>> getClosestFlexTrips(Collection<NearbyStop> nearbyStops) {
+  private Stream<T2<NearbyStop, FlexTrip>> getClosestFlexTrips(Collection<NearbyStop> nearbyStops, boolean pickup) {
     // Find all trips reachable from the nearbyStops
     Stream<T2<NearbyStop, FlexTrip>> flexTripsReachableFromNearbyStops = nearbyStops
         .stream()
         .flatMap(accessEgress -> flexIndex
             .getFlexTripsByStop(accessEgress.stop)
+            .filter(flexTrip -> pickup ? flexTrip.isBoardingPossible(accessEgress) : flexTrip.isAlightingPossible(accessEgress))
             .map(flexTrip -> new T2<>(accessEgress, flexTrip)));
 
     // Group all (NearbyStop, FlexTrip) tuples by flexTrip

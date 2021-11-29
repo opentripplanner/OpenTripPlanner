@@ -27,17 +27,13 @@ public final class Route extends TransitEntity {
 
     private String textColor;
 
-    @Deprecated private int routeBikesAllowed = 0;
-
-    /**
-     * 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
-     */
-    private int bikesAllowed = 0;
+    private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
 
     private int sortOrder = MISSING_VALUE;
 
     private String brandingUrl;
 
+    private String flexibleLineType;
 
     public Route(FeedScopedId id) {
         super(id);
@@ -131,28 +127,11 @@ public final class Route extends TransitEntity {
         this.textColor = textColor;
     }
 
-    @Deprecated
-    public int getRouteBikesAllowed() {
-        return routeBikesAllowed;
-    }
-
-    @Deprecated
-    public void setRouteBikesAllowed(int routeBikesAllowed) {
-        this.routeBikesAllowed = routeBikesAllowed;
-    }
-
-    /**
-     * @return 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
-     */
-    public int getBikesAllowed() {
+    public BikeAccess getBikesAllowed() {
         return bikesAllowed;
     }
 
-    /**
-     * @param bikesAllowed 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes
-     *          NOT allowed
-     */
-    public void setBikesAllowed(int bikesAllowed) {
+    public void setBikesAllowed(BikeAccess bikesAllowed) {
         this.bikesAllowed = bikesAllowed;
     }
 
@@ -176,11 +155,20 @@ public final class Route extends TransitEntity {
         this.brandingUrl = brandingUrl;
     }
 
+    /**
+     * Pass-through information from NeTEx FlexibleLineType. This information is not used by OTP.
+     */
+    public String getFlexibleLineType() {
+        return flexibleLineType;
+    }
+
+    public void setFlexibleLineType(String flexibleLineType) {
+        this.flexibleLineType = flexibleLineType;
+    }
+
     /** @return the route's short name, or the long name if the short name is null. */
     public String getName() {
-        if (shortName != null)
-            return shortName;
-        return longName;
+        return  shortName != null ? shortName : longName;
     }
 
     @Override

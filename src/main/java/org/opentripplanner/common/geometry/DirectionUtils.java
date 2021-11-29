@@ -22,8 +22,9 @@ public class DirectionUtils {
         double cosLat = FastMath.cos(FastMath.toRadians((a.y + b.y) / 2.0)); 
         double dY = (b.y - a.y); // in degrees, we do not care about the units
         double dX = (b.x - a.x) * cosLat; // same
-        if (Math.abs(dX) < 1e-10 && Math.abs(dY) < 1e-10)
+        if (Math.abs(dX) < 1e-10 && Math.abs(dY) < 1e-10) {
             return 180;
+        }
         double az = FastMath.toDegrees(FastMath.atan2(dX, dY));
         return az;
     }

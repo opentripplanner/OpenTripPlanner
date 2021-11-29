@@ -6,8 +6,8 @@ import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,15 +124,10 @@ public class GraphBuilderDataSources {
         );
 
         // Sort data input files by type
-        LOG.info("Files expected to be read or written:");
+        LOG.info("Existing files expected to be read or written:");
         for (FileType type : FileType.values()) {
             for (DataSource source : inputData.get(type)) {
-                if (type == FileType.CONFIG) {
-                    LOG.info(BULLET_POINT + source.detailedInfo());
-                }
-                else {
-                    LOG.info(BULLET_POINT + source.detailedInfo());
-                }
+                LOG.info(BULLET_POINT + source.detailedInfo());
             }
         }
 

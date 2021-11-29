@@ -203,9 +203,18 @@ public class ApiLeg {
 
     public String alightRule;
 
+    public ApiBookingInfo pickupBookingInfo;
+
+    public ApiBookingInfo dropOffBookingInfo;
+
     public Boolean rentedBike;
 
-    /**
+     /**
+      * Is this leg walking with a bike?
+      */
+    public Boolean walkingBike;
+
+     /**
      * The leg's duration in seconds
      */
     public double getDuration() {

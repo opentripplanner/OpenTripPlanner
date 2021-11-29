@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
-import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
-
+import static java.util.Locale.ROOT;
 import static org.opentripplanner.transit.raptor.api.debug.DebugTopic.STOP_ARRIVALS_STATISTICS;
+
+import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 
 
 /**
@@ -26,7 +27,7 @@ class DebugStopArrivalsStatistics {
         long numOfStops = 0;
         int max = 0;
 
-        for (StopArrivalParetoSet stop : stops) {
+        for (StopArrivalParetoSet<?> stop : stops) {
             if(stop != null) {
                 ++numOfStops;
                 total += stop.size();
@@ -69,15 +70,15 @@ class DebugStopArrivalsStatistics {
             return toStr(number/1_000_000.0) + "\"";
         }
         if(number > 1_000) {
-            return toStr(number/1_000.0) + "\'";
+            return toStr(number/1_000.0) + "'";
         }
         return Long.toString(number);
     }
 
     private static String toStr(double number) {
         if(number > 10) {
-            return String.format("%.0f", number);
+            return String.format(ROOT, "%.0f", number);
         }
-        return String.format("%.1f", number);
+        return String.format(ROOT, "%.1f", number);
     }
 }

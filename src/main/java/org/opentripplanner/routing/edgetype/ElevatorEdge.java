@@ -5,5 +5,5 @@ package org.opentripplanner.routing.edgetype;
  * 
  * @author mattwigway
  */
-public interface ElevatorEdge {
+public interface ElevatorEdge extends BikeWalkableEdge {
 }

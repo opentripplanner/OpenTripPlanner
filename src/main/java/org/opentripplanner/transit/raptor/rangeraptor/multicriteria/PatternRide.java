@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
@@ -50,36 +51,35 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-final class PatternRide<T extends RaptorTripSchedule> {
-    final AbstractStopArrival<T> prevArrival;
-    final int boardStopIndex;
-    final int boardPos;
-    final int boardTime;
-    final int boardWaitTime;
-    final T trip;
+public final class PatternRide<T extends RaptorTripSchedule> {
+    public final AbstractStopArrival<T> prevArrival;
+    public final int boardStopIndex;
+    public final int boardPos;
+    public final int boardTime;
+    public final T trip;
 
-    // Pareto vector
-    private final int relativeCost;
-    private final int tripId;
+    // Pareto vector: [relativeCost, tripSortIndex]
+    public final int relativeCost;
+    public final int boardCost;
+    private final int tripSortIndex;
 
     public PatternRide(
         AbstractStopArrival<T> prevArrival,
         int boardStopIndex,
         int boardPos,
         int boardTime,
-        int boardWaitTime,
+        int boardCost,
         int relativeCost,
-        T trip,
-        int tripId
+        T trip
     ) {
         this.prevArrival = prevArrival;
         this.boardStopIndex = boardStopIndex;
         this.boardPos = boardPos;
         this.boardTime = boardTime;
-        this.boardWaitTime = boardWaitTime;
-        this.tripId = tripId;
         this.trip = trip;
+        this.boardCost = boardCost;
         this.relativeCost = relativeCost;
+        this.tripSortIndex = trip.tripSortIndex();
     }
 
     /**
@@ -89,10 +89,9 @@ final class PatternRide<T extends RaptorTripSchedule> {
      * 2 criteria are needed:
      * <ul>
      *   <li>
-     *     {@code tripId} - different trips should not exclude each other. The id can be any board-/
-     *      alight-time or sequence number that is uniq for all trips within a pattern. It is only
-     *      used to check if two trips are different. The pattern trip index is used in this
-     *      implementation.
+     *     {@code tripSortIndex} - different trips should not exclude each other. The id can be
+     *     any board-/alight-time or sequence number that is uniq for all trips within a pattern.
+     *     It is only used to check if two trips are different.
      *   </li>
      *   <li>
      *     {@code relative-cost} of riding a pattern. The cost is used to compare paths that have
@@ -109,6 +108,20 @@ final class PatternRide<T extends RaptorTripSchedule> {
      */
     public static <T extends RaptorTripSchedule>
     ParetoComparator<PatternRide<T>> paretoComparatorRelativeCost() {
-        return (l, r) -> l.tripId != r.tripId || l.relativeCost < r.relativeCost;
+        return (l, r) -> l.tripSortIndex != r.tripSortIndex || l.relativeCost < r.relativeCost;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(PatternRide.class)
+            .addNum("prevArrival", prevArrival.stop())
+            .addNum("boardStop", boardStopIndex)
+            .addNum("boardPos", boardPos)
+            .addServiceTime("boardTime", boardTime)
+            .addObj("trip", trip)
+            .addNum("boardCost", boardCost)
+            .addNum("relativeCost", relativeCost)
+            .addNum("tripSortIndex", tripSortIndex)
+            .toString();
     }
 }

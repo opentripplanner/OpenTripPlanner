@@ -41,9 +41,4 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
       return point;
     }).collect(Collectors.toList());
   }
-
-  @Override
-  protected double getExpansionFactor() {
-    return 0.25;
-  }
 }

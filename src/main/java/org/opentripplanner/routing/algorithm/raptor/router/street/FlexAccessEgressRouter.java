@@ -8,6 +8,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 public class FlexAccessEgressRouter {
 
@@ -15,25 +16,25 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
       RoutingRequest request,
+      FlexParameters params,
       boolean isEgress
   ) {
 
     Collection<NearbyStop> accessStops = !isEgress ? AccessEgressRouter.streetSearch(
         request,
         StreetMode.WALK,
-        false,
-        2000
+        false
     ) : List.of();
 
     Collection<NearbyStop> egressStops = isEgress ? AccessEgressRouter.streetSearch(
         request,
         StreetMode.WALK,
-        true,
-        2000
+        true
     ) : List.of();
 
     FlexRouter flexRouter = new FlexRouter(
         request.rctx.graph,
+        params,
         request.getDateTime().toInstant(),
         request.arriveBy,
         request.additionalSearchDaysBeforeToday,

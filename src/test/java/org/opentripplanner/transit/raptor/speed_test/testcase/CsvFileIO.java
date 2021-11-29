@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import com.csvreader.CsvReader;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,12 +30,14 @@ public class CsvFileIO {
     private final File testCasesFile;
     private final File expectedResultsFile;
     private final File expectedResultsOutputFile;
+    private final boolean skipCost;
 
 
-    public CsvFileIO(File dir, String testSetName) {
+    public CsvFileIO(File dir, String testSetName, boolean skipCost) {
         testCasesFile = new File(dir, testSetName + ".csv");
         expectedResultsFile = new File(dir, testSetName + "-expected-results.csv");
         expectedResultsOutputFile = new File(dir, testSetName + "-results.csv");
+        this.skipCost = skipCost;
     }
 
     /**
@@ -55,11 +57,16 @@ public class CsvFileIO {
                 continue;
             }
             String id = csvReader.get("testCaseId");
+            TestCaseResults testCaseResults = expectedResults.get(id);
+            if(testCaseResults == null) {
+                testCaseResults = new TestCaseResults(id, skipCost);
+            }
+
             TestCase tc = new TestCase(
                     id,
-                    TimeUtils.parseHHMM(csvReader.get("departure"), TestCase.NOT_SET),
-                    TimeUtils.parseHHMM(csvReader.get("arrival"), TestCase.NOT_SET),
-                    TimeUtils.parseHHMM(csvReader.get("window"), TestCase.NOT_SET),
+                    parseTime(csvReader.get("departure"), TestCase.NOT_SET),
+                    parseTime(csvReader.get("arrival"), TestCase.NOT_SET),
+                    parseTime(csvReader.get("window"), TestCase.NOT_SET),
                     csvReader.get("description"),
                     csvReader.get("origin"),
                     csvReader.get("fromPlace"),
@@ -69,7 +76,7 @@ public class CsvFileIO {
                     csvReader.get("toPlace"),
                     Double.parseDouble(csvReader.get("toLat")),
                     Double.parseDouble(csvReader.get("toLon")),
-                    expectedResults.get(id)
+                    testCaseResults
             );
             testCases.add(tc);
         }
@@ -136,7 +143,9 @@ public class CsvFileIO {
         while (csvReader.readRecord()) {
             if (isCommentOrEmpty(csvReader.getRawRecord())) { continue; }
             Result expRes = readExpectedResult(csvReader);
-            results.computeIfAbsent(expRes.testCaseId, TestCaseResults::new).addExpectedResult(expRes);
+            results
+                .computeIfAbsent(expRes.testCaseId, id -> new TestCaseResults(id, skipCost))
+                .addExpectedResult(expRes);
         }
         return results;
     }
@@ -146,11 +155,11 @@ public class CsvFileIO {
             Result r  = new Result(
                     csvReader.get("tcId"),
                     Integer.parseInt(csvReader.get("transfers")),
-                    time2Int(csvReader.get("duration")),
+                    parseTime(csvReader.get("duration")),
                     Integer.parseInt(csvReader.get("cost")),
                     Integer.parseInt(csvReader.get("walkDistance")),
-                    time2Int(csvReader.get("startTime")),
-                    time2Int(csvReader.get("endTime")),
+                    parseTime(csvReader.get("startTime")),
+                    parseTime(csvReader.get("endTime")),
                     csvReader.get("details")
             );
             r.modes.addAll(str2Col(csvReader.get("modes"), TraverseMode::valueOf));
@@ -171,9 +180,15 @@ public class CsvFileIO {
         return TimeUtils.timeToStrLong(timeOrDuration);
     }
 
-    static Integer time2Int(String timeOrDuration) {
-        return TimeUtils.parseTimeLong(timeOrDuration, -1);
+    static Integer parseTime(String timeOrDuration) {
+        return TimeUtils.time(timeOrDuration);
     }
+
+    static Integer parseTime(String timeOrDuration, int defaultValue) {
+        if(timeOrDuration.isBlank()) { return defaultValue; }
+        return TimeUtils.time(timeOrDuration);
+    }
+
     static String col2Str(Collection<?> c) {
         return c.stream().map(Object::toString).collect(Collectors.joining(" "));
     }

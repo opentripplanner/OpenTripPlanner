@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 
+import java.util.Collection;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
-
-import java.util.Collection;
 
 
 /**
@@ -31,36 +31,44 @@ public final class StdStopArrivalsState<T extends RaptorTripSchedule> implements
     }
 
     @Override
-    public final void setAccess(final int stop, final int arrivalTime, RaptorTransfer access) {
-        stops.setAccess(stop, arrivalTime, access);
+    public void setAccessTime(int arrivalTime, RaptorTransfer access) {
+        stops.setAccessTime(arrivalTime, access);
     }
 
     @Override
-    public final Collection<Path<T>> extractPaths() {
-        return results.listPaths();
-    }
-
-    @Override
-    public final int bestTimePreviousRound(int stop) {
+    public int bestTimePreviousRound(int stop) {
         return stops.bestTimePreviousRound(stop);
     }
 
 
     @Override
-    public void setNewBestTransitTime(int stop, int alightTime, T trip, int boardStop, int boardTime, boolean newBestOverall) {
+    public void setNewBestTransitTime(
+        int stop,
+        int alightTime,
+        T trip,
+        int boardStop,
+        int boardTime,
+        boolean newBestOverall
+    ) {
         stops.transitToStop(stop, alightTime, boardStop, boardTime, trip, newBestOverall);
     }
 
     @Override
-    public void rejectNewBestTransitTime(int stop, int alightTime, T trip, int boardStop, int boardTime) {
+    public void setNewBestTransferTime(
+        int fromStop,
+        int arrivalTime,
+        RaptorTransfer transfer
+    ) {
+        stops.transferToStop(fromStop, transfer, arrivalTime);
     }
 
     @Override
-    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
-        stops.transferToStop(fromStop, transferLeg, arrivalTime);
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
+        return stops.previousTransit(boardStopIndex);
     }
 
     @Override
-    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
+    public Collection<Path<T>> extractPaths() {
+        return results.listPaths();
     }
 }

@@ -1,17 +1,16 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TransferPriority;
+import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
 
 public class StopIndexForRaptorTest {
 
@@ -53,10 +52,10 @@ public class StopIndexForRaptorTest {
     }
 
     @Test public void stopBoardAlightCosts() {
-        STOP_1.setParentStation(createStation("A", TransferPriority.DISCOURAGED));
-        STOP_2.setParentStation(createStation("B", TransferPriority.ALLOWED));
-        STOP_3.setParentStation(createStation("C", TransferPriority.RECOMMENDED));
-        STOP_4.setParentStation(createStation("D", TransferPriority.PREFERRED));
+        STOP_1.setParentStation(createStation("A", StopTransferPriority.DISCOURAGED));
+        STOP_2.setParentStation(createStation("B", StopTransferPriority.ALLOWED));
+        STOP_3.setParentStation(createStation("C", StopTransferPriority.RECOMMENDED));
+        STOP_4.setParentStation(createStation("D", StopTransferPriority.PREFERRED));
 
         StopIndexForRaptor stopIndex = new StopIndexForRaptor(STOPS, TransitTuningParameters.FOR_TEST);
 
@@ -66,7 +65,7 @@ public class StopIndexForRaptorTest {
         assertEquals("[6000, 360000, 6000, 2000, 0]", Arrays.toString(result));
     }
 
-    Station createStation(String name, TransferPriority pri) {
+    Station createStation(String name, StopTransferPriority pri) {
         return new Station(new FeedScopedId("F", name), name, null, null, null, null, null, pri);
     }
 }

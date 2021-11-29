@@ -78,10 +78,12 @@ public final class ShapePoint implements Serializable, Comparable<ShapePoint> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         ShapePoint that = (ShapePoint) o;
         return sequence == that.sequence && Objects.equals(shapeId, that.shapeId);
     }

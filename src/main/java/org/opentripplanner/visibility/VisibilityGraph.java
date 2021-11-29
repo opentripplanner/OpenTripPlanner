@@ -105,10 +105,12 @@ public class VisibilityGraph {
         for (int k1 = 0; k1 < n; k1++) {
             for (int k2 = 0; k2 < n; k2++) {
                 outs += get(k1, k2) ? "1" : "0";
-                if (k2 < n - 1)
+                if (k2 < n - 1) {
                     outs += "  ";
-                else
+                }
+                else {
                     outs += "\n";
+                }
             }
         }
 

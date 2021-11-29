@@ -1,0 +1,8 @@
+from_stop_id,to_stop_id,from_route_id,to_route_id,from_trip_id,to_trip_id,transfer_type,min_transfer_time
+L,K,,,,,0,
+K,L,,,,,0,
+K,M,,,,,3,
+M,K,,,,,3,
+D,I,2,5,,,1,
+B,B,,,1.1,2.2,1,
+F,E,,,,,2,13000

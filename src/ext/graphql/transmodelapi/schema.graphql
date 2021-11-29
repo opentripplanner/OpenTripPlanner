@@ -187,6 +187,8 @@ type Leg {
     pointsOnLink: PointsOnLink
     "Whether there is real-time data about this leg"
     realtime: Boolean
+    "Whether this leg is walking with a bike."
+    walkingBike: Boolean
     "Whether this leg is with a rented bike."
     rentedBike: Boolean
     "Whether this leg is a ride leg or not."
@@ -585,7 +587,6 @@ type RoutingParameters {
     allowBikeRental: Boolean
     "Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot."
     bikeBoardCost: Int
-    bikeParkAndRide: Boolean
     "Cost to park a bike."
     bikeParkCost: Int
     "Time to park a bike."

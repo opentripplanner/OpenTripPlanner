@@ -51,8 +51,9 @@ public class RepeatingTimePeriod implements Serializable {
         // every day of the week that this restriction is in force.
         String[] parsedOn = hour_on.split(";");
         String[] parsedOff = hour_off.split(";");
-        if (parsedOn.length != parsedOff.length)
+        if (parsedOn.length != parsedOff.length) {
             return null;
+        }
         
         int[][] onOff = new int[parsedOn.length][];
         
@@ -72,30 +73,18 @@ public class RepeatingTimePeriod implements Serializable {
                 active = true;
             
             if (active) {
-                if (today == "monday")
-                    ret.monday = onOff;
-                
-                else if (today == "tuesday")
-                    ret.tuesday = onOff;
-        
-                else if (today == "wednesday")
-                    ret.wednesday = onOff;
-                    
-                else if (today == "thursday")
-                    ret.thursday = onOff;
-                
-                else if (today == "friday")
-                    ret.friday = onOff;
-                
-                else if (today == "saturday")
-                    ret.saturday = onOff;
-                
-                else if (today == "sunday")
-                    ret.sunday = onOff;
+                if (today == "monday") { ret.monday = onOff; }
+                else if (today == "tuesday") { ret.tuesday = onOff; }
+                else if (today == "wednesday") { ret.wednesday = onOff; }
+                else if (today == "thursday") { ret.thursday = onOff; }
+                else if (today == "friday") { ret.friday = onOff; }
+                else if (today == "saturday") { ret.saturday = onOff; }
+                else if (today == "sunday") { ret.sunday = onOff; }
             }
                 
-            if (today.startsWith(day_off.toLowerCase()))
+            if (today.startsWith(day_off.toLowerCase())) {
                 active = false;
+            }
         }
         
         return ret;
@@ -167,8 +156,9 @@ public class RepeatingTimePeriod implements Serializable {
                 cal.get(Calendar.SECOND) - 12 * 3600; 
         
         for (int[] range : times) {
-            if (timeOfDay >= range[0] && timeOfDay <= range[1])
+            if (timeOfDay >= range[0] && timeOfDay <= range[1]) {
                 return true;
+            }
         }
         
         return false;   

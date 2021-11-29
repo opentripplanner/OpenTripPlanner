@@ -1,5 +1,11 @@
 package org.opentripplanner.ext.siri.updater;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
@@ -8,25 +14,18 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 public class SiriSXUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
     private static final long RETRY_INTERVAL_MILLIS = 5000;
 
-    private GraphUpdaterManager updaterManager;
+    private WriteToGraphCallback saveResultOnGraph;
 
     private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
 
@@ -78,8 +77,8 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+        this.saveResultOnGraph = saveResultOnGraph;
     }
 
     @Override
@@ -107,7 +106,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
                     moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
                     final boolean markPrimed = !moreData;
                     if (serviceDelivery.getSituationExchangeDeliveries() != null) {
-                        updaterManager.execute(graph -> {
+                        saveResultOnGraph.execute(graph -> {
                             updateHandler.update(serviceDelivery);
                             if (markPrimed) primed = true;
                         });

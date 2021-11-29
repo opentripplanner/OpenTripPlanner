@@ -45,7 +45,7 @@ public final class TimeScalarFactory {
     }
 
     public static GraphQLScalarType createSecondsSinceMidnightAsTimeStringScalar() {
-        return new GraphQLScalarType("Time", DOCUMENTATION, new Coercing<>() {
+        return GraphQLScalarType.newScalar().name("Time").description(DOCUMENTATION).coercing(new Coercing<>() {
             @Override
             public String serialize(Object input) {
                 if (input instanceof Integer) {
@@ -70,6 +70,6 @@ public final class TimeScalarFactory {
                 }
                 return null;
             }
-        });
+        }).build();
     }
 }

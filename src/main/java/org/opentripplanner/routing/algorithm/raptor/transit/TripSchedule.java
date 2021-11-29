@@ -23,14 +23,4 @@ public interface TripSchedule extends RaptorTripSchedule {
     TripPattern getOriginalTripPattern();
 
     LocalDate getServiceDate();
-
-    /**
-     * Raptor save memory by NOT storing the board/arrival stop positions in pattern; Hence we need
-     * to resolve this when mapping into a itinerary leg.
-     * <p/>
-     * Find the pattern stop index for a given stop, and arrival/departure time. We need the time
-     * in addition to the stop in cases were the trip pattern visit the same stop twice. Also the
-     * time is not sufficient since more than one stop could have the exact same departure time.
-     */
-    int findStopPosInPattern(int stopIndex, int time, boolean departure);
 }

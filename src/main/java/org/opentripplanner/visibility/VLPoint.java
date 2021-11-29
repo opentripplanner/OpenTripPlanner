@@ -32,8 +32,9 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
 
     public VLPoint projection_onto(LineSegment line_segment_temp) {
 
-        if (line_segment_temp.size() == 1)
+        if (line_segment_temp.size() == 1) {
             return line_segment_temp.first();
+        }
         // The projection of point_temp onto the line determined by
         // line_segment_temp can be represented as an affine combination
         // expressed in the form projection of Point =
@@ -48,12 +49,14 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
                         .pow(line_segment_temp.second().y - line_segment_temp.first().y, 2));
         // std::cout << "\E[1;37;40m" << "Theta is: " << theta << "\x1b[0m"
         // << std::endl;
-        if ((0.0 <= theta) && (theta <= 1.0))
+        if ((0.0 <= theta) && (theta <= 1.0)) {
             return line_segment_temp.first().times(theta)
                     .plus(line_segment_temp.second().times(1.0 - theta));
+        }
         // Else pick closest endpoint.
-        if (distance(line_segment_temp.first()) < distance(line_segment_temp.second()))
+        if (distance(line_segment_temp.first()) < distance(line_segment_temp.second())) {
             return line_segment_temp.first();
+        }
         return line_segment_temp.second();
     }
 
@@ -161,8 +164,9 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
 
     public boolean in(LineSegment line_segment_temp, double epsilon) {
 
-        if (distance(line_segment_temp) < epsilon)
+        if (distance(line_segment_temp) < epsilon) {
             return true;
+        }
         return false;
     }
 
@@ -189,8 +193,9 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
     public boolean in(VLPolygon polygon_temp, double epsilon) {
 
         int n = polygon_temp.vertices.size();
-        if (on_boundary_of(polygon_temp, epsilon))
+        if (on_boundary_of(polygon_temp, epsilon)) {
             return true;
+        }
         // Then check the number of times a ray emanating from the Point
         // crosses the boundary of the Polygon. An odd number of
         // crossings indicates the Point is in the interior of the
@@ -204,23 +209,28 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
                     && (x < (polygon_temp.get(j).x - polygon_temp.get(i).x)
                             * (y - polygon_temp.get(i).y)
                             / (polygon_temp.get(j).y - polygon_temp.get(i).y)
-                            + polygon_temp.get(i).x))
+                            + polygon_temp.get(i).x)) {
                 c = !c;
+            }
         }
         return c;
     }
 
     public boolean in(Environment environment_temp, double epsilon) {
         // On outer boundary?
-        if (on_boundary_of(environment_temp, epsilon))
+        if (on_boundary_of(environment_temp, epsilon)) {
             return true;
+        }
         // Not in outer boundary?
-        if (!in(environment_temp.outer_boundary, epsilon))
+        if (!in(environment_temp.outer_boundary, epsilon)) {
             return false;
+        }
         // In hole?
-        for (int i = 0; i < environment_temp.h(); i++)
-            if (in(environment_temp.holes.get(i)))
+        for (int i = 0; i < environment_temp.h(); i++) {
+            if (in(environment_temp.holes.get(i))) {
                 return false;
+            }
+        }
         // Must be in interior.
         return true;
     }
@@ -228,8 +238,9 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
     public boolean is_endpoint_of(LineSegment line_segment_temp, double epsilon) {
 
         if (distance(line_segment_temp.first()) <= epsilon
-                || distance(line_segment_temp.second()) <= epsilon)
+                || distance(line_segment_temp.second()) <= epsilon) {
             return true;
+        }
         return false;
     }
 
@@ -283,8 +294,7 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
 
     public int compareTo(VLPoint point2) {
 
-        if (x < point2.x)
-            return -1;
+        if (x < point2.x) { return -1; }
         else if (x == point2.x) {
             if (y < point2.y) {
                 return -1;
@@ -336,8 +346,9 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
         double distance_temp;
         for (int i = 0; i < polyline_temp.size() - 1; i++) {
             distance_temp = distance(new LineSegment(polyline_temp.get(i), polyline_temp.get(i + 1)));
-            if (distance_temp < running_min)
+            if (distance_temp < running_min) {
                 running_min = distance_temp;
+            }
         }
         return running_min;
     }
@@ -348,8 +359,9 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
         double distance_temp;
         for (int i = 0; i <= polygon_temp.n(); i++) {
             distance_temp = distance(new LineSegment(polygon_temp.get(i), polygon_temp.get(i + 1)));
-            if (distance_temp < running_min)
+            if (distance_temp < running_min) {
                 running_min = distance_temp;
+            }
         }
         return running_min;
     }
@@ -359,8 +371,9 @@ public class VLPoint implements Comparable<VLPoint>, Cloneable {
         double distance_temp;
         for (int i = 0; i <= environment_temp.h(); i++) {
             distance_temp = boundary_distance(environment_temp.get(i));
-            if (distance_temp < running_min)
+            if (distance_temp < running_min) {
                 running_min = distance_temp;
+            }
         }
         return running_min;
     }

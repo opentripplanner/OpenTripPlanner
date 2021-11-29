@@ -1,12 +1,12 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic;
 
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 
 /**
  * A wrapper around {@link Heuristics} to cash elements to avoid recalculation
@@ -18,7 +18,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     private final Heuristics heuristics;
     private final RoundProvider roundProvider;
     private final DestinationArrivalPaths<T> paths;
-    private final CostCalculator<T> costCalculator;
+    private final CostCalculator costCalculator;
     private final HeuristicAtStop[] stops;
     private final DebugHandlerFactory<T> debugHandlerFactory;
 
@@ -31,7 +31,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
             Heuristics heuristics,
             RoundProvider roundProvider,
             DestinationArrivalPaths<T> paths,
-            CostCalculator<T> costCalculator,
+            CostCalculator costCalculator,
             DebugHandlerFactory<T> debugHandlerFactory
     ) {
         this.heuristics = heuristics;

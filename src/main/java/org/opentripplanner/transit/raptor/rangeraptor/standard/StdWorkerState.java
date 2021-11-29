@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 
 /**
@@ -29,4 +30,6 @@ public interface StdWorkerState<T extends RaptorTripSchedule> extends WorkerStat
      * Set the time at a transit stop iff it is optimal. This sets both the bestTime and the transitTime
      */
     void transitToStop(int alightStop, int alightTime, int boardStop, int boardTime, T trip);
+
+    TransitArrival<T> previousTransit(int boardStopIndex);
 }

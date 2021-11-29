@@ -22,11 +22,9 @@ The complete list of modes are:
 
 - `BICYCLE_RENT`: Taking a rented, shared-mobility bike for part or the entirety of the route.  
 
-    _Prerequisite:_ Vehicle positions need to be added to OTP either as static stations or dynamic data feeds. 
+    _Prerequisite:_ Vehicle positions need to be added to OTP from dynamic data feeds. 
 
     For dynamic bike positions configure an input feed. See [Configuring real-time updaters](Configuration.md#configuring-real-time-updaters).
-
-    For static stations check the graph building documentation for the property `staticBikeRental`.
 
 - `BICYCLE_PARK`: Leaving the bicycle at the departure station and walking from the arrival station to the destination.
 

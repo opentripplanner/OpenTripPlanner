@@ -1,11 +1,11 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.TimeZone;
+import javax.validation.constraints.NotNull;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
@@ -98,14 +98,6 @@ public final class Stop extends StationElement implements StopLocation {
     return platformCode;
   }
 
-  /**
-   * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
-   * which only permits one zone per stop.
-   */
-  public String getFirstZoneAsString() {
-    return fareZones.stream().map(t -> t.getId().getId()).findFirst().orElse(null);
-  }
-
   public String getUrl() {
     return url;
   }
@@ -127,8 +119,8 @@ public final class Stop extends StationElement implements StopLocation {
    * [if parent exist] or return the default value.
    */
   @NotNull
-  public TransferPriority getCostPriority() {
-    return isPartOfStation() ? getParentStation().getCostPriority() : TransferPriority.ALLOWED;
+  public StopTransferPriority getPriority() {
+    return isPartOfStation() ? getParentStation().getPriority() : StopTransferPriority.ALLOWED;
   }
 
   public Collection<FareZone> getFareZones() {

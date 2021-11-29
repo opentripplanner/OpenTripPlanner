@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.stop;
 
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
+
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -9,18 +11,16 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.TripTimeShort;
-
-import java.util.Collection;
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
+import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 public class QuayType {
 
@@ -100,7 +100,7 @@ public class QuayType {
                       return GqlUtil.getRoutingService(environment)
                           .getPatternsForStop(environment.getSource(),true)
                               .stream()
-                              .map(pattern -> pattern.route)
+                              .map(pattern -> pattern.getRoute())
                               .distinct()
                               .collect(Collectors.toList());
                     })
@@ -144,7 +144,20 @@ public class QuayType {
                     .argument(GraphQLArgument.newArgument()
                             .name("omitNonBoarding")
                             .type(Scalars.GraphQLBoolean)
+                            .deprecate("Non-functional. Use arrivalDeparture instead.")
                             .defaultValue(false)
+                            .build())
+                    .argument(GraphQLArgument.newArgument()
+                            .name("arrivalDeparture")
+                            .type(EnumTypes.ARRIVAL_DEPARTURE)
+                            .description("Filters results by either departures, arrivals or both. "
+                                + "For departures forBoarding has to be true and the departure "
+                                + "time has to be within the specified time range. For arrivals, "
+                                + "forAlight has to be true and the arrival time has to be within "
+                                + "the specified time range. If both are asked for, either the "
+                                + "conditions for arrivals or the conditions for departures will "
+                                + "have to be true for an EstimatedCall to show.")
+                            .defaultValue(ArrivalDeparture.DEPARTURES)
                             .build())
                     .argument(GraphQLArgument.newArgument()
                             .name("whiteListed")
@@ -164,7 +177,8 @@ public class QuayType {
                         .defaultValue(false)
                         .build())
                     .dataFetcher(environment -> {
-                        boolean omitNonBoarding = environment.getArgument("omitNonBoarding");
+                        ArrivalDeparture arrivalDeparture = environment.getArgument("arrivalDeparture");
+                        boolean includeCancelledTrips = environment.getArgument("includeCancelledTrips");
                         int numberOfDepartures = environment.getArgument("numberOfDepartures");
                         Integer departuresPerLineAndDestinationDisplay = environment.getArgument("numberOfDeparturesPerLineAndDestinationDisplay");
                         int timeRange = environment.getArgument("timeRange");
@@ -180,7 +194,8 @@ public class QuayType {
                           stop,
                           startTimeSeconds,
                           timeRange,
-                          omitNonBoarding,
+                          arrivalDeparture,
+                          includeCancelledTrips,
                           numberOfDepartures,
                           departuresPerLineAndDestinationDisplay,
                           whiteListed.authorityIds,
@@ -188,7 +203,7 @@ public class QuayType {
                           transitModes,
                           environment
                       )
-                            .sorted(TripTimeShort.compareByDeparture())
+                            .sorted(TripTimeOnDate.compareByDeparture())
                             .distinct()
                             .limit(numberOfDepartures)
                             .collect(Collectors.toList());

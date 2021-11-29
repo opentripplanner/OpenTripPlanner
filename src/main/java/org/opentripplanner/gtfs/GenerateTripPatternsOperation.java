@@ -7,6 +7,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
+import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
@@ -122,9 +123,9 @@ public class GenerateTripPatternsOperation {
         // Get the existing TripPattern for this filtered StopPattern, or create one.
         StopPattern stopPattern = new StopPattern(stopTimes);
 
-        Integer directionId = trip.getDirectionId();
+        Direction direction = trip.getDirection();
         TripPattern tripPattern = findOrCreateTripPattern(
-            stopPattern, trip.getRoute(), directionId == null ? -1 : directionId
+            stopPattern, trip.getRoute(), direction
         );
 
         // Create a TripTimes object for this list of stoptimes, which form one trip.
@@ -147,15 +148,14 @@ public class GenerateTripPatternsOperation {
         }
     }
 
-    private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, int directionId) {
+    private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, Direction direction) {
         for(TripPattern tripPattern : tripPatterns.get(stopPattern)) {
-            if(tripPattern.route.equals(route) && tripPattern.directionId == directionId) {
+            if(tripPattern.getRoute().equals(route) && tripPattern.getDirection().equals(direction)) {
                 return tripPattern;
             }
         }
-        FeedScopedId patternId = generateUniqueIdForTripPattern(route, directionId);
+        FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction.gtfsCode);
         TripPattern tripPattern = new TripPattern(patternId, route, stopPattern);
-        tripPattern.directionId = directionId;
         tripPatterns.put(stopPattern, tripPattern);
         return tripPattern;
     }

@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-
-import static org.junit.Assert.assertEquals;
 
 public class StateEditorTest {
 
@@ -31,21 +32,18 @@ public class StateEditorTest {
         request.parkAndRide = true;
         Graph graph = new Graph();
         graph.index = new GraphIndex(graph);
-        graph.streetIndex = new StreetVertexIndex(graph);
         request.rctx = new RoutingContext(request, graph);
         State state = new State(request);
 
-        state.stateData.carParked = true;
-        state.stateData.bikeParked = true;
-        state.stateData.usingRentedBike = false;
-        state.stateData.nonTransitMode = TraverseMode.WALK;
+        state.stateData.vehicleParked = true;
+        state.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
+        state.stateData.currentMode = TraverseMode.WALK;
 
         StateEditor se = new StateEditor(request, null);
         se.setNonTransitOptionsFromState(state);
         State updatedState = se.makeState();
         assertEquals(TraverseMode.WALK, updatedState.getNonTransitMode());
-        assertEquals(true, updatedState.isCarParked());
-        assertEquals(true, updatedState.isBikeParked());
-        assertEquals(false, updatedState.isBikeRenting());
+        assertTrue(updatedState.isVehicleParked());
+        assertFalse(updatedState.isRentingVehicle());
     }
 }

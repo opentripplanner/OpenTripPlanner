@@ -36,9 +36,7 @@ public class EdgeUpdaterModule implements GraphBuilderModule {
     }
 
     @Override
-    public void checkInputs() throws Exception {
-        if (!dataFile.isValid()) {
-            throw new Exception(dataFile.getError());
-        }
+    public void checkInputs() {
+        //nothing
     }
 }

@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.spt;
 
+import java.io.Serializable;
+import java.util.Objects;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-
-import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * A class that determines when one search branch prunes another at the same Vertex, and ultimately which solutions
@@ -24,8 +23,8 @@ import java.util.Objects;
 public abstract class DominanceFunction implements Serializable {
     private static final long serialVersionUID = 1;
 
-    /** 
-     * Return true if the first state "defeats" the second state or at least ties with it in terms of suitability. 
+    /**
+     * Return true if the first state "defeats" the second state or at least ties with it in terms of suitability.
      * In the case that they are tied, we still want to return true so that an existing state will kick out a new one.
      * Provide this custom logic in subclasses. You would think this could be static, but in Java for some reason 
      * calling a static function will call the one on the declared type, not the runtime instance type. 
@@ -40,42 +39,72 @@ public abstract class DominanceFunction implements Serializable {
     public boolean betterOrEqualAndComparable(State a, State b) {
 
         // Does one state represent riding a rented bike and the other represent walking before/after rental?
-        if (a.isBikeRenting() != b.isBikeRenting()) {
-            return false;
-        }
-
-        if (a.hasUsedRentedBike() != b.hasUsedRentedBike()) {
+        if (!a.isCompatibleVehicleRentalState(b)) {
             return false;
         }
 
         // In case of bike renting, different networks (ie incompatible bikes) are not comparable
-        if (a.isBikeRenting()) {
-            if (!Objects.equals(a.getBikeRentalNetworks(), b.getBikeRentalNetworks()))
-                return false;
-        }
-
-        // Does one state represent driving a car and the other represent walking after the car was parked?
-        if (a.isCarParked() != b.isCarParked()) {
-            return false;
-        }
-
-        // Does one state represent riding a bike and the other represent walking after the bike was parked?
-        if (a.isBikeParked() != b.isBikeParked()) {
-            return false;
-        }
-
-        // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
-        if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
-            if (! a.getOptions().getRoutingContext().graph.getTurnRestrictions(a.backEdge).isEmpty()) {
+        // TODO: Check for vehicle type
+        if (a.isRentingVehicle()) {
+            if (!Objects.equals(a.getVehicleRentalNetwork(), b.getVehicleRentalNetwork())) {
                 return false;
             }
         }
-        
+
+        // Does one state represent driving a vehicle and the other represent walking after the vehicle was parked?
+        if (a.isVehicleParked() != b.isVehicleParked()) {
+            return false;
+        }
+
+        if (a.getCarPickupState() != b.getCarPickupState()) {
+            return false;
+        }
+
+        // Since a Vertex may be arrived at using a no-thru restricted path and one without such
+        // restrictions, treat the two as separate so one doesn't dominate the other.
+        if (a.hasEnteredNoThruTrafficArea() != b.hasEnteredNoThruTrafficArea()) {
+            return false;
+        }
+
+        /*
+         * The OTP algorithm tries hard to never visit the same node twice. This is generally a good idea because it avoids
+         * useless loops in the traversal leading to way faster processing time.
+         *
+         * However there is are certain rare pathological cases where through a series of turn restrictions and/or roadworks
+         * you absolutely must visit a vertex twice if you want to produce a result. One example would be a route like this:
+         *   https://tinyurl.com/ycqux93g (Note: At the time of writing this Hindenburgstr. is closed due to roadworks.)
+         *
+         * Therefore, if we are close to the start or the end of a route we allow this.
+         *
+         * More discussion: https://github.com/opentripplanner/OpenTripPlanner/issues/3393
+         *
+         * == Bicycles ==
+         *
+         * We used to allow also loops for bicycles as turn restrictions also apply to them, however
+         * this causes problems when the start/destination is close to an area that has a very complex
+         * network of edges due to the visibility calculation. In such a case it can lead to timeouts as
+         * too many loops are produced.
+         *
+         * Example: https://github.com/opentripplanner/OpenTripPlanner/issues/3564
+         *
+         * In any case, cyclists can always get off the bike and push it across the street so not
+         * including the loops should still result in a route. Often this will be preferable to
+         * taking a detour due to turn restrictions anyway.
+         */
+        if (a.backEdge != b.getBackEdge()
+                && (a.backEdge instanceof StreetEdge)
+                && a.getBackMode() != null && a.getBackMode().isDriving()
+                && a.getOptions().isCloseToStartOrEnd(a.getVertex())) {
+            return false;
+        }
+
         // These two states are comparable (they are on the same "plane" or "copy" of the graph).
         return betterOrEqual(a, b);
-        
+
     }
-    
+
+
+
     /**
      * Create a new shortest path tree using this function, considering whether it allows co-dominant States.
      * MultiShortestPathTree is the general case -- it will work with both single- and multi-state functions.

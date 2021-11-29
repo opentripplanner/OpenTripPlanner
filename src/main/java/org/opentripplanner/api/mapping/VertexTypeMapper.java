@@ -9,8 +9,8 @@ public class VertexTypeMapper {
         if(domain == null) { return null; }
         switch (domain) {
             case NORMAL: return ApiVertexType.NORMAL;
-            case BIKEPARK: return ApiVertexType.BIKEPARK;
-            case BIKESHARE: return ApiVertexType.BIKESHARE;
+            case VEHICLEPARKING: return ApiVertexType.BIKEPARK;
+            case VEHICLERENTAL: return ApiVertexType.BIKESHARE;
             case TRANSIT: return ApiVertexType.TRANSIT;
             default:
                 throw new IllegalArgumentException(domain.toString());

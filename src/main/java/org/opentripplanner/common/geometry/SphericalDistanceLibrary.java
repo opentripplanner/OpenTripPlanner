@@ -61,6 +61,21 @@ public abstract class SphericalDistanceLibrary {
     }
 
     /**
+     * Compute the length of a polyline
+     * @param lineString The polyline in (longitude, latitude degrees).
+     * @return The length, in meters, of the linestring.
+     */
+    public static double length(LineString lineString) {
+        double accumulatedMeters = 0;
+
+        for (int i = 1; i < lineString.getNumPoints(); i++) {
+            accumulatedMeters += distance(lineString.getCoordinateN(i - 1), lineString.getCoordinateN(i));
+        }
+
+        return accumulatedMeters;
+    }
+
+    /**
      * Compute the (approximated) length of a polyline
      * @param lineString The polyline in (longitude, latitude degrees).
      * @return The (approximated) length, in meters, of the linestring.

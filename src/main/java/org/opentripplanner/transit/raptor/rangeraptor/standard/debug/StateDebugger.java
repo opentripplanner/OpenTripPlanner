@@ -16,7 +16,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 class StateDebugger<T extends RaptorTripSchedule> {
     private final StopsCursor<T> cursor;
     private final RoundProvider roundProvider;
-    private final DebugHandler<ArrivalView<T>> debugHandlerStopArrivals;
+    private final DebugHandler<ArrivalView<?>> debugHandlerStopArrivals;
 
     StateDebugger(
             StopsCursor<T> cursor,
@@ -31,6 +31,12 @@ class StateDebugger<T extends RaptorTripSchedule> {
     void acceptAccess(int stop) {
         if(isDebug(stop)) {
             accept(stop);
+        }
+    }
+
+    void rejectAccessPath(RaptorTransfer accessPath, int arrivalTime) {
+        if (isDebug(accessPath.stop())) {
+            reject(cursor.rejectedAccess(round(), accessPath, arrivalTime));
         }
     }
 
@@ -50,9 +56,9 @@ class StateDebugger<T extends RaptorTripSchedule> {
         }
     }
 
-    void rejectTransfer(int fromStop, RaptorTransfer transferLeg, int toStop, int arrivalTime) {
-        if (isDebug(transferLeg.stop())) {
-            reject(cursor.rejectedTransfer(round(), fromStop, transferLeg, toStop, arrivalTime));
+    void rejectTransfer(int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
+        if (isDebug(transfer.stop())) {
+            reject(cursor.rejectedTransfer(round(), fromStop, transfer, toStop, arrivalTime));
         }
     }
 

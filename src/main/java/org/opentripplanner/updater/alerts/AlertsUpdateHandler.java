@@ -63,12 +63,12 @@ public class AlertsUpdateHandler {
             for (TimeRange activePeriod : alert.getActivePeriodList()) {
                 final long realStart = activePeriod.hasStart() ? activePeriod.getStart() : 0;
                 final long start = activePeriod.hasStart() ? realStart - earlyStart : 0;
-                final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : Long.MAX_VALUE;
+                final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : TimePeriod.OPEN_ENDED;
                 periods.add(new TimePeriod(start, end));
             }
         } else {
             // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
-            periods.add(new TimePeriod(0, Long.MAX_VALUE));
+            periods.add(new TimePeriod(0, TimePeriod.OPEN_ENDED));
         }
         alertText.setTimePeriods(periods);
         alertText.setFeedId(feedId);

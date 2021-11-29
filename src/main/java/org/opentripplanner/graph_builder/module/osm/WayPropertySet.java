@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import java.util.Collections;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
@@ -50,8 +51,6 @@ public class WayPropertySet {
     /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
     public WayProperties defaultProperties;
 
-    public WayPropertySetSource base;
-
     public WayPropertySet() {
         /* sensible defaults */
         defaultProperties = new WayProperties();
@@ -65,7 +64,7 @@ public class WayPropertySet {
         notes = new ArrayList<NotePicker>();
         // regex courtesy http://wiki.openstreetmap.org/wiki/Key:maxspeed
         // and edited
-        maxSpeedPattern = Pattern.compile("^([0-9][\\.0-9]+?)(?:[ ]?(kmh|km/h|kmph|kph|mph|knots))?$");
+        maxSpeedPattern = Pattern.compile("^([0-9][\\.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$");
     }
 
     /**
@@ -210,7 +209,7 @@ public class WayPropertySet {
             		"maxspeed tags; ignoring these tags", this);
         
         // if there was a defined speed and it's not 0, we're done
-        if (speed != null)
+        if (speed != null && speed > 0.0001)
             return speed;
                     
         // otherwise, we use the speedPickers
@@ -230,10 +229,12 @@ public class WayPropertySet {
             }
         }
         
-        if (bestSpeed != null)
+        if (bestSpeed != null) {
             return bestSpeed;
-        else
+        }
+        else {
             return this.defaultSpeed;
+        }
     }
 
     public Set<T2<StreetNote, NoteMatcher>> getNoteForWay(OSMWithTags way) {
@@ -266,6 +267,12 @@ public class WayPropertySet {
     }
 
     public void addProperties(OSMSpecifier spec, WayProperties properties, boolean mixin) {
+        if(!mixin && spec.containsLogicalOr()) {
+           throw new RuntimeException(
+                   String.format("The logical OR operator ('|') is only implemented for mixins. Spec %s",
+                   spec.toString())
+           );
+        }
         wayProperties.add(new WayPropertyPicker(spec, properties, mixin));
     }
 
@@ -306,9 +313,10 @@ public class WayPropertySet {
     }
     
     public Float getMetersSecondFromSpeed(String speed) {
-        Matcher m = maxSpeedPattern.matcher(speed);
-        if (!m.matches())
+        Matcher m = maxSpeedPattern.matcher(speed.trim());
+        if (!m.matches()) {
             return null;
+        }
         
         float originalUnits;
         try {
@@ -381,4 +389,7 @@ public class WayPropertySet {
 		addSpeedPicker(picker);
 	}
 
+    public List<WayPropertyPicker> getWayProperties() {
+	    return Collections.unmodifiableList(wayProperties);
+    }
 }

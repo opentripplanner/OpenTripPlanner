@@ -1,5 +1,6 @@
 package org.opentripplanner.api.common;
 
+import java.util.Set;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
 import org.opentripplanner.ext.airquality.configuration.RequestParameters;
@@ -90,10 +91,40 @@ public abstract class RoutingResource {
     protected Integer searchWindow;
 
     /**
+     * Search for the best trip options within a time window. If {@code true} two itineraries are
+     * considered optimal if one is better on arrival time(earliest wins) and the other is better
+     * on departure time(latest wins).
+     * <p>
+     * In combination with {@code arriveBy} this parameter cover the following 3 use cases:
+     * <ul>
+     *   <li>
+     *     Traveler want to find thee best alternative within a time window. Set
+     *     {@code timetableView=true} and {@code arriveBy=false}.  This is the default, and if
+     *     the intention of the traveler is unknown it gives the best result, because it includes
+     *     the two next use-cases. Setting the {@code arriveBy=false}, covers the same use-case,
+     *     but the input time is interpreted as latest-arrival-time, and not
+     *     earliest-departure-time. This works great with paging, request next/previous time-window.
+     *   </li>
+     *   <li>
+     *     Traveler want to find the best alternative with departure after a specific time.
+     *     For example: I am at the station now and want to get home as quickly as possible.
+     *     Set {@code timetableView=false} and {@code arriveBy=false}. Do not support paging.
+     *   </li>
+     *   <li>
+     *     Traveler want to find the best alternative with arrival before specific time. For
+     *     example going to a meeting. Do not support paging.
+     *     Set {@code timetableView=false} and {@code arriveBy=true}.
+     *   </li>
+     * </ul>
+     * Default: true
+     */
+    @QueryParam("timetableView")
+    public Boolean timetableView;
+
+    /**
      * Whether the trip should depart or arrive at the specified date and time.
      *
-     * @deprecated TODO OTP2 Regression. Needs to be implemented in Raptor.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2885
+     * @see #timetableView for usage.
      */
     @Deprecated
     @QueryParam("arriveBy")
@@ -133,6 +164,13 @@ public abstract class RoutingResource {
     protected Integer maxPreTransitTime;
 
     /**
+     * A multiplier for how bad walking with a bike is, compared to being in transit for equal
+     * lengths of time. Defaults to 3.
+     */
+    @QueryParam("bikeWalkingReluctance")
+    protected Double bikeWalkingReluctance;
+
+    /**
      * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      * Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
      * of not wanting to walk too much without asking for totally ridiculous itineraries, but this
@@ -140,6 +178,12 @@ public abstract class RoutingResource {
      */
     @QueryParam("walkReluctance")
     protected Double walkReluctance;
+
+    @QueryParam("bikeReluctance")
+    protected Double bikeReluctance;
+
+    @QueryParam("carReluctance")
+    protected Double carReluctance;
 
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
@@ -168,6 +212,10 @@ public abstract class RoutingResource {
     /** The user's biking speed in meters/second. Defaults to approximately 11 MPH, or 9.5 for bikeshare. */
     @QueryParam("bikeSpeed")
     protected Double bikeSpeed;
+
+    /** The user's bike walking speed in meters/second. Defaults to approximately 3 MPH. */
+    @QueryParam("bikeWalkingSpeed")
+    protected Double bikeWalkingSpeed;
 
     /** The time it takes the user to fetch their bike and park it again in seconds.
      *  Defaults to 0. */
@@ -308,6 +356,44 @@ public abstract class RoutingResource {
      */
     @QueryParam("bikeBoardCost")
     protected Integer bikeBoardCost;
+
+    @QueryParam("allowKeepingRentedBicycleAtDestination")
+    protected Boolean allowKeepingRentedBicycleAtDestination;
+
+    @QueryParam("keepingRentedBicycleAtDestinationCost")
+    protected Double keepingRentedBicycleAtDestinationCost;
+
+    /** The vehicle rental networks which may be used. If empty all networks may be used. */
+    @QueryParam("allowedVehicleRentalNetworks")
+    protected Set<String> allowedVehicleRentalNetworks;
+
+    /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+    @QueryParam("bannedVehicleRentalNetworks")
+    protected Set<String> bannedVehicleRentalNetworks;
+
+    /** Time to park a bike */
+    @QueryParam("bikeParkTime")
+    protected Integer bikeParkTime;
+
+    /** Cost of parking a bike. */
+    @QueryParam("bikeParkCost")
+    protected Integer bikeParkCost;
+
+    /** Time to park a car */
+    @QueryParam("carParkTime")
+    protected Integer carParkTime = 60;
+
+    /** Cost of parking a car. */
+    @QueryParam("carParkCost")
+    protected Integer carParkCost = 120;
+
+    /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
+    @QueryParam("requiredVehicleParkingTags")
+    protected Set<String> requiredVehicleParkingTags = Set.of();
+
+    /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
+    @QueryParam("bannedVehicleParkingTags")
+    protected Set<String> bannedVehicleParkingTags = Set.of();
 
     /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
@@ -651,6 +737,9 @@ public abstract class RoutingResource {
         if(searchWindow != null) {
             request.searchWindow = Duration.ofSeconds(searchWindow);
         }
+        if(timetableView != null) {
+            request.timetableView = timetableView;
+        }
 
         if (wheelchair != null)
             request.setWheelchairAccessible(wheelchair);
@@ -658,13 +747,14 @@ public abstract class RoutingResource {
         if (numItineraries != null)
             request.setNumItineraries(numItineraries);
 
-        if (maxWalkDistance != null) {
-            request.setMaxWalkDistance(maxWalkDistance);
-            request.maxTransferWalkDistance = maxWalkDistance;
-        }
+        if (bikeReluctance != null)
+            request.setBikeReluctance(bikeReluctance);
 
-        if (maxPreTransitTime != null)
-            request.setMaxPreTransitTime(maxPreTransitTime);
+        if (bikeWalkingReluctance != null)
+            request.setBikeWalkingReluctance(bikeWalkingReluctance);
+
+        if (carReluctance != null)
+            request.setCarReluctance(carReluctance);
 
         if (walkReluctance != null)
             request.setWalkReluctance(walkReluctance);
@@ -681,22 +771,50 @@ public abstract class RoutingResource {
         if (bikeSpeed != null)
             request.bikeSpeed = bikeSpeed;
 
+        if (bikeWalkingSpeed != null)
+            request.bikeWalkingSpeed = bikeWalkingSpeed;
+
         if (bikeSwitchTime != null)
             request.bikeSwitchTime = bikeSwitchTime;
 
         if (bikeSwitchCost != null)
             request.bikeSwitchCost = bikeSwitchCost;
 
+        if (allowKeepingRentedBicycleAtDestination != null)
+            request.allowKeepingRentedVehicleAtDestination = allowKeepingRentedBicycleAtDestination;
+
+        if (keepingRentedBicycleAtDestinationCost != null)
+            request.keepingRentedVehicleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+
+        if (allowedVehicleRentalNetworks != null)
+            request.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
+
+        if (bannedVehicleRentalNetworks != null)
+            request.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+
+        if (bikeParkCost != null)
+            request.bikeParkCost = bikeParkCost;
+
+        if (bikeParkTime != null)
+            request.bikeParkTime = bikeParkTime;
+
+        if (carParkCost != null)
+            request.carParkCost = carParkCost;
+
+        if (carParkTime != null)
+            request.carParkTime = carParkTime;
+
+        if (bannedVehicleParkingTags != null)
+            request.bannedVehicleParkingTags = bannedVehicleParkingTags;
+
+        if (requiredVehicleParkingTags != null)
+            request.requiredVehicleParkingTags = requiredVehicleParkingTags;
+
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle
-            request.setOptimize(optimize);
+            request.setBicycleOptimizeType(optimize);
             if (optimize == BicycleOptimizeType.TRIANGLE) {
-                RoutingRequest.assertTriangleParameters(
-                        triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor
-                );
-                request.setBikeTriangleSafetyFactor(triangleSafetyFactor);
-                request.setBikeTriangleSlopeFactor(triangleSlopeFactor);
-                request.setBikeTriangleTimeFactor(triangleTimeFactor);
+                request.setTriangleNormalized(triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor);
             }
         }
 
@@ -756,14 +874,14 @@ public abstract class RoutingResource {
         }
 
         if (optimize != null) {
-            request.setOptimize(optimize);
+            request.setBicycleOptimizeType(optimize);
         }
         /* Temporary code to get bike/car parking and renting working. */
         if (modes != null && !modes.qModes.isEmpty()) {
             request.modes = modes.getRequestModes();
         }
 
-        if (request.bikeRental && bikeSpeed == null) {
+        if (request.vehicleRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }
@@ -793,7 +911,7 @@ public abstract class RoutingResource {
 
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useBikeRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
+        request.useVehicleRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
             request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);
@@ -807,12 +925,6 @@ public abstract class RoutingResource {
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
 
-        if (maxHours != null)
-            request.maxHours = maxHours;
-
-        if (useRequestedDateTimeInMaxHours != null)
-            request.useRequestedDateTimeInMaxHours = useRequestedDateTimeInMaxHours;
-
         if (disableAlertFiltering != null)
             request.disableAlertFiltering = disableAlertFiltering;
 
@@ -823,7 +935,7 @@ public abstract class RoutingResource {
             request.pathComparator = pathComparator;
 
         if(debugItineraryFilter != null ) {
-            request.debugItineraryFilter = debugItineraryFilter;
+            request.itineraryFilters.debug = debugItineraryFilter;
         }
 
         //getLocale function returns defaultLocale if locale is null

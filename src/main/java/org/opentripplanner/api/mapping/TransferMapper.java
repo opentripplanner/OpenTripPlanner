@@ -1,11 +1,11 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiTransfer;
-import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.PathTransfer;
 
 public class TransferMapper {
-    /** Make a transfer from a simpletransfer edge from the graph. */
-    public static ApiTransfer mapToApi(SimpleTransfer domain) {
+
+    public static ApiTransfer mapToApi(PathTransfer domain) {
         if(domain == null) {
             return null;
         }

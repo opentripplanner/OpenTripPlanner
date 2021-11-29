@@ -1,14 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 public class RoundTrackerTest {
     private static final int ANY = 500;
@@ -24,14 +23,15 @@ public class RoundTrackerTest {
         assertEquals(0, subject.round());
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(1, subject.round());
+        assertEquals(0, subject.round());
+        assertEquals(1, subject.nextRound());
 
         roundComplete.accept(false);
         // Verify the round counter is still correct in the "round complete" phase.
         assertEquals(1, subject.round());
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(2, subject.round());
+        assertEquals(2, subject.nextRound());
 
         assertFalse(subject.hasMoreRounds());
 
@@ -39,7 +39,7 @@ public class RoundTrackerTest {
         setupIteration.accept(ANY);
         assertEquals(0, subject.round());
         assertTrue(subject.hasMoreRounds());
-        assertEquals(1, subject.round());
+        assertEquals(1, subject.nextRound());
     }
 
     @Test
@@ -50,22 +50,27 @@ public class RoundTrackerTest {
         assertEquals(0, subject.round());
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(1, subject.round());
+        assertEquals(0, subject.round());
+        assertEquals(1, subject.nextRound());
 
         // Destination reached in round 1
         roundComplete.accept(true);
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(2, subject.round());
+        assertEquals(2, subject.nextRound());
 
         assertTrue(subject.hasMoreRounds());
-        assertEquals(3, subject.round());
+        assertEquals(3, subject.nextRound());
 
         assertFalse(subject.hasMoreRounds());
     }
 
     private WorkerLifeCycle lifeCycle() {
         return new WorkerLifeCycle() {
+            @Override
+            public void onRouteSearch(Consumer<Boolean> routeSearchWithDirectionSubscriber) {
+                throw new IllegalStateException("Not expected");
+            }
             @Override public void onSetupIteration(IntConsumer setupIteration) {
                 RoundTrackerTest.this.setupIteration = setupIteration;
             }

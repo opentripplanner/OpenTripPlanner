@@ -54,8 +54,9 @@ class PolarPointWithEdgeInfo extends PolarPoint implements Cloneable {
 
         PolarPointWithEdgeInfo polar_point2 = (PolarPointWithEdgeInfo) point2;
         int bearingComp = bearing.compareTo(polar_point2.bearing);
-        if (bearingComp < 0)
+        if (bearingComp < 0) {
             return -1;
+        }
         else if (bearingComp == 0) {
             if (range < polar_point2.range) {
                 return -1;

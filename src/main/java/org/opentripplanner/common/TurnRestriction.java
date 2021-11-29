@@ -43,8 +43,9 @@ public class TurnRestriction implements Serializable {
      * @return
      */
     public boolean active(long time) {
-        if (this.time != null)
+        if (this.time != null) {
             return this.time.active(time);
+        }
         return true;
     }
 }

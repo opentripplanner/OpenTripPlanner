@@ -2,7 +2,7 @@ package org.opentripplanner.netex.validation;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.netex.index.api.HMapValidationRule;
-import org.opentripplanner.netex.issues.ObjecctNotFound;
+import org.opentripplanner.netex.issues.ObjectNotFound;
 
 
 /**
@@ -17,6 +17,6 @@ class PassengerStopAssignmentQuayNotFound extends AbstractHMapValidationRule<Str
 
     @Override
     public DataImportIssue logMessage(String stopPointRef, String quayRef) {
-        return new ObjecctNotFound("PassengerStopAssignment", stopPointRef, "quay", quayRef);
+        return new ObjectNotFound("PassengerStopAssignment", stopPointRef, "quay", quayRef);
     }
 }

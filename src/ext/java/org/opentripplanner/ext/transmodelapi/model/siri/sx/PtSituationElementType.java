@@ -167,7 +167,13 @@ public class PtSituationElementType {
                     .name("infoLinks")
                     .type(new GraphQLList(infoLinkType))
                     .description("Optional links to more information.")
-                    .dataFetcher(environment -> null)
+                    .dataFetcher(environment -> {
+                        TransitAlert alert = environment.getSource();
+                        if (!alert.getAlertUrlList().isEmpty()) {
+                            return alert.getAlertUrlList();
+                        }
+                        return null;
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("validityPeriod")
@@ -197,6 +203,12 @@ public class PtSituationElementType {
                     .type(EnumTypes.SEVERITY)
                     .description("Severity of this situation ")
                     .dataFetcher(environment -> ((TransitAlert) environment.getSource()).severity)
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("priority")
+                    .type(Scalars.GraphQLInt)
+                    .description("Priority of this situation ")
+                    .dataFetcher(environment -> ((TransitAlert) environment.getSource()).priority)
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("reportAuthority")

@@ -1,75 +1,125 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor._shared.Access;
-import org.opentripplanner.transit.raptor._shared.Bus;
-import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearch;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearchApproximateTime;
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearch;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearchApproximateTime;
+import static org.opentripplanner.util.time.TimeUtils.timeToStrLong;
 
-public class TripTimesSearchTest {
+import org.junit.Test;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.stoparrival.Access;
+import org.opentripplanner.transit.raptor._data.stoparrival.Bus;
+import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
+import org.opentripplanner.util.time.TimeUtils;
 
-    // The route have 3 stops A,B,C with the following indexes:
-    public static final int STOP_A_INDEX = 111;
-    public static final int STOP_C_INDEX = 333;
 
-    public static final int A_BOARD_TIME = 110;
-    public static final int C_ALIGHT_TIME = 300;
-    public static final int A_BOARD_EARLY = A_BOARD_TIME - 10;
-    public static final int C_ALIGHT_LATE = C_ALIGHT_TIME + 10;
+public class TripTimesSearchTest implements RaptorTestConstants {
+
+    private static final int A_BOARD_TIME = 110;
+    private static final int C_ALIGHT_TIME = 300;
+    private static final int A_BOARD_EARLY = A_BOARD_TIME - 10;
+    private static final int C_ALIGHT_LATE = C_ALIGHT_TIME + 10;
 
 
     // Given a trip-schedule with board-times [110, 210, -] and alight-times [-, 200, 300].
-    private TestRaptorTripSchedule schedule = TestRaptorTripSchedule
-            .create("T1")
-            .withBoardTimes(A_BOARD_TIME, 210, 310)
-            .withAlightTimes(100, 200, C_ALIGHT_TIME)
-            .withStopIndexes(STOP_A_INDEX, 999, STOP_C_INDEX)
+    private TestTripSchedule schedule = TestTripSchedule
+            .schedule(pattern("P1", STOP_A, STOP_B, STOP_C))
+            .departures(A_BOARD_TIME, 210, 310)
+            .arrivals(100, 200, C_ALIGHT_TIME)
             .build();
 
     @Test
     public void findTripWithPlentySlack() {
-        TripTimesSearch.BoarAlightTimes r;
+        BoardAndAlightTime r;
 
         // Search AFTER EDT
-        r = findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_C_INDEX, C_ALIGHT_LATE));
+        r = findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_LATE));
 
-        assertEquals(A_BOARD_TIME, r.boardTime);
-        assertEquals(C_ALIGHT_TIME, r.alightTime);
+        assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
 
         // Search BEFORE LAT
-        r = findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_A_INDEX, A_BOARD_EARLY));
+        r = findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_EARLY));
 
-        assertEquals(A_BOARD_TIME, r.boardTime);
-        assertEquals(C_ALIGHT_TIME, r.alightTime);
+        assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
+    }
+
+    @Test
+    public void findTripWithApproximateTimes() {
+        BoardAndAlightTime r;
+
+        // Search AFTER EDT
+        r = findTripForwardSearchApproximateTime(busFwd(STOP_A, STOP_C, C_ALIGHT_LATE));
+
+        assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
+
+        // Search BEFORE LAT
+        r = findTripReverseSearchApproximateTime(busRev(STOP_C, STOP_A, A_BOARD_EARLY));
+
+        assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
     }
 
     @Test
     public void findTripWithoutSlack() {
-        TripTimesSearch.BoarAlightTimes r;
+        BoardAndAlightTime r;
 
         // Search AFTER EDT
-        r = findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_C_INDEX, C_ALIGHT_TIME));
+        r = findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_TIME));
 
-        assertEquals(A_BOARD_TIME, r.boardTime);
-        assertEquals(C_ALIGHT_TIME, r.alightTime);
+        assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
 
 
         // Search BEFORE LAT
-        r = findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_A_INDEX, A_BOARD_TIME));
+        r = findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_TIME));
 
-        assertEquals(A_BOARD_TIME, r.boardTime);
-        assertEquals(C_ALIGHT_TIME, r.alightTime);
+        assertTimes(r, A_BOARD_TIME, C_ALIGHT_TIME);
+    }
+
+    @Test
+    public void findInLoop() {
+        // Stops A - (B - C){2 times} - D
+        var schedule = TestTripSchedule
+                .schedule(pattern("P1", STOP_A, STOP_B, STOP_C, STOP_B, STOP_C, STOP_D))
+                .times("10:01 10:02 10:03 10:04 10:05 10:06")
+                .build();
+        // Time at stop
+        int a = schedule.departure(0);
+        int b1 = schedule.departure(1);
+        int c1 = schedule.departure(2);
+        int b2 = schedule.departure(3);
+        int c2 = schedule.departure(4);
+        int d = schedule.departure(5);
+
+        // With one option the approximate time does not matter, early 09:50 or late 10:30
+        assertForwardAppxTime("09:50", STOP_A, a, STOP_D, d, schedule);
+        assertForwardAppxTime("10:30", STOP_A, a, STOP_D, d, schedule);
+        assertReverseAppxTime("09:50", STOP_D, a, STOP_A, d, schedule);
+        assertReverseAppxTime("10:30", STOP_D, a, STOP_A, d, schedule);
+
+        // Picking the closest trip from B to C, for 10:03:30 it is the first loop
+        assertForwardAppxTime("10:03:30", STOP_B, b1, STOP_C, c1, schedule);
+        assertReverseAppxTime("10:03:30", STOP_C, b1, STOP_B, c1, schedule);
+        assertForwardAppxTime("10:03:31", STOP_B, b2, STOP_C, c2, schedule);
+        assertReverseAppxTime("10:03:31", STOP_C, b2, STOP_B, c2, schedule);
+
+        // Avoid boarding early, riding the loop and then get off. Avoid: B~C~B~C~D, expect: B~C~D
+        assertForwardAppxTime("10:00", STOP_B, b2, STOP_D, d, schedule);
+        assertReverseAppxTime("10:00", STOP_D, b2, STOP_B, d, schedule);
+
+        // Avoid late alighting, ride the loop before getting off. Avoid: A~B~C~B~C, expect: A~B~C
+        assertForwardAppxTime("10:50", STOP_A, a, STOP_C, c1, schedule);
+        assertReverseAppxTime("10:50", STOP_C, a, STOP_A, c1, schedule);
     }
 
     @Test
     public void noTripFoundWhenArrivalIsToEarly() {
         try {
-            findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_C_INDEX, C_ALIGHT_TIME - 1));
+            findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_TIME - 1));
             fail();
         }
         catch (IllegalStateException e) {
@@ -83,7 +133,7 @@ public class TripTimesSearchTest {
     @Test
     public void noTripFoundWhenReverseArrivalIsToLate() {
         try {
-            findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_A_INDEX, A_BOARD_TIME + 1));
+            findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_TIME + 1));
             fail();
         }
         catch (IllegalStateException e) {
@@ -97,13 +147,13 @@ public class TripTimesSearchTest {
     @Test
     public void noTripFoundWhenArrivalIsWayTooEarly() {
         try {
-            findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_C_INDEX, 0));
+            findTripForwardSearch(busFwd(STOP_A, STOP_C, 0));
             fail();
         }
         catch (IllegalStateException e) {
             assertTrue(
                 e.getMessage(),
-                e.getMessage().contains("No arrivals before 'latestArrivalTime'")
+                e.getMessage().contains("No stops matching 'toStop'.")
             );
         }
     }
@@ -111,13 +161,13 @@ public class TripTimesSearchTest {
     @Test
     public void noTripFoundWhenReverseArrivalIsWayTooEarly() {
         try {
-            findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_A_INDEX, 10_000));
+            findTripReverseSearch(busRev(STOP_C, STOP_A, 10_000));
             fail();
         }
         catch (IllegalStateException e) {
             assertTrue(
                 e.getMessage(),
-                e.getMessage().contains("No departures after 'earliestDepartureTime'")
+                e.getMessage().contains("No stops matching 'fromStop'.")
             );
         }
     }
@@ -125,13 +175,13 @@ public class TripTimesSearchTest {
     @Test
     public void noTripFoundWhenFromStopIsMissing() {
         try {
-            findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_A_INDEX, C_ALIGHT_LATE));
+            findTripForwardSearch(busFwd(STOP_A, STOP_A, C_ALIGHT_LATE));
             fail();
         }
         catch (IllegalStateException e) {
             assertTrue(
                     e.getMessage(),
-                    e.getMessage().contains("No stops matching 'fromStop'")
+                    e.getMessage().contains("No stops matching 'fromStop'.")
             );
         }
     }
@@ -139,7 +189,7 @@ public class TripTimesSearchTest {
     @Test
     public void noTripFoundWhenToStopIsMissingInReverseSearch() {
         try {
-            findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_C_INDEX, A_BOARD_EARLY));
+            findTripReverseSearch(busRev(STOP_C, STOP_C, A_BOARD_EARLY));
             fail();
         }
         catch (IllegalStateException e) {
@@ -160,59 +210,103 @@ public class TripTimesSearchTest {
         // stops: Start at 1, loop twice: 111, 122, 133, 144, 155, and end at 1155
         // alight times:    [  -, 100, 200, 300, 400, .., 1100] and
         // departure times: [ 10, 110, 210, 310, 410, .., 1110].
-        schedule = TestRaptorTripSchedule
-                .create("T2")
-                .withBoardTimes( 10, 110, 210, 310, 410, 510, 610, 710, 810, 910, 1010, 1110)
-                .withAlightTimes( 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100)
-                .withStopIndexes( 1, 111, 122, 133, 144, 155, 111, 122, 133, 144,  155, 1155)
+        schedule = TestTripSchedule
+                .schedule(pattern(1, 111, 122, 133, 144, 155, 111, 122, 133, 144, 155, 1155))
+                .departures( 10, 110, 210, 310, 410, 510, 610, 710, 810, 910, 1010, 1110)
+                .arrivals( 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100)
                 .build();
 
-        TripTimesSearch.BoarAlightTimes r;
+        BoardAndAlightTime r;
 
         // TEST FORWARD SEARCH
         {
             // Board in the 2nd loop at stop 2 and get off at stop 3
             r = findTripForwardSearch(busFwd( 122, 133, 800));
-            assertEquals(710, r.boardTime);
-            assertEquals(800, r.alightTime);
+            assertEquals(710, r.boardTime());
+            assertEquals(800, r.alightTime());
 
             // Board in the 1st loop at stop 4 and get off at stop 3
             r = findTripForwardSearch(busFwd(144, 133, 800));
-            assertEquals(410, r.boardTime);
-            assertEquals(800, r.alightTime);
+            assertEquals(410, r.boardTime());
+            assertEquals(800, r.alightTime());
 
             // Board in the 1st stop, ride the loop twice, alight at the last stop
             r = findTripForwardSearch(busFwd(1, 1155, 1100));
-            assertEquals(10, r.boardTime);
-            assertEquals(1100, r.alightTime);
+            assertEquals(10, r.boardTime());
+            assertEquals(1100, r.alightTime());
         }
 
         // TEST REVERSE SEARCH
         {
             // Board in the 2nd loop at stop 2 and get off at stop 3
-            r = findTripReverseSearch(busRwd(133, 122, 710));
-            assertEquals(710, r.boardTime);
-            assertEquals(800, r.alightTime);
+            r = findTripReverseSearch(busRev(133, 122, 710));
+            assertEquals(710, r.boardTime());
+            assertEquals(800, r.alightTime());
 
             // Board in the 1st loop at stop 4 and get off at stop 3
-            r = findTripReverseSearch(busRwd(133, 144, 410));
-            assertEquals(410, r.boardTime);
-            assertEquals(800, r.alightTime);
+            r = findTripReverseSearch(busRev(133, 144, 410));
+            assertEquals(410, r.boardTime());
+            assertEquals(800, r.alightTime());
 
             // Board in the 1st stop, ride the loop twice, alight at the last stop
-            r = findTripReverseSearch(busRwd( 1155, 1, 10));
-            assertEquals(10, r.boardTime);
-            assertEquals(1100, r.alightTime);
+            r = findTripReverseSearch(busRev( 1155, 1, 10));
+            assertEquals(10, r.boardTime());
+            assertEquals(1100, r.alightTime());
         }
     }
 
-    Bus busFwd(int accessToStop, int transitToStop, int arrivalTime) {
-        Access access = new Access(accessToStop, -9999, -9999);
-        return new Bus(1, transitToStop, arrivalTime, schedule, access);
+    private void assertForwardAppxTime(
+            String approximateArrivalTime,
+            int boardStop,
+            int expBoardTime,
+            int alightStop,
+            int expAlightTime,
+            TestTripSchedule schedule
+    ) {
+        int arrivalTime = TimeUtils.time(approximateArrivalTime);
+        var bus = busFwd(boardStop, alightStop, arrivalTime, schedule);
+
+        var r = findTripForwardSearchApproximateTime(bus);
+
+        assertTimes(r, expBoardTime, expAlightTime);
     }
 
-    Bus busRwd(int accessToStop, int transitToStop, int arrivalTime) {
-        Access access = new Access(accessToStop, -9999, -9999);
-        return new Bus(1, transitToStop, arrivalTime, schedule, access);
+    private void assertReverseAppxTime(
+            String approximateArrivalTime,
+            int boardStop,
+            int expBoardTime,
+            int alightStop,
+            int expAlightTime,
+            TestTripSchedule schedule
+    ) {
+        int arrivalTime = TimeUtils.time(approximateArrivalTime);
+        var bus = busRev(boardStop, alightStop, arrivalTime, schedule);
+
+        var r = findTripReverseSearchApproximateTime(bus);
+
+        assertTimes(r, expBoardTime, expAlightTime);
+    }
+
+    private void assertTimes(BoardAndAlightTime r, int expBoardTime, int expAlightTime) {
+        assertEquals(timeToStrLong(expBoardTime), timeToStrLong(r.boardTime()));
+        assertEquals(timeToStrLong(expAlightTime), timeToStrLong(r.alightTime()));
+    }
+
+    private Bus busFwd(int accessToStop, int transitToStop, int arrivalTime) {
+        return busFwd(accessToStop, transitToStop, arrivalTime, schedule);
+    }
+
+    private Bus busRev(int accessToStop, int transitToStop, int arrivalTime) {
+        return busRev(accessToStop, transitToStop, arrivalTime, schedule);
+    }
+
+    private static Bus busFwd(int accessStop, int transitToStop, int arrivalTime, TestTripSchedule trip) {
+        Access access = new Access(accessStop, -9999, -9999, -9999);
+        return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
+    }
+
+    private static Bus busRev(int accessStop, int transitToStop, int arrivalTime, TestTripSchedule trip) {
+        Access access = new Access(accessStop, -9999, -9999, -9999);
+        return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
     }
 }

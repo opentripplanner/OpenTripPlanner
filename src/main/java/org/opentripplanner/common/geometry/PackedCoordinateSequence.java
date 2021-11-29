@@ -47,10 +47,12 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
      */
     public Coordinate getCoordinate(int i) {
         Coordinate[] coords = getCachedCoords();
-        if (coords != null)
+        if (coords != null) {
             return coords[i];
-        else
+        }
+        else {
             return getCoordinateInternal(i);
+        }
     }
 
     /**
@@ -74,8 +76,9 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
     public Coordinate[] toCoordinateArray() {
         Coordinate[] coords = getCachedCoords();
         // testing - never cache
-        if (coords != null)
+        if (coords != null) {
             return coords;
+        }
 
         coords = new Coordinate[size()];
         for (int i = 0; i < coords.length; i++) {

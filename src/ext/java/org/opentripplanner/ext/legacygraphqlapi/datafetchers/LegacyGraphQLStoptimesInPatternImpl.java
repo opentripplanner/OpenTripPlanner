@@ -5,7 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeOnDate;
 
 public class LegacyGraphQLStoptimesInPatternImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLStoptimesInPattern {
@@ -16,7 +16,7 @@ public class LegacyGraphQLStoptimesInPatternImpl
   }
 
   @Override
-  public DataFetcher<Iterable<TripTimeShort>> stoptimes() {
+  public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
     return environment -> getSource(environment).times;
   }
 
