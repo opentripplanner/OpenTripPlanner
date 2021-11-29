@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
@@ -13,6 +14,22 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
+    private final RoutingRequest request;
+    private final Collection<? extends RaptorTransfer> accessPaths;
+    private final Collection<? extends RaptorTransfer> egressPaths;
+    private final long startOfTime;
+
+    private RaptorRequestMapper(
+            RoutingRequest request,
+            Collection<? extends RaptorTransfer> accessPaths,
+            Collection<? extends RaptorTransfer> egressPaths,
+            long startOfTime
+    ) {
+        this.request = request;
+        this.accessPaths = accessPaths;
+        this.egressPaths = egressPaths;
+        this.startOfTime = startOfTime;
+    }
 
     public static RaptorRequest<TripSchedule> mapRequest(
             RoutingRequest request,
@@ -20,21 +37,29 @@ public class RaptorRequestMapper {
             Collection<? extends RaptorTransfer> accessPaths,
             Collection<? extends RaptorTransfer> egressPaths
     ) {
-        RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
+        return new RaptorRequestMapper(
+                request,
+                accessPaths,
+                egressPaths,
+                startOfTime.toEpochSecond()
+        ).doMap();
+    }
 
-        int time = DateMapper.secondsSinceStartOfTime(
-                startOfTime,
-                request.getDateTimeCurrentPage()
-        );
+    private RaptorRequest<TripSchedule> doMap(
+    ) {
+        var builder = new RaptorRequestBuilder<TripSchedule>();
+        var searchParams = builder.searchParams();
+        int time = relativeTime(request.getDateTimeCurrentPage());
 
         if (request.arriveBy) {
-            builder.searchParams().latestArrivalTime(time);
+            searchParams.latestArrivalTime(time);
         }
         else {
-            builder.searchParams().earliestDepartureTime(time);
+            searchParams.earliestDepartureTime(time);
         }
+
         if(request.maxTransfers != null) {
-            builder.searchParams().maxNumberOfTransfers(request.maxTransfers);
+            searchParams.maxNumberOfTransfers(request.maxTransfers);
         }
 
         builder
@@ -61,5 +86,9 @@ public class RaptorRequestMapper {
         }
 
         return builder.build();
+    }
+
+    private int relativeTime(Instant time) {
+        return (int)(time.getEpochSecond() - startOfTime);
     }
 }

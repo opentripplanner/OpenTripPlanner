@@ -55,7 +55,8 @@ public class RoutingService {
         try {
             RoutingWorker worker = new RoutingWorker(
                     router,
-                    request
+                    request,
+                    graph.getTransitLayer().getTransitDataZoneId()
             );
             response = worker.route();
         } catch (Exception e) {

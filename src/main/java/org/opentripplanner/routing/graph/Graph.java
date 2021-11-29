@@ -566,10 +566,12 @@ public class Graph implements Serializable {
                 }
                 // assume feed is unreliable after midnight on last service day
                 long u = t + SEC_IN_DAY;
-                if (t < this.transitServiceStarts)
+                if (t < this.transitServiceStarts) {
                     this.transitServiceStarts = t;
-                if (u > this.transitServiceEnds)
+                }
+                if (u > this.transitServiceEnds) {
                     this.transitServiceEnds = u;
+                }
             }
         }
         for (String agency : agencies) {

@@ -16,6 +16,7 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RoutingRequestTransitDataProviderFilter;
@@ -381,7 +382,7 @@ public class SpeedTest {
         return new RaptorRoutingRequestTransitData(
                 null,
                 transitLayer,
-                request.getDepartureDateWithZone().toInstant(),
+                DateMapper.asStartOfService(request.getDepartureDateWithZone()),
                 0,
                 1,
                 transitDataProviderFilter,

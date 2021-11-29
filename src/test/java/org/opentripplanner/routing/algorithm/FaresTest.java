@@ -261,7 +261,12 @@ public class FaresTest {
         request.from = from;
         request.to = to;
 
-        var result = TransitRouter.route(request, router, new DebugTimingAggregator());
+        var result = TransitRouter.route(
+                request,
+                router,
+                time.atZone(ZoneId.of("America/Los_Angeles")),
+                new DebugTimingAggregator()
+        );
         return result.getItineraries();
     }
 
