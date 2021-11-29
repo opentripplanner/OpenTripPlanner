@@ -595,16 +595,20 @@ public abstract class RoutingResource {
     protected Boolean reverseOptimizeOnTheFly;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add before boarding a transit leg. It is recommended to use the
+     * `boardTimes` in the `router-config.json` to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("boardSlack")
     private Integer boardSlack;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add after alighting a transit leg. It is recommended to use the
+     * `alightTimes` in the `router-config.json` to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("alightSlack")
     private Integer alightSlack;
 
