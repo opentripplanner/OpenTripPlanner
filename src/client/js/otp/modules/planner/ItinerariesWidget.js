@@ -24,6 +24,7 @@ otp.widgets.ItinerariesWidget =
 
     itineraries : null,
     activeIndex : 0,
+    pageCursor: null,
 
     // set to true by next/previous/etc. to indicate to only refresh the currently active itinerary
     refreshActiveOnly : false,
@@ -56,10 +57,10 @@ otp.widgets.ItinerariesWidget =
     },
 
     updatePlan : function(plan) {
-        this.updateItineraries(plan.itineraries, plan.queryParams);
+        this.updateItineraries(plan.itineraries, plan.queryParams, undefined, plan.pageCursor);
     },
 
-    updateItineraries : function(itineraries, queryParams, itinIndex) {
+    updateItineraries : function(itineraries, queryParams, itinIndex, pageCursor) {
 
         var this_ = this;
         var divId = this.id+"-itinsAccord";
@@ -92,6 +93,7 @@ otp.widgets.ItinerariesWidget =
         }
 
         this.itineraries = itineraries;
+        this.pageCursor = pageCursor;
 
         this.clear();
         //TRANSLATORS: widget title
@@ -236,6 +238,17 @@ otp.widgets.ItinerariesWidget =
             });
             this_.refreshActiveOnly = true;
             this_.module.updateActiveOnly = true;
+            this_.module.planTripFunction.call(this_.module, params);
+        });
+        //TRANSLATORS: button to next page of itineraries
+        $('<button>'+_tr("Next Page")+'</button>').button().appendTo(buttonRow).click(function() {
+            var itin = this_.itineraries[this_.activeIndex];
+            var params = itin.tripPlan.queryParams;
+            _.extend(params, {
+                pageCursor :  this_.pageCursor,
+            });
+            this_.refreshActiveOnly = false;
+            this_.module.updateActiveOnly = false;
             this_.module.planTripFunction.call(this_.module, params);
         });
     },

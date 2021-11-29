@@ -110,11 +110,11 @@ otp.modules.multimodal.MultimodalPlannerModule =
         }
         if(restoring && this.restoredItinIndex) {
             this.itinWidget.show();
-            this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams, this.restoredItinIndex);
+            this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams, this.restoredItinIndex, tripPlan.planData.pageCursor);
             this.restoredItinIndex = null;
         } else  {
             this.itinWidget.show();
-            this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams);
+            this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams, undefined, tripPlan.planData.pageCursor);
         }
 
         /*if(restoring) {
