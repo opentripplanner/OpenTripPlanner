@@ -110,6 +110,7 @@ public class RoutingRequestMapper {
       c.asInt("otherThanPreferredRoutesPenalty", dft.otherThanPreferredRoutesPenalty);
     request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
     request.pathComparator = c.asText("pathComparator", dft.pathComparator);
+    request.searchWindow = c.asDuration("searchWindow", dft.searchWindow);
     request.requiredVehicleParkingTags =
       c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
     request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
@@ -117,6 +118,7 @@ public class RoutingRequestMapper {
     request.stairsTimeFactor = c.asDouble("stairsTimeFactor", dft.stairsTimeFactor);
     request.startingTransitTripId =
       c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
+    request.timetableView = c.asBoolean("timetableView", dft.timetableView);
     request.transferCost = c.asInt("transferPenalty", dft.transferCost);
     request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
     request.setTransitReluctanceForMode(
