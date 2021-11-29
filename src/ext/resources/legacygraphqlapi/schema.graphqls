@@ -1454,12 +1454,21 @@ type Plan {
     messageStrings: [String]!
 
     """
+    Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
+    and keep the original request as is. This will enable you to search for itineraries in the next
+    time-window if arriveBy is false and the previous time-window if arriveBy is true.
+    The cursor based paging only support stepping to the next page, it does not support going to
+    back(previous page) or jumping.
+    """
+    pageCursor: String
+
+    """
     This is the suggested search time for the "previous page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips preceding in the
     time-window BEFORE the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    prevDateTime: Long
+    prevDateTime: Long @deprecated(reason: "Use pageCursor instead")
 
     """
     This is the suggested search time for the "next page" or time window. Insert it together
@@ -1467,13 +1476,13 @@ type Plan {
     time-window AFTER the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    nextDateTime: Long
+    nextDateTime: Long @deprecated(reason: "Use pageCursor instead")
 
     """
     This is the time window used by the raptor search. The window is an optional parameter and
     OTP might override it/dynamically assign a new value. The unit is seconds.
     """
-    searchWindowUsed: Long
+    searchWindowUsed: Long @deprecated(reason: "Use pageCursor instead")
 
     """Information about the timings for the plan generation"""
     debugOutput: debugOutput!
@@ -1957,6 +1966,16 @@ type QueryType {
         options and realtime changes.
         """
         searchWindow: Long,
+
+        """
+        Use the cursor to get the next page of results. Use this cursor for the pageCursor parameter
+        in the trip query in order to get the next page.
+        If arriveBy=false the next page is a set of itineraries departing AFTER the last itinerary
+        in this result.
+        If arriveBy=true the next page is a set of itineraries departing BEFORE the first itinerary
+        in this result.
+        """
+        pageCursor: String
 
         """
         The maximum distance (in meters) the user is willing to walk per walking

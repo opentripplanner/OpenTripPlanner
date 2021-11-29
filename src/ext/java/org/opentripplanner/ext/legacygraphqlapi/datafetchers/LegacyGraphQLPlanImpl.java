@@ -72,6 +72,11 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
+  public DataFetcher<String> pageCursor() {
+    return environment -> getSource(environment).getPageCursor().encode();
+  }
+
+  @Override
   public DataFetcher<Long> searchWindowUsed() {
     return environment -> {
       TripSearchMetadata metadata = getSource(environment).getMetadata();

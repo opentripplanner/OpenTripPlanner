@@ -792,6 +792,7 @@ public class LegacyGraphQLTypes {
     private Integer _numItineraries;
     private Boolean _omitCanceled;
     private LegacyGraphQLOptimizeType _optimize;
+    private String _pageCursor;
     private LegacyGraphQLInputPreferredInput _preferred;
     private Boolean _reverseOptimizeOnTheFly;
     private Long _searchWindow;
@@ -859,6 +860,7 @@ public class LegacyGraphQLTypes {
         } else {
           this._optimize = LegacyGraphQLOptimizeType.valueOfLabel((String) args.get("optimize"));
         }
+        this._pageCursor = (String) args.get("pageCursor");
         this._preferred = new LegacyGraphQLInputPreferredInput((Map<String, Object>) args.get("preferred"));
         this._reverseOptimizeOnTheFly = (Boolean) args.get("reverseOptimizeOnTheFly");
         this._searchWindow = (Long) args.get("searchWindow");
@@ -922,6 +924,7 @@ public class LegacyGraphQLTypes {
     public Integer getLegacyGraphQLNumItineraries() { return this._numItineraries; }
     public Boolean getLegacyGraphQLOmitCanceled() { return this._omitCanceled; }
     public LegacyGraphQLOptimizeType getLegacyGraphQLOptimize() { return this._optimize; }
+    public String getLegacyGraphQLPageCursor() { return this._pageCursor; }
     public LegacyGraphQLInputPreferredInput getLegacyGraphQLPreferred() { return this._preferred; }
     public Boolean getLegacyGraphQLReverseOptimizeOnTheFly() { return this._reverseOptimizeOnTheFly; }
     public Long getLegacyGraphQLSearchWindow() { return this._searchWindow; }

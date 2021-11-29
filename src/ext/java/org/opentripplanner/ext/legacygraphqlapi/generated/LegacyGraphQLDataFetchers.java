@@ -310,6 +310,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<String>> messageEnums();
     public DataFetcher<Iterable<String>> messageStrings();
     public DataFetcher<Long> nextDateTime();
+    public DataFetcher<String> pageCursor();
     public DataFetcher<Long> prevDateTime();
     public DataFetcher<Long> searchWindowUsed();
     public DataFetcher<StopArrival> to();
