@@ -900,6 +900,14 @@ public class LegacyGraphQLDataFetchers {
     }
 
     /**
+     * This is used for alert entities that we don't explicitly handle or they are missing.
+     */
+    public interface LegacyGraphQLUnknown {
+
+        public DataFetcher<String> description();
+    }
+
+    /**
      * Vehicle parking represents a location where bicycles or cars can be parked.
      */
     public interface LegacyGraphQLVehicleParking {

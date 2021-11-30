@@ -213,7 +213,7 @@ enum AlertEffectType {
 
 
 """Entity related to an alert"""
-union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip
+union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip | Unknown
 
 """Severity level of a alert"""
 enum AlertSeverityLevelType {
@@ -2889,6 +2889,14 @@ type SystemNotice {
     tag: String
     """Notice's description"""
     text: String
+}
+
+"""
+This is used for alert entities that we don't explicitly handle or they are missing.
+"""
+type Unknown {
+    """Entity's description"""
+    description: String
 }
 
 enum VertexType {

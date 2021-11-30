@@ -6,6 +6,7 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRoute;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknown;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -39,6 +40,9 @@ public class LegacyGraphQLAlertEntityTypeResolver implements TypeResolver {
     }
     if (o instanceof LegacyGraphQLStopOnTrip) {
       return schema.getObjectType("StopOnTrip");
+    }
+    if (o instanceof LegacyGraphQLUnknown) {
+      return schema.getObjectType("Unknown");
     }
 
     return null;
