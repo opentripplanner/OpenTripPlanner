@@ -27,7 +27,6 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -353,7 +352,7 @@ public class GeometryAndBlockProcessor {
     }
 
     private List<LinearLocation> getLinearLocations(List<StopTime> stopTimes, LineString shape) {
-        var isFlexTrip = FlexTrip.isFlexTrip(stopTimes);
+        var isFlexTrip = FlexTrip.containsFlexStops(stopTimes);
         // This trip does not have shape_dist in stop_times, but does have an associated shape.
         ArrayList<IndexedLineSegment> segments = new ArrayList<>();
         for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
