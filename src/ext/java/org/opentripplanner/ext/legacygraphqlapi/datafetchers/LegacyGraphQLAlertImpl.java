@@ -10,6 +10,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteType;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRoute;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknown;
@@ -216,6 +217,16 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
                 Stop stop = stopAndTripKey == null ? null : getRoutingService(environment).getStopForId(stopAndTripKey.stop);
                 Trip trip = stopAndTripKey == null ? null : getRoutingService(environment).getTripForId().get(stopAndTripKey.routeOrTrip);
                 return new LegacyGraphQLStopOnTrip(stop, trip);
+              }
+              if (entitySelector instanceof EntitySelector.RouteTypeAndAgency) {
+                Agency agency = getRoutingService(environment).getAgencyForId(
+                        ((EntitySelector.RouteTypeAndAgency) entitySelector).agencyId);
+                int routeType = ((EntitySelector.RouteTypeAndAgency) entitySelector).routeType;
+                return new LegacyGraphQLRouteType(agency, routeType);
+              }
+              if (entitySelector instanceof EntitySelector.RouteType) {
+                int routeType = ((EntitySelector.RouteType) entitySelector).routeType;
+                return new LegacyGraphQLRouteType(null, routeType);
               }
               if (entitySelector instanceof EntitySelector.Unknown) {
                 return new LegacyGraphQLUnknown(

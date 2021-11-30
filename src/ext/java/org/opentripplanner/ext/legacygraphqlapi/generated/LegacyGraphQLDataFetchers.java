@@ -2,6 +2,7 @@
 package org.opentripplanner.ext.legacygraphqlapi.generated;
 
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteType;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
@@ -37,6 +38,7 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
 import java.util.Map;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknown;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
@@ -676,6 +678,19 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Integer> type();
 
         public DataFetcher<String> url();
+    }
+
+    /**
+     * Contains alerts that affect a GTFS route type. If agency is defined, only the routes of the
+     * defined agency of the defined route type are affected by the alerts.
+     */
+    public interface LegacyGraphQLRouteType {
+
+        public DataFetcher<Agency> agency();
+
+        public DataFetcher<Iterable<TransitAlert>> alerts();
+
+        public DataFetcher<Integer> routeType();
     }
 
     /**

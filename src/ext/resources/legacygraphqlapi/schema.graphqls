@@ -213,7 +213,7 @@ enum AlertEffectType {
 
 
 """Entity related to an alert"""
-union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip | Unknown
+union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip | RouteType | Unknown
 
 """Severity level of a alert"""
 enum AlertSeverityLevelType {
@@ -2400,6 +2400,30 @@ type Route implements Node {
     trips: [Trip]
 
     """List of alerts which have an effect on the route"""
+    alerts: [Alert]
+}
+
+"""
+Contains alerts that affect a GTFS route type.
+If agency is defined, only the routes of the defined agency of the defined route type
+are affected by the alerts.
+"""
+type RouteType {
+    """
+    GTFS Route type.
+    For the list of possible values, see:
+        https://developers.google.com/transit/gtfs/reference/#routestxt and
+        https://developers.google.com/transit/gtfs/reference/extended-route-types
+    """
+    routeType: Int!
+
+    """A public transport agency"""
+    agency: Agency
+
+    """
+    List of alerts which have an effect on the defined route type.
+    If agency is not null, the alerts only affect the route type for the specified agency.
+    """
     alerts: [Alert]
 }
 

@@ -190,6 +190,54 @@ public interface EntitySelector {
     }
   }
 
+  class RouteType implements EntitySelector {
+
+    public final int routeType;
+
+    public RouteType(int routeType) {
+      this.routeType = routeType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {return true;}
+      if (o == null || getClass() != o.getClass()) {return false;}
+      RouteType that = (RouteType) o;
+      return routeType == that.routeType;
+    }
+
+    @Override
+    public int hashCode() {
+      return 37 * routeType;
+    }
+  }
+
+  class RouteTypeAndAgency implements EntitySelector {
+
+    public final int routeType;
+
+    public final FeedScopedId agencyId;
+
+    public RouteTypeAndAgency(int routeType, FeedScopedId agencyId) {
+      this.routeType = routeType;
+      this.agencyId = agencyId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {return true;}
+      if (o == null || getClass() != o.getClass()) {return false;}
+      RouteTypeAndAgency that = (RouteTypeAndAgency) o;
+      return routeType == that.routeType && agencyId.equals(that.agencyId);
+    }
+
+    @Override
+    public int hashCode() {
+      int agencyHash = Objects.hash(agencyId);
+      return 37 * routeType * agencyHash;
+    }
+  }
+
   class StopAndRouteOrTripKey {
     public final FeedScopedId stop;
     public final FeedScopedId routeOrTrip;

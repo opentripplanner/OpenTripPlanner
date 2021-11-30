@@ -100,6 +100,7 @@ class LegacyGraphQLIndex {
           .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnRouteImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnTripImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLUnknownImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLRouteTypeImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

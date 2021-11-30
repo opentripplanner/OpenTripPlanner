@@ -35,6 +35,8 @@ public class AlertsUpdateHandler {
 
     private String feedId;
 
+    private static final int MISSING_INT_FIELD_VALUE = -1;
+
     private TransitAlertService transitAlertService;
 
     /** How long before the posted start of an event it should be displayed to users */
@@ -91,7 +93,7 @@ public class AlertsUpdateHandler {
             if (informed.hasTrip() && informed.getTrip().hasDirectionId()) {
                 direction = informed.getTrip().getDirectionId();
             } else {
-                direction = -1;
+                direction = MISSING_INT_FIELD_VALUE;
             }
 
             // TODO: The other elements of a TripDescriptor are ignored...
@@ -107,6 +109,11 @@ public class AlertsUpdateHandler {
             String agencyId = null;
             if (informed.hasAgencyId()) {
                 agencyId = informed.getAgencyId().intern();
+            }
+
+            int routeType = MISSING_INT_FIELD_VALUE;
+            if (informed.hasRouteType()) {
+                routeType = informed.getRouteType();
             }
 
             if (tripId != null) {
@@ -131,7 +138,16 @@ public class AlertsUpdateHandler {
             } else if (stopId != null) {
                 alertText.addEntity(new EntitySelector.Stop(new FeedScopedId(feedId, stopId)));
             } else if (agencyId != null) {
-                alertText.addEntity(new EntitySelector.Agency(new FeedScopedId(feedId, agencyId)));
+                FeedScopedId feedScopedAgencyId = new FeedScopedId(feedId, agencyId);
+                if (routeType != MISSING_INT_FIELD_VALUE) {
+                    alertText.addEntity(
+                            new EntitySelector.RouteTypeAndAgency(routeType, feedScopedAgencyId));
+                } else {
+                    alertText.addEntity(new EntitySelector.Agency(feedScopedAgencyId));
+                }
+            }
+            else if (routeType != MISSING_INT_FIELD_VALUE) {
+                alertText.addEntity(new EntitySelector.RouteType(routeType));
             } else {
                 String description = "Entity selector: "+informed;
                 alertText.addEntity(new EntitySelector.Unknown(description));

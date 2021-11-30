@@ -25,6 +25,7 @@ config:
     Polyline: String
   mappers:
     Agency: org.opentripplanner.model.Agency#Agency
+    RouteType: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteType#LegacyGraphQLRouteType
     Alert: org.opentripplanner.routing.alertpatch.TransitAlert#TransitAlert
     AlertCauseType: String
     AlertEffectType: String
@@ -75,6 +76,7 @@ config:
     TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.model.Trip#Trip
+    Unknown: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknown#LegacyGraphQLUnknown
     VehicleParking: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     VehicleParkingSpaces: org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces#VehicleParkingSpaces
     VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParkingState#VehicleParkingState
