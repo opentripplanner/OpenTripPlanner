@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
+import static org.opentripplanner.ext.transmodelapi.mapping.SeverityMapper.getTransmodelSeverity;
 
 public class PtSituationElementType {
   private static final String NAME = "PtSituationElement";
@@ -202,7 +203,7 @@ public class PtSituationElementType {
                     .name("severity")
                     .type(EnumTypes.SEVERITY)
                     .description("Severity of this situation ")
-                    .dataFetcher(environment -> ((TransitAlert) environment.getSource()).severity)
+                    .dataFetcher(environment -> getTransmodelSeverity(((TransitAlert) environment.getSource()).severity))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("priority")
