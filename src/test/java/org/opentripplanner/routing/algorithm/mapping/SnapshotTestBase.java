@@ -261,6 +261,8 @@ public abstract class SnapshotTestBase {
                 return new QualifiedMode(ApiRequestMode.BICYCLE, Qualifier.PARK);
             case BIKE_RENTAL:
                 return new QualifiedMode(ApiRequestMode.BICYCLE, Qualifier.RENT);
+            case SCOOTER_RENTAL:
+                return new QualifiedMode(ApiRequestMode.SCOOTER, Qualifier.RENT);
             case CAR:
                 return new QualifiedMode(ApiRequestMode.CAR);
             case CAR_TO_PARK:

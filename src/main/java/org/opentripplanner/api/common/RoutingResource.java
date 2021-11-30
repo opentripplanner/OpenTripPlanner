@@ -867,7 +867,7 @@ public abstract class RoutingResource {
             request.modes = modes.getRequestModes();
         }
 
-        if (request.bikeRental && bikeSpeed == null) {
+        if (request.vehicleRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }

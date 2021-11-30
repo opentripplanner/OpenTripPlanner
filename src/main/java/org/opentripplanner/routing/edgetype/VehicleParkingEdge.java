@@ -85,7 +85,7 @@ public class VehicleParkingEdge extends Edge {
 
         if (options.streetSubRequestModes.getBicycle()) {
             // Parking a rented bike is not allowed
-            if (s0.isBikeRenting()) {
+            if (s0.isRentingVehicle()) {
                 return null;
             }
 

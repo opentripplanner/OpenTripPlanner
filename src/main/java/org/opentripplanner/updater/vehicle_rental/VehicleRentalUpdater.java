@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_rental;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
@@ -17,6 +20,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
@@ -127,7 +131,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
                         // the toString includes the text "Bike rental station"
                         LOG.info("VehicleRentalPlace {} is unlinked", vehicleRentalVertex);
                     }
-                    tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex));
+                    Set<FormFactor> formFactors = Stream.concat(
+                        station.getAvailablePickupFormFactors(false).stream(),
+                        station.getAvailableDropoffFormFactors(false).stream()
+                    ).collect(Collectors.toSet());
+                    for (FormFactor formFactor : formFactors) {
+                        tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex, formFactor));
+                    }
                     verticesByStation.put(station.getId(), vehicleRentalVertex);
                     tempEdgesByStation.put(station.getId(), tempEdges);
                 } else {

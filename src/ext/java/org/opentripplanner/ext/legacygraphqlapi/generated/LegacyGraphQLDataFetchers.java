@@ -739,6 +739,9 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<String> zoneId();
     }
 
+    /**
+     * Stop that should (but not guaranteed) to exist on a route.
+     */
     public interface LegacyGraphQLStopOnRoute {
 
         public DataFetcher<Route> route();
@@ -746,6 +749,9 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Object> stop();
     }
 
+    /**
+     * Stop that should (but not guaranteed) to exist on a trip.
+     */
     public interface LegacyGraphQLStopOnTrip {
 
         public DataFetcher<Object> stop();

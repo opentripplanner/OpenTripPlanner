@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 
 /**
  * The transfer optimization is performed by calculating "cost" values:
@@ -51,7 +51,7 @@ public interface TransferOptimized {
      * <p>
      * Precedence: second
      *
-     * @see TransferWaitTimeCalculator
+     * @see TransferWaitTimeCostCalculator
      */
     int waitTimeOptimizedCost();
 

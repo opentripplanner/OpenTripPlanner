@@ -80,7 +80,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -100,8 +100,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -189,7 +193,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -209,8 +213,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -303,7 +311,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -323,8 +331,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -373,7 +385,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -393,8 +405,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2480,7 +2496,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -2500,8 +2516,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2589,7 +2609,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -2609,8 +2629,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2703,7 +2727,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -2723,8 +2747,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -2773,7 +2801,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -2793,8 +2821,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3443,7 +3475,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -3463,8 +3495,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3552,7 +3588,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -3572,8 +3608,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3666,7 +3706,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -3686,8 +3726,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -3736,7 +3780,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -3756,8 +3800,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -5033,7 +5081,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -5053,8 +5101,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -5142,7 +5194,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -5162,8 +5214,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -5256,7 +5312,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -5276,8 +5332,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -5326,7 +5386,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -5346,8 +5406,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -5512,7 +5576,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -5532,8 +5596,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -5621,7 +5689,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -5641,8 +5709,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -5864,7 +5936,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -5884,8 +5956,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -5973,7 +6049,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -5993,8 +6069,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -6831,7 +6911,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -6851,8 +6931,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -6923,7 +7007,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -6943,8 +7027,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -7037,7 +7125,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -7057,8 +7145,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -7107,7 +7199,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -7127,8 +7219,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -9410,7 +9506,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -9430,8 +9526,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -9502,7 +9602,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102323"
@@ -9522,8 +9622,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -9616,7 +9720,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -9636,8 +9740,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
@@ -9686,7 +9794,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "allowOverloading": false,
               "allowPickup": true,
               "carStation": false,
-              "floatingBike": false,
+              "floatingVehicle": false,
               "id": {
                 "feedId": "test-network",
                 "id": "-102309"
@@ -9706,8 +9814,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "realTimeData": false,
               "spacesAvailable": 0,
               "spacesDisabled": 0,
-              "vehicleSpacesAvailable": { },
-              "vehicleTypesAvailable": { },
+              "vehicleSpacesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
+              "vehicleTypesAvailable": {
+                "org.opentripplanner.routing.vehicle_rental.RentalVehicleType@51f0add2": 2
+              },
               "vehiclesAvailable": 0,
               "vehiclesDisabled": 0
             },
