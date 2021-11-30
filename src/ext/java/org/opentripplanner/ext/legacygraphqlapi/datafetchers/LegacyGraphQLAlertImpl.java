@@ -218,7 +218,8 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
                 return new LegacyGraphQLStopOnTrip(stop, trip);
               }
               if (entitySelector instanceof EntitySelector.Unknown) {
-                return new LegacyGraphQLUnknown(null);
+                return new LegacyGraphQLUnknown(
+                        ((EntitySelector.Unknown) entitySelector).description);
               }
               return null;
             })

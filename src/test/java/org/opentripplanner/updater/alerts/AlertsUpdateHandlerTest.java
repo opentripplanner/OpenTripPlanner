@@ -12,6 +12,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -380,16 +381,39 @@ public class AlertsUpdateHandlerTest {
     }
 
     @Test
-    public void testUnknownSelector() {
+    public void testMissingSelector() {
         GtfsRealtime.Alert alert = Alert.newBuilder().build();
         TransitAlert transitAlert = processOneAlert(alert);
         long totalSelectorCount = transitAlert.getEntities().size();
         assertEquals(1l, totalSelectorCount);
-        long unknownSelectorCount = transitAlert.getEntities()
+        List<EntitySelector> selectors = transitAlert.getEntities()
                 .stream()
                 .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
-                .count();
-        assertEquals(1l, unknownSelectorCount);
+                .collect(Collectors.toList());
+        assertEquals(1l, selectors.size());
+        assertEquals(
+                "Alert had no entities", ((EntitySelector.Unknown) selectors.get(0)).description);
+    }
+
+    @Test
+    public void testUnknownSelector() {
+        // Setting just direction is not supported and should result in entity not being handled
+        GtfsRealtime.Alert alert = Alert.newBuilder()
+                .addInformedEntity(
+                        GtfsRealtime.EntitySelector.newBuilder().setDirectionId(1).build())
+                .build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        List<EntitySelector> selectors = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
+                .collect(Collectors.toList());
+        assertEquals(1l, selectors.size());
+        assertEquals(
+                "Entity selector: direction_id: 1\n",
+                ((EntitySelector.Unknown) selectors.get(0)).description
+        );
     }
 
     private TransitAlert processOneAlert(GtfsRealtime.Alert alert) {

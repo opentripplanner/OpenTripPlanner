@@ -132,11 +132,14 @@ public class AlertsUpdateHandler {
                 alertText.addEntity(new EntitySelector.Stop(new FeedScopedId(feedId, stopId)));
             } else if (agencyId != null) {
                 alertText.addEntity(new EntitySelector.Agency(new FeedScopedId(feedId, agencyId)));
+            } else {
+                String description = "Entity selector: "+informed;
+                alertText.addEntity(new EntitySelector.Unknown(description));
             }
         }
 
         if (alertText.getEntities().isEmpty()) {
-            alertText.addEntity(new EntitySelector.Unknown());
+            alertText.addEntity(new EntitySelector.Unknown("Alert had no entities"));
         }
 
         alertText.severity = getAlertSeverityForGtfsRtSeverity(alert.getSeverityLevel());

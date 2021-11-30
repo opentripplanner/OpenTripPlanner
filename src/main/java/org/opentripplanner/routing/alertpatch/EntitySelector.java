@@ -166,17 +166,27 @@ public interface EntitySelector {
 
   class Unknown implements EntitySelector {
 
+    public final String description;
+
+    public Unknown(String description) {
+      this.description = description;
+    }
+
     @Override
     public boolean equals(Object o) {
-      if (this == o || getClass() == o.getClass()) {
+      if (this == o) {
         return true;
       }
-      return false;
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      Unknown that = (Unknown) o;
+      return description.equals(that.description);
     }
 
     @Override
     public int hashCode() {
-      return 100000007;
+      return Objects.hash(description);
     }
   }
 
