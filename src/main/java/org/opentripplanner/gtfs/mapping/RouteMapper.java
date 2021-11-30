@@ -1,7 +1,10 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static org.opentripplanner.gtfs.mapping.TransitModeMapper.mapMode;
+
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
@@ -38,7 +41,17 @@ class RouteMapper {
         lhs.setLongName(rhs.getLongName());
         int routeType = rhs.getType();
         lhs.setType(routeType);
-        lhs.setMode(TransitModeMapper.mapModeForRoute(routeType, lhs, issueStore));
+        TransitMode mode = mapMode(routeType);
+        if (mode == null) {
+            issueStore.add(
+                    "RouteMapper", "Treating %s route type for route %s as BUS.", routeType,
+                    lhs.getId().toString()
+            );
+            lhs.setMode(TransitMode.BUS);
+        }
+        else {
+            lhs.setMode(mode);
+        }
         lhs.setDesc(rhs.getDesc());
         lhs.setUrl(rhs.getUrl());
         lhs.setColor(rhs.getColor());

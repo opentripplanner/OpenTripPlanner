@@ -81,28 +81,4 @@ public class TransitModeMapper {
                 throw new IllegalArgumentException("unknown gtfs route type " + routeType);
         }
     }
-
-    /**
-     * For routes a mode must be set. If {@link #mapMode} returns it as null, we use BUS as
-     * default.
-     *
-     * @param routeType  Original route type that was mapped into a mode
-     * @param route      The route for which the mode is for
-     * @param issueStore Issue store
-     */
-    public static TransitMode mapModeForRoute(
-            int routeType,
-            Route route,
-            DataImportIssueStore issueStore
-    ) {
-        TransitMode mode = mapMode(routeType);
-        if (mode == null) {
-            issueStore.add(
-                    "TransitModeMapper", "Treating %s route type for route %s as BUS.", routeType,
-                    route.getId().toString()
-            );
-            return TransitMode.BUS;
-        }
-        return mode;
-    }
 }
