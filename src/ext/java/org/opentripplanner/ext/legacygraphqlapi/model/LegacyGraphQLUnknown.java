@@ -1,7 +1,8 @@
 package org.opentripplanner.ext.legacygraphqlapi.model;
 
 /**
- * Class for unknown entities that contains no information.
+ * Class for unknown entities. Either no entity was defined or an entity that we don't support yet
+ * in that context.
  */
 public class LegacyGraphQLUnknown {
 
