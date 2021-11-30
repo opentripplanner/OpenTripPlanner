@@ -44,16 +44,6 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
     return url;
   }
 
-  @Override
-  public double getLat() {
-    return geometry.getCentroid().getX();
-  }
-
-  @Override
-  public double getLon() {
-    return geometry.getCentroid().getY();
-  }
-
   public void setUrl(String url) {
     this.url = url;
   }

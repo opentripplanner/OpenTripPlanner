@@ -44,16 +44,6 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
     return null;
   }
 
-  @Override
-  public double getLat() {
-    return geometry.getCentroid().getY();
-  }
-
-  @Override
-  public double getLon() {
-    return geometry.getCentroid().getX();
-  }
-
   /**
    * Returns the centroid of all stops and areas belonging to this location group.
    */

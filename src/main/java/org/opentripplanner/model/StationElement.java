@@ -60,14 +60,6 @@ public abstract class StationElement extends TransitEntity {
     return description;
   }
 
-  public double getLat() {
-    return getCoordinate().latitude();
-  }
-
-  public double getLon() {
-    return getCoordinate().longitude();
-  }
-
   /**
    * Center point/location for the station element. Returns the coordinate of the parent station, if
    * the coordinate is not defined for this station element.

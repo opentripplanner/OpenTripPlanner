@@ -39,9 +39,13 @@ public interface StopLocation {
 
   default TransitMode getVehicleType() { return null; }
 
-  double getLat();
+  default double getLat() {
+    return getCoordinate().latitude();
+  }
 
-  double getLon();
+  default double getLon() {
+    return getCoordinate().longitude();
+  }
 
   default Station getParentStation() { return null; }
 
