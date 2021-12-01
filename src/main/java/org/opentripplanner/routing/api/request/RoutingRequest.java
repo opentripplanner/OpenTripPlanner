@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
-import org.opentripplanner.ext.airquality.configuration.RequestParameters;
+import org.opentripplanner.ext.dataOverlay.configuration.RequestParameters;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -54,8 +54,6 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.airquality.configuration;
+package org.opentripplanner.ext.dataOverlay.configuration;
 
 /**
  * POJO class describing expected data-settings.json structure

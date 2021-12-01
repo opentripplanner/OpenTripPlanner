@@ -1,7 +1,7 @@
-package org.opentripplanner.ext.airquality;
+package org.opentripplanner.ext.dataOverlay;
 
 
-import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
+import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;

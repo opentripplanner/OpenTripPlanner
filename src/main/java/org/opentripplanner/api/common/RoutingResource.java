@@ -2,8 +2,8 @@ package org.opentripplanner.api.common;
 
 import java.util.Set;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
-import org.opentripplanner.ext.airquality.configuration.RequestParameters;
+import org.opentripplanner.ext.dataOverlay.GenericFileConfigurationParser;
+import org.opentripplanner.ext.dataOverlay.configuration.RequestParameters;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.api.request.RoutingRequest;

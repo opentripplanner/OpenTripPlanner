@@ -11,10 +11,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.opentripplanner.ext.airquality.EdgeUpdaterModule;
-import org.opentripplanner.ext.airquality.GenericDataFile;
-import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
-import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
+import org.opentripplanner.ext.dataOverlay.EdgeUpdaterModule;
+import org.opentripplanner.ext.dataOverlay.GenericDataFile;
+import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
@@ -25,8 +24,6 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
-import org.opentripplanner.graph_builder.module.*;
-import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -45,13 +42,6 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.opentripplanner.datastore.FileType.*;
-import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
 import static org.opentripplanner.util.OTPFeature.DataOverlay;
 
 /**

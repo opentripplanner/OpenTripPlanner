@@ -1,24 +1,15 @@
-package org.opentripplanner.ext.airquality;
+package org.opentripplanner.ext.dataOverlay;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
-import org.opentripplanner.ext.airquality.configuration.IndexVariable;
-import org.opentripplanner.ext.airquality.configuration.ParameterType;
-import org.opentripplanner.ext.airquality.configuration.RequestParameters;
-import org.opentripplanner.standalone.configure.OTPAppConstruction;
+import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
+import org.opentripplanner.ext.dataOverlay.configuration.IndexVariable;
+import org.opentripplanner.ext.dataOverlay.configuration.ParameterType;
+import org.opentripplanner.ext.dataOverlay.configuration.RequestParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

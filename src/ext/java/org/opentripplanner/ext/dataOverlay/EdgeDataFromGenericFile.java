@@ -1,6 +1,6 @@
-package org.opentripplanner.ext.airquality;
+package org.opentripplanner.ext.dataOverlay;
 
-import org.opentripplanner.ext.airquality.configuration.TimeUnit;
+import org.opentripplanner.ext.dataOverlay.configuration.TimeUnit;
 
 import java.io.Serializable;
 import java.util.Map;

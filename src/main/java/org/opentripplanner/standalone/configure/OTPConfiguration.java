@@ -2,13 +2,12 @@ package org.opentripplanner.standalone.configure;
 
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.datastore.OtpDataStoreConfig;
-import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
+import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

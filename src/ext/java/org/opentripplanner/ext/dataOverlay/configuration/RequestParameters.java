@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.airquality.configuration;
+package org.opentripplanner.ext.dataOverlay.configuration;
 
 /**
  * This class describes the expected routing request parameters for the generic data

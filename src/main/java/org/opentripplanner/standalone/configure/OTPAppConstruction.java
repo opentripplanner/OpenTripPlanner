@@ -1,7 +1,5 @@
 package org.opentripplanner.standalone.configure;
 
-import org.opentripplanner.ext.airquality.GenericFileConfigurationParser;
-import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreFactory;

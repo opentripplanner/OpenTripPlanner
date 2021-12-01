@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.airquality.configuration;
+package org.opentripplanner.ext.dataOverlay.configuration;
 
 /**
  * This class describes the variables for the incoming .nc data file

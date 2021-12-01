@@ -1,7 +1,7 @@
-package org.opentripplanner.ext.airquality;
+package org.opentripplanner.ext.dataOverlay;
 
-import org.opentripplanner.ext.airquality.configuration.IndexVariable;
-import org.opentripplanner.ext.airquality.configuration.DavaOverlayConfig;
+import org.opentripplanner.ext.dataOverlay.configuration.IndexVariable;
+import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
 import ucar.ma2.Array;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFiles;
