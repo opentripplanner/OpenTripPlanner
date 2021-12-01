@@ -48,6 +48,7 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
@@ -236,7 +237,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
-    // TODO OTP2 Maybe this should be up to the API?
     public boolean showIntermediateStops = false;
 
     /** max walk/bike speed along streets, in meters per second */
@@ -335,25 +335,43 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /** Cost of getting on and off your own bike */
     public int bikeSwitchCost;
 
-    /** Time to rent a bike */
-    public int bikeRentalPickupTime = 60;
+    /** Time to rent a vehicle */
+    public int vehicleRentalPickupTime = 60;
 
     /**
-     * Cost of renting a bike. The cost is a bit more than actual time to model the associated cost and trouble.
+     * Cost of renting a vehicle. The cost is a bit more than actual time to model the associated cost and trouble.
      */
-    public int bikeRentalPickupCost = 120;
+    public int vehicleRentalPickupCost = 120;
 
-    /** Time to drop-off a rented bike */
-    public int bikeRentalDropoffTime = 30;
+    /** Time to drop-off a rented vehicle */
+    public int vehicleRentalDropoffTime = 30;
 
-    /** Cost of dropping-off a rented bike */
-    public int bikeRentalDropoffCost = 30;
+    /** Cost of dropping-off a rented vehicle */
+    public int vehicleRentalDropoffCost = 30;
+
+    /** The vehicle rental networks which may be used. If empty all networks may be used. */
+    public Set<String> allowedVehicleRentalNetworks = Set.of();
+
+    /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+    public Set<String> bannedVehicleRentalNetworks = Set.of();
 
     /** Time to park a bike */
     public int bikeParkTime = 60;
 
     /** Cost of parking a bike. */
     public int bikeParkCost = 120;
+
+    /** Time to park a car */
+    public int carParkTime = 60;
+
+    /** Cost of parking a car. */
+    public int carParkCost = 120;
+
+    /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
+    public Set<String> requiredVehicleParkingTags = Set.of();
+
+    /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
+    public Set<String> bannedVehicleParkingTags = Set.of();
 
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
@@ -647,10 +665,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
       Additional flags affecting mode transitions.
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
     */
-    public boolean bikeRental = false;
-    public boolean bikeParkAndRide = false;
+    public boolean vehicleRental = false;
     public boolean parkAndRide  = false;
     public boolean carPickup = false;
+
+    public Set<FormFactor> allowedRentalFormFactors = new HashSet<>();
 
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
@@ -1008,11 +1027,17 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
                     break;
                 case BIKE_TO_PARK:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
-                    streetRequest.bikeParkAndRide = true;
+                    streetRequest.parkAndRide = true;
                     break;
                 case BIKE_RENTAL:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
-                    streetRequest.bikeRental = true;
+                    streetRequest.vehicleRental = true;
+                    streetRequest.allowedRentalFormFactors.add(FormFactor.BICYCLE);
+                    break;
+                case SCOOTER_RENTAL:
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
+                    streetRequest.vehicleRental = true;
+                    streetRequest.allowedRentalFormFactors.add(FormFactor.SCOOTER);
                     break;
                 case CAR:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
@@ -1027,6 +1052,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
                     break;
                 case CAR_RENTAL:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK));
+                    streetRequest.vehicleRental = true;
+                    streetRequest.allowedRentalFormFactors.add(FormFactor.CAR);
             }
         }
 
@@ -1051,6 +1078,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.streetSubRequestModes = streetSubRequestModes.clone();
 
+            clone.allowedVehicleRentalNetworks = Set.copyOf(allowedVehicleRentalNetworks);
+            clone.bannedVehicleRentalNetworks = Set.copyOf(bannedVehicleRentalNetworks);
+
+            clone.requiredVehicleParkingTags = Set.copyOf(requiredVehicleParkingTags);
+            clone.bannedVehicleParkingTags = Set.copyOf(bannedVehicleParkingTags);
+
             clone.preferredAgencies = Set.copyOf(preferredAgencies);
             clone.unpreferredAgencies = Set.copyOf(unpreferredAgencies);
             clone.whiteListedAgencies = Set.copyOf(whiteListedAgencies);
@@ -1062,6 +1095,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             clone.unpreferredRoutes = unpreferredRoutes.clone();
 
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
+
+            clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
 
             return clone;
         } catch (CloneNotSupportedException e) {

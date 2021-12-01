@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import java.util.Collection;
+import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -35,11 +37,6 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
     return name;
   }
 
-  @Override
-  public String getCode() {
-    return null;
-  }
-
   /**
    * Returns the centroid of all stops and areas belonging to this location group.
    */
@@ -47,6 +44,11 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
   public WgsCoordinate getCoordinate() {
     Point centroid = geometry.getCentroid();
     return new WgsCoordinate(centroid.getY(), centroid.getX());
+  }
+
+  @Override
+  public String getFirstZoneAsString() {
+    return null;
   }
 
   /**

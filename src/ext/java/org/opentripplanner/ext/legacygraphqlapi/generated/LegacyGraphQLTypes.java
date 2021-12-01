@@ -49,6 +49,7 @@ public class LegacyGraphQLTypes {
      * Effect of a alert
      */
     public enum LegacyGraphQLAlertEffectType {
+        AccessibilityIssue("ACCESSIBILITY_ISSUE"),
         AdditionalService("ADDITIONAL_SERVICE"),
         Detour("DETOUR"),
         ModifiedService("MODIFIED_SERVICE"),
@@ -425,6 +426,7 @@ public class LegacyGraphQLTypes {
         Gondola("GONDOLA"),
         LegSwitch("LEG_SWITCH"),
         Rail("RAIL"),
+        Scooter("SCOOTER"),
         Subway("SUBWAY"),
         Tram("TRAM"),
         Transit("TRANSIT"),
@@ -570,7 +572,9 @@ public class LegacyGraphQLTypes {
         private Iterable<LegacyGraphQLAlertCauseType> _cause;
         private Iterable<LegacyGraphQLAlertEffectType> _effect;
         private Iterable<String> _feeds;
+        private Iterable<String> _route;
         private Iterable<LegacyGraphQLAlertSeverityLevelType> _severityLevel;
+        private Iterable<String> _stop;
 
         public LegacyGraphQLQueryTypeAlertsArgs(Map<String, Object> args) {
             if (args != null) {
@@ -585,11 +589,13 @@ public class LegacyGraphQLTypes {
                             .collect(Collectors.toList());
                 }
                 this._feeds = (Iterable<String>) args.get("feeds");
+                this._route = (Iterable<String>) args.get("route");
                 if (args.get("severityLevel") != null) {
                     this._severityLevel = ((List<String>) args.get("severityLevel")).stream()
                             .map(LegacyGraphQLAlertSeverityLevelType::valueOfLabel)
                             .collect(Collectors.toList());
                 }
+                this._stop = (Iterable<String>) args.get("stop");
             }
         }
 
@@ -599,7 +605,11 @@ public class LegacyGraphQLTypes {
 
         public Iterable<String> getLegacyGraphQLFeeds() {return this._feeds;}
 
+        public Iterable<String> getLegacyGraphQLRoute() {return this._route;}
+
         public Iterable<LegacyGraphQLAlertSeverityLevelType> getLegacyGraphQLSeverityLevel() {return this._severityLevel;}
+
+        public Iterable<String> getLegacyGraphQLStop() {return this._stop;}
     }
 
     public static class LegacyGraphQLQueryTypeBikeParkArgs {
@@ -1350,6 +1360,32 @@ public class LegacyGraphQLTypes {
         public Iterable<String> getLegacyGraphQLFeeds() {return this._feeds;}
     }
 
+    public static class LegacyGraphQLQueryTypeVehicleParkingArgs {
+
+        private String _id;
+
+        public LegacyGraphQLQueryTypeVehicleParkingArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._id = (String) args.get("id");
+            }
+        }
+
+        public String getLegacyGraphQLId() {return this._id;}
+    }
+
+    public static class LegacyGraphQLQueryTypeVehicleParkingsArgs {
+
+        private Iterable<String> _ids;
+
+        public LegacyGraphQLQueryTypeVehicleParkingsArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._ids = (Iterable<String>) args.get("ids");
+            }
+        }
+
+        public Iterable<String> getLegacyGraphQLIds() {return this._ids;}
+    }
+
     public static class LegacyGraphQLQueryTypeVehicleRentalStationArgs {
 
         private String _id;
@@ -1594,6 +1630,36 @@ public class LegacyGraphQLTypes {
         }
 
         public String getLegacyGraphQLServiceDate() {return this._serviceDate;}
+    }
+
+
+    /**
+     * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that
+     * they may be represented differently to the user.
+     */
+    public enum LegacyGraphQLVehicleParkingState {
+        Closed("CLOSED"),
+        Operational("OPERATIONAL"),
+        TemporarilyClosed("TEMPORARILY_CLOSED");
+
+        public final String label;
+
+        LegacyGraphQLVehicleParkingState(String label) {
+            this.label = label;
+        }
+
+        private static final Map<String, LegacyGraphQLVehicleParkingState> BY_LABEL =
+                new HashMap<>();
+
+        static {
+            for (LegacyGraphQLVehicleParkingState e : values()) {
+                BY_LABEL.put(e.label, e);
+            }
+        }
+
+        public static LegacyGraphQLVehicleParkingState valueOfLabel(String label) {
+            return BY_LABEL.get(label);
+        }
     }
 
 

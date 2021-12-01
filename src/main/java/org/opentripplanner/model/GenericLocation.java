@@ -57,6 +57,12 @@ public class GenericLocation {
         return stopId != null || (lat != null && lng != null);
     }
 
+    public static GenericLocation fromStopId(String name, String feedId, String stopId) {
+        return new GenericLocation(name,
+                new FeedScopedId(feedId, stopId), null, null
+        );
+    }
+
     @Override
     public String toString() {
         ValueObjectToStringBuilder buf = ValueObjectToStringBuilder.of().skipNull();

@@ -6,6 +6,8 @@ import org.opentripplanner.util.OTPFeature;
 public class TransferOptimizationRequest implements TransferOptimizationParameters {
   public boolean optimizeTransferWaitTime = true;
   public double minSafeWaitTimeFactor = 5.0;
+  public double backTravelWaitTimeFactor = 1.0;
+  public double extraStopBoardAlightCostsFactor = 0.0;
 
   @Override
   public boolean optimizeTransferPriority() {
@@ -18,7 +20,17 @@ public class TransferOptimizationRequest implements TransferOptimizationParamete
   }
 
   @Override
+  public double backTravelWaitTimeFactor() {
+    return backTravelWaitTimeFactor;
+  }
+
+  @Override
   public double minSafeWaitTimeFactor() {
     return minSafeWaitTimeFactor;
+  }
+
+  @Override
+  public double extraStopBoardAlightCostsFactor() {
+    return extraStopBoardAlightCostsFactor;
   }
 }

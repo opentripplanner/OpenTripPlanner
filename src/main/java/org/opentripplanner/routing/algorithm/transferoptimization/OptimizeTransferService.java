@@ -6,8 +6,8 @@ import java.util.List;
 import org.opentripplanner.routing.algorithm.raptor.path.PathDiff;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathService;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.slf4j.Logger;
@@ -21,22 +21,22 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
 
   private static final Logger LOG = LoggerFactory.getLogger(OptimizeTransferService.class);
 
-  private final OptimizePathService<T> optimizePathService;
+  private final OptimizePathDomainService<T> optimizePathDomainService;
   private final MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator;
-  private final TransferWaitTimeCalculator transferWaitTimeCostCalculator;
+  private final TransferWaitTimeCostCalculator transferWaitTimeCostCalculator;
 
   public OptimizeTransferService(
-          OptimizePathService<T> optimizePathService,
+          OptimizePathDomainService<T> optimizePathDomainService,
           MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator,
-          TransferWaitTimeCalculator transferWaitTimeCalculator
+          TransferWaitTimeCostCalculator transferWaitTimeCostCalculator
   ) {
-    this.optimizePathService = optimizePathService;
+    this.optimizePathDomainService = optimizePathDomainService;
     this.minSafeTransferTimeCalculator = minSafeTransferTimeCalculator;
-    this.transferWaitTimeCostCalculator = transferWaitTimeCalculator;
+    this.transferWaitTimeCostCalculator = transferWaitTimeCostCalculator;
   }
 
-  public OptimizeTransferService(OptimizePathService<T> optimizePathService) {
-    this.optimizePathService = optimizePathService;
+  public OptimizeTransferService(OptimizePathDomainService<T> optimizePathDomainService) {
+    this.optimizePathDomainService = optimizePathDomainService;
     this.minSafeTransferTimeCalculator = null;
     this.transferWaitTimeCostCalculator = null;
   }
@@ -80,6 +80,6 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
     if (path.numberOfTransfersExAccessEgress() == 0) {
       return List.of(new OptimizedPath<>(path));
     }
-    return optimizePathService.findBestTransitPath(path);
+    return optimizePathDomainService.findBestTransitPath(path);
   }
 }

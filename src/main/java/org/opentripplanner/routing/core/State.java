@@ -8,6 +8,7 @@ import java.util.Objects;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
@@ -67,7 +68,7 @@ public class State implements Cloneable {
 
             /* vehicle rental searches may end in three states (see isFinal()): BEFORE_RENTING/RENTING_FLOATING/HAVE_RENTED
                for forward/reverse searches to be symmetric an additional RENTING_FLOATING state needs to be created. */
-            if (request.bikeRental && request.arriveBy) {
+            if (request.vehicleRental && request.arriveBy) {
                 states.add(
                     new State(
                         vertex,
@@ -176,7 +177,7 @@ public class State implements Cloneable {
         // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
         this.stateData.startTime = startTime;
-        if (options.bikeRental) {
+        if (options.vehicleRental) {
             if (options.arriveBy) {
                 if (keptRentedVehicleAtDestination) {
                     this.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
@@ -209,12 +210,11 @@ public class State implements Cloneable {
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
         if (options.parkAndRide) {
-            this.stateData.carParked = options.arriveBy;
-            this.stateData.currentMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
-        } else if (options.bikeParkAndRide) {
-            this.stateData.bikeParked = options.arriveBy;
-            this.stateData.currentMode = this.stateData.bikeParked ? TraverseMode.WALK
-                    : TraverseMode.BICYCLE;
+            this.stateData.vehicleParked = options.arriveBy;
+            this.stateData.currentMode = this.stateData.vehicleParked ?
+                TraverseMode.WALK
+                : options.streetSubRequestModes.getBicycle() ?
+                    TraverseMode.BICYCLE : TraverseMode.CAR;
         }
         this.walkDistance = 0;
         this.time = timeSeconds * 1000;
@@ -248,7 +248,7 @@ public class State implements Cloneable {
 
     public String toString() {
         return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] "
-                + (isBikeRenting() ? "BIKE_RENT " : "") + (isCarParked() ? "CAR_PARKED " : "")
+                + (isRentingVehicle() ? "VEHICLE_RENT " : "") + (isVehicleParked() ? "VEHICLE_PARKED " : "")
                 + vertex + ">";
     }
     
@@ -256,9 +256,9 @@ public class State implements Cloneable {
         return "<State " + new Date(getTimeInMillis()) + 
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
-                " d=" + this.getWalkDistance() + 
-                " br=" + this.isBikeRenting() +
-                " pr=" + this.isCarParked() + ">";
+                " d=" + this.getWalkDistance() +
+                " r=" + this.isRentingVehicle() +
+                " pr=" + this.isVehicleParked() + ">";
     }
 
     public CarPickupState getCarPickupState() {
@@ -281,20 +281,20 @@ public class State implements Cloneable {
                         == state.stateData.mayKeepRentedVehicleAtDestination;
     }
 
-    public boolean isBikeRentingFromStation() {
+    public boolean isRentingVehicleFromStation() {
         return stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION;
     }
 
-    public boolean isBikeRentingFloating() {
+    public boolean isRentingFloatingVehicle() {
         return stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING;
     }
 
-    public boolean isBikeRenting() {
+    public boolean isRentingVehicle() {
         return stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
             || stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING;
     }
 
-    public boolean bikeRentalIsFinished() {
+    public boolean vehicleRentalIsFinished() {
         return stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED
                 || stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING
                 || (
@@ -304,20 +304,16 @@ public class State implements Cloneable {
         );
     }
 
-    public boolean bikeRentalNotStarted() {
+    public boolean vehicleRentalNotStarted() {
         return stateData.vehicleRentalState == VehicleRentalState.BEFORE_RENTING;
     }
 
     public VehicleRentalState getVehicleRentalState() {
         return stateData.vehicleRentalState;
     }
-    
-    public boolean isCarParked() {
-        return stateData.carParked;
-    }
 
-    public boolean isBikeParked() {
-        return stateData.bikeParked;
+    public boolean isVehicleParked() {
+        return stateData.vehicleParked;
     }
 
     /**
@@ -326,20 +322,16 @@ public class State implements Cloneable {
     public boolean isFinal() {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
         boolean parkAndRide = stateData.opt.parkAndRide;
-        boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
-        boolean bikeRentingOk;
-        boolean bikeParkAndRideOk;
-        boolean carParkAndRideOk;
+        boolean vehicleRentingOk;
+        boolean vehicleParkAndRideOk;
         if (stateData.opt.arriveBy) {
-            bikeRentingOk = !stateData.opt.bikeRental || !isBikeRenting();
-            bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
-            carParkAndRideOk = !parkAndRide || !isCarParked();
+            vehicleRentingOk = !stateData.opt.vehicleRental || !isRentingVehicle();
+            vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
         } else {
-            bikeRentingOk = !stateData.opt.bikeRental || (bikeRentalNotStarted() || bikeRentalIsFinished());
-            bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
-            carParkAndRideOk = !parkAndRide || isCarParked();
+            vehicleRentingOk = !stateData.opt.vehicleRental || (vehicleRentalNotStarted() || vehicleRentalIsFinished());
+            vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return vehicleRentingOk && vehicleParkAndRideOk;
     }
 
     public double getWalkDistance() {
@@ -465,8 +457,7 @@ public class State implements Cloneable {
         State newState = new State(this.vertex, getTimeSeconds(), stateData.opt.reversedClone());
         // TODO Check if those two lines are needed:
         newState.stateData.vehicleRentalState = stateData.vehicleRentalState;
-        newState.stateData.carParked = stateData.carParked;
-        newState.stateData.bikeParked = stateData.bikeParked;
+        newState.stateData.vehicleParked = stateData.vehicleParked;
         newState.stateData.carPickupState = stateData.carPickupState;
         return newState;
     }
@@ -568,37 +559,34 @@ public class State implements Cloneable {
             // propagate the modes through to the reversed edge
             editor.setBackMode(orig.getBackMode());
 
-            if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
+            if (orig.isRentingVehicle() && !orig.getBackState().isRentingVehicle()) {
                 var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
                 editor.dropOffRentedVehicleAtStation(
-                        stationVertex.getVehicleMode(),
+                        ((VehicleRentalEdge) edge).formFactor,
                         stationVertex.getStation().getNetwork(),
                         false
                 );
             }
-            else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
+            else if (!orig.isRentingVehicle() && orig.getBackState().isRentingVehicle()) {
                 var stationVertex = ((VehicleRentalStationVertex) orig.vertex);
-                if (orig.getBackState().isBikeRentingFromStation()) {
+                if (orig.getBackState().isRentingVehicleFromStation()) {
                     editor.beginVehicleRentingAtStation(
-                            stationVertex.getVehicleMode(),
+                            ((VehicleRentalEdge) edge).formFactor,
                             stationVertex.getStation().getNetwork(),
                             orig.backState.mayKeepRentedVehicleAtDestination(),
                             false
                     );
                 }
-                else if (orig.getBackState().isBikeRentingFloating()) {
+                else if (orig.getBackState().isRentingFloatingVehicle()) {
                     editor.beginFloatingVehicleRenting(
-                            stationVertex.getVehicleMode(),
+                            ((VehicleRentalEdge) edge).formFactor,
                             stationVertex.getStation().getNetwork(),
                             false
                     );
                 }
             }
-            if (orig.isCarParked() != orig.getBackState().isCarParked()) {
-                editor.setCarParked(!orig.isCarParked());
-            }
-            if (orig.isBikeParked() != orig.getBackState().isBikeParked()) {
-                editor.setBikeParked(!orig.isBikeParked());
+            if (orig.isVehicleParked() != orig.getBackState().isVehicleParked()) {
+                editor.setVehicleParked(true, orig.getNonTransitMode());
             }
 
             ret = editor.makeState();

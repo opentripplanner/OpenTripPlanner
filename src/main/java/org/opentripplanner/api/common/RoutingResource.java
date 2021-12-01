@@ -1,5 +1,6 @@
 package org.opentripplanner.api.common;
 
+import java.util.Set;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -361,6 +362,38 @@ public abstract class RoutingResource {
 
     @QueryParam("keepingRentedBicycleAtDestinationCost")
     protected Double keepingRentedBicycleAtDestinationCost;
+
+    /** The vehicle rental networks which may be used. If empty all networks may be used. */
+    @QueryParam("allowedVehicleRentalNetworks")
+    protected Set<String> allowedVehicleRentalNetworks;
+
+    /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+    @QueryParam("bannedVehicleRentalNetworks")
+    protected Set<String> bannedVehicleRentalNetworks;
+
+    /** Time to park a bike */
+    @QueryParam("bikeParkTime")
+    protected Integer bikeParkTime;
+
+    /** Cost of parking a bike. */
+    @QueryParam("bikeParkCost")
+    protected Integer bikeParkCost;
+
+    /** Time to park a car */
+    @QueryParam("carParkTime")
+    protected Integer carParkTime = 60;
+
+    /** Cost of parking a car. */
+    @QueryParam("carParkCost")
+    protected Integer carParkCost = 120;
+
+    /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
+    @QueryParam("requiredVehicleParkingTags")
+    protected Set<String> requiredVehicleParkingTags = Set.of();
+
+    /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
+    @QueryParam("bannedVehicleParkingTags")
+    protected Set<String> bannedVehicleParkingTags = Set.of();
 
     /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
@@ -739,6 +772,30 @@ public abstract class RoutingResource {
         if (keepingRentedBicycleAtDestinationCost != null)
             request.keepingRentedVehicleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
 
+        if (allowedVehicleRentalNetworks != null)
+            request.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
+
+        if (bannedVehicleRentalNetworks != null)
+            request.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+
+        if (bikeParkCost != null)
+            request.bikeParkCost = bikeParkCost;
+
+        if (bikeParkTime != null)
+            request.bikeParkTime = bikeParkTime;
+
+        if (carParkCost != null)
+            request.carParkCost = carParkCost;
+
+        if (carParkTime != null)
+            request.carParkTime = carParkTime;
+
+        if (bannedVehicleParkingTags != null)
+            request.bannedVehicleParkingTags = bannedVehicleParkingTags;
+
+        if (requiredVehicleParkingTags != null)
+            request.requiredVehicleParkingTags = requiredVehicleParkingTags;
+
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setBicycleOptimizeType(optimize);
@@ -810,7 +867,7 @@ public abstract class RoutingResource {
             request.modes = modes.getRequestModes();
         }
 
-        if (request.bikeRental && bikeSpeed == null) {
+        if (request.vehicleRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }

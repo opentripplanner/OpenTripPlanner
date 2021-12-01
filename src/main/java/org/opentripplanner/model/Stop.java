@@ -98,14 +98,6 @@ public final class Stop extends StationElement implements StopLocation {
     return platformCode;
   }
 
-  /**
-   * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
-   * which only permits one zone per stop.
-   */
-  public String getFirstZoneAsString() {
-    return fareZones.stream().map(t -> t.getId().getId()).findFirst().orElse(null);
-  }
-
   public String getUrl() {
     return url;
   }

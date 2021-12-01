@@ -3,12 +3,13 @@ package org.opentripplanner.ext.legacygraphqlapi.generated;
 
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
@@ -29,11 +30,16 @@ import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import graphql.relay.Connection;
 import graphql.relay.Edge;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRoute;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
 import java.util.Map;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.model.SystemNotice;
 import graphql.schema.TypeResolver;
 import graphql.schema.DataFetcher;
@@ -97,6 +103,8 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Long> effectiveStartDate();
 
+        public DataFetcher<Iterable<Object>> entities();
+
         public DataFetcher<String> feed();
 
         public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -108,6 +116,12 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Object> stop();
 
         public DataFetcher<Trip> trip();
+    }
+
+    /**
+     * Entity related to an alert
+     */
+    public interface LegacyGraphQLAlertEntity extends TypeResolver {
     }
 
     /**
@@ -458,11 +472,11 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Long> arrivalTime();
 
-        public DataFetcher<BikePark> bikePark();
+        public DataFetcher<VehicleParking> bikePark();
 
         public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
-        public DataFetcher<Object> carPark();
+        public DataFetcher<VehicleParking> carPark();
 
         public DataFetcher<Long> departureTime();
 
@@ -475,6 +489,8 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<VehicleRentalVehicle> rentalVehicle();
 
         public DataFetcher<Object> stop();
+
+        public DataFetcher<VehicleParking> vehicleParking();
 
         public DataFetcher<VehicleRentalStation> vehicleRentalStation();
 
@@ -524,9 +540,9 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Iterable<TransitAlert>> alerts();
 
-        public DataFetcher<BikePark> bikePark();
+        public DataFetcher<VehicleParking> bikePark();
 
-        public DataFetcher<Iterable<BikePark>> bikeParks();
+        public DataFetcher<Iterable<VehicleParking>> bikeParks();
 
         public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
@@ -534,9 +550,9 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
 
-        public DataFetcher<Object> carPark();
+        public DataFetcher<VehicleParking> carPark();
 
-        public DataFetcher<Iterable<Object>> carParks();
+        public DataFetcher<Iterable<VehicleParking>> carParks();
 
         public DataFetcher<Object> cluster();
 
@@ -585,6 +601,10 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Trip> trip();
 
         public DataFetcher<Iterable<Trip>> trips();
+
+        public DataFetcher<VehicleParking> vehicleParking();
+
+        public DataFetcher<Iterable<VehicleParking>> vehicleParkings();
 
         public DataFetcher<VehicleRentalStation> vehicleRentalStation();
 
@@ -717,6 +737,26 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Object> wheelchairBoarding();
 
         public DataFetcher<String> zoneId();
+    }
+
+    /**
+     * Stop that should (but not guaranteed) to exist on a route.
+     */
+    public interface LegacyGraphQLStopOnRoute {
+
+        public DataFetcher<Route> route();
+
+        public DataFetcher<Object> stop();
+    }
+
+    /**
+     * Stop that should (but not guaranteed) to exist on a trip.
+     */
+    public interface LegacyGraphQLStopOnTrip {
+
+        public DataFetcher<Object> stop();
+
+        public DataFetcher<Trip> trip();
     }
 
     /**
@@ -857,6 +897,58 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<String> tripShortName();
 
         public DataFetcher<Object> wheelchairAccessible();
+    }
+
+    /**
+     * Vehicle parking represents a location where bicycles or cars can be parked.
+     */
+    public interface LegacyGraphQLVehicleParking {
+
+        public DataFetcher<Boolean> anyCarPlaces();
+
+        public DataFetcher<VehicleParkingSpaces> availability();
+
+        public DataFetcher<Boolean> bicyclePlaces();
+
+        public DataFetcher<VehicleParkingSpaces> capacity();
+
+        public DataFetcher<Boolean> carPlaces();
+
+        public DataFetcher<String> detailsUrl();
+
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+
+        public DataFetcher<String> imageUrl();
+
+        public DataFetcher<Double> lat();
+
+        public DataFetcher<Double> lon();
+
+        public DataFetcher<String> name();
+
+        public DataFetcher<String> note();
+
+        public DataFetcher<Boolean> realtime();
+
+        public DataFetcher<VehicleParkingState> state();
+
+        public DataFetcher<Iterable<String>> tags();
+
+        public DataFetcher<String> vehicleParkingId();
+
+        public DataFetcher<Boolean> wheelchairAccessibleCarPlaces();
+    }
+
+    /**
+     * The number of spaces by type. null if unknown.
+     */
+    public interface LegacyGraphQLVehicleParkingSpaces {
+
+        public DataFetcher<Integer> bicycleSpaces();
+
+        public DataFetcher<Integer> carSpaces();
+
+        public DataFetcher<Integer> wheelchairAccessibleCarSpaces();
     }
 
     /**

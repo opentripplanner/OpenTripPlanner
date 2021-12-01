@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The purpose of this class is to be able to turn features on and off.
  * <p>
- * This configuration is optional an found under "feature" in the top
+ * This configuration is optional and found under "feature" in the top
  * level 'otp-config.json' file.
  */
 public enum OTPFeature {
@@ -44,7 +44,7 @@ public enum OTPFeature {
 
 
     /**
-     * This method allowes the application to initilize each OTP feature. Only use this
+     * This method allows the application to initialize each OTP feature. Only use this
      * method at startup-time.
      *
      * THIS METHOD IS NOT THREAD-SAFE!

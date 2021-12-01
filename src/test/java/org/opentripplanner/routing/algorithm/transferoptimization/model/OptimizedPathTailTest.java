@@ -28,12 +28,29 @@ class OptimizedPathTailTest implements RaptorTestConstants {
             txConstrained(t2.trip(), STOP_D, t3.trip(), STOP_D).staySeated()
     );
 
-    private final TransferWaitTimeCalculator waitTimeCalc = new TransferWaitTimeCalculator(5.0);
+    private final TransferWaitTimeCostCalculator
+            waitTimeCalc = new TransferWaitTimeCostCalculator(1.0, 5.0);
+
+    /**
+     * Give stop B and D an extra stop-priority-cost.
+     *
+     *  Stop B is visited once and stop D twice. This will add the following extra cost to the path:
+     *  <pre>
+     *  - extraStopBoardAlightCostsFactor = 2.0
+     *  - Cost stop B = 30s ($30.00)
+     *  - Cost stop D = 10s ($10.00)
+     *
+     *  Extra cost = (30.0 + 2 * 10.0) * 2.0 = $100.00
+     *  </pre>
+     */
+    private final int[] stopBoardAlightCost = new int[] { 0, 0, 3000, 0, 1000, 0};
 
     private final OptimizedPathTail<TestTripSchedule> subject = new OptimizedPathTail<>(
             BasicPathTestCase.SLACK_PROVIDER,
             BasicPathTestCase.COST_CALCULATOR,
             waitTimeCalc,
+            stopBoardAlightCost,
+            2.0,
             this::stopIndexToName
     );
 
@@ -56,7 +73,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
                 + "~ BUS L21 11:00 11:23 ~ D "
                 + "~ BUS L31 11:40 11:52 ~ E "
                 + "~ Walk 7m45s "
-                + "[$8019 $46pri $153.91wtc]";
+                + "[$8019 $46pri $-101126wtc]";
 
         assertEquals(exp, subject.toString());
     }
@@ -104,7 +121,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
                 + "~ BUS L21 11:00 11:23 23m $2724 ~ D 17m {staySeated} "
                 + "~ BUS L31 11:40 11:52 12m $1737 ~ E 15s "
                 + "~ Walk 7m45s 11:52:15 12:00 $930 "
-                + "[10:00 12:00 2h $8019 $46pri $153.91wtc]";
+                + "[10:00 12:00 2h $8019 $46pri $-101126wtc]";
 
         assertEquals(expPath, path.toStringDetailed(this::stopIndexToName));
     }

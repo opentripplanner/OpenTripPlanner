@@ -29,7 +29,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -111,6 +111,7 @@ public class TransitRouter {
                     requestTransitDataProvider.stopNameResolver(),
                     router.graph.getTransferService(),
                     requestTransitDataProvider,
+                    transitLayer.getStopIndex().stopBoardAlightCosts,
                     raptorRequest,
                     request.transferOptimization
             ).optimize(transitResponse.paths());
@@ -126,16 +127,15 @@ public class TransitRouter {
         );
         FareService fareService = router.graph.getService(FareService.class);
 
-        // TODO
         for (Path<TripSchedule> path : paths) {
             // Convert the Raptor/Astar paths to OTP API Itineraries
             Itinerary itinerary = itineraryMapper.createItinerary(path);
+
             // Decorate the Itineraries with fare information.
-            // Itinerary and Leg are API model classes, lacking internal object references needed for effective
-            // fare calculation. We derive the fares from the internal Path objects and add them to the itinerary.
             if (fareService != null) {
-                itinerary.fare = fareService.getCost(path, transitLayer);
+                itinerary.fare = fareService.getCost(itinerary);
             }
+
             itineraries.add(itinerary);
         }
 

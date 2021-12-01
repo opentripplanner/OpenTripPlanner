@@ -55,11 +55,11 @@ class AreaGroup {
         HashMap<Coordinate, OSMNode> nodeMap = new HashMap<Coordinate, OSMNode>();
         for (Area area : areas) {
             for (Ring ring : area.outermostRings) {
-                allRings.add(ring.toJtsPolygon());
+                allRings.add(ring.jtsPolygon);
                 for (OSMNode node : ring.nodes) {
                     nodeMap.put(new Coordinate(node.lon, node.lat), node);
                 }
-                for (Ring inner : ring.holes) {
+                for (Ring inner : ring.getHoles()) {
                     for (OSMNode node : inner.nodes) {
                         nodeMap.put(new Coordinate(node.lon, node.lat), node);
                     }
@@ -93,7 +93,7 @@ class AreaGroup {
         Multimap<OSMNode, Area> areasForNode = LinkedListMultimap.create();
         for (Area area : areasLevels.keySet()) {
             for (Ring ring : area.outermostRings) {
-                for (Ring inner : ring.holes) {
+                for (Ring inner : ring.getHoles()) {
                     for (OSMNode node : inner.nodes) {
                         areasForNode.put(node, area);
                     }
@@ -155,7 +155,7 @@ class AreaGroup {
                 }
                 hole.add(node);
             }
-            ring.holes.add(new Ring(hole));
+            ring.addHole(new Ring(hole));
         }
 
         return ring;

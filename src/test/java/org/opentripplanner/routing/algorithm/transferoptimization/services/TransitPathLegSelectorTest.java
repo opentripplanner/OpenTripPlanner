@@ -43,7 +43,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     private final int T10_40 = TimeUtils.time("10:40");
 
     private final OptimizedPathTail<TestTripSchedule> pathTail = new OptimizedPathTail<>(
-            SLACK_PROVIDER, COST_CALCULATOR, null, this::stopIndexToName
+            SLACK_PROVIDER, COST_CALCULATOR, null, null, 0.0, this::stopIndexToName
     );
 
     private final TestTripSchedule TRIP = TestTripSchedule.schedule()

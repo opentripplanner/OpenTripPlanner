@@ -2,8 +2,11 @@ package org.opentripplanner.routing.vehicle_rental;
 
 import static java.util.Locale.ROOT;
 
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.util.I18NString;
 
 import java.time.ZonedDateTime;
@@ -125,7 +128,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     }
 
     @Override
-    public boolean isFloatingBike() {
+    public boolean isFloatingVehicle() {
         return false;
     }
 
@@ -136,6 +139,26 @@ public class VehicleRentalStation implements VehicleRentalPlace {
                 vehicleSpacesAvailable.keySet().stream()
             )
             .anyMatch(rentalVehicleType -> rentalVehicleType.formFactor.equals(RentalVehicleType.FormFactor.CAR));
+    }
+
+    @Override
+    public Set<FormFactor> getAvailablePickupFormFactors(boolean includeRealtimeAvailability) {
+        return vehicleTypesAvailable
+                .entrySet()
+                .stream()
+                .filter(e -> !includeRealtimeAvailability || e.getValue() > 0)
+                .map(e -> e.getKey().formFactor)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<FormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability) {
+        return vehicleSpacesAvailable
+                .entrySet()
+                .stream()
+                .filter(e -> !includeRealtimeAvailability || e.getValue() > 0)
+                .map(e -> e.getKey().formFactor)
+                .collect(Collectors.toSet());
     }
 
     @Override

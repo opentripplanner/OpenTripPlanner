@@ -328,6 +328,10 @@ otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     'TRANSIT,BICYCLE_RENT'     : _tr('Transit & Rented Bicycle'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    'SCOOTER_RENT'             : _tr('Rented Scooter'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    'TRANSIT,SCOOTER_RENT'     : _tr('Transit & Rented Scooter'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "FLEX_ACCESS,WALK,TRANSIT" : _tr('Transit with flex access'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "FLEX_EGRESS,WALK,TRANSIT" : _tr('Transit with flex egress'),

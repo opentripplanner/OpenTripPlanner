@@ -80,7 +80,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
-import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
@@ -88,6 +87,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
@@ -111,9 +111,6 @@ public class Graph implements Serializable {
         = new SimpleIntersectionTraversalCostModel(DEFAULT_DRIVING_DIRECTION);
 
     private final OtpProjectInfo projectInfo = projectInfo();
-
-    // TODO Remove this field, use Router.routerId ?
-    public String routerId;
 
     private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
@@ -351,8 +348,6 @@ public class Graph implements Serializable {
         if (e != null) {
             turnRestrictions.remove(e);
             streetNotesService.removeStaticNotes(e);
-
-            if (e instanceof EdgeWithCleanup) ((EdgeWithCleanup) e).detach();
 
             if (e.fromv != null) {
                 e.fromv.removeOutgoing(e);
@@ -972,6 +967,10 @@ public class Graph implements Serializable {
 
     public VehicleRentalStationService getVehicleRentalStationService() {
         return getService(VehicleRentalStationService.class);
+    }
+
+    public VehicleParkingService getVehicleParkingService() {
+        return getService(VehicleParkingService.class);
     }
 
     public Collection<Notice> getNoticesByEntity(TransitEntity entity) {

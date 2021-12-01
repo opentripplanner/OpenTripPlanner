@@ -14,6 +14,8 @@ import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -83,8 +85,8 @@ public class EnumTypes {
             .name("VertexType")
             .value("normal", VertexType.NORMAL)
             .value("transit", VertexType.TRANSIT)
-            .value("bikePark", VertexType.BIKEPARK)
-            .value("bikeShare", VertexType.BIKESHARE)
+            .value("bikePark", VertexType.VEHICLEPARKING)
+            .value("bikeShare", VertexType.VEHICLERENTAL)
             //TODO QL: .value("parkAndRide", VertexType.PARKANDRIDE)
             .build();
 
@@ -106,6 +108,10 @@ public class EnumTypes {
         .value("bike_rental", StreetMode.BIKE_RENTAL, "Walk to a bike rental point, "
             + "bike to a bike rental drop-off point, and walk the rest of the way. This can include "
             + "bike rental at fixed locations or free-floating services.")
+        .value("scooter_rental", StreetMode.SCOOTER_RENTAL, "Walk to a scooter "
+                + "rental point, ride a scooter to a scooter rental drop-off point, and walk the "
+                + "rest of the way. This can include scooter rental at fixed locations or "
+                + "free-floating services.")
         .value("car", StreetMode.CAR, "Car only. Direct mode only.")
         .value("car_park", StreetMode.CAR_TO_PARK, "Start in the car, drive to a "
             + "parking area, and walk the rest of the way. Direct mode and access mode only.")
@@ -133,6 +139,7 @@ public class EnumTypes {
             .value("transit", TraverseMode.TRANSIT, "Any for of public transportation")
             .value("foot", TraverseMode.WALK)
             .value("car", TraverseMode.CAR)
+            .value("scooter", TraverseMode.SCOOTER)
             // TODO OTP2 - Car park no added
             // .value("car_park", TraverseMode.CAR_PARK, "Combine with foot and transit for park and ride.")
             // .value("car_dropoff", TraverseMode.CAR_DROPOFF, "Combine with foot and transit for kiss and ride.")
@@ -273,6 +280,25 @@ public class EnumTypes {
         .value("arrivals", ArrivalDeparture.ARRIVALS, "Only show arrivals")
         .value("departures", ArrivalDeparture.DEPARTURES, "Only show departures")
         .value("both", ArrivalDeparture.BOTH, "Show both arrivals and departures")
+        .build();
+
+    public static GraphQLEnumType ROUTING_ERROR_CODE = GraphQLEnumType.newEnum()
+        .name("RoutingErrorCode")
+        .value("noTransitConnection", RoutingErrorCode.NO_TRANSIT_CONNECTION, "No transit connection was found between the origin and destination withing the operating day or the next day")
+        .value("noTransitConnectionInSearchWindow", RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, "Transit connection was found, but it was outside the search window, see metadata for the next search window")
+        .value("outsideServicePeriod", RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, "The date specified is outside the range of data currently loaded into the system")
+        .value("outsideBounds", RoutingErrorCode.OUTSIDE_BOUNDS, "The coordinates are outside the bounds of the data currently loaded into the system")
+        .value("locationNotFound", RoutingErrorCode.LOCATION_NOT_FOUND, "The specified location is not close to any streets or transit stops")
+        .value("noStopsInRange", RoutingErrorCode.NO_STOPS_IN_RANGE, "No stops are reachable from the location specified. You can try searching using a different access or egress mode")
+        .value("walkingBetterThanTransit", RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search")
+        .value("systemError", RoutingErrorCode.SYSTEM_ERROR, "An unknown error happened during the search. The details have been logged to the server logs")
+        .build();
+
+    public static GraphQLEnumType INPUT_FIELD = GraphQLEnumType.newEnum()
+        .name("InputField")
+        .value("dateTime", InputField.DATE_TIME)
+        .value("from", InputField.FROM_PLACE)
+        .value("to", InputField.TO_PLACE)
         .build();
 
     public static Object enumToString(GraphQLEnumType type, Enum<?> value) {

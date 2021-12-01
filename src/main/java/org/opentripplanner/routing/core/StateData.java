@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 import java.util.Set;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 
 /**
  * StateData contains the components of search state that are unlikely to be changed as often as
@@ -16,9 +17,7 @@ public class StateData implements Cloneable {
 
     // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
 
-    protected boolean carParked;
-
-    protected boolean bikeParked;
+    protected boolean vehicleParked;
 
     protected VehicleRentalState vehicleRentalState;
 
@@ -42,6 +41,8 @@ public class StateData implements Cloneable {
     protected boolean backWalkingBike;
 
     public String vehicleRentalNetwork;
+
+    public FormFactor rentalVehicleFormFactor;
 
     /* This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
     protected boolean enteredNoThroughTrafficArea;

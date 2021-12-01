@@ -13,5 +13,7 @@ public class OtpNumberFormatTest {
         assertEquals("$0.01", OtpNumberFormat.formatCost(1));
         assertEquals("$22", OtpNumberFormat.formatCost(2200));
         assertEquals("$21.97", OtpNumberFormat.formatCost(2197));
+        assertEquals("$9999.99", OtpNumberFormat.formatCost(999_999));
+        assertEquals("$10000", OtpNumberFormat.formatCost(1_000_000));
     }
 }

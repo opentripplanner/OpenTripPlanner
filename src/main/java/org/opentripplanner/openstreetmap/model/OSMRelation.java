@@ -18,4 +18,9 @@ public class OSMRelation extends OSMWithTags {
   public String toString() {
     return "osm relation " + id;
   }
+
+  @Override
+  public String getOpenStreetMapLink() {
+    return String.format("http://www.openstreetmap.org/relation/%d", getId());
+  }
 }

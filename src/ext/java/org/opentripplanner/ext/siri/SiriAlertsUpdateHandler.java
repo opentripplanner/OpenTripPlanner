@@ -36,7 +36,6 @@ import uk.org.siri.siri20.OperatorRefStructure;
 import uk.org.siri.siri20.PtSituationElement;
 import uk.org.siri.siri20.RoutePointTypeEnumeration;
 import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.SeverityEnumeration;
 import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
 import uk.org.siri.siri20.StopPointRef;
 import uk.org.siri.siri20.VehicleJourneyRef;
@@ -417,12 +416,8 @@ public class SiriAlertsUpdateHandler {
 
         alert.alertType = situation.getReportType();
 
-        if (situation.getSeverity() != null) {
-            alert.severity = situation.getSeverity().value();
-        } else {
-            // When severity is not set - use default
-            alert.severity = SeverityEnumeration.NORMAL.value();
-        }
+        alert.severity =
+                SiriSeverityMapper.getAlertSeverityForSiriSeverity(situation.getSeverity());
 
         if (situation.getParticipantRef() != null) {
             String codespace = situation.getParticipantRef().getValue();

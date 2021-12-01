@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 /**
  * This is for translated strings for which translations are read from OSM or GTFS alerts.
@@ -22,9 +23,9 @@ public class TranslatedString implements I18NString, Serializable {
      * Store all translations, so we don't get memory overhead for identical strings
      * As this is static, it isn't serialized when saving the graph.
      */
-    private static HashMap<Map<String, String>, I18NString> intern = new HashMap<>();
+    private static final HashMap<Map<String, String>, I18NString> intern = new HashMap<>();
 
-    private Map<String, String> translations = new HashMap<>();
+    private final Map<String, String> translations = new HashMap<>();
 
     private TranslatedString(Map<String, String> translations) {
         for (Map.Entry<String, String> i : translations.entrySet()) {
@@ -39,6 +40,11 @@ public class TranslatedString implements I18NString, Serializable {
     @Override
     public boolean equals(Object other) {
         return (other instanceof TranslatedString) && this.translations.equals(((TranslatedString)other).translations);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(translations);
     }
 
     /**
@@ -75,7 +81,7 @@ public class TranslatedString implements I18NString, Serializable {
      * @return The available translations
      */
     public List<Entry<String,String>> getTranslations() {
-        return new ArrayList<Entry<String, String>>(translations.entrySet());
+        return new ArrayList<>(translations.entrySet());
     }
 
     /**

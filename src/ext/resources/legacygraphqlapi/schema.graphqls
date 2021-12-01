@@ -55,19 +55,43 @@ type Alert implements Node {
     Agency affected by the disruption. Note that this value is present only if the
     disruption has an effect on all operations of the agency (e.g. in case of a strike).
     """
-    agency: Agency
+    agency: Agency @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected agencies.
+       Use entities instead.
+       """
+    )
 
     """Route affected by the disruption"""
-    route: Route
+    route: Route @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected routes.
+       Use entities instead.
+       """
+    )
 
     """Trip affected by the disruption"""
-    trip: Trip
+    trip: Trip @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected trips.
+       Use entities instead.
+       """
+    )
 
     """Stop affected by the disruption"""
-    stop: Stop
+    stop: Stop @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected stops.
+       Use entities instead.
+       """
+    )
 
     """Patterns affected by the disruption"""
-    patterns: [Pattern]
+    patterns: [Pattern] @deprecated(reason: "This will always return an empty list. Use entities instead.")
 
     """Header of the alert, if available"""
     alertHeaderText: String
@@ -105,6 +129,11 @@ type Alert implements Node {
     Time when this alert is not in effect anymore. Format: Unix timestamp in seconds
     """
     effectiveEndDate: Long
+
+    """
+    Entities affected by the disruption.
+    """
+    entities: [AlertEntity]
 }
 
 """Cause of a alert"""
@@ -177,7 +206,14 @@ enum AlertEffectType {
 
     """NO_EFFECT"""
     NO_EFFECT
+
+    """ACCESSIBILITY_ISSUE"""
+    ACCESSIBILITY_ISSUE
 }
+
+
+"""Entity related to an alert"""
+union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip
 
 """Severity level of a alert"""
 enum AlertSeverityLevelType {
@@ -231,6 +267,123 @@ type BikePark implements Node & PlaceInterface {
 
     """Latitude of the bike park (WGS 84)"""
     lat: Float
+}
+
+"""Vehicle parking represents a location where bicycles or cars can be parked."""
+type VehicleParking implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the park"""
+    vehicleParkingId: String
+
+    """Name of the park"""
+    name: String!
+
+    """
+    If true, value of `spacesAvailable` is updated from a real-time source.
+    """
+    realtime: Boolean
+
+    """Longitude of the bike park (WGS 84)"""
+    lon: Float
+
+    """Latitude of the bike park (WGS 84)"""
+    lat: Float
+
+    """
+    URL which contains details of this vehicle parking.
+    """
+    detailsUrl: String
+
+    """
+    URL of an image which may be displayed to the user showing the vehicle parking.
+    """
+    imageUrl: String
+
+    """
+    Source specific tags of the vehicle parking, which describe the available features. For example
+    park_and_ride, bike_lockers, or static_osm_data.
+    """
+    tags: [String]
+
+    """
+    A short translatable note containing details of this vehicle parking.
+    """
+    note: String
+
+    """
+    The state of this vehicle parking.
+    Only ones in an OPERATIONAL state may be used for Park and Ride.
+    """
+    state: VehicleParkingState
+
+    """
+    Does this vehicle parking have spaces (capacity) for bicycles.
+    """
+    bicyclePlaces: Boolean
+
+    """
+    Does this vehicle parking have spaces (capacity) for either wheelchair accessible (disabled)
+    or normal cars.
+    """
+    anyCarPlaces: Boolean
+
+    """
+    Does this vehicle parking have spaces (capacity) for cars excluding wheelchair accessible spaces.
+    Use anyCarPlaces to check if any type of car may use this vehicle parking.
+    """
+    carPlaces: Boolean
+
+    """
+    Does this vehicle parking have wheelchair accessible (disabled) car spaces (capacity).
+    """
+    wheelchairAccessibleCarPlaces: Boolean
+
+    """
+    The capacity (maximum available spaces) of this vehicle parking.
+    """
+    capacity: VehicleParkingSpaces
+
+    """
+    The currently available spaces at this vehicle parking.
+    """
+    availability: VehicleParkingSpaces
+}
+
+"""
+The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that they
+may be represented differently to the user.
+"""
+enum VehicleParkingState {
+    """May be used for park and ride."""
+    OPERATIONAL
+    """Can't be used for park and ride."""
+    TEMPORARILY_CLOSED
+    """Can't be used for park and ride."""
+    CLOSED
+}
+
+"""
+The number of spaces by type. null if unknown.
+"""
+type VehicleParkingSpaces {
+    """
+    The number of bicycle spaces.
+    """
+    bicycleSpaces: Int
+
+    """
+    The number of car spaces.
+    """
+    carSpaces: Int
+
+    """
+    The number of wheelchair accessible (disabled) car spaces.
+    """
+    wheelchairAccessibleCarSpaces: Int
 }
 
 """
@@ -1072,6 +1225,9 @@ enum Mode {
     """RAIL"""
     RAIL
 
+    """SCOOTER"""
+    SCOOTER
+
     """SUBWAY"""
     SUBWAY
 
@@ -1270,10 +1426,13 @@ type Place {
     rentalVehicle: RentalVehicle
 
     """The bike parking related to the place"""
-    bikePark: BikePark
+    bikePark: BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """The car parking related to the place"""
-    carPark: CarPark
+    carPark: CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
+
+    """The vehicle parking related to the place"""
+    vehicleParking: VehicleParking
 }
 
 type placeAtDistance implements Node {
@@ -1686,6 +1845,12 @@ type QueryType {
 
         """Only return alerts with these causes"""
         cause: [AlertCauseType!]
+
+        """Only return alerts affecting these routes"""
+        route: [String!]
+
+        """Only return alerts affecting these stops"""
+        stop: [String!]
     ): [Alert]
 
     """Get the time range for which the API has data available"""
@@ -1737,12 +1902,12 @@ type QueryType {
     vehicleRentalStation(id: String!): VehicleRentalStation
 
     """Get all bike parks"""
-    bikeParks: [BikePark]
+    bikeParks: [BikePark] @deprecated(reason: "bikeParks is deprecated. Use vehicleParkings instead.")
 
     """
     Get a single bike park based on its ID, i.e. value of field `bikeParkId`
     """
-    bikePark(id: String!): BikePark
+    bikePark(id: String!): BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """Get all car parks"""
     carParks(
@@ -1751,10 +1916,25 @@ type QueryType {
         **Note:** if an id is invalid (or the car park service is unavailable) the returned list will contain `null` values.
         """
         ids: [String]
-    ): [CarPark]
+    ): [CarPark] @deprecated(reason: "carParks is deprecated. Use vehicleParkings instead.")
 
     """Get a single car park based on its ID, i.e. value of field `carParkId`"""
-    carPark(id: String!): CarPark
+    carPark(id: String!): CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
+
+    """Get all vehicle parkings"""
+    vehicleParkings(
+        """
+        Return vehicle parkings with these ids.
+        **Note:** if an id is invalid (or the vehicle parking service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [VehicleParking]
+
+    """
+    Get a single vehicle parking based on its ID
+    """
+    vehicleParking(id: String!): VehicleParking
 
     """Needed until https://github.com/facebook/relay/issues/112 is resolved"""
     viewer: QueryType
@@ -2011,7 +2191,7 @@ type QueryType {
         debugItineraryFilter: Boolean
 
         """Is bike rental allowed? Default value: false"""
-        allowBikeRental: Boolean
+        allowBikeRental: Boolean @deprecated(reason: "Rental is specified by modes")
 
         """
         Whether arriving at the destination with a rented (station) bicycle is allowed without
@@ -2447,6 +2627,36 @@ type stopAtDistanceEdge {
     """The item at the end of the edge"""
     node: stopAtDistance
     cursor: String!
+}
+
+"""
+Stop that should (but not guaranteed) to exist on a route.
+"""
+type StopOnRoute {
+    """
+    Stop at the route. It's also possible that the stop is no longer on the route
+    or that the stop is null when it can no longer be found.
+    """
+    stop: Stop
+    """
+    Route which contains the stop. Route is null if it can't be found anymore.
+    """
+    route: Route
+}
+
+"""
+Stop that should (but not guaranteed) to exist on a trip.
+"""
+type StopOnTrip {
+    """
+    Stop at the trip. It's also possible that the stop is no longer on the trip
+    or that the stop is null when it can no longer be found.
+    """
+    stop: Stop
+    """
+    Trip which contains the stop. Route is null if it can't be found anymore.
+    """
+    trip: Trip
 }
 
 """

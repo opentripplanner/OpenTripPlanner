@@ -2,9 +2,7 @@ package org.opentripplanner.routing.api.request;
 
 
 import java.util.function.DoubleFunction;
-
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
-import org.opentripplanner.routing.algorithm.filterchain.filter.AddMinSafeTransferCostFilter;
 
 /**
  * Group by Similarity filter parameters
@@ -36,17 +34,6 @@ public class ItineraryFilterParameters {
    * 1.0 to turn off
    */
   public double groupedOtherThanSameLegsMaxCostMultiplier;
-
-  /**
-   * If set greater than zero(0.0), an addition to the itinerary generalized-cost for "unsafe
-   * transfers" is added to the generalized-cost for all itineraries. The extra cost is calculated
-   * by first calculating a safe-transfer-time. Then the given factor is multiplied with the
-   * difference between the actual and safe transfer time. The safe transfer time increase for
-   * long long journeys.
-   *
-   * @see AddMinSafeTransferCostFilter for details on calculating the extra unsafe transfer cost.
-   */
-  public double minSafeTransferTimeFactor;
 
   /**
    * A relative maximum limit for the generalized cost for transit itineraries. The limit is a
@@ -105,7 +92,6 @@ public class ItineraryFilterParameters {
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepThree = 0.68;
     this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
-    this.minSafeTransferTimeFactor = 0.0;
     this.bikeRentalDistanceRatio = 0.0;
     this.parkAndRideDurationRatio = 0.0;
     this.transitGeneralizedCostLimit =
@@ -123,7 +109,6 @@ public class ItineraryFilterParameters {
       double groupSimilarityKeepOne,
       double groupSimilarityKeepThree,
       double groupedOtherThanSameLegsMaxCostMultiplier,
-      double minSafeTransferTimeFactor,
       DoubleFunction<Double> transitGeneralizedCostLimit,
       DoubleFunction<Double> nonTransitGeneralizedCostLimit,
       double bikeRentalDistanceRatio,
@@ -133,7 +118,6 @@ public class ItineraryFilterParameters {
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
     this.groupSimilarityKeepThree = groupSimilarityKeepThree;
     this.groupedOtherThanSameLegsMaxCostMultiplier = groupedOtherThanSameLegsMaxCostMultiplier;
-    this.minSafeTransferTimeFactor = minSafeTransferTimeFactor;
     this.transitGeneralizedCostLimit = transitGeneralizedCostLimit;
     this.nonTransitGeneralizedCostLimit = nonTransitGeneralizedCostLimit;
     this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;

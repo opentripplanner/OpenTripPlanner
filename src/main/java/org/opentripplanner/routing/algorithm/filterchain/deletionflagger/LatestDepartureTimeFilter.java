@@ -6,8 +6,9 @@ import org.opentripplanner.model.plan.Itinerary;
 import java.time.Instant;
 
 public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
-    private final long limitMs;
+    public static final String TAG = "latest-departure-time-limit";
 
+    private final long limitMs;
 
     public LatestDepartureTimeFilter(Instant latestDepartureTime) {
         this.limitMs = latestDepartureTime.toEpochMilli();
@@ -15,7 +16,12 @@ public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
 
     @Override
     public String name() {
-        return "latest-departure-time-limit";
+        return TAG;
+    }
+
+    @Override
+    public boolean skipAlreadyFlaggedItineraries() {
+        return false;
     }
 
     @Override
