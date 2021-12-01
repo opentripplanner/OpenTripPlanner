@@ -16,7 +16,7 @@ import ucar.nc2.Variable;
 import ucar.nc2.units.DateUnit;
 
 /**
- * Generic data file which is read according to graphs/data-settings.json settings
+ * Generic data file which is read according to data-overlay-config.json settings
  *
  * @author Katja Danilova
  */

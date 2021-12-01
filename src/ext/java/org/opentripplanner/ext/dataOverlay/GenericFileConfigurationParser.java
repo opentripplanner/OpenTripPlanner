@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class parses the settings from data-settings.json data source and formats them based on
+ * This class parses the settings from data-overlay-config.json data source and formats them based on
  * use-case (input grid data parsing, request parameters)
  *
  * @author Katja Danilova
@@ -98,7 +98,7 @@ public class GenericFileConfigurationParser {
      * parameter, value = penalty parameter. These parameters will be filled during request and
      * routing process
      *
-     * @param davaOverlayConfig settings from data-settings.json
+     * @param davaOverlayConfig settings from data-overlay-config.json
      * @return map of request parameters
      */
     public static Map<RequestParameters, RequestParameters> parseConfParam(DavaOverlayConfig davaOverlayConfig) {

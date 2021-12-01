@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.dataOverlay.configuration;
 
 /**
- * POJO class describing expected data-settings.json structure
+ * POJO class describing expected data-overlay-config.json structure
  *
  * @author Katja Danilova
  */

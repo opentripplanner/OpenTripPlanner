@@ -34,7 +34,7 @@ public class ConfigLoader {
     private static final String OTP_CONFIG_FILENAME = "otp-config.json";
     private static final String BUILD_CONFIG_FILENAME = "build-config.json";
     private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
-    private static final String DATA_OVERLAY_CONFIG_FILENAME = "data-settings.json";
+    private static final String DATA_OVERLAY_CONFIG_FILENAME = "data-overlay-config.json";
 
     /** When echoing config files to logs, values for these keys will be hidden. */
     private static final Set<String> REDACT_KEYS = Set.of("secretKey", "accessKey", "gsCredentials");
@@ -131,7 +131,7 @@ public class ConfigLoader {
     }
 
     /**
-     * Loads data overlay configuration from data-settings.json
+     * Loads data overlay configuration from data-overlay-config.json
      */
     public DavaOverlayConfig loadDataOverlayConfig() {
         JsonNode node = loadJsonByFilename(DATA_OVERLAY_CONFIG_FILENAME);
