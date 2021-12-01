@@ -473,20 +473,13 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             s1.incrementWalkDistance(getEffectiveBikeDistance());
         }
 
-        s1.incrementTimeInSeconds(roundedTime);
-        
-        s1.incrementWeight(weight);
-
-        /*
-         * If traverse mode is WALK or BICYCLE and the request contains the parameters from data-settings.json
-         * then the weight is updated based on additional parameters (like air quality)
-         * Weight is increased for each quality parameter defined in the request.
-         */
-        boolean walkingOrBiking = traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE;
-
-        if (walkingOrBiking && OTPFeature.DataOverlay.isOn()) {
-            s1.incrementWeight(calculateDataOverlayPenalties(options));
+        if (OTPFeature.DataOverlay.isOn() && (traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE)) {
+            weight += calculateDataOverlayPenalties(options);
         }
+
+        s1.incrementTimeInSeconds(roundedTime);
+
+        s1.incrementWeight(weight);
 
         return s1;
     }
