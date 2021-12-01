@@ -15,6 +15,7 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
@@ -206,13 +207,13 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
               }
               if (entitySelector instanceof EntitySelector.StopAndRoute) {
                 StopAndRouteOrTripKey stopAndRouteKey = ((EntitySelector.StopAndRoute) entitySelector).stopAndRoute;
-                Stop stop = stopAndRouteKey == null ? null : getRoutingService(environment).getStopForId(stopAndRouteKey.stop);
+                StopLocation stop = stopAndRouteKey == null ? null : getRoutingService(environment).getStopForId(stopAndRouteKey.stop);
                 Route route = stopAndRouteKey == null ? null : getRoutingService(environment).getRouteForId(stopAndRouteKey.routeOrTrip);
                 return new LegacyGraphQLStopOnRoute(stop, route);
               }
               if (entitySelector instanceof EntitySelector.StopAndTrip) {
                 StopAndRouteOrTripKey stopAndTripKey = ((EntitySelector.StopAndTrip) entitySelector).stopAndTrip;
-                Stop stop = stopAndTripKey == null ? null : getRoutingService(environment).getStopForId(stopAndTripKey.stop);
+                StopLocation stop = stopAndTripKey == null ? null : getRoutingService(environment).getStopForId(stopAndTripKey.stop);
                 Trip trip = stopAndTripKey == null ? null : getRoutingService(environment).getTripForId().get(stopAndTripKey.routeOrTrip);
                 return new LegacyGraphQLStopOnTrip(stop, trip);
               }
