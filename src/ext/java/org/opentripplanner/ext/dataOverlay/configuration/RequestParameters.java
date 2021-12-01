@@ -4,6 +4,7 @@ package org.opentripplanner.ext.dataOverlay.configuration;
  * This class describes the expected routing request parameters for the generic data
  */
 public class RequestParameters {
+
     private String name;
     private String variable;
     private ParameterType parameterType;

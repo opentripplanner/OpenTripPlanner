@@ -1,9 +1,8 @@
 package org.opentripplanner.ext.dataOverlay;
 
-import org.opentripplanner.ext.dataOverlay.configuration.TimeUnit;
-
 import java.io.Serializable;
 import java.util.Map;
+import org.opentripplanner.ext.dataOverlay.configuration.TimeUnit;
 
 /**
  * Abstract grid data description class which is stored at StreetEdge.
@@ -11,17 +10,23 @@ import java.util.Map;
  * @author Katja Danilova
  */
 public class EdgeDataFromGenericFile implements Serializable {
+
     private final long dataStartTime;
     private final Map<String, float[]> variableValues;
     private final TimeUnit timeUnit;
 
     /**
      * Sets the abstract grid data
-     *  @param dataStartTime the time when the grid records start
+     *
+     * @param dataStartTime  the time when the grid records start
      * @param variableValues map of variable names and arrays of their values
-     * @param timeUnit time unit of the data overlay
+     * @param timeUnit       time unit of the data overlay
      */
-    public EdgeDataFromGenericFile(long dataStartTime, Map<String, float[]> variableValues, TimeUnit timeUnit) {
+    public EdgeDataFromGenericFile(
+            long dataStartTime,
+            Map<String, float[]> variableValues,
+            TimeUnit timeUnit
+    ) {
         this.dataStartTime = dataStartTime;
         this.variableValues = variableValues;
         this.timeUnit = timeUnit;

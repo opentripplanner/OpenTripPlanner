@@ -6,6 +6,7 @@ package org.opentripplanner.ext.dataOverlay.configuration;
  * @author Katja Danilova
  */
 public class DavaOverlayConfig {
+
     private String fileName;
     private String latitudeVariable;
     private String longitudeVariable;

@@ -4,6 +4,7 @@ package org.opentripplanner.ext.dataOverlay.configuration;
  * This class describes the variables for the incoming .nc data file
  */
 public class IndexVariable {
+
     private String name;
     private String displayName;
     private String variable;
