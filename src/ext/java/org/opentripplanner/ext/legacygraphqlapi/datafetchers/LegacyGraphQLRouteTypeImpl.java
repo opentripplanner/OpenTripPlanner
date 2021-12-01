@@ -2,11 +2,13 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.Collection;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteType;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.services.TransitAlertService;
 
 public class LegacyGraphQLRouteTypeImpl
         implements LegacyGraphQLDataFetchers.LegacyGraphQLRouteType {
@@ -21,16 +23,17 @@ public class LegacyGraphQLRouteTypeImpl
         return environment -> {
             int routeType = getSource(environment).getRouteType();
             Agency agency = getSource(environment).getAgency();
-            if (agency != null) {
-                return environment.<LegacyGraphQLRequestContext>getContext()
-                        .getRoutingService()
-                        .getTransitAlertService()
-                        .getRouteTypeAndAgencyAlerts(routeType, agency.getId());
-            }
-            return environment.<LegacyGraphQLRequestContext>getContext()
+            String feedId = agency.getId().getFeedId();
+            TransitAlertService service = environment.<LegacyGraphQLRequestContext>getContext()
                     .getRoutingService()
-                    .getTransitAlertService()
-                    .getRouteTypeAlerts(routeType);
+                    .getTransitAlertService();
+            if (agency != null) {
+                Collection<TransitAlert> routeTypeAndAgencyAlerts =
+                        service.getRouteTypeAndAgencyAlerts(routeType, agency.getId());
+                routeTypeAndAgencyAlerts.addAll(service.getRouteTypeAlerts(routeType, feedId));
+                return routeTypeAndAgencyAlerts;
+            }
+            return service.getRouteTypeAlerts(routeType, feedId);
         };
     }
 
@@ -39,7 +42,7 @@ public class LegacyGraphQLRouteTypeImpl
         return environment -> getSource(environment).getRouteType();
     }
 
-    private LegacyGraphQLRouteType getSource(DataFetchingEnvironment environment) {
+    private LegacyGraphQLRouteTypeModel getSource(DataFetchingEnvironment environment) {
         return environment.getSource();
     }
 }

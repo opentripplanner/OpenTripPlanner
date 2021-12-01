@@ -5,6 +5,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
@@ -120,6 +121,15 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> List.of();
+  }
+
+  @Override
+  public DataFetcher<LegacyGraphQLRouteTypeModel> routeType() {
+    return environment -> {
+      Agency agency = getSource(environment).getAgency();
+      int type = getSource(environment).getType();
+      return new LegacyGraphQLRouteTypeModel(agency, type);
+    };
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

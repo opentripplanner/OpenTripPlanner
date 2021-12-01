@@ -2401,6 +2401,12 @@ type Route implements Node {
 
     """List of alerts which have an effect on the route"""
     alerts: [Alert]
+
+    """
+    GTFS route type of the route. There can be alerts that affect routes of a route type
+    or routes of an agency that are of certain route type.
+    """
+    routeType: RouteType!
 }
 
 """
@@ -2422,7 +2428,8 @@ type RouteType {
 
     """
     List of alerts which have an effect on the defined route type.
-    If agency is not null, the alerts only affect the route type for the specified agency.
+    If agency is not null, there can also be alerts that only affect the route type
+    for the specified agency in addition to alerts that affect the route type for all agencies.
     """
     alerts: [Alert]
 }

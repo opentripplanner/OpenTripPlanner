@@ -30,5 +30,5 @@ public interface TransitAlertService {
 
     Collection<TransitAlert> getRouteTypeAndAgencyAlerts(int routeType, FeedScopedId agency);
 
-    Collection<TransitAlert> getRouteTypeAlerts(int routeType);
+    Collection<TransitAlert> getRouteTypeAlerts(int routeType, String feedId);
 }

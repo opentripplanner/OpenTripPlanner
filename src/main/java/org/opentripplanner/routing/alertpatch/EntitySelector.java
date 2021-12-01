@@ -194,8 +194,11 @@ public interface EntitySelector {
 
     public final int routeType;
 
-    public RouteType(int routeType) {
+    public final String feedId;
+
+    public RouteType(int routeType, String feedId) {
       this.routeType = routeType;
+      this.feedId = feedId;
     }
 
     @Override
@@ -203,12 +206,12 @@ public interface EntitySelector {
       if (this == o) {return true;}
       if (o == null || getClass() != o.getClass()) {return false;}
       RouteType that = (RouteType) o;
-      return routeType == that.routeType;
+      return routeType == that.routeType && feedId.equals(that.feedId);
     }
 
     @Override
     public int hashCode() {
-      return 37 * routeType;
+      return 37 * routeType * Objects.hash(feedId);
     }
   }
 

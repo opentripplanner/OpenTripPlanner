@@ -5,7 +5,7 @@ import org.opentripplanner.model.Agency;
 /**
  * Class for route types. If agency is defined, the object is the route for the specific agency.
  */
-public class LegacyGraphQLRouteType {
+public class LegacyGraphQLRouteTypeModel {
 
     /**
      * If defined, this is the route type is only relevant for the agency.
@@ -17,7 +17,7 @@ public class LegacyGraphQLRouteType {
      */
     private final int routeType;
 
-    public LegacyGraphQLRouteType(
+    public LegacyGraphQLRouteTypeModel(
             Agency agency,
             int routeType
     ) {

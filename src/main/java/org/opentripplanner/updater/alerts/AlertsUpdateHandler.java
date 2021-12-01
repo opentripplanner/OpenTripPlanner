@@ -147,7 +147,7 @@ public class AlertsUpdateHandler {
                 }
             }
             else if (routeType != MISSING_INT_FIELD_VALUE) {
-                alertText.addEntity(new EntitySelector.RouteType(routeType));
+                alertText.addEntity(new EntitySelector.RouteType(routeType, feedId));
             } else {
                 String description = "Entity selector: "+informed;
                 alertText.addEntity(new EntitySelector.Unknown(description));

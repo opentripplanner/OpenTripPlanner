@@ -141,10 +141,10 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getRouteTypeAlerts(int routeType) {
+  public Collection<TransitAlert> getRouteTypeAlerts(int routeType, String feedId) {
     return transitAlertServices
             .stream()
-            .map(transitAlertService -> transitAlertService.getRouteTypeAlerts(routeType))
+            .map(transitAlertService -> transitAlertService.getRouteTypeAlerts(routeType, feedId))
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
   }

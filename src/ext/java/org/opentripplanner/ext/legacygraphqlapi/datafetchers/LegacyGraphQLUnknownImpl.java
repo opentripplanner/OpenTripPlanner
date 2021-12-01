@@ -3,7 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknown;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
 
 public class LegacyGraphQLUnknownImpl
         implements LegacyGraphQLDataFetchers.LegacyGraphQLUnknown {
@@ -13,7 +13,7 @@ public class LegacyGraphQLUnknownImpl
         return environment -> getSource(environment).getDescription();
     }
 
-    private LegacyGraphQLUnknown getSource(DataFetchingEnvironment environment) {
+    private LegacyGraphQLUnknownModel getSource(DataFetchingEnvironment environment) {
         return environment.getSource();
     }
 }

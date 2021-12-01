@@ -107,8 +107,8 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     }
 
     @Override
-    public Collection<TransitAlert> getRouteTypeAlerts(int routeType) {
-        return alerts.get(new EntitySelector.RouteType(routeType));
+    public Collection<TransitAlert> getRouteTypeAlerts(int routeType, String feedId) {
+        return alerts.get(new EntitySelector.RouteType(routeType, feedId));
     }
 
     @Override
