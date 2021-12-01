@@ -49,6 +49,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
     static Graph graph;
 
+    float delta = 0.01f;
+
     @Test
     public void parseCobbCountyAsScheduledDeviatedTrip() {
         var flexTrips = graph.flexTripsById.values();
@@ -60,6 +62,16 @@ public class ScheduledDeviatedTripTest extends FlexTest {
                 flexTrips.stream().map(FlexTrip::getClass).collect(
                         Collectors.toSet())
         );
+
+        var trip = getFlexTrip();
+        System.out.println(trip.getStops().stream().map(s -> s.getId().getId()).collect(Collectors.toList()));
+        var stop = trip.getStops().stream().filter(s -> s.getId().getId().equals("cujv")).findFirst().get();
+        assertEquals(33.85465, stop.getLat(), delta);
+        assertEquals(-84.60039, stop.getLon(), delta);
+
+        var flexZone = trip.getStops().stream().filter(s -> s.getId().getId().equals("zone_3")).findFirst().get();
+        assertEquals(33.825846635310214, flexZone.getLat(), delta);
+        assertEquals(-84.63430143459385, flexZone.getLon(), delta);
     }
 
     @Test
