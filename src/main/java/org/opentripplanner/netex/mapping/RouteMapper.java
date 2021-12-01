@@ -67,7 +67,16 @@ class RouteMapper {
         );
         otpRoute.setType(transportType);
         TransitMode mode = TransitModeMapper.mapMode(transportType);
-        otpRoute.setMode(mode);
+        if (mode == null) {
+            issueStore.add(
+                    "RouteMapper", "Treating %s route type for route %s as BUS.", transportType,
+                    otpRoute.getId().toString()
+            );
+            otpRoute.setMode(TransitMode.BUS);
+        }
+        else {
+            otpRoute.setMode(mode);
+        }
         if (line instanceof FlexibleLine_VersionStructure) {
             otpRoute.setFlexibleLineType(((FlexibleLine_VersionStructure) line)
                 .getFlexibleLineType().value());
