@@ -6,17 +6,17 @@ package org.opentripplanner.api.resource;
 public class DebugOutput {
 
     /**
-     * Time taken for worker initialization in milliseconds.
+     * Time taken for worker initialization in nanoseconds.
      */
     public final long precalculationTime;
 
     /**
-     * Time taken in the direct street router in milliseconds.
+     * Time taken in the direct street router in nanoseconds.
      */
     public final long directStreetRouterTime;
 
     /**
-     * Time taken in the transit router (including access/egress street router) in milliseconds.
+     * Time taken in the transit router (including access/egress street router) in nanoseconds.
      * Detailed timing information within the transit router is sored in transitRouterTimes.
      *
      * @see DebugOutput#transitRouterTimes;
@@ -25,17 +25,17 @@ public class DebugOutput {
 
     /**
      * Time taken in sorting and filtering of the itineraries from the direct and transit routers in
-     * milliseconds.
+     * nanoseconds.
      */
     public final long filteringTime;
 
     /**
-     * Time taken for the mapping of the internal classes to the api classes in milliseconds.
+     * Time taken for the mapping of the internal classes to the api classes in nanoseconds.
      */
     public final long renderingTime;
 
     /**
-     * Total time taken for the route request in milliseconds.
+     * Total time taken for the route request in nanoseconds.
      */
     public final long totalTime;
 
