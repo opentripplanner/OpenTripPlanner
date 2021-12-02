@@ -85,9 +85,22 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
     /** Start by adding the last transit leg with the egress leg attached. */
     public OptimizedPathTail<T> addTransitTail(TransitPathLeg<T> leg) {
-        egress(leg.nextLeg().asEgressLeg().egress());
-        var times = new BoardAndAlightTime(leg.trip(), leg.getFromStopPosition(), leg.getToStopPosition());
-        transit(leg.trip(), times);
+        var next = leg.nextLeg();
+        // this could also be a transfer to a flex leg
+        if(next.isTransferLeg()) {
+            next = next.nextLeg();
+        }
+        if (next.isEgressLeg()) {
+            egress(next.asEgressLeg().egress());
+            var times = new BoardAndAlightTime(
+                    leg.trip(),
+                    leg.getFromStopPosition(),
+                    leg.getToStopPosition()
+            );
+            transit(leg.trip(), times);
+        } else {
+            throw new IllegalStateException("We expect an egress leg at the end of the RAPTOR path.");
+        }
         return this;
     }
 
