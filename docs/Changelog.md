@@ -91,6 +91,7 @@
 - Update GtfsRealtime and include severity, effect and cause from GTFS RT [#3747](https://github.com/opentripplanner/OpenTripPlanner/pull/3747)
 - Handle miscellaneous service as BUS instead of crashing build [#3755](https://github.com/opentripplanner/OpenTripPlanner/pull/3755)
 - Update all timers to micrometer instances [#3744](https://github.com/opentripplanner/OpenTripPlanner/pull/3744)
+- Bugfix: ClassCastException when planning flex routes [#3762](https://github.com/opentripplanner/OpenTripPlanner/pull/3762)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
