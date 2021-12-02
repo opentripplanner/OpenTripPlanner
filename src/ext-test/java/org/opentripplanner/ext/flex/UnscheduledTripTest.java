@@ -25,8 +25,6 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
  */
 public class UnscheduledTripTest extends FlexTest {
 
-    static final String ASPEN_GTFS = "/flex/aspen-flex-on-demand.gtfs.zip";
-
     static Graph graph;
 
     @Test
