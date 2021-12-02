@@ -90,6 +90,7 @@
 - Remove old visibility graph library from walkable area builder [#3753](https://github.com/opentripplanner/OpenTripPlanner/pull/3753)
 - Update GtfsRealtime and include severity, effect and cause from GTFS RT [#3747](https://github.com/opentripplanner/OpenTripPlanner/pull/3747)
 - Handle miscellaneous service as BUS instead of crashing build [#3755](https://github.com/opentripplanner/OpenTripPlanner/pull/3755)
+- Update all timers to micrometer instances [#3744](https://github.com/opentripplanner/OpenTripPlanner/pull/3744)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
