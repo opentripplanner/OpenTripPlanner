@@ -19,6 +19,11 @@ import org.opentripplanner.util.OTPFeature;
 
 abstract public class FlexTest {
 
+    static final String ASPEN_GTFS = "/flex/aspen-flex-on-demand.gtfs.zip";
+    static final String COBB_FLEX_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
+    static final String COBB_BUS_30_GTFS = "/flex/cobblinc-bus-30-only.gtfs.zip";
+    static final String COBB_OSM = "/flex/cobb-county.filtered.osm.pbf";
+
     static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator(null);
     static final ServiceDate serviceDate = new ServiceDate(2021, 4, 11);
     static final int secondsSinceMidnight = LocalTime.of(10, 0).toSecondOfDay();

@@ -35,8 +35,6 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class ScheduledDeviatedTripTest extends FlexTest {
 
-    static final String COBB_COUNTY_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
-
     static Graph graph;
 
     @Test
@@ -121,7 +119,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
     @BeforeAll
     static void setup() throws URISyntaxException {
-        graph = FlexTest.buildFlexGraph(COBB_COUNTY_GTFS);
+        graph = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
     }
 
     private static NearbyStop getNearbyStop(FlexTrip trip) {
