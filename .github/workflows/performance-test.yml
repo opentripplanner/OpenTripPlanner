@@ -1,0 +1,55 @@
+name: Performance test
+
+on:
+  push:
+
+jobs:
+  perf-test:
+    runs-on: performance-test
+    steps:
+      - uses: actions/checkout@v2.3.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.2
+        with:
+          maven-version: 3.8.2
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Cache graph build input files paths
+        uses: actions/cache@v2
+        with:
+          path: |
+            graph/osm.pbf
+            graph/*.zip
+          key: graph
+
+      - name: Build jar
+        run: mvn -DskipTests --batch-mode package
+
+      - name: Download OSM & Netex data
+        run: |
+          mkdir -p graph
+          wget https://download.geofabrik.de/europe/norway-210101.osm.pbf -O graph/osm.pbf --no-clobber
+          wget https://storage.googleapis.com/marduk-production/outbound/netex/rb_norway-aggregated-netex.zip -O graph/rb_norway-aggregated-netex.zip --no-clobber
+
+      - name: Build Norway graph
+        run: |
+          # copying the Entur build config but removing the "storage" section because that needs credentials
+          jq '. | del(.storage)' docs/examples/entur/build-config.json > graph/build-config.json
+          cp target/otp-2.1.0-SNAPSHOT-shaded.jar otp.jar
+          java -Xmx32G -jar otp.jar --build --save graph
+
