@@ -10434,6 +10434,76 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                       "latitude": 45.530205,
                       "longitude": -122.666118
                     },
+                    "geometry": {
+                      "SRID": 0,
+                      "empty": false,
+                      "factory": {
+                        "SRID": 0,
+                        "coordinateSequenceFactory": { },
+                        "precisionModel": {
+                          "floating": true,
+                          "modelType": {
+                            "name": "FLOATING"
+                          },
+                          "scale": 0.0
+                        }
+                      },
+                      "geometries": [
+                        {
+                          "SRID": 0,
+                          "coordinates": {
+                            "coords": [
+                              -122.666118,
+                              45.530205
+                            ],
+                            "dimension": 2
+                          },
+                          "empty": false,
+                          "factory": {
+                            "SRID": 0,
+                            "coordinateSequenceFactory": { },
+                            "precisionModel": {
+                              "floating": true,
+                              "modelType": {
+                                "name": "FLOATING"
+                              },
+                              "scale": 0.0
+                            }
+                          },
+                          "rectangle": false,
+                          "simple": true,
+                          "valid": true
+                        },
+                        {
+                          "SRID": 0,
+                          "coordinates": {
+                            "coords": [
+                              -122.666118,
+                              45.530205
+                            ],
+                            "dimension": 2
+                          },
+                          "empty": false,
+                          "factory": {
+                            "SRID": 0,
+                            "coordinateSequenceFactory": { },
+                            "precisionModel": {
+                              "floating": true,
+                              "modelType": {
+                                "name": "FLOATING"
+                              },
+                              "scale": 0.0
+                            }
+                          },
+                          "rectangle": false,
+                          "simple": true,
+                          "valid": true
+                        }
+                      ],
+                      "rectangle": false,
+                      "simple": true,
+                      "valid": true
+                    },
                     "id": {
                       "feedId": "prt",
                       "id": "79-tc"
@@ -12877,6 +12947,76 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "coordinate": {
                   "latitude": 45.530205,
                   "longitude": -122.666118
+                },
+                "geometry": {
+                  "SRID": 0,
+                  "empty": false,
+                  "factory": {
+                    "SRID": 0,
+                    "coordinateSequenceFactory": { },
+                    "precisionModel": {
+                      "floating": true,
+                      "modelType": {
+                        "name": "FLOATING"
+                      },
+                      "scale": 0.0
+                    }
+                  },
+                  "geometries": [
+                    {
+                      "SRID": 0,
+                      "coordinates": {
+                        "coords": [
+                          -122.666118,
+                          45.530205
+                        ],
+                        "dimension": 2
+                      },
+                      "empty": false,
+                      "factory": {
+                        "SRID": 0,
+                        "coordinateSequenceFactory": { },
+                        "precisionModel": {
+                          "floating": true,
+                          "modelType": {
+                            "name": "FLOATING"
+                          },
+                          "scale": 0.0
+                        }
+                      },
+                      "rectangle": false,
+                      "simple": true,
+                      "valid": true
+                    },
+                    {
+                      "SRID": 0,
+                      "coordinates": {
+                        "coords": [
+                          -122.666118,
+                          45.530205
+                        ],
+                        "dimension": 2
+                      },
+                      "empty": false,
+                      "factory": {
+                        "SRID": 0,
+                        "coordinateSequenceFactory": { },
+                        "precisionModel": {
+                          "floating": true,
+                          "modelType": {
+                            "name": "FLOATING"
+                          },
+                          "scale": 0.0
+                        }
+                      },
+                      "rectangle": false,
+                      "simple": true,
+                      "valid": true
+                    }
+                  ],
+                  "rectangle": false,
+                  "simple": true,
+                  "valid": true
                 },
                 "id": {
                   "feedId": "prt",
