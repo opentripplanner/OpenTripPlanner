@@ -53,9 +53,6 @@ public class RepairStopTimesForEachTripOperation {
             /* Fetch the stop times for this trip. Copy the list since it's immutable. */
             List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 
-            /* Remove stoptimes without stops */
-            stopTimes.removeIf(st -> !(st.getStop() instanceof StopLocation));
-
             /* Stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);
             if (!removedStopSequences.isEmpty()) {
