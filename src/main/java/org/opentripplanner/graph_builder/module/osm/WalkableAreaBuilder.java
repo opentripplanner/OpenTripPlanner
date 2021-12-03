@@ -241,9 +241,13 @@ public class WalkableAreaBuilder {
                         );
                         edges.addAll(newEdges);
                         ringEdges.addAll(newEdges);
-                        // TODO: this is really needed only for convex nodes, could be a perf optimization
-                        visibilityNodes.add(node);
+                        // A node can only be a visibility node only if it is an entrance to the
+                        // area or a convex point, i.e. the angle is over 180 degrees.
+                        if (outerRing.isNodeConvex(i)) {
+                            visibilityNodes.add(node);
+                        }
                         if (isStartingNode(node, osmWayIds)) {
+                            visibilityNodes.add(node);
                             startingNodes.add(node);
                         }
                     }
@@ -252,11 +256,15 @@ public class WalkableAreaBuilder {
                             OSMNode node = innerRing.nodes.get(j);
                             edges.addAll(createEdgesForRingSegment(edgeList, area, innerRing, j,
                                     alreadyAddedEdges));
-                            // TODO: this is really needed only for convex nodes, could be a perf optimization
-                            visibilityNodes.add(node);
+                            // A node can only be a visibility node only if it is an entrance to the
+                            // area or a convex point, i.e. the angle is over 180 degrees.
+                            // For holes, the internal angle is calculated, so we must swap the sign
+                            if (!innerRing.isNodeConvex(j)) {
+                                visibilityNodes.add(node);
+                            }
                             if (isStartingNode(node, osmWayIds)) {
+                                visibilityNodes.add(node);
                                 startingNodes.add(node);
-
                             }
                         }
                     }
