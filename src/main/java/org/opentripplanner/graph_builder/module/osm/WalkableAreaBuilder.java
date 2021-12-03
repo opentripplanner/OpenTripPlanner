@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
@@ -84,6 +85,8 @@ public class WalkableAreaBuilder {
     private OSMDatabase osmdb;
 
     private WayPropertySet wayPropertySet;
+
+    private Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
     private StreetEdgeFactory edgeFactory;
 
@@ -492,8 +495,17 @@ public class WalkableAreaBuilder {
 
             backStreet.setStreetClass(cls);
 
-            WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
-            handler.applyWayProperties(street, backStreet, wayData, areaEntity);
+            if (!wayPropertiesCache.containsKey(areaEntity)) {
+                WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
+                wayPropertiesCache.put(areaEntity, wayData);
+            }
+
+            handler.applyWayProperties(
+                street,
+                backStreet,
+                wayPropertiesCache.get(areaEntity),
+                areaEntity
+            );
             return Set.of(street, backStreet);
         } else {
             // take the part that intersects with the start vertex
@@ -566,8 +578,12 @@ public class WalkableAreaBuilder {
             I18NString name = handler.getNameForWay(areaEntity, id);
             namedArea.setName(name);
 
-            WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
-            Double safety = wayData.getSafetyFeatures().first;
+            if (!wayPropertiesCache.containsKey(areaEntity)) {
+                WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
+                wayPropertiesCache.put(areaEntity, wayData);
+            }
+
+            Double safety = wayPropertiesCache.get(areaEntity).getSafetyFeatures().first;
             namedArea.setBicycleSafetyMultiplier(safety);
 
             namedArea.setOriginalEdges(intersection);
