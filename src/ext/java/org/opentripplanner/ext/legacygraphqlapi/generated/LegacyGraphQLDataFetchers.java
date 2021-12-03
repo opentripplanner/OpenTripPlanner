@@ -745,7 +745,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<org.locationtech.jts.geom.Geometry> geoJson();
 
-        public DataFetcher<Iterable<EncodedPolylineBean>> polylines();
+        public DataFetcher<Iterable<EncodedPolylineBean>> googleEncoded();
     }
 
     /**

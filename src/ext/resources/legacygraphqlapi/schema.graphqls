@@ -850,7 +850,7 @@ type StopGeometries {
 
     Proper stops are represented as single point "lines".
     """
-    polylines: [Geometry]
+    googleEncoded: [Geometry]
 }
 
 input InputBanned {

@@ -17,7 +17,7 @@ public class LegacyGraphQLStopGeometriesImpl implements LegacyGraphQLStopGeometr
     }
 
     @Override
-    public DataFetcher<Iterable<EncodedPolylineBean>> polylines() {
+    public DataFetcher<Iterable<EncodedPolylineBean>> googleEncoded() {
         return env -> {
             var geometries = getSource(env);
             var polylines = new ArrayList<EncodedPolylineBean>();
