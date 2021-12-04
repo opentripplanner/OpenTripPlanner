@@ -211,9 +211,11 @@ public class WalkableAreaBuilder {
                 Collection<OSMNode> nodes = osmdb.getStopsInArea(area.parent);
                 if (nodes != null) {
                     for (OSMNode node : nodes) {
-                        platformLinkingVertices.add(handler.getVertexForOsmNode(node, areaEntity));
+                        OsmVertex vertex = handler.getVertexForOsmNode(node, areaEntity);
+                        platformLinkingVertices.add(vertex);
                         visibilityNodes.add(node);
                         startingNodes.add(node);
+                        edgeList.visibilityVertices.add(vertex);
                     }
                 }
 
@@ -230,6 +232,7 @@ public class WalkableAreaBuilder {
                             OSMNode node = osmdb.getNode(v.nodeId);
                             visibilityNodes.add(node);
                             startingNodes.add(node);
+                            edgeList.visibilityVertices.add(v);
                         }
                     }
 
@@ -252,6 +255,7 @@ public class WalkableAreaBuilder {
                         if (isStartingNode(node, osmWayIds)) {
                             visibilityNodes.add(node);
                             startingNodes.add(node);
+                            edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
                         }
                     }
                     for (Ring innerRing : outerRing.getHoles()) {
@@ -268,6 +272,7 @@ public class WalkableAreaBuilder {
                             if (isStartingNode(node, osmWayIds)) {
                                 visibilityNodes.add(node);
                                 startingNodes.add(node);
+                                edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
                             }
                         }
                     }
@@ -288,13 +293,16 @@ public class WalkableAreaBuilder {
             createNamedAreas(edgeList, ring, group.areas);
 
             for (OSMNode nodeI : visibilityNodes) {
+                IntersectionVertex startEndpoint = handler.getVertexForOsmNode(nodeI, areaEntity);
+                if (startingNodes.contains(nodeI)) {
+                    startingVertices.add(startEndpoint);
+                }
+
                 for (OSMNode nodeJ : visibilityNodes) {
                     P2<OSMNode> nodePair = new P2<OSMNode>(nodeI, nodeJ);
                     if (alreadyAddedEdges.contains(nodePair))
                         continue;
 
-                    IntersectionVertex startEndpoint = handler.getVertexForOsmNode(nodeI,
-                            areaEntity);
                     IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nodeJ,
                             areaEntity);
 
@@ -311,23 +319,11 @@ public class WalkableAreaBuilder {
                             edgeList
                         );
                         edges.addAll(segments);
-                        if (startingNodes.contains(nodeI)) {
-                            startingVertices.add(startEndpoint);
-                            for (AreaEdge segment: segments) {
-                                segment.getArea().visibilityVertices.add(startEndpoint);
-                            }
-                            if (platformLinkingVertices.contains(startEndpoint)) {
-                                ringEdges.addAll(segments);
-                            }
+                        if (platformLinkingVertices.contains(startEndpoint)) {
+                            ringEdges.addAll(segments);
                         }
-                        if (startingNodes.contains(nodeJ)) {
-                            startingVertices.add(endEndpoint);
-                            for (AreaEdge segment: segments) {
-                                segment.getArea().visibilityVertices.add(endEndpoint);
-                            }
-                            if (platformLinkingVertices.contains(endEndpoint)) {
-                                ringEdges.addAll(segments);
-                            }
+                        if (platformLinkingVertices.contains(endEndpoint)) {
+                            ringEdges.addAll(segments);
                         }
                     }
                 }
