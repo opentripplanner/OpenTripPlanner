@@ -156,6 +156,13 @@ public final class StopTime implements Comparable<StopTime> {
         return timepoint != MISSING_VALUE;
     }
 
+    public StopTime Shift(int timeShift){
+        StopTime r = new StopTime(this);
+        r.departureTime += timeShift;
+        r.arrivalTime += timeShift;
+        return r;
+    }
+
     /**
      * @return 1 if the stop-time is a timepoint location
      */

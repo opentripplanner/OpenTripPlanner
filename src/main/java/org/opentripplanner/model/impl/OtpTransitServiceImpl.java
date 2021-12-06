@@ -126,12 +126,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.trips = immutableList(builder.getTripsById().values());
         this.flexTrips = immutableList(builder.getFlexTripsById().values());
 
-        if(!builder.getFrequencies().isEmpty()) {
-            LOG.error(
-                "OTP2 do not support GTFS Trip Frequencies. "
-                + "See https://github.com/opentripplanner/OpenTripPlanner/issues/3243."
-            );
-        }
     }
 
     @Override

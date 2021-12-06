@@ -9,12 +9,8 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
+
+import org.opentripplanner.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +32,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
 
     /** The trips whose arrivals and departures are represented by this TripTimes */
     private final Trip trip;
+
+    public final Frequency frequency;
 
     // not final because these are set later, after TripTimes construction.
     private int serviceCode = -1;
@@ -132,6 +130,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      */
     public TripTimes(final Trip trip, final Collection<StopTime> stopTimes, final Deduplicator deduplicator) {
         this.trip = trip;
+        this.frequency = null;
         final int nStops = stopTimes.size();
         final int[] departures = new int[nStops];
         final int[] arrivals   = new int[nStops];
@@ -172,6 +171,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     public TripTimes(final TripTimes object) {
         this.timeShift = object.timeShift;
         this.trip = object.trip;
+        this.frequency = object.frequency;
         this.serviceCode = object.serviceCode;
         this.headsigns = object.headsigns;
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
@@ -185,6 +185,29 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         this.originalGtfsStopSequence = object.originalGtfsStopSequence;
         this.realTimeState = object.realTimeState;
         this.timepoints = object.timepoints;
+    }
+
+    public TripTimes(TripTimes object, Frequency frequency, int timeShift) {
+        this.trip = object.trip;
+        this.frequency = frequency;
+        this.timeShift  = timeShift;
+        this.serviceCode = object.serviceCode;
+        this.headsigns = object.headsigns;
+        this.scheduledArrivalTimes = object.scheduledArrivalTimes;
+        this.scheduledDepartureTimes = object.scheduledDepartureTimes;
+        this.arrivalTimes = null;
+        this.departureTimes = null;
+        this.recordedStops = object.recordedStops;
+        this.predictionInaccurateOnStops = object.predictionInaccurateOnStops;
+        this.pickupBookingInfos = object.pickupBookingInfos;
+        this.dropOffBookingInfos = object.dropOffBookingInfos;
+        this.originalGtfsStopSequence = object.originalGtfsStopSequence;
+        this.realTimeState = object.realTimeState;
+        this.timepoints = object.timepoints;
+    }
+
+    public Frequency getFrequency() {
+        return frequency;
     }
 
     public void setServiceCode(int serviceCode) {

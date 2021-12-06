@@ -4,13 +4,8 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.Trip;
+
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -30,6 +25,10 @@ public class Leg {
   public final TraverseMode mode;
 
   private final Trip trip;
+
+    public Frequency tripFrequency;
+
+    public int tripFrequencyStartTime;
 
   /**
    * The date and time this leg begins.
@@ -199,6 +198,7 @@ public class Leg {
   public Leg(Trip trip) {
     this.mode = TraverseMode.fromTransitMode(trip.getRoute().getMode());
     this.trip = trip;
+
   }
 
   /**
@@ -263,17 +263,25 @@ public class Leg {
      * in common.
      */
     public boolean isPartiallySameTransitLeg(Leg other) {
-      // Assert both legs are transit legs
-      if(!isTransitLeg() || !other.isTransitLeg()) { throw new IllegalStateException(); }
+        // Assert both legs are transit legs
+        if (!isTransitLeg() || !other.isTransitLeg()) { throw new IllegalStateException(); }
 
-      // Must be on the same service date
-      if(!serviceDate.equals(other.serviceDate)) { return false; }
+        // Must be on the same service date
+        if (!serviceDate.equals(other.serviceDate)) { return false; }
 
-      // If NOT the same trip, return false
-      if(!trip.getId().equals(other.trip.getId())) { return false; }
+        // If NOT the same trip, return false
+        if (!trip.getId().equals(other.trip.getId())) { return false; }
 
-      // Return true if legs overlap
-      return this.from.stopIndex < other.to.stopIndex && to.stopIndex > other.from.stopIndex;
+        // If a frequency based trip, then return false is not on the same frequency departure
+        if (tripFrequency != null && !isSameTripFrequency(other)) { return false; }
+
+        // Return true if legs overlap
+        return this.from.stopIndex < other.to.stopIndex && to.stopIndex > other.from.stopIndex;
+    }
+
+    private boolean isSameTripFrequency(Leg other) {
+        return tripFrequency.equals(other.tripFrequency)
+                && tripFrequencyStartTime == other.tripFrequencyStartTime;
     }
 
   /** For transit legs, the route agency. For non-transit legs {@code null}. */

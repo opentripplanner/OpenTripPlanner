@@ -182,6 +182,10 @@ public class RaptorPathToItineraryMapper {
         }
 
         leg.serviceDate = new ServiceDate(tripSchedule.getServiceDate());
+        if(tripTimes.frequency != null) {
+            leg.tripFrequency = tripTimes.frequency;
+            leg.tripFrequencyStartTime = tripTimes.getDepartureTime(0);
+        }
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());
         leg.from = mapStopToPlace(boardStop, boardStopIndexInPattern, tripTimes);
