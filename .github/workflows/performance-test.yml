@@ -53,3 +53,8 @@ jobs:
           cp target/otp-2.1.0-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save graph
 
+      - name: Copy graph, run speed test
+        run: |
+          mv graph/graph.obj src/test/resources/raptor/speedtest/norway
+          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.arguments="--dir=src/test/resources/raptor/speedtest/norway"
+
