@@ -42,7 +42,6 @@ jobs:
 
       - name: Download OSM & Netex data
         run: |
-          rm -rf graph
           mkdir -p graph
           wget https://download.geofabrik.de/europe/norway-210101.osm.pbf -O graph/osm.pbf --no-clobber || true
           wget https://storage.googleapis.com/marduk-production/outbound/netex/rb_norway-aggregated-netex.zip -O graph/rb_norway-aggregated-netex.zip --no-clobber || true
