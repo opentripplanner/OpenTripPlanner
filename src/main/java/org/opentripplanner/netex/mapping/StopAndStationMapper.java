@@ -14,9 +14,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.Issue;
+import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -43,6 +45,7 @@ class StopAndStationMapper {
     private final StationMapper stationMapper;
     private final StopMapper stopMapper;
     private final TariffZoneMapper tariffZoneMapper;
+    private final StopPlaceTypeMapper stopPlaceTypeMapper = new StopPlaceTypeMapper();
     private final DataImportIssueStore issueStore;
 
 
@@ -82,12 +85,15 @@ class StopAndStationMapper {
 
         Station station = mapStopPlaceAllVersionsToStation(selectedStopPlace);
         Collection<FareZone> fareZones = mapTariffZones(selectedStopPlace);
+        TransitMode transitMode = TransitModeMapper.mapMode(
+            stopPlaceTypeMapper.getTransportMode(selectedStopPlace)
+        );
 
         // Loop through all versions of the StopPlace in order to collect all quays, even if they
         // were deleted in never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Quay quay : listOfQuays(stopPlace)) {
-                addNewStopToParentIfNotPresent(quay, station, fareZones);
+                addNewStopToParentIfNotPresent(quay, station, fareZones, transitMode);
             }
         }
     }
@@ -144,9 +150,10 @@ class StopAndStationMapper {
     private void addNewStopToParentIfNotPresent(
         Quay quay,
         Station station,
-        Collection<FareZone> fareZones
+        Collection<FareZone> fareZones,
+        TransitMode transitMode
     ) {
-        // TODO OTP2 - This assumtion is only valid because Norway have a
+        // TODO OTP2 - This assumption is only valid because Norway have a
         //           - national stop register, we should add all stops/quays
         //           - for version resolution.
         // Continue if this is not newest version of quay
@@ -157,7 +164,7 @@ class StopAndStationMapper {
             return;
         }
 
-        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones);
+        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode);
         if (stop == null) return;
 
         station.addChildStop(stop);

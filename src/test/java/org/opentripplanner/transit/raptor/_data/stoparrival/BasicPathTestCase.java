@@ -10,6 +10,12 @@ import static org.opentripplanner.util.time.TimeUtils.time;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.routing.algorithm.GraphRoutingTest;
+import org.opentripplanner.routing.algorithm.raptor.transit.FlexAccessEgressAdapter;
+import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
@@ -141,6 +147,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
     private static final RaptorTransfer ACCESS = walk(STOP_A, ACCESS_DURATION, ACCESS_COST);
     private static final RaptorTransfer EGRESS = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
+    // this is of course not a real flex egress
+    private static final RaptorTransfer FLEX = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
 
     public static final String LINE_11 = "L11";
     public static final String LINE_21 = "L21";
@@ -247,6 +255,22 @@ public class BasicPathTestCase implements RaptorTestConstants {
         var leg2 = new TransitPathLeg<>(TRIP_1, times2, EMPTY_CONSTRAINTS, LINE_11_COST, leg3);
         AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
             ACCESS, ACCESS_START, ACCESS_END, ACCESS_COST, leg2.asTransitLeg()
+        );
+        return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST);
+    }
+
+    public static Path<TestTripSchedule> flexTripAsPath() {
+        PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
+                FLEX, EGRESS_START, EGRESS_END, EGRESS_COST
+        );
+        var transfer = TestTransfer.walk(STOP_C, TX_END - TX_START);
+        PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
+                STOP_B, TX_START, TX_END, transfer.generalizedCost(), transfer, leg6
+        );
+        var times2 = BoardAndAlightTime.create(TRIP_1, STOP_A, L11_START, STOP_B, L11_END);
+        var leg2 = new TransitPathLeg<>(TRIP_1, times2, EMPTY_CONSTRAINTS, LINE_11_COST, leg3);
+        AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
+                ACCESS, ACCESS_START, ACCESS_END, ACCESS_COST, leg2.asTransitLeg()
         );
         return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST);
     }

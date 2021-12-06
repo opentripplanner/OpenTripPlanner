@@ -47,6 +47,7 @@ public class TraverseModeMapper {
             case TRAM: return "TRAM";
             case TRANSIT: return "TRANSIT";
             case WALK: return "WALK";
+            case SCOOTER: return "SCOOTER";
             case TROLLEYBUS: return "TROLLEYBUS";
             case MONORAIL: return "MONORAIL";
         }

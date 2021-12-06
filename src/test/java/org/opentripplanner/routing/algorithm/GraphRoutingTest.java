@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,6 +38,8 @@ import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -46,7 +49,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
@@ -313,6 +315,9 @@ public abstract class GraphRoutingTest {
             vehicleRentalStation.latitude = latitude;
             vehicleRentalStation.vehiclesAvailable = 2;
             vehicleRentalStation.spacesAvailable = 2;
+            final RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(network);
+            vehicleRentalStation.vehicleTypesAvailable = Map.of(vehicleType, 2);
+            vehicleRentalStation.vehicleSpacesAvailable = Map.of(vehicleType, 2);
             vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = false;
             return vehicleRentalStation;
         }
@@ -327,7 +332,7 @@ public abstract class GraphRoutingTest {
                     graph,
                     vehicleRentalStationEntity(id, latitude, longitude, network)
             );
-            new VehicleRentalEdge(vertex);
+            new VehicleRentalEdge(vertex, RentalVehicleType.getDefaultType(network).formFactor);
             return vertex;
         }
 

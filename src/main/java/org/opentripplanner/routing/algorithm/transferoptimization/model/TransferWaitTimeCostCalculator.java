@@ -114,7 +114,7 @@ import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCo
  *   </li>
  * </ol>
  */
-public class TransferWaitTimeCalculator {
+public class TransferWaitTimeCostCalculator {
   public static final int ZERO_COST = 0;
 
   /**
@@ -144,7 +144,7 @@ public class TransferWaitTimeCalculator {
    * @param backTravelWaitTimeFactor This factor is used to calculate a cost, with should balance
    *                                 the wait time against extra transit time and less walking.
    */
-  public TransferWaitTimeCalculator(
+  public TransferWaitTimeCostCalculator(
       double backTravelWaitTimeFactor,
       double minSafeWaitTimeFactor
   ) {

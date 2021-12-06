@@ -1,7 +1,9 @@
 package org.opentripplanner.ext.smoovebikerental;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.GenericJsonVehicleRentalDataSource;
@@ -24,10 +26,12 @@ public class SmooveBikeRentalDataSource
     private final boolean allowOverloading;
 
     private final String networkName;
+    private final RentalVehicleType vehicleType;
 
     public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
         super(config, "result");
         networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
+        vehicleType = RentalVehicleType.getDefaultType(networkName);
         allowOverloading = config.isAllowOverloading();
     }
 
@@ -74,6 +78,8 @@ public class SmooveBikeRentalDataSource
             station.spacesAvailable = node.path("free_slots").asInt();
             station.capacity = node.path("total_slots").asInt();
         }
+        station.vehicleTypesAvailable = Map.of(vehicleType, station.vehiclesAvailable);
+        station.vehicleSpacesAvailable = Map.of(vehicleType, station.spacesAvailable);
         station.allowOverloading = allowOverloading;
         return station;
     }

@@ -214,6 +214,7 @@ public class EstimatedCallType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("situations")
+                    .withDirective(gqlUtil.timingData)
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                     .description("Get all relevant situations for this EstimatedCall.")
                     .dataFetcher(environment -> {
@@ -296,7 +297,7 @@ public class EstimatedCallType {
     if (alertPatches != null) {
 
       // First and last period
-      alertPatches.removeIf(alert -> alert.getEffectiveStartDate().after(toTime) ||
+      alertPatches.removeIf(alert -> (alert.getEffectiveStartDate() != null && alert.getEffectiveStartDate().after(toTime)) ||
           (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().before(fromTime)));
 
       // Handle repeating validityPeriods

@@ -1,31 +1,33 @@
 package org.opentripplanner.transit.raptor.rangeraptor.debug;
 
-import org.opentripplanner.transit.raptor.util.AvgTimer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 
 public class WorkerPerformanceTimers {
-    /** The NOOP timers are used when the timer is turned off */
-    public static final WorkerPerformanceTimers NOOP = new WorkerPerformanceTimers("NOOP");
-
     // Variables to track time spent
-    private final AvgTimer timerRoute;
-    private final AvgTimer timerByMinuteScheduleSearch;
-    private final AvgTimer timerByMinuteTransfers;
+    private final Timer timerRoute;
+    private final Timer timerByMinuteScheduleSearch;
+    private final Timer timerByMinuteTransfers;
 
-    public WorkerPerformanceTimers(String namePrefix) {
-        timerRoute = AvgTimer.timerMilliSec(namePrefix + ":route");
-        timerByMinuteScheduleSearch = AvgTimer.timerMicroSec(namePrefix + ":runRaptorForMinute Transit");
-        timerByMinuteTransfers = AvgTimer.timerMicroSec(namePrefix + ":runRaptorForMinute Transfers");
+    public WorkerPerformanceTimers(String namePrefix, MeterRegistry registry) {
+        timerRoute = Timer.builder("raptor." + namePrefix + ".route").register(registry);
+        timerByMinuteScheduleSearch = Timer
+                .builder("raptor." + namePrefix + ".minute.transit")
+                .register(registry);
+        timerByMinuteTransfers = Timer
+                .builder("raptor." + namePrefix + ".minute.transfers")
+                .register(registry);
     }
 
-    public AvgTimer timerRoute() {
+    public Timer timerRoute() {
         return timerRoute;
     }
 
-    public AvgTimer timerByMinuteScheduleSearch() {
+    public Timer timerByMinuteScheduleSearch() {
         return timerByMinuteScheduleSearch;
     }
 
-    public AvgTimer timerByMinuteTransfers() {
+    public Timer timerByMinuteTransfers() {
         return timerByMinuteTransfers;
     }
 }

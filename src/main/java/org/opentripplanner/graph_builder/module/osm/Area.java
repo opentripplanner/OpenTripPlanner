@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.TLongObjectMap;
+import org.locationtech.jts.geom.TopologyException;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -32,9 +32,9 @@ class Area {
     // This is the way or relation that has the relevant tags for the area
     OSMWithTags parent;
 
-    List<Ring> outermostRings = new ArrayList<Ring>();
+    final List<Ring> outermostRings;
 
-    private MultiPolygon jtsMultiPolygon;
+    public MultiPolygon jtsMultiPolygon;
 
     Area(OSMWithTags parent, List<OSMWay> outerRingWays, List<OSMWay> innerRingWays,
          TLongObjectMap<OSMNode> _nodes) {
@@ -57,40 +57,47 @@ class Area {
             outerRings.add(new Ring(ring, _nodes));
         }
 
-        // now, ring grouping
-        // first, find outermost rings
-        OUTER: for (Ring outer : outerRings) {
-            for (Ring possibleContainer : outerRings) {
-                if (outer != possibleContainer
-                        && outer.geometry.hasPointInside(possibleContainer.geometry)) {
-                    continue OUTER;
-                }
-            }
-            outermostRings.add(outer);
+        List<Ring> outermostRings = new ArrayList<>();
 
-            // find holes in this ring
-            for (Ring possibleHole : innerRings) {
-                if (possibleHole.geometry.hasPointInside(outer.geometry)) {
-                    outer.holes.add(possibleHole);
+        try {
+            // now, ring grouping
+            // first, find outermost rings
+            OUTER: for (Ring outer : outerRings) {
+                for (Ring possibleContainer : outerRings) {
+                    if (outer != possibleContainer
+                            && outer.jtsPolygon.within(possibleContainer.jtsPolygon)) {
+                        continue OUTER;
+                    }
+                }
+                outermostRings.add(outer);
+
+                // find holes in this ring
+                for (Ring possibleHole : innerRings) {
+                    if (possibleHole.jtsPolygon.within(outer.jtsPolygon)) {
+                        outer.addHole(possibleHole);
+                    }
                 }
             }
+        } catch (TopologyException ex) {
+            throw new AreaConstructionException();
         }
+
+        // Make outermostRings immutable
+        this.outermostRings = List.copyOf(outermostRings);
         // run this at end of ctor so that exception
         // can be caught in the right place
-        toJTSMultiPolygon();
+        jtsMultiPolygon = calculateJTSMultiPolygon();
     }
 
-    public MultiPolygon toJTSMultiPolygon() {
-        if (jtsMultiPolygon == null) {
-            List<Polygon> polygons = new ArrayList<Polygon>();
-            for (Ring ring : outermostRings) {
-                polygons.add(ring.toJtsPolygon());
-            }
-            jtsMultiPolygon = GeometryUtils.getGeometryFactory().createMultiPolygon(
-                    polygons.toArray(new Polygon[0]));
-            if (!jtsMultiPolygon.isValid()) {
-                throw new AreaConstructionException();
-            }
+    private MultiPolygon calculateJTSMultiPolygon() {
+        List<Polygon> polygons = new ArrayList<Polygon>();
+        for (Ring ring : outermostRings) {
+            polygons.add(ring.jtsPolygon);
+        }
+        MultiPolygon jtsMultiPolygon = GeometryUtils.getGeometryFactory().createMultiPolygon(
+                polygons.toArray(new Polygon[0]));
+        if (!jtsMultiPolygon.isValid()) {
+            throw new AreaConstructionException();
         }
 
         return jtsMultiPolygon;

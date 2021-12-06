@@ -5,12 +5,14 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
 
 public class TransferMapperTest {
     private static final String FEED_ID = "FEED";
 
-    private static final RouteMapper ROUTE_MAPPER = new RouteMapper(new AgencyMapper(FEED_ID));
+    private static final RouteMapper ROUTE_MAPPER =
+            new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false));
 
     private static final TripMapper TRIP_MAPPER = new TripMapper(ROUTE_MAPPER);
 

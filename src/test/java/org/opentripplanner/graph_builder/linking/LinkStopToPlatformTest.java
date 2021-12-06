@@ -49,7 +49,7 @@ public class LinkStopToPlatformTest {
         vertices.add(new IntersectionVertex(graph, "4", 10.22493, 59.13518, "Platform vertex 4"));
         vertices.add(new IntersectionVertex(graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
 
-        AreaEdgeList areaEdgeList = new AreaEdgeList();
+        AreaEdgeList areaEdgeList = new AreaEdgeList(GeometryUtils.getGeometryFactory().createPolygon());
 
         ArrayList<AreaEdge> edges = new ArrayList<AreaEdge>();
 

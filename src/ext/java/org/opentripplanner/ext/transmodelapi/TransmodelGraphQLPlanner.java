@@ -170,7 +170,6 @@ public class TransmodelGraphQLPlanner {
         //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
         // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
         //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
-        callWith.argument("allowBikeRental", (Boolean v) -> request.bikeRental = v);
         callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
 
         callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
@@ -217,7 +216,7 @@ public class TransmodelGraphQLPlanner {
             }
         }*/
 
-        if (request.bikeRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
+        if (request.vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }

@@ -96,9 +96,9 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
                 if (s0.getOptions().parkAndRide && !s0.isVehicleParked()) {
                     return null;
                 }
-                // Forbid taking a (station) rental bike in the station. This allows taking along
-                // floating bikes.
-                else if (s0.isBikeRentingFromStation() && !(s0.mayKeepRentedVehicleAtDestination() && s0.getOptions().allowKeepingRentedVehicleAtDestination)) {
+                // Forbid taking a (station) rental vehicle in the station. This allows taking along
+                // floating rental vehicles.
+                else if (s0.isRentingVehicleFromStation() && !(s0.mayKeepRentedVehicleAtDestination() && s0.getOptions().allowKeepingRentedVehicleAtDestination)) {
                     return null;
                 }
                 // Allow taking an owned bike in the station
@@ -126,7 +126,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
                 return null;
         }
 
-        if (s0.isBikeRentingFromStation()
+        if (s0.isRentingVehicleFromStation()
                 && s0.mayKeepRentedVehicleAtDestination()
                 && s0.getOptions().allowKeepingRentedVehicleAtDestination) {
             s1.incrementWeight(s0.getOptions().keepingRentedVehicleAtDestinationCost);
