@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -121,7 +122,7 @@ public class GeometryAndBlockProcessor {
         // only the tripTimes (which don't have enough information to build a geometry). So we keep
         // them here. In the current design, a trip pattern does not have a single geometry, but
         // one per hop, so we store them in an array.
-        Map<TripPattern, LineString[]> geometriesByTripPattern = Maps.newHashMap();
+        Map<TripPattern, LineString[]> geometriesByTripPattern = new ConcurrentHashMap<>();
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
 
@@ -136,7 +137,7 @@ public class GeometryAndBlockProcessor {
         );
         LOG.info(progress.startMessage());
 
-        for (TripPattern tripPattern : tripPatterns) {
+        tripPatterns.stream().parallel().forEach(tripPattern -> {
             for (Trip trip : tripPattern.getTrips()) {
                 // create geometries if they aren't already created
                 // note that this is not only done on new trip patterns, because it is possible that
@@ -150,7 +151,7 @@ public class GeometryAndBlockProcessor {
             }
             //Keep lambda! A method-ref would causes incorrect class and line number to be logged
             progress.step(m -> LOG.info(m));
-        }
+        });
         LOG.info(progress.completeMessage());
 
         /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
