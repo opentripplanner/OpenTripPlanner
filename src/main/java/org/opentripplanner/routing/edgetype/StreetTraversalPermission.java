@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Map;
-import java.util.HashMap;
 import java.util.EnumSet;
 
 import org.opentripplanner.routing.core.TraverseMode;
@@ -20,11 +18,12 @@ public enum StreetTraversalPermission {
     BICYCLE_AND_CAR(4 | 2),
     ALL(4 | 2 | 1);
 
-    private static final Map<Integer, StreetTraversalPermission> lookup = new HashMap<Integer, StreetTraversalPermission>();
+    private static final StreetTraversalPermission[] lookup = new StreetTraversalPermission[8];
 
     static {
-        for (StreetTraversalPermission s : EnumSet.allOf(StreetTraversalPermission.class))
-            lookup.put(s.code, s);
+        for (StreetTraversalPermission s : EnumSet.allOf(StreetTraversalPermission.class)) {
+            lookup[s.code] = s;
+        }
     }
 
     public int code;
@@ -34,7 +33,7 @@ public enum StreetTraversalPermission {
     }
 
     public static StreetTraversalPermission get(int code) {
-        return lookup.get(code);
+        return lookup[code];
     }
 
     public StreetTraversalPermission add(StreetTraversalPermission perm) {
