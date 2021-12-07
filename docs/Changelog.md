@@ -93,6 +93,7 @@
 - Update all timers to micrometer instances [#3744](https://github.com/opentripplanner/OpenTripPlanner/pull/3744)
 - Bugfix: ClassCastException when planning flex routes [#3762](https://github.com/opentripplanner/OpenTripPlanner/pull/3762)
 - Add mode from parent StopPlace for Quays in Netex mapper [#3751](https://github.com/opentripplanner/OpenTripPlanner/pull/3751)
+- Minor performance improvements [#3767](https://github.com/opentripplanner/OpenTripPlanner/pull/3767)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
