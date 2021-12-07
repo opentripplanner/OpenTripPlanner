@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
@@ -920,7 +921,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> {
               List<FeedScopedId> lineIds = mapIDsToDomain(environment.getArgument("lines"));
-              //List<String> privateCodes=environment.getArgument("privateCodes");
+              List<String> privateCodes = environment.getArgument("privateCodes");
               List<Long> activeDates = environment.getArgument("activeDates");
               // TODO OTP2 - Use FeedScoped ID
               List<String> authorities = environment.getArgument("authorities");
@@ -931,7 +932,7 @@ public class TransmodelGraphQLSchema {
                   .filter(t -> lineIds == null || lineIds.isEmpty() || lineIds.contains(t
                       .getRoute()
                       .getId()))
-                  //.filter(t -> CollectionUtils.isEmpty(privateCodes) || privateCodes.contains(t.getTripPrivateCode()))
+                  .filter(t -> CollectionUtils.isEmpty(privateCodes) || privateCodes.contains(t.getInternalPlanningCode()))
                   .filter(t -> authorities == null || authorities.isEmpty()  || authorities.contains(t
                       .getRoute()
                       .getAgency()
