@@ -159,6 +159,20 @@ public class TimetableSnapshot {
 
         return pattern.getScheduledTimetable();
     }
+
+    public void removeLastAddedTripPattern(TripPattern tripPattern, ServiceDate serviceDate) {
+        SortedSet<Timetable> sortedTimetables = this.timetables.get(tripPattern);
+        if (sortedTimetables != null) {
+
+            // Remove Timetable for given date
+            sortedTimetables.removeIf(timetable -> (timetable != null && timetable.isValidFor(serviceDate)));
+
+            if (sortedTimetables.isEmpty()) {
+                // No more realtime-updates exist - remove entry
+                timetables.remove(tripPattern);
+            }
+        }
+    }
     
     /**
      * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as

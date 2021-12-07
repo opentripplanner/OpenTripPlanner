@@ -944,10 +944,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             if (tripIndex == -1) {
                 LOG.warn("Could not cancel previously added trip {}", tripId);
             } else {
-                final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
-                newTripTimes.cancelTrip();
-                buffer.update(pattern, newTripTimes, serviceDate);
-//                buffer.removeLastAddedTripPattern(feedId, tripId, serviceDate);
+                /*
+                  Remove the previous realtime-added TripPattern from buffer.
+                  Only one version of the realtime-update should exist
+                 */
+                buffer.removeLastAddedTripPattern(pattern, serviceDate);
                 success = true;
             }
         }
