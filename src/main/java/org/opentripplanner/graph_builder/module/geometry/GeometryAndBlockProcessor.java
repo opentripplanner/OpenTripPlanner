@@ -137,7 +137,7 @@ public class GeometryAndBlockProcessor {
         );
         LOG.info(progress.startMessage());
 
-        tripPatterns.stream().parallel().forEach(tripPattern -> {
+        tripPatterns.parallelStream().forEach(tripPattern -> {
             for (Trip trip : tripPattern.getTrips()) {
                 // create geometries if they aren't already created
                 // note that this is not only done on new trip patterns, because it is possible that
