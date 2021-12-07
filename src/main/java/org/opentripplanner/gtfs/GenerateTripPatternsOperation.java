@@ -117,16 +117,16 @@ public class GenerateTripPatternsOperation {
         if (frequencies != null && !(frequencies.isEmpty())) {
             // Create a TripTimes object for this list of stoptimes, which form one trip.
             var tripTimesMap = new HashMap<Integer, TripTimes>();
-                for (Frequency freq : frequencies) {
-                    TripTimes tripTimes = tripTimesMap.computeIfAbsent(
-                            freq.getExactTimes() ==1 ? 0: freq.getHeadwaySecs(),
-                            headway -> new TripTimes(trip, shiftStopTimes(stopTimes, headway), deduplicator)
-                    );
-                    int timeShift = timeShiftForFrequencyBasedTrip(tripTimes, freq);
-                    while (timeShift <= freq.getEndTime()) {
-                        tripPattern.add(new TripTimes(tripTimes, freq, timeShift));
-                        timeShift += freq.getHeadwaySecs();
-                    }
+            for (Frequency freq : frequencies) {
+                TripTimes tripTimes = tripTimesMap.computeIfAbsent(
+                        freq.getExactTimes() ==1 ? 0: freq.getHeadwaySecs(),
+                        headway -> new TripTimes(trip, shiftStopTimes(stopTimes, headway), deduplicator)
+                );
+                int timeShift = timeShiftForFrequencyBasedTrip(tripTimes, freq);
+                while (timeShift <= freq.getEndTime()) {
+                    tripPattern.add(new TripTimes(tripTimes, freq, timeShift));
+                    timeShift += freq.getHeadwaySecs();
+                }
                 freqCount++;
             }
             if (tripPattern.getTrips().isEmpty()) {
