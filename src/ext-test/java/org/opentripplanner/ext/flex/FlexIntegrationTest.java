@@ -1,9 +1,12 @@
 package org.opentripplanner.ext.flex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.FakeGraph.getFileForResource;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
+import static org.opentripplanner.routing.core.TraverseMode.BUS;
+import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -46,18 +49,28 @@ public class FlexIntegrationTest {
     static Router router;
 
     @BeforeAll
-    static void setup() throws URISyntaxException {
+    static void setup() {
         OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-        var osmPath = getFileForResource(FlexTest.COBB_OSM).getAbsolutePath();
-        var gtfsPath = getFileForResource(FlexTest.COBB_BUS_30_GTFS).getAbsolutePath();
-        var flexGtfsPath = getFileForResource(FlexTest.COBB_FLEX_GTFS).getAbsolutePath();
+        var osmPath = getAbsolutePath(FlexTest.COBB_OSM);
+        var cobblincGtfsPath = getAbsolutePath(FlexTest.COBB_BUS_30_GTFS);
+        var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
+        var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
 
         graph = ConstantsForTests.buildOsmGraph(osmPath);
-        addGtfsToGraph(graph, List.of(gtfsPath, flexGtfsPath));
+        addGtfsToGraph(graph, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
         router = new Router(graph, RouterConfig.DEFAULT);
         router.startup();
 
         service = new RoutingService(graph);
+    }
+
+    private static String getAbsolutePath(String cobbOsm) {
+        try {
+            return getFileForResource(cobbOsm).getAbsolutePath();
+        }
+        catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -65,7 +78,7 @@ public class FlexIntegrationTest {
         var from = new GenericLocation(33.84329482265106, -84.583740234375);
         var to = new GenericLocation(33.86701256815635, -84.61787939071655);
 
-        var itin = getItinerary(graph, from, to);
+        var itin = getItinerary(from, to, 2);
 
         assertEquals(4, itin.legs.size());
 
@@ -73,34 +86,62 @@ public class FlexIntegrationTest {
         assertEquals(TraverseMode.WALK, walkToBus.mode);
 
         var bus = itin.legs.get(1);
-        assertEquals(TraverseMode.BUS, bus.mode);
+        assertEquals(BUS, bus.mode);
         assertEquals("30", bus.getRoute().getShortName());
 
         var transfer = itin.legs.get(2);
         assertEquals(TraverseMode.WALK, transfer.mode);
 
         var flex = itin.legs.get(3);
-        assertEquals(TraverseMode.BUS, flex.mode);
+        assertEquals(BUS, flex.mode);
         assertEquals("Zone 2", flex.getRoute().getShortName());
         assertTrue(flex.flexibleTrip);
-
     }
 
-    private Itinerary getItinerary(Graph graph, GenericLocation from, GenericLocation to) {
+    @Test
+    public void shouldReturnARouteWithTwoTransfers() {
+        var from = GenericLocation.fromStopId("ALEX DR@ALEX WAY", "MARTA", "97266");
+        var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+
+        var itin = getItinerary(from, to, 1);
+
+        assertEquals(5, itin.legs.size());
+
+        var firstBus = itin.legs.get(0);
+        assertEquals(BUS, firstBus.mode);
+        assertEquals("856", firstBus.getRoute().getShortName());
+
+        var transferToSecondBus = itin.legs.get(1);
+        assertEquals(WALK, transferToSecondBus.mode);
+
+        var secondBus = itin.legs.get(2);
+        assertEquals(BUS, secondBus.mode);
+        assertEquals("30", secondBus.getRoute().getShortName());
+
+        var transferToFlex = itin.legs.get(3);
+        assertEquals(WALK, transferToFlex.mode);
+
+        var finalFlex = itin.legs.get(4);
+        assertEquals(BUS, finalFlex.mode);
+        assertEquals("Zone 2", finalFlex.getRoute().getShortName());
+        assertTrue(finalFlex.flexibleTrip);
+    }
+
+    private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {
         RoutingRequest request = new RoutingRequest();
         request.dateTime = dateTime;
         request.from = from;
         request.to = to;
         request.numItineraries = 10;
         request.searchWindow = Duration.ofHours(2);
-        request.setRoutingContext(graph);
-
         request.modes.egressMode = FLEXIBLE;
 
         var result = service.route(request, router);
         var itineraries = result.getTripPlan().itineraries;
 
-        return itineraries.get(2);
+        assertFalse(itineraries.isEmpty());
+
+        return itineraries.get(index);
     }
 
     private static void addGtfsToGraph(
@@ -126,6 +167,8 @@ public class FlexIntegrationTest {
 
         // generate direct transfers
         var req = new RoutingRequest();
+
+        // we don't have a complete coverage of the entire area so use straight lines for transfers
         var transfers = new DirectTransferGenerator(600, List.of(req));
         transfers.buildGraph(graph, extra);
 
