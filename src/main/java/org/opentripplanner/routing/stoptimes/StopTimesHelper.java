@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
+import static org.opentripplanner.util.time.DateConstants.ONE_DAY_SECONDS;
 
 public class StopTimesHelper {
   /**
@@ -57,9 +58,10 @@ public class StopTimesHelper {
     }
     List<StopTimesInPattern> result = new ArrayList<>();
 
-    LocalDate date = LocalDate.ofEpochDay(startTime/86400);
+    LocalDate date = LocalDate.ofEpochDay(startTime/ONE_DAY_SECONDS);
 
-    int numberOfDays = timeRange / 86400 + 1; // Number of days requested + the following day
+    // Number of days requested + the following day
+    int numberOfDays = timeRange / ONE_DAY_SECONDS + 1;
 
     List<ServiceDate> dates = new ArrayList<>();
 
