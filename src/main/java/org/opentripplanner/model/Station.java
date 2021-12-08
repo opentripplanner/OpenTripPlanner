@@ -68,6 +68,7 @@ public class Station extends TransitEntity implements StopCollection {
 
   public void addChildStop(Stop stop) {
     this.childStops.add(stop);
+    this.geometry = computeGeometry(coordinate, childStops);
   }
 
   @Override
