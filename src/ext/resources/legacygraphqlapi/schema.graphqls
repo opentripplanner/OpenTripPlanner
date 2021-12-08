@@ -2497,6 +2497,13 @@ type Stop implements Node & PlaceInterface {
     a polygon or a group of stops either consisting of either points or polygons.
 
     Regular fixed-schedule stops return a single point.
+
+    Stations (parent stations with child stops) contain a geometry collection with a point for the
+    central coordinate plus a convex hull polygon (https://en.wikipedia.org/wiki/Convex_hull) of all
+    coordinates of the child stops.
+
+    If there are only two child stops then the convex hull is a straight line between the them. If
+    there is a single child stop then it's a single point.
     """
     geometries: StopGeometries
 
