@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 
@@ -33,7 +34,9 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
    */
   @Override
   public String getName() {
-    return name;
+    // according to the spec stop location names are optional for flex zones so, we return the id
+    // when it's null. *shrug*
+    return Optional.ofNullable(name).orElse(getId().toString());
   }
 
   @Override
