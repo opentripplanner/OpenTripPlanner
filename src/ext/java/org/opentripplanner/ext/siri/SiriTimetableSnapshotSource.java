@@ -788,7 +788,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
                         // Check whether trip id has been used for previously ADDED/MODIFIED trip message and cancel
                         // previously created trip
-                        cancelPreviouslyAddedTrip(feedId, trip.getId().getId(), serviceDate);
+                        removePreviousRealtimeUpdate(feedId, trip.getId().getId(), serviceDate);
 
                         // Calculate modified stop-pattern
                         Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
@@ -925,15 +925,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     /**
-     * Cancel previously added trip from buffer if there is a previously added trip with given trip
+     * Removes previous trip-update from buffer if there is an update with given trip
      * id (without agency id) on service date
      *
      * @param feedId feed id the trip id belongs to
      * @param tripId trip id without agency id
      * @param serviceDate service date
-     * @return true if a previously added trip was cancelled
+     * @return true if a previously added trip was removed
      */
-    private boolean cancelPreviouslyAddedTrip(final String feedId, final String tripId, final ServiceDate serviceDate) {
+    private boolean removePreviousRealtimeUpdate(final String feedId, final String tripId, final ServiceDate serviceDate) {
         boolean success = false;
 
         final TripPattern pattern = buffer.getLastAddedTripPattern(new FeedScopedId(feedId, tripId), serviceDate);
