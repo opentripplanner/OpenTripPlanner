@@ -13,7 +13,9 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -54,11 +56,12 @@ public class StopTimesHelper {
       boolean includeCancelledTrips
   ) {
     if (startTime == 0) {
-      startTime = System.currentTimeMillis() / 1000;
+      startTime = Instant.now().getEpochSecond();
     }
     List<StopTimesInPattern> result = new ArrayList<>();
 
-    LocalDate date = LocalDate.ofEpochDay(startTime/ONE_DAY_SECONDS);
+    ZoneId zoneId = routingService.getTransitLayer().getTransitDataZoneId();
+    LocalDate date = Instant.ofEpochSecond(startTime).atZone(zoneId).toLocalDate();
 
     // Number of days requested + the following day
     int numberOfDays = timeRange / ONE_DAY_SECONDS + 1;
