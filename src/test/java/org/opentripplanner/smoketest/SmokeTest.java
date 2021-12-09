@@ -1,17 +1,26 @@
 package org.opentripplanner.smoketest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.SneakyThrows;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
+import org.opentripplanner.api.resource.TripPlannerResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is both a utility class and a category to select or deselect smoke tests during test
@@ -23,6 +32,8 @@ import org.opentripplanner.api.json.JSONObjectMapperProvider;
  */
 public class SmokeTest {
 
+    static final Logger LOG = LoggerFactory.getLogger(SmokeTest.class);
+    static HttpClient client = HttpClient.newHttpClient();
     static final ObjectMapper mapper;
 
     static {
@@ -50,6 +61,30 @@ public class SmokeTest {
                 .GET()
                 .build();
 
+    }
+
+    static TripPlannerResponse sendPlanRequest(Map<String, String> params) {
+        var request = SmokeTest.planRequest(params);
+        TripPlannerResponse otpResponse;
+        try {
+
+            var response = client.send(request, BodyHandlers.ofInputStream());
+
+            assertEquals(
+                    200, response.statusCode(), "Status code returned by OTP server was not 200");
+            otpResponse = SmokeTest.mapper.readValue(response.body(), TripPlannerResponse.class);
+        }
+        catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        LOG.info(
+                "Request to {} returned {} itineraries",
+                request.uri(),
+                otpResponse.getPlan().itineraries.size()
+        );
+
+        return otpResponse;
     }
 
 

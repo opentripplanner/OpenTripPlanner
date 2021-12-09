@@ -1,53 +1,50 @@
 package org.opentripplanner.smoketest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse.BodyHandlers;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.opentripplanner.api.resource.TripPlannerResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Category(SmokeTest.class)
 public class AtlantaSmokeTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AtlantaSmokeTest.class);
-
-    HttpClient client = HttpClient.newHttpClient();
-
     @Test
-    public void returnRouteFromCentralAtlantaToPowderSprings()
-    throws IOException, InterruptedException {
+    public void returnRouteFromCentralAtlantaToPowderSprings() {
         var params = Map.of(
                 "fromPlace", "33.714059324224124,-84.37225341796875",
                 "toPlace", "33.882387270695105,-84.51576232910155",
                 "time", "1:00pm",
                 "date", SmokeTest.nextMonday().toString(),
-                "mode", "TRANSIT,WALK",
+                "mode", "TRANSIT,WALK,FLEX_EGRESS",
                 "showIntermediateStops", "true",
                 "locale", "en"
         );
+        var otpResponse = SmokeTest.sendPlanRequest(params);
 
-        var request = SmokeTest.planRequest(params);
+        assertTrue(otpResponse.getPlan().itineraries.size() > 1);
 
-        var response = client.send(request, BodyHandlers.ofInputStream());
+        var itineraries = otpResponse.getPlan().itineraries;
 
-        assertEquals(200, response.statusCode(), "Status code returned by OTP server was not 200");
+        var itineraryModes = itineraries.stream()
+                .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
+                .collect(Collectors.toList());
 
-        var tripPlannerResponse =
-                SmokeTest.mapper.readValue(response.body(), TripPlannerResponse.class);
 
-        LOG.info(
-                "Request to {} returned {} itineraries",
-                request.uri(),
-                tripPlannerResponse.getPlan().itineraries.size()
+        var expectedModes = List.of("WALK", "BUS", "WALK", "SUBWAY", "WALK", "BUS", "BUS", "WALK");
+
+        // the assertion is a little fuzzy as more detailed ones would be hard to maintain over time
+        assertTrue(
+                itineraryModes.contains(expectedModes),
+                String.format(
+                        "Could not find expected mode %s in itineraries which had modes %s",
+                        expectedModes,
+                        itineraryModes
+                )
         );
 
-        assertTrue(tripPlannerResponse.getPlan().itineraries.size() > 1);
+
     }
 }
