@@ -1,25 +1,26 @@
 package org.opentripplanner.smoketest;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.smoketest.SmokeTest.assertThatItineraryHasModes;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.opentripplanner.api.model.ApiItinerary;
 
 @Category(SmokeTest.class)
 public class AtlantaSmokeTest {
 
-    String centralAtlanta = "33.714059324224124,-84.37225341796875";
-    String powderSpringsFlexZone1 = "33.882387270695105,-84.51576232910155";
+    String nearGeorgiaStateStation = "33.74139944890028,-84.38607215881348";
+    String powderSpringsInsideFlexZone1 = "33.86425088555784,-84.67141628265381";
 
     @Test
     public void regularRouteFromCentralAtlantaToPowderSprings() {
         var params = Map.of(
-                "fromPlace", centralAtlanta,
-                "toPlace", powderSpringsFlexZone1,
+                "fromPlace", nearGeorgiaStateStation,
+                "toPlace", powderSpringsInsideFlexZone1,
                 "time", "1:00pm",
                 "date", SmokeTest.nextMonday().toString(),
                 "mode", "TRANSIT,WALK",
@@ -31,25 +32,37 @@ public class AtlantaSmokeTest {
 
         assertTrue(itineraries.size() > 1);
 
-        var expectedModes = List.of("WALK", "BUS", "WALK", "SUBWAY", "WALK", "BUS", "BUS", "WALK");
-        // the assertion is a little fuzzy as more detailed ones would be hard to maintain over time
+        var expectedModes = List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS", "WALK");
         assertThatItineraryHasModes(itineraries, expectedModes);
     }
 
-    private static void assertThatItineraryHasModes(
-            List<ApiItinerary> itineraries,
-            List<String> expectedModes
-    ) {
-        var itineraryModes = itineraries.stream()
-                .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
-                .collect(Collectors.toList());
-        assertTrue(
-                itineraryModes.contains(expectedModes),
-                String.format(
-                        "Could not find an mode combination '%s' in itineraries %s",
-                        expectedModes,
-                        itineraryModes
-                )
+    @Test
+    public void flexRouteFromCentralAtlantaToPowderSprings() {
+        var params = Map.of(
+                "fromPlace", nearGeorgiaStateStation,
+                "toPlace", powderSpringsInsideFlexZone1,
+                "time", "1:00pm",
+                "date", SmokeTest.nextMonday().toString(),
+                "mode", "FLEX_EGRESS,WALK,TRANSIT",
+                "showIntermediateStops", "true",
+                "locale", "en",
+                "searchWindow", Long.toString(Duration.ofHours(2).toSeconds())
         );
+        var otpResponse = SmokeTest.sendPlanRequest(params);
+        var itineraries = otpResponse.getPlan().itineraries;
+
+        assertTrue(itineraries.size() > 0);
+
+        var expectedModes = List.of("WALK", "SUBWAY", "WALK", "BUS", "BUS");
+        assertThatItineraryHasModes(itineraries, expectedModes);
+
+        var transitLegs = itineraries.stream()
+                .flatMap(i -> i.legs.stream().filter(l -> l.transitLeg))
+                .collect(Collectors.toList());
+
+        var hasFlexLeg = transitLegs.stream().map(l -> l.routeShortName).anyMatch(name -> name.equals("Zone 1"));
+
+        assertTrue(hasFlexLeg);
+
     }
 }

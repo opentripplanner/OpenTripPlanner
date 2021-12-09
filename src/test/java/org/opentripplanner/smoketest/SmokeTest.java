@@ -1,6 +1,7 @@
 package org.opentripplanner.smoketest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -14,10 +15,11 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.SneakyThrows;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
+import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.resource.TripPlannerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,7 @@ public class SmokeTest {
 
     static TripPlannerResponse sendPlanRequest(Map<String, String> params) {
         var request = SmokeTest.planRequest(params);
+        LOG.info("Sending request to {}", request.uri());
         TripPlannerResponse otpResponse;
         try {
 
@@ -87,5 +90,20 @@ public class SmokeTest {
         return otpResponse;
     }
 
-
+    static void assertThatItineraryHasModes(
+            List<ApiItinerary> itineraries,
+            List<String> expectedModes
+    ) {
+        var itineraryModes = itineraries.stream()
+                .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
+                .collect(Collectors.toList());
+        assertTrue(
+                itineraryModes.contains(expectedModes),
+                String.format(
+                        "Could not find a mode combination '%s' in itineraries %s",
+                        expectedModes,
+                        itineraryModes
+                )
+        );
+    }
 }
