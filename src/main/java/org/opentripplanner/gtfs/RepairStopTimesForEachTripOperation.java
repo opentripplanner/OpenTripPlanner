@@ -2,6 +2,9 @@ package org.opentripplanner.gtfs;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssue;
@@ -12,20 +15,17 @@ import org.opentripplanner.graph_builder.issues.HopZeroTime;
 import org.opentripplanner.graph_builder.issues.NegativeDwellTime;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.issues.RepeatedStops;
-import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * This class is responsible for cleaning stop times, removing duplicates, correcting bad data
- * and so on. This do only apply to GTFS imports.
+ * and so on. This only applies to GTFS imports.
  */
 public class RepairStopTimesForEachTripOperation {
     private static final Logger LOG = LoggerFactory.getLogger(RepairStopTimesForEachTripOperation.class);
@@ -52,6 +52,12 @@ public class RepairStopTimesForEachTripOperation {
 
             /* Fetch the stop times for this trip. Copy the list since it's immutable. */
             List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
+
+            // if we don't have flex routing enabled then remove all the flex locations and location
+            // groups
+            if(OTPFeature.FlexRouting.isOff()) {
+                stopTimes.removeIf(st -> !(st.getStop() instanceof Stop));
+            }
 
             /* Stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);
