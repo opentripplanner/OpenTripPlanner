@@ -36,3 +36,8 @@ target/
 
 # for local dev only
 src/ext/resources/reportapi/report.csv
+
+smoke-tests/*.jar
+smoke-tests/**/*.obj
+smoke-tests/**/*.pbf
+smoke-tests/**/*.zip
