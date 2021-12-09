@@ -1456,11 +1456,19 @@ type Plan {
     """
     Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
     and keep the original request as is. This will enable you to search for itineraries in the next
-    time-window if arriveBy is false and the previous time-window if arriveBy is true.
-    The cursor based paging only support stepping to the next page, it does not support going to
-    back(previous page) or jumping.
+    time-window.
+    The cursor based paging only support stepping to the next page, as it does not support jumping.
     """
-    pageCursor: String
+    nextPageCursor: String
+
+    """
+    Use the cursor to go to the previous "page" of itineraries. Copy the cursor from the last
+    response and keep the original request as is. This will enable you to search for itineraries in
+    the previous time-window.
+    The cursor based paging only support stepping to the previous page, as it does not support
+    jumping.
+    """
+    previousPageCursor: String
 
     """
     This is the suggested search time for the "previous page" or time window. Insert it together
@@ -1468,7 +1476,7 @@ type Plan {
     time-window BEFORE the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    prevDateTime: Long @deprecated(reason: "Use pageCursor instead")
+    prevDateTime: Long @deprecated(reason: "Use previousPageCursor instead")
 
     """
     This is the suggested search time for the "next page" or time window. Insert it together
@@ -1476,13 +1484,13 @@ type Plan {
     time-window AFTER the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    nextDateTime: Long @deprecated(reason: "Use pageCursor instead")
+    nextDateTime: Long @deprecated(reason: "Use nextPageCursor instead")
 
     """
     This is the time window used by the raptor search. The window is an optional parameter and
     OTP might override it/dynamically assign a new value. The unit is seconds.
     """
-    searchWindowUsed: Long @deprecated(reason: "Use pageCursor instead")
+    searchWindowUsed: Long @deprecated(reason: "Use previousPageCursor or nextPageCursor instead")
 
     """Information about the timings for the plan generation"""
     debugOutput: debugOutput!

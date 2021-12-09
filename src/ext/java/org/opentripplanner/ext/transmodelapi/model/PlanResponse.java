@@ -14,7 +14,8 @@ public class PlanResponse {
     public TripSearchMetadata metadata;
     public List<RoutingError> messages = new ArrayList<>();
     public DebugOutput debugOutput;
-    public PageCursor pageCursor;
+    public PageCursor previousPageCursor;
+    public PageCursor nextPageCursor;
 
 
     @Override
@@ -24,6 +25,8 @@ public class PlanResponse {
                 + ", metadata=" + metadata
                 + ", messages=" + messages
                 + ", debugOutput=" + debugOutput
+                + ", previousPageCursor=" + previousPageCursor
+                + ", nextPageCursor=" + nextPageCursor
                 + '}';
     }
 }

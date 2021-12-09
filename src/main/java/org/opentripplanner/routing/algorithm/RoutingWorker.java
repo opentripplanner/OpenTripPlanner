@@ -46,6 +46,7 @@ public class RoutingWorker {
     private final ZonedDateTime searchStartTime;
     private SearchParams raptorSearchParamsUsed = null;
     private Itinerary firstRemovedItinerary = null;
+    private boolean reverseFilteringDirection = false;
 
     public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
         this.debugTimingAggregator.startedCalculating();
@@ -68,6 +69,8 @@ public class RoutingWorker {
         if(request.pageCursor != null) {
             Instant dateTimeCurrentPage = request.getDateTimeCurrentPage();
             request.setDateTime(dateTimeCurrentPage);
+            reverseFilteringDirection = request.pageCursor.reverseFilteringDirection;
+            request.modes.directMode = StreetMode.NOT_SET;
             LOG.debug("Request dateTime={} set from pageCursor.", dateTimeCurrentPage);
         }
 
@@ -121,6 +124,7 @@ public class RoutingWorker {
             request,
             filterOnLatestDepartureTime,
             emptyDirectModeHandler.removeWalkAllTheWayResults(),
+            reverseFilteringDirection,
             it -> firstRemovedItinerary = it
         );
 
@@ -142,7 +146,8 @@ public class RoutingWorker {
                 firstRemovedItinerary,
                 filteredItineraries,
                 routingErrors,
-                debugTimingAggregator
+                debugTimingAggregator,
+                reverseFilteringDirection
         );
     }
 

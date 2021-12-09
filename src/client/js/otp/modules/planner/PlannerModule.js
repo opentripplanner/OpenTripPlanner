@@ -416,7 +416,8 @@ otp.modules.planner.PlannerModule =
                 }
 
                 if(data.plan) {
-                    data.plan.pageCursor = data.pageCursor;
+                    data.plan.nextPageCursor = data.nextPageCursor;
+                    data.plan.previousPageCursor = data.previousPageCursor;
                     // allow for optional pre-processing step (used by Fieldtrip module)
                     if(typeof this_.preprocessPlan == 'function') {
                         this_.preprocessPlan(data.plan, queryParams, function() {

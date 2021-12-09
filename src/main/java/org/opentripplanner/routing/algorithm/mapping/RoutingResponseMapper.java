@@ -26,26 +26,40 @@ public class RoutingResponseMapper {
             Itinerary firstRemovedItinerary,
             List<Itinerary> itineraries,
             Set<RoutingError> routingErrors,
-            DebugTimingAggregator debugTimingAggregator
+            DebugTimingAggregator debugTimingAggregator,
+            boolean reverseFilteringDirection
     ) {
         // Create response
         var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
-        var pageCursor = PageCursorMapper.map(
+
+        var previousPageCursor = PageCursorMapper.mapPreviousPage(
                 request.arriveBy,
                 startOfTimeTransit,
                 searchParams,
-                firstRemovedItinerary
+                firstRemovedItinerary,
+                reverseFilteringDirection
+        );
+
+
+        var nextPageCursor = PageCursorMapper.mapNextPage(
+                request.arriveBy,
+                startOfTimeTransit,
+                searchParams,
+                firstRemovedItinerary,
+                reverseFilteringDirection
         );
 
         LOG.debug("PageCursor in:  " + request.pageCursor);
-        LOG.debug("PageCursor out: " + pageCursor);
+        LOG.debug("PageCursor out(previous) : " + previousPageCursor);
+        LOG.debug("PageCursor out(next) : " + nextPageCursor);
 
         var metadata = createTripSearchMetadata(
                 request, searchParams, firstRemovedItinerary
         );
         return new RoutingResponse(
                 tripPlan,
-                pageCursor,
+                previousPageCursor,
+                nextPageCursor,
                 metadata,
                 new ArrayList<>(routingErrors),
                 debugTimingAggregator

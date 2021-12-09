@@ -72,8 +72,13 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<String> pageCursor() {
-    return environment -> getSource(environment).getPageCursor().encode();
+  public DataFetcher<String> previousPageCursor() {
+    return environment -> getSource(environment).getPreviousPageCursor().encode();
+  }
+
+  @Override
+  public DataFetcher<String> nextPageCursor() {
+    return environment -> getSource(environment).getNextPageCursor().encode();
   }
 
   @Override

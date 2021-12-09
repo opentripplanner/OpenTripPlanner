@@ -24,7 +24,8 @@ otp.widgets.ItinerariesWidget =
 
     itineraries : null,
     activeIndex : 0,
-    pageCursor: null,
+    previousPageCursor: null,
+    nextPageCursor: null,
 
     // set to true by next/previous/etc. to indicate to only refresh the currently active itinerary
     refreshActiveOnly : false,
@@ -57,10 +58,22 @@ otp.widgets.ItinerariesWidget =
     },
 
     updatePlan : function(plan) {
-        this.updateItineraries(plan.itineraries, plan.queryParams, undefined, plan.pageCursor);
+        this.updateItineraries(
+            plan.itineraries,
+            plan.queryParams,
+            undefined,
+            plan.previousPageCursor,
+            plan.nextPageCursor
+        );
     },
 
-    updateItineraries : function(itineraries, queryParams, itinIndex, pageCursor) {
+    updateItineraries : function(
+        itineraries,
+        queryParams,
+        itinIndex,
+        previousPageCursor,
+        nextPageCursor
+    ) {
 
         var this_ = this;
         var divId = this.id+"-itinsAccord";
@@ -93,7 +106,8 @@ otp.widgets.ItinerariesWidget =
         }
 
         this.itineraries = itineraries;
-        this.pageCursor = pageCursor;
+        this.previousPageCursor = previousPageCursor;
+        this.nextPageCursor = nextPageCursor;
 
         this.clear();
         //TRANSLATORS: widget title
@@ -174,70 +188,15 @@ otp.widgets.ItinerariesWidget =
         var serviceBreakTime = "03:00am";
         var this_ = this;
         var buttonRow = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.footer);
-        //TRANSLATORS: button to first itinerary
-        $('<button>'+_tr("First")+'</button>').button().appendTo(buttonRow).click(function() {
+        //TRANSLATORS: button to next page of itineraries
+        $('<button>'+_tr("Previous Page")+'</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
-            var stopId = itin.getFirstStopID();
             _.extend(params, {
-                startTransitStopId :  stopId,
-                date: moment(this_.module.date, otp.config.locale.time.date_format).format("MM-DD-YYYY"),
-                time : serviceBreakTime,
-                arriveBy : false,
-                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
+                pageCursor :  this_.previousPageCursor,
             });
-            this_.refreshActiveOnly = true;
-            this_.module.updateActiveOnly = true;
-            this_.module.planTripFunction.call(this_.module, params);
-        });
-        //TRANSLATORS: button to previous itinerary
-        $('<button>'+_tr("Previous")+'</button>').button().appendTo(buttonRow).click(function() {
-            var itin = this_.itineraries[this_.activeIndex];
-            var params = itin.tripPlan.queryParams;
-            var newEndTime = itin.itinData.endTime - 90000;
-            var stopId = itin.getFirstStopID();
-            _.extend(params, {
-                startTransitStopId :  stopId,
-                time : otp.util.Time.formatItinTime(newEndTime, "h:mma"),
-                date : otp.util.Time.formatItinTime(newEndTime, "MM-DD-YYYY"),
-                arriveBy : true,
-                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
-            });
-            this_.refreshActiveOnly = true;
-            this_.module.updateActiveOnly = true;
-            this_.module.planTripFunction.call(this_.module, params);
-        });
-        //TRANSLATORS: button to next itinerary
-        $('<button>'+_tr("Next")+'</button>').button().appendTo(buttonRow).click(function() {
-            var itin = this_.itineraries[this_.activeIndex];
-            var params = itin.tripPlan.queryParams;
-            var newStartTime = itin.itinData.startTime + 90000;
-            var stopId = itin.getFirstStopID();
-            _.extend(params, {
-                startTransitStopId :  stopId,
-                time : otp.util.Time.formatItinTime(newStartTime, "h:mma"),
-                date : otp.util.Time.formatItinTime(newStartTime, "MM-DD-YYYY"),
-                arriveBy : false,
-                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
-            });
-            this_.refreshActiveOnly = true;
-            this_.module.updateActiveOnly = true;
-            this_.module.planTripFunction.call(this_.module, params);
-        });
-        //TRANSLATORS: button to last itinerary
-        $('<button>'+_tr("Last")+'</button>').button().appendTo(buttonRow).click(function() {
-            var itin = this_.itineraries[this_.activeIndex];
-            var params = itin.tripPlan.queryParams;
-            var stopId = itin.getFirstStopID();
-            _.extend(params, {
-                startTransitStopId :  stopId,
-                date : moment(this_.module.date, otp.config.locale.time.date_format).add('days', 1).format("MM-DD-YYYY"),
-                time : serviceBreakTime,
-                arriveBy : true,
-                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
-            });
-            this_.refreshActiveOnly = true;
-            this_.module.updateActiveOnly = true;
+            this_.refreshActiveOnly = false;
+            this_.module.updateActiveOnly = false;
             this_.module.planTripFunction.call(this_.module, params);
         });
         //TRANSLATORS: button to next page of itineraries
@@ -245,7 +204,7 @@ otp.widgets.ItinerariesWidget =
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             _.extend(params, {
-                pageCursor :  this_.pageCursor,
+                pageCursor :  this_.nextPageCursor,
             });
             this_.refreshActiveOnly = false;
             this_.module.updateActiveOnly = false;

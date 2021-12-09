@@ -58,7 +58,8 @@ public class TransmodelGraphQLPlanner {
             response.metadata = res.getMetadata();
             response.messages = res.getRoutingErrors();
             response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
-            response.pageCursor = res.getPageCursor();
+            response.previousPageCursor = res.getPreviousPageCursor();
+            response.nextPageCursor = res.getNextPageCursor();
         }
         catch (ParameterException e) {
             var msg = e.message.get();

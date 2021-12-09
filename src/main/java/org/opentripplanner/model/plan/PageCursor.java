@@ -30,27 +30,45 @@ public class PageCursor {
     public final Instant earliestDepartureTime;
     public final Instant latestArrivalTime;
     public final Duration searchWindow;
+    public final boolean reverseFilteringDirection;
 
     private PageCursor(
             Instant earliestDepartureTime,
             Instant latestArrivalTime,
-            Duration searchWindow
+            Duration searchWindow,
+            boolean reverseFilteringDirection
     ) {
         this.earliestDepartureTime = earliestDepartureTime;
         this.latestArrivalTime = latestArrivalTime;
         this.searchWindow = searchWindow;
+        this.reverseFilteringDirection = reverseFilteringDirection;
     }
 
     public static PageCursor arriveByCursor(
-            Instant earliestDepartureTime, Instant latestArrivalTime, Duration searchWindow
+        Instant earliestDepartureTime,
+        Instant latestArrivalTime,
+        Duration searchWindow,
+        boolean reverseFilteringDirection
     ) {
-        return new PageCursor(earliestDepartureTime, latestArrivalTime, searchWindow);
+        return new PageCursor(
+            earliestDepartureTime,
+            latestArrivalTime,
+            searchWindow,
+            reverseFilteringDirection
+        );
     }
 
     public static PageCursor departAfterCursor(
-            Instant earliestDepartureTime, Duration searchWindow
+        Instant earliestDepartureTime,
+        Duration searchWindow,
+        boolean reverseFilteringDirection
     ) {
-        return new PageCursor(earliestDepartureTime, null, searchWindow);
+        return new PageCursor(
+            earliestDepartureTime,
+            null,
+            searchWindow,
+            reverseFilteringDirection
+        );
     }
 
     @Override
@@ -59,6 +77,7 @@ public class PageCursor {
                 .addTime("edt", earliestDepartureTime)
                 .addTime("lat", latestArrivalTime)
                 .addDuration("searchWindow", searchWindow)
+                .addBoolIfTrue("reverseFilteringDirection", reverseFilteringDirection)
                 .toString();
     }
 
@@ -70,6 +89,7 @@ public class PageCursor {
             writeTime(earliestDepartureTime, out);
             writeTime(latestArrivalTime, out);
             writeDuration(searchWindow, out);
+            writeBoolean(reverseFilteringDirection, out);
             out.flush();
             return Base64.getUrlEncoder().encodeToString(buf.toByteArray());
         }
@@ -91,7 +111,8 @@ public class PageCursor {
             var edt = readTime(in);
             var lat = readTime(in);
             var searchWindow = readDuration(in);
-            return new PageCursor(edt, lat, searchWindow);
+            var reverseFilteringDirection = readBoolean(in);
+            return new PageCursor(edt, lat, searchWindow, reverseFilteringDirection);
         }
         catch (IOException e) {
             LOG.error("Unable to decode page cursor: '" + cursor + "'", e);
@@ -99,8 +120,12 @@ public class PageCursor {
         }
     }
 
-    public Instant nextDateTime() {
-        return arriveBy() ? latestArrivalTime : earliestDepartureTime;
+    private Instant getEarliestDepartureTime() {
+        return earliestDepartureTime;
+    }
+
+    public Instant getLatestArrivalTime() {
+        return latestArrivalTime;
     }
 
     private static void writeTime(Instant time, ObjectOutputStream out) throws IOException {
@@ -119,6 +144,14 @@ public class PageCursor {
 
     private static Duration readDuration(ObjectInputStream in) throws IOException {
         return Duration.ofSeconds(in.readInt());
+    }
+
+    private static void writeBoolean(boolean value, ObjectOutputStream out) throws IOException {
+        out.writeBoolean(value);
+    }
+
+    private static boolean readBoolean(ObjectInputStream in) throws IOException {
+        return in.readBoolean();
     }
 
     private boolean arriveBy() {

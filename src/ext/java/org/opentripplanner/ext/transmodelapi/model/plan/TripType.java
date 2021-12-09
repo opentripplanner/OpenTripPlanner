@@ -96,15 +96,23 @@ public class TripType {
             .dataFetcher(env -> ((PlanResponse) env.getSource()).debugOutput)
             .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("previousPageCursor")
+                .description("Use the cursor to get the previous page of results. Use this cursor for "
+                    + "the pageCursor parameter in the trip query in order to get the previous page.\n"
+                    + "The previous page is a set of itineraries departing BEFORE the first itinerary"
+                    + " in this result.")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(env -> ((PlanResponse) env.getSource()).previousPageCursor.encode())
+                .build()
+            )
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pageCursor")
                 .description("Use the cursor to get the next page of results. Use this cursor for "
                     + "the pageCursor parameter in the trip query in order to get the next page.\n"
-                    + "If arriveBy=false the next page is a set of itineraries departing AFTER the "
-                    + "last itinerary in this result.\n"
-                    + "If arriveBy=true the next page is a set of itineraries departing BEFORE the "
-                    + "first itinerary in this result.")
+                    + "The next page is a set of itineraries departing AFTER the last "
+                    + "itinerary in this result.")
                 .type(Scalars.GraphQLString)
-                .dataFetcher(env -> ((PlanResponse) env.getSource()).pageCursor.encode())
+                .dataFetcher(env -> ((PlanResponse) env.getSource()).nextPageCursor.encode())
                 .build()
             )
         .build();

@@ -975,7 +975,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * the time-window used.
      */
     public Instant getDateTimeCurrentPage() {
-        return pageCursor == null ? Instant.ofEpochSecond(dateTime) : pageCursor.nextDateTime();
+        return pageCursor == null ? Instant.ofEpochSecond(dateTime) : (
+                arriveBy
+                        ? pageCursor.latestArrivalTime
+                        : pageCursor.earliestDepartureTime
+        );
     }
 
     public void setDateTime(Instant dateTime) {

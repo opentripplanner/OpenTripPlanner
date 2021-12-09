@@ -15,7 +15,8 @@ public class TripPlannerResponse {
     public HashMap<String, String> requestParameters;
     private ApiTripPlan plan;
     private ApiTripSearchMetadata metadata;
-    private String pageCursor;
+    private String previousPageCursor;
+    private String nextPageCursor;
 
     private PlannerError error = null;
 
@@ -55,24 +56,36 @@ public class TripPlannerResponse {
     }
 
     /**
-     * Use the cursor to get the next page of results. Insert this cursor into the
+     * Use the cursor to get the previous page of results. Insert this cursor into the
      * request and get post it to get the next page.
      * <p>
-     * If arriveBy=false the next page is a set of itineraries departing AFTER the last
-     * itinerary in this result.
-     * <p>
-     * If arriveBy=true the next page is a set of itineraries departing BEFORE the first
-     * itinerary in this result.
+     * The previous page is a set of itineraries departing BEFORE the first itinerary in this result.
      * <p>
      * Note! The behavior is undefined if timetableView is off. This is possible to support,
      * but require more information to be included in the cursor.
      */
-    public String getPageCursor() {
-        return pageCursor;
+    public String getPreviousPageCursor() {
+        return previousPageCursor;
     }
 
-    public void setPageCursor(String pageCursor) {
-        this.pageCursor = pageCursor;
+    public void setPreviousPageCursor(String pageCursor) {
+        this.previousPageCursor = pageCursor;
+    }
+    /**
+     * Use the cursor to get the next page of results. Insert this cursor into the
+     * request and get post it to get the next page.
+     * <p>
+     * The next page is a set of itineraries departing AFTER the last itinerary in this result.
+     * <p>
+     * Note! The behavior is undefined if timetableView is off. This is possible to support,
+     * but require more information to be included in the cursor.
+     */
+    public String getNextPageCursor() {
+        return nextPageCursor;
+    }
+
+    public void setNextPageCursor(String pageCursor) {
+        this.nextPageCursor = pageCursor;
     }
 
     /** The error (if any) that this response raised. */

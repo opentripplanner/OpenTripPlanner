@@ -8,20 +8,23 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 
 public class RoutingResponse {
     private final TripPlan tripPlan;
-    private final PageCursor pageCursor;
+    private final PageCursor nextPageCursor;
+    private final PageCursor previousPageCursor;
     private final TripSearchMetadata metadata;
     private final List<RoutingError> routingErrors;
     private final DebugTimingAggregator debugTimingAggregator;
 
     public RoutingResponse(
         TripPlan tripPlan,
-        PageCursor pageCursor,
+        PageCursor previousPageCursor,
+        PageCursor nextPageCursor,
         TripSearchMetadata metadata,
         List<RoutingError> routingErrors,
         DebugTimingAggregator debugTimingAggregator
     ) {
         this.tripPlan = tripPlan;
-        this.pageCursor = pageCursor;
+        this.nextPageCursor = nextPageCursor;
+        this.previousPageCursor = previousPageCursor;
         this.metadata = metadata;
         this.routingErrors = routingErrors;
         this.debugTimingAggregator = debugTimingAggregator;
@@ -31,8 +34,12 @@ public class RoutingResponse {
         return tripPlan;
     }
 
-    public PageCursor getPageCursor() {
-        return pageCursor;
+    public PageCursor getNextPageCursor() {
+        return nextPageCursor;
+    }
+
+    public PageCursor getPreviousPageCursor() {
+        return previousPageCursor;
     }
 
     public TripSearchMetadata getMetadata() {
@@ -49,7 +56,8 @@ public class RoutingResponse {
     public String toString() {
         return ToStringBuilder.of(RoutingResponse.class)
                 .addObj("tripPlan", tripPlan)
-                .addObj("pageCursor", pageCursor)
+                .addObj("nextPageCursor", nextPageCursor)
+                .addObj("previousPageCursor", previousPageCursor)
                 .addObj("metadata", metadata)
                 .addObj("routingErrors", routingErrors)
                 .toString();
