@@ -53,16 +53,16 @@ public class AtlantaSmokeTest {
 
         assertTrue(itineraries.size() > 0);
 
-        var expectedModes = List.of("WALK", "SUBWAY", "WALK", "BUS", "BUS");
+        var expectedModes = List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS");
         assertThatItineraryHasModes(itineraries, expectedModes);
 
         var transitLegs = itineraries.stream()
                 .flatMap(i -> i.legs.stream().filter(l -> l.transitLeg))
                 .collect(Collectors.toList());
 
-        var hasFlexLeg = transitLegs.stream().map(l -> l.routeShortName).anyMatch(name -> name.equals("Zone 1"));
+        var hasFlexRoute = transitLegs.stream().map(l -> l.routeShortName).anyMatch(name -> name.equals("Zone 1"));
 
-        assertTrue(hasFlexLeg);
+        assertTrue(hasFlexRoute);
 
     }
 }

@@ -4,8 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.io.IOException;
 import java.net.URI;
@@ -21,6 +26,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.resource.TripPlannerResponse;
+import org.opentripplanner.routing.core.Fare;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,17 +44,30 @@ public class SmokeTest {
     static HttpClient client = HttpClient.newHttpClient();
     static final ObjectMapper mapper;
 
+    static class CurrencyDeserializer extends JsonDeserializer<Fare> {
+        @Override
+        public Fare deserialize(
+                JsonParser jsonParser, DeserializationContext deserializationContext
+        ) throws IOException, JsonProcessingException {
+            return null;
+        }
+    }
+
     static {
         var provider = new JSONObjectMapperProvider();
+
+        SimpleModule module = new SimpleModule("SmokeTests");
+        module.addDeserializer(Fare.class, new CurrencyDeserializer());
+
         mapper = provider.getContext(null);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
+        mapper.registerModule(module);
     }
 
     static LocalDate nextMonday() {
         return LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
     }
-
 
     static HttpRequest planRequest(Map<String, String> params) {
         var urlParams = params.entrySet()
