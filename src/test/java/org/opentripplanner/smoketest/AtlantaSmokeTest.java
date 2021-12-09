@@ -11,14 +11,17 @@ import org.junit.experimental.categories.Category;
 @Category(SmokeTest.class)
 public class AtlantaSmokeTest {
 
+    String centralAtlanta = "33.714059324224124,-84.37225341796875";
+    String powderSpringsFlexZone1 = "33.882387270695105,-84.51576232910155";
+
     @Test
-    public void returnRouteFromCentralAtlantaToPowderSprings() {
+    public void regularRouteFromCentralAtlantaToPowderSprings() {
         var params = Map.of(
-                "fromPlace", "33.714059324224124,-84.37225341796875",
-                "toPlace", "33.882387270695105,-84.51576232910155",
+                "fromPlace", centralAtlanta,
+                "toPlace", powderSpringsFlexZone1,
                 "time", "1:00pm",
                 "date", SmokeTest.nextMonday().toString(),
-                "mode", "TRANSIT,WALK,FLEX_EGRESS",
+                "mode", "TRANSIT,WALK",
                 "showIntermediateStops", "true",
                 "locale", "en"
         );
@@ -32,7 +35,6 @@ public class AtlantaSmokeTest {
                 .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
                 .collect(Collectors.toList());
 
-
         var expectedModes = List.of("WALK", "BUS", "WALK", "SUBWAY", "WALK", "BUS", "BUS", "WALK");
 
         // the assertion is a little fuzzy as more detailed ones would be hard to maintain over time
@@ -44,7 +46,5 @@ public class AtlantaSmokeTest {
                         itineraryModes
                 )
         );
-
-
     }
 }
