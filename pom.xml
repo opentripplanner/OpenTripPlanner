@@ -238,7 +238,8 @@
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
-                    <excludedGroups>org.opentripplanner.smoketest.SmokeTest</excludedGroups>
+                    <excludedGroups>${test.excluded.groups}</excludedGroups>
+                    <groups>${test.included.groups}</groups>
                 </configuration>
             </plugin>
             <plugin>
@@ -723,6 +724,24 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>unit-tests</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <test.included.groups>*</test.included.groups>
+                <test.excluded.groups>org.opentripplanner.smoketest.SmokeTest</test.excluded.groups>
+            </properties>
+        </profile>
+        <profile>
+            <id>smoke-tests</id>
+            <!-- Set groups property to blank value which will match nothing -->
+            <properties>
+                <test.included.groups>org.opentripplanner.smoketest.SmokeTest</test.included.groups>
+                <test.excluded.groups>*</test.excluded.groups>
+            </properties>
+        </profile>
         <profile>
             <id>clean-test-snapshots</id>
             <build>
