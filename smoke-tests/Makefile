@@ -1,11 +1,7 @@
 CURL:=curl -L -\# --fail --create-dirs
-current_dir = $(shell pwd)
-
-download: otp.jar
 
 otp.jar:
 	cp ../target/otp-*-SNAPSHOT-shaded.jar otp.jar
-
 
 atlanta/osm.pbf:
 	${CURL} https://leonard.io/ibi/atlanta-2021-12-08.osm.pbf -o $@

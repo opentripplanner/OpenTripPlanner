@@ -23,12 +23,13 @@ jobs:
         with:
           java-version: 11
       # Retain the local Maven repository to speed up builds.
-      - name: Setup Maven Cache
+      - name: Cache local Maven repository
         uses: actions/cache@v2
-        id: cache
         with:
-          path: ~/.m2
-          key: maven-local-repo
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       # So that the branch name can be reference via $GITHUB_REF_SLUG.
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
