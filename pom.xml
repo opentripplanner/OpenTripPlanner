@@ -238,6 +238,7 @@
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
+                    <excludedGroups>org.opentripplanner.smoketest.SmokeTest</excludedGroups>
                 </configuration>
             </plugin>
             <plugin>
