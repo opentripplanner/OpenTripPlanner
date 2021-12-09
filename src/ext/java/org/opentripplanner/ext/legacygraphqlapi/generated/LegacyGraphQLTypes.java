@@ -1439,6 +1439,54 @@ public class LegacyGraphQLTypes {
     }
 
 
+    public static class LegacyGraphQLRouteAlertsArgs {
+
+        private Iterable<LegacyGraphQLRouteAlertType> _types;
+
+        public LegacyGraphQLRouteAlertsArgs(Map<String, Object> args) {
+            if (args != null) {
+                if (args.get("types") != null) {
+                    this._types = ((List<String>) args.get("types")).stream()
+                            .map(LegacyGraphQLRouteAlertType::valueOfLabel)
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+
+        public Iterable<LegacyGraphQLRouteAlertType> getLegacyGraphQLTypes() {return this._types;}
+    }
+
+    /**
+     * Entities that are relevant for routes that can contain alerts
+     */
+    public enum LegacyGraphQLRouteAlertType {
+        Agency("AGENCY"),
+        Route("ROUTE"),
+        RouteType("ROUTE_TYPE"),
+        StopsOnRoute("STOPS_ON_ROUTE"),
+        StopsOnTrips("STOPS_ON_TRIPS"),
+        Trips("TRIPS");
+
+        public final String label;
+
+        LegacyGraphQLRouteAlertType(String label) {
+            this.label = label;
+        }
+
+        private static final Map<String, LegacyGraphQLRouteAlertType> BY_LABEL = new HashMap<>();
+
+        static {
+            for (LegacyGraphQLRouteAlertType e : values()) {
+                BY_LABEL.put(e.label, e);
+            }
+        }
+
+        public static LegacyGraphQLRouteAlertType valueOfLabel(String label) {
+            return BY_LABEL.get(label);
+        }
+    }
+
+
     public static class LegacyGraphQLStopStopTimesForPatternArgs {
 
         private String _id;

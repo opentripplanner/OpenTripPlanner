@@ -2399,14 +2399,39 @@ type Route implements Node {
     """List of trips which operate on this route"""
     trips: [Trip]
 
-    """List of alerts which have an effect on the route"""
-    alerts: [Alert]
+    """
+    List of alerts which have an effect on the route directly or indirectly.
+    By default only alerts directly affecting this route are returned. It's also possible
+    to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the route.
+        By default only returns alerts that directly affect this route.
+        """
+        types: [RouteAlertType]
+    ): [Alert]
+}
 
-    """
-    GTFS route type of the route. There can be alerts that affect routes of a route type
-    or routes of an agency that are of certain route type.
-    """
-    routeType: RouteType!
+"""Entities that are relevant for routes that can contain alerts"""
+enum RouteAlertType {
+    """Alerts affecting the route's agency."""
+    AGENCY
+
+    """Alerts directly affecting the route."""
+    ROUTE
+
+    """Alerts affecting the route type of the route."""
+    ROUTE_TYPE
+
+    """Alerts affecting the stops that are on the route."""
+    STOPS_ON_ROUTE
+
+    """Alerts affecting the route's trips."""
+    TRIPS
+
+    """Alerts affecting the stops on some trips of the route."""
+    STOPS_ON_TRIPS
 }
 
 """

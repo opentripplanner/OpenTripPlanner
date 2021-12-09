@@ -667,8 +667,6 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Iterable<TripPattern>> patterns();
 
-        public DataFetcher<LegacyGraphQLRouteTypeModel> routeType();
-
         public DataFetcher<String> shortName();
 
         public DataFetcher<Iterable<Object>> stops();
