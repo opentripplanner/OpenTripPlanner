@@ -47,3 +47,6 @@ jobs:
           make run-atlanta &
           # OTP needs a little while to start up so we sleep
           sleep 10
+
+      - name: Run smoke tests
+        run: mvn test -P smoke-tests
