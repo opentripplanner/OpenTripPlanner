@@ -50,7 +50,6 @@ public class RoutingWorker {
     private boolean reverseFilteringDirection = false;
 
     public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
-        this.debugTimingAggregator.startedCalculating();
         this.request = request;
         this.router = router;
         this.searchStartTime = DateMapper.asStartOfService(request.getDateTimeCurrentPage(), zoneId);

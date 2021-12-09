@@ -81,7 +81,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
-import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
@@ -350,8 +349,6 @@ public class Graph implements Serializable {
         if (e != null) {
             turnRestrictions.remove(e);
             streetNotesService.removeStaticNotes(e);
-
-            if (e instanceof EdgeWithCleanup) ((EdgeWithCleanup) e).detach();
 
             if (e.fromv != null) {
                 e.fromv.removeOutgoing(e);

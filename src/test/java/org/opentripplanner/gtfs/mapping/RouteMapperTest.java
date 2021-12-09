@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BikeAccess;
 
 import java.util.Collection;
@@ -63,7 +64,8 @@ public class RouteMapperTest {
         ROUTE.setBrandingUrl(BRANDING_URL);
     }
 
-    private final RouteMapper subject = new RouteMapper(new AgencyMapper(FEED_ID));
+    private final RouteMapper subject =
+            new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false));
 
     @Test
     public void testMapCollection() throws Exception {

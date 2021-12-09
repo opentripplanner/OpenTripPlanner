@@ -674,7 +674,7 @@ Any public field or setter method in this class can be given a default value usi
 
 ### Tuning transfer optimization
 
-The main purpose of transfer optimization is to handle cases where one can transfer between two routes at more than one point (pair of stops), ensuring transfers occur at the best possible location. By post-processing all paths returned by the router, OTP can apply sophisticated calculations that are too slow or not algorithmically valid within Raptor. Transfers are optimized before the paths reach the itinerary filter chain.
+The main purpose of transfer optimization is to handle cases where it is possible to transfer between two routes at more than one point (pair of stops). The transfer optimization ensures that transfers occur at the best possible location. By post-processing all paths returned by the router, OTP can apply sophisticated calculations that are too slow or not algorithmically valid within Raptor. Transfers are optimized before the paths are passed to the itinerary-filter-chain.
 
 For a detailed description of the design and the optimization calculations see the [design documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md) (dev-2.x latest).
 
@@ -688,15 +688,16 @@ The optimized transfer service will try to, in order:
 1. Use transfer priority. This includes stay-seated and guaranteed transfers.
 2. Use the transfers with the best distribution of the wait-time, and avoid very short transfers.
 3. Avoid back-travel
+4. Boost stop-priority to select preferred and recommended stops.
 
-If two paths have the same priority level, then we break the tie by looking at waiting times. The
-goal is to maximize the wait-time for each stop, avoiding situations where there is little time 
-available to make the transfer. This is balanced with the generalized-cost. The cost is adjusted 
-with a new cost for wait-time.
+If two paths have the same transfer priority level, then we break the tie by looking at waiting
+times. The goal is to maximize the wait-time for each stop, avoiding situations where there is 
+little time available to make the transfer. This is balanced with the generalized-cost. The cost is
+adjusted with a new cost for wait-time (optimized-wait-time-cost).
 
 The defaults should work fine, but if you have results with short wait-times dominating a better 
-option or "back-travel", then try to increase the `minSafeWaitTimeFactor` and/or 
-`backTravelWaitTimeFactor`.
+option or "back-travel", then try to increase the `minSafeWaitTimeFactor`, 
+`backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
 
 ```JSON
 // router-config.json
@@ -705,7 +706,8 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor` and/or
     "transferOptimization": {
       "optimizeTransferWaitTime": true,
       "minSafeWaitTimeFactor": 5.0,
-      "backTravelWaitTimeFactor": 1.0
+      "backTravelWaitTimeFactor": 1.0,
+      "extraStopBoardAlightCostsFactor": 2.5
     }
   }
 }

@@ -7,22 +7,22 @@ package org.opentripplanner.api.resource;
 public class TransitTimingOutput {
 
     /**
-     * Time taken for the initialization of the raptor router in milliseconds.
+     * Time taken for the initialization of the raptor router in nanoseconds.
      */
     public final long tripPatternFilterTime;
 
     /**
-     * Time taken for the access and egress routing in milliseconds.
+     * Time taken for the access and egress routing in nanoseconds.
      */
     public final long accessEgressTime;
 
     /**
-     * Time taken for the raptor search in milliseconds.
+     * Time taken for the raptor search in nanoseconds.
      */
     public final long raptorSearchTime;
 
     /**
-     * Time taken for mapping from the raptor paths to itinerary objects in milliseconds.
+     * Time taken for mapping from the raptor paths to itinerary objects in nanoseconds.
      */
     public final long itineraryCreationTime;
 

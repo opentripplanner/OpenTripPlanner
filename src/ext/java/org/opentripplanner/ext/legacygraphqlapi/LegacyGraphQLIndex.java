@@ -16,6 +16,8 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import io.micrometer.core.instrument.Metrics;
+import java.util.List;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.*;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
@@ -96,6 +98,9 @@ class LegacyGraphQLIndex {
           .type(IntrospectionTypeWiring.build(LegacyGraphQLBookingInfoImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLVehicleRentalStationImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLRentalVehicleImpl.class))
+          .type("AlertEntity", type -> type.typeResolver(new LegacyGraphQLAlertEntityTypeResolver()))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnRouteImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnTripImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
@@ -115,7 +120,7 @@ class LegacyGraphQLIndex {
 
     if (OTPFeature.ActuatorAPI.isOn()) {
       instrumentation = new ChainedInstrumentation(
-              new MicrometerGraphQLInstrumentation(ActuatorAPI.prometheusRegistry),
+              new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, List.of()),
               instrumentation
       );
     }

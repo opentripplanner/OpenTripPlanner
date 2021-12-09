@@ -12,6 +12,7 @@ import org.opentripplanner.standalone.server.OTPApplication;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.logging.MetricsLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,6 +119,7 @@ public class OTPAppConstruction {
     public OTPServer server(Router router) {
         if (server == null) {
             server = new OTPServer(config.getCli(), router);
+            new MetricsLogging(server);
         }
         return server;
     }

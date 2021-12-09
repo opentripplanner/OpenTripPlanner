@@ -94,6 +94,7 @@ public class QuayType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("lines")
+                    .withDirective(gqlUtil.timingData)
                     .description("List of lines servicing this quay")
                     .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(lineType))))
                     .dataFetcher(environment -> {
@@ -107,6 +108,7 @@ public class QuayType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("journeyPatterns")
+                    .withDirective(gqlUtil.timingData)
                     .description("List of journey patterns servicing this quay")
                     .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
                     .dataFetcher(environment -> {
@@ -117,6 +119,7 @@ public class QuayType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("estimatedCalls")
+                    .withDirective(gqlUtil.timingData)
                     .description("List of visits to this quay as part of vehicle journeys.")
                     .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
                     .argument(GraphQLArgument.newArgument()
