@@ -19,6 +19,7 @@ import org.opentripplanner.routing.algorithm.raptor.router.street.DirectFlexRout
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -42,7 +43,7 @@ public class RoutingWorker {
 
     private final RoutingRequest request;
     private final Router router;
-    private final FilterTransitWhenDirectModeIsEmpty emptyDirectModeHandler;
+    private FilterTransitWhenDirectModeIsEmpty emptyDirectModeHandler;
     private final ZonedDateTime searchStartTime;
     private SearchParams raptorSearchParamsUsed = null;
     private Itinerary firstRemovedItinerary = null;
@@ -52,7 +53,6 @@ public class RoutingWorker {
         this.debugTimingAggregator.startedCalculating();
         this.request = request;
         this.router = router;
-        this.emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
         this.searchStartTime = DateMapper.asStartOfService(request.getDateTimeCurrentPage(), zoneId);
     }
 
@@ -76,6 +76,7 @@ public class RoutingWorker {
 
         // If no direct mode is set, then we set one.
         // See {@link FilterTransitWhenDirectModeIsEmpty}
+        this.emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
         request.modes.directMode = emptyDirectModeHandler.resolveDirectMode();
 
         this.debugTimingAggregator.finishedPrecalculating();
