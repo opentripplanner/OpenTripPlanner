@@ -164,6 +164,7 @@ public class LegacyGraphQLTypes {
         public Integer getLegacyGraphQLTimeRange() {return this._timeRange;}
     }
 
+
     public enum LegacyGraphQLFilterPlaceType {
         BicycleRent("BICYCLE_RENT"),
         BikePark("BIKE_PARK"),
@@ -1461,6 +1462,7 @@ public class LegacyGraphQLTypes {
      */
     public enum LegacyGraphQLRouteAlertType {
         Agency("AGENCY"),
+        DirectionOnRoute("DIRECTION_ON_ROUTE"),
         Route("ROUTE"),
         RouteType("ROUTE_TYPE"),
         StopsOnRoute("STOPS_ON_ROUTE"),

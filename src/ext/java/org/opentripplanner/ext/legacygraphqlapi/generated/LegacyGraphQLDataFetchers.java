@@ -14,6 +14,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLDirectionOnRouteModel;
 import org.opentripplanner.common.model.P2;
 import java.util.Map;
 import org.opentripplanner.routing.core.FareComponent;
@@ -305,6 +306,17 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Object> stop();
 
         public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
+    }
+
+    /**
+     * Direction on a route. In practice, this means the trips/patterns of a route that have the
+     * defined direction.
+     */
+    public interface LegacyGraphQLDirectionOnRoute {
+
+        public DataFetcher<Integer> directionId();
+
+        public DataFetcher<Route> route();
     }
 
     /**

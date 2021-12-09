@@ -416,6 +416,25 @@ public class AlertsUpdateHandlerTest {
         );
     }
 
+    @Test
+    public void testDirectionAndRouteSelector() {
+        GtfsRealtime.Alert alert = Alert.newBuilder()
+                .addInformedEntity(
+                        GtfsRealtime.EntitySelector.newBuilder()
+                                .setDirectionId(1)
+                                .setRouteId("1")
+                                .build())
+                .build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        long directionAndRouteSelectorCount = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.DirectionAndRoute)
+                .count();
+        assertEquals(1l, directionAndRouteSelectorCount);
+    }
+
     private TransitAlert processOneAlert(GtfsRealtime.Alert alert) {
         GtfsRealtime.FeedMessage message = GtfsRealtime.FeedMessage.newBuilder()
                 .setHeader(GtfsRealtime.FeedHeader.newBuilder().setGtfsRealtimeVersion("2.0"))

@@ -17,8 +17,6 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.TranslatedString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,8 +29,6 @@ import java.util.Map;
  *
  */
 public class AlertsUpdateHandler {
-    private static final Logger log = LoggerFactory.getLogger(AlertsUpdateHandler.class);
-
     private String feedId;
 
     private static final int MISSING_INT_FIELD_VALUE = -1;
@@ -89,11 +85,9 @@ public class AlertsUpdateHandler {
                 routeId = informed.getRouteId();
             }
 
-            int direction;
-            if (informed.hasTrip() && informed.getTrip().hasDirectionId()) {
-                direction = informed.getTrip().getDirectionId();
-            } else {
-                direction = MISSING_INT_FIELD_VALUE;
+            int direction = MISSING_INT_FIELD_VALUE;
+            if (informed.hasDirectionId()) {
+                direction = informed.getDirectionId();
             }
 
             // TODO: The other elements of a TripDescriptor are ignored...
@@ -126,11 +120,15 @@ public class AlertsUpdateHandler {
                     alertText.addEntity(new EntitySelector.Trip(new FeedScopedId(feedId, tripId)));
                 }
             } else if (routeId != null) {
-                // TODO: Handle direction
                 if (stopId != null) {
                     alertText.addEntity(new EntitySelector.StopAndRoute(
                         new FeedScopedId(feedId, stopId),
                         new FeedScopedId(feedId, routeId)
+                    ));
+                } else if (direction != MISSING_INT_FIELD_VALUE) {
+                    alertText.addEntity(new EntitySelector.DirectionAndRoute(
+                            direction,
+                            new FeedScopedId(feedId, routeId)
                     ));
                 } else {
                     alertText.addEntity(new EntitySelector.Route(new FeedScopedId(feedId, routeId)));

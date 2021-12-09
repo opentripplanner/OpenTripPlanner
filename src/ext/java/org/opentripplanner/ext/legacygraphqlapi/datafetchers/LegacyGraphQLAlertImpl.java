@@ -10,6 +10,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLDirectionOnRouteModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
@@ -21,6 +22,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
+import org.opentripplanner.routing.alertpatch.EntitySelector.DirectionAndRoute;
 import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRouteOrTripKey;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.util.I18NString;
@@ -227,6 +229,11 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
               if (entitySelector instanceof EntitySelector.RouteType) {
                 int routeType = ((EntitySelector.RouteType) entitySelector).routeType;
                 return new LegacyGraphQLRouteTypeModel(null, routeType);
+              }
+              if (entitySelector instanceof EntitySelector.DirectionAndRoute) {
+                int direction = ((DirectionAndRoute) entitySelector).direction;
+                Route route = getRoutingService(environment).getRouteForId(((EntitySelector.DirectionAndRoute) entitySelector).routeId);
+                return new LegacyGraphQLDirectionOnRouteModel(direction, route);
               }
               if (entitySelector instanceof EntitySelector.Unknown) {
                 return new LegacyGraphQLUnknownModel(
