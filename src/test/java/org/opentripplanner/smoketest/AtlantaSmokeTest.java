@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.opentripplanner.api.model.ApiItinerary;
 
 @Category(SmokeTest.class)
 public class AtlantaSmokeTest {
@@ -26,22 +27,26 @@ public class AtlantaSmokeTest {
                 "locale", "en"
         );
         var otpResponse = SmokeTest.sendPlanRequest(params);
-
-        assertTrue(otpResponse.getPlan().itineraries.size() > 1);
-
         var itineraries = otpResponse.getPlan().itineraries;
 
+        assertTrue(itineraries.size() > 1);
+
+        var expectedModes = List.of("WALK", "BUS", "WALK", "SUBWAY", "WALK", "BUS", "BUS", "WALK");
+        // the assertion is a little fuzzy as more detailed ones would be hard to maintain over time
+        assertThatItineraryHasModes(itineraries, expectedModes);
+    }
+
+    private static void assertThatItineraryHasModes(
+            List<ApiItinerary> itineraries,
+            List<String> expectedModes
+    ) {
         var itineraryModes = itineraries.stream()
                 .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
                 .collect(Collectors.toList());
-
-        var expectedModes = List.of("WALK", "BUS", "WALK", "SUBWAY", "WALK", "BUS", "BUS", "WALK");
-
-        // the assertion is a little fuzzy as more detailed ones would be hard to maintain over time
         assertTrue(
                 itineraryModes.contains(expectedModes),
                 String.format(
-                        "Could not find expected mode %s in itineraries which had modes %s",
+                        "Could not find an mode combination '%s' in itineraries %s",
                         expectedModes,
                         itineraryModes
                 )
