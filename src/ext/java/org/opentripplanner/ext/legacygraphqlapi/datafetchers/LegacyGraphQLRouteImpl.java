@@ -157,6 +157,12 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
               });
             });
           }
+          else if (type.equals(LegacyGraphQLTypes.LegacyGraphQLRouteAlertType.DirectionOnRoute)) {
+            alerts.addAll(
+                    alertService.getDirectionAndRouteAlerts(0, getSource(environment).getId()));
+            alerts.addAll(
+                    alertService.getDirectionAndRouteAlerts(1, getSource(environment).getId()));
+          }
         });
         return alerts.stream().distinct().collect(Collectors.toList());
       }

@@ -148,4 +148,13 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
   }
+
+  @Override
+  public Collection<TransitAlert> getDirectionAndRouteAlerts(int direction, FeedScopedId route) {
+    return transitAlertServices
+            .stream()
+            .map(transitAlertService -> transitAlertService.getDirectionAndRouteAlerts(direction, route))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+  }
 }

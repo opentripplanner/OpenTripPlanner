@@ -112,6 +112,11 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     }
 
     @Override
+    public Collection<TransitAlert> getDirectionAndRouteAlerts(int direction, FeedScopedId route) {
+        return alerts.get(new EntitySelector.DirectionAndRoute(direction, route));
+    }
+
+    @Override
     public void setAlerts(Collection<TransitAlert> alerts) {
         Multimap<EntitySelector, TransitAlert> newAlerts = HashMultimap.create();
         for (TransitAlert alert : alerts) {
