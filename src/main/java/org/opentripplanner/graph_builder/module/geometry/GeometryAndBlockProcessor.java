@@ -644,7 +644,10 @@ public class GeometryAndBlockProcessor {
         CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
         geometry = geometryFactory.createLineString(sequence);
         geometriesByShapeId.put(shapeId, geometry);
-        distancesByShapeId.put(shapeId, distances);
+
+        if(distances != null) {
+            distancesByShapeId.put(shapeId, distances);
+        }
 
         return geometry;
     }
