@@ -93,11 +93,6 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   }
 
   @Override
-  public StopTransferPriority getPriority() {
-    return null;
-  }
-
-  @Override
   public boolean isPartOfSameStationAs(StopLocation alternativeStop) {
     return false;
   }

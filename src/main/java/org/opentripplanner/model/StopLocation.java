@@ -83,7 +83,9 @@ public interface StopLocation {
 
   boolean isPartOfStation();
 
-  StopTransferPriority getPriority();
+  default StopTransferPriority getPriority() {
+    return StopTransferPriority.ALLOWED;
+  }
 
   boolean isPartOfSameStationAs(StopLocation alternativeStop);
 }
