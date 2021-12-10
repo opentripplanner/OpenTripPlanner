@@ -44,7 +44,12 @@ public class SmokeTest {
     static HttpClient client = HttpClient.newHttpClient();
     static final ObjectMapper mapper;
 
-    static class CurrencyDeserializer extends JsonDeserializer<Fare> {
+    /**
+     * The Fare class is a little hard to deserialize so we have a custom deserializer as we don't
+     * run any assertions against the fares. (That is done during unit tests.)
+     */
+    static class FareDeserializer extends JsonDeserializer<Fare> {
+
         @Override
         public Fare deserialize(
                 JsonParser jsonParser, DeserializationContext deserializationContext
@@ -57,7 +62,7 @@ public class SmokeTest {
         var provider = new JSONObjectMapperProvider();
 
         SimpleModule module = new SimpleModule("SmokeTests");
-        module.addDeserializer(Fare.class, new CurrencyDeserializer());
+        module.addDeserializer(Fare.class, new FareDeserializer());
 
         mapper = provider.getContext(null);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -69,7 +74,10 @@ public class SmokeTest {
         return LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
     }
 
-    static HttpRequest planRequest(Map<String, String> params) {
+    /**
+     * Builds an HTTP request for sending to an OTP instance.
+     */
+    static HttpRequest buildPlanRequest(Map<String, String> params) {
         var urlParams = params.entrySet()
                 .stream()
                 .map(kv -> kv.getKey() + "=" + kv.getValue())
@@ -84,8 +92,11 @@ public class SmokeTest {
 
     }
 
+    /**
+     * Sends an HTTP request to the OTP plan endpoint and deserializes the response.
+     */
     static TripPlannerResponse sendPlanRequest(Map<String, String> params) {
-        var request = SmokeTest.planRequest(params);
+        var request = SmokeTest.buildPlanRequest(params);
         LOG.info("Sending request to {}", request.uri());
         TripPlannerResponse otpResponse;
         try {
@@ -109,6 +120,10 @@ public class SmokeTest {
         return otpResponse;
     }
 
+    /**
+     * Given a list of itineraries assert that at least one of them has legs that
+     * have the expected modes.
+     */
     static void assertThatItineraryHasModes(
             List<ApiItinerary> itineraries,
             List<String> expectedModes

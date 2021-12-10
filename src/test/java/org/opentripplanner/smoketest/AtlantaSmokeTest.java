@@ -10,6 +10,16 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+/**
+ * This smoke test expects an OTP installation running at localhost:8080
+ * <p>
+ * It uses the REST API to check that a route from central Atlanta to the flex zone in Powder
+ * Springs can be planned. In order to guarantee somewhat predictable results over time it uses 1pm
+ * on the next Monday relative to the day the test is run as the start time of the route.
+ * <p>
+ * The assertions are intentionally vague as more precise ones would probably cause false positives
+ * when there are slight changes in the schedule.
+ */
 @Category(SmokeTest.class)
 public class AtlantaSmokeTest {
 
@@ -60,9 +70,11 @@ public class AtlantaSmokeTest {
                 .flatMap(i -> i.legs.stream().filter(l -> l.transitLeg))
                 .collect(Collectors.toList());
 
-        var hasFlexRoute = transitLegs.stream().map(l -> l.routeShortName).anyMatch(name -> name.equals("Zone 1"));
+        var usesZone1Route = transitLegs.stream()
+                .map(l -> l.routeShortName)
+                .anyMatch(name -> name.equals("Zone 1"));
 
-        assertTrue(hasFlexRoute);
+        assertTrue(usesZone1Route);
 
     }
 }

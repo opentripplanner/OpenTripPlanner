@@ -733,6 +733,9 @@
     </dependencies>
 
     <profiles>
+        <!-- We set up profiles so that by default only the unit tests (not smoke tests) are executed
+             when running `mvn test`
+             -->
         <profile>
             <id>unit-tests</id>
             <activation>
@@ -743,9 +746,9 @@
                 <test.excluded.groups>org.opentripplanner.smoketest.SmokeTest</test.excluded.groups>
             </properties>
         </profile>
+        <!-- If you want the smoke tests use `mvn test -P smoke-tests` -->
         <profile>
             <id>smoke-tests</id>
-            <!-- Set groups property to blank value which will match nothing -->
             <properties>
                 <test.included.groups>org.opentripplanner.smoketest.SmokeTest</test.included.groups>
                 <test.excluded.groups>*</test.excluded.groups>
