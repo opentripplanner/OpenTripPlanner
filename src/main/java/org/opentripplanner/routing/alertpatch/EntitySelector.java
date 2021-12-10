@@ -263,7 +263,7 @@ public interface EntitySelector {
     @Override
     public int hashCode() {
       int routeHash = Objects.hash(routeId);
-      return 41 * direction * agencyHash;
+      return 41 * direction * routeHash;
     }
   }
 
