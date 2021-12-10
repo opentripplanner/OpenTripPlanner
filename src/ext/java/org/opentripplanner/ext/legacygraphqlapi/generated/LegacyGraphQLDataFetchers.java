@@ -327,6 +327,8 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Iterable<Agency>> agencies();
 
+        public DataFetcher<Iterable<TransitAlert>> alerts();
+
         public DataFetcher<String> feedId();
     }
 
@@ -693,14 +695,12 @@ public class LegacyGraphQLDataFetchers {
     }
 
     /**
-     * Contains alerts that affect a GTFS route type. If agency is defined, only the routes of the
-     * defined agency of the defined route type are affected by the alerts.
+     * Route type entity which covers all agencies if agency is null, otherwise only relevant for
+     * one agency.
      */
     public interface LegacyGraphQLRouteType {
 
         public DataFetcher<Agency> agency();
-
-        public DataFetcher<Iterable<TransitAlert>> alerts();
 
         public DataFetcher<Integer> routeType();
     }

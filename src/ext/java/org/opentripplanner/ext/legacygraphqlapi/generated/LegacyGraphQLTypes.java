@@ -8,6 +8,50 @@ import java.util.stream.Collectors;
 
 public class LegacyGraphQLTypes {
 
+    public static class LegacyGraphQLAgencyAlertsArgs {
+
+        private Iterable<LegacyGraphQLAgencyAlertType> _types;
+
+        public LegacyGraphQLAgencyAlertsArgs(Map<String, Object> args) {
+            if (args != null) {
+                if (args.get("types") != null) {
+                    this._types = ((List<String>) args.get("types")).stream()
+                            .map(LegacyGraphQLAgencyAlertType::valueOfLabel)
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+
+        public Iterable<LegacyGraphQLAgencyAlertType> getLegacyGraphQLTypes() {return this._types;}
+    }
+
+    /**
+     * Entities, which are relevant for an agency and can contain alerts
+     */
+    public enum LegacyGraphQLAgencyAlertType {
+        Agency("AGENCY"),
+        Routes("ROUTES"),
+        RouteTypes("ROUTE_TYPES");
+
+        public final String label;
+
+        LegacyGraphQLAgencyAlertType(String label) {
+            this.label = label;
+        }
+
+        private static final Map<String, LegacyGraphQLAgencyAlertType> BY_LABEL = new HashMap<>();
+
+        static {
+            for (LegacyGraphQLAgencyAlertType e : values()) {
+                BY_LABEL.put(e.label, e);
+            }
+        }
+
+        public static LegacyGraphQLAgencyAlertType valueOfLabel(String label) {
+            return BY_LABEL.get(label);
+        }
+    }
+
 
     /**
      * Cause of a alert
@@ -164,6 +208,48 @@ public class LegacyGraphQLTypes {
         public Integer getLegacyGraphQLTimeRange() {return this._timeRange;}
     }
 
+    public static class LegacyGraphQLFeedAlertsArgs {
+
+        private Iterable<LegacyGraphQLFeedAlertType> _types;
+
+        public LegacyGraphQLFeedAlertsArgs(Map<String, Object> args) {
+            if (args != null) {
+                if (args.get("types") != null) {
+                    this._types = ((List<String>) args.get("types")).stream()
+                            .map(LegacyGraphQLFeedAlertType::valueOfLabel)
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+
+        public Iterable<LegacyGraphQLFeedAlertType> getLegacyGraphQLTypes() {return this._types;}
+    }
+
+    /**
+     * Entities, which are relevant for a feed and can contain alerts
+     */
+    public enum LegacyGraphQLFeedAlertType {
+        Agencies("AGENCIES"),
+        RouteTypes("ROUTE_TYPES");
+
+        public final String label;
+
+        LegacyGraphQLFeedAlertType(String label) {
+            this.label = label;
+        }
+
+        private static final Map<String, LegacyGraphQLFeedAlertType> BY_LABEL = new HashMap<>();
+
+        static {
+            for (LegacyGraphQLFeedAlertType e : values()) {
+                BY_LABEL.put(e.label, e);
+            }
+        }
+
+        public static LegacyGraphQLFeedAlertType valueOfLabel(String label) {
+            return BY_LABEL.get(label);
+        }
+    }
 
     public enum LegacyGraphQLFilterPlaceType {
         BicycleRent("BICYCLE_RENT"),
@@ -482,6 +568,23 @@ public class LegacyGraphQLTypes {
     }
 
 
+    public static class LegacyGraphQLPatternAlertsArgs {
+
+        private Iterable<LegacyGraphQLPatternAlertType> _types;
+
+        public LegacyGraphQLPatternAlertsArgs(Map<String, Object> args) {
+            if (args != null) {
+                if (args.get("types") != null) {
+                    this._types = ((List<String>) args.get("types")).stream()
+                            .map(LegacyGraphQLPatternAlertType::valueOfLabel)
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+
+        public Iterable<LegacyGraphQLPatternAlertType> getLegacyGraphQLTypes() {return this._types;}
+    }
+
     public static class LegacyGraphQLPatternTripsForDateArgs {
 
         private String _serviceDate;
@@ -493,6 +596,38 @@ public class LegacyGraphQLTypes {
         }
 
         public String getLegacyGraphQLServiceDate() {return this._serviceDate;}
+    }
+
+    /**
+     * Entities, which are relevant for a pattern and can contain alerts
+     */
+    public enum LegacyGraphQLPatternAlertType {
+        Agency("AGENCY"),
+        Direction("DIRECTION"),
+        Pattern("PATTERN"),
+        Route("ROUTE"),
+        RouteType("ROUTE_TYPE"),
+        StopsOnPattern("STOPS_ON_PATTERN"),
+        StopsOnTrips("STOPS_ON_TRIPS"),
+        Trips("TRIPS");
+
+        public final String label;
+
+        LegacyGraphQLPatternAlertType(String label) {
+            this.label = label;
+        }
+
+        private static final Map<String, LegacyGraphQLPatternAlertType> BY_LABEL = new HashMap<>();
+
+        static {
+            for (LegacyGraphQLPatternAlertType e : values()) {
+                BY_LABEL.put(e.label, e);
+            }
+        }
+
+        public static LegacyGraphQLPatternAlertType valueOfLabel(String label) {
+            return BY_LABEL.get(label);
+        }
     }
 
     public enum LegacyGraphQLPickupDropoffType {
@@ -1489,6 +1624,23 @@ public class LegacyGraphQLTypes {
     }
 
 
+    public static class LegacyGraphQLStopAlertsArgs {
+
+        private Iterable<LegacyGraphQLStopAlertType> _types;
+
+        public LegacyGraphQLStopAlertsArgs(Map<String, Object> args) {
+            if (args != null) {
+                if (args.get("types") != null) {
+                    this._types = ((List<String>) args.get("types")).stream()
+                            .map(LegacyGraphQLStopAlertType::valueOfLabel)
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+
+        public Iterable<LegacyGraphQLStopAlertType> getLegacyGraphQLTypes() {return this._types;}
+    }
+
     public static class LegacyGraphQLStopStopTimesForPatternArgs {
 
         private String _id;
@@ -1614,6 +1766,38 @@ public class LegacyGraphQLTypes {
         public Integer getLegacyGraphQLMaxDistance() {return this._maxDistance;}
     }
 
+    /**
+     * Entities, which are relevant for a stop and can contain alerts
+     */
+    public enum LegacyGraphQLStopAlertType {
+        AgenciesOfRoutes("AGENCIES_OF_ROUTES"),
+        DirectionsOnRoutes("DIRECTIONS_ON_ROUTES"),
+        Patterns("PATTERNS"),
+        Routes("ROUTES"),
+        Stop("STOP"),
+        StopOnRoutes("STOP_ON_ROUTES"),
+        StopOnTrips("STOP_ON_TRIPS"),
+        Trips("TRIPS");
+
+        public final String label;
+
+        LegacyGraphQLStopAlertType(String label) {
+            this.label = label;
+        }
+
+        private static final Map<String, LegacyGraphQLStopAlertType> BY_LABEL = new HashMap<>();
+
+        static {
+            for (LegacyGraphQLStopAlertType e : values()) {
+                BY_LABEL.put(e.label, e);
+            }
+        }
+
+        public static LegacyGraphQLStopAlertType valueOfLabel(String label) {
+            return BY_LABEL.get(label);
+        }
+    }
+
 
     public static class LegacyGraphQLTransportModeInput {
 
@@ -1641,6 +1825,23 @@ public class LegacyGraphQLTypes {
         public LegacyGraphQLMode getLegacyGraphQLMode() {return this._mode;}
 
         public LegacyGraphQLQualifier getLegacyGraphQLQualifier() {return this._qualifier;}
+    }
+
+    public static class LegacyGraphQLTripAlertsArgs {
+
+        private Iterable<LegacyGraphQLTripAlertType> _types;
+
+        public LegacyGraphQLTripAlertsArgs(Map<String, Object> args) {
+            if (args != null) {
+                if (args.get("types") != null) {
+                    this._types = ((List<String>) args.get("types")).stream()
+                            .map(LegacyGraphQLTripAlertType::valueOfLabel)
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+  
+        public Iterable<LegacyGraphQLTripAlertType> getLegacyGraphQLTypes() {return this._types;}
     }
 
     public static class LegacyGraphQLTripArrivalStoptimeArgs {
@@ -1680,6 +1881,37 @@ public class LegacyGraphQLTypes {
         }
 
         public String getLegacyGraphQLServiceDate() {return this._serviceDate;}
+    }
+
+    /**
+     * Entities, which are relevant for a trip and can contain alerts
+     */
+    public enum LegacyGraphQLTripAlertType {
+        Agency("AGENCY"),
+        Direction("DIRECTION"),
+        Pattern("PATTERN"),
+        Route("ROUTE"),
+        RouteType("ROUTE_TYPE"),
+        StopsOnTrip("STOPS_ON_TRIP"),
+        Trip("TRIP");
+
+        public final String label;
+
+        LegacyGraphQLTripAlertType(String label) {
+            this.label = label;
+        }
+
+        private static final Map<String, LegacyGraphQLTripAlertType> BY_LABEL = new HashMap<>();
+
+        static {
+            for (LegacyGraphQLTripAlertType e : values()) {
+                BY_LABEL.put(e.label, e);
+            }
+        }
+
+        public static LegacyGraphQLTripAlertType valueOfLabel(String label) {
+            return BY_LABEL.get(label);
+        }
     }
 
 

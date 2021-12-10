@@ -33,9 +33,31 @@ type Agency implements Node {
     routes: [Route]
 
     """
-    List of alerts which have an effect on all operations of the agency (e.g. a strike)
+    By default, list of alerts which have an effect on all operations of the agency (e.g. a strike).
+    It's also possible to return other relevant alerts through defining types.
     """
-    alerts: [Alert]
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the agency.
+        By default only returns alerts that have an effect on all operations of the agency (e.g. a strike).
+        """
+        types: [AgencyAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for an agency and can contain alerts"""
+enum AgencyAlertType {
+    """Alerts affecting the agency."""
+    AGENCY
+
+    """Alerts affecting agency's routes"""
+    ROUTES
+
+    """
+    Alerts affecting the different route types of the agency.
+    Alerts that affect route types on all agencies can be fetched through Feed.
+    """
+    ROUTE_TYPES
 }
 
 """Alert of a current or upcoming disruption in public transportation"""
@@ -822,6 +844,29 @@ type Feed {
 
     """List of agencies which provide data to this feed"""
     agencies: [Agency]
+
+    """
+    Alerts relevant for the feed.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the feed.
+        """
+        types: [FeedAlertType!]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a feed and can contain alerts"""
+enum FeedAlertType {
+    """Alerts affecting the feed's agencies"""
+    AGENCIES
+
+    """
+    Alerts affecting the route types across the feed.
+    There might be alerts that only affect route types within an agency of the feed,
+    and those can be fetched through the Agency.
+    """
+    ROUTE_TYPES
 }
 
 enum FilterPlaceType {
@@ -1356,8 +1401,46 @@ type Pattern implements Node {
     """
     semanticHash: String
 
-    """List of alerts which have an effect on trips of the pattern"""
-    alerts: [Alert]
+    """
+    By default, list of alerts which have directly an effect on just the pattern.
+    It's also possible to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the pattern.
+        By default, list of alerts which have directly an effect on just the pattern.
+        """
+        types: [PatternAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a pattern and can contain alerts"""
+enum PatternAlertType {
+    """Alerts affecting the pattern"""
+    PATTERN
+
+    """Alerts affecting the pattern's route's agency"""
+    AGENCY
+
+    """Alerts affecting the route that the pattern runs on"""
+    ROUTE
+
+    """Alerts affecting the route type of the route that the pattern runs on"""
+    ROUTE_TYPE
+
+    """Alerts affecting the trips which run on this pattern"""
+    TRIPS
+
+    """Alerts affecting the stops which are on this pattern"""
+    STOPS_ON_PATTERN
+
+    """Alerts affecting the stops of the trips which run on this pattern"""
+    STOPS_ON_TRIPS
+
+    """
+    Alerts affecting the direction of the pattern.
+    """
+    DIRECTION
 }
 
 enum PickupDropoffType {
@@ -2457,9 +2540,8 @@ enum RouteAlertType {
 }
 
 """
-Contains alerts that affect a GTFS route type.
-If agency is defined, only the routes of the defined agency of the defined route type
-are affected by the alerts.
+Route type entity which covers all agencies if agency is null,
+otherwise only relevant for one agency.
 """
 type RouteType {
     """
@@ -2472,13 +2554,6 @@ type RouteType {
 
     """A public transport agency"""
     agency: Agency
-
-    """
-    List of alerts which have an effect on the defined route type.
-    If agency is not null, there can also be alerts that only affect the route type
-    for the specified agency in addition to alerts that affect the route type for all agencies.
-    """
-    alerts: [Alert]
 }
 
 """Time range for which the API has data available"""
@@ -2679,8 +2754,47 @@ type Stop implements Node & PlaceInterface {
         omitCanceled: Boolean = true
     ): [Stoptime]
 
-    """List of alerts which have an effect on this stop"""
-    alerts: [Alert]
+    """
+    By default, list of alerts which have directly an effect on just the stop.
+    It's also possible to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the stop.
+        By default, list of alerts which have directly an effect on just the stop.
+        """
+        types: [StopAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a stop and can contain alerts"""
+enum StopAlertType {
+    """Alerts affecting the stop"""
+    STOP
+
+    """Alerts affecting the stop's patterns"""
+    PATTERNS
+
+    """Alerts affecting the agencies of the routes going through the stop"""
+    AGENCIES_OF_ROUTES
+
+    """Alerts affecting the routes that go through the stop"""
+    ROUTES
+
+    """Alerts affecting the trips that go through this stop"""
+    TRIPS
+
+    """Alerts affecting the stop on specific routes"""
+    STOP_ON_ROUTES
+
+    """Alerts affecting the stop on specific trips"""
+    STOP_ON_TRIPS
+
+    """
+    Alerts affecting different directions on routes.
+    Only the directions that go through the stop are included.
+    """
+    DIRECTIONS_ON_ROUTES
 }
 
 type stopAtDistance implements Node {
@@ -2950,8 +3064,46 @@ type Trip implements Node {
     """
     tripGeometry: Geometry
 
-    """List of alerts which have an effect on this trip"""
-    alerts: [Alert]
+    """
+    By default, list of alerts which have directly an effect on just the trip.
+    It's also possible to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the trip.
+        By default, list of alerts which have directly an effect on just the trip.
+        """
+        types: [TripAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a trip and can contain alerts"""
+enum TripAlertType {
+    """Alerts affecting the trip"""
+    TRIP
+
+    """Alerts affecting the trip's pattern"""
+    PATTERN
+
+    """Alerts affecting the trip's agency"""
+    AGENCY
+
+    """Alerts affecting the trip's route"""
+    ROUTE
+
+    """Alerts affecting the route type of the trip's route"""
+    ROUTE_TYPE
+
+    """
+    Alerts affecting the stops visited on the trip.
+    Some of the alerts can only affect the trip or its route on the stop.
+    """
+    STOPS_ON_TRIP
+
+    """
+    Alerts affecting the direction of the trip.
+    """
+    DIRECTION
 }
 
 """
