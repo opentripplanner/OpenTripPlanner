@@ -126,6 +126,10 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                     getSource(environment).getId()
                             .getFeedId()
             ));
+            alerts.addAll(alertService.getRouteTypeAndAgencyAlerts(
+                    getSource(environment).getType(),
+                    getSource(environment).getAgency().getId()
+            ));
           }
           else if (type.equals(LegacyGraphQLTypes.LegacyGraphQLRouteAlertType.Agency)) {
             alerts.addAll(alertService.getAgencyAlerts(getSource(environment).getAgency().getId()));
@@ -154,7 +158,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
             });
           }
         });
-        return alerts;
+        return alerts.stream().distinct().collect(Collectors.toList());
       }
       else {
         return getRoutingService(environment).getTransitAlertService()
