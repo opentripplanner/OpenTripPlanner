@@ -120,6 +120,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
           switch (type) {
             case Route:
               alerts.addAll(alertService.getRouteAlerts(getSource(environment).getId()));
+              break;
             case RouteType:
               alerts.addAll(alertService.getRouteTypeAlerts(
                       getSource(environment).getType(),
@@ -130,12 +131,15 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                       getSource(environment).getType(),
                       getSource(environment).getAgency().getId()
               ));
+              break;
             case Agency:
               alerts.addAll(
                       alertService.getAgencyAlerts(getSource(environment).getAgency().getId()));
+              break;
             case Trips:
               getTrips(environment).forEach(
                       trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
+              break;
             case StopsOnRoute:
               getStops(environment).forEach(stop -> {
                 alerts.addAll(alertService.getStopAlerts(((StopLocation) stop).getId()));
@@ -144,6 +148,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                         getSource(environment).getId()
                 ));
               });
+              break;
             case StopsOnTrips:
               Iterable<Trip> trips = getTrips(environment);
               getStops(environment).forEach(stop -> {
@@ -153,11 +158,13 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                   ));
                 });
               });
+              break;
             case DirectionOnRoute:
               alerts.addAll(
                       alertService.getDirectionAndRouteAlerts(0, getSource(environment).getId()));
               alerts.addAll(
                       alertService.getDirectionAndRouteAlerts(1, getSource(environment).getId()));
+              break;
           }
         });
         return alerts.stream().distinct().collect(Collectors.toList());
