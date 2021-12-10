@@ -117,51 +117,47 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
-          if (type.equals(LegacyGraphQLTypes.LegacyGraphQLRouteAlertType.Route)) {
-            alerts.addAll(alertService.getRouteAlerts(getSource(environment).getId()));
-          }
-          else if (type.equals(LegacyGraphQLTypes.LegacyGraphQLRouteAlertType.RouteType)) {
-            alerts.addAll(alertService.getRouteTypeAlerts(
-                    getSource(environment).getType(),
-                    getSource(environment).getId()
-                            .getFeedId()
-            ));
-            alerts.addAll(alertService.getRouteTypeAndAgencyAlerts(
-                    getSource(environment).getType(),
-                    getSource(environment).getAgency().getId()
-            ));
-          }
-          else if (type.equals(LegacyGraphQLTypes.LegacyGraphQLRouteAlertType.Agency)) {
-            alerts.addAll(alertService.getAgencyAlerts(getSource(environment).getAgency().getId()));
-          }
-          else if (type.equals(LegacyGraphQLTypes.LegacyGraphQLRouteAlertType.Trips)) {
-            getTrips(environment).forEach(
-                    trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
-          }
-          else if (type.equals(LegacyGraphQLTypes.LegacyGraphQLRouteAlertType.StopsOnRoute)) {
-            getStops(environment).forEach(stop -> {
-              alerts.addAll(alertService.getStopAlerts(((StopLocation) stop).getId()));
-              alerts.addAll(alertService.getStopAndRouteAlerts(
-                      ((StopLocation) stop).getId(),
+          switch (type) {
+            case Route:
+              alerts.addAll(alertService.getRouteAlerts(getSource(environment).getId()));
+            case RouteType:
+              alerts.addAll(alertService.getRouteTypeAlerts(
+                      getSource(environment).getType(),
                       getSource(environment).getId()
+                              .getFeedId()
               ));
-            });
-          }
-          else if (type.equals(LegacyGraphQLTypes.LegacyGraphQLRouteAlertType.StopsOnTrips)) {
-            Iterable<Trip> trips = getTrips(environment);
-            getStops(environment).forEach(stop -> {
-              trips.forEach(trip -> {
-                alerts.addAll(alertService.getStopAndTripAlerts(((StopLocation) stop).getId(),
-                        trip.getId(), null
+              alerts.addAll(alertService.getRouteTypeAndAgencyAlerts(
+                      getSource(environment).getType(),
+                      getSource(environment).getAgency().getId()
+              ));
+            case Agency:
+              alerts.addAll(
+                      alertService.getAgencyAlerts(getSource(environment).getAgency().getId()));
+            case Trips:
+              getTrips(environment).forEach(
+                      trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
+            case StopsOnRoute:
+              getStops(environment).forEach(stop -> {
+                alerts.addAll(alertService.getStopAlerts(((StopLocation) stop).getId()));
+                alerts.addAll(alertService.getStopAndRouteAlerts(
+                        ((StopLocation) stop).getId(),
+                        getSource(environment).getId()
                 ));
               });
-            });
-          }
-          else if (type.equals(LegacyGraphQLTypes.LegacyGraphQLRouteAlertType.DirectionOnRoute)) {
-            alerts.addAll(
-                    alertService.getDirectionAndRouteAlerts(0, getSource(environment).getId()));
-            alerts.addAll(
-                    alertService.getDirectionAndRouteAlerts(1, getSource(environment).getId()));
+            case StopsOnTrips:
+              Iterable<Trip> trips = getTrips(environment);
+              getStops(environment).forEach(stop -> {
+                trips.forEach(trip -> {
+                  alerts.addAll(alertService.getStopAndTripAlerts(((StopLocation) stop).getId(),
+                          trip.getId(), null
+                  ));
+                });
+              });
+            case DirectionOnRoute:
+              alerts.addAll(
+                      alertService.getDirectionAndRouteAlerts(0, getSource(environment).getId()));
+              alerts.addAll(
+                      alertService.getDirectionAndRouteAlerts(1, getSource(environment).getId()));
           }
         });
         return alerts.stream().distinct().collect(Collectors.toList());
