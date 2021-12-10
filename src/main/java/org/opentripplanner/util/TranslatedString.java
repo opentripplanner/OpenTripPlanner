@@ -53,11 +53,11 @@ public class TranslatedString implements I18NString, Serializable {
   }
 
   /**
-   * Gets an interned I18NString. If the translations only have a single value, return a
+   * Gets an interned I18NString. If the translations only have a single value, and no language set, return a
    * NonTranslatedString, otherwise a TranslatedString
    *
    * @param translations A Map of languages and translations, a null language is the default
-   *                     translation
+   * translation
    */
   public static I18NString getI18NString(Map<String, String> translations) {
     if (intern.containsKey(translations)) {
@@ -65,12 +65,16 @@ public class TranslatedString implements I18NString, Serializable {
     } else {
       I18NString ret;
       // Check if we only have one name, even under multiple languages
-      if (new HashSet<>(translations.values()).size() < 2) {
+      if (
+        new HashSet<>(translations.values()).size() < 2 &&
+        translations.keySet().iterator().next() == null
+      ) {
         ret = new NonLocalizedString(translations.values().iterator().next());
       } else {
         ret = new TranslatedString(translations);
       }
       intern.put(translations, ret);
+
       return ret;
     }
   }
