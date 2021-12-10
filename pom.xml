@@ -459,6 +459,12 @@
             <artifactId>micrometer-jersey2</artifactId>
             <version>${micrometer.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-influx</artifactId>
+            <version>${micrometer.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- netcdf4 -->
 

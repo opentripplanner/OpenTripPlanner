@@ -5,13 +5,16 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.influx.InfluxConfig;
+import io.micrometer.influx.InfluxMeterRegistry;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.URI;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,7 +72,7 @@ public class SpeedTest {
     private final Graph graph;
     private final TransitLayer transitLayer;
 
-    private final MeterRegistry registry = new SimpleMeterRegistry();
+    private final MeterRegistry registry = RegistrySetup.chooseRegistry();
     private final Clock clock = registry.config().clock();
 
     private final SpeedTestCmdLineOpts opts;
@@ -96,6 +99,11 @@ public class SpeedTest {
         this.streetRouter = new EgressAccessRouter(graph, transitLayer, registry);
         this.nAdditionalTransfers = opts.numOfExtraTransfers();
         this.service = new RaptorService<>(new RaptorConfig<>(config.transitRoutingParams, registry));
+
+        registry.config().commonTags(List.of(
+                Tag.of("git.commit", projectInfo().versionControl.commit),
+                Tag.of("git.branch", projectInfo().versionControl.branch)
+        ));
 
         // record the lowest percentile of times
         registry.config().meterFilter(
@@ -155,6 +163,9 @@ public class SpeedTest {
             runSingleTest(i+1, nSamples);
         }
         printProfileStatistics();
+
+        // close() sends the results to influxdb
+        registry.close();
 
         service.shutdown();
         System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());

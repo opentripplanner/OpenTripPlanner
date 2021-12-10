@@ -37,3 +37,5 @@ target/
 
 # for local dev only
 src/ext/resources/reportapi/report.csv
+
+src/test/resources/raptor/speedtest/norway/graph.obj
