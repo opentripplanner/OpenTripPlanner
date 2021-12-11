@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -97,8 +98,9 @@ public class SpeedTest {
         this.nAdditionalTransfers = opts.numOfExtraTransfers();
         this.service = new RaptorService<>(new RaptorConfig<>(config.transitRoutingParams, registry));
 
+        var measurementEnv = Optional.ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT")).orElse("local");
         registry.config().commonTags(List.of(
-                Tag.of("measurement.environment", System.getenv("MEASUREMENT_ENVIRONMENT")),
+                Tag.of("measurement.environment", measurementEnv),
                 Tag.of("git.commit", projectInfo().versionControl.commit),
                 Tag.of("git.branch", projectInfo().versionControl.branch)
         ));
