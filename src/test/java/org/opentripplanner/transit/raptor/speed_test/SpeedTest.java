@@ -98,6 +98,7 @@ public class SpeedTest {
         this.service = new RaptorService<>(new RaptorConfig<>(config.transitRoutingParams, registry));
 
         registry.config().commonTags(List.of(
+                Tag.of("measurement.environment", System.getenv("MEASUREMENT_ENVIRONMENT")),
                 Tag.of("git.commit", projectInfo().versionControl.commit),
                 Tag.of("git.branch", projectInfo().versionControl.branch)
         ));
