@@ -52,9 +52,6 @@ public class RegistrySetup {
             }
         };
 
-        System.out.println(influxConfig.uri());
-        System.out.println(influxConfig.password());
-        System.out.println(password);
         return new InfluxMeterRegistry(influxConfig, Clock.SYSTEM);
     }
 

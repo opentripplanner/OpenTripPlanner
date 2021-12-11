@@ -30,7 +30,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Cache graph build input files paths
+      - name: Cache graph input files
         uses: actions/cache@v2
         with:
           path: |
@@ -43,7 +43,6 @@ jobs:
 
       - name: Download OSM & Netex data
         run: |
-          rm -rf graph/*.zip
           mkdir -p graph
           wget https://download.geofabrik.de/europe/norway-210101.osm.pbf -O graph/osm.pbf --no-clobber || true
           wget https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip -O graph/rb_norway-aggregated-netex.zip --no-clobber || true
@@ -56,6 +55,8 @@ jobs:
           java -Xmx32G -jar otp.jar --build --save graph
 
       - name: Copy graph, run speed test
+        env:
+          PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
         run: |
           mv graph/graph.obj src/test/resources/raptor/speedtest/norway
           mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.arguments="--dir=src/test/resources/raptor/speedtest/norway"
