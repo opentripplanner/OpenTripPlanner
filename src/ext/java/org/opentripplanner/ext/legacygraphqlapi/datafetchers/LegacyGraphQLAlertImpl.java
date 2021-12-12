@@ -16,6 +16,7 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteMo
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -194,37 +195,67 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
     return environment -> getSource(environment).getEntities().stream()
             .map(entitySelector -> {
               if (entitySelector instanceof EntitySelector.Stop) {
-                return getRoutingService(environment).getStopForId(((EntitySelector.Stop) entitySelector).stopId);
+                FeedScopedId id = ((EntitySelector.Stop) entitySelector).stopId;
+                Stop stop = getRoutingService(environment).getStopForId(id);
+                return getAlertEntityOrUnknown(stop, id.toString(), "stop");
               }
               if (entitySelector instanceof EntitySelector.Agency) {
-                return getRoutingService(environment).getAgencyForId(((EntitySelector.Agency) entitySelector).agencyId);
+                FeedScopedId id = ((EntitySelector.Agency) entitySelector).agencyId;
+                Agency agency = getRoutingService(environment).getAgencyForId(id);
+                return getAlertEntityOrUnknown(agency, id.toString(), "agency");
               }
               if (entitySelector instanceof EntitySelector.Route) {
-                return getRoutingService(environment).getRouteForId(((EntitySelector.Route) entitySelector).routeId);
+                FeedScopedId id = ((EntitySelector.Route) entitySelector).routeId;
+                Route route = getRoutingService(environment).getRouteForId(id);
+                return getAlertEntityOrUnknown(route, id.toString(), "route");
               }
               if (entitySelector instanceof EntitySelector.Trip) {
-                return getRoutingService(environment).getTripForId().get(((EntitySelector.Trip) entitySelector).tripId);
+                FeedScopedId id = ((EntitySelector.Trip) entitySelector).tripId;
+                Trip trip = getRoutingService(environment).getTripForId().get(id);
+                return getAlertEntityOrUnknown(trip, id.toString(), "trip");
               }
               if (entitySelector instanceof EntitySelector.TripPattern) {
-                return getRoutingService(environment).getTripPatternForId(((EntitySelector.TripPattern) entitySelector).tripPatternId);
+                FeedScopedId id = ((EntitySelector.TripPattern) entitySelector).tripPatternId;
+                TripPattern tripPattern = getRoutingService(environment).getTripPatternForId(id);
+                return getAlertEntityOrUnknown(tripPattern, id.toString(), "trip pattern");
               }
               if (entitySelector instanceof EntitySelector.StopAndRoute) {
-                StopAndRouteOrTripKey stopAndRouteKey = ((EntitySelector.StopAndRoute) entitySelector).stopAndRoute;
-                Stop stop = stopAndRouteKey == null ? null : getRoutingService(environment).getStopForId(stopAndRouteKey.stop);
-                Route route = stopAndRouteKey == null ? null : getRoutingService(environment).getRouteForId(stopAndRouteKey.routeOrTrip);
-                return new LegacyGraphQLStopOnRouteModel(stop, route);
+                StopAndRouteOrTripKey stopAndRouteKey =
+                        ((EntitySelector.StopAndRoute) entitySelector).stopAndRoute;
+                FeedScopedId stopId = stopAndRouteKey.stop;
+                FeedScopedId routeId = stopAndRouteKey.routeOrTrip;
+                Stop stop = getRoutingService(environment).getStopForId(stopId);
+                Route route = getRoutingService(environment).getRouteForId(routeId);
+                return stop != null && route != null
+                        ? new LegacyGraphQLStopOnRouteModel(
+                        stop, route)
+                        : getUnknownForAlertEntityPair(stop, route, stopId.toString(),
+                                routeId.toString(), "stop", "route"
+                        );
               }
               if (entitySelector instanceof EntitySelector.StopAndTrip) {
-                StopAndRouteOrTripKey stopAndTripKey = ((EntitySelector.StopAndTrip) entitySelector).stopAndTrip;
-                Stop stop = stopAndTripKey == null ? null : getRoutingService(environment).getStopForId(stopAndTripKey.stop);
-                Trip trip = stopAndTripKey == null ? null : getRoutingService(environment).getTripForId().get(stopAndTripKey.routeOrTrip);
-                return new LegacyGraphQLStopOnTripModel(stop, trip);
+                StopAndRouteOrTripKey stopAndTripKey =
+                        ((EntitySelector.StopAndTrip) entitySelector).stopAndTrip;
+                FeedScopedId stopId = stopAndTripKey.stop;
+                FeedScopedId tripId = stopAndTripKey.routeOrTrip;
+                Stop stop = getRoutingService(environment).getStopForId(stopId);
+                Trip trip = getRoutingService(environment).getTripForId().get(tripId);
+                return stop != null && trip != null
+                        ? new LegacyGraphQLStopOnTripModel(stop, trip)
+                        : getUnknownForAlertEntityPair(stop, trip, stopId.toString(),
+                                tripId.toString(), "stop", "trip"
+                        );
               }
               if (entitySelector instanceof EntitySelector.RouteTypeAndAgency) {
-                Agency agency = getRoutingService(environment).getAgencyForId(
-                        ((EntitySelector.RouteTypeAndAgency) entitySelector).agencyId);
+                FeedScopedId agencyId =
+                        ((EntitySelector.RouteTypeAndAgency) entitySelector).agencyId;
                 int routeType = ((EntitySelector.RouteTypeAndAgency) entitySelector).routeType;
-                return new LegacyGraphQLRouteTypeModel(agency, routeType);
+                Agency agency = getRoutingService(environment).getAgencyForId(agencyId);
+                return agency != null
+                        ? new LegacyGraphQLRouteTypeModel(agency, routeType)
+                        : getUnknownForAlertEntityPair(agency, routeType, agency.toString(),
+                                Integer.toString(routeType), "agency", "route type"
+                        );
               }
               if (entitySelector instanceof EntitySelector.RouteType) {
                 int routeType = ((EntitySelector.RouteType) entitySelector).routeType;
@@ -232,8 +263,13 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
               }
               if (entitySelector instanceof EntitySelector.DirectionAndRoute) {
                 int direction = ((DirectionAndRoute) entitySelector).direction;
-                Route route = getRoutingService(environment).getRouteForId(((EntitySelector.DirectionAndRoute) entitySelector).routeId);
-                return new LegacyGraphQLDirectionOnRouteModel(direction, route);
+                FeedScopedId routeId = ((EntitySelector.DirectionAndRoute) entitySelector).routeId;
+                Route route = getRoutingService(environment).getRouteForId(routeId);
+                return route != null
+                        ? new LegacyGraphQLDirectionOnRouteModel(direction, route)
+                        : getUnknownForAlertEntityPair(route, direction, route.toString(),
+                                Integer.toString(direction), "route", "direction"
+                        );
               }
               if (entitySelector instanceof EntitySelector.Unknown) {
                 return new LegacyGraphQLUnknownModel(
@@ -243,6 +279,42 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
             })
             .map(Object.class::cast)
             .collect(Collectors.toList());
+  }
+
+  private Object getAlertEntityOrUnknown(Object entity, String id, String type) {
+    if (entity != null) {
+      return entity;
+    }
+    return new LegacyGraphQLUnknownModel(
+            String.format("Alert's entity selector was %s with id %s but the %s doesn't exist.",
+                    type, id, type
+            ));
+  }
+
+  private Object getUnknownForAlertEntityPair(
+          Object entityA,
+          Object entityB,
+          String idA,
+          String idB,
+          String typeA,
+          String typeB
+  ) {
+    if (entityA == null && entityB == null) {
+      return new LegacyGraphQLUnknownModel(String.format(
+              "Alert's entity selector was %s with id %s and %s with id %s but the %s and %s don't exist.",
+              typeA, idA, typeB, idB, typeA, typeB
+      ));
+    }
+    if (entityA == null) {
+      return new LegacyGraphQLUnknownModel(String.format(
+              "Alert's entity selector was %s with id %s and %s with id %s but the %s doesn't exist.",
+              typeA, idA, typeB, idB, typeA
+      ));
+    }
+    return new LegacyGraphQLUnknownModel(String.format(
+            "Alert's entity selector was %s with id %s and %s with id %s but the %s doesn't exist.",
+            typeA, idA, typeB, idB, typeB
+    ));
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

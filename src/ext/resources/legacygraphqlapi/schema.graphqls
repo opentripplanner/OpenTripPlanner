@@ -790,7 +790,7 @@ type DirectionOnRoute {
     """
     The route which (should) contain trips/patterns with the defined direction.
     """
-    route: Route
+    route: Route!
 }
 
 type elevationProfileComponent {
@@ -2826,14 +2826,11 @@ Stop that should (but not guaranteed) to exist on a route.
 """
 type StopOnRoute {
     """
-    Stop at the route. It's also possible that the stop is no longer on the route
-    or that the stop is null when it can no longer be found.
+    Stop at the route. It's also possible that the stop is no longer on the route.
     """
-    stop: Stop
-    """
-    Route which contains the stop. Route is null if it can't be found anymore.
-    """
-    route: Route
+    stop: Stop!
+    """Route which contains the stop."""
+    route: Route!
 }
 
 """
@@ -2841,14 +2838,13 @@ Stop that should (but not guaranteed) to exist on a trip.
 """
 type StopOnTrip {
     """
-    Stop at the trip. It's also possible that the stop is no longer on the trip
-    or that the stop is null when it can no longer be found.
+    Stop at the trip. It's also possible that the stop is no longer on the trip.
     """
-    stop: Stop
+    stop: Stop!
     """
-    Trip which contains the stop. Route is null if it can't be found anymore.
+    Trip which contains the stop.
     """
-    trip: Trip
+    trip: Trip!
 }
 
 """
