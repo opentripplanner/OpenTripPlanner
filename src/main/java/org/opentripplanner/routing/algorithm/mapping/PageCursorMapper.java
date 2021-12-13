@@ -111,8 +111,13 @@ public class PageCursorMapper {
                 return PageCursor.arriveByCursor(edt, lat, sw, true);
             } else {
                 if (firstRemovedItinerary != null) {
+                    Instant endOfSearchWindow = edt.plus(sw);
                     edt = firstRemovedItinerary.startTime().toInstant();
                     edt = edt.truncatedTo(ChronoUnit.MINUTES);
+                    // If EDT would be outside SW, revert to end of SW
+                    if (edt.isAfter(endOfSearchWindow)) {
+                        edt = endOfSearchWindow;
+                    }
                 } else {
                     edt = edt.plus(sw);
                 }
