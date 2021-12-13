@@ -18,3 +18,7 @@ Example input files and setup is included in the resource test folder:
 ```
 mvn compiler:testCompile exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.arguments="--dir=src/test/resources/raptor/speedtest/norway"
 ```
+
+## CI
+
+The test is run after every merge to master. Its Github Actions workflow is defined in [performance-test.yml](../../../../../../../../.github/workflows/performance-test.yml).
