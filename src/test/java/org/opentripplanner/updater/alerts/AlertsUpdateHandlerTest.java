@@ -435,6 +435,43 @@ public class AlertsUpdateHandlerTest {
         assertEquals(1l, directionAndRouteSelectorCount);
     }
 
+    @Test
+    public void testRouteTypeSelector() {
+        GtfsRealtime.Alert alert = Alert.newBuilder()
+                .addInformedEntity(
+                        GtfsRealtime.EntitySelector.newBuilder()
+                                .setRouteType(1)
+                                .build())
+                .build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        long RouteTypeSelectorCount = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteType)
+                .count();
+        assertEquals(1l, RouteTypeSelectorCount);
+    }
+
+    @Test
+    public void testRouteTypeAndAgencySelector() {
+        GtfsRealtime.Alert alert = Alert.newBuilder()
+                .addInformedEntity(
+                        GtfsRealtime.EntitySelector.newBuilder()
+                                .setRouteType(1)
+                                .setAgencyId("1")
+                                .build())
+                .build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        long RouteTypeAndAgencySelectorCount = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteTypeAndAgency)
+                .count();
+        assertEquals(1l, RouteTypeAndAgencySelectorCount);
+    }
+
     private TransitAlert processOneAlert(GtfsRealtime.Alert alert) {
         GtfsRealtime.FeedMessage message = GtfsRealtime.FeedMessage.newBuilder()
                 .setHeader(GtfsRealtime.FeedHeader.newBuilder().setGtfsRealtimeVersion("2.0"))
