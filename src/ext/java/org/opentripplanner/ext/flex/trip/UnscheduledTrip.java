@@ -99,7 +99,7 @@ public class UnscheduledTrip extends FlexTrip {
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
       NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
-    // Boarding is always at the last stop for unscheduled trips
+    // Boarding is always at the first stop for unscheduled trips
     int fromIndex = 0;
 
     // Find alighting index
