@@ -102,7 +102,8 @@ public class SpeedTest {
         registry.config().commonTags(List.of(
                 Tag.of("measurement.environment", measurementEnv),
                 Tag.of("git.commit", projectInfo().versionControl.commit),
-                Tag.of("git.branch", projectInfo().versionControl.branch)
+                Tag.of("git.branch", projectInfo().versionControl.branch),
+                Tag.of("git.buildtime", projectInfo().versionControl.buildTime)
         ));
 
         // record the lowest percentile of times
