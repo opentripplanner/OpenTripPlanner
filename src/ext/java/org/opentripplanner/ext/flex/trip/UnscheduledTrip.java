@@ -72,14 +72,23 @@ public class UnscheduledTrip extends FlexTrip {
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
       NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
+    // Find boarding index
     int fromIndex = getFromIndex(access);
-    int toIndex = getToIndex(access);
 
-    if (stopTimes[fromIndex].dropOffType == NONE.getGtfsCode()) { return Stream.empty(); }
+    // Alighting is always at the last stop for unscheduled trips
+    int toIndex = stopTimes.length - 1;
+
+    // Check if trip is possible
+    if (fromIndex == -1 ||
+        fromIndex > toIndex ||
+        stopTimes[toIndex].dropOffType == NONE.getGtfsCode()
+    ) {
+      return Stream.empty();
+    }
 
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
-    for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
+    for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
       res.add(new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, date, calculator, params));
     }
 
@@ -90,14 +99,23 @@ public class UnscheduledTrip extends FlexTrip {
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
       NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator, FlexParameters params
   ) {
-    int fromIndex = getFromIndex(egress);
+    // Boarding is always at the last stop for unscheduled trips
+    int fromIndex = 0;
+
+    // Find alighting index
     int toIndex = getToIndex(egress);
 
-    if (stopTimes[toIndex].pickupType == NONE.getGtfsCode()) { return Stream.empty(); }
+    // Check if trip is possible
+    if (toIndex == -1 ||
+        fromIndex > toIndex ||
+        stopTimes[fromIndex].pickupType == NONE.getGtfsCode()
+    ) {
+      return Stream.empty();
+    }
 
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 
-    for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
+    for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
       res.add(new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, date, calculator, params));
     }
 
