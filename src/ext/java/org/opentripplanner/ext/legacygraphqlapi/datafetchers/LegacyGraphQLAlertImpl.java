@@ -18,7 +18,7 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
@@ -196,7 +196,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
             .map(entitySelector -> {
               if (entitySelector instanceof EntitySelector.Stop) {
                 FeedScopedId id = ((EntitySelector.Stop) entitySelector).stopId;
-                Stop stop = getRoutingService(environment).getStopForId(id);
+                StopLocation stop = getRoutingService(environment).getStopForId(id);
                 return getAlertEntityOrUnknown(stop, id.toString(), "stop");
               }
               if (entitySelector instanceof EntitySelector.Agency) {
@@ -224,7 +224,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
                         ((EntitySelector.StopAndRoute) entitySelector).stopAndRoute;
                 FeedScopedId stopId = stopAndRouteKey.stop;
                 FeedScopedId routeId = stopAndRouteKey.routeOrTrip;
-                Stop stop = getRoutingService(environment).getStopForId(stopId);
+                StopLocation stop = getRoutingService(environment).getStopForId(stopId);
                 Route route = getRoutingService(environment).getRouteForId(routeId);
                 return stop != null && route != null
                         ? new LegacyGraphQLStopOnRouteModel(
@@ -238,7 +238,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
                         ((EntitySelector.StopAndTrip) entitySelector).stopAndTrip;
                 FeedScopedId stopId = stopAndTripKey.stop;
                 FeedScopedId tripId = stopAndTripKey.routeOrTrip;
-                Stop stop = getRoutingService(environment).getStopForId(stopId);
+                StopLocation stop = getRoutingService(environment).getStopForId(stopId);
                 Trip trip = getRoutingService(environment).getTripForId().get(tripId);
                 return stop != null && trip != null
                         ? new LegacyGraphQLStopOnTripModel(stop, trip)

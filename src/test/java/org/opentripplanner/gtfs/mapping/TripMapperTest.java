@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BikeAccess;
 
 import java.util.Collection;
@@ -56,7 +57,8 @@ public class TripMapperTest {
         TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE);
     }
 
-    private TripMapper subject = new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)));
+    private TripMapper subject = new TripMapper(
+            new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)));
 
     @Test
     public void testMapCollection() throws Exception {

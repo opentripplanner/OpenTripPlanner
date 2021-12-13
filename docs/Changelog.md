@@ -89,6 +89,13 @@
 - Extra stop priority cost in optimized transfer service [#3731](https://github.com/opentripplanner/OpenTripPlanner/pull/3731)
 - Remove old visibility graph library from walkable area builder [#3753](https://github.com/opentripplanner/OpenTripPlanner/pull/3753)
 - Update GtfsRealtime and include severity, effect and cause from GTFS RT [#3747](https://github.com/opentripplanner/OpenTripPlanner/pull/3747)
+- Handle miscellaneous service as BUS instead of crashing build [#3755](https://github.com/opentripplanner/OpenTripPlanner/pull/3755)
+- Update all timers to micrometer instances [#3744](https://github.com/opentripplanner/OpenTripPlanner/pull/3744)
+- Bugfix: ClassCastException when planning flex routes [#3762](https://github.com/opentripplanner/OpenTripPlanner/pull/3762)
+- Add mode from parent StopPlace for Quays in Netex mapper [#3751](https://github.com/opentripplanner/OpenTripPlanner/pull/3751)
+- Minor performance improvements [#3767](https://github.com/opentripplanner/OpenTripPlanner/pull/3767)
+- Parallelise computing of trip pattern geometries [#3766](https://github.com/opentripplanner/OpenTripPlanner/pull/3766)
+- Add flex stop to TripTimes, return geometries in GraphQL API [#3757](https://github.com/opentripplanner/OpenTripPlanner/pull/3757)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

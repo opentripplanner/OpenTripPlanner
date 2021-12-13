@@ -46,7 +46,6 @@ public class RoutingWorker {
     private int searchWindowUsedInSeconds = TransitRouter.NOT_SET;
 
     public RoutingWorker(RoutingRequest request, Router router) {
-        this.debugTimingAggregator.startedCalculating();
         this.request = request;
         this.router = router;
         this.emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);

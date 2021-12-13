@@ -7,6 +7,7 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class RouterConfig implements Serializable {
     private final JsonNode rawJson;
     private final String configVersion;
     private final String requestLogFile;
-    private final boolean transmodelApiHideFeedId;
+    private final TransmodelAPIConfig transmodelApi;
     private final double streetRoutingTimeoutSeconds;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
@@ -47,7 +48,7 @@ public class RouterConfig implements Serializable {
         this.rawJson = node;
         this.configVersion = adapter.asText("configVersion", null);
         this.requestLogFile = adapter.asText("requestLogFile", null);
-        this.transmodelApiHideFeedId = adapter.path("transmodelApi").asBoolean("hideFeedId", false);
+        this.transmodelApi = new TransmodelAPIConfig(adapter.path("transmodelApi"));
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
         );
@@ -93,7 +94,7 @@ public class RouterConfig implements Serializable {
         return streetRoutingTimeoutSeconds;
     }
 
-    public boolean transmodelApiHideFeedId() { return transmodelApiHideFeedId; }
+    public TransmodelAPIConfig transmodelApi() { return transmodelApi; }
 
     public RoutingRequest routingRequestDefaults() {
         return routingRequestDefaults;

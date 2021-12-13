@@ -15,6 +15,8 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 class OptimizedPathTailTest implements RaptorTestConstants {
     private final Path<TestTripSchedule> orgPath = BasicPathTestCase.basicTripAsPath();
 
+    private final Path<TestTripSchedule> flexPath = BasicPathTestCase.flexTripAsPath();
+
     private final TransitPathLeg<TestTripSchedule> t1 = orgPath.accessLeg().nextTransitLeg();
     @SuppressWarnings("ConstantConditions")
     private final TransitPathLeg<TestTripSchedule> t2 = t1.nextTransitLeg();
@@ -61,7 +63,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     }
 
     @Test
-    void testToSting() {
+    void testToString() {
         subject.addTransitTail(t3);
         subject.addTransitAndTransferLeg(t2, tx23);
         subject.addTransitAndTransferLeg(t1, tx12);
@@ -74,6 +76,19 @@ class OptimizedPathTailTest implements RaptorTestConstants {
                 + "~ BUS L31 11:40 11:52 ~ E "
                 + "~ Walk 7m45s "
                 + "[$8019 $46pri $-101126wtc]";
+
+        assertEquals(exp, subject.toString());
+    }
+
+    @Test
+    void shouldHandleATransferAfterLastTransit() {
+        subject.addTransitTail(flexPath.accessLeg().nextTransitLeg());
+        subject.access(orgPath.accessLeg().access());
+
+        var exp = "Walk 3m15s ~ A "
+                + "~ BUS L11 10:04 10:35 ~ B "
+                + "~ Walk 7m45s "
+                + "[$3318 $0pri $60wtc]";
 
         assertEquals(exp, subject.toString());
     }

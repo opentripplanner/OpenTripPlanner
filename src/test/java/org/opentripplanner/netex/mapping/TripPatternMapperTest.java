@@ -57,7 +57,7 @@ public class TripPatternMapperTest {
         assertEquals(4, tripPattern.getStops().size());
         assertEquals(1, tripPattern.getTrips().size());
 
-        List<Stop> stops = tripPattern.getStops();
+        var stops = tripPattern.getStops();
         Trip trip = tripPattern.getTrips().get(0);
 
         assertEquals("RUT:ServiceJourney:1", trip.getId().getId());

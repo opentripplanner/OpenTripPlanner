@@ -7,6 +7,7 @@ import org.onebusaway.gtfs.model.Trip;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -47,7 +48,8 @@ public class FrequencyMapperTest {
     }
 
     private FrequencyMapper subject = new FrequencyMapper(
-            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID))));
+            new TripMapper(
+                    new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))));
 
     @Test
     public void testMapCollection() throws Exception {

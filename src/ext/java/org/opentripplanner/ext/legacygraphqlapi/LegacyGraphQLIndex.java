@@ -16,6 +16,8 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import io.micrometer.core.instrument.Metrics;
+import java.util.List;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.*;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
@@ -47,7 +49,7 @@ class LegacyGraphQLIndex {
       .setNameFormat("GraphQLExecutor-%d")
       .build());
 
-  static private GraphQLSchema buildSchema() {
+  static protected GraphQLSchema buildSchema() {
     try {
       URL url = Resources.getResource("legacygraphqlapi/schema.graphqls");
       String sdl = Resources.toString(url, Charsets.UTF_8);
@@ -55,6 +57,7 @@ class LegacyGraphQLIndex {
       RuntimeWiring runtimeWiring = RuntimeWiring
           .newRuntimeWiring()
           .scalar(LegacyGraphQLScalars.polylineScalar)
+          .scalar(LegacyGraphQLScalars.geoJsonScalar)
           .scalar(LegacyGraphQLScalars.graphQLIDScalar)
           .scalar(ExtendedScalars.GraphQLLong)
           .type("Node", type -> type.typeResolver(new LegacyGraphQLNodeTypeResolver()))
@@ -102,6 +105,7 @@ class LegacyGraphQLIndex {
           .type(IntrospectionTypeWiring.build(LegacyGraphQLUnknownImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLRouteTypeImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLDirectionOnRouteImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStopGeometriesImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
@@ -121,7 +125,7 @@ class LegacyGraphQLIndex {
 
     if (OTPFeature.ActuatorAPI.isOn()) {
       instrumentation = new ChainedInstrumentation(
-              new MicrometerGraphQLInstrumentation(ActuatorAPI.prometheusRegistry),
+              new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, List.of()),
               instrumentation
       );
     }
