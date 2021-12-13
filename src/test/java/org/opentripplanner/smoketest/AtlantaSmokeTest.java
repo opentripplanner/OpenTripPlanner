@@ -35,7 +35,8 @@ public class AtlantaSmokeTest {
                 "date", SmokeTest.nextMonday().toString(),
                 "mode", "TRANSIT,WALK",
                 "showIntermediateStops", "true",
-                "locale", "en"
+                "locale", "en",
+                "searchWindow", Long.toString(Duration.ofHours(2).toSeconds())
         );
         var otpResponse = SmokeTest.sendPlanRequest(params);
         var itineraries = otpResponse.getPlan().itineraries;
