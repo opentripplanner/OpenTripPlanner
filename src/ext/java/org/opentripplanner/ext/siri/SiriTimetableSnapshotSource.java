@@ -915,7 +915,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 LOG.warn("Could not cancel scheduled trip {}", tripId);
             } else {
                 final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
-                newTripTimes.cancelTrip();
+                newTripTimes.invalidateUpdatedTrip();
                 buffer.update(pattern, newTripTimes, serviceDate);
                 success = true;
             }

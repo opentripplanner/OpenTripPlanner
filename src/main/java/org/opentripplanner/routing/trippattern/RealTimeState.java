@@ -22,6 +22,11 @@ public enum RealTimeState {
     CANCELED,
 
     /**
+     * The realtime-update is outdated as it been replaced by a new update.
+     */
+    REALTIME_DATA_OUTDATED,
+
+    /**
      * The trip has been added using a real-time update, i.e. the trip was not present in the GTFS feed.
      */
     ADDED,

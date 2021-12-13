@@ -387,6 +387,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     public void cancelTrip() {
         realTimeState = RealTimeState.CANCELED;
     }
+    public void invalidateUpdatedTrip() {
+        realTimeState = RealTimeState.REALTIME_DATA_OUTDATED;
+    }
 
     public void updateDepartureTime(final int stop, final int time) {
         prepareForRealTimeUpdates();
