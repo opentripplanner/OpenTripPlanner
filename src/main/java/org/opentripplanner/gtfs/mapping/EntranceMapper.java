@@ -1,11 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.Entrance;
+import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.util.NonLocalizedString;
 
 /** Responsible for mapping GTFS Entrance into the OTP model. */
 class EntranceMapper {
@@ -17,11 +19,14 @@ class EntranceMapper {
     }
 
     /** Map from GTFS to OTP model, {@code null} safe. */
-    Entrance map(org.onebusaway.gtfs.model.Stop orginal) {
-        return orginal == null ? null : mappedEntrances.computeIfAbsent(orginal, this::doMap);
+    Entrance map(org.onebusaway.gtfs.model.Stop original) {
+        return map(original, null);
+    }
+    Entrance map(org.onebusaway.gtfs.model.Stop original, I18NString nameTranslations) {
+        return original == null ? null : mappedEntrances.computeIfAbsent(original, k -> doMap(original, nameTranslations));
     }
 
-    private Entrance doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+    private Entrance doMap(org.onebusaway.gtfs.model.Stop gtfsStop, I18NString nameTranslations) {
         if (gtfsStop.getLocationType()
                 != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
             throw new IllegalArgumentException(
@@ -33,7 +38,7 @@ class EntranceMapper {
 
         return new Entrance(
             base.getId(),
-            base.getName(),
+            nameTranslations == null ? new NonLocalizedString(base.getName()) : nameTranslations,
             base.getCode(),
             base.getDescription(),
             base.getCoordinate(),

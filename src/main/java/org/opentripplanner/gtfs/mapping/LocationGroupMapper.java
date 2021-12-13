@@ -2,6 +2,7 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public class LocationGroupMapper {
 
   private FlexLocationGroup doMap(org.onebusaway.gtfs.model.LocationGroup element) {
     FlexLocationGroup locationGroup = new FlexLocationGroup(mapAgencyAndId(element.getId()));
-    locationGroup.setName(element.getName());
+    locationGroup.setName(new NonLocalizedString(element.getName()));
 
     for (org.onebusaway.gtfs.model.StopLocation location : element.getLocations()) {
       if (location instanceof org.onebusaway.gtfs.model.Stop) {

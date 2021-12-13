@@ -2,15 +2,16 @@ package org.opentripplanner.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.opentripplanner.util.I18NString;
 
 public class ApiStopShort {
 
     public String id;
     public String code;
-    public String name;
+    public I18NString name;
     public double lat;
     public double lon;
-    public String url;
+    public I18NString url;
 
     /**
      * The fully qualified parent station id including the feedId.

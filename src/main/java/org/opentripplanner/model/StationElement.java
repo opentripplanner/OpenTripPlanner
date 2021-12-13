@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import org.opentripplanner.util.I18NString;
+
 /**
  * Acts as the supertype for all entities, except stations, created from the GTFS stops table. Most
  * of the fileds are shared between the types, and eg. in pathways the namespace any of them can be
@@ -7,7 +9,7 @@ package org.opentripplanner.model;
  */
 public abstract class StationElement extends TransitEntity {
 
-  private final String name;
+  private final I18NString name;
 
   private final String code;
 
@@ -23,7 +25,7 @@ public abstract class StationElement extends TransitEntity {
 
   public StationElement(
       FeedScopedId id,
-      String name,
+      I18NString name,
       String code,
       String description,
       WgsCoordinate coordinate,
@@ -42,7 +44,7 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Name of the station element if provided.
    */
-  public String getName() {
+  public I18NString getName() {
     return name;
   }
 

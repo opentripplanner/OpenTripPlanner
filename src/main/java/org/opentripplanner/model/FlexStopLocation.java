@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the
@@ -11,7 +12,7 @@ import org.locationtech.jts.geom.Point;
 public class FlexStopLocation extends TransitEntity implements StopLocation {
   private static final long serialVersionUID = 1L;
 
-  private String name;
+  private I18NString name;
 
   private Geometry geometry;
 
@@ -26,11 +27,11 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
    * communication, eg. the name of the village where the service stops.
    */
   @Override
-  public String getName() {
+  public I18NString getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(I18NString name) {
     this.name = name;
   }
 

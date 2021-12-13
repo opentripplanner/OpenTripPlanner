@@ -1,11 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.BoardingArea;
+import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.util.NonLocalizedString;
 
 /** Responsible for mapping GTFS Boarding areas into the OTP model. */
 class BoardingAreaMapper {
@@ -18,10 +20,14 @@ class BoardingAreaMapper {
 
   /** Map from GTFS to OTP model, {@code null} safe. */
   BoardingArea map(org.onebusaway.gtfs.model.Stop orginal) {
-    return orginal == null ? null : mappedBoardingAreas.computeIfAbsent(orginal, this::doMap);
+    return map(orginal, null);
   }
 
-  private BoardingArea doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+  BoardingArea map(org.onebusaway.gtfs.model.Stop original, I18NString nameTranslations) {
+    return original == null ? null : mappedBoardingAreas.computeIfAbsent(original, k -> doMap(original, nameTranslations));
+  }
+
+  private BoardingArea doMap(org.onebusaway.gtfs.model.Stop gtfsStop, I18NString nameTranslations) {
     if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA) {
       throw new IllegalArgumentException(
           "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA
@@ -32,7 +38,7 @@ class BoardingAreaMapper {
 
     return new BoardingArea(
         base.getId(),
-        base.getName(),
+        nameTranslations == null ? new NonLocalizedString(base.getName()) : nameTranslations,
         base.getCode(),
         base.getDescription(),
         base.getCoordinate(),

@@ -93,12 +93,12 @@ public class TransitStopVertex extends Vertex {
 
     @Override
     public String getName() {
-        return stop.getName();
+        return stop.getName().toString();
     }
 
     @Override
     public String getName(Locale locale) {
-        return stop.getName();
+        return stop.getName().toString(locale);
     }
 
     @Override

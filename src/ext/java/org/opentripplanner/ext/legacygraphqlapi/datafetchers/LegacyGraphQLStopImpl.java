@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -78,7 +79,19 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> getValue(environment, Stop::getName, Station::getName);
+    return environment -> {
+      String lang = new LegacyGraphQLTypes.LegacyGraphQLStopNameArgs(
+              environment.getArguments()).getLegacyGraphQLLang();
+      return getValue(
+              environment,
+              stop -> {
+                return stop.getName().toString(lang == null ? environment.getLocale() : new Locale(lang));
+              },
+              station -> {
+                return station.getName().toString(lang == null ? environment.getLocale() : new Locale(lang));
+              }
+      );
+    };
   }
 
   @Override
@@ -108,7 +121,19 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> url() {
-    return environment -> getValue(environment, Stop::getUrl, Station::getUrl);
+    return environment -> {
+      String lang = new LegacyGraphQLTypes.LegacyGraphQLStopUrlArgs(
+              environment.getArguments()).getLegacyGraphQLLang();
+      return getValue(
+              environment,
+              stop -> {
+                return stop.getUrl().toString(lang == null ? environment.getLocale() : new Locale(lang));
+              },
+              station -> {
+                return station.getUrl().toString(lang == null ? environment.getLocale() : new Locale(lang));
+              }
+      );
+    };
   }
 
   @Override

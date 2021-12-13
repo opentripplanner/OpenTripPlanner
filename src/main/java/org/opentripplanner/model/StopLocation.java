@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.util.I18NString;
 
 /**
  * A StopLocation describes a place where a vehicle can be boarded or alighted, which is not
@@ -14,7 +15,7 @@ public interface StopLocation {
   FeedScopedId getId();
 
   /** Name of the StopLocation, if provided */
-  String getName();
+  I18NString getName();
 
   /**
    * Short text or a number that identifies the location for riders. These codes are often used in

@@ -170,13 +170,13 @@ public class AddTransitModelEntitiesToGraph {
                 new PathwayEdge(
                     boardingAreaVertex,
                     stationElementNodes.get(boardingArea.getParentStop()),
-                    boardingArea.getName()
+                    boardingArea.getName().toString()
                 );
 
                 new PathwayEdge(
                     stationElementNodes.get(boardingArea.getParentStop()),
                     boardingAreaVertex,
-                    boardingArea.getName()
+                    boardingArea.getName().toString()
                 );
             }
         }

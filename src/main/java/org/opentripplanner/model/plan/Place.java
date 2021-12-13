@@ -143,7 +143,7 @@ public class Place {
 
     public static Place forStop(StopLocation stop, Integer stopIndex, Integer stopSequence) {
         return new Place(
-                stop.getName(),
+                stop.getName().toString(),
                 null,
                 stop.getCoordinate(),
                 VertexType.TRANSIT,
@@ -164,7 +164,7 @@ public class Place {
         // The actual vertex is used because the StopLocation coordinates may not be equal to the vertex's
         // coordinates.
         return new Place(
-                stop.getName(),
+                stop.getName().toString(),
                 null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.TRANSIT,

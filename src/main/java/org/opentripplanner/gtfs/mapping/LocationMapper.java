@@ -4,6 +4,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.UnsupportedGeometryException;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class LocationMapper {
   private FlexStopLocation doMap(org.onebusaway.gtfs.model.Location gtfsLocation) {
     FlexStopLocation otpLocation = new FlexStopLocation(mapAgencyAndId(gtfsLocation.getId()));
 
-    otpLocation.setName(gtfsLocation.getName());
+    otpLocation.setName(new NonLocalizedString(gtfsLocation.getName()));
     otpLocation.setZoneId(gtfsLocation.getZoneId());
     try {
       otpLocation.setGeometry(GeometryUtils.convertGeoJsonToJtsGeometry(gtfsLocation.getGeometry()));

@@ -3,6 +3,7 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.util.NonLocalizedString;
 import org.rutebanken.netex.model.StopPlace;
 
 
@@ -20,7 +21,8 @@ class StationMapper {
   Station map(StopPlace stopPlace) {
     Station station = new Station(
         idFactory.createId(stopPlace.getId()),
-        stopPlace.getName() == null ? "N/A" : stopPlace.getName().getValue(),
+        stopPlace.getName() == null ? new NonLocalizedString("N/A")
+                : new NonLocalizedString(stopPlace.getName().getValue()),
         WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid()),
         null,
         stopPlace.getDescription() != null ? stopPlace.getDescription().getValue() : null,

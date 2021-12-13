@@ -36,7 +36,7 @@ public class TransitPathwayNodeVertex extends Vertex {
 
   @Override
   public String getName() {
-    return node.getName();
+    return node.getName().toString();
   }
 
   public boolean isWheelchairEntrance() {

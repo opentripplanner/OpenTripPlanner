@@ -201,7 +201,7 @@ public class LegacyGraphQLQueryTypeImpl
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         stopStream = stopStream.filter(stop -> stop
-            .getName()
+            .getName().toString(environment.getLocale())
             .toLowerCase(environment.getLocale())
             .startsWith(name));
       }
@@ -374,7 +374,7 @@ public class LegacyGraphQLQueryTypeImpl
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         stationStream = stationStream.filter(station -> station
-                .getName()
+                .getName().toString(environment.getLocale())
                 .toLowerCase(environment.getLocale())
                 .startsWith(name));
       }

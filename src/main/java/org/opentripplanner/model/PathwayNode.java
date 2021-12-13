@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.opentripplanner.util.I18NString;
+
 /**
  * A place where a station connects to the street network. Equivalent to GTFS stop location .
  */
@@ -8,7 +10,7 @@ public final class PathwayNode extends StationElement {
 
   public PathwayNode(
       FeedScopedId id,
-      String name,
+      I18NString name,
       String code,
       String description,
       WgsCoordinate coordinate,

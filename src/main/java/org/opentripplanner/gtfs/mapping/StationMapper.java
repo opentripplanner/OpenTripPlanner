@@ -5,6 +5,8 @@ import org.opentripplanner.model.Station;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
@@ -23,11 +25,15 @@ class StationMapper {
   private Map<org.onebusaway.gtfs.model.Stop, Station> mappedStops = new HashMap<>();
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  Station map(org.onebusaway.gtfs.model.Stop orginal) {
-    return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
+  Station map(org.onebusaway.gtfs.model.Stop original) {
+    return map(original, null, null);
   }
 
-  private Station doMap(org.onebusaway.gtfs.model.Stop rhs) {
+  Station map(org.onebusaway.gtfs.model.Stop original, I18NString nameTranslations, I18NString urlTranslations) {
+    return original == null ? null : mappedStops.computeIfAbsent(original, k -> doMap(original, nameTranslations, urlTranslations));
+  }
+
+  private Station doMap(org.onebusaway.gtfs.model.Stop rhs, I18NString nameTranslations, I18NString urlTranslations) {
     if (rhs.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
       throw new IllegalArgumentException(
           "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION + ", but got "
@@ -36,11 +42,11 @@ class StationMapper {
 
     return new Station(
         mapAgencyAndId(rhs.getId()),
-        rhs.getName(),
+        nameTranslations == null ? new NonLocalizedString(rhs.getName()) : nameTranslations,
         WgsCoordinateMapper.mapToDomain(rhs),
         rhs.getCode(),
         rhs.getDesc(),
-        rhs.getUrl(),
+        urlTranslations == null ? new NonLocalizedString(rhs.getUrl()) : urlTranslations,
         rhs.getTimezone() == null ? null : TimeZone.getTimeZone(rhs.getTimezone()),
         // Use default cost priority
         null

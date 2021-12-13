@@ -36,7 +36,7 @@ public class TransitEntranceVertex extends Vertex {
 
   @Override
   public String getName() {
-    return entrance.getName();
+    return entrance.getName().toString();
   }
 
   public boolean isWheelchairEntrance() {

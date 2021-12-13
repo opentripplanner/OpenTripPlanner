@@ -11,6 +11,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class StopIndexForRaptorTest {
 
@@ -66,6 +67,6 @@ public class StopIndexForRaptorTest {
     }
 
     Station createStation(String name, StopTransferPriority pri) {
-        return new Station(new FeedScopedId("F", name), name, null, null, null, null, null, pri);
+        return new Station(new FeedScopedId("F", name), new NonLocalizedString(name), null, null, null, null, null, pri);
     }
 }

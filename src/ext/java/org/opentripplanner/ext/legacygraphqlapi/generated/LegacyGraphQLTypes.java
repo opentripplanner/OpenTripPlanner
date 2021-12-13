@@ -1439,6 +1439,19 @@ public class LegacyGraphQLTypes {
     }
 
 
+    public static class LegacyGraphQLStopNameArgs {
+
+        private String _lang;
+
+        public LegacyGraphQLStopNameArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._lang = (String) args.get("lang");
+            }
+        }
+
+        public String getLegacyGraphQLLang() {return this._lang;}
+    }
+
     public static class LegacyGraphQLStopStopTimesForPatternArgs {
 
         private String _id;
@@ -1562,6 +1575,19 @@ public class LegacyGraphQLTypes {
         }
 
         public Integer getLegacyGraphQLMaxDistance() {return this._maxDistance;}
+    }
+
+    public static class LegacyGraphQLStopUrlArgs {
+
+        private String _lang;
+
+        public LegacyGraphQLStopUrlArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._lang = (String) args.get("lang");
+            }
+        }
+
+        public String getLegacyGraphQLLang() {return this._lang;}
     }
 
 

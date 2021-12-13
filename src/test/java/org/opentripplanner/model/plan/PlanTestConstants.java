@@ -6,6 +6,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.time.DurationUtils;
 
 public interface PlanTestConstants {
@@ -75,7 +76,7 @@ public interface PlanTestConstants {
   private static Place place(String name, double lat, double lon) {
     var stop = new Stop(
             new FeedScopedId(FEED_ID, name),
-            name,
+            new NonLocalizedString(name),
             null,
             null,
             WgsCoordinate.creatOptionalCoordinate(lat, lon),

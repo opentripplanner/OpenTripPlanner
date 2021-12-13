@@ -31,7 +31,7 @@ public class TransitBoardingAreaVertex extends Vertex {
 
   @Override
   public String getName() {
-    return boardingArea.getName();
+    return boardingArea.getName().toString();
   }
 
   public boolean isWheelchairAccessible() {

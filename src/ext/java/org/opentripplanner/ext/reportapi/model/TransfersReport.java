@@ -86,7 +86,7 @@ public class TransfersReport {
     ) {
         var r = new TxPoint();
         if (p instanceof StopTransferPoint) {
-            r.loc = p.getStop().getName();
+            r.loc = p.getStop().getName().toString();
             return r;
         }
         var ptn = index.getPatternForTrip().get(p.getTrip());
@@ -97,9 +97,6 @@ public class TransfersReport {
         r.trip = route.getName() + " " + route.getMode() + " " + route.getLongName()
                 + " " + trip.getTripHeadsign();
         r.c = null;
-
-
-
 
         if (ptn.getStops().size() > p.getStopPosition()) {
             int pos = p.getStopPosition();

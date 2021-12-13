@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
+import org.opentripplanner.util.I18NString;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
@@ -17,7 +18,7 @@ public class Station extends TransitEntity implements StopCollection {
   private static final long serialVersionUID = 1L;
   public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
 
-  private final String name;
+  private final I18NString name;
 
   private final String code;
 
@@ -30,7 +31,7 @@ public class Station extends TransitEntity implements StopCollection {
   /**
    * URL to a web page containing information about this particular station
    */
-  private final String url;
+  private final I18NString url;
 
   private final TimeZone timezone;
 
@@ -40,11 +41,11 @@ public class Station extends TransitEntity implements StopCollection {
 
   public Station(
       FeedScopedId id,
-      String name,
+      I18NString name,
       WgsCoordinate coordinate,
       String code,
       String description,
-      String url,
+      I18NString url,
       TimeZone timezone,
       StopTransferPriority priority
   ) {
@@ -67,7 +68,7 @@ public class Station extends TransitEntity implements StopCollection {
     return "<Station " + getId() + ">";
   }
 
-  public String getName() {
+  public I18NString getName() {
     return name;
   }
 
@@ -85,7 +86,7 @@ public class Station extends TransitEntity implements StopCollection {
     return description;
   }
 
-  public String getUrl() {
+  public I18NString getUrl() {
     return url;
   }
 

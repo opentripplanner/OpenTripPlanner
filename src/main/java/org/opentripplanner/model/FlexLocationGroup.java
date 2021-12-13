@@ -10,6 +10,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.opentripplanner.util.I18NString;
 
 /**
  * A group of stopLocations, which can share a common Stoptime
@@ -18,7 +19,7 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
 
   private static final long serialVersionUID = 1L;
 
-  private String name;
+  private I18NString name;
 
   private final Set<StopLocation> stopLocations = new HashSet<>();
 
@@ -28,12 +29,12 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
     super(id);
   }
 
-  public void setName(String name) {
+  public void setName(I18NString name) {
     this.name = name;
   }
 
   @Override
-  public String getName() {
+  public I18NString getName() {
     return name;
   }
 

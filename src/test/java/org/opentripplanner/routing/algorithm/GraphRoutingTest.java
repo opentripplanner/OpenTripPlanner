@@ -205,7 +205,7 @@ public abstract class GraphRoutingTest {
         public Entrance entranceEntity(String id, double latitude, double longitude) {
             return new Entrance(
                     new FeedScopedId(TEST_FEED_ID, id),
-                    id,
+                    new NonLocalizedString(id),
                     id,
                     null,
                     WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
@@ -217,7 +217,7 @@ public abstract class GraphRoutingTest {
         public Stop stopEntity(String id, double latitude, double longitude) {
             return new Stop(
                     new FeedScopedId(TEST_FEED_ID, id),
-                    id,
+                    new NonLocalizedString(id),
                     id,
                     null,
                     WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
