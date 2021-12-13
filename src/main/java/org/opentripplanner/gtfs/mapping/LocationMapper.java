@@ -32,6 +32,8 @@ public class LocationMapper {
     FlexStopLocation otpLocation = new FlexStopLocation(mapAgencyAndId(gtfsLocation.getId()));
 
     otpLocation.setName(gtfsLocation.getName());
+    otpLocation.setUrl(gtfsLocation.getUrl());
+    otpLocation.setDescription(gtfsLocation.getDescription());
     otpLocation.setZoneId(gtfsLocation.getZoneId());
     try {
       otpLocation.setGeometry(GeometryUtils.convertGeoJsonToJtsGeometry(gtfsLocation.getGeometry()));

@@ -254,7 +254,7 @@ public class EstimatedCallType {
 
     FeedScopedId stopId = tripTimeOnDate.getStopId();
 
-    Stop stop = routingService.getStopForId(stopId);
+    var stop = routingService.getStopForId(stopId);
     FeedScopedId parentStopId = stop.getParentStation().getId();
 
     Collection<TransitAlert> allAlerts = new HashSet<>();

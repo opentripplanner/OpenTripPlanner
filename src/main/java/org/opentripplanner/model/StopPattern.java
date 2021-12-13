@@ -3,7 +3,6 @@ package org.opentripplanner.model;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,12 +36,12 @@ public class StopPattern implements Serializable {
 
     private static final long serialVersionUID = 20140101L;
     
-    private final Stop[] stops;
+    private final StopLocation[] stops;
     private final PickDrop[]  pickups;
     private final PickDrop[]  dropoffs;
 
     private StopPattern (int size) {
-        stops     = new Stop[size];
+        stops     = new StopLocation[size];
         pickups   = new PickDrop[size];
         dropoffs  = new PickDrop[size];
     }
@@ -56,11 +55,11 @@ public class StopPattern implements Serializable {
 
         for (int i = 0; i < size; ++i) {
             StopTime stopTime = stopTimeIterator.next();
-            stops[i] = (Stop) stopTime.getStop();
+            stops[i] = stopTime.getStop();
             // should these just be booleans? anything but 1 means pick/drop is allowed.
             // pick/drop messages could be stored in individual trips
-            pickups[i] = stopTime.getPickupType();
-            dropoffs[i] = stopTime.getDropOffType();
+            pickups[i] = computePickDrop(stopTime.getStop(), stopTime.getPickupType());
+            dropoffs[i] = computePickDrop(stopTime.getStop(), stopTime.getDropOffType());
         }
         /*
          * TriMet GTFS has many trips that differ only in the pick/drop status of their initial and
@@ -75,11 +74,24 @@ public class StopPattern implements Serializable {
     }
 
     /**
+     * Raptor should not be allowed to board or alight flex stops because they have fake
+     * coordinates (centroids) and might not have times.
+     */
+    private static PickDrop computePickDrop(StopLocation stop, PickDrop pickDrop) {
+        if(stop instanceof FlexStopLocation) {
+            return PickDrop.NONE;
+        }
+        else {
+            return pickDrop;
+        }
+    }
+
+    /**
      * @param stopId in agency_id format
      */
     public boolean containsStop (String stopId) {
         if (stopId == null) { return false; }
-        for (Stop stop : stops) if (stopId.equals(stop.getId().toString())) { return true; }
+        for (StopLocation stop : stops) if (stopId.equals(stop.getId().toString())) { return true; }
         return false;
     }
 
@@ -128,7 +140,7 @@ public class StopPattern implements Serializable {
         Hasher hasher = hashFunction.newHasher();
         int size = stops.length;
         for (int s = 0; s < size; s++) {
-            Stop stop = stops[s];
+            StopLocation stop = stops[s];
             // Truncate the lat and lon to 6 decimal places in case they move slightly between
             // feed versions
             hasher.putLong((long) (stop.getLat() * 1000000));
@@ -143,11 +155,11 @@ public class StopPattern implements Serializable {
         return hasher.hash();
     }
 
-    public Stop[] getStops() {
+    public StopLocation[] getStops() {
         return stops;
     }
 
-    public Stop getStop(int i) {
+    public StopLocation getStop(int i) {
         return stops[i];
     }
 

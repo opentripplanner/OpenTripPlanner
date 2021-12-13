@@ -2,7 +2,7 @@ package org.opentripplanner.model;
 
 /**
  * Acts as the supertype for all entities, except stations, created from the GTFS stops table. Most
- * of the fileds are shared between the types, and eg. in pathways the namespace any of them can be
+ * of the fields are shared between the types, and eg. in pathways the namespace any of them can be
  * used as from and to.
  */
 public abstract class StationElement extends TransitEntity {
@@ -60,14 +60,6 @@ public abstract class StationElement extends TransitEntity {
     return description;
   }
 
-  public double getLat() {
-    return getCoordinate().latitude();
-  }
-
-  public double getLon() {
-    return getCoordinate().longitude();
-  }
-
   /**
    * Center point/location for the station element. Returns the coordinate of the parent station, if
    * the coordinate is not defined for this station element.
@@ -123,8 +115,8 @@ public abstract class StationElement extends TransitEntity {
    * Return {@code true} if this stop (element) has the same parent station as the other stop
    * (element).
    */
-  public boolean isPartOfSameStationAs(StationElement other) {
-    return isPartOfStation() && parentStation.equals(other.parentStation);
+  public boolean isPartOfSameStationAs(StopLocation other) {
+    return isPartOfStation() && parentStation.equals(other.getParentStation());
   }
 
   public void setParentStation(Station parentStation) {

@@ -18,6 +18,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
@@ -26,7 +27,6 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -225,8 +225,8 @@ public class GeometryAndBlockProcessor {
                     }
                     TripPattern prevPattern = patternForTripTimes.get(prev);
                     TripPattern currPattern = patternForTripTimes.get(curr);
-                    Stop fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
-                    Stop toStop = currPattern.getStop(0);
+                    var fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
+                    var toStop = currPattern.getStop(0);
                     double teleportationDistance = SphericalDistanceLibrary.fastDistance(
                             fromStop.getLat(),
                             fromStop.getLon(),
@@ -352,6 +352,7 @@ public class GeometryAndBlockProcessor {
     }
 
     private List<LinearLocation> getLinearLocations(List<StopTime> stopTimes, LineString shape) {
+        var isFlexTrip = FlexTrip.containsFlexStops(stopTimes);
         // This trip does not have shape_dist in stop_times, but does have an associated shape.
         ArrayList<IndexedLineSegment> segments = new ArrayList<>();
         for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
@@ -375,7 +376,7 @@ public class GeometryAndBlockProcessor {
                     continue;
                 }
                 double distance = segment.distance(coord);
-                if (distance < maxStopToShapeSnapDistance) {
+                if (distance < maxStopToShapeSnapDistance || isFlexTrip) {
                     stopSegments.add(segment);
                     maxSegmentIndex = index;
                     if (minSegmentIndexForThisStop == -1)

@@ -20,6 +20,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -78,37 +79,37 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> getValue(environment, Stop::getName, Station::getName);
+    return environment -> getValue(environment, StopLocation::getName, Station::getName);
   }
 
   @Override
   public DataFetcher<Double> lat() {
-    return environment -> getValue(environment, Stop::getLat, Station::getLat);
+    return environment -> getValue(environment, StopLocation::getLat, Station::getLat);
   }
 
   @Override
   public DataFetcher<Double> lon() {
-    return environment -> getValue(environment, Stop::getLon, Station::getLon);
+    return environment -> getValue(environment, StopLocation::getLon, Station::getLon);
   }
 
   @Override
   public DataFetcher<String> code() {
-    return environment -> getValue(environment, Stop::getCode, Station::getCode);
+    return environment -> getValue(environment, StopLocation::getCode, Station::getCode);
   }
 
   @Override
   public DataFetcher<String> desc() {
-    return environment -> getValue(environment, Stop::getDescription, Station::getDescription);
+    return environment -> getValue(environment, StopLocation::getDescription, Station::getDescription);
   }
 
   @Override
   public DataFetcher<String> zoneId() {
-    return environment -> getValue(environment, Stop::getFirstZoneAsString, station -> null);
+    return environment -> getValue(environment, StopLocation::getFirstZoneAsString, station -> null);
   }
 
   @Override
   public DataFetcher<String> url() {
-    return environment -> getValue(environment, Stop::getUrl, Station::getUrl);
+    return environment -> getValue(environment, StopLocation::getUrl, Station::getUrl);
   }
 
   @Override
@@ -118,18 +119,23 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Object> parentStation() {
-    return environment -> getValue(environment, Stop::getParentStation, station -> null);
+    return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
   }
 
   @Override
   public DataFetcher<Object> wheelchairBoarding() {
-    return environment -> getValue(environment, Stop::getWheelchairBoarding, station -> null);
+    return environment -> getValue(environment, StopLocation::getWheelchairBoarding, station -> null);
   }
 
   // TODO
   @Override
   public DataFetcher<String> direction() {
     return environment -> null;
+  }
+
+  @Override
+  public DataFetcher<Object> geometries() {
+    return environment -> getValue(environment, StopLocation::getGeometry, Station::getGeometry);
   }
 
   @Override
@@ -184,7 +190,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> platformCode() {
-    return environment -> getValue(environment, Stop::getPlatformCode, station -> null);
+    return environment -> getValue(environment, StopLocation::getPlatformCode, station -> null);
   }
 
   @Override
@@ -264,7 +270,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
-      Function<Stop, List<StopTimesInPattern>> stopTFunction = stop ->
+      Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
           routingService.getStopTimesForStop(
               stop,
               date,
@@ -294,7 +300,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
-      Function<Stop, List<StopTimesInPattern>> stopTFunction = stop ->
+      Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
           routingService.stopTimesForStop(
               stop,
               args.getLegacyGraphQLStartTime(),
@@ -325,7 +331,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
-      Function<Stop, Stream<StopTimesInPattern>> stopTFunction = stop ->
+      Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
           routingService.stopTimesForStop(
               stop,
               args.getLegacyGraphQLStartTime(),
@@ -363,12 +369,12 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   private <T> T getValue(
       DataFetchingEnvironment environment,
-      Function<Stop, T> stopTFunction,
+      Function<StopLocation, T> stopTFunction,
       Function<Station, T> stationTFunction
   ) {
       Object source = environment.getSource();
-      if (source instanceof Stop) {
-        return stopTFunction.apply((Stop) source);
+      if (source instanceof StopLocation) {
+        return stopTFunction.apply((StopLocation) source);
       }
       else if (source instanceof Station) {
         return stationTFunction.apply((Station) source);

@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -27,7 +28,7 @@ public class SiriTripPatternCache {
 
     private final Map<StopPatternServiceDateKey, TripPattern> cache = new HashMap<>();
 
-    private final ListMultimap<Stop, TripPattern> patternsForStop = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
+    private final ListMultimap<StopLocation, TripPattern> patternsForStop = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
 
     private final Map<TripServiceDateKey, TripPattern> updatedTripPatternsForTripCache = new HashMap<>();
 
@@ -145,7 +146,7 @@ public class SiriTripPatternCache {
         }
 
         // To make these trip patterns visible for departureRow searches.
-        for (Stop stop: tripPattern.getStops()) {
+        for (var stop: tripPattern.getStops()) {
             if (!patternsForStop.containsEntry(stop, tripPattern)) {
                 patternsForStop.put(stop, tripPattern);
             }

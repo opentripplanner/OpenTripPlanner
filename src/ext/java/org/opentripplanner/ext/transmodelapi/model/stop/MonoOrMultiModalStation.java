@@ -30,7 +30,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
 
   private final TimeZone timezone;
 
-  private final Collection<Stop> childStops;
+  private final Collection<StopLocation> childStops;
 
   private final MonoOrMultiModalStation parentStation;
 
@@ -92,7 +92,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     return timezone;
   }
 
-  public Collection<Stop> getChildStops() {
+  public Collection<StopLocation> getChildStops() {
     return childStops;
   }
 
