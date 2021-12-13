@@ -243,12 +243,12 @@ public interface EntitySelector {
 
   class DirectionAndRoute implements EntitySelector {
 
-    public final int direction;
+    public final int directionId;
 
     public final FeedScopedId routeId;
 
-    public DirectionAndRoute(int direction, FeedScopedId routeId) {
-      this.direction = direction;
+    public DirectionAndRoute(int directionId, FeedScopedId routeId) {
+      this.directionId = directionId;
       this.routeId = routeId;
     }
 
@@ -257,13 +257,13 @@ public interface EntitySelector {
       if (this == o) {return true;}
       if (o == null || getClass() != o.getClass()) {return false;}
       DirectionAndRoute that = (DirectionAndRoute) o;
-      return direction == that.direction && routeId.equals(that.routeId);
+      return directionId == that.directionId && routeId.equals(that.routeId);
     }
 
     @Override
     public int hashCode() {
       int routeHash = Objects.hash(routeId);
-      return 41 * direction * routeHash;
+      return 41 * directionId * routeHash;
     }
   }
 

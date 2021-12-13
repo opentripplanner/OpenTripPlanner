@@ -262,13 +262,13 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
                 return new LegacyGraphQLRouteTypeModel(null, routeType);
               }
               if (entitySelector instanceof EntitySelector.DirectionAndRoute) {
-                int direction = ((DirectionAndRoute) entitySelector).direction;
+                int directionId = ((DirectionAndRoute) entitySelector).directionId;
                 FeedScopedId routeId = ((EntitySelector.DirectionAndRoute) entitySelector).routeId;
                 Route route = getRoutingService(environment).getRouteForId(routeId);
                 return route != null
-                        ? new LegacyGraphQLDirectionOnRouteModel(direction, route)
-                        : getUnknownForAlertEntityPair(route, direction, route.toString(),
-                                Integer.toString(direction), "route", "direction"
+                        ? new LegacyGraphQLDirectionOnRouteModel(directionId, route)
+                        : getUnknownForAlertEntityPair(route, directionId, route.toString(),
+                                Integer.toString(directionId), "route", "direction"
                         );
               }
               if (entitySelector instanceof EntitySelector.Unknown) {

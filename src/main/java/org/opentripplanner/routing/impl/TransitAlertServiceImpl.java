@@ -112,8 +112,8 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     }
 
     @Override
-    public Collection<TransitAlert> getDirectionAndRouteAlerts(int direction, FeedScopedId route) {
-        return alerts.get(new EntitySelector.DirectionAndRoute(direction, route));
+    public Collection<TransitAlert> getDirectionAndRouteAlerts(int directionId, FeedScopedId route) {
+        return alerts.get(new EntitySelector.DirectionAndRoute(directionId, route));
     }
 
     @Override

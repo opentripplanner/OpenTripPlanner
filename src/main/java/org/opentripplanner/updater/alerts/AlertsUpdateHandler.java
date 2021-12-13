@@ -85,9 +85,9 @@ public class AlertsUpdateHandler {
                 routeId = informed.getRouteId();
             }
 
-            int direction = MISSING_INT_FIELD_VALUE;
+            int directionId = MISSING_INT_FIELD_VALUE;
             if (informed.hasDirectionId()) {
-                direction = informed.getDirectionId();
+                directionId = informed.getDirectionId();
             }
 
             // TODO: The other elements of a TripDescriptor are ignored...
@@ -125,9 +125,9 @@ public class AlertsUpdateHandler {
                         new FeedScopedId(feedId, stopId),
                         new FeedScopedId(feedId, routeId)
                     ));
-                } else if (direction != MISSING_INT_FIELD_VALUE) {
+                } else if (directionId != MISSING_INT_FIELD_VALUE) {
                     alertText.addEntity(new EntitySelector.DirectionAndRoute(
-                            direction,
+                            directionId,
                             new FeedScopedId(feedId, routeId)
                     ));
                 } else {
