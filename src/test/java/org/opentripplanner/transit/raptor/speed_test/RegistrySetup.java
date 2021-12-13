@@ -22,8 +22,7 @@ public class RegistrySetup {
 
             @Override
             public Duration step() {
-                // we intentionally set a high step because we only want to send the metrics on shutdown
-                return Duration.ofMinutes(10);
+                return Duration.ofSeconds(10);
             }
 
             @Override
