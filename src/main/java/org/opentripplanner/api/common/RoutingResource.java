@@ -1,28 +1,31 @@
 package org.opentripplanner.api.common;
 
+import java.time.Duration;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.ext.dataOverlay.GenericFileConfigurationParser;
-import org.opentripplanner.ext.dataOverlay.configuration.RequestParameters;
+import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.BannedStopSet;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.time.Duration;
-import java.util.*;
 
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
@@ -683,9 +686,9 @@ public abstract class RoutingResource {
      * Range/sanity check the query parameter fields and build a Request object from them.
      *
      * @throws ParameterException when there is a problem interpreting a query parameter
-     * @param requestParameters incoming request parameters
+     * @param queryParameters incoming request parameters
      */
-    protected RoutingRequest buildRequest(HashMap<String, String> requestParameters) throws ParameterException {
+    protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) throws ParameterException {
         Router router = otpServer.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
 
@@ -719,19 +722,6 @@ public abstract class RoutingResource {
             } else {
                 request.setDateTime(date, time, tz);
             }
-        }
-
-
-         if (OTPFeature.DataOverlay.isOn() && otpServer.getRouter().davaOverlayConfig != null) {
-            request.genericGridDataRequestParam = GenericFileConfigurationParser.parseConfParam(this.otpServer.getRouter().davaOverlayConfig);
-             if (request.genericGridDataRequestParam != null) {
-                 for (Map.Entry<RequestParameters, RequestParameters> genParam : request.genericGridDataRequestParam.entrySet()) {
-                     RequestParameters thresholdEmpty = genParam.getKey();
-                     RequestParameters penaltyEmpty = genParam.getValue();
-                     thresholdEmpty.setValue(requestParameters.get(thresholdEmpty.getName()));
-                     penaltyEmpty.setValue(requestParameters.get(penaltyEmpty.getName()));
-                 }
-             }
         }
 
         if(searchWindow != null) {
@@ -940,6 +930,11 @@ public abstract class RoutingResource {
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
+
+        if (OTPFeature.DataOverlay.isOn()) {
+            request.dataOverlay = DataOverlayParameters.parseQueryParams(queryParameters);
+        }
+
         return request;
     }
 

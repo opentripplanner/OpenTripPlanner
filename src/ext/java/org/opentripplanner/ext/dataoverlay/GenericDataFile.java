@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.dataOverlay;
+package org.opentripplanner.ext.dataoverlay;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,8 +7,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
-import org.opentripplanner.ext.dataOverlay.configuration.IndexVariable;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.dataoverlay.configuration.IndexVariable;
 import ucar.ma2.Array;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFiles;
@@ -22,8 +22,9 @@ import ucar.nc2.units.DateUnit;
  */
 public class GenericDataFile {
 
+    private final String dataSource;
     private OffsetDateTime originDate;
-    private String error;
+    private String error = null;
     private ucar.ma2.Array timeArray;
     private ucar.ma2.Array latitudeArray;
     private Array longitudeArray;
@@ -34,10 +35,10 @@ public class GenericDataFile {
      * arrays of their values from the .nc file
      *
      * @param file              input .nc data grid file
-     * @param davaOverlayConfig settings which describe the file variables selection
+     * @param dataOverlayConfig settings which describe the file variables selection
      */
-    public GenericDataFile(File file, DavaOverlayConfig davaOverlayConfig) {
-        error = null;
+    public GenericDataFile(File file, DataOverlayConfig dataOverlayConfig) {
+        this.dataSource = file.getPath();
 
         try {
             if (!file.exists()) {
@@ -47,20 +48,21 @@ public class GenericDataFile {
 
             NetcdfFile netcdfFile = readNetcdfFile(file);
 
-            Variable time = netcdfFile.findVariable(davaOverlayConfig.getTimeVariable());
+            Variable time = netcdfFile.findVariable(dataOverlayConfig.getTimeVariable());
 
             if (time == null) {
                 error = String.format("Missing time variable from %s file", file.getAbsolutePath());
                 return;
             }
 
-            Variable latitude = netcdfFile.findVariable(davaOverlayConfig.getLatitudeVariable());
-            Variable longitude = netcdfFile.findVariable(davaOverlayConfig.getLongitudeVariable());
+            Variable latitude = netcdfFile.findVariable(dataOverlayConfig.getLatitudeVariable());
+            Variable longitude = netcdfFile.findVariable(dataOverlayConfig.getLongitudeVariable());
 
             HashMap<IndexVariable, Variable> genVariables = new HashMap<>();
-            for (IndexVariable indexVariable : davaOverlayConfig.getIndexVariables()) {
+            for (IndexVariable indexVariable : dataOverlayConfig.getIndexVariables()) {
                 genVariables.put(
-                        indexVariable, netcdfFile.findVariable(indexVariable.getVariable()));
+                        indexVariable, netcdfFile.findVariable(indexVariable.getVariable())
+                );
                 //todo check if any vars from the configuration are missing from the file?
             }
 
@@ -100,6 +102,10 @@ public class GenericDataFile {
         catch (Exception e) {
             error = e.getMessage();
         }
+    }
+
+    String getDataSource() {
+        return dataSource;
     }
 
     /**

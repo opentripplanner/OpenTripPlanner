@@ -2,17 +2,10 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import net.objecthunter.exp4j.Expression;
-import net.objecthunter.exp4j.ExpressionBuilder;
-import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -23,9 +16,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.ext.dataOverlay.EdgeDataFromGenericFile;
-import org.opentripplanner.ext.dataOverlay.configuration.RequestParameters;
-import org.opentripplanner.ext.dataOverlay.configuration.TimeUnit;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -43,7 +33,6 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +46,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-    private EdgeDataFromGenericFile extraData;
+    private StreetEdgeCostExtension costExtension;
 
     private static final long serialVersionUID = 1L;
 
@@ -473,8 +462,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             s1.incrementWalkDistance(getEffectiveBikeDistance());
         }
 
-        if (OTPFeature.DataOverlay.isOn() && (traverseMode == TraverseMode.WALK || traverseMode == TraverseMode.BICYCLE)) {
-            weight += calculateDataOverlayPenalties(options);
+        if (costExtension != null) {
+           weight += costExtension.calculateExtraCost(options, traverseMode);
         }
 
         s1.incrementTimeInSeconds(roundedTime);
@@ -482,110 +471,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         s1.incrementWeight(weight);
 
         return s1;
-    }
-
-    /**
-     * Calculates the total penalties based on request parameters and overlay data
-     *
-     * @param requestOptions request options
-     * @return total penalty
-     */
-    private double calculateDataOverlayPenalties(RoutingRequest requestOptions) {
-        double totalPenalty = 0d;
-        if (extraData != null && extraData.getVariableValues() != null) {
-            Instant requestInstant = requestOptions.getDateTime().toInstant();
-            for (Map.Entry<RequestParameters, RequestParameters> thresholdPenaltyPair : requestOptions.genericGridDataRequestParam.entrySet()) {
-                String indexVariableName = thresholdPenaltyPair.getKey().getVariable();
-
-                long dataStartTime = 0;
-                float[] genDataValuesForTime = new float[0];
-
-                if (extraData.getVariableValues() != null && extraData.getVariableValues()
-                        .containsKey(indexVariableName)) {
-                    dataStartTime = extraData.getDataStartTime();
-                    genDataValuesForTime = extraData.getVariableValues().get(indexVariableName);
-                }
-
-                //calculate time format based on the input file settings
-                TimeUnit selectedTimeUnit = extraData.getTimeFormat();
-                Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
-                int dataQualityRequestedTime;
-                if (selectedTimeUnit == TimeUnit.SECONDS) {
-                    dataQualityRequestedTime =
-                            (int) ChronoUnit.SECONDS.between(aqiTimeInstant, requestInstant);
-                }
-                else if (selectedTimeUnit == TimeUnit.MS_EPOCH) {
-                    dataQualityRequestedTime =
-                            (int) ChronoUnit.MILLIS.between(aqiTimeInstant, requestInstant);
-                }
-                else {
-                    dataQualityRequestedTime =
-                            (int) ChronoUnit.HOURS.between(aqiTimeInstant, requestInstant);
-                }
-
-                if (dataQualityRequestedTime >= 0) {
-                    if (dataQualityRequestedTime < genDataValuesForTime.length) {
-                        float value = genDataValuesForTime[dataQualityRequestedTime];
-                        String penaltyFormulaString = thresholdPenaltyPair.getValue().getFormula();
-
-                        if (penaltyFormulaString.isEmpty()) {
-                            throw new IllegalArgumentException(
-                                    String.format("Formula for %s should not be empty",
-                                            thresholdPenaltyPair.getValue().getName()
-                                    ));
-                        }
-
-                        double penaltyForParameters =
-                                calculatePenaltyFromParameters(penaltyFormulaString, value,
-                                        thresholdPenaltyPair.getKey(),
-                                        thresholdPenaltyPair.getValue()
-                                );
-
-                        if (penaltyForParameters >= 0) {
-                            totalPenalty += penaltyForParameters;
-                        }
-                    }
-                    else {
-                        LOG.warn("No available data overlay for the given time");
-                    }
-                }
-            }
-        }
-
-        return totalPenalty;
-    }
-
-    /**
-     * Uses the formula from the penalty parameter and calculates the penalty based on that
-     *
-     * @param formula penalty formula
-     * @param value data
-     * @param threshold threshold parameter value
-     * @param penalty penalty parameter value
-     * @return penalty
-     */
-    private double calculatePenaltyFromParameters (String formula, float value, RequestParameters threshold, RequestParameters penalty){
-        if (threshold == null || penalty == null || threshold.getValue() == null || penalty.getValue() == null) {
-            return 0.0;
-        }
-
-        Map<String, Double> variables = new HashMap<>();
-
-        variables.put("THRESHOLD", Double.parseDouble(threshold.getValue()));
-        variables.put("PENALTY", Double.parseDouble(penalty.getValue()));
-        variables.put("VALUE", (double) value);
-
-        try {
-            Expression expression = new ExpressionBuilder(formula)
-                .variables(variables.keySet().toArray(new String[0]))
-                .build()
-                .setVariables(variables);
-            return expression.evaluate();
-
-        }
-        catch (UnknownFunctionOrVariableException ex){
-            throw new IllegalArgumentException(String.format("Formula %s did not receive all the required parameters", formula));
-        }
     }
 
     /* The no-thru traffic support works by not allowing a transition from a no-thru area out of it.
@@ -884,8 +769,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         return graph.getTurnRestrictions(this);
     }
 
-    public void setExtraData(EdgeDataFromGenericFile extraData) {
-        this.extraData = extraData;
+    public void setCostExtension(StreetEdgeCostExtension costExtension) {
+        this.costExtension = costExtension;
     }
 
     /** Split this street edge and return the resulting street edges. After splitting, the original

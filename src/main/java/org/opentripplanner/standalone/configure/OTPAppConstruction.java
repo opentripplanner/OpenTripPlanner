@@ -44,6 +44,7 @@ public class OTPAppConstruction {
     private OTPServer server = null;
     private GraphBuilderDataSources graphBuilderDataSources = null;
 
+
     /**
      * Create a new OTP configuration instance for a given directory.
      */
@@ -83,7 +84,6 @@ public class OTPAppConstruction {
         LOG.info("Wiring up and configuring graph builder task.");
         return GraphBuilder.create(
                 config.buildConfig(),
-                config.dataOverlayConfig(),
                 graphBuilderDataSources(),
                 baseGraph
         );

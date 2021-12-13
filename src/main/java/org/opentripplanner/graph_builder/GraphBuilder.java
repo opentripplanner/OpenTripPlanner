@@ -5,17 +5,16 @@ import static org.opentripplanner.datastore.FileType.GTFS;
 import static org.opentripplanner.datastore.FileType.NETEX;
 import static org.opentripplanner.datastore.FileType.OSM;
 import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
+import static org.opentripplanner.util.OTPFeature.DataOverlay;
 
 import com.google.common.collect.Lists;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.opentripplanner.ext.dataOverlay.EdgeUpdaterModule;
-import org.opentripplanner.ext.dataOverlay.GenericDataFile;
-import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -42,15 +41,13 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.opentripplanner.util.OTPFeature.DataOverlay;
-
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.
  * It is modular: GraphBuilderModules are placed in a list and run in sequence.
  */
 public class GraphBuilder implements Runnable {
 
-    private static Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
     private final List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
 
@@ -97,7 +94,6 @@ public class GraphBuilder implements Runnable {
      */
     public static GraphBuilder create(
         BuildConfig config,
-        DavaOverlayConfig davaOverlayConfig,
         GraphBuilderDataSources dataSources,
         Graph baseGraph
     ) {
@@ -249,16 +245,10 @@ public class GraphBuilder implements Runnable {
         }
 
         if (DataOverlay.isOn()) {
-            if (davaOverlayConfig == null) {
-                LOG.error("No data overlay configuration file found!");
-            } else {
-                File dataFile = new File(davaOverlayConfig.getFileName());
-                if (dataFile.exists()) {
-                    GenericDataFile genericDataFile = new GenericDataFile(dataFile, davaOverlayConfig);
-                    EdgeUpdaterModule edgeUpdaterModule = new EdgeUpdaterModule(genericDataFile, davaOverlayConfig);
-                    graphBuilder.addModule(edgeUpdaterModule);
-                } else {
-                    LOG.error("No data file " + dataFile + " found!");
+            if (config.dataOverlay != null) {
+                GraphBuilderModule module = DataOverlayFactory.create(config.dataOverlay);
+                if(module != null) {
+                    graphBuilder.addModule(module);
                 }
             }
         }

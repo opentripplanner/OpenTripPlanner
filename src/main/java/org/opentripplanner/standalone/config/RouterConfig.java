@@ -2,13 +2,16 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.updater.UpdatersParameters;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +44,7 @@ public class RouterConfig implements Serializable {
     private final UpdatersParameters updatersParameters;
     private final VectorTileConfig vectorTileLayers;
     private final FlexConfig flexConfig;
+    private final DataOverlayConfig dataOverlayConfig;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
@@ -56,6 +60,10 @@ public class RouterConfig implements Serializable {
         this.updatersParameters = new UpdatersConfig(adapter);
         this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
         this.flexConfig = new FlexConfig(adapter.path("flex"));
+
+        this.dataOverlayConfig = OTPFeature.DataOverlay.isOnElseNull(
+                () -> DataOverlayConfigMapper.map(adapter.path("dataOverlay"))
+        );
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
@@ -113,6 +121,10 @@ public class RouterConfig implements Serializable {
 
     public FlexParameters flexParameters(RoutingRequest request) { 
         return flexConfig.toFlexParameters(request);
+    }
+
+    public DataOverlayConfig getDataOverlayConfig() {
+        return dataOverlayConfig;
     }
 
     /**

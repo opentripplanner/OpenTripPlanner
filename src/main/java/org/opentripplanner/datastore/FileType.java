@@ -20,6 +20,7 @@ public enum FileType {
 
   private final String icon;
   private final String text;
+
   FileType(String icon, String text) {
     this.icon = icon;
     this.text = text;

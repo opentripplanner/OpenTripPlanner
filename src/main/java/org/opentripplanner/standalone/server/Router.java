@@ -5,7 +5,6 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
-import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -33,7 +32,6 @@ public class Router {
     public final Graph graph;
     public final RouterConfig routerConfig;
     public final RaptorConfig<TripSchedule> raptorConfig;
-    public DavaOverlayConfig davaOverlayConfig;
 
     /**
      *  Separate logger for incoming requests. This should be handled with a Logback logger
@@ -60,11 +58,6 @@ public class Router {
         this.graph = graph;
         this.routerConfig = routerConfig;
         this.raptorConfig = new RaptorConfig<>(routerConfig.raptorTuningParameters());
-    }
-
-    public Router(Graph graph, RouterConfig routerConfig, DavaOverlayConfig davaOverlayConfig) {
-        this(graph, routerConfig);
-        this.davaOverlayConfig = davaOverlayConfig;
     }
 
     /*

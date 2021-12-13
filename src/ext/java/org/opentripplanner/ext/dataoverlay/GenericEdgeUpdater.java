@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.dataOverlay;
+package org.opentripplanner.ext.dataoverlay;
 
 import java.awt.geom.Point2D;
 import java.time.Instant;
@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.Map;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
-import org.opentripplanner.ext.dataOverlay.configuration.TimeUnit;
+import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
@@ -28,14 +27,14 @@ import ucar.ma2.Index;
  *
  * @author Simeon Platonov
  */
-public class GenericEdgeUpdater {
+class GenericEdgeUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericEdgeUpdater.class);
     private static final int REPORT_EVERY_N_EDGE = 10000;
 
     private final GenericDataFile dataFile;
     private final Collection<StreetEdge> streetEdges;
-    private final DavaOverlayConfig davaOverlayConfig;
+    private final TimeUnit timeFormat;
 
     private final Map<String, Array> genericVariablesData;
     private int edgesUpdated;
@@ -45,36 +44,36 @@ public class GenericEdgeUpdater {
      * Calculates the generic data start time and sets the earlier parsed map of generic data file
      *
      * @param dataFile          map of generic grid data from .nc file
-     * @param fileConfiguration configuration for data file
      * @param streetEdges       collection of all street edges to be updated
      */
-    public GenericEdgeUpdater(
+    GenericEdgeUpdater(
             GenericDataFile dataFile,
-            DavaOverlayConfig fileConfiguration,
+            TimeUnit timeFormat,
             Collection<StreetEdge> streetEdges
     ) {
         super();
         this.dataFile = dataFile;
         this.streetEdges = streetEdges;
-        this.davaOverlayConfig = fileConfiguration;
+        this.timeFormat = timeFormat;
         this.edgesUpdated = 0;
 
-        this.dataStartTime = calculateDataStartTime(fileConfiguration);
+        this.dataStartTime = calculateDataStartTime(timeFormat);
         genericVariablesData = dataFile.getNetcdfDataForVariable();
-        LOG.info(String.format("Street edges update from %s starting from time stamp %d",
-                fileConfiguration.getFileName(), this.dataStartTime
-        ));
+
+        LOG.info(
+                "Street edges update from {} starting from time stamp {}",
+                dataFile.getDataSource(),
+                this.dataStartTime
+        );
     }
 
     /**
      * Returns ms from epoch for the first data point of the file, by default data format is assumed
      * to be hours
      *
-     * @param configuration configuration
      * @return epoch milliseconds
      */
-    private long calculateDataStartTime(DavaOverlayConfig configuration) {
-        TimeUnit timeFormat = configuration.getTimeFormat();
+    private long calculateDataStartTime(TimeUnit timeFormat) {
         Array timeArray = dataFile.getTimeArray();
         Class dataType = timeArray.getDataType().getPrimitiveClassType();
         Instant originInstant = this.dataFile.getOriginDate().toInstant();
@@ -125,11 +124,11 @@ public class GenericEdgeUpdater {
             edgeGenericDataValues.put(variableValues.getKey(), averageDataValue);
         }
 
-        EdgeDataFromGenericFile edgeGenData =
-                new EdgeDataFromGenericFile(dataStartTime, edgeGenericDataValues,
-                        davaOverlayConfig.getTimeFormat()
+        DataOverlayStreetEdgeCostExtension edgeGenData =
+                new DataOverlayStreetEdgeCostExtension(
+                        dataStartTime, edgeGenericDataValues, timeFormat
                 );
-        streetEdge.setExtraData(edgeGenData);
+        streetEdge.setCostExtension(edgeGenData);
 
         edgesUpdated++;
 

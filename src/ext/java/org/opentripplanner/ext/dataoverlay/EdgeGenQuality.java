@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.dataOverlay;
+package org.opentripplanner.ext.dataoverlay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,14 +10,14 @@ import java.util.Map;
  *
  * @author Katja Danilova
  */
-public class EdgeGenQuality<E extends Number> {
+class EdgeGenQuality<E extends Number> {
 
     private final Map<Integer, List<E>> gridDataVariableValues;
 
     /**
      * Constructor
      */
-    public EdgeGenQuality() {
+    EdgeGenQuality() {
         gridDataVariableValues = new HashMap<>();
     }
 
@@ -27,7 +27,7 @@ public class EdgeGenQuality<E extends Number> {
      * @param time          time
      * @param propertyValue propertyValue
      */
-    public void addPropertyValueSample(int time, E propertyValue) {
+    void addPropertyValueSample(int time, E propertyValue) {
         List<E> existing = gridDataVariableValues.get(time);
         if (existing == null) {
             gridDataVariableValues.put(time, List.of(propertyValue));
@@ -46,7 +46,7 @@ public class EdgeGenQuality<E extends Number> {
      * @param time time
      * @return property value
      */
-    public float getPropertyValue(int time) {
+    float getPropertyValue(int time) {
         return getAverage(getPropertyValuesInTime(time));
     }
 
@@ -56,7 +56,7 @@ public class EdgeGenQuality<E extends Number> {
      * @param times times
      * @return pollutantValues
      */
-    public float[] getPropertyValueAverage(int times) {
+    float[] getPropertyValueAverage(int times) {
         float[] result = new float[times];
 
         for (int time = 0; time < times; time++) {

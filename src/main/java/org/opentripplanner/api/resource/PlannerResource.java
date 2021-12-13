@@ -69,7 +69,7 @@ public class PlannerResource extends RoutingResource {
         try {
 
             /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
-            request = super.buildRequest(response.requestParameters);
+            request = super.buildRequest(uriInfo.getQueryParameters());
             router = otpServer.getRouter();
 
             // Route

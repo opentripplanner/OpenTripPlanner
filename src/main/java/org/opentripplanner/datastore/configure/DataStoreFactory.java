@@ -69,11 +69,11 @@ public class DataStoreFactory {
         // datasource uri passed in
         repositories.add(
             new FileDataSourceRepository(
-                        config.baseDirectory(),
-                        config.gtfsLocalFilePattern(),
-                        config.netexLocalFilePattern(),
-                        config.osmLocalFilePattern(),
-                        config.demLocalFilePattern()
+                config.baseDirectory(),
+                config.gtfsLocalFilePattern(),
+                config.netexLocalFilePattern(),
+                config.osmLocalFilePattern(),
+                config.demLocalFilePattern()
             )
         );
 

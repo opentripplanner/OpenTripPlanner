@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.io.IOUtils;
-import org.opentripplanner.ext.dataOverlay.GenericFileConfigurationParser;
-import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +32,6 @@ public class ConfigLoader {
     private static final String OTP_CONFIG_FILENAME = "otp-config.json";
     private static final String BUILD_CONFIG_FILENAME = "build-config.json";
     private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
-    private static final String DATA_OVERLAY_CONFIG_FILENAME = "data-overlay-config.json";
 
     /** When echoing config files to logs, values for these keys will be hidden. */
     private static final Set<String> REDACT_KEYS = Set.of("secretKey", "accessKey", "gsCredentials");
@@ -84,8 +81,7 @@ public class ConfigLoader {
     public static boolean isConfigFile(String filename) {
         return OTP_CONFIG_FILENAME.equals(filename)
             || BUILD_CONFIG_FILENAME.equals(filename)
-            || ROUTER_CONFIG_FILENAME.equals(filename)
-            || DATA_OVERLAY_CONFIG_FILENAME.equals(filename);
+            || ROUTER_CONFIG_FILENAME.equals(filename);
     }
 
     /**
@@ -128,17 +124,6 @@ public class ConfigLoader {
             return RouterConfig.DEFAULT;
         }
         return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true);
-    }
-
-    /**
-     * Loads data overlay configuration from data-overlay-config.json
-     */
-    public DavaOverlayConfig loadDataOverlayConfig() {
-        JsonNode node = loadJsonByFilename(DATA_OVERLAY_CONFIG_FILENAME);
-        if(node.isMissingNode()) {
-            return null;
-        }
-        return GenericFileConfigurationParser.parse(node, DATA_OVERLAY_CONFIG_FILENAME);
     }
 
     /**

@@ -1,8 +1,8 @@
-package org.opentripplanner.ext.dataOverlay;
+package org.opentripplanner.ext.dataoverlay;
 
 
 import java.util.HashMap;
-import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
+import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -16,17 +16,14 @@ import org.opentripplanner.routing.graph.Graph;
 public class EdgeUpdaterModule implements GraphBuilderModule {
 
     private final GenericDataFile dataFile;
-    private final DavaOverlayConfig fileConfiguration;
+    private final TimeUnit timeFormat;
 
     /**
      * Sets the generic grid data file
-     *
-     * @param dataFile      generic data file
-     * @param configuration corresponding configuration
      */
-    public EdgeUpdaterModule(GenericDataFile dataFile, DavaOverlayConfig configuration) {
+    public EdgeUpdaterModule(GenericDataFile dataFile, TimeUnit timeFormat) {
         this.dataFile = dataFile;
-        this.fileConfiguration = configuration;
+        this.timeFormat = timeFormat;
     }
 
     @Override
@@ -35,8 +32,9 @@ public class EdgeUpdaterModule implements GraphBuilderModule {
             HashMap<Class<?>, Object> extra,
             DataImportIssueStore issueStore
     ) {
-        GenericEdgeUpdater genericEdgeUpdater =
-                new GenericEdgeUpdater(dataFile, fileConfiguration, graph.getStreetEdges());
+        GenericEdgeUpdater genericEdgeUpdater = new GenericEdgeUpdater(
+                dataFile, timeFormat, graph.getStreetEdges()
+        );
         genericEdgeUpdater.updateEdges();
     }
 

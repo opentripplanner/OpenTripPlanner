@@ -5,6 +5,7 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
+import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +103,8 @@ public class RoutingRequestMapper {
             (TransferOptimizationRequest)request.transferOptimization,
             c.path("transferOptimization")
         );
+
+        request.dataOverlay = DataOverlayParametersMapper.map(c.path("dataOverlay"));
 
         return request;
     }

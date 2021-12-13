@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-import org.opentripplanner.ext.dataOverlay.configuration.RequestParameters;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -28,6 +27,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -78,9 +78,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
-
-    /** The filled request parameters for penalties and thresholds values */
-    public Map<RequestParameters, RequestParameters> genericGridDataRequestParam;
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
@@ -721,6 +718,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * a day is used, this will need to be increased.
      */
     public int additionalSearchDaysAfterToday = 2;
+
+
+    /**
+     * The filled request parameters for penalties and thresholds values
+     */
+    public DataOverlayParameters dataOverlay = null;
+
 
     /* CONSTRUCTORS */
 

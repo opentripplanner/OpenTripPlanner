@@ -92,5 +92,4 @@ class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
     public Pattern demLocalFilePattern() {
         return config.localFileNamePatterns.dem;
     }
-
 }

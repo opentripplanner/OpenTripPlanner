@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
@@ -207,6 +208,14 @@ public class TransitRouter {
         // Prepare access/egress lists
         try (RoutingRequest accessRequest = request.getStreetSearchRequest(mode)) {
             accessRequest.setRoutingContext(router.graph);
+
+            if(OTPFeature.DataOverlay.isOn()) {
+                accessRequest.rctx.dataOverlayContext = new DataOverlayContext(
+                        router.routerConfig.getDataOverlayConfig(),
+                        request.dataOverlay
+                );
+            }
+
             if (!isEgress) {
                 accessRequest.allowKeepingRentedVehicleAtDestination = false;
             }

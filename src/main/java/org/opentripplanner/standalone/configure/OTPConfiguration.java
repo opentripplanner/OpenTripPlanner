@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.configure;
 
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.datastore.OtpDataStoreConfig;
-import org.opentripplanner.ext.dataOverlay.configuration.DavaOverlayConfig;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;
@@ -56,14 +55,11 @@ public class OTPConfiguration {
      */
     private RouterConfig routerConfig;
 
-    private DavaOverlayConfig dataOverlayConfig;
-
     private OTPConfiguration(CommandLineParameters cli, ConfigLoader configLoader) {
         this.cli = cli;
         this.otpConfig = configLoader.loadOtpConfig();
         this.buildConfig = configLoader.loadBuildConfig();
         this.routerConfig = configLoader.loadRouterConfig();
-        this.dataOverlayConfig = configLoader.loadDataOverlayConfig();
     }
 
     /**
@@ -122,13 +118,6 @@ public class OTPConfiguration {
      */
     public BuildConfig buildConfig() {
         return buildConfig;
-    }
-
-    /**
-     * Get the data overlay config
-     */
-    public DavaOverlayConfig dataOverlayConfig() {
-        return dataOverlayConfig;
     }
 
     /**

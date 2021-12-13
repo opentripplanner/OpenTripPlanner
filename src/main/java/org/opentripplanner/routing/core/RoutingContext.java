@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
@@ -66,6 +67,11 @@ public class RoutingContext implements Cloneable {
 
     /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
     public boolean slopeRestrictionRemoved = false;
+
+    /**
+     * DataOverlay Sandbox module context.
+     */
+    public DataOverlayContext dataOverlayContext;
 
     /* CONSTRUCTORS */
 

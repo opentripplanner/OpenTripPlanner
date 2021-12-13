@@ -3,7 +3,6 @@ package org.opentripplanner.datastore;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -135,5 +134,4 @@ public interface OtpDataStoreConfig {
      * @see #DEFAULT_DEM_PATTERN for default value.
      */
     Pattern demLocalFilePattern();
-
 }
