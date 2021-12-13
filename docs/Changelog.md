@@ -95,6 +95,7 @@
 - Add mode from parent StopPlace for Quays in Netex mapper [#3751](https://github.com/opentripplanner/OpenTripPlanner/pull/3751)
 - Minor performance improvements [#3767](https://github.com/opentripplanner/OpenTripPlanner/pull/3767)
 - Parallelise computing of trip pattern geometries [#3766](https://github.com/opentripplanner/OpenTripPlanner/pull/3766)
+- Add flex stop to TripTimes, return geometries in GraphQL API [#3757](https://github.com/opentripplanner/OpenTripPlanner/pull/3757)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
