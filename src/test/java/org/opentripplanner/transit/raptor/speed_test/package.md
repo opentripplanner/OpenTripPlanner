@@ -12,3 +12,9 @@ this test.
 
 Example input files and setup is included in the resource test folder:
  - {@code /raptor/speedtest/norway}.
+
+## Running 
+
+```
+mvn compiler:testCompile exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.arguments="--dir=src/test/resources/raptor/speedtest/norway"
+```
