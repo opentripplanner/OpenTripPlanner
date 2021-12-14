@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
@@ -43,6 +44,7 @@ public class SmokeTest {
     static final Logger LOG = LoggerFactory.getLogger(SmokeTest.class);
     static HttpClient client = HttpClient.newHttpClient();
     static final ObjectMapper mapper;
+    static final Set<DayOfWeek> weekend = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 
     /**
      * The Fare class is a little hard to deserialize so we have a custom deserializer as we don't
@@ -70,8 +72,20 @@ public class SmokeTest {
         mapper.registerModule(module);
     }
 
-    static LocalDate nextMonday() {
-        return LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+    /**
+     * Return the closest non-weekend day.
+     * <p>
+     * On Saturday and Sunday, this returns the following Monday. During the work week it returns
+     * the current day.
+     */
+    static LocalDate closestWorkDay() {
+        var today = LocalDate.now();
+        if (weekend.contains(today.getDayOfWeek())) {
+            return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        }
+        else {
+            return today;
+        }
     }
 
     /**
@@ -121,8 +135,8 @@ public class SmokeTest {
     }
 
     /**
-     * Given a list of itineraries assert that at least one of them has legs that
-     * have the expected modes.
+     * Given a list of itineraries assert that at least one of them has legs that have the expected
+     * modes.
      */
     static void assertThatItineraryHasModes(
             List<ApiItinerary> itineraries,
