@@ -60,5 +60,5 @@ jobs:
           MEASUREMENT_ENVIRONMENT: CI
         run: |
           mv graph/graph.obj src/test/resources/raptor/speedtest/norway
-          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.arguments="--dir=src/test/resources/raptor/speedtest/norway"
+          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=src/test/resources/raptor/speedtest/norway -p md -n 4"
 
