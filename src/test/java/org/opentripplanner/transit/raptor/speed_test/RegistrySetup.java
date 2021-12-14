@@ -13,7 +13,9 @@ public class RegistrySetup {
     public static final String influxPasswordEnvVariable = "PERFORMANCE_INFLUX_DB_PASSWORD";
 
     static Optional<String> influxPassword() {
-        return Optional.ofNullable(System.getenv(influxPasswordEnvVariable));
+        return Optional
+                .ofNullable(System.getenv(influxPasswordEnvVariable))
+                .filter(s -> !s.strip().isEmpty());
     }
 
     static MeterRegistry influxRegistry(String password) {
