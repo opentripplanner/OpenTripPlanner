@@ -99,6 +99,7 @@
 - Fix checking allowed boarding/alighting for unscheduled flex trips [#3782](https://github.com/opentripplanner/OpenTripPlanner/pull/3782)
 - Calculating number of days to use in StopTimes-request [#3742](https://github.com/opentripplanner/OpenTripPlanner/pull/3742)
 - Walkable area builder improvements [#3765](https://github.com/opentripplanner/OpenTripPlanner/pull/3765)
+- Remove hardcoded alighting/boarding on first/last stop [#3784](https://github.com/opentripplanner/OpenTripPlanner/pull/3784)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
