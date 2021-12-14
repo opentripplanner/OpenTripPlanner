@@ -2,10 +2,15 @@ name: Performance test
 
 on:
   push:
+    branches:
+      - dev-2.x
+  pull_request:
+    branches:
+      - dev-2.x
 
 jobs:
   perf-test:
-    if: github.repository_owner == 'leonardehrenfried'
+    if: github.repository_owner == 'opentripplanner'
     runs-on: performance-test
     steps:
       - uses: actions/checkout@v2.3.2
