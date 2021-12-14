@@ -3,10 +3,8 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 2,NSB,11:00,15:00,1:00,Gol,NSR:StopPlace:324,60.69917,8.97123,Billingstad,NSR:StopPlace:577,59.874783,10.483057
 3,Ruter,15:00,17:00,1:30,IKEA Slependen,NSR:StopPlace:4401,59.87577,10.500488,Oslo Bussterminal,NSR:StopPlace:6505,59.91177,10.757994
 4,Østold,16:00,20:30,1:00,Sponvika,NSR:StopPlace:3009,59.09267,11.229988,Skjærhalden,NSR:StopPlace:1845,59.025497,11.036771
-5,Østold,13:00,14:30,1:00,Ørje busstorg,NSR:StopPlace:911,59.480717,11.656314,Skjønhaug torv,NSR:StopPlace:1005,59.641224,11.315405
 6,Akershus,14:00,16:00,1:00,Borud,NSR:StopPlace:5300,59.700043,11.196891,Lillestrøm terminal,NSR:StopPlace:4489,59.953896,11.043521
 7,Oslo,17:00,20:00,2:00,Prinsdal,NSR:StopPlace:6740,59.834175,10.807415,Solemskogen,NSR:StopPlace:6626,59.979305,10.817612
-8,Hedmark,08:00,16:00,2:00,Drevsjø,NSR:StopPlace:8674,61.886,12.030646,Dalsbygda sentrum,NSR:StopPlace:8189,62.527782,11.108747
 9,Oppland,15:00,17:00,1:30,Steinvegen,NSR:StopPlace:14093,61.13245,10.454416,Holsjordet,NSR:StopPlace:14320,61.099922,10.47955
 10,Buskerud,08:00,15:00,5:00,Hokksund stasjon,NSR:StopPlace:245,59.767204,9.910567,Fossekallveien,NSR:StopPlace:15726,60.178715,10.257535
 11,Vestfold,13:00,16:00,1:00,Torggata,NSR:StopPlace:17452,59.417572,10.482581,Høyjord,NSR:StopPlace:18872,59.366146,10.120965
@@ -14,7 +12,6 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 13,Aust_Agder,10:00,12:00,1:15,Hastensund,NSR:StopPlace:21979,58.50631,8.922674,Kolbjørnsvik,NSR:StopPlace:24171,58.451637,8.76895
 14,Rogaland,08:00,15:16,4:00,Hauge i Dalane,NSR:StopPlace:26062,58.343338,6.29508,Heskestad,NSR:StopPlace:26370,58.490974,6.361217
 15,Hordaland,16:00,18:00,1:30,Melkeplassen,NSR:StopPlace:31882,60.376045,5.303988,Starefossbakken,NSR:StopPlace:29147,60.387913,5.35192
-16,Sogn og Fjordane,14:00,17:00,2:00,Helgheim,NSR:StopPlace:34066,61.231983,7.115655,Vik kommunehus,NSR:StopPlace:37210,61.08844,6.579569
 17,Møre og Romsdal,08:00,10:00,1:15,Slinningsodden,NSR:StopPlace:41499,62.461693,6.16515,Kråmyra,NSR:StopPlace:40181,62.47539,6.191737
 18,Sør Trøndelag,07:00,20:00,8:00,Meldal sentrum,NSR:StopPlace:42516,63.04669,9.713128,Fillan busstasjon,NSR:StopPlace:43785,63.60113,8.973342
 19,Nord Trøndelag,06:00,18:00,4:00,Verrabotn,NSR:StopPlace:45683,63.802647,10.581465,Snåsa,NSR:StopPlace:673,64.245766,12.380184
