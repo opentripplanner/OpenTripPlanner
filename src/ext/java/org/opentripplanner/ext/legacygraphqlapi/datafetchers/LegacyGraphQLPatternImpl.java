@@ -135,7 +135,10 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
         types.forEach(type -> {
           switch (type) {
             case Pattern:
-              alerts.addAll(alertService.getTripPatternAlerts(getSource(environment).getId()));
+              alerts.addAll(alertService.getDirectionAndRouteAlerts(
+                      getSource(environment).getDirection().gtfsCode,
+                      getRoute(environment).getId()
+              ));
               break;
             case Agency:
               alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
@@ -175,18 +178,15 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
                         )));
               });
               break;
-            case Direction:
-              alerts.addAll(alertService.getDirectionAndRouteAlerts(
-                      getSource(environment).getDirection().gtfsCode,
-                      getRoute(environment).getId()
-              ));
-              break;
           }
         });
         return alerts.stream().distinct().collect(Collectors.toList());
       }
       else {
-        return alertService.getTripPatternAlerts(getSource(environment).getId());
+        return alertService.getDirectionAndRouteAlerts(
+                getSource(environment).getDirection().gtfsCode,
+                getRoute(environment).getId()
+        );
       }
     };
   }

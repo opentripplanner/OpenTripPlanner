@@ -118,17 +118,6 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getTripPatternAlerts(
-      FeedScopedId tripPattern
-  ) {
-    return transitAlertServices
-        .stream()
-        .map(transitAlertService -> transitAlertService.getTripPatternAlerts(tripPattern))
-        .flatMap(Collection::stream)
-        .collect(Collectors.toList());
-  }
-
-  @Override
   public Collection<TransitAlert> getRouteTypeAndAgencyAlerts(
       int routeType, FeedScopedId agency
   ) {

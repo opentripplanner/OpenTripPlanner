@@ -110,7 +110,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
-      TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
+      TransitAlertService alertService = getAlertService(environment);
       var args = new LegacyGraphQLTypes.LegacyGraphQLRouteAlertsArgs(
               environment.getArguments());
       Iterable<LegacyGraphQLTypes.LegacyGraphQLRouteAlertType> types = args.getLegacyGraphQLTypes();
@@ -159,7 +159,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                 });
               });
               break;
-            case DirectionOnRoute:
+            case Patterns:
               alerts.addAll(
                       alertService.getDirectionAndRouteAlerts(0, getSource(environment).getId()));
               alerts.addAll(
@@ -170,8 +170,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
         return alerts.stream().distinct().collect(Collectors.toList());
       }
       else {
-        return getRoutingService(environment).getTransitAlertService()
-                .getRouteAlerts(getSource(environment).getId());
+        return getAlertService(environment).getRouteAlerts(getSource(environment).getId());
       }
     };
   }

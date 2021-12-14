@@ -371,13 +371,9 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         }
         if (types.contains(LegacyGraphQLStopAlertType.Patterns) || types.contains(
                 LegacyGraphQLStopAlertType.Trips) || types.contains(
-                LegacyGraphQLStopAlertType.StopOnTrips) || types.contains(
-                LegacyGraphQLStopAlertType.DirectionsOnRoutes)) {
+                LegacyGraphQLStopAlertType.StopOnTrips)) {
           getPatterns(environment).forEach(pattern -> {
             if (types.contains(LegacyGraphQLStopAlertType.Patterns)) {
-              alerts.addAll(alertService.getTripPatternAlerts(pattern.getId()));
-            }
-            if (types.contains(LegacyGraphQLStopAlertType.DirectionsOnRoutes)) {
               alerts.addAll(alertService.getDirectionAndRouteAlerts(
                       pattern.getDirection().gtfsCode,
                       pattern.getRoute().getId()

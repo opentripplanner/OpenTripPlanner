@@ -603,7 +603,6 @@ public class LegacyGraphQLTypes {
      */
     public enum LegacyGraphQLPatternAlertType {
         Agency("AGENCY"),
-        Direction("DIRECTION"),
         Pattern("PATTERN"),
         Route("ROUTE"),
         RouteType("ROUTE_TYPE"),
@@ -1597,7 +1596,7 @@ public class LegacyGraphQLTypes {
      */
     public enum LegacyGraphQLRouteAlertType {
         Agency("AGENCY"),
-        DirectionOnRoute("DIRECTION_ON_ROUTE"),
+        Patterns("PATTERNS"),
         Route("ROUTE"),
         RouteType("ROUTE_TYPE"),
         StopsOnRoute("STOPS_ON_ROUTE"),
@@ -1771,7 +1770,6 @@ public class LegacyGraphQLTypes {
      */
     public enum LegacyGraphQLStopAlertType {
         AgenciesOfRoutes("AGENCIES_OF_ROUTES"),
-        DirectionsOnRoutes("DIRECTIONS_ON_ROUTES"),
         Patterns("PATTERNS"),
         Routes("ROUTES"),
         Stop("STOP"),
@@ -1840,7 +1838,7 @@ public class LegacyGraphQLTypes {
                 }
             }
         }
-  
+
         public Iterable<LegacyGraphQLTripAlertType> getLegacyGraphQLTypes() {return this._types;}
     }
 
@@ -1888,7 +1886,6 @@ public class LegacyGraphQLTypes {
      */
     public enum LegacyGraphQLTripAlertType {
         Agency("AGENCY"),
-        Direction("DIRECTION"),
         Pattern("PATTERN"),
         Route("ROUTE"),
         RouteType("ROUTE_TYPE"),

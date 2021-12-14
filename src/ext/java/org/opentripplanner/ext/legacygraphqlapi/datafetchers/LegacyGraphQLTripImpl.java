@@ -300,10 +300,10 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
               alerts.addAll(alertService.getRouteAlerts(getRoute(environment).getId()));
               break;
             case Pattern:
-              TripPattern pattern = getTripPattern(environment);
-              if (pattern != null) {
-                alerts.addAll(alertService.getTripPatternAlerts(pattern.getId()));
-              }
+              alerts.addAll(alertService.getDirectionAndRouteAlerts(
+                      getSource(environment).getDirection().gtfsCode,
+                      getRoute(environment).getId()
+              ));
               break;
             case StopsOnTrip:
               getStops(environment).forEach(stop -> {
@@ -316,12 +316,6 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
                         ));
                 alerts.addAll(alertService.getStopAlerts(stopId));
               });
-              break;
-            case Direction:
-              alerts.addAll(alertService.getDirectionAndRouteAlerts(
-                      getSource(environment).getDirection().gtfsCode,
-                      getRoute(environment).getId()
-              ));
               break;
           }
         });

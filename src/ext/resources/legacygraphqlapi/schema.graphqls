@@ -235,7 +235,7 @@ enum AlertEffectType {
 
 
 """Entity related to an alert"""
-union AlertEntity = Agency | DirectionOnRoute | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip | RouteType | Unknown
+union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip | RouteType | Unknown
 
 """Severity level of a alert"""
 enum AlertSeverityLevelType {
@@ -776,21 +776,6 @@ type DepartureRow implements Node & PlaceInterface {
         """If false, returns also canceled trips"""
         omitCanceled: Boolean = true
     ): [Stoptime]
-}
-
-"""
-Direction on a route. In practice,
-this means the trips/patterns of a route that have the defined direction.
-"""
-type DirectionOnRoute {
-    """
-    Direction of trips/patterns on a route.
-    """
-    directionId: Int!
-    """
-    The route which (should) contain trips/patterns with the defined direction.
-    """
-    route: Route!
 }
 
 type elevationProfileComponent {
@@ -1452,11 +1437,6 @@ enum PatternAlertType {
 
     """Alerts affecting the stops of the trips which run on this pattern"""
     STOPS_ON_TRIPS
-
-    """
-    Alerts affecting the direction of the pattern.
-    """
-    DIRECTION
 }
 
 enum PickupDropoffType {
@@ -2548,11 +2528,9 @@ enum RouteAlertType {
     STOPS_ON_TRIPS
 
     """
-    Alerts affecting different directions on a route. In practice,
-    this means that the alerts only affect trips/patterns that go to the
-    direction defined in the alert's entity.
+    Alerts affecting route's patterns.
     """
-    DIRECTION_ON_ROUTE
+    PATTERNS
 }
 
 """
@@ -2820,12 +2798,6 @@ enum StopAlertType {
 
     """Alerts affecting the stop on specific trips"""
     STOP_ON_TRIPS
-
-    """
-    Alerts affecting different directions on routes.
-    Only the directions that go through the stop are included.
-    """
-    DIRECTIONS_ON_ROUTES
 }
 
 type stopAtDistance implements Node {
@@ -3126,11 +3098,6 @@ enum TripAlertType {
     Some of the alerts can only affect the trip or its route on the stop.
     """
     STOPS_ON_TRIP
-
-    """
-    Alerts affecting the direction of the trip.
-    """
-    DIRECTION
 }
 
 """

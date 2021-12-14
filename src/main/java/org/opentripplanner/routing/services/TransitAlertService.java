@@ -26,8 +26,6 @@ public interface TransitAlertService {
 
     Collection<TransitAlert> getStopAndTripAlerts(FeedScopedId stop, FeedScopedId trip, ServiceDate serviceDate);
 
-    Collection<TransitAlert> getTripPatternAlerts(FeedScopedId tripPattern);
-
     Collection<TransitAlert> getRouteTypeAndAgencyAlerts(int routeType, FeedScopedId agency);
 
     Collection<TransitAlert> getRouteTypeAlerts(int routeType, String feedId);

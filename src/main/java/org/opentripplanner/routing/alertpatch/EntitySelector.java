@@ -99,25 +99,6 @@ public interface EntitySelector {
     }
   }
 
-  class TripPattern implements EntitySelector {
-    public final FeedScopedId tripPatternId;
-
-    public TripPattern(FeedScopedId tripPatternId) {this.tripPatternId = tripPatternId;}
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) { return true; }
-      if (o == null || getClass() != o.getClass()) { return false; }
-      TripPattern that = (TripPattern) o;
-      return tripPatternId.equals(that.tripPatternId);
-    }
-
-    @Override
-    public int hashCode() {
-      return tripPatternId.hashCode();
-    }
-  }
-
   class StopAndRoute implements EntitySelector {
     public final StopAndRouteOrTripKey stopAndRoute;
 
