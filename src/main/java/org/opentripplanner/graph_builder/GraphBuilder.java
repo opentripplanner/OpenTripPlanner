@@ -5,7 +5,6 @@ import static org.opentripplanner.datastore.FileType.GTFS;
 import static org.opentripplanner.datastore.FileType.NETEX;
 import static org.opentripplanner.datastore.FileType.OSM;
 import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
-import static org.opentripplanner.util.OTPFeature.DataOverlay;
 
 import com.google.common.collect.Lists;
 import java.io.File;
@@ -244,7 +243,7 @@ public class GraphBuilder implements Runnable {
             );
         }
 
-        if (DataOverlay.isOn()) {
+        if (OTPFeature.DataOverlay.isOn()) {
             if (config.dataOverlay != null) {
                 GraphBuilderModule module = DataOverlayFactory.create(config.dataOverlay);
                 if(module != null) {

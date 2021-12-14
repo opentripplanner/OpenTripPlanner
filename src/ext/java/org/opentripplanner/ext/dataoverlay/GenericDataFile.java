@@ -108,65 +108,30 @@ public class GenericDataFile {
         return dataSource;
     }
 
-    /**
-     * Gets the map of variable names and arrays of corresponding data from .nc file
-     *
-     * @return map of variables names and corresponding grid data arrays
-     */
     public Map<String, Array> getNetcdfDataForVariable() {
         return netcdfDataForVariable;
     }
 
-    /**
-     * Returns whether the file was valid or not
-     *
-     * @return whether the file was valid or not
-     */
     public boolean isValid() {
         return error == null;
     }
 
-    /**
-     * Returns error if one is present in the file, null otherwise
-     *
-     * @return error if one is present in the file.
-     */
     public String getError() {
         return error;
     }
 
-    /**
-     * Returns time array
-     *
-     * @return time array
-     */
     public Array getTimeArray() {
         return timeArray;
     }
 
-    /**
-     * Returns latitude array
-     *
-     * @return latitude array
-     */
     public Array getLatitudeArray() {
         return latitudeArray;
     }
 
-    /**
-     * Returns longitude array
-     *
-     * @return longitude array
-     */
     public Array getLongitudeArray() {
         return longitudeArray;
     }
 
-    /**
-     * Returns origin date
-     *
-     * @return origin date
-     */
     public OffsetDateTime getOriginDate() {
         return originDate;
     }

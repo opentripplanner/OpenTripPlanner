@@ -467,18 +467,6 @@
             <artifactId>netcdf4</artifactId>
             <version>${netcdf4.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>${micrometer.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-jersey2</artifactId>
-            <version>${micrometer.version}</version>
-        </dependency>
-
         <!--
             Netex XML document - JAXB generated Java model.
             This is generated using the official Netex schema(v1.0) and support the entire model,
