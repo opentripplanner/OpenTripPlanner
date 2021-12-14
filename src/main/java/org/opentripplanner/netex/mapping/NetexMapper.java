@@ -287,9 +287,17 @@ public class NetexMapper {
     }
 
     private void mapFlexibleStopPlaces() {
+        Collection<FlexibleStopPlace> flexibleStopPlaces =
+                currentNetexIndex.getFlexibleStopPlacesById().localValues();
+
+        // Building the indices in FlexStopLocationMapper is expensive, so skip it if not needed
+        if (flexibleStopPlaces.size() == 0) {
+            return;
+        }
+
         FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(idFactory, transitBuilder.getStops().values());
 
-        for (FlexibleStopPlace flexibleStopPlace : currentNetexIndex.getFlexibleStopPlacesById().localValues()) {
+        for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {
             StopLocation stopLocation = flexStopLocationMapper.map(flexibleStopPlace);
             if (stopLocation instanceof FlexStopLocation) {
                 transitBuilder.getLocations().add((FlexStopLocation) stopLocation);
