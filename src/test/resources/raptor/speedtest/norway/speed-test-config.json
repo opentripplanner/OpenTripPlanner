@@ -11,7 +11,7 @@
   tuningParameters: {
     // Default is 12
   "testDate": "2021-12-14",
-  // maxWalkDistanceMeters : 2000,
+  maxWalkDistanceMeters : 2700,
   // 1.4 m/s = ~ 5.0 km/t
   // walkSpeedMeterPrSecond: 1.4,
   "tuningParameters": {
