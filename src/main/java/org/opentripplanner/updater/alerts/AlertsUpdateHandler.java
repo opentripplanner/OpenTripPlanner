@@ -90,7 +90,6 @@ public class AlertsUpdateHandler {
                 directionId = informed.getDirectionId();
             }
 
-            // TODO: The other elements of a TripDescriptor are ignored...
             String tripId = null;
             if (informed.hasTrip() && informed.getTrip().hasTripId()) {
                 tripId = informed.getTrip().getTripId();
