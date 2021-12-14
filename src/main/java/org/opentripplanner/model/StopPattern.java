@@ -61,16 +61,6 @@ public class StopPattern implements Serializable {
             pickups[i] = computePickDrop(stopTime.getStop(), stopTime.getPickupType());
             dropoffs[i] = computePickDrop(stopTime.getStop(), stopTime.getDropOffType());
         }
-        /*
-         * TriMet GTFS has many trips that differ only in the pick/drop status of their initial and
-         * final stops. This may have something to do with interlining. They are turning pickups off
-         * on the final stop of a trip to indicate that there is no interlining, because they supply
-         * block IDs for all trips, even those followed by dead runs. See issue 681. Enabling
-         * dropoffs at the initial stop and pickups at the final merges similar patterns while
-         * having no effect on routing.
-         */
-        dropoffs[0] = PickDrop.SCHEDULED;
-        pickups[size - 1] = PickDrop.SCHEDULED;
     }
 
     /**
