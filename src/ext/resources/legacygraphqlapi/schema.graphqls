@@ -2548,6 +2548,12 @@ type RouteType {
 
     """A public transport agency"""
     agency: Agency
+
+    """
+    The routes which have the defined routeType and belong to the agency, if defined.
+    Otherwise all routes of the feed that have the defined routeType.
+    """
+    routes: [Route]
 }
 
 """Time range for which the API has data available"""

@@ -691,6 +691,8 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Agency> agency();
 
         public DataFetcher<Integer> routeType();
+
+        public DataFetcher<Iterable<Route>> routes();
     }
 
     /**

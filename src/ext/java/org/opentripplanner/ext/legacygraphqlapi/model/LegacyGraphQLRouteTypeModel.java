@@ -17,12 +17,19 @@ public class LegacyGraphQLRouteTypeModel {
      */
     private final int routeType;
 
+    /**
+     * Route type only covers routes of this feed.
+     */
+    private final String feedId;
+
     public LegacyGraphQLRouteTypeModel(
             Agency agency,
-            int routeType
+            int routeType,
+            String feedId
     ) {
         this.agency = agency;
         this.routeType = routeType;
+        this.feedId = feedId;
     }
 
     public Agency getAgency() {
@@ -31,5 +38,9 @@ public class LegacyGraphQLRouteTypeModel {
 
     public int getRouteType() {
         return routeType;
+    }
+
+    public String getFeedId() {
+        return feedId;
     }
 }
