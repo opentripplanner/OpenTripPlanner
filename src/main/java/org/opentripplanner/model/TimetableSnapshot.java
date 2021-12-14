@@ -160,16 +160,26 @@ public class TimetableSnapshot {
         return pattern.getScheduledTimetable();
     }
 
-    public void removeLastAddedTripPattern(TripPattern tripPattern, ServiceDate serviceDate) {
+    public void removeRealtimeUpdatedTripTimes(TripPattern tripPattern, FeedScopedId tripId, ServiceDate serviceDate) {
         SortedSet<Timetable> sortedTimetables = this.timetables.get(tripPattern);
         if (sortedTimetables != null) {
 
-            // Remove Timetable for given date
-            sortedTimetables.removeIf(timetable -> (timetable != null && timetable.isValidFor(serviceDate)));
+            TripTimes tripTimesToRemove = null;
+            for (Timetable timetable : sortedTimetables) {
+                if (timetable.isValidFor(serviceDate)) {
+                    final int tripIndex = timetable.getTripIndex(tripId);
+                    if (tripIndex != -1) {
+                        tripTimesToRemove = timetable.getTripTimes(tripIndex);
+                    } else {
+                        LOG.debug("No triptimes to remove");
+                    }
+                }
+            }
 
-            if (sortedTimetables.isEmpty()) {
-                // No more realtime-updates exist - remove entry
-                timetables.remove(tripPattern);
+            if (tripTimesToRemove != null) {
+                for (Timetable sortedTimetable : sortedTimetables) {
+                    sortedTimetable.getTripTimes().remove(tripTimesToRemove);
+                }
             }
         }
     }
