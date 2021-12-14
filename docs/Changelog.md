@@ -98,6 +98,7 @@
 - Add flex stop to TripTimes, return geometries in GraphQL API [#3757](https://github.com/opentripplanner/OpenTripPlanner/pull/3757)
 - Fix checking allowed boarding/alighting for unscheduled flex trips [#3782](https://github.com/opentripplanner/OpenTripPlanner/pull/3782)
 - Calculating number of days to use in StopTimes-request [#3742](https://github.com/opentripplanner/OpenTripPlanner/pull/3742)
+- Walkable area builder improvements [#3765](https://github.com/opentripplanner/OpenTripPlanner/pull/3765)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
