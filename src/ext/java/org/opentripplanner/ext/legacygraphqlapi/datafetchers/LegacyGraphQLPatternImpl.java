@@ -13,11 +13,11 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.util.PolylineEncoder;
@@ -162,21 +162,33 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
                       trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
               break;
             case StopsOnPattern:
+              alerts.addAll(alertService.getAllAlerts()
+                      .stream()
+                      .filter(alert -> alert.getEntities()
+                              .stream()
+                              .anyMatch(entity -> (
+                                      entity instanceof EntitySelector.StopAndRoute
+                                              && ((EntitySelector.StopAndRoute) entity).stopAndRoute.routeOrTrip.equals(
+                                              getRoute(environment).getId())
+                              )))
+                      .collect(Collectors.toList()));
               getSource(environment).getStops().forEach(stop -> {
                 FeedScopedId stopId = stop.getId();
                 alerts.addAll(alertService.getStopAlerts(stopId));
-                alerts.addAll(
-                        alertService.getStopAndRouteAlerts(stopId, getRoute(environment).getId()));
               });
               break;
             case StopsOnTrips:
               Iterable<Trip> trips = getTrips(environment);
-              getStops(environment).forEach(stop -> {
-                trips.forEach(trip -> alerts.addAll(
-                        alertService.getStopAndTripAlerts(((StopLocation) stop).getId(),
-                                trip.getId(), null
-                        )));
-              });
+              trips.forEach(trip -> alerts.addAll(alertService.getAllAlerts()
+                      .stream()
+                      .filter(alert -> alert.getEntities()
+                              .stream()
+                              .anyMatch(entity -> (
+                                      entity instanceof EntitySelector.StopAndTrip
+                                              && ((EntitySelector.StopAndTrip) entity).stopAndTrip.routeOrTrip.equals(
+                                              getSource(environment).getId())
+                              )))
+                      .collect(Collectors.toList())));
               break;
           }
         });

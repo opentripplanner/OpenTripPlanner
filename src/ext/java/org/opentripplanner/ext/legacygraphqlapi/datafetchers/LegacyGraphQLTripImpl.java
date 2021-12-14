@@ -19,6 +19,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -306,14 +307,22 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
               ));
               break;
             case StopsOnTrip:
+              alerts.addAll(alertService.getAllAlerts()
+                      .stream()
+                      .filter(alert -> alert.getEntities()
+                              .stream()
+                              .anyMatch(entity -> (
+                                      entity instanceof EntitySelector.StopAndRoute
+                                              && ((EntitySelector.StopAndRoute) entity).stopAndRoute.routeOrTrip.equals(
+                                              getRoute(environment).getId())
+                              ) || (
+                                      entity instanceof EntitySelector.StopAndTrip
+                                              && ((EntitySelector.StopAndTrip) entity).stopAndTrip.routeOrTrip.equals(
+                                              getSource(environment).getId())
+                              )))
+                      .collect(Collectors.toList()));
               getStops(environment).forEach(stop -> {
                 FeedScopedId stopId = ((StopLocation) stop).getId();
-                alerts.addAll(
-                        alertService.getStopAndRouteAlerts(getRoute(environment).getId(), stopId));
-                alerts.addAll(
-                        alertService.getStopAndTripAlerts(getSource(environment).getId(), stopId,
-                                null
-                        ));
                 alerts.addAll(alertService.getStopAlerts(stopId));
               });
               break;

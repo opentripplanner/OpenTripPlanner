@@ -13,6 +13,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 
@@ -141,22 +142,27 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                       trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
               break;
             case StopsOnRoute:
+              alerts.addAll(alertService.getAllAlerts().stream()
+                      .filter(alert -> alert.getEntities()
+                              .stream()
+                              .anyMatch(entity -> entity instanceof EntitySelector.StopAndRoute
+                                      && ((EntitySelector.StopAndRoute) entity).stopAndRoute.routeOrTrip.equals(
+                                      getSource(environment).getId())))
+                      .collect(Collectors.toList()));
               getStops(environment).forEach(stop -> {
                 alerts.addAll(alertService.getStopAlerts(((StopLocation) stop).getId()));
-                alerts.addAll(alertService.getStopAndRouteAlerts(
-                        ((StopLocation) stop).getId(),
-                        getSource(environment).getId()
-                ));
               });
               break;
             case StopsOnTrips:
               Iterable<Trip> trips = getTrips(environment);
-              getStops(environment).forEach(stop -> {
-                trips.forEach(trip -> {
-                  alerts.addAll(alertService.getStopAndTripAlerts(((StopLocation) stop).getId(),
-                          trip.getId(), null
-                  ));
-                });
+              trips.forEach(trip -> {
+                alerts.addAll(alertService.getAllAlerts().stream()
+                        .filter(alert -> alert.getEntities()
+                                .stream()
+                                .anyMatch(entity -> entity instanceof EntitySelector.StopAndTrip
+                                        && ((EntitySelector.StopAndTrip) entity).stopAndTrip.routeOrTrip.equals(
+                                        trip.getId())))
+                        .collect(Collectors.toList()));
               });
               break;
             case Patterns:

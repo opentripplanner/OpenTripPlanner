@@ -27,6 +27,8 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
+import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRoute;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -369,9 +371,27 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         if (types.contains(LegacyGraphQLStopAlertType.Stop)) {
           alerts.addAll(alertService.getStopAlerts(id));
         }
-        if (types.contains(LegacyGraphQLStopAlertType.Patterns) || types.contains(
-                LegacyGraphQLStopAlertType.Trips) || types.contains(
+        if (types.contains(LegacyGraphQLStopAlertType.StopOnRoutes) || types.contains(
                 LegacyGraphQLStopAlertType.StopOnTrips)) {
+          alerts.addAll(alertService.getAllAlerts()
+                  .stream()
+                  .filter(alert -> alert.getEntities()
+                          .stream()
+                          .anyMatch(entity -> (
+                                  types.contains(LegacyGraphQLStopAlertType.StopOnRoutes) &&
+                                          entity instanceof EntitySelector.StopAndRoute
+                                          && ((StopAndRoute) entity).stopAndRoute.stop.equals(id)
+                          ) || (
+                                  types.contains(
+                                          LegacyGraphQLStopAlertType.StopOnTrips) &&
+                                          entity instanceof EntitySelector.StopAndTrip
+                                          && ((EntitySelector.StopAndTrip) entity).stopAndTrip.stop.equals(
+                                          id)
+                          )))
+                  .collect(Collectors.toList()));
+        }
+        if (types.contains(LegacyGraphQLStopAlertType.Patterns) || types.contains(
+                LegacyGraphQLStopAlertType.Trips)) {
           getPatterns(environment).forEach(pattern -> {
             if (types.contains(LegacyGraphQLStopAlertType.Patterns)) {
               alerts.addAll(alertService.getDirectionAndRouteAlerts(
@@ -379,31 +399,21 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
                       pattern.getRoute().getId()
               ));
             }
-            if (types.contains(LegacyGraphQLStopAlertType.Trips) || types.contains(
-                    LegacyGraphQLStopAlertType.StopOnTrips)) {
+            if (types.contains(LegacyGraphQLStopAlertType.Trips)) {
               pattern.getTrips().forEach(trip -> {
-                if (types.contains(LegacyGraphQLStopAlertType.Trips)) {
-                  alerts.addAll(alertService.getTripAlerts(trip.getId(), null));
-                }
-                if (types.contains(LegacyGraphQLStopAlertType.StopOnTrips)) {
-                  alerts.addAll(alertService.getStopAndTripAlerts(id, trip.getId(), null));
-                }
+                alerts.addAll(alertService.getTripAlerts(trip.getId(), null));
               });
             }
           });
         }
         if (types.contains(LegacyGraphQLStopAlertType.Routes) || types.contains(
-                LegacyGraphQLStopAlertType.AgenciesOfRoutes) || types.contains(
-                LegacyGraphQLStopAlertType.StopOnRoutes)) {
+                LegacyGraphQLStopAlertType.AgenciesOfRoutes)) {
           getRoutes(environment).forEach(route -> {
             if (types.contains(LegacyGraphQLStopAlertType.Routes)) {
               alerts.addAll(alertService.getRouteAlerts(route.getId()));
             }
             if (types.contains(LegacyGraphQLStopAlertType.AgenciesOfRoutes)) {
               alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
-            }
-            if (types.contains(LegacyGraphQLStopAlertType.StopOnRoutes)) {
-              alerts.addAll(alertService.getStopAndRouteAlerts(id, route.getId()));
             }
           });
         }
