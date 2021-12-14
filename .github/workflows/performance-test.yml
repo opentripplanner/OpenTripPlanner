@@ -67,3 +67,10 @@ jobs:
           mv graph/graph.obj src/test/resources/raptor/speedtest/norway
           mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=src/test/resources/raptor/speedtest/norway -p md -n 4"
 
+      - name: Archive travel results file
+        uses: actions/upload-artifact@v2
+        with:
+          name: travelSearch-results.csv
+          path: |
+            src/test/resources/raptor/speedtest/norway/travelSearch-results.csv
+
