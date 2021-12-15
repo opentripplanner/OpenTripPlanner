@@ -38,9 +38,9 @@ class IncludeFileDirective {
     /**
      * A pattern matching a placeholder like '${includeFile:my-own-config.json}'. The placeholder
      * must start with '${includeFile:' and end with '}'. The file name must consist of only
-     * alphanumerical characters(a-z, A-Z, 0-9), dot `.` and underscore '_'.
+     * alphanumerical characters(a-z, A-Z, 0-9), dot '.', dash '-', and underscore '_'.
      */
-    private final static Pattern INCLUDE_FILE_PATTERN = Pattern.compile("\"?\\$\\{includeFile:([.\\w]+)}\"?");
+    private final static Pattern INCLUDE_FILE_PATTERN = Pattern.compile("\"?\\$\\{includeFile:([-.\\w]+)}\"?");
 
     /**
      * Search for {@link #INCLUDE_FILE_PATTERN}s and replace each placeholder with the value of the
