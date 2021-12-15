@@ -168,10 +168,12 @@ public class TimetableSnapshot {
             for (Timetable timetable : sortedTimetables) {
                 if (timetable.isValidFor(serviceDate)) {
                     final int tripIndex = timetable.getTripIndex(tripId);
-                    if (tripIndex != -1) {
-                        tripTimesToRemove = timetable.getTripTimes(tripIndex);
+                    if (tripIndex == -1) {
+                        LOG.debug("No triptimes to remove for trip {}", tripId);
+                    } else if (tripTimesToRemove != null) {
+                        LOG.debug("Found two triptimes to remove for trip {}", tripId);
                     } else {
-                        LOG.debug("No triptimes to remove");
+                        tripTimesToRemove = timetable.getTripTimes(tripIndex);
                     }
                 }
             }
