@@ -137,8 +137,8 @@ messages and all OTP APIs can be used to get the OTP Serialization Version Id.
 
 ## Include file directive
 
-It is possible to inject the content of another file into a configuration file. This make it 
-possible to keep part of the configuration in separate files. To include the content of a file use
+It is possible to inject the contents of another file into a configuration file. This makes it 
+possible to keep parts of the configuration in separate files. To include the contents of a file, use
 `${includeFile:FILE_NAME}`. The `FILE_NAME` must be the name of a file in the configuration 
 directory. Relative paths are not supported. 
 <p>
