@@ -11,6 +11,7 @@ import org.opentripplanner.GtfsTest;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -103,7 +104,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertFalse(containsTripEntity(transitAlert));
     assertEquals(situationNumber, transitAlert.getId());
     assertEquals(reportType, transitAlert.alertType);
-    assertEquals(severity.value(), transitAlert.severity);
+    assertEquals(AlertSeverity.SEVERE, transitAlert.severity);
     assertEquals(priorityValue, transitAlert.priority);
 
     assertTrue(matchesEntity(transitAlert, stopId));

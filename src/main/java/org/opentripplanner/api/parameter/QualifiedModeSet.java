@@ -192,6 +192,11 @@ public class QualifiedModeSet implements Serializable {
             }
         }
 
+        // If we search eg. Transit + flex access and egress, fallback to walking transfers
+        if (transferMode == null) {
+            transferMode = StreetMode.WALK;
+        }
+
         return new RequestModes(
             accessMode,
             transferMode,

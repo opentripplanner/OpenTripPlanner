@@ -8,7 +8,9 @@ import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTransferPriority;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 
@@ -20,7 +22,7 @@ public class StopIndexForRaptorTest {
     private final Stop STOP_3 = Stop.stopForTest("ID-" + 4, 0.0, 0.0);
     private final Stop STOP_4 = Stop.stopForTest("ID-" + 5, 0.0, 0.0);
 
-    private final List<Stop> STOPS = Arrays.asList(
+    private final List<StopLocation> STOPS = Arrays.asList(
             STOP_0,
             STOP_1,
             STOP_2,
@@ -38,7 +40,7 @@ public class StopIndexForRaptorTest {
 
 
     @Test public void listStopIndexesForTripPattern() {
-        Stop[] input = new Stop[] {
+        StopLocation[] input = new Stop[] {
                 STOP_0,
                 STOP_2,
                 STOP_4
@@ -66,6 +68,6 @@ public class StopIndexForRaptorTest {
     }
 
     Station createStation(String name, StopTransferPriority pri) {
-        return new Station(new FeedScopedId("F", name), name, null, null, null, null, null, pri);
+        return new Station(new FeedScopedId("F", name), name, new WgsCoordinate(0, 0), null, null, null, null, pri);
     }
 }

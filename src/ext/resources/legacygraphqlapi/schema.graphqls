@@ -55,19 +55,43 @@ type Alert implements Node {
     Agency affected by the disruption. Note that this value is present only if the
     disruption has an effect on all operations of the agency (e.g. in case of a strike).
     """
-    agency: Agency
+    agency: Agency @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected agencies.
+       Use entities instead.
+       """
+    )
 
     """Route affected by the disruption"""
-    route: Route
+    route: Route @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected routes.
+       Use entities instead.
+       """
+    )
 
     """Trip affected by the disruption"""
-    trip: Trip
+    trip: Trip @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected trips.
+       Use entities instead.
+       """
+    )
 
     """Stop affected by the disruption"""
-    stop: Stop
+    stop: Stop @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected stops.
+       Use entities instead.
+       """
+    )
 
     """Patterns affected by the disruption"""
-    patterns: [Pattern]
+    patterns: [Pattern] @deprecated(reason: "This will always return an empty list. Use entities instead.")
 
     """Header of the alert, if available"""
     alertHeaderText: String
@@ -105,6 +129,11 @@ type Alert implements Node {
     Time when this alert is not in effect anymore. Format: Unix timestamp in seconds
     """
     effectiveEndDate: Long
+
+    """
+    Entities affected by the disruption.
+    """
+    entities: [AlertEntity]
 }
 
 """Cause of a alert"""
@@ -177,7 +206,14 @@ enum AlertEffectType {
 
     """NO_EFFECT"""
     NO_EFFECT
+
+    """ACCESSIBILITY_ISSUE"""
+    ACCESSIBILITY_ISSUE
 }
+
+
+"""Entity related to an alert"""
+union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip
 
 """Severity level of a alert"""
 enum AlertSeverityLevelType {
@@ -799,6 +835,22 @@ type Geometry {
     https://developers.google.com/maps/documentation/utilities/polylinealgorithm)
     """
     points: Polyline
+}
+
+scalar GeoJson
+
+type StopGeometries {
+    """Representation of the stop geometries as GeoJSON (https://geojson.org/)"""
+    geoJson: GeoJson,
+
+    """
+    Representation of a stop as a series of polylines.
+
+    Polygons of flex stops are represented as linear rings (lines where the first and last point are the same).
+
+    Proper stops are represented as single point "lines".
+    """
+    googleEncoded: [Geometry]
 }
 
 input InputBanned {
@@ -1809,6 +1861,12 @@ type QueryType {
 
         """Only return alerts with these causes"""
         cause: [AlertCauseType!]
+
+        """Only return alerts affecting these routes"""
+        route: [String!]
+
+        """Only return alerts affecting these stops"""
+        stop: [String!]
     ): [Alert]
 
     """Get the time range for which the API has data available"""
@@ -2434,6 +2492,21 @@ type Stop implements Node & PlaceInterface {
     """Longitude of the stop (WGS 84)"""
     lon: Float
 
+    """
+    Representations of this stop's geometry. This is mainly interesting for flex stops which can be
+    a polygon or a group of stops either consisting of either points or polygons.
+
+    Regular fixed-schedule stops return a single point.
+
+    Stations (parent stations with child stops) contain a geometry collection with a point for the
+    central coordinate plus a convex hull polygon (https://en.wikipedia.org/wiki/Convex_hull) of all
+    coordinates of the child stops.
+
+    If there are only two child stops then the convex hull is a straight line between the them. If
+    there is a single child stop then it's a single point.
+    """
+    geometries: StopGeometries
+
     """Stop code which is visible at the stop"""
     code: String
 
@@ -2585,6 +2658,36 @@ type stopAtDistanceEdge {
     """The item at the end of the edge"""
     node: stopAtDistance
     cursor: String!
+}
+
+"""
+Stop that should (but not guaranteed) to exist on a route.
+"""
+type StopOnRoute {
+    """
+    Stop at the route. It's also possible that the stop is no longer on the route
+    or that the stop is null when it can no longer be found.
+    """
+    stop: Stop
+    """
+    Route which contains the stop. Route is null if it can't be found anymore.
+    """
+    route: Route
+}
+
+"""
+Stop that should (but not guaranteed) to exist on a trip.
+"""
+type StopOnTrip {
+    """
+    Stop at the trip. It's also possible that the stop is no longer on the trip
+    or that the stop is null when it can no longer be found.
+    """
+    stop: Stop
+    """
+    Trip which contains the stop. Route is null if it can't be found anymore.
+    """
+    trip: Trip
 }
 
 """

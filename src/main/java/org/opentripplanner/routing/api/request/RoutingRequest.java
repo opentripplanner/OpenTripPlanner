@@ -1287,6 +1287,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     public Set<FeedScopedId> getBannedRoutes(Collection<Route> routes) {
+        if (bannedRoutes.isEmpty() && bannedAgencies.isEmpty() &&
+            whiteListedRoutes.isEmpty() && whiteListedAgencies.isEmpty()
+        ) {
+            return Set.of();
+        }
+
         Set<FeedScopedId> bannedRoutes = new HashSet<>();
         for (Route route : routes) {
             if (routeIsBanned(route)) {
@@ -1311,14 +1317,14 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     private boolean routeIsBanned(Route route) {
         /* check if agency is banned for this plan */
-        if (bannedAgencies != null) {
+        if (!bannedAgencies.isEmpty()) {
             if (bannedAgencies.contains(route.getAgency().getId())) {
                 return true;
             }
         }
 
         /* check if route banned for this plan */
-        if (bannedRoutes != null) {
+        if (!bannedRoutes.isEmpty()) {
             if (bannedRoutes.matches(route)) {
                 return true;
             }
@@ -1328,7 +1334,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         boolean whiteListInUse = false;
 
         /* check if agency is whitelisted for this plan */
-        if (whiteListedAgencies != null && whiteListedAgencies.size() > 0) {
+        if (!whiteListedAgencies.isEmpty()) {
             whiteListInUse = true;
             if (whiteListedAgencies.contains(route.getAgency().getId())) {
                 whiteListed = true;
@@ -1336,7 +1342,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         }
 
         /* check if route is whitelisted for this plan */
-        if (whiteListedRoutes != null && !whiteListedRoutes.isEmpty()) {
+        if (!whiteListedRoutes.isEmpty()) {
             whiteListInUse = true;
             if (whiteListedRoutes.matches(route)) {
                 whiteListed = true;

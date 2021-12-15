@@ -20,6 +20,7 @@ import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
@@ -105,12 +106,12 @@ public class AddTransitModelEntitiesToGraph {
 
     private void addStopsToGraphAndGenerateStopVertexes(Graph graph) {
         // Compute the set of modes for each stop based on all the TripPatterns it is part of
-        Map<Stop, Set<TransitMode>> stopModeMap = new HashMap<>();
+        Map<StopLocation, Set<TransitMode>> stopModeMap = new HashMap<>();
 
         for (TripPattern pattern : transitService.getTripPatterns()) {
             TransitMode mode = pattern.getMode();
             graph.addTransitMode(mode);
-            for (Stop stop : pattern.getStops()) {
+            for (var stop : pattern.getStops()) {
                 Set<TransitMode> set = stopModeMap.computeIfAbsent(stop, s -> new HashSet<>());
                 set.add(mode);
             }

@@ -2,15 +2,18 @@ package org.opentripplanner.standalone.server;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.jersey2.server.DefaultJerseyTagsProvider;
 import io.micrometer.jersey2.server.MetricsApplicationEventListener;
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import org.glassfish.jersey.CommonProperties;
+import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
-import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -87,19 +90,44 @@ public class OTPApplication extends Application {
             // Serialize POJOs (unannotated) JSON using Jackson
             new JSONObjectMapperProvider(),
             // Allow injecting the OTP server object into Jersey resource classes
-            server.makeBinder()
+            server.makeBinder(),
+            // Add performance instrumentation of Jersey requests to micrometer
+            getMetricsApplicationEventListener()
         );
 
         if (OTPFeature.ActuatorAPI.isOn()) {
-            singletons.add(new MetricsApplicationEventListener(
-                    ActuatorAPI.prometheusRegistry,
-                    new DefaultJerseyTagsProvider(),
-                    "http.server.requests",
-                    true
-            ));
+            singletons.add(getBoundPrometheusRegistry());
         }
 
         return singletons;
+    }
+
+    private MetricsApplicationEventListener getMetricsApplicationEventListener() {
+        return new MetricsApplicationEventListener(
+                Metrics.globalRegistry,
+                new DefaultJerseyTagsProvider(),
+                "http.server.requests",
+                true
+        );
+    }
+
+    /**
+     * Instantiate and add the prometheus micrometer registry to the global composite registry.
+     * @return A AbstractBinder, which can be used to inject the registry into the Actuator API calls
+     */
+    private AbstractBinder getBoundPrometheusRegistry() {
+        PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
+                PrometheusConfig.DEFAULT
+        );
+
+        Metrics.globalRegistry.add(prometheusRegistry);
+
+        return new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(prometheusRegistry).to(PrometheusMeterRegistry.class);
+            }
+        };
     }
 
     /**

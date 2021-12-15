@@ -185,6 +185,7 @@ public class LegType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("fromEstimatedCall")
+            .withDirective(gqlUtil.timingData)
             .description("EstimatedCall for the quay where the leg originates.")
             .type(estimatedCallType)
             .dataFetcher(env -> TripTimeShortHelper.getTripTimeShortForFromPlace(env
@@ -193,6 +194,7 @@ public class LegType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("toEstimatedCall")
+            .withDirective(gqlUtil.timingData)
             .description("EstimatedCall for the quay where the leg ends.")
             .type(estimatedCallType)
             .dataFetcher(env -> TripTimeShortHelper.getTripTimeShortForToPlace(
@@ -235,6 +237,7 @@ public class LegType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("intermediateEstimatedCalls")
+            .withDirective(gqlUtil.timingData)
             .description(
                 "For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list."
             )
@@ -246,6 +249,7 @@ public class LegType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("serviceJourneyEstimatedCalls")
+            .withDirective(gqlUtil.timingData)
             .description(
                 "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list.")
             .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))

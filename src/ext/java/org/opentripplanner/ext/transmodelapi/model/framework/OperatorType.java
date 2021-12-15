@@ -14,7 +14,9 @@ import java.util.stream.Collectors;
 public class OperatorType {
 
   public static GraphQLObjectType create(
-      GraphQLOutputType lineType, GraphQLOutputType serviceJourneyType
+      GraphQLOutputType lineType,
+      GraphQLOutputType serviceJourneyType,
+      GqlUtil gqlUtil
   ) {
     return GraphQLObjectType.newObject()
             .name("Operator")
@@ -39,6 +41,7 @@ public class OperatorType {
 //                        .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("lines")
+                    .withDirective(gqlUtil.timingData)
                     .type(new GraphQLNonNull(new GraphQLList(lineType)))
                     .dataFetcher(environment -> {
                       return GqlUtil.getRoutingService(environment).getAllRoutes()
@@ -49,6 +52,7 @@ public class OperatorType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("serviceJourney")
+                    .withDirective(gqlUtil.timingData)
                     .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
                     .dataFetcher(environment -> {
                       return GqlUtil.getRoutingService(environment).getTripForId().values()

@@ -92,9 +92,11 @@ public class GraphBuilder implements Runnable {
      * build a graph from the given data source and configuration directory.
      */
     public static GraphBuilder create(
-        BuildConfig config,
-        GraphBuilderDataSources dataSources,
-        Graph baseGraph
+            BuildConfig config,
+            GraphBuilderDataSources dataSources,
+            Graph baseGraph,
+            boolean loadStreetGraph,
+            boolean saveStreetGraph
     ) {
 
         boolean hasOsm  = dataSources.has(OSM);
@@ -173,7 +175,7 @@ public class GraphBuilder implements Runnable {
         // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
         // existence of stops in islands. If an island has a stop, it actually may be a real island and should
         // not be removed quite as easily
-        if ( hasOsm ) {
+        if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
             PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
             pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
             pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);

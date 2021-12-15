@@ -136,8 +136,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
         // update references
         index.networkIdByGroupOfLineId.addAll(networkIdByGroupOfLineId);
+    }
 
-        // Log summary of errors
+    static void logSummary() {
         PASSENGER_STOP_ASSIGNMENT_LOGGER.logTotal("PassengerStopAssignment with empty quay ref.");
     }
 

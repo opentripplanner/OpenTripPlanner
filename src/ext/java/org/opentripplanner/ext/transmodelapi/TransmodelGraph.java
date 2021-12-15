@@ -8,6 +8,9 @@ import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.execution.instrumentation.Instrumentation;
 import graphql.schema.GraphQLSchema;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
+import java.util.List;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
@@ -43,13 +46,14 @@ class TransmodelGraph {
             Router router,
             Map<String, Object> variables,
             String operationName,
-            int maxResolves
+            int maxResolves,
+            Iterable<Tag> tracingTags
     ) {
         Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
         if (OTPFeature.ActuatorAPI.isOn()) {
             instrumentation = new ChainedInstrumentation(
-                    new MicrometerGraphQLInstrumentation(ActuatorAPI.prometheusRegistry),
-                    instrumentation
+                new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, tracingTags),
+                instrumentation
             );
         }
 
@@ -72,8 +76,26 @@ class TransmodelGraph {
         return graphQL.execute(executionInput);
     }
 
-    Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int maxResolves) {
-        ExecutionResult result = getGraphQLExecutionResult(query, router, variables, operationName, maxResolves);
-        return Response.status(Response.Status.OK).entity(GraphQLResponseSerializer.serialize(result)).build();
+    Response getGraphQLResponse(
+            String query,
+            Router router,
+            Map<String, Object> variables,
+            String operationName,
+            int maxResolves,
+            Iterable<Tag> tracingTags
+    ) {
+        ExecutionResult result = getGraphQLExecutionResult(
+            query,
+            router,
+            variables,
+            operationName,
+            maxResolves,
+            tracingTags
+        );
+
+        return Response
+            .status(Response.Status.OK)
+            .entity(GraphQLResponseSerializer.serialize(result))
+            .build();
     }
 }

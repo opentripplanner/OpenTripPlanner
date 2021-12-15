@@ -4,7 +4,6 @@ import static org.opentripplanner.transit.raptor.api.transit.CostCalculator.ZERO
 
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ValueObjectToStringBuilder;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimized;
@@ -31,18 +30,28 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 {
 
     @Nullable
-    private final TransferWaitTimeCalculator waitTimeCostCalculator;
+    private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
+    private final StopPriorityCostCalculator stopPriorityCostCalculator;
+
     private int transferPriorityCost = TransferConstraint.ZERO_COST;
-    private int waitTimeOptimizedCost = TransferWaitTimeCalculator.ZERO_COST;
+    private int waitTimeOptimizedCost = TransferWaitTimeCostCalculator.ZERO_COST;
 
     public OptimizedPathTail(
             RaptorSlackProvider slackProvider,
             CostCalculator costCalculator,
-            TransferWaitTimeCalculator waitTimeCostCalculator,
+            TransferWaitTimeCostCalculator waitTimeCostCalculator,
+            int[] stopBoardAlightCosts,
+            double extraStopBoardAlightCostsFactor,
             RaptorStopNameResolver stopNameResolver
     ) {
         super(null, slackProvider, costCalculator, stopNameResolver);
         this.waitTimeCostCalculator = waitTimeCostCalculator;
+        this.stopPriorityCostCalculator = (stopBoardAlightCosts != null || extraStopBoardAlightCostsFactor > 0.01)
+            ? new StopPriorityCostCalculator(
+                extraStopBoardAlightCostsFactor,
+                stopBoardAlightCosts
+            )
+            : null;
     }
 
     private OptimizedPathTail(OptimizedPathTail<T> other) {
@@ -50,6 +59,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         this.waitTimeCostCalculator = other.waitTimeCostCalculator;
         this.waitTimeOptimizedCost = other.waitTimeOptimizedCost;
         this.transferPriorityCost = other.transferPriorityCost;
+        this.stopPriorityCostCalculator = other.stopPriorityCostCalculator;
     }
 
     @Override
@@ -75,9 +85,22 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
     /** Start by adding the last transit leg with the egress leg attached. */
     public OptimizedPathTail<T> addTransitTail(TransitPathLeg<T> leg) {
-        egress(leg.nextLeg().asEgressLeg().egress());
-        var times = new BoardAndAlightTime(leg.trip(), leg.getFromStopPosition(), leg.getToStopPosition());
-        transit(leg.trip(), times);
+        var next = leg.nextLeg();
+        // this can also be a transfer leg to a flex trip
+        if(next.isTransferLeg()) {
+            next = next.nextLeg();
+        }
+        if (next.isEgressLeg()) {
+            egress(next.asEgressLeg().egress());
+            var times = new BoardAndAlightTime(
+                    leg.trip(),
+                    leg.getFromStopPosition(),
+                    leg.getToStopPosition()
+            );
+            transit(leg.trip(), times);
+        } else {
+            throw new IllegalStateException("We expect an egress leg at the end of the RAPTOR path.");
+        }
         return this;
     }
 
@@ -103,26 +126,11 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         // The board position will be changed when a new head is inserted.
         int boardStopPos = 0;
 
-        // Using the earliest-departure-time as input here is in some cases wrong, but the leg
-        // created here is temporary and will be mutated when connected with the leg in front of it.
-        addTransitLeg(
-                originalLeg.trip(),
-                boardStopPos,
-                tx.from().stopPosition(),
-                tx.constrainedTransfer()
-        );
-        return this;
-    }
+        var trip = originalLeg.trip();
+        var times = new BoardAndAlightTime(trip, boardStopPos, tx.from().stopPosition());
+        transit(trip, times, tx.constrainedTransfer());
 
-    private void addTransitLeg(
-            T trip,
-            int boardStopPos,
-            int alightStopPos,
-            @Nullable ConstrainedTransfer txConstraintsAfter
-    ) {
-        var times = new BoardAndAlightTime(trip, boardStopPos, alightStopPos);
-        var c = txConstraintsAfter == null ? null : txConstraintsAfter.getTransferConstraint();
-        transit(trip, times, txConstraintsAfter);
+        return this;
     }
 
     @Override
@@ -213,6 +221,10 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     private void addOptimizedWaitTimeCost(PathBuilderLeg<?> pathLeg) {
         if(waitTimeCostCalculator == null) { return; }
 
+        waitTimeOptimizedCost += extraStopPriorityCost(pathLeg);
+
+        if(!pathLeg.isTransit() || pathLeg.nextTransitLeg() == null) { return; }
+
         int waitTime = pathLeg.waitTimeBeforeNextTransitIncludingSlack();
         if(waitTime < 0) { return; }
 
@@ -234,7 +246,23 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
             }
         }
 
-        int cost = waitTimeCostCalculator.calculateOptimizedWaitCost(waitTime);
-        this.waitTimeOptimizedCost += cost;
+        this.waitTimeOptimizedCost += waitTimeCostCalculator.calculateOptimizedWaitCost(waitTime);
+    }
+
+    private int extraStopPriorityCost(PathBuilderLeg<?> leg) {
+        if(stopPriorityCostCalculator == null) { return ZERO_COST; }
+
+        int extraCost = ZERO_COST;
+        // Ideally we would like to add the board- & alight-stop-cost when a new transit-leg
+        // is added to the path. But, the board stop is unknown until the leg before it is
+        // added. So, instead of adding the board-stop-cost when it is added, we wait and add it
+        // when a new leg is added in front of it.
+        if(leg.next() != null && leg.next().isTransit()) {
+            extraCost += stopPriorityCostCalculator.extraStopPriorityCost(leg.toStop());
+        }
+        if(leg.isTransit()) {
+            extraCost += stopPriorityCostCalculator.extraStopPriorityCost(leg.toStop());
+        }
+        return extraCost;
     }
 }

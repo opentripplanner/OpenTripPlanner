@@ -94,18 +94,6 @@ public class GtfsContextBuilder {
     }
 
     /**
-     * The {@link org.opentripplanner.graph_builder.module.GtfsModule} is responsible for repairing
-     * StopTimes for all trips and trip patterns generation, so turn this feature <b>off</b>
-     * when using GtfsModule to load data.
-     *
-     * This feature is turned <b>on</b> by <em>default</em>.
-     */
-    public GtfsContextBuilder turnOffRepairStopTimesAndTripPatternsGeneration() {
-        this.repairStopTimesAndGenerateTripPatterns = false;
-        return this;
-    }
-
-    /**
      * This method will:
      * <ol>
      *     <li>repair stop-times (if enabled)</li>

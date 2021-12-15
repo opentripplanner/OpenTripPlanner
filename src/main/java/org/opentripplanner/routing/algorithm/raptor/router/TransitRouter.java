@@ -112,6 +112,7 @@ public class TransitRouter {
                     requestTransitDataProvider.stopNameResolver(),
                     router.graph.getTransferService(),
                     requestTransitDataProvider,
+                    transitLayer.getStopIndex().stopBoardAlightCosts,
                     raptorRequest,
                     request.transferOptimization
             ).optimize(transitResponse.paths());
