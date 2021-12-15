@@ -44,7 +44,6 @@ public class SmokeTest {
     static final Logger LOG = LoggerFactory.getLogger(SmokeTest.class);
     static HttpClient client = HttpClient.newHttpClient();
     static final ObjectMapper mapper;
-    static final Set<DayOfWeek> weekend = Set.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 
     /**
      * The Fare class is a little hard to deserialize so we have a custom deserializer as we don't
@@ -73,19 +72,15 @@ public class SmokeTest {
     }
 
     /**
-     * Return the closest non-weekend day.
-     * <p>
-     * On Saturday and Sunday, this returns the following Monday. During the work week it returns
-     * the current day.
+     * In order to have somewhat predictable results we get the route for the next Monday.
+     *
+     * FIXME: In the tech call on 2021-12-14 we said that we want to use the next business day, but
+     * as of 2021-12-15 this is not possible because the trips in the MARTA feed available to download
+     * start on 2021-12-18. After that date we can actually implement this logic.
      */
-    static LocalDate closestWorkDay() {
+    static LocalDate nextMonday() {
         var today = LocalDate.now();
-        if (weekend.contains(today.getDayOfWeek())) {
-            return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-        }
-        else {
-            return today;
-        }
+        return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
     }
 
     /**
