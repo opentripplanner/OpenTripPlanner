@@ -48,10 +48,11 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
     @Override
     public double calculateExtraCost(
             RoutingRequest options,
+            int edgeLength,
             TraverseMode traverseMode
     ) {
         if (traverseMode.isWalking() || traverseMode.isCycling()) {
-            return calculateDataOverlayPenalties(options);
+            return calculateDataOverlayPenalties(options) * edgeLength/1000;
         }
         return 0d;
     }

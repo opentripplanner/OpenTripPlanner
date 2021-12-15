@@ -16,6 +16,7 @@ public interface StreetEdgeCostExtension {
      */
     double calculateExtraCost(
             RoutingRequest options,
+            int edgeLength,
             TraverseMode traverseMode
     );
 }
