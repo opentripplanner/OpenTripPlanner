@@ -463,7 +463,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         }
 
         if (costExtension != null) {
-           weight += costExtension.calculateExtraCost(options, traverseMode);
+           weight += costExtension.calculateExtraCost(options, traverseMode) * length_mm/1000;
         }
 
         s1.incrementTimeInSeconds(roundedTime);
