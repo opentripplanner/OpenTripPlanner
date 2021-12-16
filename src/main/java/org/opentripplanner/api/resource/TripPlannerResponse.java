@@ -56,10 +56,13 @@ public class TripPlannerResponse {
     }
 
     /**
-     * Use the cursor to get the previous page of results. Insert this cursor into the
-     * request and get post it to get the next page.
+     * Use the cursor to get the previous page of results. Insert the cursor into the
+     * request and post it to get the previous page.
      * <p>
-     * The previous page is a set of itineraries departing BEFORE the first itinerary in this result.
+     * The previous page is a set of itineraries departing BEFORE the first itinerary in the result for a 
+     * depart after search. For an arrive by search the previous page is the next set of itineraries departing 
+     * AFTER the last itinerary in the result. When using the default sort order the previous set of itineraries
+     * is inserted before the current result.
      * <p>
      * Note! The behavior is undefined if timetableView is off. This is possible to support,
      * but require more information to be included in the cursor.
