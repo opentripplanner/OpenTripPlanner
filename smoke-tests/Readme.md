@@ -1,8 +1,8 @@
 ## IBI Group OTP Smoke Tests
 
 This folder contains scripts and configuration files for running an OTP instance that can then be
-use to run smoke tests against. These tests are intended as a last sanity check when we merge
-upstream changes as these merges tend to be very large. It helps to reduce the burden on the
+used to run smoke tests against. These tests are intended as a last sanity check when we merge
+upstream changes as these merges tend to be very large. It reduces the burden on the
 reviewer and increases the confidence that the upstream merge won't break anything.
 
 ### Commands
@@ -18,7 +18,7 @@ cd smoke-tests
 make build-atlanta
 ```
 
-After the graph is build you can then run OTP with:
+After the graph is built you can then run OTP with:
 
 ```
 make run-atlanta
@@ -27,6 +27,8 @@ make run-atlanta
 And finally run the smoke tests with
 
 ```
+# go back to the root directory
+cd ..
 mvn test -P smoke-tests
 ```
 

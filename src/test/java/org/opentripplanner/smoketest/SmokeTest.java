@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
@@ -37,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * By default, the smoke tests are not run when you execute `mvn test`.
  * <p>
- * If you want run them use the following command: `mvn test -P smoke-tests`
+ * If you want run them, use `mvn test -P smoke-tests`.
  */
 public class SmokeTest {
 
@@ -73,10 +72,12 @@ public class SmokeTest {
 
     /**
      * In order to have somewhat predictable results we get the route for the next Monday.
-     *
-     * FIXME: In the tech call on 2021-12-14 we said that we want to use the next business day, but
-     * as of 2021-12-15 this is not possible because the trips in the MARTA feed available to download
-     * start on 2021-12-18. After that date we can actually implement this logic.
+     * <p>
+     * When we approach the end of the validity of the GTFS feed there might be days when this logic
+     * results in failures as the next Monday is after the end of the service period.
+     * <p>
+     * This is a problem in particular in the case of MARTA as they only publish new data about 2
+     * days before the expiration date of the old one.
      */
     static LocalDate nextMonday() {
         var today = LocalDate.now();
@@ -98,7 +99,6 @@ public class SmokeTest {
                 .uri(uri)
                 .GET()
                 .build();
-
     }
 
     /**
@@ -109,7 +109,6 @@ public class SmokeTest {
         LOG.info("Sending request to {}", request.uri());
         TripPlannerResponse otpResponse;
         try {
-
             var response = client.send(request, BodyHandlers.ofInputStream());
 
             assertEquals(
