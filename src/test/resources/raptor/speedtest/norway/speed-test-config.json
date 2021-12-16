@@ -8,9 +8,6 @@
   // Default is 1.4 m/s = ~ 5.0 km/t
   walkSpeedMeterPrSecond: 1.4,
 
-  // 1.4 m/s = ~ 5.0 km/t
-  // walkSpeedMeterPrSecond: 1.4,
-
   "tuningParameters": {
     // maxNumberOfTransfers: 12,
 
@@ -21,42 +18,43 @@
     dynamicSearchWindow: {
       // Default is 0.4
       minTripTimeCoefficient: 0.3,
-    // searchThreadPoolSize: 0,
+      // searchThreadPoolSize: 0,
 
-    "dynamicSearchWindow": {
-      "minTransitTimeCoefficient": 0.75,
-      "minWaitTimeCoefficient": 0.0
-      // minTimeMinutes: 30,
-      // minTimeMinutes: 40,
+      "dynamicSearchWindow": {
+        "minTransitTimeCoefficient": 0.75,
+        "minWaitTimeCoefficient": 0.0
+        // minTimeMinutes: 30,
+        // minTimeMinutes: 40,
 
-      // default is 180 minutes (3 hours)
-      // maxLengthMinutes : 360,
+        // default is 180 minutes (3 hours)
+        // maxLengthMinutes : 360,
 
-      // stepMinutes: 10
-      // stepMinutes: 10
+        // stepMinutes: 10
+        // stepMinutes: 10
+      },
+      "stopTransferCost": {
+        "DISCOURAGED": 86400,
+        "ALLOWED": 3000,
+        "RECOMMENDED": 300,
+        "PREFERRED": 0
+      }
     },
-    "stopTransferCost": {
-      "DISCOURAGED": 86400,
-      "ALLOWED":      3000,
-      "RECOMMENDED":   300,
-      "PREFERRED":       0
-    }
-  },
-  "routingDefaults": {
-    // Should not be used - a high cost indicate an error
-    "bikeBoardCost": 222000,
-    "walkBoardCost": 600,
-    "transferCost": 0,
-    "walkReluctance": 4.0,
-    "waitReluctance": 1.0,
-    "boardSlack": 30,
-    "alightSlack": 15,
-    "transferSlack": 60,
-    "boardSlackForMode" : {
-      "AIRPLANE" : 1800
-    },
-    "transitReluctance" : {
-      "RAIL" : 1.0
+    "routingDefaults": {
+      // Should not be used - a high cost indicate an error
+      "bikeBoardCost": 222000,
+      "walkBoardCost": 600,
+      "transferCost": 0,
+      "walkReluctance": 4.0,
+      "waitReluctance": 1.0,
+      "boardSlack": 30,
+      "alightSlack": 15,
+      "transferSlack": 60,
+      "boardSlackForMode": {
+        "AIRPLANE": 1800
+      },
+      "transitReluctance": {
+        "RAIL": 1.0
+      }
     }
   }
 }
