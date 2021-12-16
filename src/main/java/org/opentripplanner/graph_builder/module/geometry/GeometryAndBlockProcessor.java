@@ -52,6 +52,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
  * geometries. It also does some other postprocessing involving fares and interlined blocks.
+ *
+ * The computation runs in parallel so be careful about threadsafety when modifying the logic here.
  */
 public class GeometryAndBlockProcessor {
 
@@ -63,10 +65,13 @@ public class GeometryAndBlockProcessor {
 
     private OtpTransitService transitService;
 
+    // this is threadsafe implementation
     private Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
 
+    // this is threadsafe implementation
     private Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
 
+    // this is threadsafe implementation
     private Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
 
     private FareServiceFactory fareServiceFactory;
@@ -101,7 +106,14 @@ public class GeometryAndBlockProcessor {
         run(graph, new DataImportIssueStore(false));
     }
 
-    /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
+    /**
+     * Generate the edges. Assumes that there are already vertices in the graph for the stops.
+     *
+     * The geometries for the trip patterns are computed in parallel. The collections needed for
+     * this are concurrent implementations and therefore threadsafe but the issue store, the graph,
+     * the OtpTransitService and others are not.
+     *
+     */
     @SuppressWarnings("Convert2MethodRef")
     public void run(Graph graph, DataImportIssueStore issueStore) {
         this.issueStore = issueStore;
