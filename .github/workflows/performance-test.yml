@@ -54,8 +54,7 @@ jobs:
 
       - name: Build Norway graph
         run: |
-          # copying the Entur build config but removing the "storage" section because that needs credentials
-          jq '. | del(.storage)' docs/examples/entur/build-config.json > graph/build-config.json
+          cp test/ci-performance-test/build-config.json graph/build-config.json
           cp target/otp-2.1.0-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save graph
 
@@ -64,13 +63,13 @@ jobs:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           MEASUREMENT_ENVIRONMENT: CI
         run: |
-          mv graph/graph.obj src/test/resources/raptor/speedtest/norway
-          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=src/test/resources/raptor/speedtest/norway -p md -n 4"
+          mv graph/graph.obj test/ci-performance-test/
+          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/ci-performance-test/ -p md -n 4"
 
       - name: Archive travel results file
         uses: actions/upload-artifact@v2
         with:
           name: travelSearch-results.csv
           path: |
-            src/test/resources/raptor/speedtest/norway/travelSearch-results.csv
+            test/ci-performance-test/travelSearch-results.csv
 

@@ -1,0 +1,19 @@
+testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon,destination,toPlace,toLat,toLon
+1,Fylkeskryssende,08:00,12:00,2:00,Notodden Skysstasjon,NSR:StopPlace:20762,59.556698,9.25651,Oslo Bussterminal,NSR:StopPlace:6505,59.91177,10.757994
+2,NSB,11:00,15:00,1:00,Gol,NSR:StopPlace:324,60.69917,8.97123,Billingstad,NSR:StopPlace:577,59.874783,10.483057
+3,Ruter,15:00,17:00,1:30,IKEA Slependen,NSR:StopPlace:4401,59.87577,10.500488,Oslo Bussterminal,NSR:StopPlace:6505,59.91177,10.757994
+4,Østold,16:00,20:30,1:00,Sponvika,NSR:StopPlace:3009,59.09267,11.229988,Skjærhalden,NSR:StopPlace:1845,59.025497,11.036771
+7,Oslo,17:00,20:00,2:00,Prinsdal,NSR:StopPlace:6740,59.834175,10.807415,Solemskogen,NSR:StopPlace:6626,59.979305,10.817612
+9,Oppland,15:00,17:00,1:30,Steinvegen,NSR:StopPlace:14093,61.13245,10.454416,Holsjordet,NSR:StopPlace:14320,61.099922,10.47955
+10,Buskerud,08:00,15:00,5:00,Hokksund stasjon,NSR:StopPlace:245,59.767204,9.910567,Fossekallveien,NSR:StopPlace:15726,60.178715,10.257535
+11,Vestfold,13:00,16:00,1:00,Torggata,NSR:StopPlace:17452,59.417572,10.482581,Høyjord,NSR:StopPlace:18872,59.366146,10.120965
+12,Telemark,10:00,11:30,1:00,Meieritorvet,NSR:StopPlace:20257,59.13879,9.648428,Skien sykehjem,NSR:StopPlace:19979,59.213493,9.596075
+14,Rogaland,08:00,15:16,4:00,Hauge i Dalane,NSR:StopPlace:26062,58.343338,6.29508,Heskestad,NSR:StopPlace:26370,58.490974,6.361217
+15,Hordaland,16:00,18:00,1:30,Melkeplassen,NSR:StopPlace:31882,60.376045,5.303988,Starefossbakken,NSR:StopPlace:29147,60.387913,5.35192
+17,Møre og Romsdal,08:00,10:00,1:15,Slinningsodden,NSR:StopPlace:41499,62.461693,6.16515,Kråmyra,NSR:StopPlace:40181,62.47539,6.191737
+20,Troms,15:00,17:00,1:50,Harstad kirke,NSR:StopPlace:52154,68.801636,16.534492,Lamoveien,NSR:StopPlace:53953,68.81136,16.507952
+21,Finnmark,08:00,18:00,8:00,Indre Billefjord,NSR:StopPlace:57518,70.31518,25.046686,Karasjok bussterminal,NSR:StopPlace:56754,69.472664,25.5169
+22,Fylkeskryssende,09:00,16:00,3:00,Hjellum,NSR:StopPlace:11701,61.768383,9.527959,Lyngveien,NSR:StopPlace:6645,59.897415,10.792623
+23,Fylkeskryssende,04:00,26:00,12:00,Trondheim S,NSR:StopPlace:659,63.436462,10.398694,Brønnøysund sentrum,NSR:StopPlace:51790,65.4755,12.211214
+26,Ekspressbuss,08:00,23:00,7:00,Skjærhalden,NSR:StopPlace:1845,59.025497,11.036771,Lærdal rådhus,NSR:StopPlace:34505,61.09855,7.480798
+28,Oslo høyfrekvens,16:05,18:05,2:00,Marienlyst,,59.932322,10.724663,Kjøbenhavngata,,59.928979,10.769432
