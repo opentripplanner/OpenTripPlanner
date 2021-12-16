@@ -94,7 +94,7 @@ public class GTFSToOtpTransitServiceMapper {
         return builder;
     }
 
-    public void mapStopTripAndRouteDatantoBuilder() {
+    public void mapStopTripAndRouteDataIntoBuilder() {
 
         builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
         builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
@@ -120,7 +120,7 @@ public class GTFSToOtpTransitServiceMapper {
     }
 
     /**
-     * Note! Trip-pattens must be added BEFORE mapping transfers
+     * Note! Trip-pattenrs must be added BEFORE mapping transfers
      */
     private void mapAndAddTransfersToBuilder() {
         TransferMapper transferMapper = new TransferMapper(
