@@ -1,10 +1,8 @@
 # Data Overlay
-
 Use grid data in NetCDF format to populate the graph. Also provides custom route endpoint parameters for the data "penalty" and "threshold". This allows route planning to be based on the custom data calculated penalties. Data examples: air qualuty, environmental, and other data types that are tied to certain geographical locations. 
 
 
 ## Contact Info
-
 Developed and maintained by <strong>Metatavu OY</strong>, Finland.
 
 Developers:
