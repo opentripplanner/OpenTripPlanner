@@ -135,10 +135,12 @@ public class SpeedTest {
         }
         catch (OtpAppException ae) {
             System.err.println(ae.getMessage());
+            System.exit(1);
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
             e.printStackTrace(System.err);
+            System.exit(1);
         }
     }
 
