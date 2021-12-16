@@ -52,6 +52,17 @@ public class LegacyGraphQLBikeParkImpl implements LegacyGraphQLDataFetchers.Lega
         return environment -> getSource(environment).getY();
     }
 
+    @Override
+    public DataFetcher<Iterable<String>> tags() {
+        return environment -> getSource(environment).getTags();
+    }
+
+    // TODO
+    @Override
+    public DataFetcher<Iterable<Object>> openingHours() {
+        return environment -> null;
+    }
+
     private VehicleParking getSource(DataFetchingEnvironment environment) {
         return environment.getSource();
     }
