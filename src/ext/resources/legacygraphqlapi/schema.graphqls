@@ -2037,10 +2037,8 @@ type QueryType {
 
         """
         Use the cursor to get the next or previous page of results.
-        If arriveBy=false the next page is a set of itineraries departing AFTER the last itinerary
-        in this result and the previous page is a set of itineraries departing BEFORE the first itinerary.
-        If arriveBy=true the next page is a set of itineraries departing BEFORE the first itinerary
-        in this result and the previous page is a set of itineraries departing AFTER the last itinerary.
+        The next page is a set of itineraries departing after the last itinerary in this result and
+        the previous page is a set of itineraries departing before the first itinerary.
         This is only usable when public transportation mode(s) are included in the query.
         """
         pageCursor: String
