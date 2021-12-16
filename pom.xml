@@ -134,6 +134,9 @@
                 <configuration>
                     <!-- Target Java versions -->
                     <release>11</release>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -238,6 +241,8 @@
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
+                    <excludedGroups>${test.excluded.groups}</excludedGroups>
+                    <groups>${test.included.groups}</groups>
                 </configuration>
             </plugin>
             <plugin>
@@ -592,6 +597,12 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+            <version>${jackson.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!--
           Google library imports
@@ -722,6 +733,27 @@
     </dependencies>
 
     <profiles>
+        <!-- We set up profiles so that by default only the unit tests (not smoke tests) are executed
+             when running `mvn test`
+             -->
+        <profile>
+            <id>unit-tests</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <test.included.groups>*</test.included.groups>
+                <test.excluded.groups>org.opentripplanner.smoketest.SmokeTest</test.excluded.groups>
+            </properties>
+        </profile>
+        <!-- If you want the smoke tests use `mvn test -P smoke-tests` -->
+        <profile>
+            <id>smoke-tests</id>
+            <properties>
+                <test.included.groups>org.opentripplanner.smoketest.SmokeTest</test.included.groups>
+                <test.excluded.groups>*</test.excluded.groups>
+            </properties>
+        </profile>
         <profile>
             <id>clean-test-snapshots</id>
             <build>

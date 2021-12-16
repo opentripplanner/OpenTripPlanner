@@ -1,0 +1,51 @@
+name: Smoke Tests
+
+on:
+  pull_request:
+    branches:
+      - ibi-dev
+      - ibi-dev-2.x
+jobs:
+  smoke-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      MAVEN_OPTS: -Xmx2g
+    steps:
+
+      - uses: actions/checkout@v2.3.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Cache OSM files
+        uses: actions/cache@v2
+        with:
+          path: smoke-tests/atlanta/*.pbf
+          key: osm
+
+      - name: Build jar file
+        run: mvn clean package -Dmaven.test.skip
+
+      - name: Build Atlanta graph and start OTP in background
+        run: |
+          cd smoke-tests
+          make build-atlanta
+          make run-atlanta &
+          # OTP needs a little while to start up so we sleep
+          sleep 10
+
+      - name: Run smoke tests
+        run: mvn test -P smoke-tests
