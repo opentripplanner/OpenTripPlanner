@@ -1491,18 +1491,20 @@ type Plan {
 
     """
     Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
-    and keep the original request as is. This will enable you to search for itineraries in the next
-    time-window.
+    to the pageCursor query parameter and keep the original request otherwise as is.
+    This will enable you to search for itineraries in the next time-window.
     The cursor based paging only support stepping to the next page, as it does not support jumping.
+    This is only usable when public transportation mode(s) are included in the query.
     """
     nextPageCursor: String
 
     """
     Use the cursor to go to the previous "page" of itineraries. Copy the cursor from the last
-    response and keep the original request as is. This will enable you to search for itineraries in
-    the previous time-window.
+    response to the pageCursor query parameter and keep the original request otherwise as is.
+    This will enable you to search for itineraries in the previous time-window.
     The cursor based paging only support stepping to the previous page, as it does not support
     jumping.
+    This is only usable when public transportation mode(s) are included in the query.
     """
     previousPageCursor: String
 
@@ -2018,12 +2020,12 @@ type QueryType {
         searchWindow: Long,
 
         """
-        Use the cursor to get the next page of results. Use this cursor for the pageCursor parameter
-        in the trip query in order to get the next page.
+        Use the cursor to get the next or previous page of results.
         If arriveBy=false the next page is a set of itineraries departing AFTER the last itinerary
-        in this result.
+        in this result and the previous page is a set of itineraries departing BEFORE the first itinerary.
         If arriveBy=true the next page is a set of itineraries departing BEFORE the first itinerary
-        in this result.
+        in this result and the previous page is a set of itineraries departing AFTER the last itinerary.
+        This is only usable when public transportation mode(s) are included in the query.
         """
         pageCursor: String
 

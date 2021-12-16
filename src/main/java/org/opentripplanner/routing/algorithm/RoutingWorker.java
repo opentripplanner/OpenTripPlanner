@@ -62,9 +62,9 @@ public class RoutingWorker {
         LOG.debug("Request org. time : " + request.getDateTimeOriginalSearch());
         LOG.debug("Request page time : " + request.getDateTimeCurrentPage());
 
-        // Adjust the 'dateTime' if "goto next page"(the page cursor is set)
-        // The date-time is used for many thing like finding the days to search,
-        // but the transit search is using the cursor[if exist], not the datetime.
+        // Adjust the 'dateTime' if the page cursor is set to "goto next page".
+        // The date-time is used for many things, for example finding the days to search,
+        // but the transit search is using the cursor[if exist], not the date-time.
         if(request.pageCursor != null) {
             Instant dateTimeCurrentPage = request.getDateTimeCurrentPage();
             request.setDateTime(dateTimeCurrentPage);

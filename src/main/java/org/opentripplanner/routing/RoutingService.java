@@ -51,22 +51,15 @@ public class RoutingService {
 
     // TODO We should probably not have the Router as a parameter here
     public RoutingResponse route(RoutingRequest request, Router router) {
-        RoutingResponse response;
         try {
-            RoutingWorker worker = new RoutingWorker(
-                    router,
-                    request,
-                    graph.getTransitLayer().getTransitDataZoneId()
-            );
-            response = worker.route();
-        } catch (Exception e) {
+            var zoneId = graph.getTransitLayer().getTransitDataZoneId();
+            RoutingWorker worker = new RoutingWorker(router, request, zoneId);
+            return worker.route();
+        } finally {
             if (request != null) {
                 request.cleanup();
             }
-            throw e;
         }
-        request.cleanup();
-        return response;
     }
 
     /**
