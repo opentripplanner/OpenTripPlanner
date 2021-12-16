@@ -110,7 +110,8 @@ public class GeometryAndBlockProcessor {
 
     /**
      * Generate the edges. Assumes that there are already vertices in the graph for the stops.
-     *
+     * <p>
+     * THREAD SAFTY
      * The geometries for the trip patterns are computed in parallel. The collections needed for
      * this are concurrent implementations and therefore threadsafe but the issue store, the graph,
      * the OtpTransitService and others are not.
