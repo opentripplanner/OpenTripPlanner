@@ -267,6 +267,22 @@ type BikePark implements Node & PlaceInterface {
 
     """Latitude of the bike park (WGS 84)"""
     lat: Float
+
+    """
+    Source specific tags of the bike park, which describe the available features.
+    """
+    tags: [String]
+
+    """
+    Opening hours for the selected dates using the local time of the park.
+    Each date can have multiple time spans.
+    """
+    openingHours(
+        """
+        Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
+        """
+        dates: [String!]!
+    ): [LocalTimeSpanDate]
 }
 
 """Vehicle parking represents a location where bicycles or cars can be parked."""
@@ -667,6 +683,22 @@ type CarPark implements Node & PlaceInterface {
 
     """Latitude of the car park (WGS 84)"""
     lat: Float
+
+    """
+    Source specific tags of the car park, which describe the available features.
+    """
+    tags: [String]
+
+    """
+    Opening hours for the selected dates using the local time of the park.
+    Each date can have multiple time spans.
+    """
+    openingHours(
+        """
+        Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
+        """
+        dates: [String!]!
+    ): [LocalTimeSpanDate]
 }
 
 """Cluster is a list of stops grouped by name and proximity"""
@@ -1186,6 +1218,24 @@ type Leg {
     dropOffBookingInfo: BookingInfo
 
     pickupBookingInfo: BookingInfo
+}
+
+"""A span of time."""
+type LocalTimeSpan {
+    """The start of the time timespan as seconds from midnight."""
+    from: Int!
+
+    """The end of the timespan as seconds from midnight."""
+    to: Int!
+}
+
+"""A date using the local timezone of the object that can contain timespans."""
+type LocalTimeSpanDate {
+    """The time spans for this date."""
+    timeSpans: [LocalTimeSpan]
+
+    """The date of this time span. Format: YYYYMMDD."""
+    date: String!
 }
 
 """Identifies whether this stop represents a stop or station."""
