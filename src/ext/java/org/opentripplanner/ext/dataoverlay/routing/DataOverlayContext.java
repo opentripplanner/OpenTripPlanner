@@ -10,6 +10,7 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.api.ParameterType;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,17 +21,17 @@ public class DataOverlayContext {
     private final List<Parameter> parameters = new ArrayList<>();
 
     public DataOverlayContext(
-            DataOverlayConfig config,
+            DataOverlayParameterBindings parameterBindings,
             DataOverlayParameters requestParameters
     ) {
         for (ParameterName paramName : requestParameters.listParameterNames()) {
-            addParameter(paramName, config, requestParameters);
+            addParameter(paramName, parameterBindings, requestParameters);
         }
     }
 
     private void addParameter(
             ParameterName paramName,
-            DataOverlayConfig config,
+            DataOverlayParameterBindings parameterBindings,
             DataOverlayParameters requestParameters
     ) {
         var penalty = requestParameters.get(paramName, PENALTY);
@@ -41,7 +42,7 @@ public class DataOverlayContext {
 
         if(isParameterValueInvalid(threshold, paramName, THRESHOLD)) { return; }
 
-        var binding = config.getParameterBinding(paramName);
+        var binding = parameterBindings.getParameterBinding(paramName);
 
         if(binding.isEmpty()) {
             LOG.warn("Request parameter config not found. Parameter: {}", paramName);

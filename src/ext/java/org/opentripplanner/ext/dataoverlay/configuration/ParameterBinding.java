@@ -17,6 +17,9 @@ import org.opentripplanner.model.base.ToStringBuilder;
  * </pre>
  */
 public class ParameterBinding {
+
+    private static final long serialVersionUID = 1L;
+
     private final ParameterName name;
     private final String variable;
     private final String formula;

@@ -124,10 +124,6 @@ public class RouterConfig implements Serializable {
         return flexConfig.toFlexParameters(request);
     }
 
-    public DataOverlayConfig getDataOverlayConfig() {
-        return dataOverlayConfig;
-    }
-
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
      */

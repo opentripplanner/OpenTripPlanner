@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DataOverlayParameters implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOG = LoggerFactory.getLogger(DataOverlayParameters.class);
 
     private final Map<T2<ParameterName, ParameterType>, Double> values = new HashMap<>();

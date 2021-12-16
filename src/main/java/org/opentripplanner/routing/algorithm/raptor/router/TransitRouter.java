@@ -210,13 +210,6 @@ public class TransitRouter {
         try (RoutingRequest accessRequest = request.getStreetSearchRequest(mode)) {
             accessRequest.setRoutingContext(router.graph);
 
-            if(OTPFeature.DataOverlay.isOn()) {
-                accessRequest.rctx.dataOverlayContext = new DataOverlayContext(
-                        router.routerConfig.getDataOverlayConfig(),
-                        request.dataOverlay
-                );
-            }
-
             if (!isEgress) {
                 accessRequest.allowKeepingRentedVehicleAtDestination = false;
             }

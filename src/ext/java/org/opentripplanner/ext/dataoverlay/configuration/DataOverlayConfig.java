@@ -12,13 +12,16 @@ import org.opentripplanner.model.base.ToStringBuilder;
  * @author Katja Danilova
  */
 public class DataOverlayConfig implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private final String fileName;
     private final String latitudeVariable;
     private final String longitudeVariable;
     private final String timeVariable;
     private final TimeUnit timeFormat;
     private final List<IndexVariable> indexVariables;
-    private final List<ParameterBinding> requestParameters;
+    private final DataOverlayParameterBindings requestParameters;
 
     public DataOverlayConfig(
             String fileName,
@@ -35,7 +38,7 @@ public class DataOverlayConfig implements Serializable {
         this.timeVariable = timeVariable;
         this.timeFormat = timeFormat;
         this.indexVariables = indexVariables;
-        this.requestParameters = requestParameters;
+        this.requestParameters = new DataOverlayParameterBindings(requestParameters);
     }
 
     /**
@@ -97,14 +100,8 @@ public class DataOverlayConfig implements Serializable {
      *
      * @return the request parameters [ ]
      */
-    public List<ParameterBinding> getRequestParameters() {
+    public DataOverlayParameterBindings getParameterBindings() {
         return requestParameters;
-    }
-
-    public Optional<ParameterBinding> getParameterBinding(ParameterName name) {
-        return requestParameters.stream()
-                .filter(it -> it.getName() == name)
-                .findFirst();
     }
 
     @Override
@@ -116,7 +113,7 @@ public class DataOverlayConfig implements Serializable {
                 .addStr("timeVariable", timeVariable)
                 .addEnum("timeFormat", timeFormat)
                 .addCol("indexVariables", indexVariables)
-                .addCol("requestParameters", requestParameters)
+                .addObj("requestParameters", requestParameters)
                 .toString();
     }
 }

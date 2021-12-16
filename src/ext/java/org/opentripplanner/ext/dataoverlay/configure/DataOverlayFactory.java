@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.dataoverlay.configure;
 
 import java.io.File;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.GenericDataFile;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
@@ -12,12 +13,16 @@ public class DataOverlayFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataOverlayFactory.class);
 
+    @Nullable
     public static GraphBuilderModule create(DataOverlayConfig config) {
+        if(config == null) { return null; }
+
         File dataFile = new File(config.getFileName());
         if (dataFile.exists()) {
             return new EdgeUpdaterModule(
                     new GenericDataFile(dataFile, config),
-                    config.getTimeFormat()
+                    config.getTimeFormat(),
+                    config.getParameterBindings()
             );
         }
         else {

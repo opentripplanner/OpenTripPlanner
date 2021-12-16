@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +114,9 @@ public class RoutingContext implements Cloneable {
         this.opt = routingRequest;
         this.graph = graph;
         this.tempEdges = new HashSet<>();
+        this.dataOverlayContext = OTPFeature.DataOverlay.isOnElseNull(() ->
+            new DataOverlayContext(graph.dataOverlayParameterBindings, routingRequest.dataOverlay)
+        );
 
         Set<Vertex> fromVertices;
         Set<Vertex> toVertices;

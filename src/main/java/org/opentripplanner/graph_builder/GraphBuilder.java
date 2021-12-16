@@ -246,11 +246,9 @@ public class GraphBuilder implements Runnable {
         }
 
         if (OTPFeature.DataOverlay.isOn()) {
-            if (config.dataOverlay != null) {
-                GraphBuilderModule module = DataOverlayFactory.create(config.dataOverlay);
-                if(module != null) {
-                    graphBuilder.addModule(module);
-                }
+            var module = DataOverlayFactory.create(config.dataOverlay);
+            if(module != null) {
+                graphBuilder.addModule(module);
             }
         }
 
