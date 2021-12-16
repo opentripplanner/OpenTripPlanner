@@ -6,6 +6,7 @@ Use grid data in NetCDF format to populate the graph. Also provides custom route
 Developed and maintained by <strong>Metatavu OY</strong>, Finland.
 
 Developers:
+
 <strong>Katja Danilova</strong> - katja.danilova@metatavu.fi\
 <strong>Simeon Platonov</strong> - simeon.platonov@metatavu.fi\
 <strong>Daniil Smirnov</strong> - daniil.smirnov@metatavu.fi
