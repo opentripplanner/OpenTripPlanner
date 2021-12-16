@@ -92,11 +92,7 @@ public abstract class RoutingResource {
     /**
      * Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last
      * response and keep the original request as is. This will enable you to search for itineraries
-     * int the next time-window if arriveBy is false and the previous time-window if arrive-by is
-     * true.
-     * <p>
-     * The cursor based paging only support stepping to the next page, it does not support going
-     * back to the previous page or jumping.
+     * in the next or previous time-window.
      * <p>
      * This is an optional parameter.
      */

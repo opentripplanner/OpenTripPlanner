@@ -56,12 +56,6 @@ public class RoutingWorker {
     }
 
     public RoutingResponse route() {
-        LOG.debug("RoutingWorker input");
-        LOG.debug("PageCursor        : " + request.pageCursor);
-        LOG.debug("Request sw        : " + request.searchWindow);
-        LOG.debug("Request org. time : " + request.getDateTimeOriginalSearch());
-        LOG.debug("Request page time : " + request.getDateTimeCurrentPage());
-
         // Adjust the 'dateTime' if the page cursor is set to "goto next page".
         // The date-time is used for many things, for example finding the days to search,
         // but the transit search is using the cursor[if exist], not the date-time.
@@ -102,27 +96,10 @@ public class RoutingWorker {
 
         debugTimingAggregator.finishedRouting();
 
-        Instant filterOnLatestDepartureTime = null;
-
-        // Filter itineraries away that depart after the latest-departure-time for depart after
-        // search. These itineraries are a result of time-shifting the access leg and is needed for
-        // the raptor to prune the results. These itineraries are often not ideal, but if they
-        // pareto optimal for the "next" window, they will appear when a "next" search is performed.
-        if(!request.arriveBy
-            && raptorSearchParamsUsed != null
-            && raptorSearchParamsUsed.isSearchWindowSet()
-            && raptorSearchParamsUsed.isEarliestDepartureTimeSet()
-        ) {
-            int ldt = raptorSearchParamsUsed.earliestDepartureTime()
-                    + raptorSearchParamsUsed.searchWindowInSeconds();
-            filterOnLatestDepartureTime = searchStartTime.plusSeconds(ldt).toInstant();
-        }
-
-
         // Filter itineraries
         ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
             request,
-            filterOnLatestDepartureTime,
+            filterOnLatestDepartureTime(),
             emptyDirectModeHandler.removeWalkAllTheWayResults(),
             reverseFilteringDirection,
             it -> firstRemovedItinerary = it
@@ -149,6 +126,25 @@ public class RoutingWorker {
                 debugTimingAggregator,
                 reverseFilteringDirection
         );
+    }
+
+    /**
+     * Filter itineraries away that depart after the latest-departure-time for depart after
+     * search. These itineraries are a result of time-shifting the access leg and is needed for
+     * the raptor to prune the results. These itineraries are often not ideal, but if they
+     * pareto optimal for the "next" window, they will appear when a "next" search is performed.
+     */
+    private Instant filterOnLatestDepartureTime() {
+        if(!request.arriveBy
+            && raptorSearchParamsUsed != null
+            && raptorSearchParamsUsed.isSearchWindowSet()
+            && raptorSearchParamsUsed.isEarliestDepartureTimeSet()
+        ) {
+            int ldt = raptorSearchParamsUsed.earliestDepartureTime()
+                    + raptorSearchParamsUsed.searchWindowInSeconds();
+            return searchStartTime.plusSeconds(ldt).toInstant();
+        }
+        return null;
     }
 
     private void routeDirectStreet(

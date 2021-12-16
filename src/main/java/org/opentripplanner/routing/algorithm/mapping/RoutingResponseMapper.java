@@ -32,7 +32,7 @@ public class RoutingResponseMapper {
         // Create response
         var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
 
-        var previousPageCursor = PageCursorMapper.mapPreviousPage(
+        var previousPageCursor = PageCursorFactory.getPreviousPageCursor(
                 request.arriveBy,
                 startOfTimeTransit,
                 searchParams,
@@ -41,7 +41,7 @@ public class RoutingResponseMapper {
         );
 
 
-        var nextPageCursor = PageCursorMapper.mapNextPage(
+        var nextPageCursor = PageCursorFactory.getNextPageCursor(
                 request.arriveBy,
                 startOfTimeTransit,
                 searchParams,

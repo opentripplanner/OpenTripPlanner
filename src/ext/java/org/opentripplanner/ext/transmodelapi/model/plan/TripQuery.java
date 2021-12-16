@@ -60,10 +60,7 @@ public class TripQuery {
             .description(
                 "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from "
                 + "the last response and keep the original request as is. This will enable you to "
-                + "search for itineraries in the next time-window if arriveBy is false and the "
-                + "previous time-window if arriveBy is true.\n"
-                + "The cursor based paging only support stepping to the next page, it does not "
-                + "support going to back(previous page) or jumping."
+                + "search for itineraries in the next or previous time-window."
             )
             .type(Scalars.GraphQLString)
             .build()

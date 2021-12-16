@@ -9,10 +9,10 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 
-public class PageCursorMapper {
+public class PageCursorFactory {
 
     @Nullable
-    public static PageCursor mapPreviousPage(
+    public static PageCursor getPreviousPageCursor(
             boolean arriveBy,
             ZonedDateTime startOfTime,
             SearchParams searchParams,
@@ -79,7 +79,7 @@ public class PageCursorMapper {
 
 
     @Nullable
-    public static PageCursor mapNextPage(
+    public static PageCursor getNextPageCursor(
             boolean arriveBy,
             ZonedDateTime startOfTime,
             SearchParams searchParams,

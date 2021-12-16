@@ -7,6 +7,7 @@ import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
@@ -73,12 +74,18 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> previousPageCursor() {
-    return environment -> getSource(environment).getPreviousPageCursor().encode();
+    return environment -> {
+      final PageCursor pageCursor = getSource(environment).getPreviousPageCursor();
+      return pageCursor != null ? pageCursor.encode() : null;
+    };
   }
 
   @Override
   public DataFetcher<String> nextPageCursor() {
-    return environment -> getSource(environment).getNextPageCursor().encode();
+    return environment -> {
+      final PageCursor pageCursor = getSource(environment).getNextPageCursor();
+      return pageCursor != null ? pageCursor.encode() : null;
+    };
   }
 
   @Override

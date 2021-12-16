@@ -9,6 +9,7 @@ import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
 import java.util.stream.Collectors;
@@ -102,7 +103,11 @@ public class TripType {
                     + "The previous page is a set of itineraries departing BEFORE the first itinerary"
                     + " in this result.")
                 .type(Scalars.GraphQLString)
-                .dataFetcher(env -> ((PlanResponse) env.getSource()).previousPageCursor.encode())
+                .dataFetcher(env -> {
+                    final PageCursor pageCursor =
+                            ((PlanResponse) env.getSource()).previousPageCursor;
+                    return pageCursor != null ? pageCursor.encode() : null;
+                })
                 .build()
             )
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -112,7 +117,11 @@ public class TripType {
                     + "The next page is a set of itineraries departing AFTER the last "
                     + "itinerary in this result.")
                 .type(Scalars.GraphQLString)
-                .dataFetcher(env -> ((PlanResponse) env.getSource()).nextPageCursor.encode())
+                .dataFetcher(env -> {
+                    final PageCursor pageCursor =
+                            ((PlanResponse) env.getSource()).nextPageCursor;
+                    return pageCursor != null ? pageCursor.encode() : null;
+                })
                 .build()
             )
         .build();

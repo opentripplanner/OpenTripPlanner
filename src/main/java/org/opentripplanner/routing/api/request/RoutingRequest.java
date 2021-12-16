@@ -194,12 +194,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * Use the cursor to go to the next or previous "page" of trips.
      * You should pass in the original request as is.
      * <p>
-     * If arriveBy is false, then the next page of itineraries will depart AFTER the current results
-     * and the previous page of itineraries will depart BEFORE the current results.
-     * If arriveBy is true, then the next page of itineraries will arrive BEFORE the current results
-      * and the previous page of itineraries will arrive AFTER the current results.
+     * The next page of itineraries will depart after the current results
+     * and the previous page of itineraries will depart before the current results.
      * <p>
-     * The paging do not support timeTableView=false and arriveBy=true, this will result in
+     * The paging does not support timeTableView=false and arriveBy=true, this will result in
      * none pareto-optimal results.
      */
     public PageCursor pageCursor;

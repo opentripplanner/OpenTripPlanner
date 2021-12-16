@@ -19,7 +19,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 
-class PageCursorMapperTest implements PlanTestConstants {
+class PageCursorFactoryTest implements PlanTestConstants {
 
     static final ZoneId zoneId = UTC;
     static final Instant time = Instant.parse("2020-02-02T12:00:00Z");
@@ -43,7 +43,7 @@ class PageCursorMapperTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = PageCursorMapper.mapNextPage(
+        PageCursor pageCursor = PageCursorFactory.getNextPageCursor(
                 false,
                 startOfTime,
                 searchParams,
@@ -65,7 +65,7 @@ class PageCursorMapperTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = PageCursorMapper.mapPreviousPage(
+        PageCursor pageCursor = PageCursorFactory.getPreviousPageCursor(
                 false,
                 startOfTime,
                 searchParams,
@@ -88,7 +88,7 @@ class PageCursorMapperTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
 
-        PageCursor pageCursor = PageCursorMapper.mapNextPage(
+        PageCursor pageCursor = PageCursorFactory.getNextPageCursor(
                 false,
                 startOfTime,
                 searchParams,
@@ -111,7 +111,7 @@ class PageCursorMapperTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
 
-        PageCursor pageCursor = PageCursorMapper.mapPreviousPage(
+        PageCursor pageCursor = PageCursorFactory.getPreviousPageCursor(
                 false,
                 startOfTime,
                 searchParams,
@@ -133,7 +133,7 @@ class PageCursorMapperTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = PageCursorMapper.mapNextPage(
+        PageCursor pageCursor = PageCursorFactory.getNextPageCursor(
                 false,
                 startOfTime,
                 searchParams,
@@ -155,7 +155,7 @@ class PageCursorMapperTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = PageCursorMapper.mapPreviousPage(
+        PageCursor pageCursor = PageCursorFactory.getPreviousPageCursor(
                 false,
                 startOfTime,
                 searchParams,
@@ -178,7 +178,7 @@ class PageCursorMapperTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
 
-        PageCursor pageCursor = PageCursorMapper.mapNextPage(
+        PageCursor pageCursor = PageCursorFactory.getNextPageCursor(
                 false,
                 startOfTime,
                 searchParams,
@@ -201,7 +201,7 @@ class PageCursorMapperTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
 
-        PageCursor pageCursor = PageCursorMapper.mapPreviousPage(
+        PageCursor pageCursor = PageCursorFactory.getPreviousPageCursor(
                 false,
                 startOfTime,
                 searchParams,
@@ -224,7 +224,7 @@ class PageCursorMapperTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = PageCursorMapper.mapNextPage(
+        PageCursor pageCursor = PageCursorFactory.getNextPageCursor(
                 true,
                 startOfTime,
                 searchParams,
@@ -247,7 +247,7 @@ class PageCursorMapperTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = PageCursorMapper.mapPreviousPage(
+        PageCursor pageCursor = PageCursorFactory.getPreviousPageCursor(
                 true,
                 startOfTime,
                 searchParams,
@@ -271,7 +271,7 @@ class PageCursorMapperTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
 
-        PageCursor pageCursor = PageCursorMapper.mapNextPage(
+        PageCursor pageCursor = PageCursorFactory.getNextPageCursor(
                 true,
                 startOfTime,
                 searchParams,
@@ -295,7 +295,7 @@ class PageCursorMapperTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
 
-        PageCursor pageCursor = PageCursorMapper.mapPreviousPage(
+        PageCursor pageCursor = PageCursorFactory.getPreviousPageCursor(
                 true,
                 startOfTime,
                 searchParams,
@@ -318,7 +318,7 @@ class PageCursorMapperTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = PageCursorMapper.mapNextPage(
+        PageCursor pageCursor = PageCursorFactory.getNextPageCursor(
                 true,
                 startOfTime,
                 searchParams,
@@ -341,7 +341,7 @@ class PageCursorMapperTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = PageCursorMapper.mapPreviousPage(
+        PageCursor pageCursor = PageCursorFactory.getPreviousPageCursor(
                 true,
                 startOfTime,
                 searchParams,
@@ -365,7 +365,7 @@ class PageCursorMapperTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
 
-        PageCursor pageCursor = PageCursorMapper.mapNextPage(
+        PageCursor pageCursor = PageCursorFactory.getNextPageCursor(
                 true,
                 startOfTime,
                 searchParams,
@@ -389,7 +389,7 @@ class PageCursorMapperTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
 
-        PageCursor pageCursor = PageCursorMapper.mapPreviousPage(
+        PageCursor pageCursor = PageCursorFactory.getPreviousPageCursor(
                 true,
                 startOfTime,
                 searchParams,

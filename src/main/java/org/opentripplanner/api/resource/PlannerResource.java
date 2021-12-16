@@ -17,6 +17,7 @@ import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -77,8 +78,12 @@ public class PlannerResource extends RoutingResource {
             // Map to API
             TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale, request.showIntermediateStops);
             response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
-            response.setPreviousPageCursor(res.getPreviousPageCursor().encode());
-            response.setNextPageCursor(res.getNextPageCursor().encode());
+            if (res.getPreviousPageCursor() != null) {
+                response.setPreviousPageCursor(res.getPreviousPageCursor().encode());
+            }
+            if (res.getNextPageCursor() != null) {
+                response.setNextPageCursor(res.getNextPageCursor().encode());
+            }
             response.setMetadata(TripSearchMetadataMapper.mapTripSearchMetadata(res.getMetadata()));
             if (!res.getRoutingErrors().isEmpty()) {
                 // The api can only return one error message, so the first one is mapped

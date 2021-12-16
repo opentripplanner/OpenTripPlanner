@@ -75,8 +75,8 @@ public class TripPlannerResponse {
         this.previousPageCursor = pageCursor;
     }
     /**
-     * Use the cursor to get the next page of results. Insert this cursor into the
-     * request and get post it to get the next page.
+     * Use the cursor to get the next page of results. Insert the cursor into the
+     * request and post it to get the next page.
      * <p>
      * The next page is a set of itineraries departing AFTER the last itinerary in this result.
      * <p>
