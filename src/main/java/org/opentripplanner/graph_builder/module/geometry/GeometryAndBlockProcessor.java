@@ -183,7 +183,7 @@ public class GeometryAndBlockProcessor {
     private void interline(Collection<TripPattern> tripPatterns, Graph graph) {
 
         /* Record which Pattern each interlined TripTimes belongs to. */
-        Map<TripTimes, TripPattern> patternForTripTimes = new ConcurrentHashMap<>();
+        Map<TripTimes, TripPattern> patternForTripTimes = new HashMap<>();
 
         /* TripTimes grouped by the block ID and service ID of their trips. Must be a ListMultimap to allow sorting. */
         ListMultimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
