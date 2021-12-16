@@ -22,7 +22,15 @@ Company email: info@metatavu.fi
 
 ## Documentation
 
+We have been working with OTP since version 1 mainly for producing the Air Quality affected routing for the city of Helsinki, Finland. That project required us to modify the original OTP quite a lot so we didn't propose our efforts for the community.
+
+With the OTP2 release we decided to create a dedicated layer on top of OTP2 which not only leaves the initial structure of the Open Trip Planner intact, but also brings some additional features for those, who actually need them. This layer's main feature is populating the graph with a grid data (i.e air quality, temperature, humidity, pressure, wind speed and direction, and e.t.c). For this to work two files are required: the actual data file (i.e in NetCDF format) and a .json settings file which describes the contents of the data file. Please refer to the diagram for more information.
+
 It is a sandbox feature.
+
+Please see the configuration part for setup instructions and examples.
+
+### Configuration 
 
 Enable the feature by including it to the ```otp-config.json```:
 
@@ -31,14 +39,7 @@ Enable the feature by including it to the ```otp-config.json```:
 { "otpFeatures": { "DataOverlay" : true } }
 ```
 
-Please see the configuration part for setup instructions and examples.
-
-### Configuration 
-
-```json
-// otp-config.json
-{ "otpFeatures": { "DataOverlay" : true } }
-```
+TODO - Katja, please provide other instructions here
 
 ```json
 // build-config.json
