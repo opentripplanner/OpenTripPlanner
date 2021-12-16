@@ -66,7 +66,6 @@ public abstract class GtfsTest extends TestCase {
         graph = new Graph();
         router = new Router(graph, RouterConfig.DEFAULT);
 
-        gtfsBundle.setTransfersTxtDefinesStationPaths(true);
         gtfsGraphBuilderImpl.buildGraph(graph, null);
         // Set the agency ID to be used for tests to the first one in the feed.
         agencyId = graph.getAgencies().iterator().next().getId().getId();

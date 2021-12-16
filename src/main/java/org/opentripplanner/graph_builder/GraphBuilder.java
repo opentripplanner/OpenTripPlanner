@@ -134,13 +134,6 @@ public class GraphBuilder implements Runnable {
 
                 GtfsBundle gtfsBundle = new GtfsBundle((CompositeDataSource)gtfsData);
 
-                // TODO OTP2 - In OTP2 we have deleted the transfer edges from the street graph.
-                //           - The new transfer generation do not take this config param into
-                //           - account any more. This needs some investigation and probably
-                //           - a fix, but we are unsure if this is used any more. The Pathways.txt
-                //           - and osm import replaces this functionality.
-                gtfsBundle.setTransfersTxtDefinesStationPaths(config.useTransfersTxt);
-
                 if (config.parentStopLinking) {
                     gtfsBundle.linkStopsToParentStations = true;
                 }
@@ -222,11 +215,10 @@ public class GraphBuilder implements Runnable {
             if (OTPFeature.FlexRouting.isOn()) {
                 graphBuilder.addModule(new FlexLocationsToStreetEdgesMapper());
             }
-            // The stops can be linked to each other once they are already linked to the street network.
-            if ( ! config.useTransfersTxt) {
-                // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds, config.transferRequests));
-            }
+
+            // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
+            graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds, config.transferRequests));
+
             // Analyze routing between stops to generate report
             if (OTPFeature.TransferAnalyzer.isOn()) {
                 graphBuilder.addModule(new DirectTransferAnalyzer(
