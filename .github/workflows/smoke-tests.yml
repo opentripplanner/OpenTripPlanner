@@ -1,6 +1,9 @@
 name: Smoke Tests
 
 on:
+  push:
+    branches:
+      - ibi-dev-2.x
   pull_request:
     branches:
       - ibi-dev
