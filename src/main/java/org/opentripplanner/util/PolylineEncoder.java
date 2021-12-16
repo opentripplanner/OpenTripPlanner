@@ -4,6 +4,8 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -32,13 +34,18 @@ public class PolylineEncoder {
 
     public static EncodedPolylineBean createEncodings(Geometry geometry) {
         if (geometry instanceof LineString) {
-
             LineString string = (LineString) geometry;
             Coordinate[] coordinates = string.getCoordinates();
             return createEncodings(new CoordinateList(coordinates));
         } else if (geometry instanceof MultiLineString) {
             MultiLineString mls = (MultiLineString) geometry;
             return createEncodings(new CoordinateList(mls.getCoordinates()));
+        } else if (geometry instanceof Polygon) {
+            Polygon polygon = (Polygon) geometry;
+            return createEncodings(new CoordinateList(polygon.getCoordinates()));
+        } else if (geometry instanceof Point) {
+            Point point = (Point) geometry;
+            return createEncodings(new CoordinateList(point.getCoordinates()));
         } else {
             throw new IllegalArgumentException(geometry.toString());
         }

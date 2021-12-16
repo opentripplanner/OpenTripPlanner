@@ -2,8 +2,9 @@ package org.opentripplanner.ext.flex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
-import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -16,15 +17,23 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.WrappedCurrency;
+import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.TestUtils;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service
@@ -35,9 +44,9 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class ScheduledDeviatedTripTest extends FlexTest {
 
-    static final String COBB_COUNTY_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
-
     static Graph graph;
+
+    float delta = 0.01f;
 
     @Test
     public void parseCobbCountyAsScheduledDeviatedTrip() {
@@ -50,6 +59,16 @@ public class ScheduledDeviatedTripTest extends FlexTest {
                 flexTrips.stream().map(FlexTrip::getClass).collect(
                         Collectors.toSet())
         );
+
+        var trip = getFlexTrip();
+        System.out.println(trip.getStops().stream().map(s -> s.getId().getId()).collect(Collectors.toList()));
+        var stop = trip.getStops().stream().filter(s -> s.getId().getId().equals("cujv")).findFirst().get();
+        assertEquals(33.85465, stop.getLat(), delta);
+        assertEquals(-84.60039, stop.getLon(), delta);
+
+        var flexZone = trip.getStops().stream().filter(s -> s.getId().getId().equals("zone_3")).findFirst().get();
+        assertEquals(33.825846635310214, flexZone.getLat(), delta);
+        assertEquals(-84.63430143459385, flexZone.getLon(), delta);
     }
 
     @Test
@@ -114,14 +133,108 @@ public class ScheduledDeviatedTripTest extends FlexTest {
         var itinerary = itineraries.iterator().next();
         assertFalse(itinerary.fare.fare.isEmpty());
 
-        assertEquals(new Money(new WrappedCurrency("USD"), 250), itinerary.fare.getFare(FareType.regular));
+        assertEquals(
+                new Money(new WrappedCurrency("USD"), 250),
+                itinerary.fare.getFare(FareType.regular)
+        );
 
         OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
     }
 
+
+    /**
+     * Trips which consist of flex and fixed-schedule stops should work in transit mode.
+     * <p>
+     * The flex stops will show up as intermediate stops (without a departure/arrival time) but you
+     * cannot board or alight.
+     */
+    @Test
+    public void flexTripInTransitMode() {
+        var feedId = graph.getFeedIds().iterator().next();
+
+        var router = new Router(graph, RouterConfig.DEFAULT);
+        router.startup();
+
+        // from zone 3 to zone 2
+        var from = GenericLocation.fromStopId(
+                "Transfer Point for Route 30",
+                feedId,
+                "cujv"
+        );
+        var to = GenericLocation.fromStopId(
+                "Zone 1 - PUBLIX Super Market,Zone 1 Collection Point",
+                feedId,
+                "yz85"
+        );
+
+        var itineraries = getItineraries(from, to, router);
+
+        assertEquals(1, itineraries.size());
+
+        var itin = itineraries.get(0);
+        var leg = itin.legs.get(0);
+
+        assertEquals("cujv", leg.from.stop.getId().getId());
+        assertEquals("yz85", leg.to.stop.getId().getId());
+
+        var intermediateStops = leg.intermediateStops;
+        assertEquals(1, intermediateStops.size());
+        assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
+
+        assertThatPolylinesAreEqual(
+                leg.legGeometry.getPoints(),
+                "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"
+        );
+
+    }
+
+    /**
+     * We add flex trips, that can potentially not have a departure and arrival time, to the trip.
+     * <p>
+     * Normally these trip times are interpolated/repaired during the graph build but for flex this
+     * is exactly what we don't want. Here we check that the interpolation process is skipped.
+     *
+     * @see org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation#interpolateStopTimes(List)
+     */
+    @Test
+    public void shouldNotInterpolateFlexTimes() {
+        var feedId = graph.getFeedIds().iterator().next();
+        var pattern = graph.tripPatternForId.get(new FeedScopedId(feedId, "090z:0:01"));
+
+        assertEquals(3, pattern.getStops().size());
+
+        var tripTimes = pattern.getScheduledTimetable().getTripTimes(0);
+        var arrivalTime = tripTimes.getArrivalTime(1);
+
+        assertEquals(StopTime.MISSING_VALUE, arrivalTime);
+    }
+
+    /**
+     * Checks that trips which have continuous pick up/drop off set are parsed correctly.
+     */
+    @Test
+    public void parseContinuousPickup() {
+        var lincolnGraph = FlexTest.buildFlexGraph(LINCOLN_COUNTY_GBFS);
+        assertNotNull(lincolnGraph);
+    }
+
+    private static List<Itinerary> getItineraries(
+            GenericLocation from,
+            GenericLocation to,
+            Router router
+    ) {
+        RoutingRequest request = new RoutingRequest();
+        request.dateTime = TestUtils.dateInSeconds("America/Atlanta", 2021, 11, 25, 12, 0, 0);
+        request.from = from;
+        request.to = to;
+
+        var result = TransitRouter.route(request, router, new DebugTimingAggregator());
+        return result.getItineraries();
+    }
+
     @BeforeAll
-    static void setup() throws URISyntaxException {
-        graph = FlexTest.buildFlexGraph(COBB_COUNTY_GTFS);
+    static void setup() {
+        graph = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
     }
 
     private static NearbyStop getNearbyStop(FlexTrip trip) {

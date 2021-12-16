@@ -2,7 +2,8 @@
   // Run all test-cases on the given date
   testDate: "2020-01-15",
 
-  accessEgressMaxWalkDistanceMeters: 1000,
+  // OTP Default is 45 minutes (2700 seconds)
+  // maxWalkDurationSeconds: 2700,
 
   // Default is 1.4 m/s = ~ 5.0 km/t
   walkSpeedMeterPrSecond: 1.4,
@@ -16,9 +17,6 @@
 
     // Default is 60
     // iterationDepartureStepInSeconds: 60,
-
-    // Default is 0
-    searchThreadPoolSize: 8,
 
     dynamicSearchWindow: {
       // Default is 0.4

@@ -54,6 +54,8 @@ public class AreaEdgeList implements Serializable {
             geometryFactory.createPoint(newVertex.getCoordinate())
         );
 
+        int added = 0;
+
         for (IntersectionVertex v : visibilityVertices) {
             LineString newGeometry = geometryFactory.createLineString(
                 new Coordinate[] {nearestPoints[0], v.getCoordinate() }
@@ -68,6 +70,15 @@ public class AreaEdgeList implements Serializable {
             // check to see if this splits multiple NamedAreas. This code is rather similar to
             // code in OSMGBI, but the data structures are different
             createSegments(newVertex, v, areas);
+            added++;
+        }
+
+        // TODO: Temporary fix for unconnected area edges. This should go away when moving walkable
+        // area calculation to be done after stop linking
+        if (added == 0) {
+            for (IntersectionVertex v : visibilityVertices) {
+                createSegments(newVertex, v, areas);
+            }
         }
 
         visibilityVertices.add(newVertex);

@@ -174,11 +174,11 @@ public class SiriFuzzyTripMatcher {
         if (trips == null || trips.isEmpty()) {
             //SIRI-data may report other platform, but still on the same Parent-stop
             String feedId = routingService.getFeedIds().iterator().next();
-            Stop stop = routingService.getStopForId(new FeedScopedId(feedId, lastStopPoint));
+            var stop = routingService.getStopForId(new FeedScopedId(feedId, lastStopPoint));
             if (stop != null && stop.isPartOfStation()) {
                 // TODO OTP2 resolve stop-station split
-                Collection<Stop> allQuays = stop.getParentStation().getChildStops();
-                for (Stop quay : allQuays) {
+                var allQuays = stop.getParentStation().getChildStops();
+                for (var quay : allQuays) {
                     Set<Trip> tripSet = start_stop_tripCache.get(createStartStopKey(quay.getId().getId(), secondsSinceMidnight));
                     if (tripSet != null) {
                         if (trips == null) {
@@ -292,7 +292,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     public Set<Route> getRoutesForStop(FeedScopedId siriStopId) {
-        Stop stop = routingService.getStopForId(siriStopId);
+        var stop = routingService.getStopForId(siriStopId);
         return routingService.getRoutesForStop(stop);
     }
 
@@ -306,7 +306,7 @@ public class SiriFuzzyTripMatcher {
 
         //First, assume same agency
 
-        Stop firstStop = routingService.getAllStops().stream().findFirst().get();
+        var firstStop = routingService.getAllStops().stream().findFirst().get();
         FeedScopedId id = new FeedScopedId(firstStop.getId().getFeedId(), siriStopId);
         if (routingService.getStopForId(id) != null) {
             return id;
@@ -316,8 +316,8 @@ public class SiriFuzzyTripMatcher {
         }
 
         //Not same agency - loop through all stops/Stations
-        Collection<Stop> stops = routingService.getAllStops();
-        for (Stop stop : stops) {
+        var stops = routingService.getAllStops();
+        for (var stop : stops) {
             if (stop.getId().getId().equals(siriStopId)) {
                 return stop.getId();
             }
