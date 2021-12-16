@@ -111,7 +111,7 @@ public class TripType {
                 .build()
             )
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("pageCursor")
+                .name("nextPageCursor")
                 .description("Use the cursor to get the next page of results. Use this cursor for "
                     + "the pageCursor parameter in the trip query in order to get the next page.\n"
                     + "The next page is a set of itineraries departing AFTER the last "
