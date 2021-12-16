@@ -1,11 +1,15 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.map.TLongObjectMap;
+import org.apache.commons.lang3.ArrayUtils;
+import org.locationtech.jts.algorithm.Orientation;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 
@@ -39,6 +43,12 @@ public class Ring {
             vertices.add(point);
         }
         geometry = vertices.toArray(new Coordinate[0]);
+        // Make sure rings are always clockwise, in order to be able to calculate if it is concave/convex
+        if (Orientation.isCCW(new CoordinateArrayListSequence(new ArrayList<>(List.of(geometry))))) {
+            nodes = new ArrayList<>(nodes);
+            Collections.reverse(nodes);
+            ArrayUtils.reverse(geometry);
+        }
         jtsPolygon = calculateJtsPolygon();
     }
 
@@ -52,6 +62,11 @@ public class Ring {
             vertices.add(point);
             return true;
         });
+        // Make sure rings are always clockwise, in order to be able to calculate if it is concave/convex
+        if (Orientation.isCCW(new CoordinateArrayListSequence(vertices))) {
+            Collections.reverse(nodes);
+            Collections.reverse(vertices);
+        }
         geometry = vertices.toArray(new Coordinate[0]);
         jtsPolygon = calculateJtsPolygon();
     }
@@ -63,6 +78,18 @@ public class Ring {
     public void addHole(Ring hole) {
         holes.add(hole);
         jtsPolygon = calculateJtsPolygon();
+    }
+
+    /**
+     * Checks whether the ith node in the ring is convex (has an angle of over 180 degrees).
+     */
+    boolean isNodeConvex(int i) {
+        int n = nodes.size() - 1;
+        OSMNode cur = nodes.get(i);
+        OSMNode prev = nodes.get((i + n - 1) % n);
+        OSMNode next = nodes.get((i + 1) % n);
+        return (cur.lon - prev.lon) * (next.lat - cur.lat) -
+                (cur.lat - prev.lat) * (next.lon - cur.lon) > 0;
     }
 
     private Polygon calculateJtsPolygon() {

@@ -690,6 +690,8 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<String> direction();
 
+        public DataFetcher<Object> geometries();
+
         public DataFetcher<String> gtfsId();
 
         public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -733,6 +735,13 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Object> wheelchairBoarding();
 
         public DataFetcher<String> zoneId();
+    }
+
+    public interface LegacyGraphQLStopGeometries {
+
+        public DataFetcher<org.locationtech.jts.geom.Geometry> geoJson();
+
+        public DataFetcher<Iterable<EncodedPolylineBean>> googleEncoded();
     }
 
     /**

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.TimeZone;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
@@ -157,8 +157,8 @@ public class RaptorPathToItineraryMapper {
             boolean firstLeg
     ) {
 
-        Stop boardStop = transitLayer.getStopByIndex(pathLeg.fromStop());
-        Stop alightStop = transitLayer.getStopByIndex(pathLeg.toStop());
+        var boardStop = transitLayer.getStopByIndex(pathLeg.fromStop());
+        var alightStop = transitLayer.getStopByIndex(pathLeg.toStop());
         TripSchedule tripSchedule = pathLeg.trip();
         TripTimes tripTimes = tripSchedule.getOriginalTripTimes();
 
@@ -228,8 +228,8 @@ public class RaptorPathToItineraryMapper {
     }
 
     private List<Leg> mapTransferLeg(TransferPathLeg<TripSchedule> pathLeg, TraverseMode transferMode) {
-        Stop transferFromStop = transitLayer.getStopByIndex(pathLeg.fromStop());
-        Stop transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
+        var transferFromStop = transitLayer.getStopByIndex(pathLeg.fromStop());
+        var transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = ((TransferWithDuration) pathLeg.transfer()).transfer();
 
         Place from = Place.forStop(transferFromStop, null, null);
@@ -330,7 +330,7 @@ public class RaptorPathToItineraryMapper {
     /**
      * Maps stops for transit legs.
      */
-    private Place mapStopToPlace(Stop stop, Integer stopIndex, TripTimes tripTimes) {
+    private Place mapStopToPlace(StopLocation stop, Integer stopIndex, TripTimes tripTimes) {
         return Place.forStop(stop, stopIndex, tripTimes.getOriginalGtfsStopSequence(stopIndex));
     }
 
@@ -347,7 +347,7 @@ public class RaptorPathToItineraryMapper {
         TripSchedule tripSchedule = pathLeg.trip();
 
         for (int i = boardStopIndexInPattern + 1; i < alightStopIndexInPattern; i++) {
-            Stop stop = tripPattern.getStopPattern().getStops()[i];
+            var stop = tripPattern.getStopPattern().getStops()[i];
 
             Place place = mapStopToPlace(stop, i, tripSchedule.getOriginalTripTimes());
             StopArrival visit = new StopArrival(

@@ -74,8 +74,8 @@ public class EntranceMapperTest  {
     assertEquals("A:E1", result.getId().toString());
     assertEquals(CODE, result.getCode());
     assertEquals(DESC, result.getDescription());
-    assertEquals(LAT, result.getLat(), 0.0001d);
-    assertEquals(LON, result.getLon(), 0.0001d);
+    assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
+    assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName());
     assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
   }
@@ -106,7 +106,7 @@ public class EntranceMapperTest  {
     org.opentripplanner.model.Entrance result = subject.map(input);
 
     // Exception expected because the entrence and the parent do not have a coordinate
-    result.getLat();
+    result.getCoordinate().latitude();
   }
 
   /** Mapping the same object twice, should return the the same instance. */

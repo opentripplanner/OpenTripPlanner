@@ -20,13 +20,9 @@ import org.opentripplanner.routing.api.request.StreetMode;
 public class TransitSnapshotTest
         extends SnapshotTestBase {
 
-    static GenericLocation ptc = new GenericLocation("Rose Quarter Transit Center",
-            new FeedScopedId("prt", "79-tc"), null, null
-    );
+    static GenericLocation ptc = GenericLocation.fromStopId("Rose Quarter Transit Center", "prt", "79-tc");
 
-    static GenericLocation ps = new GenericLocation("NE 12th & Couch",
-            new FeedScopedId("prt", "6577"), null, null
-    );
+    static GenericLocation ps = GenericLocation.fromStopId("NE 12th & Couch", "prt", "6577");
 
     static GenericLocation p0 = new GenericLocation("SE Stark    St. & SE 17th Ave. (P0)", null,
             45.519320, -122.648567

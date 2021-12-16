@@ -22,7 +22,7 @@ class TransfersMapper {
         List<List<Transfer>> transferByStopIndex = new ArrayList<>();
 
         for (int i = 0; i < stopIndex.stopsByIndex.size(); ++i) {
-            Stop stop = stopIndex.stopsByIndex.get(i);
+            var stop = stopIndex.stopsByIndex.get(i);
             ArrayList<Transfer> list = new ArrayList<>();
             transferByStopIndex.add(list);
 

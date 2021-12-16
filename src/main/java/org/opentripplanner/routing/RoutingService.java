@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import lombok.experimental.Delegate;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -86,7 +87,7 @@ public class RoutingService {
      * @param includeCancelledTrips If true, cancelled trips will also be included in result.
      */
     public List<StopTimesInPattern> stopTimesForStop(
-            Stop stop, long startTime, int timeRange, int numberOfDepartures, ArrivalDeparture arrivalDeparture, boolean includeCancelledTrips
+            StopLocation stop, long startTime, int timeRange, int numberOfDepartures, ArrivalDeparture arrivalDeparture, boolean includeCancelledTrips
     ) {
         return StopTimesHelper.stopTimesForStop(
                 this,
@@ -108,7 +109,7 @@ public class RoutingService {
      * @param serviceDate Return all departures for the specified date
      */
     public List<StopTimesInPattern> getStopTimesForStop(
-            Stop stop, ServiceDate serviceDate, ArrivalDeparture arrivalDeparture
+            StopLocation stop, ServiceDate serviceDate, ArrivalDeparture arrivalDeparture
     ) {
         return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, arrivalDeparture);
     }
@@ -130,7 +131,7 @@ public class RoutingService {
      * @param arrivalDeparture   Filter by arrivals, departures, or both
      */
     public List<TripTimeOnDate> stopTimesForPatternAtStop(
-            Stop stop, TripPattern pattern, long startTime, int timeRange, int numberOfDepartures, ArrivalDeparture arrivalDeparture
+            StopLocation stop, TripPattern pattern, long startTime, int timeRange, int numberOfDepartures, ArrivalDeparture arrivalDeparture
     ) {
         return StopTimesHelper.stopTimesForPatternAtStop(
                 this,
@@ -148,7 +149,7 @@ public class RoutingService {
      * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
      * added by realtime updates are added to the collection.
      */
-    public Collection<TripPattern> getPatternsForStop(Stop stop, boolean includeRealtimeUpdates) {
+    public Collection<TripPattern> getPatternsForStop(StopLocation stop, boolean includeRealtimeUpdates) {
         return graph.index.getPatternsForStop(stop,
                 includeRealtimeUpdates ? lazyGetTimeTableSnapShot() : null
         );

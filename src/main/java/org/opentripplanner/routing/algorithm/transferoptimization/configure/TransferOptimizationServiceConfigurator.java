@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
 import java.util.function.IntFunction;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
@@ -23,7 +23,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * Responsible for assembly of the prioritized-transfer services.
  */
 public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedule> {
-  private final IntFunction<Stop> stopLookup;
+  private final IntFunction<StopLocation> stopLookup;
   private final RaptorStopNameResolver stopNameResolver;
   private final TransferService transferService;
   private final RaptorTransitDataProvider<T> transitDataProvider;
@@ -33,7 +33,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
 
 
   private TransferOptimizationServiceConfigurator(
-      IntFunction<Stop> stopLookup,
+      IntFunction<StopLocation> stopLookup,
       RaptorStopNameResolver stopNameResolver,
       TransferService transferService,
       RaptorTransitDataProvider<T> transitDataProvider,
@@ -54,7 +54,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
    * Scope: Request
    */
   public static <T extends RaptorTripSchedule> OptimizeTransferService<T> createOptimizeTransferService(
-      IntFunction<Stop> stopLookup,
+      IntFunction<StopLocation> stopLookup,
       RaptorStopNameResolver stopNameResolver,
       TransferService transferService,
       RaptorTransitDataProvider<T> transitDataProvider,

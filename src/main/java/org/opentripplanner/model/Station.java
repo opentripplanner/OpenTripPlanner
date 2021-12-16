@@ -1,11 +1,16 @@
 package org.opentripplanner.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import static org.opentripplanner.common.geometry.GeometryUtils.getGeometryFactory;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
+import org.locationtech.jts.algorithm.ConvexHull;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
@@ -27,6 +32,8 @@ public class Station extends TransitEntity implements StopCollection {
 
   private final StopTransferPriority priority;
 
+  private GeometryCollection geometry;
+
   /**
    * URL to a web page containing information about this particular station
    */
@@ -36,7 +43,7 @@ public class Station extends TransitEntity implements StopCollection {
 
   // We serialize this class to json only for snapshot tests, and this creates cyclical structures
   @JsonBackReference
-  private final Set<Stop> childStops = new HashSet<>();
+  private final Set<StopLocation> childStops = new HashSet<>();
 
   public Station(
       FeedScopedId id,
@@ -56,10 +63,12 @@ public class Station extends TransitEntity implements StopCollection {
     this.url = url;
     this.timezone = timezone;
     this.priority = priority == null ? DEFAULT_PRIORITY : priority;
+    this.geometry = computeGeometry(coordinate, childStops);
   }
 
   public void addChildStop(Stop stop) {
     this.childStops.add(stop);
+    this.geometry = computeGeometry(coordinate, childStops);
   }
 
   @Override
@@ -106,7 +115,7 @@ public class Station extends TransitEntity implements StopCollection {
     return timezone;
   }
 
-  public Collection<Stop> getChildStops() {
+  public Collection<StopLocation> getChildStops() {
     return childStops;
   }
 
@@ -116,5 +125,24 @@ public class Station extends TransitEntity implements StopCollection {
 
   public double getLon() {
     return coordinate.longitude();
+  }
+
+  /**
+   * A geometry collection that contains the center point and the convex hull of all the
+   * child stops.
+   */
+  public GeometryCollection getGeometry() {
+    return geometry;
+  }
+
+  private static GeometryCollection computeGeometry(WgsCoordinate coordinate, Set<StopLocation> childStops) {
+    var stationPoint =  getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
+    var childGeometries = childStops.stream().map(StopLocation::getGeometry).collect(Collectors.toList());
+    childGeometries.add(stationPoint);
+
+    var geometryCollection = getGeometryFactory().createGeometryCollection(childGeometries.toArray(new Geometry[]{}));
+    var convexHull = new ConvexHull(geometryCollection).getConvexHull();
+
+    return getGeometryFactory().createGeometryCollection(new Geometry[]{ stationPoint, convexHull });
   }
 }

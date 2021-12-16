@@ -77,8 +77,8 @@ public class SpeedTestRequest {
         return config.walkSpeedMeterPrSecond;
     }
 
-    public double getAccessEgressMaxWalkDistanceMeters() {
-        return config.maxWalkDistanceMeters;
+    public double getAccessEgressMaxWalkDurationSeconds() {
+        return config.maxWalkDurationSeconds;
     }
 
 

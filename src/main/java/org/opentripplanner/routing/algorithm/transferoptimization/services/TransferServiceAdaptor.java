@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.function.IntFunction;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferService;
@@ -20,12 +21,12 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class TransferServiceAdaptor<T extends RaptorTripSchedule> {
-    private final IntFunction<Stop> stopLookup;
+    private final IntFunction<StopLocation> stopLookup;
     private final TransferService transferService;
 
 
     protected TransferServiceAdaptor(
-            IntFunction<Stop> stopLookup,
+            IntFunction<StopLocation> stopLookup,
             TransferService transferService
     ) {
         this.stopLookup = stopLookup;
@@ -33,7 +34,7 @@ public class TransferServiceAdaptor<T extends RaptorTripSchedule> {
     }
 
     public static <T extends RaptorTripSchedule> TransferServiceAdaptor<T> create(
-            IntFunction<Stop> stopLookup,
+            IntFunction<StopLocation> stopLookup,
             TransferService transferService
     ) {
         return new TransferServiceAdaptor<>(stopLookup, transferService);
@@ -61,7 +62,7 @@ public class TransferServiceAdaptor<T extends RaptorTripSchedule> {
         );
     }
 
-    private Stop stop(int index) {
+    private StopLocation stop(int index) {
         return stopLookup.apply(index);
     }
 

@@ -169,7 +169,6 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
             getSource(environment).getRoute().getAgency().getId()
         );
 
-        Stop stop = timetable.getPattern().getStop(0);
         return new TripTimeOnDate(triptimes, 0, tripPattern, serviceDate
         );
       } catch (ParseException e) {
@@ -200,7 +199,6 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
               getSource(environment).getRoute().getAgency().getId()
           );
 
-        Stop stop = timetable.getPattern().getStop(triptimes.getNumStops() - 1);
         return new TripTimeOnDate(triptimes, triptimes.getNumStops() - 1, tripPattern, serviceDate
         );
       } catch (ParseException e) {

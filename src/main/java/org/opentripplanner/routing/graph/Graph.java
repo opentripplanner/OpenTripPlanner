@@ -915,7 +915,7 @@ public class Graph implements Serializable {
         return transitAlertService;
     }
 
-    private Collection<Stop> getStopsForId(FeedScopedId id) {
+    private Collection<StopLocation> getStopsForId(FeedScopedId id) {
 
         // GroupOfStations
         GroupOfStations groupOfStations = groupOfStationsById.get(id);
@@ -935,7 +935,7 @@ public class Graph implements Serializable {
             return station.getChildStops();
         }
         // Single stop
-        Stop stop = index.getStopForId(id);
+        var stop = index.getStopForId(id);
         if (stop != null) {
             return Collections.singleton(stop);
         }
@@ -949,7 +949,7 @@ public class Graph implements Serializable {
      * @return The associated TransitStopVertex or all underlying TransitStopVertices
      */
     public Set<Vertex> getStopVerticesById(FeedScopedId id) {
-        Collection<Stop> stops = getStopsForId(id);
+        var stops = getStopsForId(id);
 
         if (stops == null) {
             return null;
@@ -995,7 +995,7 @@ public class Graph implements Serializable {
     }
 
     /** Get all stops within a given bounding box. */
-    public Collection<Stop> getStopsByBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
+    public Collection<StopLocation> getStopsByBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
         Envelope envelope = new Envelope(
                 new Coordinate(minLon, minLat),
                 new Coordinate(maxLon, maxLat)

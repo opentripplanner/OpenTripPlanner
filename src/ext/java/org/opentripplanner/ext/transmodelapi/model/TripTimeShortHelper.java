@@ -135,9 +135,9 @@ public class TripTimeShortHelper {
         if (stop == null) return false;
         boolean foundMatch = stop.getId().equals(candidate);
         if (!foundMatch && stop instanceof Stop) {
-            if (((Stop) stop).isPartOfStation()) {
-                Station parentStation = ((Stop) stop).getParentStation();
-                for (Stop childStop : parentStation.getChildStops()) {
+            if (stop.isPartOfStation()) {
+                Station parentStation = stop.getParentStation();
+                for (var childStop : parentStation.getChildStops()) {
                     if (childStop.getId().equals(candidate)) {
                         return true;
                     }
