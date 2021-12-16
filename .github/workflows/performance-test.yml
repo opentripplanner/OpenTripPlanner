@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            graph/osm.pbf
+            graph/*.osm.pbf
             graph/*.zip
           key: graph
 
@@ -49,8 +49,8 @@ jobs:
       - name: Download OSM & Netex data
         run: |
           mkdir -p graph
-          wget https://download.geofabrik.de/europe/norway-210101.osm.pbf -O graph/osm.pbf --no-clobber || true
-          wget https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip -O graph/rb_norway-aggregated-netex.zip --no-clobber || true
+          wget https://download.geofabrik.de/europe/norway-210101.osm.pbf -O graph/norway.osm.pbf --no-clobber -q --show-progress --progress=bar:force || true
+          wget https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip -O graph/rb_norway-aggregated-netex.zip --no-clobber -q --show-progress --progress=bar:force || true
 
       - name: Build Norway graph
         run: |

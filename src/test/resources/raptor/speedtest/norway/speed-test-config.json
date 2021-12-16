@@ -10,7 +10,7 @@
 
   // 1.4 m/s = ~ 5.0 km/t
   // walkSpeedMeterPrSecond: 1.4,
-  
+
   "tuningParameters": {
     // maxNumberOfTransfers: 12,
 
