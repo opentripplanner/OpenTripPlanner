@@ -53,6 +53,8 @@ import org.slf4j.LoggerFactory;
  * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
  * geometries. It also does some other postprocessing involving fares and interlined blocks.
  *
+ * <p>
+ * THREAD SAFTY
  * The computation runs in parallel so be careful about threadsafety when modifying the logic here.
  */
 public class GeometryAndBlockProcessor {
