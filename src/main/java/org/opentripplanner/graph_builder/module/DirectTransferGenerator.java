@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,14 +39,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     final double radiusByDurationInSeconds;
 
     private final List<RoutingRequest> transferRequests;
-
-    public List<String> provides() {
-        return List.of("linking");
-    }
-
-    public List<String> getPrerequisites() {
-        return List.of("street to transit");
-    }
 
     public DirectTransferGenerator (double radiusByDurationInSeconds, List<RoutingRequest> transferRequests) {
         this.radiusByDurationInSeconds = radiusByDurationInSeconds;

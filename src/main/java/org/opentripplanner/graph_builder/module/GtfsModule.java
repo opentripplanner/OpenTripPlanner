@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Sets;
 import java.awt.Color;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,8 +40,8 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -73,16 +72,6 @@ public class GtfsModule implements GraphBuilderModule {
     public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
         this.gtfsBundles = bundles;
         this.transitPeriodLimit = transitPeriodLimit;
-    }
-
-    public List<String> provides() {
-        List<String> result = new ArrayList<String>();
-        result.add("transit");
-        return result;
-    }
-
-    public List<String> getPrerequisites() {
-        return Collections.emptyList();
     }
 
     public void setFareServiceFactory(FareServiceFactory factory) {

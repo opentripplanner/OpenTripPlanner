@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -40,16 +39,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private Boolean addExtraEdgesToAreas = true;
-
-  public List<String> provides() {
-    return Arrays.asList("street to transit", "linking");
-  }
-
-  public List<String> getPrerequisites() {
-    return List.of("streets"); // don't include transit, because we also link P+Rs and bike rental stations,
-    // which you could have without transit. However, if you have transit, this module should be run after it
-    // is loaded.
-  }
 
   @Override
   public void buildGraph(

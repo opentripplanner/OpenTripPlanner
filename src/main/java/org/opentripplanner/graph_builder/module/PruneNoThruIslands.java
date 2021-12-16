@@ -1,14 +1,20 @@
 package org.opentripplanner.graph_builder.module;
 
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Polygon;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.issues.GraphIsland;
 import org.opentripplanner.graph_builder.issues.IsolatedStop;
 import org.opentripplanner.graph_builder.issues.PrunedIslandStop;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -16,10 +22,10 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitEntityLink;
+import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
-import org.opentripplanner.routing.edgetype.StreetTransitEntityLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -27,19 +33,6 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
 
 /**
  * this module is part of the  {@link org.opentripplanner.graph_builder.services.GraphBuilderModule}
@@ -52,10 +45,8 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(PruneNoThruIslands.class);
 
-    private static int islandCounter = 0;
-
     /**
-     * this field indicate the maximum size for island without stops
+     * this field indicates the maximum size for island without stops
      * island under this size will be pruned.
      */
     private int pruningThresholdIslandWithoutStops;
@@ -70,19 +61,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
     public PruneNoThruIslands(StreetLinkerModule streetLinkerModule) {
         this.streetLinkerModule = streetLinkerModule;
-    }
-
-    public List<String> provides() {
-        return Collections.emptyList();
-    }
-
-    public List<String> getPrerequisites() {
-        /**this module can run after the street module only but if
-         * the street linker did not run then it couldn't identifies island with stops.
-         * so if the need is to distinguish between island with stops or without stops
-         * as explained before this module should run after the streets and the linker modules.
-         */
-        return Arrays.asList("streets");
     }
 
     @Override
