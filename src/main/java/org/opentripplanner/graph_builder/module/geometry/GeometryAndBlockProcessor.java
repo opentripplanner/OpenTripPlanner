@@ -645,7 +645,9 @@ public class GeometryAndBlockProcessor {
         geometry = geometryFactory.createLineString(sequence);
         geometriesByShapeId.put(shapeId, geometry);
 
-        if(distances != null) {
+        // If we don't have distances here, we can't calculate them ourselves because we can't
+        // assume the units will match
+        if(hasAllDistances) {
             distancesByShapeId.put(shapeId, distances);
         }
 
