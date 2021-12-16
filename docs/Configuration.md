@@ -255,7 +255,6 @@ config key | description | value type | value default | notes
 `transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
 `transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | date or period | &minus;P1Y | _2020&#8209;01&#8209;01, &minus;P1M3D, &minus;P3W_
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
-`useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `maxAreaNodes` | Visibility calculations for an area will not be done if there are more nodes than this limit | integer | 500 |
 

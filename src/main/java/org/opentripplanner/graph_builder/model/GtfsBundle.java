@@ -29,9 +29,7 @@ public class GtfsBundle {
 
     private CsvInputSource csvInputSource;
 
-    private boolean transfersTxtDefinesStationPaths = false;
-
-    /** 
+    /**
      * Create direct transfers between the constituent stops of each parent station.
      * This is different from "linking stops to parent stations" below.
      */
@@ -111,24 +109,6 @@ public class GtfsBundle {
 
     public void setFeedId(GtfsFeedId feedId) {
         this.feedId = feedId;
-    }
-
-    /**
-     * Transfers.txt usually specifies where the transit operator prefers people to transfer, 
-     * due to schedule structure and other factors.
-     * 
-     * However, in systems like the NYC subway system, transfers.txt can partially substitute 
-     * for the missing pathways.txt file.  In this case, transfer edges will be created between
-     * stops where transfers are defined.
-     * 
-     * @return
-     */
-    public boolean doesTransfersTxtDefineStationPaths() {
-        return transfersTxtDefinesStationPaths;
-    }
-
-    public void setTransfersTxtDefinesStationPaths(boolean transfersTxtDefinesStationPaths) {
-        this.transfersTxtDefinesStationPaths = transfersTxtDefinesStationPaths;
     }
 
     public void checkInputs() {
