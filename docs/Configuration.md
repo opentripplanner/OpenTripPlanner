@@ -133,7 +133,46 @@ you can run the following bash command:
  
 The Maven _pom.xml_, the _META-INF/MANIFEST.MF_, the OTP command line(`--serVerId`), log start-up
 messages and all OTP APIs can be used to get the OTP Serialization Version Id.  
-              
+
+
+## Include file directive
+
+It is possible to inject the contents of another file into a configuration file. This makes it 
+possible to keep parts of the configuration in separate files. To include the contents of a file, use
+`${includeFile:FILE_NAME}`. The `FILE_NAME` must be the name of a file in the configuration 
+directory. Relative paths are not supported. 
+<p>
+To allow both files (the configuration file and the injected file) to be valid JSON files, a special
+case is supported. If the include file directive is quoted, then the quotes are removed, if the 
+text inserted is valid JSON (starts with `{` and ends with `}`). 
+
+Variable substitution is performed on configuration file after the include file directive; Hence
+variable substitution is also performed on the text in the injected file.
+
+Here is an example including variable substitution, assuming version 2.1.0 of OTP:
+
+```JSON
+// build-config.json
+{
+  "storage" : "${includeFile:storage.json}"
+} 
+``` 
+
+```JSON
+// storage.json
+{
+  "streetGraph": "street-graph-v${maven.version}.obj"
+}
+``` 
+The result will look like this:
+```JSON
+{
+  "storage" : {
+    "streetGraph": "street-graph-v2.1.0.obj"
+  }
+} 
+``` 
+
  
 # System-wide Configuration
 
