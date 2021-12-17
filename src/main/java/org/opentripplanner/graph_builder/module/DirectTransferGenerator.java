@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * network among themselves. This is necessary for routing in long-distance mode.
  *
  * It will use the street network if OSM data has already been loaded into the graph.
- * Otherwise it will use straight-line distance between stops.
+ * Otherwise, it will use straight-line distance between stops.
  */
 public class DirectTransferGenerator implements GraphBuilderModule {
 

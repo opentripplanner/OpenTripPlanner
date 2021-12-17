@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -7,15 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.Transfer;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.MinTimeTransfer;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
@@ -48,7 +50,7 @@ class TransferMapper {
 
   /**
    * This is a regular transfer that is defined in the transit data (as opposed to OpenStreetMap
-   * data). In the case that both are present, this should take precedence. Because the the duration
+   * data). In the case that both are present, this should take precedence. Because the duration
    * of the transfer is given and not the distance, walk speed will have no effect on this.
    */
   private static final int MIN_TIME = 2;
@@ -97,7 +99,7 @@ class TransferMapper {
     throw new IllegalArgumentException("Mapping missing for type: " + type);
   }
 
-  Collection<ConstrainedTransfer> map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
+  Collection<ConstrainedTransfer> mapConstrainedTransfers(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
     List<ConstrainedTransfer> result = new ArrayList<>();
 
     for (org.onebusaway.gtfs.model.Transfer it : allTransfers) {
@@ -106,7 +108,25 @@ class TransferMapper {
     return result;
   }
 
-  /**
+  Collection<MinTimeTransfer> mapMinTimeTransfers(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
+    return allTransfers.stream()
+            .filter(t -> t.getTransferType() == MIN_TIME)
+            .filter(Transfer::isMinTransferTimeSet)
+            .flatMap(this::expandMinTimeTransfers)
+            .collect(Collectors.toList());
+  }
+
+  private Stream<MinTimeTransfer> expandMinTimeTransfers(Transfer t) {
+      var froms = getStopOrChildStops(t.getFromStop());
+      var tos = getStopOrChildStops(t.getToStop());
+      var minTransferTime = Duration.ofSeconds(t.getMinTransferTime());
+
+      return froms.stream().flatMap(from ->
+        tos.stream().map(to -> new MinTimeTransfer(from, to, minTransferTime))
+      );
+  }
+
+    /**
    * Map from GTFS to OTP model, {@code null} safe.
    */
   Collection<ConstrainedTransfer> map(org.onebusaway.gtfs.model.Transfer original) {

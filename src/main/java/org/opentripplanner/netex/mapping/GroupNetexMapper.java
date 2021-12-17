@@ -54,7 +54,7 @@ class GroupNetexMapper {
         for (ServiceJourneyInterchange it : interchanges) {
             ConstrainedTransfer result = mapper.mapToTransfer(it);
             if(result != null) {
-                transitBuilder.getTransfers().add(result);
+                transitBuilder.getConstrainedTransfers().add(result);
             }
         }
     }

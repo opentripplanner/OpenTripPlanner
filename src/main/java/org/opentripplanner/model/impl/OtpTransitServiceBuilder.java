@@ -41,6 +41,7 @@ import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.MinTimeTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,6 +101,8 @@ public class OtpTransitServiceBuilder {
     private final EntityById<FareZone> fareZonesById = new EntityById<>();
 
     private final List<ConstrainedTransfer> transfers = new ArrayList<>();
+
+    private final List<MinTimeTransfer> minTimeTransfers = new ArrayList<>();
 
     private final EntityById<Trip> tripsById = new EntityById<>();
 
@@ -206,8 +209,12 @@ public class OtpTransitServiceBuilder {
 
     public EntityById<FareZone> getFareZonesById() { return fareZonesById; }
 
-    public List<ConstrainedTransfer> getTransfers() {
+    public List<ConstrainedTransfer> getConstrainedTransfers() {
         return transfers;
+    }
+
+    public List<MinTimeTransfer> getMinTimeTransfers() {
+        return minTimeTransfers;
     }
 
     public EntityById<Trip> getTripsById() {

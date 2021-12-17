@@ -120,7 +120,7 @@ public class GTFSToOtpTransitServiceMapper {
     }
 
     /**
-     * Note! Trip-pattenrs must be added BEFORE mapping transfers
+     * Note! Trip-patterns must be added BEFORE mapping transfers
      */
     private void mapAndAddTransfersToBuilder() {
         TransferMapper transferMapper = new TransferMapper(
@@ -130,7 +130,8 @@ public class GTFSToOtpTransitServiceMapper {
                 tripMapper,
                 builder.getStopTimesSortedByTrip()
         );
-        builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
+        builder.getConstrainedTransfers().addAll(transferMapper.mapConstrainedTransfers(data.getAllTransfers()));
+        builder.getMinTimeTransfers().addAll(transferMapper.mapMinTimeTransfers(data.getAllTransfers()));
     }
 
 

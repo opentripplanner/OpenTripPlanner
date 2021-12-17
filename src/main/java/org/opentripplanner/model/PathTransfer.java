@@ -7,7 +7,7 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.graph.Edge;
 
 /**
- * Represents a transfer between stops with the street network path attatched to it.
+ * Represents a transfer between stops with the street network path attached to it.
  * <p>
  * Do not confuse this with {@link ConstrainedTransfer}.
  *
