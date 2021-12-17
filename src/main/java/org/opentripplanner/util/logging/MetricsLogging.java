@@ -43,12 +43,13 @@ public class MetricsLogging {
         Router router = otpServer.getRouter();
         Graph graph = router.graph;
 
-        new GuavaCacheMetrics(
-                graph.getTransitLayer().getTransferCache().getTransferCache(),
-                "raptorTransfersCache",
-                List.of(Tag.of("cache", "raptorTransfers"))
-        ).bindTo(Metrics.globalRegistry);
-
+        if(graph.getTransitLayer() != null) {
+            new GuavaCacheMetrics(
+                    graph.getTransitLayer().getTransferCache().getTransferCache(),
+                    "raptorTransfersCache",
+                    List.of(Tag.of("cache", "raptorTransfers"))
+            ).bindTo(Metrics.globalRegistry);
+        }
         new ExecutorServiceMetrics(
                 ForkJoinPool.commonPool(),
                 "commonPool",
