@@ -7,7 +7,6 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
@@ -582,7 +581,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             route.setAgency(dummyAgency);
             // Guess the route type as it doesn't exist yet in the specifications
             // Bus. Used for short- and long-distance bus routes.
-            route.setType(3);
+            route.setGtfsType(3);
             route.setMode(TransitMode.BUS);
             // Create route name
             route.setLongName(tripId);

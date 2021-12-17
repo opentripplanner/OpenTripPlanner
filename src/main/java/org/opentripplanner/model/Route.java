@@ -15,9 +15,9 @@ public final class Route extends TransitEntity {
 
     private String longName;
 
-    private int type;
-
     private TransitMode mode;
+
+    private int gtfsType;
 
     private String desc;
 
@@ -87,12 +87,12 @@ public final class Route extends TransitEntity {
         this.desc = desc;
     }
 
-    public int getType() {
-        return type;
+    public int getGtfsType() {
+        return gtfsType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setGtfsType(int gtfsType) {
+        this.gtfsType = gtfsType;
     }
 
     public TransitMode getMode() {

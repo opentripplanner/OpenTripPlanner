@@ -5,7 +5,6 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
@@ -465,7 +464,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         if (route == null) { // Route is unknown - create new
             route = new Route(routeId);
-            route.setType(getRouteType(estimatedVehicleJourney.getVehicleModes()));
+            route.setGtfsType(getRouteType(estimatedVehicleJourney.getVehicleModes()));
             route.setOperator(operator);
 
             // TODO - SIRI: Is there a better way to find authority/Agency?

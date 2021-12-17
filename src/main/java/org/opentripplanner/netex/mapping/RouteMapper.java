@@ -65,7 +65,7 @@ class RouteMapper {
                 line.getTransportMode(),
                 line.getTransportSubmode()
         );
-        otpRoute.setType(transportType);
+        otpRoute.setGtfsType(transportType);
         TransitMode mode = TransitModeMapper.mapMode(transportType);
         if (mode == null) {
             issueStore.add(
