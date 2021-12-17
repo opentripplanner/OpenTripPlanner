@@ -76,8 +76,10 @@ public class LineType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("transportSubmode")
                     .type(EnumTypes.TRANSPORT_SUBMODE)
-                    .description("NOT IMPLEMENTED")
-                    .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
+                    .dataFetcher(environment -> {
+                        final String netexSubMode = ((Route) environment.getSource()).getNetexSubmode();
+                        return netexSubMode != null ? TransmodelTransportSubmode.fromValue(netexSubMode): null;
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("description")

@@ -9,6 +9,7 @@ import org.opentripplanner.model.BikeAccess;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.opentripplanner.model.TransitMode;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -29,7 +30,9 @@ public class RouteMapperTest {
 
     private static final String DESC = "Desc";
 
-    private static final int TYPE = 2;
+    private static final Integer ROUTE_TYPE = 2;
+
+    private static final TransitMode TRANSIT_MODE = TransitMode.RAIL;
 
     private static final String URL = "www.url.me";
 
@@ -55,7 +58,7 @@ public class RouteMapperTest {
         ROUTE.setShortName(SHORT_NAME);
         ROUTE.setLongName(LONG_NAME);
         ROUTE.setDesc(DESC);
-        ROUTE.setType(TYPE);
+        ROUTE.setType(ROUTE_TYPE);
         ROUTE.setUrl(URL);
         ROUTE.setColor(COLOR);
         ROUTE.setTextColor(TEXT_COLOR);
@@ -83,7 +86,8 @@ public class RouteMapperTest {
         assertEquals(SHORT_NAME, result.getShortName());
         assertEquals(LONG_NAME, result.getLongName());
         assertEquals(DESC, result.getDesc());
-        assertEquals(TYPE, result.getGtfsType());
+        assertEquals(ROUTE_TYPE, result.getGtfsType());
+        assertEquals(TRANSIT_MODE, result.getMode());
         assertEquals(URL, result.getUrl());
         assertEquals(COLOR, result.getColor());
         assertEquals(TEXT_COLOR, result.getTextColor());
@@ -104,7 +108,8 @@ public class RouteMapperTest {
         assertNull(result.getShortName());
         assertNull(result.getLongName());
         assertNull(result.getDesc());
-        assertEquals(0, result.getGtfsType());
+        assertEquals(0, (int) result.getGtfsType());
+        assertEquals(TransitMode.TRAM, result.getMode());
         assertNull(result.getUrl());
         assertNull(result.getColor());
         assertNull(result.getTextColor());

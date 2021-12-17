@@ -96,6 +96,10 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         return route.getMode();
     }
 
+    public final String getNetexSubmode() {
+        return route.getNetexSubmode();
+    }
+
     public LineString getHopGeometry(int stopIndex) {
         if (hopGeometries != null) {
             return CompactLineString.uncompactLineString(

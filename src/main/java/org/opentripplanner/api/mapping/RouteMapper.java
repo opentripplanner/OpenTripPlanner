@@ -24,7 +24,9 @@ public class RouteMapper {
         api.shortName = domain.getShortName();
         api.longName = domain.getLongName();
         api.mode = TraverseModeMapper.mapToApi(domain.getMode());
-        api.type = domain.getGtfsType();
+        api.type = domain.getGtfsType() != null
+            ? domain.getGtfsType()
+            : RouteTypeMapper.mapToApi(domain.getMode());
         api.desc = domain.getDesc();
         api.url = domain.getUrl();
         api.color = domain.getColor();
