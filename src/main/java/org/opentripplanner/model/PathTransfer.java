@@ -44,6 +44,10 @@ public class PathTransfer implements Serializable {
 
     public List<Edge> getEdges() { return this.edges; }
 
+    public PathTransfer copyWithDistanceMeters(double meters){
+        return new PathTransfer(from, to, meters, edges);
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.of(getClass())
