@@ -7,17 +7,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.CompactLineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -31,6 +20,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.geometry.CompactLineString;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
+import org.opentripplanner.routing.trippattern.TripTimes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
@@ -236,9 +235,10 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * trip as one of the scheduled trips on this pattern.
      */
     public void add(TripTimes tt) {
-        // Only scheduled trips (added at graph build time, rather than directly to the timetable via updates) are in this list.
-        getTrips().add(tt.getTrip());
+        // Only scheduled trips (added at graph build time, rather than directly to the timetable
+        // via updates) are in this list.
         scheduledTimetable.addTripTimes(tt);
+
         // Check that all trips added to this pattern are on the initially declared route.
         // Identity equality is valid on GTFS entity objects.
         if (this.route != tt.getTrip().getRoute()) {
@@ -302,7 +302,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
      */
     public List<Trip> getTrips() {
-        return scheduledTimetable.getTripTimes().stream().map(t -> t.getTrip()).collect(Collectors.toList());
+        return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList());
     }
 
     /** The human-readable, unique name for this trip pattern. */
