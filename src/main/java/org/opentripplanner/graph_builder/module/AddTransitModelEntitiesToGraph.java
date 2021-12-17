@@ -350,7 +350,7 @@ public class AddTransitModelEntitiesToGraph {
 
     private void addTransfersToGraph(Graph graph) {
         graph.getTransferService().addAll(
-            transitService.getAllTransfers()
+            transitService.getAllConstrainedTransfers()
         );
     }
 

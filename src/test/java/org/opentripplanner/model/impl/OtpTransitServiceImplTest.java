@@ -99,7 +99,7 @@ public class OtpTransitServiceImplTest {
     @Test
     public void testGetAllTransfers() {
         var result = removeFeedScope(
-                subject.getAllTransfers()
+                subject.getAllConstrainedTransfers()
                         .stream()
                         .map(Object::toString)
                         .sorted()

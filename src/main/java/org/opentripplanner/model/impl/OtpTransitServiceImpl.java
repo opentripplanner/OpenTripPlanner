@@ -34,6 +34,7 @@ import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.MinTimeTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +91,9 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Map<Trip, List<StopTime>> stopTimesByTrip;
 
-    private final Collection<ConstrainedTransfer> transfers;
+    private final Collection<ConstrainedTransfer> constrainedTransfers;
+
+    private final Collection<MinTimeTransfer> minTimeTransfers;
 
     private final Collection<TripPattern> tripPatterns;
 
@@ -121,7 +124,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.locationsById = builder.getLocations().asImmutableMap();
         this.locationGroupsById = builder.getLocationGroups().asImmutableMap();
         this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
-        this.transfers = immutableList(builder.getConstrainedTransfers());
+        this.constrainedTransfers = immutableList(builder.getConstrainedTransfers());
+        this.minTimeTransfers = immutableList(builder.getMinTimeTransfers());
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
         this.trips = immutableList(builder.getTripsById().values());
         this.flexTrips = immutableList(builder.getFlexTripsById().values());
@@ -244,8 +248,13 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
-    public Collection<ConstrainedTransfer> getAllTransfers() {
-        return transfers;
+    public Collection<ConstrainedTransfer> getAllConstrainedTransfers() {
+        return constrainedTransfers;
+    }
+
+    @Override
+    public Collection<MinTimeTransfer> getMinTimeTransfers() {
+        return minTimeTransfers;
     }
 
     @Override

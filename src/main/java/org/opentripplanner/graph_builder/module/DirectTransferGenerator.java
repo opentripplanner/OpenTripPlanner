@@ -40,7 +40,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     private final List<RoutingRequest> transferRequests;
 
-    public DirectTransferGenerator (double radiusByDurationInSeconds, List<RoutingRequest> transferRequests) {
+    public DirectTransferGenerator(double radiusByDurationInSeconds, List<RoutingRequest> transferRequests) {
         this.radiusByDurationInSeconds = radiusByDurationInSeconds;
         this.transferRequests = transferRequests;
     }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.MinTimeTransfer;
 
 /**
  * Methods for accessing imported entities.
@@ -70,7 +71,9 @@ public interface OtpTransitService {
      */
     List<StopTime> getStopTimesForTrip(Trip trip);
 
-    Collection<ConstrainedTransfer> getAllTransfers();
+    Collection<ConstrainedTransfer> getAllConstrainedTransfers();
+
+    Collection<MinTimeTransfer> getMinTimeTransfers();
 
     Collection<TripPattern> getTripPatterns();
 

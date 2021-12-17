@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.model.transfer.MinTimeTransfer;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -93,6 +95,8 @@ public class GtfsModule implements GraphBuilderModule {
 
         CalendarServiceData calendarServiceData = graph.getCalendarDataService();
 
+        var minTimeTransfers = new ArrayList<MinTimeTransfer>();
+
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
                 GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
@@ -120,11 +124,14 @@ public class GtfsModule implements GraphBuilderModule {
                 // NB! The calls below have side effects - the builder state is updated!
                 createTripPatterns(graph, builder, calendarServiceData.getServiceIds());
 
-                OtpTransitService transitModel = builder.build();
+                OtpTransitService transitService = builder.build();
 
-                addTransitModelToGraph(graph, gtfsBundle, transitModel);
+                addTransitModelToGraph(graph, gtfsBundle, transitService);
 
-                createGeometryAndBlockProcessor(gtfsBundle, transitModel).run(graph, issueStore);
+                createGeometryAndBlockProcessor(gtfsBundle, transitService).run(graph, issueStore);
+
+                minTimeTransfers.addAll(transitService.getMinTimeTransfers());
+
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -134,6 +141,8 @@ public class GtfsModule implements GraphBuilderModule {
             // code should be safe without the try/catch block.
             gtfsBundles.forEach(GtfsBundle::close);
         }
+
+        extra.put(MinTimeTransfer.class, minTimeTransfers);
 
         graph.clearCachedCalenderService();
         // We need to save the calendar service data so we can use it later
