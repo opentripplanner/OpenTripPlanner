@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.dataoverlay.configuration;
 
+import java.io.Serializable;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.routing.Parameter;
 import org.opentripplanner.model.base.ToStringBuilder;
@@ -16,7 +17,7 @@ import org.opentripplanner.model.base.ToStringBuilder;
  * }
  * </pre>
  */
-public class ParameterBinding {
+public class ParameterBinding implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
