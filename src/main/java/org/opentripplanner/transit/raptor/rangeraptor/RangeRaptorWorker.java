@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor;
 
 import static java.util.stream.Collectors.groupingBy;
 
+import io.micrometer.core.instrument.Timer;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +25,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleBoardSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
-import org.opentripplanner.transit.raptor.util.AvgTimer;
 
 
 /**
@@ -146,7 +146,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      */
     @Override
     public Collection<Path<T>> route() {
-        timerRoute().time(() -> {
+        timerRoute().record(() -> {
             lifeCycle.notifyRouteSearchStart(calculator.searchForward());
             transitData.setup();
 
@@ -206,7 +206,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * Perform a scheduled search
      */
     private void findAllTransitForRound() {
-        timerByMinuteScheduleSearch().time(() -> {
+        timerByMinuteScheduleSearch().record(() -> {
             IntIterator stops = state.stopsTouchedPreviousRound();
             Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
 
@@ -316,7 +316,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     private void transfersForRound() {
-        timerByMinuteTransfers().time(() -> {
+        timerByMinuteTransfers().record(() -> {
             IntIterator it = state.stopsTouchedByTransitCurrentRound();
 
             while (it.hasNext()) {
@@ -408,7 +408,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     // Track time spent, measure performance
     // TODO TGR - Replace by performance tests
-    private AvgTimer timerRoute() { return timers.timerRoute(); }
-    private AvgTimer timerByMinuteScheduleSearch() { return timers.timerByMinuteScheduleSearch(); }
-    private AvgTimer timerByMinuteTransfers() { return timers.timerByMinuteTransfers(); }
+    private Timer timerRoute() { return timers.timerRoute(); }
+    private Timer timerByMinuteScheduleSearch() { return timers.timerByMinuteScheduleSearch(); }
+    private Timer timerByMinuteTransfers() { return timers.timerByMinuteTransfers(); }
 }

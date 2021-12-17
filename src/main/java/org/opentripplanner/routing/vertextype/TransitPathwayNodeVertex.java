@@ -25,13 +25,13 @@ public class TransitPathwayNodeVertex extends Vertex {
     super(
         graph,
         node.getId().toString(),
-        node.getLon(),
-        node.getLat()
+        node.getCoordinate().longitude(),
+        node.getCoordinate().latitude()
     );
     this.node = node;
     this.wheelchairEntrance = node.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
-    graph.expandToInclude(node.getLon(), node.getLat());
+    graph.expandToInclude(node.getCoordinate().longitude(), node.getCoordinate().latitude());
   }
 
   @Override

@@ -1,7 +1,6 @@
 {
   "dataImportReport": true,
   "transit": true,
-  "useTransfersTxt": false,
   "parentStopLinking": true,
   "stationTransfers": false,
   "subwayAccessTime": 0,

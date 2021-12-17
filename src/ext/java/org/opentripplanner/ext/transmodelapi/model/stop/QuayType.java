@@ -18,6 +18,7 @@ import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -49,17 +50,17 @@ public class QuayType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("latitude")
                     .type(Scalars.GraphQLFloat)
-                    .dataFetcher(environment -> (((Stop) environment.getSource()).getLat()))
+                    .dataFetcher(environment -> (((StopLocation) environment.getSource()).getLat()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("longitude")
                     .type(Scalars.GraphQLFloat)
-                    .dataFetcher(environment -> (((Stop) environment.getSource()).getLon()))
+                    .dataFetcher(environment -> (((StopLocation) environment.getSource()).getLon()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("description")
                     .type(Scalars.GraphQLString)
-                    .dataFetcher(environment -> (((Stop) environment.getSource()).getDescription()))
+                    .dataFetcher(environment -> (((StopLocation) environment.getSource()).getDescription()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopPlace")
@@ -67,7 +68,7 @@ public class QuayType {
                 .type(stopPlaceType)
                 .dataFetcher(environment ->
                     {
-                        Station station = ((Stop) environment.getSource()).getParentStation();
+                        Station station = ((StopLocation) environment.getSource()).getParentStation();
                         if (station != null) {
                           return new MonoOrMultiModalStation(
                                 station,
@@ -84,16 +85,17 @@ public class QuayType {
                     .name("wheelchairAccessible")
                     .type(EnumTypes.WHEELCHAIR_BOARDING)
                     .description("Whether this quay is suitable for wheelchair boarding.")
-                    .dataFetcher(environment -> (((Stop) environment.getSource()).getWheelchairBoarding()))
+                    .dataFetcher(environment -> (((StopLocation) environment.getSource()).getWheelchairBoarding()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("publicCode")
                     .type(Scalars.GraphQLString)
                     .description("Public code used to identify this quay within the stop place. For instance a platform code.")
-                    .dataFetcher(environment -> (((Stop) environment.getSource()).getCode()))
+                    .dataFetcher(environment -> (((StopLocation) environment.getSource()).getCode()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("lines")
+                    .withDirective(gqlUtil.timingData)
                     .description("List of lines servicing this quay")
                     .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(lineType))))
                     .dataFetcher(environment -> {
@@ -107,6 +109,7 @@ public class QuayType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("journeyPatterns")
+                    .withDirective(gqlUtil.timingData)
                     .description("List of journey patterns servicing this quay")
                     .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
                     .dataFetcher(environment -> {
@@ -117,6 +120,7 @@ public class QuayType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("estimatedCalls")
+                    .withDirective(gqlUtil.timingData)
                     .description("List of visits to this quay as part of vehicle journeys.")
                     .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
                     .argument(GraphQLArgument.newArgument()
@@ -215,18 +219,18 @@ public class QuayType {
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                 .dataFetcher(env -> {
                   return GqlUtil.getRoutingService(env).getTransitAlertService()
-                      .getStopAlerts(((Stop)env.getSource()).getId());
+                      .getStopAlerts(((StopLocation)env.getSource()).getId());
                 })
                     .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
 //                        .name("stopType")
 //                        .type(stopTypeEnum)
-//                        .dataFetcher(environment -> (((Stop) environment.getSource()).getStopType()))
+//                        .dataFetcher(environment -> (((StopLocation) environment.getSource()).getStopType()))
 //                        .build())
            .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("tariffZones")
                     .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
-                    .dataFetcher(environment -> ((Stop) environment.getSource()).getFareZones())
+                    .dataFetcher(environment -> ((StopLocation) environment.getSource()).getFareZones())
                     .build())
            .build();
   }

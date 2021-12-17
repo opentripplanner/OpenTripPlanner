@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.Transfer;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
@@ -140,8 +141,8 @@ class TransferMapper {
     // applies to all stops in that station." we thus expand transfers that use parent stations
     // to all the member stops.
 
-    Collection<Stop> fromStops = getStopOrChildStops(rhs.getFromStop());
-    Collection<Stop> toStops = getStopOrChildStops(rhs.getToStop());
+    var fromStops = getStopOrChildStops(rhs.getFromStop());
+    var toStops = getStopOrChildStops(rhs.getToStop());
 
     Collection<TransferPoint> fromPoints = mapTransferPoints(fromStops, fromTrip, fromRoute);
     Collection<TransferPoint> toPoints = mapTransferPoints(toStops, toTrip, toRoute);
@@ -173,7 +174,7 @@ class TransferMapper {
   }
 
   private Collection<TransferPoint> mapTransferPoints(
-      Collection<Stop> stops,
+      Collection<StopLocation> stops,
       Trip trip,
       Route route
   ) {
@@ -197,7 +198,7 @@ class TransferMapper {
        */
     }
     else {
-      for (Stop stop : stops) {
+      for (var stop : stops) {
         result.add(new StopTransferPoint(stop));
       }
 
@@ -206,7 +207,7 @@ class TransferMapper {
   }
 
   private Collection<TransferPoint> createTransferPointForTrip(
-      Collection<Stop> stops,
+      Collection<StopLocation> stops,
       Trip trip,
       BiFunction<Trip, Integer, TransferPoint> createPoint
   ) {
@@ -223,7 +224,7 @@ class TransferMapper {
     return result;
   }
 
-  private Collection<Stop> getStopOrChildStops(org.onebusaway.gtfs.model.Stop gtfsStop) {
+  private Collection<StopLocation> getStopOrChildStops(org.onebusaway.gtfs.model.Stop gtfsStop) {
     if (gtfsStop.getLocationType() == 0) {
       return Collections.singletonList(stopMapper.map(gtfsStop));
     }

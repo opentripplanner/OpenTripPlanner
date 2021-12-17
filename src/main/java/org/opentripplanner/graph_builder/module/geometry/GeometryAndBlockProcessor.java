@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -17,6 +18,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
@@ -25,7 +27,6 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -121,7 +122,7 @@ public class GeometryAndBlockProcessor {
         // only the tripTimes (which don't have enough information to build a geometry). So we keep
         // them here. In the current design, a trip pattern does not have a single geometry, but
         // one per hop, so we store them in an array.
-        Map<TripPattern, LineString[]> geometriesByTripPattern = Maps.newHashMap();
+        Map<TripPattern, LineString[]> geometriesByTripPattern = new ConcurrentHashMap<>();
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
 
@@ -136,7 +137,7 @@ public class GeometryAndBlockProcessor {
         );
         LOG.info(progress.startMessage());
 
-        for (TripPattern tripPattern : tripPatterns) {
+        tripPatterns.parallelStream().forEach(tripPattern -> {
             for (Trip trip : tripPattern.getTrips()) {
                 // create geometries if they aren't already created
                 // note that this is not only done on new trip patterns, because it is possible that
@@ -150,7 +151,7 @@ public class GeometryAndBlockProcessor {
             }
             //Keep lambda! A method-ref would causes incorrect class and line number to be logged
             progress.step(m -> LOG.info(m));
-        }
+        });
         LOG.info(progress.completeMessage());
 
         /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
@@ -224,8 +225,8 @@ public class GeometryAndBlockProcessor {
                     }
                     TripPattern prevPattern = patternForTripTimes.get(prev);
                     TripPattern currPattern = patternForTripTimes.get(curr);
-                    Stop fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
-                    Stop toStop = currPattern.getStop(0);
+                    var fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
+                    var toStop = currPattern.getStop(0);
                     double teleportationDistance = SphericalDistanceLibrary.fastDistance(
                             fromStop.getLat(),
                             fromStop.getLon(),
@@ -351,6 +352,7 @@ public class GeometryAndBlockProcessor {
     }
 
     private List<LinearLocation> getLinearLocations(List<StopTime> stopTimes, LineString shape) {
+        var isFlexTrip = FlexTrip.containsFlexStops(stopTimes);
         // This trip does not have shape_dist in stop_times, but does have an associated shape.
         ArrayList<IndexedLineSegment> segments = new ArrayList<>();
         for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
@@ -374,7 +376,7 @@ public class GeometryAndBlockProcessor {
                     continue;
                 }
                 double distance = segment.distance(coord);
-                if (distance < maxStopToShapeSnapDistance) {
+                if (distance < maxStopToShapeSnapDistance || isFlexTrip) {
                     stopSegments.add(segment);
                     maxSegmentIndex = index;
                     if (minSegmentIndexForThisStop == -1)

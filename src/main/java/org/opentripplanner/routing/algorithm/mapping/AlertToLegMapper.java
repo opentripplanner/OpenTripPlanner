@@ -115,7 +115,7 @@ public class AlertToLegMapper {
                 }
 
                 // ...and siblings - platform may have been changed
-                for (Stop siblingStop : stop.getParentStation().getChildStops()) {
+                for (var siblingStop : stop.getParentStation().getChildStops()) {
                     if (!stop.getId().equals(siblingStop.getId())) {
                         Collection<TransitAlert> siblingAlerts = graph.getTransitAlertService().getStopAndRouteAlerts(stop.getParentStation().getId(), routeId);
                         if (siblingAlerts != null) {
@@ -181,7 +181,7 @@ public class AlertToLegMapper {
                 }
 
                 // ...and siblings - platform may have been changed
-                for (Stop siblingStop : stop.getParentStation().getChildStops()) {
+                for (var siblingStop : stop.getParentStation().getChildStops()) {
                     if (!stop.getId().equals(siblingStop.getId())) {
                         Collection<TransitAlert> siblingAlerts = graph.getTransitAlertService().getStopAndTripAlerts(stop.getParentStation().getId(), tripId, serviceDate);
                         if (siblingAlerts != null) {
@@ -227,7 +227,7 @@ public class AlertToLegMapper {
                 }
 
                 // ...and siblings - platform may have been changed
-                for (Stop siblingStop : stop.getParentStation().getChildStops()) {
+                for (var siblingStop : stop.getParentStation().getChildStops()) {
                     if (!stop.getId().equals(siblingStop.getId())) {
                         Collection<TransitAlert> siblingAlerts = graph.getTransitAlertService().getStopAlerts(stop.getParentStation().getId());
                         if (siblingAlerts != null) {
