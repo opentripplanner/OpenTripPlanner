@@ -9,13 +9,13 @@ public class ApiStop implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public String id;
-    public I18NString name;
+    public String name;
     public Double lat;
     public Double lon;
     public String code;
     public String desc;
     public String zoneId;
-    public I18NString url;
+    public String url;
     public Integer locationType;
 
     /** The fully qualified parent station id including the feedId. */

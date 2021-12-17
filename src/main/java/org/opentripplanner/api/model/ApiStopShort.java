@@ -8,10 +8,10 @@ public class ApiStopShort {
 
     public String id;
     public String code;
-    public I18NString name;
+    public String name;
     public double lat;
     public double lon;
-    public I18NString url;
+    public String url;
 
     /**
      * The fully qualified parent station id including the feedId.

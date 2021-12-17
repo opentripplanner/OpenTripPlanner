@@ -1,11 +1,15 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import org.onebusaway.gtfs.impl.translation.TranslationServiceDataFactoryImpl;
-import org.onebusaway.gtfs.impl.translation.TranslationServiceImpl;
+import java.util.stream.Collectors;
+import org.onebusaway.gtfs.model.Translation;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BoardingArea;
@@ -17,6 +21,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.TranslatedString;
+import org.opentripplanner.util.TranslationHelper;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -78,6 +83,10 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
+    private static final String STOPS_TABLE_NAME = "stops";
+
+    private static final String STOP_FIELD_PREFIX = "stop_";
+
     private static final String NAME_FIELD_NAME = "name";
 
     private static final String URL_FIELD_NAME = "url";
@@ -106,15 +115,13 @@ public class GTFSToOtpTransitServiceMapper {
     }
 
     public void mapStopTripAndRouteDatantoBuilder() {
-
-        TranslationServiceImpl ts = new TranslationServiceImpl();
-        ts.setData(TranslationServiceDataFactoryImpl.createData(data));
-        Set<String> languages = getLanguagesFromTranslations(data.getAllTranslations());
-        //add also feed info's language if not exists translated languages on translations.txt
+        String feedLanguage = null;
         if (data.getAllFeedInfos().iterator().hasNext()) {
-            languages.add(data.getAllFeedInfos().iterator().next().getLang());
+            feedLanguage = data.getAllFeedInfos().iterator().next().getLang();
         }
-        
+
+        TranslationHelper translationHelper =  new TranslationHelper(data.getAllTranslations());
+
         builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
         builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
         builder.getCalendars().addAll(serviceCalendarMapper.map(data.getAllCalendars()));
@@ -127,7 +134,7 @@ public class GTFSToOtpTransitServiceMapper {
             builder.getShapePoints().put(shapePoint.getShapeId(), shapePoint);
         }
 
-        mapGtfsStopsToOtpTypes(data, ts, languages);
+        mapGtfsStopsToOtpTypes(data, translationHelper.getByTableName(STOPS_TABLE_NAME), feedLanguage);
 
         builder.getLocations().addAll(locationMapper.map(data.getAllLocations()));
         builder.getLocationGroups().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
@@ -152,44 +159,17 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
     }
 
-    private Set<String> getLanguagesFromTranslations(Collection allTranslations) {
-        Set<String> languages = new HashSet<>(Set.of());
-        java.util.Iterator<org.onebusaway.gtfs.model.Translation> iterator =
-                allTranslations.iterator();
-        while (iterator.hasNext()) {
-            org.onebusaway.gtfs.model.Translation translation = iterator.next();
-            languages.add(translation.getLanguage());
-        }
-        return languages;
-    }
-
-    private I18NString getTranslations(
-            TranslationServiceImpl ts,
-            Set<String> languages,
-            Object object,
-            String fieldName
-    ) {
-        HashMap<String, String> translations = new HashMap<>();
-        for (String lang: languages) {
-            if (object instanceof org.onebusaway.gtfs.model.Stop) {
-                org.onebusaway.gtfs.model.Stop t = ts.getTranslatedEntity(lang, org.onebusaway.gtfs.model.Stop.class,
-                        (org.onebusaway.gtfs.model.Stop) object
-                );
-                if (fieldName.equals(NAME_FIELD_NAME)) {
-                    translations.put(lang, t.getName());
-                } else if (fieldName.equals(URL_FIELD_NAME)) {
-                    translations.put(lang, t.getUrl());
-                }
-            }
-        }
-        return TranslatedString.getI18NString(translations);
-    }
-
-    private void mapGtfsStopsToOtpTypes(GtfsRelationalDao data, TranslationServiceImpl ts, Set<String> languages) {
+    private void mapGtfsStopsToOtpTypes(GtfsRelationalDao data, Map<Optional<String>, List<Translation>> stopTranslations, String feedLanguage) { //TODO, TranslationServiceImpl ts, Set<String> languages) {
         StopToParentStationLinker stopToParentStationLinker = new StopToParentStationLinker(issueStore);
         for (org.onebusaway.gtfs.model.Stop it : data.getAllStops()) {
+            List<Translation> translations = null;
+            if (stopTranslations.containsKey(it.getId().getId())) {
+                translations = stopTranslations.get(it.getId().getId());
+            } else if (stopTranslations.containsKey(it.getName())) {
+                translations = stopTranslations.get(it.getName());
+            }
             if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
-                Stop stop = stopMapper.map(it, getTranslations(ts, languages, it, NAME_FIELD_NAME), getTranslations(ts, languages, it, URL_FIELD_NAME));
+                Stop stop = stopMapper.map(it, TranslationHelper.getTranslationsByFieldName(translations, STOP_FIELD_PREFIX + NAME_FIELD_NAME, it.getName(), feedLanguage), TranslationHelper.getTranslationsByFieldName(translations, STOP_FIELD_PREFIX + URL_FIELD_NAME, it.getUrl(), feedLanguage));
                 builder.getStops().add(stop);
                 stopToParentStationLinker.addStationElement(stop, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
@@ -197,7 +177,7 @@ public class GTFSToOtpTransitServiceMapper {
                 builder.getStations().add(station);
                 stopToParentStationLinker.addStation(station);
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
-                Entrance entrance = entranceMapper.map(it, getTranslations(ts, languages, it, NAME_FIELD_NAME));
+                Entrance entrance = entranceMapper.map(it, TranslationHelper.getTranslationsByFieldName(translations, STOP_FIELD_PREFIX + NAME_FIELD_NAME, it.getName(), feedLanguage));
                 builder.getEntrances().add(entrance);
                 stopToParentStationLinker.addStationElement(entrance, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE) {
@@ -205,12 +185,11 @@ public class GTFSToOtpTransitServiceMapper {
                 builder.getPathwayNodes().add(pathwayNode);
                 stopToParentStationLinker.addStationElement(pathwayNode, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA) {
-                BoardingArea boardingArea = boardingAreaMapper.map(it, getTranslations(ts, languages, it, NAME_FIELD_NAME));
+                BoardingArea boardingArea = boardingAreaMapper.map(it, TranslationHelper.getTranslationsByFieldName(translations, STOP_FIELD_PREFIX + NAME_FIELD_NAME, it.getName(), feedLanguage));
                 builder.getBoardingAreas().add(boardingArea);
                 stopToParentStationLinker.addBoardingArea(boardingArea, it.getParentStation());
             }
         }
-
         stopToParentStationLinker.link();
     }
 }
