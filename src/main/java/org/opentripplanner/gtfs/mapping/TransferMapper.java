@@ -1,25 +1,29 @@
 package org.opentripplanner.gtfs.mapping;
 
-import java.util.ArrayList;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.Transfer;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.RouteTransferPoint;
+import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.util.logging.ThrottleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +36,7 @@ import org.slf4j.LoggerFactory;
 class TransferMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransferMapper.class);
+  private static final Logger FIXED_ROUTE_ERROR = ThrottleLogger.throttle(LOG);
 
   /**
    * This transfer is recommended over other transfers. The routing algorithm should prefer this
@@ -69,6 +74,9 @@ class TransferMapper {
 
   private final TripStopTimes stopTimesByTrip;
 
+  private final Multimap<Route, Trip> tripsByRoute = ArrayListMultimap.create();
+
+
   TransferMapper(
       RouteMapper routeMapper,
       StationMapper stationMapper,
@@ -97,27 +105,17 @@ class TransferMapper {
   }
 
   Collection<ConstrainedTransfer> map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
-    List<ConstrainedTransfer> result = new ArrayList<>();
+    setup(!allTransfers.isEmpty());
 
-    for (org.onebusaway.gtfs.model.Transfer it : allTransfers) {
-      result.addAll(map(it));
-    }
-    return result;
+    return allTransfers.stream().map(this::map)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
   }
 
-  /**
-   * Map from GTFS to OTP model, {@code null} safe.
-   */
-  Collection<ConstrainedTransfer> map(org.onebusaway.gtfs.model.Transfer original) {
-    return original == null ? List.of() : doMap(original);
-  }
-
-  private Collection<ConstrainedTransfer> doMap(org.onebusaway.gtfs.model.Transfer rhs) {
-
+  ConstrainedTransfer map(org.onebusaway.gtfs.model.Transfer rhs) {
     Trip fromTrip = tripMapper.map(rhs.getFromTrip());
     Trip toTrip = tripMapper.map(rhs.getToTrip());
-    Route fromRoute = routeMapper.map(rhs.getFromRoute());
-    Route toRoute = routeMapper.map(rhs.getToRoute());
+
     TransferConstraint constraint = mapConstraint(rhs, fromTrip, toTrip);
 
     // TODO TGR - Create a transfer for this se issue #3369
@@ -131,35 +129,21 @@ class TransferMapper {
       else {
         LOG.warn("Transfer skipped - no effect on routing: " + rhs);
       }
-      return List.of();
+      return null;
     }
 
-    // Transfers may be specified using parent stations
-    // (https://developers.google.com/transit/gtfs/reference/transfers-file)
-    // "If the stop ID refers to a station that contains multiple stops, this transfer rule
-    // applies to all stops in that station." we thus expand transfers that use parent stations
-    // to all the member stops.
+    TransferPoint fromPoint = mapTransferPoint(rhs.getFromStop(), rhs.getFromRoute(), fromTrip, false);
+    TransferPoint toPoint = mapTransferPoint(rhs.getToStop(), rhs.getToRoute(), toTrip, true);
 
-    var fromStops = getStopOrChildStops(rhs.getFromStop());
-    var toStops = getStopOrChildStops(rhs.getToStop());
+    return new ConstrainedTransfer(null, fromPoint, toPoint, constraint);
+  }
 
-    Collection<TransferPoint> fromPoints = mapTransferPoints(fromStops, fromTrip, fromRoute);
-    Collection<TransferPoint> toPoints = mapTransferPoints(toStops, toTrip, toRoute);
+  private void setup(boolean run) {
+    if(!run) { return; }
 
-    Collection<ConstrainedTransfer> result = new ArrayList<>();
-
-    for (TransferPoint fromPoint : fromPoints) {
-      for (TransferPoint toPoint : toPoints) {
-        var transfer = new ConstrainedTransfer(
-                null,
-                fromPoint,
-                toPoint,
-                constraint
-        );
-        result.add(transfer);
-      }
+    for (Trip trip : tripMapper.getMappedTrips()) {
+      tripsByRoute.put(trip.getRoute(), trip);
     }
-    return result;
   }
 
   private TransferConstraint mapConstraint(Transfer rhs, Trip fromTrip, Trip toTrip) {
@@ -172,64 +156,90 @@ class TransferMapper {
     return builder.build();
   }
 
-  private Collection<TransferPoint> mapTransferPoints(
-      Collection<StopLocation> stops,
-      Trip trip,
-      Route route
+  private TransferPoint mapTransferPoint(
+          org.onebusaway.gtfs.model.Stop rhsStopOrStation,
+          org.onebusaway.gtfs.model.Route rhsRoute,
+          Trip trip,
+          boolean boardTrip
   ) {
-    Collection<TransferPoint> result = new ArrayList<>();
-    if (trip != null) {
-      result.addAll(createTransferPointForTrip(stops, trip, TripTransferPoint::new));
-    }
-    else if (route != null) {
-      /*
-      TODO - This code result in a OutOfMemory exception, fin out why and fix it
-           - See issue https://github.com/opentripplanner/OpenTripPlanner/issues/3429
-      for (Trip tripInRoute : tripsByRoute.get(route)) {
-        result.addAll(
-            createTransferPointForTrip(
-              stops,
-              tripInRoute,
-              (t,i) -> new RouteTransferPoint(route, t, i)
-            )
-        );
-      }
-       */
+    Route route = routeMapper.map(rhsRoute);
+    Station station = null;
+    Stop stop = null;
+
+    // A transfer is specified using Stops and/or Station, according to the GTFS specification:
+    //
+    //    If the stop ID refers to a station that contains multiple stops, this transfer rule
+    //    applies to all stops in that station.
+    //
+    // Source: https://developers.google.com/transit/gtfs/reference/transfers-file
+
+    if (rhsStopOrStation.getLocationType() == 0) {
+      stop  = stopMapper.map(rhsStopOrStation);
     }
     else {
-      for (var stop : stops) {
-        result.add(new StopTransferPoint(stop));
-      }
-
+      station = stationMapper.map(rhsStopOrStation);
     }
-    return result;
+    if(trip != null) {
+      int stopPositionInPattern = stopPosition(trip, stop, station, boardTrip);
+      return stopPositionInPattern < 0 ? null : new TripTransferPoint(trip, stopPositionInPattern);
+    }
+    else if(route != null) {
+      var trips = tripsByRoute.get(route);
+      if(trips.isEmpty()) { throw new IllegalStateException("No trips found for route: " + route); }
+
+      int stopPositionInPattern = stopPosition(route, stop, station, boardTrip);
+      return new RouteTransferPoint(route, stopPositionInPattern);
+    }
+    else if(stop != null) {
+      return new StopTransferPoint(stop);
+    }
+    else if(station != null) {
+      return new StationTransferPoint(station);
+    }
+
+    throw new IllegalStateException("Should not get here!");
   }
 
-  private Collection<TransferPoint> createTransferPointForTrip(
-      Collection<StopLocation> stops,
-      Trip trip,
-      BiFunction<Trip, Integer, TransferPoint> createPoint
-  ) {
-    Collection<TransferPoint> result = new ArrayList<>();
+
+  private int stopPosition(Route route, Stop stop, Station station, boolean boardTrip) {
+    var stopPosList = tripsByRoute.get(route).stream()
+            .map(t -> stopPosition(t, stop, station, boardTrip))
+            .distinct()
+            .collect(Collectors.toList());
+
+    if(stopPosList.size() == 1) { return stopPosList.get(0); }
+
+    FIXED_ROUTE_ERROR.error(
+        "In GTFS 'transfers.txt' a transfer-point can be a combination of route and stop/station!"
+        + "OTP only support this case, if the stop/station have the same stop point in trip-"
+        + "pattern for all trips in the route. Route: " + route
+    );
+    return -1;
+  }
+
+
+  private int stopPosition(Trip trip, Stop stop, Station station, boolean boardTrip) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
-    for (int i = 0; i < stopTimes.size(); ++i) {
-      StopTime stopTime = stopTimes.get(i);
 
-      //noinspection SuspiciousMethodCalls
-      if (stops.contains(stopTime.getStop())) {
-        result.add(createPoint.apply(trip, i));
+    // We can board at the first stop, but not alight.
+    final int firstStopPos = boardTrip ? 0 : 1;
+    // We can alight at the last stop, but not board, the lastStopPos is exclusive
+    final int lastStopPos =  stopTimes.size() - (boardTrip ? 1 : 0);
+
+    Predicate<StopLocation> stopMatches = station != null
+            ? (s) -> (s instanceof Stop && ((Stop)s).getParentStation() == station)
+            : (s) -> s == stop;
+
+    for (int i = firstStopPos; i < lastStopPos; i++) {
+      StopTime stopTime = stopTimes.get(i);
+      if(boardTrip && !stopTime.getPickupType().isRoutable()) { continue; }
+      if(!boardTrip && !stopTime.getDropOffType().isRoutable()) { continue; }
+
+      if(stopMatches.test(stopTime.getStop())) {
+        return i;
       }
     }
-    return result;
-  }
-
-  private Collection<StopLocation> getStopOrChildStops(org.onebusaway.gtfs.model.Stop gtfsStop) {
-    if (gtfsStop.getLocationType() == 0) {
-      return Collections.singletonList(stopMapper.map(gtfsStop));
-    }
-    else {
-      return stationMapper.map(gtfsStop).getChildStops();
-    }
+    return -1;
   }
 
   private boolean sameBlockId(Trip a, Trip b) {
@@ -237,17 +247,5 @@ class TransferMapper {
       return false;
     }
     return a.getBlockId() != null && a.getBlockId().equals(b.getBlockId());
-  }
-
-  @Nullable
-  private Map<Route,List<Trip>> createTripsByRouteMapIfRouteTransfersExist(
-      Collection<Trip> trips,
-      Collection<org.onebusaway.gtfs.model.Transfer> allTransfers
-  ) {
-    if(allTransfers.stream().anyMatch(t -> t.getFromRoute() != null || t.getToRoute() != null)) {
-      return trips.stream().collect(Collectors.groupingBy(Trip::getRoute));
-    }
-    // Return null, not an empty map to enforce NPE if used when no Route exist
-    return null;
   }
 }

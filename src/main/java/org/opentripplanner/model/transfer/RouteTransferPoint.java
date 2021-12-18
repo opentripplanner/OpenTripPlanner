@@ -2,25 +2,26 @@ package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 
-/**
- * This is a specialized version of the {@link TripTransferPoint}, it represent a
- * given trip of the GTFS Route transfer. It override the specificity-ranking. Except for that,
- * it behave like its super type. So, when looking up tran
- * <p>
- * By expanding a route into trips, we can drop expanded-trips(lower specificity ranking)
- * if a "real" trip-transfers-point exist.
- */
-public class RouteTransferPoint extends TripTransferPoint implements Serializable {
+public final class RouteTransferPoint implements TransferPoint, Serializable {
 
   private static final long serialVersionUID = 1L;
 
   private final Route route;
+  private final int stopPositionInPattern;
 
-  public RouteTransferPoint(Route route, Trip trip, int stopPosition) {
-    super(trip, stopPosition);
+  public RouteTransferPoint(Route route, int stopPositionInPattern) {
     this.route = route;
+    this.stopPositionInPattern = stopPositionInPattern;
+  }
+
+  public Route getRoute() {
+    return route;
+  }
+
+  public int getStopPositionInPattern() {
+    return stopPositionInPattern;
   }
 
   @Override
@@ -29,12 +30,19 @@ public class RouteTransferPoint extends TripTransferPoint implements Serializabl
   }
 
   @Override
-  public int getSpecificityRanking() { return 1; }
+  public int getSpecificityRanking() { return 2; }
+
+  @Override
+  public boolean isRouteTransferPoint() { return true; }
 
   @Override
   public String toString() {
-    return "<Route " + route.getId() + " " + route.getName()
-            + ", trip: " + getTrip().getId()
-            + ", @stopPos:" + getStopPosition() + ">";
+    return ValueObjectToStringBuilder.of()
+            .addText("<Route ")
+            .addObj(route.getId())
+            .addText(" @stopPos:")
+            .addNum(stopPositionInPattern)
+            .addText(">")
+            .toString();
   }
 }

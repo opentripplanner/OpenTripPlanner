@@ -1,30 +1,28 @@
 package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
-import java.util.Objects;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 
-public class TripTransferPoint implements TransferPoint, Serializable {
+public final class TripTransferPoint implements TransferPoint, Serializable {
 
   private static final long serialVersionUID = 1L;
 
   private final Trip trip;
-  private final int stopPosition;
+  private final int stopPositionInPattern;
 
 
-  public TripTransferPoint(Trip trip, int stopPosition) {
+  public TripTransferPoint(Trip trip, int stopPositionInPattern) {
     this.trip = trip;
-    this.stopPosition = stopPosition;
+    this.stopPositionInPattern = stopPositionInPattern;
   }
 
-  @Override
-  public final Trip getTrip() {
+  public Trip getTrip() {
     return trip;
   }
 
-  @Override
-  public final int getStopPosition() {
-    return stopPosition;
+  public int getStopPositionInPattern() {
+    return stopPositionInPattern;
   }
 
   @Override
@@ -32,36 +30,20 @@ public class TripTransferPoint implements TransferPoint, Serializable {
     return false;
   }
 
-  /**
-   * <a href="https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
-   *     GTFS Specificity of a transfer
-   * </a>
-   * {@link #equals(Object)}
-   */
   @Override
-  public int getSpecificityRanking() { return 2; }
+  public int getSpecificityRanking() { return 3; }
+
+  @Override
+  public boolean isTripTransferPoint() { return true; }
 
   @Override
   public String toString() {
-    return "<Trip " + trip.getId() + " @stopPos:" + stopPosition + ">";
-  }
-
-  /**
-   * This equals is intentionally final and enforce equality based on the *trip* and
-   * *stop-position*. Any sub-type is equal if the trip and stop-position match, the type is not
-   * used. This allow us to create sub-types and override the {@link #getSpecificityRanking()}.
-   */
-  @Override
-  public final boolean equals(Object o) {
-    if (this == o) { return true; }
-    if (!(o instanceof TripTransferPoint)) { return false; }
-
-    TripTransferPoint that = (TripTransferPoint) o;
-    return stopPosition == that.stopPosition && trip.getId().equals(that.trip.getId());
-  }
-
-  @Override
-  public final int hashCode() {
-    return Objects.hash(trip.getId(), stopPosition);
+    return ValueObjectToStringBuilder.of()
+            .addText("<Trip ")
+            .addObj(trip.getId())
+            .addText(" @stopPos:")
+            .addNum(stopPositionInPattern)
+            .addText(">")
+            .toString();
   }
 }

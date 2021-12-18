@@ -1,6 +1,10 @@
 package org.opentripplanner.graph_builder.linking;
 
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,14 +27,9 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-
 public class LinkStopToPlatformTest {
 
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
     private Graph graph;
 

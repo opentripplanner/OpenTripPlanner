@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.id;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,6 +33,7 @@ public class TestRouteData implements TestTransitCaseData {
     private final Map<Trip, TripTimes> tripTimesByTrip = new HashMap<>();
     private final Map<Trip, TripSchedule> tripSchedulesByTrip = new HashMap<>();
     private final RaptorTimeTable<TripSchedule> timetable;
+    private final TripPatternWithRaptorStopIndexes raptorTripPattern;
     private Trip currentTrip;
 
     public TestRouteData(String route, TransitMode mode, List<Stop> stops, String ... times) {
@@ -47,15 +50,19 @@ public class TestRouteData implements TestTransitCaseData {
                 .map(tripTimesByTrip::get)
                 .collect(Collectors.toList());
 
-        var tripPattern = new TripPatternWithRaptorStopIndexes(
-                stopIndexes(stopTimesFistTrip),
-                new TripPattern(id("TP1"), this.route, new StopPattern(stopTimesFistTrip))
+        raptorTripPattern = new TripPatternWithRaptorStopIndexes(
+                new TripPattern(id("TP:"+route), this.route, new StopPattern(stopTimesFistTrip)),
+                stopIndexes(stopTimesFistTrip)
         );
+        tripTimes.forEach(t -> raptorTripPattern.getPattern().add(t));
+
         var listOfTripPatternForDates = List.of(
-                new TripPatternForDate(tripPattern, tripTimes, DATE)
+                new TripPatternForDate(raptorTripPattern, tripTimes, DATE)
         );
 
-        var patternForDates = new TripPatternForDates(tripPattern, listOfTripPatternForDates, List.of(OFFSET));
+        var patternForDates = new TripPatternForDates(
+                raptorTripPattern, listOfTripPatternForDates, List.of(OFFSET)
+        );
         for (Trip trip : trips) {
             var tripSchedule = new TripScheduleWithOffset(
                     patternForDates, DATE, tripTimesByTrip.get(trip), OFFSET
@@ -75,58 +82,49 @@ public class TestRouteData implements TestTransitCaseData {
         return trip;
     }
 
-    Trip trip() {
+    public Route getRoute() {
+        return route;
+    }
+
+    public Trip trip() {
         return currentTrip;
     }
 
-    TestRouteData firstTrip() {
+    public TestRouteData firstTrip() {
         this.currentTrip = trips.get(0);
         return this;
     }
 
-    TestRouteData lastTrip() {
+    public TestRouteData lastTrip() {
         this.currentTrip = trips.get(trips.size()-1);
         return this;
     }
 
-    StopTime getStopTime(Stop stop) {
+    public StopTime getStopTime(Stop stop) {
         return stopTimesByTrip.get(currentTrip).get(stopPosition(stop));
     }
 
-    RaptorTimeTable<TripSchedule> getTimetable() {
+    public RaptorTimeTable<TripSchedule> getTimetable() {
         return timetable;
     }
 
-    TripSchedule getTripSchedule() {
+    public TripSchedule getTripSchedule() {
         return tripSchedulesByTrip.get(currentTrip);
     }
 
+    public TripPatternWithRaptorStopIndexes getRaptorTripPattern() {
+        return raptorTripPattern;
+    }
 
     private List<StopTime> getStopTimes() {
         return stopTimesByTrip.get(currentTrip);
-    }
-
-    private Route getRoute() {
-        return route;
-    }
-
-    private List<Trip> getTrips() {
-        return trips;
-    }
-
-    private Map<Trip, List<StopTime>> getStopTimesByTrip() {
-        return stopTimesByTrip;
-    }
-
-    private Map<Trip, TripTimes> getTripTimesByTrip() {
-        return tripTimesByTrip;
     }
 
     int[] stopIndexes(Collection<StopTime> times) {
         return times.stream().mapToInt(it -> stopIndex(it.getStop())).toArray();
     }
 
-    int stopPosition(StopLocation stop) {
+    public int stopPosition(StopLocation stop) {
         List<StopTime> times = firstTrip().getStopTimes();
         for (int i=0; i<times.size(); ++i) {
             if(stop == times.get(i).getStop()) { return i; }
@@ -141,10 +139,6 @@ public class TestRouteData implements TestTransitCaseData {
             stopTimes.add(stopTime(trip, stops.get(i), times[i], i+1));
         }
         return stopTimes;
-    }
-
-    private StopTime findStopTime(StopLocation stop, List<StopTime> times) {
-        return times.stream().filter(it -> it.getStop() == stop).findFirst().orElseThrow();
     }
 
     private StopTime stopTime(Trip trip, Stop stop, int time, int seq) {

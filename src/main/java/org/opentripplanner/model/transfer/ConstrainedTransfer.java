@@ -18,6 +18,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final int FROM_RANKING_COEFFICIENT = 11;
+    private static final int TO_RANKING_COEFFICIENT = 10;
 
     private final FeedScopedId id;
 
@@ -67,17 +69,43 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
         return constraint.isRegularTransfer();
     }
 
-    public boolean matchesStopPos(int fromStopPos, int toStopPos) {
-        return from.getStopPosition() == fromStopPos && to.getStopPosition() == toStopPos;
-    }
-
     /**
      * <a href="https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
      * Specificity of a transfer
      * </a>
+     *
+     * The ranking implemented here is slightly modified:
+     * <ul>
+     *     <li>
+     *         The specification do not say anything about Stations even if Stations can be used to
+     *         specify a transfer-point. In OTP stops are more specific than station, so we use the
+     *         following transfer-point ranking:
+     *         <ol>
+     *             <li>Station: 0 (zero)</li>
+     *             <li>Stop: 1</li>
+     *             <li>Route: 2</li>
+     *             <li>Trip: 3</li>
+     *         </ol>
+     *     </li>
+     *     <li>
+     *         Two transfers may have the same ranking if we add together the from-point and
+     *         to-point ranking.
+     *         For example, {@code from trip(3) + to stop(1) == from route(2) + to route(2)}
+     *         have the same ranking. To avoid this problem, we give the from-point a small
+     *         advantage. We multiply the from point with 11 and the to point with 10, this
+     *         break the ties in favor of the from point. In the example above the
+     *         ConstrainedTransfer specificityRanking is:
+     * <pre>
+     * Case 1: from trip to stop :=  11 * 3 + 10 * 1 = 43
+     * Case 2: from route to route :=  11 * 2 + 10 * 2 = 42
+     * </pre>
+     *         Case 1 have the highest ranking.
+     *     </li>
+     * </ul>
      */
     public int getSpecificityRanking() {
-        return from.getSpecificityRanking() + to.getSpecificityRanking();
+        return from.getSpecificityRanking() * FROM_RANKING_COEFFICIENT
+                + to.getSpecificityRanking() * TO_RANKING_COEFFICIENT;
     }
 
     @Override

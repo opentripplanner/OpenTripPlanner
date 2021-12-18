@@ -4,14 +4,14 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 
 public class TripPatternWithId extends TripPatternWithRaptorStopIndexes {
-  private FeedScopedId id;
+  private final FeedScopedId id;
 
   public TripPatternWithId(
       FeedScopedId id,
       int[] stopIndexes,
       org.opentripplanner.model.TripPattern originalTripPattern
   ) {
-    super(stopIndexes, originalTripPattern);
+    super(originalTripPattern, stopIndexes);
     this.id = id;
   }
 

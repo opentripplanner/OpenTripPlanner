@@ -106,12 +106,9 @@ public class OtpTransitServiceImplTest {
                         .collect(joining("\n"))
         );
 
-        // There is 9 transfers, but because of the route to trip we get more
-        // TODO TGR - Support Route to trip expansion
         assertEquals(
-                //"Transfer{from: (route: 2, trip: 2.1, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
-                //+ "Transfer{from: (route: 2, trip: 2.2, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
-                "ConstrainedTransfer{from: <Stop K>, to: <Stop L>, constraint: {priority: RECOMMENDED}}\n"
+                "ConstrainedTransfer{from: <Route 2 @stopPos:2>, to: <Route 5 @stopPos:0>, constraint: {guaranteed}}\n"
+                + "ConstrainedTransfer{from: <Stop K>, to: <Stop L>, constraint: {priority: RECOMMENDED}}\n"
                 + "ConstrainedTransfer{from: <Stop K>, to: <Stop M>, constraint: {priority: NOT_ALLOWED}}\n"
                 + "ConstrainedTransfer{from: <Stop L>, to: <Stop K>, constraint: {priority: RECOMMENDED}}\n"
                 + "ConstrainedTransfer{from: <Stop M>, to: <Stop K>, constraint: {priority: NOT_ALLOWED}}\n"

@@ -13,6 +13,9 @@ public class ConstrainedTransferTest implements TransferTestData {
   private static final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
   private static final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
 
+  private final ConstrainedTransfer TX_STATIONS = new ConstrainedTransfer(null, STATION_POINT, STATION_POINT, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_STATION_TO_A = new ConstrainedTransfer(null, STATION_POINT, STOP_POINT_A, NO_CONSTRAINS);
+  private final ConstrainedTransfer TX_T11_STATION = new ConstrainedTransfer(null, TRIP_POINT_11, STATION_POINT, NO_CONSTRAINS);
   private final ConstrainedTransfer TX_A_TO_B = new ConstrainedTransfer(null, STOP_POINT_A, STOP_POINT_B, NO_CONSTRAINS);
   private final ConstrainedTransfer TX_A_TO_R22 = new ConstrainedTransfer(null, STOP_POINT_A, ROUTE_POINT_22, NO_CONSTRAINS);
   private final ConstrainedTransfer TX_A_TO_T23 = new ConstrainedTransfer(null, STOP_POINT_A, TRIP_POINT_23, NO_CONSTRAINS);
@@ -36,13 +39,16 @@ public class ConstrainedTransferTest implements TransferTestData {
 
   @Test
   public void getSpecificityRanking() {
-    assertEquals(0, TX_A_TO_B.getSpecificityRanking());
-    assertEquals(1, TX_R11_TO_B.getSpecificityRanking());
-    assertEquals(1, TX_A_TO_R22.getSpecificityRanking());
-    assertEquals(2, TX_R11_TO_R22.getSpecificityRanking());
-    assertEquals(2, TX_A_TO_T23.getSpecificityRanking());
-    assertEquals(3, TX_T11_TO_R22.getSpecificityRanking());
-    assertEquals(4, TX_T11_TO_T22.getSpecificityRanking());
+    assertEquals(0, TX_STATIONS.getSpecificityRanking());
+    assertEquals(10, TX_STATION_TO_A.getSpecificityRanking());
+    assertEquals(21, TX_A_TO_B.getSpecificityRanking());
+    assertEquals(31, TX_A_TO_R22.getSpecificityRanking());
+    assertEquals(32, TX_R11_TO_B.getSpecificityRanking());
+    assertEquals(33, TX_T11_STATION.getSpecificityRanking());
+    assertEquals(41, TX_A_TO_T23.getSpecificityRanking());
+    assertEquals(42, TX_R11_TO_R22.getSpecificityRanking());
+    assertEquals(53, TX_T11_TO_R22.getSpecificityRanking());
+    assertEquals(63, TX_T11_TO_T22.getSpecificityRanking());
   }
 
   @Test

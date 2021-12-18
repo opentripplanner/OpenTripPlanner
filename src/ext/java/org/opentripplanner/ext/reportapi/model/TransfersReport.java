@@ -6,17 +6,23 @@ import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.RouteTransferPoint;
+import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferPoint;
+import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.routing.graph.GraphIndex;
 
 
 /**
  * This class is used to export transfers for human verification to a CSV file. This is useful
  * when trying to debug the rather complicated NeTEx data format or to get the GTFS transfers in a
- * more human readable form. It can also be used to test transfer functionality, since it is easy
+ * more human-readable form. It can also be used to test transfer functionality, since it is easy
  * to read and find special test-cases when needed.
  */
 public class TransfersReport {
@@ -41,32 +47,39 @@ public class TransfersReport {
 
     String export() {
         buf.addHeader(
-                "Id", "Operator", "FromTripId", "FromTrip", "FromStop",
-                "ToTripId", "ToTrip", "ToStop", "ArrivalTime", "DepartureTime", "TransferTime",
-                "Walk", "Priority", "MaxWaitTime", "StaySeated", "Guaranteed"
+                "Id", "Operator", "From", "FromId", "FromRoute", "FromTrip", "FromStop",
+                "FromSpecificity", "To", "ToId", "ToRoute", "ToTrip", "ToStop", "ToSpecificity",
+                "ArrivalTime", "DepartureTime", "TransferTime", "Walk", "Priority", "MaxWaitTime",
+                "StaySeated", "Guaranteed"
         );
 
         transfers.forEach(t -> {
             var from = pointInfo(t.getFrom(), true);
             var to = pointInfo(t.getTo(), false);
-            var dist = (from.c == null || to.c == null)
+            var dist = (from.coordinate == null || to.coordinate == null)
                     ? ""
                     : String.format(
                             "%.0fm",
-                            SphericalDistanceLibrary.fastDistance(from.c, to.c)
+                            SphericalDistanceLibrary.fastDistance(from.coordinate, to.coordinate)
                     );
             var duration = (from.time == NOT_SET || to.time == NOT_SET)
                     ? "" : durationToStr(to.time - from.time);
             var c = t.getTransferConstraint();
 
             buf.addText(t.getId() == null ? "" : t.getId().getId());
-            buf.addText(t.getFrom().getTrip().getOperator().getId().getId());
-            buf.addText(from.tripId);
+            buf.addText((from.operator.isEmpty() ? to : from).operator);
+            buf.addText(from.type);
+            buf.addText(from.entityId);
+            buf.addText(from.route);
             buf.addText(from.trip);
             buf.addText(from.loc);
-            buf.addText(to.tripId);
+            buf.addNumber(from.specificity);
+            buf.addText(to.type);
+            buf.addText(to.entityId);
+            buf.addText(to.route);
             buf.addText(to.trip);
             buf.addText(to.loc);
+            buf.addNumber(to.specificity);
             buf.addTime(from.time, NOT_SET);
             buf.addTime(to.time, NOT_SET);
             buf.addText(duration);
@@ -85,42 +98,83 @@ public class TransfersReport {
             boolean arrival
     ) {
         var r = new TxPoint();
-        if (p instanceof StopTransferPoint) {
-            r.loc = p.getStop().getName();
-            return r;
+
+        if(p instanceof TripTransferPoint) {
+            var tp = (TripTransferPoint)p;
+            var trip = tp.getTrip();
+            var route = trip.getRoute();
+            var ptn = index.getPatternForTrip().get(trip);
+            r.operator = trip.getOperator().getId().getId();
+            r.type = "Trip";
+            r.entityId = trip.getId().getId();
+            r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
+            r.trip = trip.getTripHeadsign();
+            addLocation(r, ptn, tp.getStopPositionInPattern(), trip, arrival);
         }
-        var ptn = index.getPatternForTrip().get(p.getTrip());
-        var trip = p.getTrip();
-        var route = trip.getRoute();
-
-        r.tripId = trip.getId().getId();
-        r.trip = route.getName() + " " + route.getMode() + " " + route.getLongName()
-                + " " + trip.getTripHeadsign();
-        r.c = null;
-
-
-
-
-        if (ptn.getStops().size() > p.getStopPosition()) {
-            int pos = p.getStopPosition();
-            var stop = ptn.getStops().get(pos);
-            var tt = ptn.getScheduledTimetable().getTripTimes(trip);
-            r.loc += stop.getName() + " [" + pos + "]" +  " " + stop.getCoordinate();
-            r.time = arrival ? tt.getScheduledArrivalTime(pos) : tt.getScheduledDepartureTime(pos);
-            r.c = stop.getCoordinate().asJtsCoordinate();
+        else if(p instanceof RouteTransferPoint) {
+            var rp = (RouteTransferPoint)p;
+            var route = rp.getRoute();
+            var ptn = index.getPatternsForRoute().get(route).stream().findFirst().orElse(null);
+            r.operator = route.getOperator().getId().getId();
+            r.type = "Route";
+            r.entityId = route.getId().getId();
+            r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
+            addLocation(r, ptn, rp.getStopPositionInPattern(), null, arrival);
         }
-        else {
-            r.loc += "[Stop index not found: " + p.getStopPosition() + "]";
+        else if(p instanceof StopTransferPoint) {
+            var sp = (StopTransferPoint)p;
+            StopLocation stop = sp.getStop();
+            r.type = "Stop";
+            r.entityId = stop.getId().getId();
+            r.loc = stop.getName();
+            r.coordinate = stop.getCoordinate().asJtsCoordinate();
         }
-        r.loc += " " + p.getSpecificityRanking();
+        else if(p instanceof StationTransferPoint) {
+            var sp = (StationTransferPoint)p;
+            Station station = sp.getStation();
+            r.type = "Station";
+            r.entityId = station.getId().getId();
+            r.loc = station.getName();
+            r.coordinate = station.getCoordinate().asJtsCoordinate();
+        }
+
+        r.specificity = p.getSpecificityRanking();
+        r.coordinate = null;
         return r;
     }
 
+    private static void addLocation(
+            TxPoint r,
+            TripPattern pattern,
+            int stopPosition,
+            Trip trip,
+            boolean arrival
+    ) {
+        if(pattern == null || stopPosition >= pattern.getStopPattern().getSize()) {
+            r.loc += "[Stop position not found: " + stopPosition + "]";
+            return;
+        }
+        var stop = pattern.getStops().get(stopPosition);
+        r.loc += stop.getName() + " [" + stopPosition + "]" +  " " + stop.getCoordinate();
+        r.coordinate = stop.getCoordinate().asJtsCoordinate();
+
+        if(trip != null) {
+            var tt = pattern.getScheduledTimetable().getTripTimes(trip);
+            r.time = arrival
+                    ? tt.getScheduledArrivalTime(stopPosition)
+                    : tt.getScheduledDepartureTime(stopPosition);
+        }
+    }
+
     static class TxPoint {
+        private String operator = "";
+        private String type = "";
+        private String entityId = "";
         private String loc = "";
-        private String tripId = "";
         private String trip = "";
-        private Coordinate c = null;
+        private String route = "";
+        private Integer specificity = null;
+        private Coordinate coordinate = null;
         private int time = NOT_SET;
     }
 }

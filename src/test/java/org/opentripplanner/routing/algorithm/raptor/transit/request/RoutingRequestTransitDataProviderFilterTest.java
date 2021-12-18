@@ -1,20 +1,28 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.opentripplanner.model.*;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripAlteration;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 public class RoutingRequestTransitDataProviderFilterTest {
 
@@ -134,7 +142,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     TripPattern pattern = new TripPattern(null, route, stopPattern);
 
     TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
-        new int[0], pattern
+            pattern, new int[0]
     );
 
     TripTimes tripTimes = Mockito.mock(TripTimes.class);

@@ -97,6 +97,9 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         return priority;
     }
 
+    /**
+     * Also known as interlining of GTFS trips with the same block id.
+     */
     public boolean isStaySeated() {
         return staySeated;
     }
@@ -110,10 +113,19 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
      * if the alight-slack or board-slack is too tight. We ignore slack for facilitated transfers.
      * <p>
      * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer
-     * is either stay-seated or guaranteed. High priority transfers are not.
+     * is either stay-seated or guaranteed. High priority transfers are not facilitated.
      */
     public boolean isFacilitated() {
         return staySeated || guaranteed;
+    }
+
+
+    /**
+     * This switch enables transfers in Raptor, ignoring transfer constraints with for example
+     * only priority set.
+     */
+    public boolean useInRaptorRouting() {
+        return isStaySeated() || isGuaranteed() || isNotAllowed();
     }
 
     @Override
@@ -131,6 +143,10 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     /**
      * Maximum time after scheduled departure time the connecting transport is guarantied to wait
      * for the delayed trip.
+     * <p>
+     * THIS IS NOT CONSIDERED IN RAPTOR. Otp relay on real-time data for this, so if the "from"
+     * vehicle is delayed, then the real time system is also responsible for propagating the delay
+     * onto the "to" trip.
      */
     public int getMaxWaitTime() {
         return maxWaitTime;
@@ -195,13 +211,12 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         return NONE_FACILITATED_COST;
     }
 
-
-
-    public static Builder create() { return new Builder(); }
-
     private boolean isMaxWaitTimeSet() {
         return maxWaitTime != MAX_WAIT_TIME_NOT_SET;
     }
+
+
+    public static Builder create() { return new Builder(); }
 
     public static class Builder {
         private TransferPriority priority = ALLOWED;

@@ -49,6 +49,14 @@ public class TransferConstraintTest implements TransferTestData {
   }
 
   @Test
+  public void useInRaptorRouting() {
+    assertTrue(GUARANTIED.useInRaptorRouting());
+    assertTrue(STAY_SEATED.useInRaptorRouting());
+    assertFalse(NO_CONSTRAINS.useInRaptorRouting());
+    assertTrue(NOT_ALLOWED.useInRaptorRouting());
+  }
+
+  @Test
   public void isNotAllowed() {
     assertTrue(NOT_ALLOWED.isNotAllowed());
     assertFalse(GUARANTIED.isNotAllowed());

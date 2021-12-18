@@ -6,7 +6,7 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * A very simple CSV builder to create CSV reports.
  * <p>
- * This class helps formatting common types like time, duration and enums.
+ * This class helps to format common types like time, duration and enums.
  */
 class CsvReportBuilder {
     private final String sep;
@@ -51,12 +51,12 @@ class CsvReportBuilder {
     }
 
     void addNumber(Number num) {
-        buf.append(num.toString());
+        buf.append(num == null ? "" : num.toString());
         sep();
     }
 
     void addBoolean(Boolean b) {
-        buf.append(b.toString());
+        buf.append(b == null ? "" : b.toString());
         sep();
     }
 
