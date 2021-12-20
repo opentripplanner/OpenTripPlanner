@@ -45,7 +45,6 @@ public class RouterConfig implements Serializable {
     private final UpdatersParameters updatersParameters;
     private final VectorTileConfig vectorTileLayers;
     private final FlexConfig flexConfig;
-    private final DataOverlayConfig dataOverlayConfig;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
