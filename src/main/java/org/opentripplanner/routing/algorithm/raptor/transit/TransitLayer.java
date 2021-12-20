@@ -76,12 +76,12 @@ public class TransitLayer {
   }
 
   public int getIndexByStop(Stop stop) {
-    return stopIndex.indexByStop.get(stop);
+    return stopIndex.indexOf(stop);
   }
 
   @Nullable
   public StopLocation getStopByIndex(int stop) {
-    return stop != -1 ? this.stopIndex.stopsByIndex.get(stop) : null;
+    return stop == -1 ? null : this.stopIndex.stopByIndex(stop);
   }
 
   public StopIndexForRaptor getStopIndex() {
@@ -104,7 +104,7 @@ public class TransitLayer {
   }
 
   public int getStopCount() {
-    return stopIndex.stopsByIndex.size();
+    return stopIndex.size();
   }
 
   @Nullable

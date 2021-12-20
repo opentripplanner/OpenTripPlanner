@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -26,24 +25,27 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConve
  * The scope of instances of this class is limited to the mapping process, the final state is
  * stored in the {@link TransitLayer}.
  */
-public class StopIndexForRaptor {
-    public final List<StopLocation> stopsByIndex;
-    public final Map<StopLocation, Integer> indexByStop = new HashMap<>();
+public final class StopIndexForRaptor {
+    private final List<StopLocation> stopsByIndex;
+    private final Map<StopLocation, Integer> indexByStop = new HashMap<>();
     public final int[] stopBoardAlightCosts;
 
     public StopIndexForRaptor(Collection<StopLocation> stops, TransitTuningParameters tuningParameters) {
-        this.stopsByIndex = new ArrayList<>(stops);
+        this.stopsByIndex = List.copyOf(stops);
         initializeIndexByStop();
         this.stopBoardAlightCosts = createStopBoardAlightCosts(stopsByIndex, tuningParameters);
     }
 
-    /**
-     * Create map between stop and index used by Raptor to stop objects in original graph
-     */
-    void initializeIndexByStop() {
-        for(int i = 0; i< stopsByIndex.size(); ++i) {
-            indexByStop.put(stopsByIndex.get(i), i);
-        }
+    public StopLocation stopByIndex(int index) {
+        return stopsByIndex.get(index);
+    }
+
+    public int indexOf(StopLocation stop) {
+        return indexByStop.get(stop);
+    }
+
+    public int size() {
+        return stopsByIndex.size();
     }
 
     /**
@@ -56,6 +58,15 @@ public class StopIndexForRaptor {
             stopIndex[i] = indexByStop.get(stops[i]);
         }
         return stopIndex;
+    }
+
+    /**
+     * Create map between stop and index used by Raptor to stop objects in original graph
+     */
+    private void initializeIndexByStop() {
+        for(int i = 0; i< stopsByIndex.size(); ++i) {
+            indexByStop.put(stopsByIndex.get(i), i);
+        }
     }
 
     /**
