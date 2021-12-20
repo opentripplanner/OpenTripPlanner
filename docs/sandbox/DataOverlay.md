@@ -91,15 +91,14 @@ Example of build-config.json that includes the dataOverlay plugin configuration:
 }
 ```
 
-
-TODO - set some meaningful values into the example
+Default values for Data overlay plugin can also be included in router-config instead of being sent with teach request. If any Data overlay parameters are passed in user query, all the default values from router-config are ignored.
 ```json
-// otp-config.json
-{ 
+// router-config.json
+{
   "routingDefaults": {
     "dataOverlay" : {
-      "carbon_monoxide_penalty" : 0.2,
-      "carbon_monoxide_threshold" : 0.2
+      "particulate_matter_10_threshold" : 100,
+      "particulate_matter_10_penalty" : 19
     }
   }
 }
