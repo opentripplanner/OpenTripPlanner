@@ -17,6 +17,9 @@ import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
 
+/**
+ * Vehicle parking updater class for https://github.com/offenesdresden/ParkAPI format APIs.
+ */
 abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
 
     private static final String JSON_PARSE_PATH = "lots";

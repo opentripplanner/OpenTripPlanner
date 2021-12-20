@@ -5,6 +5,10 @@ import java.util.Map;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import java.util.Collection;
 
+/**
+ * Vehicle parking updater class that extends the {@link ParkAPIUpdater}. Meant for reading bicycle
+ * parks from https://github.com/offenesdresden/ParkAPI format APIs.
+ */
 public class BicycleParkAPIUpdater extends ParkAPIUpdater {
 
     public BicycleParkAPIUpdater(
