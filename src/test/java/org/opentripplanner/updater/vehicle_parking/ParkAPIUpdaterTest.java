@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class ParkApiUpdaterTest {
+public class ParkAPIUpdaterTest {
 
     @Test
     void parseCars() {
@@ -15,7 +15,7 @@ public class ParkApiUpdaterTest {
         var cwd = System.getProperty("user.dir");
         var url = "file://" + cwd + "/src/test/resources/vehicle_parking/parkapi-reutlingen.json";
 
-        var updater = new CarParkAPIUpdater(url, "park-api", List.of());
+        var updater = new CarParkAPIUpdater(url, "park-api", null, List.of());
 
         assertTrue(updater.update());
         var parkingLots = updater.getUpdates();
