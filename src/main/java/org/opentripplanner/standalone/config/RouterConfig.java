@@ -7,12 +7,10 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.updater.UpdatersParameters;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,10 +58,6 @@ public class RouterConfig implements Serializable {
         this.updatersParameters = new UpdatersConfig(adapter);
         this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
         this.flexConfig = new FlexConfig(adapter.path("flex"));
-
-        this.dataOverlayConfig = OTPFeature.DataOverlay.isOnElseNull(
-                () -> DataOverlayConfigMapper.map(adapter.path("dataOverlay"))
-        );
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
