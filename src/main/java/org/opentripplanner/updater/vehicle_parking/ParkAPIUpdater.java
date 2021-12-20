@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.OsmOpeningHours;
-import org.opentripplanner.routing.core.TimeRestriction;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
@@ -83,8 +81,9 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
                 .state(state)
                 .x(x)
                 .y(y)
-                .openingHours(parseOpeningHours(jsonNode.path("opening_hours")))
-                .feeHours(parseOpeningHours(jsonNode.path("fee_hours")))
+                // TODO
+                // .openingHours(parseOpeningHours(jsonNode.path("opening_hours")))
+                // .feeHours(parseOpeningHours(jsonNode.path("fee_hours")))
                 .detailsUrl(jsonNode.has("url") ? jsonNode.get("url").asText() : null)
                 .note(note)
                 .capacity(capacity)
@@ -134,14 +133,15 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
         return spaces != null && spaces > 0;
     }
 
-    @SneakyThrows
-    private TimeRestriction parseOpeningHours(JsonNode jsonNode) {
-        if (jsonNode == null || jsonNode.asText().isBlank()) {
-            return null;
-        }
+    // TODO
+    // @SneakyThrows
+    // private TimeRestriction parseOpeningHours(JsonNode jsonNode) {
+    //     if (jsonNode == null || jsonNode.asText().isBlank()) {
+    //         return null;
+    //     }
 
-        return OsmOpeningHours.parseFromOsm(jsonNode.asText());
-    }
+    //     return OsmOpeningHours.parseFromOsm(jsonNode.asText());
+    // }
 
     private Integer parseSpacesValue(JsonNode jsonNode, String fieldName) {
         if (!jsonNode.has(fieldName)) {
