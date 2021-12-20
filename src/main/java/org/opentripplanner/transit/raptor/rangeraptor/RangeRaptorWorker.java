@@ -214,7 +214,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 var route = routeIterator.next();
                 var pattern = route.pattern();
                 var tripSearch = createTripSearch(route.timetable());
-                var txService = enableTransferConstraints
+                var txSearch = enableTransferConstraints
                         ? calculator.transferConstraintsSearch(route) : null;
 
                 int alightSlack = slackProvider.alightSlack(pattern);
@@ -239,7 +239,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
 
                             boolean handled = boardWithConstrainedTransfer(
-                                    txService, route.timetable(), stopIndex, stopPos
+                                    txSearch, route.timetable(), stopIndex, stopPos
                             );
 
                             // Find the best trip and board [no guaranteed transfer exist]
@@ -282,14 +282,14 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * trip search from execution.
      */
     private boolean boardWithConstrainedTransfer(
-            RaptorConstrainedTripScheduleBoardingSearch<T> txService,
+            RaptorConstrainedTripScheduleBoardingSearch<T> txSearch,
             RaptorTimeTable<T> targetTimetable,
             int targetStopIndex,
             int targetStopPos
     ) {
         if(!enableTransferConstraints) { return false; }
 
-        if(!txService.transferExist(targetStopPos)) { return false; }
+        if(!txSearch.transferExist(targetStopPos)) { return false; }
 
         // Get the previous transit stop arrival (transfer source)
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
@@ -302,7 +302,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 slackProvider.alightSlack(sourceStopArrival.trip().pattern())
         );
 
-        var result = txService.find(
+        var result = txSearch.find(
                 targetTimetable,
                 sourceStopArrival.trip(),
                 sourceStopArrival.stop(),
