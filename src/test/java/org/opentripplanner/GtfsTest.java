@@ -44,8 +44,6 @@ public abstract class GtfsTest extends TestCase {
 
     public abstract String getFeedName();
 
-    public boolean isLongDistance() { return false; }
-
     private String agencyId;
 
     public Itinerary itinerary = null;

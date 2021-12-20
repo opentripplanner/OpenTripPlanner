@@ -1,5 +1,6 @@
 package org.opentripplanner.model.transfer;
 
+import com.google.common.base.MoreObjects;
 import java.time.Duration;
 import org.opentripplanner.model.StopLocation;
 
@@ -12,5 +13,14 @@ public class MinTimeTransfer {
         this.from = from;
         this.to = to;
         this.minTransferTime = minTransferTime;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("from", from)
+                .add("to", to)
+                .add("minTransferTime", minTransferTime)
+                .toString();
     }
 }
