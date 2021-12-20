@@ -76,7 +76,7 @@ public class GraphBuilder implements Runnable {
         }
 
         DataImportIssueStore issueStore = new DataImportIssueStore(true);
-        HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
+        HashMap<Class<?>, Object> extra = new HashMap<>();
 
         for (GraphBuilderModule load : graphBuilderModules) {
             load.buildGraph(graph, extra, issueStore);

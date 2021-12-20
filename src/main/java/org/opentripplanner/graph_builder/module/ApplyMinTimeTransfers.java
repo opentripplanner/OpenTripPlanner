@@ -10,6 +10,15 @@ import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.transfer.MinTimeTransfer;
 import org.opentripplanner.routing.graph.Graph;
 
+/**
+ * Transit data (for example transfers.txt) can describe how long a transfer between two stops can
+ * take. The previous graph build step {@link DirectTransferGenerator} calculates the transfers on
+ * the OSM street network and calculates a time, too.
+ * <p>
+ * In this step we take both data sources and combine them: if we already have an OSM-based transfer
+ * we use its edges in order to display a nice shape rather than a straight line, but we override
+ * with the one from the transit data.
+ */
 public class ApplyMinTimeTransfers implements GraphBuilderModule {
 
     public final float AVERAGE_WALKING_SPEED = 1.4f;
@@ -37,6 +46,11 @@ public class ApplyMinTimeTransfers implements GraphBuilderModule {
             var shortestTransfer =
                     pathTransfers.min(Comparator.comparingDouble(PathTransfer::getDistanceMeters));
 
+            // transfers don't have a fixed time but a distance so the time for traversal depends
+            // on the walking speed. here we convert the minimum time back to a distance so that
+            // logic still works. this is in line with the GTFS spec with says that the
+            // mininum transfer time is for a "typical rider".
+            // https://github.com/google/transit/blob/master/gtfs/spec/en/reference.md#transferstxt
             final float meters =
                     minTimeTransfer.minTransferTime.getSeconds() / AVERAGE_WALKING_SPEED;
 
@@ -47,11 +61,13 @@ public class ApplyMinTimeTransfers implements GraphBuilderModule {
             });
 
             if (shortestTransfer.isEmpty()) {
+                // no path found on OSM network, so we generate one with a straight line instead.
+                // this is likely a problem in the OSM data.
                 var directLineTransfer =
                         new PathTransfer(minTimeTransfer.from, minTimeTransfer.to, meters, null);
                 transfers.add(directLineTransfer);
                 issueStore.add(
-                        "NoTransferPathFound",
+                        "NoTransferStreetPathFound",
                         "Transit data contains transfer %s but no path found on street network.",
                         minTimeTransfer
                 );
