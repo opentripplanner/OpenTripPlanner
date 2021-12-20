@@ -154,7 +154,7 @@ public class NodeAdapter {
 
     public Optional<Double> asDoubleOptional(String paramName) {
         JsonNode node = param(paramName);
-        if(node.isEmpty()) { return Optional.empty(); }
+        if(node.isMissingNode()) { return Optional.empty(); }
         return Optional.of(node.asDouble());
     }
 

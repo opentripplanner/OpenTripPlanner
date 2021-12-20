@@ -125,7 +125,7 @@ public class DataOverlayParameters implements Serializable {
             int pos = parameter.lastIndexOf('_');
             if (pos < 0 || pos > parameter.length() - 2) {return null;}
             var name = ParameterName.valueOf(parameter.substring(0, pos).toUpperCase());
-            var type = ParameterType.valueOf(parameter.substring(pos + 1));
+            var type = ParameterType.valueOf(parameter.substring(pos + 1).toUpperCase());
             return new T2<>(name, type);
         }
         catch (IllegalArgumentException ignore) {
