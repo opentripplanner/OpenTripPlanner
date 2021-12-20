@@ -13,7 +13,7 @@ class SmooveBikeRentalDataSourceTest {
     void makeStation() {
         SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource(
                 new SmooveBikeRentalDataSourceParameters(
-                        "file:src/test/resources/bike/smoove.json",
+                        "file:src/ext-test/resources/smoovebikerental/smoove.json",
                         null,
                         true,
                         Map.of()
@@ -79,7 +79,7 @@ class SmooveBikeRentalDataSourceTest {
     void makeStationWithoutOverloading() {
         SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource(
                 new SmooveBikeRentalDataSourceParameters(
-                        "file:src/test/resources/bike/smoove.json",
+                        "file:src/ext-test/resources/smoovebikerental/smoove.json",
                         null,
                         false,
                         Map.of()

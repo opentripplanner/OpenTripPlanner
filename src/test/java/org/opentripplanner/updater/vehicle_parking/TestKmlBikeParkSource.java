@@ -12,7 +12,7 @@ public class TestKmlBikeParkSource extends TestCase {
   public void testKML() {
 
     KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(
-        "file:src/test/resources/bike/NSFietsenstallingen.kml",
+        "file:src/test/resources/vehicle_parking/NSFietsenstallingen.kml",
         TEST_FEED_ID,
         null,
         false
@@ -33,7 +33,7 @@ public class TestKmlBikeParkSource extends TestCase {
   public void testKMLWithFolder() {
 
       KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(
-          "file:src/test/resources/bike/NSFietsenstallingen_folder.kml",
+          "file:src/test/resources/vehicle_parking/NSFietsenstallingen_folder.kml",
           TEST_FEED_ID,
           null,
           false
