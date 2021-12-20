@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.HashMap;
 import junit.framework.TestCase;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -64,7 +65,7 @@ public abstract class GtfsTest extends TestCase {
         graph = new Graph();
         router = new Router(graph, RouterConfig.DEFAULT);
 
-        gtfsGraphBuilderImpl.buildGraph(graph, null);
+        gtfsGraphBuilderImpl.buildGraph(graph, new HashMap<>());
         // Set the agency ID to be used for tests to the first one in the feed.
         agencyId = graph.getAgencies().iterator().next().getId().getId();
         System.out.printf("Set the agency ID for this test to %s\n", agencyId);
