@@ -50,7 +50,7 @@ public class PlaceTest {
         assertNull(p.coordinate);
     }
 
-    private static Stop stop(String stopId, double lat, double lon) {
+    public static Stop stop(String stopId, double lat, double lon) {
        return new Stop(
                 new FeedScopedId("S", stopId),
                 null,

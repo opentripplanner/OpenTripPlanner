@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Graph;
  */
 public class ApplyMinTimeTransfers implements GraphBuilderModule {
 
+    // https://en.wikipedia.org/wiki/Preferred_walking_speed
     public final float AVERAGE_WALKING_SPEED = 1.4f;
 
     @Override
@@ -67,7 +68,7 @@ public class ApplyMinTimeTransfers implements GraphBuilderModule {
                         new PathTransfer(minTimeTransfer.from, minTimeTransfer.to, meters, null);
                 transfers.add(directLineTransfer);
                 issueStore.add(
-                        "NoTransferStreetPathFound",
+                        "NoTransferStreetPath",
                         "Transit data contains transfer %s but no path found on street network.",
                         minTimeTransfer
                 );
