@@ -13,8 +13,6 @@ interface ConstrainedBoardingSearchStrategy {
 
     TransferPoint source(ConstrainedTransfer tx);
 
-    TransferPoint target(ConstrainedTransfer tx);
-
     int time(RaptorTripSchedule schedule, int stopPos);
 
     int findSourceStopPosition(RaptorTripSchedule schedule, int timeLimit, int stop);

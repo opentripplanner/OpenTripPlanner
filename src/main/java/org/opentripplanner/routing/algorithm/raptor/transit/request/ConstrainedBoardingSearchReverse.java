@@ -16,9 +16,6 @@ class ConstrainedBoardingSearchReverse
     public TransferPoint source(ConstrainedTransfer tx) {return tx.getTo();}
 
     @Override
-    public TransferPoint target(ConstrainedTransfer tx) {return tx.getFrom();}
-
-    @Override
     public int time(RaptorTripSchedule schedule, int stopPos) {
         return schedule.arrival(stopPos);
     }
