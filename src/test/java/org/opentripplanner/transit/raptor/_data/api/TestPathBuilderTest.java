@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor._data.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_DURATION;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_START;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING;
@@ -20,7 +21,6 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_COST;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_DURATION;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.util.time.DurationUtils.duration;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
