@@ -173,6 +173,6 @@ public final class Route extends TransitEntity {
 
     @Override
     public String toString() {
-        return "<Route " + getId() + " " + shortName + ">";
+        return "<Route " + getId() + " " + getName() + ">";
     }
 }

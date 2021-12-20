@@ -43,7 +43,7 @@ public class TripTransferPoint implements TransferPoint, Serializable {
 
   @Override
   public String toString() {
-    return "(trip: " + trip.getId() + ", stopPos: " + stopPosition + ")";
+    return "<Trip " + trip.getId() + " @stopPos:" + stopPosition + ">";
   }
 
   /**

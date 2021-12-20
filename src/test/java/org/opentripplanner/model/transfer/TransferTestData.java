@@ -6,14 +6,16 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 
 public interface TransferTestData {
+    String FEED_ID = "F";
+
     Stop STOP_A = Stop.stopForTest("A", 60.0, 11.0);
     Stop STOP_B = Stop.stopForTest("B", 60.0, 11.0);
 
-    Route ROUTE_1 = new Route(new FeedScopedId("R", "1"));
-    Route ROUTE_2 = new Route(new FeedScopedId("R", "2"));
+    Route ROUTE_1 = createRoute(1, "L1");
+    Route ROUTE_2 = createRoute(2, "L2");
 
-    Trip TRIP_1 = createTrip("1", ROUTE_1);
-    Trip TRIP_2 = createTrip("2", ROUTE_2);
+    Trip TRIP_1 = createTrip(1, ROUTE_1);
+    Trip TRIP_2 = createTrip(2, ROUTE_2);
 
     TransferPoint STOP_POINT_A = new StopTransferPoint(STOP_A);
     TransferPoint STOP_POINT_B = new StopTransferPoint(STOP_B);
@@ -25,9 +27,19 @@ public interface TransferTestData {
     TransferPoint TRIP_POINT_23 = new TripTransferPoint(TRIP_2, 3);
 
 
-    private static Trip createTrip(String id, Route route) {
-        Trip t = new Trip(new FeedScopedId("T", id));
+    private static Trip createTrip(int id, Route route) {
+        Trip t = new Trip(createId(id));
         t.setRoute(route);
         return t;
+    }
+
+    private static Route createRoute(int id, String name) {
+        Route route = new Route(createId(id));
+        route.setShortName(name);
+        return route;
+    }
+
+    private static FeedScopedId createId(int id) {
+        return new FeedScopedId(FEED_ID, String.valueOf(id));
     }
 }

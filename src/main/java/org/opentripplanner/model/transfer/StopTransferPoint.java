@@ -2,7 +2,6 @@ package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 
 public class StopTransferPoint implements TransferPoint, Serializable {
@@ -32,7 +31,7 @@ public class StopTransferPoint implements TransferPoint, Serializable {
 
   @Override
   public String toString() {
-    return "(stop: " + stop.getId() + ")";
+    return "<Stop " + stop.getId() + ">";
   }
 
   @Override

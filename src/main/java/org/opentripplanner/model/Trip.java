@@ -114,8 +114,8 @@ public final class Trip extends TransitEntity {
     }
 
     /**
-     * Return human friendly short info to identify the trip when mode, from/to stop and
-     * times are known. This method is meant for logging, and should not be exposed in any API.
+     * Return human friendly short info to identify the trip when mode, from/to stop and times are
+     * known. This method is meant for debug/logging, and should not be exposed in any API.
      */
     public String logInfo() {
         if(hasValue(tripShortName)) { return tripShortName; }

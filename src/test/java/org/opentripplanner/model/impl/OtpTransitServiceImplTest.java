@@ -111,11 +111,11 @@ public class OtpTransitServiceImplTest {
         assertEquals(
                 //"Transfer{from: (route: 2, trip: 2.1, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
                 //+ "Transfer{from: (route: 2, trip: 2.2, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
-                "ConstrainedTransfer{from: (stop: K), to: (stop: L), constraint: {priority: RECOMMENDED}}\n"
-                + "ConstrainedTransfer{from: (stop: K), to: (stop: M), constraint: {priority: NOT_ALLOWED}}\n"
-                + "ConstrainedTransfer{from: (stop: L), to: (stop: K), constraint: {priority: RECOMMENDED}}\n"
-                + "ConstrainedTransfer{from: (stop: M), to: (stop: K), constraint: {priority: NOT_ALLOWED}}\n"
-                + "ConstrainedTransfer{from: (trip: 1.1, stopPos: 1), to: (trip: 2.2, stopPos: 0), constraint: {guaranteed}}",
+                "ConstrainedTransfer{from: <Stop K>, to: <Stop L>, constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: <Stop K>, to: <Stop M>, constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: <Stop L>, to: <Stop K>, constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: <Stop M>, to: <Stop K>, constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: <Trip 1.1 @stopPos:1>, to: <Trip 2.2 @stopPos:0>, constraint: {guaranteed}}",
                 result
         );
     }

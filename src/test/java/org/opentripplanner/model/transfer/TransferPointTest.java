@@ -79,8 +79,8 @@ public class TransferPointTest implements TransferTestData {
 
     @Test
     public void testToString() {
-        assertEquals("(stop: F:A)", STOP_POINT_A.toString());
-        assertEquals("(route: R:1, trip: T:1, stopPos: 1)", ROUTE_POINT_11.toString());
-        assertEquals("(trip: T:1, stopPos: 1)", TRIP_POINT_11.toString());
+        assertEquals("<Stop F:A>", STOP_POINT_A.toString());
+        assertEquals("<Route F:1 L1, trip: F:1, @stopPos:1>", ROUTE_POINT_11.toString());
+        assertEquals("<Trip F:1 @stopPos:1>", TRIP_POINT_11.toString());
     }
 }

@@ -60,7 +60,7 @@ public class ConstrainedTransferTest implements TransferTestData {
   @Test
   public void testToString() {
     assertEquals(
-            "ConstrainedTransfer{from: (stop: F:A), to: (stop: F:B), constraint: {no constraints}}",
+            "ConstrainedTransfer{from: <Stop F:A>, to: <Stop F:B>, constraint: {no constraints}}",
             TX_A_TO_B.toString()
     );
   }
