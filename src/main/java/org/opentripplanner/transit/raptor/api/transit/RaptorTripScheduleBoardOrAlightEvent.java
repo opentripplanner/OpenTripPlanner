@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
-import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 /**
  * The purpose of the TripScheduleBoardAlight is to represent the board/alight for a
@@ -50,8 +50,10 @@ public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedu
     int getTime();
 
     /**
-     * Return the transfer constrains for the transfer before this boarding, if it exists.
+     * Return the transfer constrains for the transfer before this boarding.
+     * If there are no transfer constraints assisiated with the boarding the
+     * {@link RaptorTransferConstraint#isRegularTransfer()} is {@code true}.
      */
-    @Nullable
+    @NotNull
     RaptorTransferConstraint getTransferConstraint();
 }

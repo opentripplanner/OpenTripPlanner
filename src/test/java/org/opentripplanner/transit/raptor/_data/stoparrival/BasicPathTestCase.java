@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
@@ -329,7 +330,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     ) {
         boolean firstTransit = TRIP_1 == trip;
         int boardCost = COST_CALCULATOR.boardingCost(
-                firstTransit, prevArrivalTime, boardStop, boardTime, trip, null
+                firstTransit, prevArrivalTime, boardStop, boardTime, trip, REGULAR_TRANSFER
         );
 
         return COST_CALCULATOR.transitArrivalCost(

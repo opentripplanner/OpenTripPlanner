@@ -61,7 +61,7 @@ class ConstrainedBoardingSearchReverse
                 }
             }
             if (alightPrevNormalTrip) {
-                return new T2<>(i, null);
+                return new T2<>(i, TransferConstraint.REGULAR_TRANSFER);
             }
         }
         return null;

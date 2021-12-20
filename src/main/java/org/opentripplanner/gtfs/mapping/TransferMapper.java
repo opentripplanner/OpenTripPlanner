@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.Transfer;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
@@ -125,7 +124,7 @@ class TransferMapper {
     int transferTime = rhs.getMinTransferTime();
 
     // If this transfer do not give any advantages in the routing, then drop it
-    if(constraint.noConstraints()) {
+    if(constraint.isRegularTransfer()) {
       if(transferTime > 0) {
         LOG.info("Transfer skipped, issue #3369: " + rhs);
       }

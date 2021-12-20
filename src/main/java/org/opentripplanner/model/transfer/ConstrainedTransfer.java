@@ -64,7 +64,7 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
     }
 
     public boolean noConstraints() {
-        return constraint.noConstraints();
+        return constraint.isRegularTransfer();
     }
 
     public boolean matchesStopPos(int fromStopPos, int toStopPos) {

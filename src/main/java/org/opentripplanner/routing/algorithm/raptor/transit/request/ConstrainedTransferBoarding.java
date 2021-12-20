@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
@@ -15,9 +16,9 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
     private final int time;
 
     ConstrainedTransferBoarding(
-            TransferConstraint constraint,
+            @NotNull TransferConstraint constraint,
             int tripIndex,
-            T trip,
+            @NotNull T trip,
             int stopPositionInPattern,
             int time
     ) {
@@ -32,6 +33,7 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
     public int getTripIndex() { return tripIndex; }
 
     @Override
+    @NotNull
     public T getTrip() { return trip; }
 
     @Override
@@ -41,6 +43,7 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
     public int getTime() { return time; }
 
     @Override
+    @NotNull
     public TransferConstraint getTransferConstraint() {
         return constraint;
     }

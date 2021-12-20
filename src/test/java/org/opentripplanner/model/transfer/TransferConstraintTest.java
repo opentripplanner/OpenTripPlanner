@@ -71,12 +71,12 @@ public class TransferConstraintTest implements TransferTestData {
 
   @Test
   public void noConstraints() {
-    assertTrue(NO_CONSTRAINS.noConstraints());
-    assertFalse(STAY_SEATED.noConstraints());
-    assertFalse(GUARANTIED.noConstraints());
-    assertFalse(RECOMMENDED.noConstraints());
-    assertFalse(MAX_WAIT_TIME.noConstraints());
-    assertFalse(EVERYTHING.noConstraints());
+    assertTrue(NO_CONSTRAINS.isRegularTransfer());
+    assertFalse(STAY_SEATED.isRegularTransfer());
+    assertFalse(GUARANTIED.isRegularTransfer());
+    assertFalse(RECOMMENDED.isRegularTransfer());
+    assertFalse(MAX_WAIT_TIME.isRegularTransfer());
+    assertFalse(EVERYTHING.isRegularTransfer());
   }
 
   @Test

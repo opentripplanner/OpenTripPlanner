@@ -20,6 +20,12 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
     private static final long serialVersionUID = 1L;
 
+
+    /**
+     * A regular transfer is a transfer with no constraints.
+     */
+    public static final TransferConstraint REGULAR_TRANSFER = create().build();
+
     /**
      * STAY_SEATED is not a priority, but we assign a cost to it to be able to compare it with other
      * transfers with a priority and the {@link #GUARANTIED_TRANSFER_COST}.
@@ -115,6 +121,13 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         return priority == NOT_ALLOWED;
     }
 
+    @Override
+    public boolean isRegularTransfer() {
+        // Note! The 'maxWaitTime' is only valid with the guaranteed flag set, so we
+        // do not need to check it here
+        return !(staySeated || guaranteed || priority.isConstrained());
+    }
+
     /**
      * Maximum time after scheduled departure time the connecting transport is guarantied to wait
      * for the delayed trip.
@@ -140,7 +153,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     }
 
     public String toString() {
-        if(noConstraints()) { return "{no constraints}"; }
+        if(isRegularTransfer()) { return "{no constraints}"; }
 
         return ToStringBuilder.of()
                 .addEnum("priority", priority, ALLOWED)
@@ -148,12 +161,6 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
                 .addBoolIfTrue("guaranteed", guaranteed)
                 .addDurationSec("maxWaitTime", maxWaitTime, MAX_WAIT_TIME_NOT_SET)
                 .toString();
-    }
-
-    public boolean noConstraints() {
-        // Note! The 'maxWaitTime' is only valid with the guaranteed flag set, so we
-        // do not need to check it here
-        return !(staySeated || guaranteed || priority.isConstrained());
     }
 
     /**

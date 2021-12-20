@@ -20,6 +20,7 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_COST;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_DURATION;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.util.time.DurationUtils.duration;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
@@ -46,7 +47,12 @@ public class TestPathBuilderTest implements RaptorTestConstants {
 
     var transitLeg = path.accessLeg().nextLeg().asTransitLeg();
     int boardCost = COST_CALCULATOR.boardingCost(
-        true, path.accessLeg().toTime(), STOP_A, transitLeg.fromTime(), transitLeg.trip(), null
+            true,
+            path.accessLeg().toTime(),
+            STOP_A,
+            transitLeg.fromTime(),
+            transitLeg.trip(),
+            REGULAR_TRANSFER
     );
 
     int transitCost = COST_CALCULATOR.transitArrivalCost(

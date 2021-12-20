@@ -311,10 +311,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
         if (result == null) { return false; }
 
-        if (
-                result.getTransferConstraint() != null &&
-                result.getTransferConstraint().isNotAllowed()
-        ) {
+        if (result.getTransferConstraint().isNotAllowed()) {
             // We are blocking a normal trip search here by returning
             // true without boarding the trip
             return true;
