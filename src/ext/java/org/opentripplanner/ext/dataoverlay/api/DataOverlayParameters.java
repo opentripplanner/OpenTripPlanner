@@ -40,6 +40,10 @@ public class DataOverlayParameters implements Serializable {
 
     private final Map<T2<ParameterName, ParameterType>, Double> values = new HashMap<>();
 
+    public boolean isEmpty() {
+        return values.isEmpty();
+    }
+
     /**
      * Parse the input {@code params} and create a new {@link DataOverlayParameters}
      * instance. All unknown parameters are ignored, so are missing values. This method is

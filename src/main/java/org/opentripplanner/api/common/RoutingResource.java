@@ -932,7 +932,10 @@ public abstract class RoutingResource {
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
 
         if (OTPFeature.DataOverlay.isOn()) {
-            request.dataOverlay = DataOverlayParameters.parseQueryParams(queryParameters);
+            var queryDataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
+            if (!queryDataOverlayParameters.isEmpty()) {
+                request.dataOverlay = queryDataOverlayParameters;
+            }
         }
 
         return request;
