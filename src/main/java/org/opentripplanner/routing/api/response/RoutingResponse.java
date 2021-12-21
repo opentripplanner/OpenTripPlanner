@@ -1,24 +1,30 @@
 package org.opentripplanner.routing.api.response;
 
+import java.util.List;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 
-import java.util.List;
-import java.util.StringJoiner;
-
 public class RoutingResponse {
     private final TripPlan tripPlan;
+    private final PageCursor nextPageCursor;
+    private final PageCursor previousPageCursor;
     private final TripSearchMetadata metadata;
     private final List<RoutingError> routingErrors;
     private final DebugTimingAggregator debugTimingAggregator;
 
     public RoutingResponse(
         TripPlan tripPlan,
+        PageCursor previousPageCursor,
+        PageCursor nextPageCursor,
         TripSearchMetadata metadata,
         List<RoutingError> routingErrors,
         DebugTimingAggregator debugTimingAggregator
     ) {
         this.tripPlan = tripPlan;
+        this.nextPageCursor = nextPageCursor;
+        this.previousPageCursor = previousPageCursor;
         this.metadata = metadata;
         this.routingErrors = routingErrors;
         this.debugTimingAggregator = debugTimingAggregator;
@@ -28,11 +34,19 @@ public class RoutingResponse {
         return tripPlan;
     }
 
+    public PageCursor getNextPageCursor() {
+        return nextPageCursor;
+    }
+
+    public PageCursor getPreviousPageCursor() {
+        return previousPageCursor;
+    }
+
     public TripSearchMetadata getMetadata() {
         return metadata;
     }
 
-    public DebugTimingAggregator getDebugAggregator() {
+    public DebugTimingAggregator getDebugTimingAggregator() {
         return debugTimingAggregator;
     }
 
@@ -40,11 +54,12 @@ public class RoutingResponse {
 
     @Override
     public String toString() {
-        return new StringJoiner(
-                ", ", RoutingResponse.class.getSimpleName() + "[", "]"
-        )
-                .add("tripPlan=" + tripPlan)
-                .add("metadata=" + metadata)
+        return ToStringBuilder.of(RoutingResponse.class)
+                .addObj("tripPlan", tripPlan)
+                .addObj("nextPageCursor", nextPageCursor)
+                .addObj("previousPageCursor", previousPageCursor)
+                .addObj("metadata", metadata)
+                .addObj("routingErrors", routingErrors)
                 .toString();
     }
 }

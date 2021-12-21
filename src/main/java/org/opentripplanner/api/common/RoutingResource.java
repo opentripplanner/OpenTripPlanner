@@ -17,6 +17,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -92,6 +93,16 @@ public abstract class RoutingResource {
      */
     @QueryParam("searchWindow")
     protected Integer searchWindow;
+
+    /**
+     * Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last
+     * response and keep the original request as is. This will enable you to search for itineraries
+     * in the next or previous time-window.
+     * <p>
+     * This is an optional parameter.
+     */
+    @QueryParam("pageCursor")
+    public String pageCursor;
 
     /**
      * Search for the best trip options within a time window. If {@code true} two itineraries are
@@ -599,16 +610,20 @@ public abstract class RoutingResource {
     protected Boolean reverseOptimizeOnTheFly;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add before boarding a transit leg. It is recommended to use the
+     * `boardTimes` in the `router-config.json` to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("boardSlack")
     private Integer boardSlack;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add after alighting a transit leg. It is recommended to use the
+     * `alightTimes` in the `router-config.json` to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("alightSlack")
     private Integer alightSlack;
 
@@ -714,8 +729,7 @@ public abstract class RoutingResource {
                     if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
                         gregCal.setTimeZone(tz);
                     }
-                    Date d2 = gregCal.getTime();
-                    request.setDateTime(d2);
+                    request.setDateTime(gregCal.toInstant());
                 } catch (DatatypeConfigurationException e) {
                     request.setDateTime(date, time, tz);
                 }
@@ -726,6 +740,9 @@ public abstract class RoutingResource {
 
         if(searchWindow != null) {
             request.searchWindow = Duration.ofSeconds(searchWindow);
+        }
+        if(pageCursor != null) {
+            request.pageCursor = PageCursor.decode(pageCursor);
         }
         if(timetableView != null) {
             request.timetableView = timetableView;
@@ -899,9 +916,7 @@ public abstract class RoutingResource {
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;
 
-        final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
-        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useVehicleRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
+        request.useVehicleRentalAvailabilityInformation = request.isTripPlannedForNow();
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
             request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);

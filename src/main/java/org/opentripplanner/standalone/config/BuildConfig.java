@@ -82,11 +82,6 @@ public class BuildConfig {
     public final boolean transit;
 
     /**
-     * Create direct transfer edges from transfers.txt in GTFS, instead of based on distance.
-     */
-    public final boolean useTransfersTxt;
-
-    /**
      * Link GTFS stops to their parent stops.
      */
     public final boolean parentStopLinking;
@@ -358,7 +353,6 @@ public class BuildConfig {
         transit = c.asBoolean("transit", true);
         transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
-        useTransfersTxt = c.asBoolean("useTransfersTxt", false);
         writeCachedElevations = c.asBoolean("writeCachedElevations", false);
         maxAreaNodes = c.asInt("maxAreaNodes", 500);
 
