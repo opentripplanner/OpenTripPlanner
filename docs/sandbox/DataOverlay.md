@@ -91,7 +91,7 @@ Example of build-config.json that includes the dataOverlay plugin configuration:
 }
 ```
 
-Default values for Data overlay plugin can also be included in router-config instead of being sent with teach request. If any Data overlay parameters are passed in user query, all the default values from router-config are ignored.
+Default values for Data overlay plugin can also be included in router-config instead of being sent with each request. If any Data overlay parameters are passed in user query, all the default values from router-config are ignored.
 ```json
 // router-config.json
 {
