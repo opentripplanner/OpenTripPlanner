@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import static java.util.stream.Collectors.groupingBy;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.stream.Stream;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 
 
 /**
@@ -32,14 +30,10 @@ class RaptorRoutingRequestTransitDataCreator {
   private final LocalDate departureDate;
 
 
-  RaptorRoutingRequestTransitDataCreator(TransitLayer transitLayer, Instant departureTime) {
+  RaptorRoutingRequestTransitDataCreator(TransitLayer transitLayer, ZonedDateTime searchStartTime) {
     this.transitLayer = transitLayer;
-    this.departureDate = LocalDate.ofInstant(departureTime, transitLayer.getTransitDataZoneId());
-    this.searchStartTime = DateMapper.asStartOfService(departureDate, transitLayer.getTransitDataZoneId());
-  }
-
-  ZonedDateTime getSearchStartTime() {
-    return searchStartTime;
+    this.departureDate = searchStartTime.toLocalDate();
+    this.searchStartTime = searchStartTime;
   }
 
   List<List<TripPatternForDates>> createTripPatternsPerStop(

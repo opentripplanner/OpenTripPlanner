@@ -4,6 +4,7 @@ import static java.lang.Boolean.TRUE;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -171,7 +172,7 @@ public class ToStringBuilder {
      * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss.
      * Note! The DATE is not printed. {@code null} value is ignored.
      */
-    public ToStringBuilder addCalTime(String name, Calendar time) {
+    public ToStringBuilder addTimeCal(String name, Calendar time) {
         return addIfNotNull(name, time, t -> formatTime(t.getTime()));
     }
 
@@ -204,6 +205,10 @@ public class ToStringBuilder {
                 .mapToObj(TimeUtils::timeToStrCompact)
                 .collect(Collectors.joining(" ", "[", "]"))
         );
+    }
+
+    public ToStringBuilder addTime(String name, Instant time) {
+        return addIfNotNull(name, time, Instant::toString);
     }
 
     /**

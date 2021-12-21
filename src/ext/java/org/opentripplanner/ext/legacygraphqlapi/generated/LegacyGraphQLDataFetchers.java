@@ -8,8 +8,6 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
@@ -28,16 +26,10 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import graphql.relay.Connection;
-import graphql.relay.Edge;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRoute;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
-import java.util.Map;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.model.SystemNotice;
@@ -553,7 +545,11 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Long> nextDateTime();
 
+        public DataFetcher<String> nextPageCursor();
+
         public DataFetcher<Long> prevDateTime();
+
+        public DataFetcher<String> previousPageCursor();
 
         public DataFetcher<Long> searchWindowUsed();
 

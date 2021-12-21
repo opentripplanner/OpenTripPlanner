@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -562,10 +563,12 @@ public class Graph implements Serializable {
                 }
                 // assume feed is unreliable after midnight on last service day
                 long u = t + SEC_IN_DAY;
-                if (t < this.transitServiceStarts)
+                if (t < this.transitServiceStarts) {
                     this.transitServiceStarts = t;
-                if (u > this.transitServiceEnds)
+                }
+                if (u > this.transitServiceEnds) {
                     this.transitServiceEnds = u;
+                }
             }
         }
         for (String agency : agencies) {
@@ -576,7 +579,8 @@ public class Graph implements Serializable {
     }
 
     // Check to see if we have transit information for a given date
-    public boolean transitFeedCovers(long t) {
+    public boolean transitFeedCovers(Instant time) {
+        long t = time.getEpochSecond();
         return t >= this.transitServiceStarts && t < this.transitServiceEnds;
     }
 

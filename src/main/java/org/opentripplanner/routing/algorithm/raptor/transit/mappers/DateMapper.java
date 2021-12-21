@@ -16,6 +16,11 @@ public class DateMapper {
                 .minusHours(12);
     }
 
+    public static ZonedDateTime asStartOfService(Instant time, ZoneId zoneId) {
+        LocalDate date = LocalDate.ofInstant(time, zoneId);
+        return DateMapper.asStartOfService(date, zoneId);
+    }
+
     public static ZonedDateTime asStartOfService(LocalDate localDate, ZoneId zoneId) {
         return ZonedDateTime.of(localDate, LocalTime.NOON, zoneId)
                 .minusHours(12);
