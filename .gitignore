@@ -19,6 +19,7 @@ dependency-reduced-pom.xml
 interactive_otp_main.json
 /otp
 /otp-ui
+Dockerfile
 
 # Directories
 .idea/

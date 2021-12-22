@@ -114,16 +114,15 @@ public class GraphPathFinder {
 
     /**
      *  Try to find N paths through the Graph
-     * @throws RoutingValidationException
-     * @throws PathNotFoundException
      */
     public List<GraphPath> graphPathFinderEntryPoint (RoutingRequest request) {
+        long reqTime = request.getDateTimeCurrentPage().getEpochSecond();
 
         // We used to perform a protective clone of the RoutingRequest here.
         // There is no reason to do this if we don't modify the request.
         // Any code that changes them should be performing the copy!
 
-        List<GraphPath> paths = null;
+        List<GraphPath> paths;
         try {
             paths = getPaths(request);
             if (paths == null && request.wheelchairAccessible) {
@@ -148,12 +147,12 @@ public class GraphPathFinder {
                 GraphPath graphPath = gpi.next();
                 // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
                 if (request.arriveBy) {
-                    if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
+                    if (graphPath.states.getLast().getTimeSeconds() > reqTime) {
                         LOG.error("A graph path arrives after the requested time. This implies a bug.");
                         gpi.remove();
                     }
                 } else {
-                    if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
+                    if (graphPath.states.getFirst().getTimeSeconds() < reqTime) {
                         LOG.error("A graph path leaves before the requested time. This implies a bug.");
                         gpi.remove();
                     }

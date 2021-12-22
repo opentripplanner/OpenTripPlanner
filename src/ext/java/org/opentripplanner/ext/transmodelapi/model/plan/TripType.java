@@ -9,6 +9,7 @@ import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
 import java.util.stream.Collectors;
@@ -34,6 +35,7 @@ public class TripType {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("metadata")
             .description("The trip request metadata.")
+            .deprecate("Use pageCursor instead")
             .type(tripMetadataType)
             .dataFetcher(env -> ((PlanResponse) env.getSource()).metadata)
             .build())
@@ -94,6 +96,34 @@ public class TripType {
                 .build()))
             .dataFetcher(env -> ((PlanResponse) env.getSource()).debugOutput)
             .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("previousPageCursor")
+                .description("Use the cursor to get the previous page of results. Use this cursor for "
+                    + "the pageCursor parameter in the trip query in order to get the previous page.\n"
+                    + "The previous page is a set of itineraries departing BEFORE the first itinerary"
+                    + " in this result.")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(env -> {
+                    final PageCursor pageCursor =
+                            ((PlanResponse) env.getSource()).previousPageCursor;
+                    return pageCursor != null ? pageCursor.encode() : null;
+                })
+                .build()
+            )
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("nextPageCursor")
+                .description("Use the cursor to get the next page of results. Use this cursor for "
+                    + "the pageCursor parameter in the trip query in order to get the next page.\n"
+                    + "The next page is a set of itineraries departing AFTER the last "
+                    + "itinerary in this result.")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(env -> {
+                    final PageCursor pageCursor =
+                            ((PlanResponse) env.getSource()).nextPageCursor;
+                    return pageCursor != null ? pageCursor.encode() : null;
+                })
+                .build()
+            )
         .build();
   }
 }

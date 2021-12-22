@@ -80,8 +80,8 @@ public class ConfigLoader {
      */
     public static boolean isConfigFile(String filename) {
         return OTP_CONFIG_FILENAME.equals(filename)
-                || BUILD_CONFIG_FILENAME.equals(filename)
-                || ROUTER_CONFIG_FILENAME.equals(filename);
+            || BUILD_CONFIG_FILENAME.equals(filename)
+            || ROUTER_CONFIG_FILENAME.equals(filename);
     }
 
     /**
