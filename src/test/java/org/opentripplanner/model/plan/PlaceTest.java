@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Locale;
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -69,7 +70,7 @@ public class PlaceTest {
 
     private static Place place(Stop stop) {
         return Place.forStop(
-                stop, null, null
+                stop, null, null, new Locale("en", "US")
         );
     }
 }

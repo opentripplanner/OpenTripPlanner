@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
@@ -214,7 +215,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return Place.forStop(
             source.stop,
             stopIndex,
-            null
+            null,
+            new Locale("en", "US")
     );
   }
 }

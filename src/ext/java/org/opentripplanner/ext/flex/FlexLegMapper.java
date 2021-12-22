@@ -29,13 +29,15 @@ public class FlexLegMapper {
                 flexEdge.s1,
                 flexEdge.getFromVertex(),
                 flexEdge.flexTemplate.fromStopIndex,
-                null
+                null,
+                requestedLocale
         );
         leg.to = Place.forFlexStop(
                 flexEdge.s2,
                 flexEdge.getToVertex(),
                 flexEdge.flexTemplate.toStopIndex,
-                null
+                null,
+                requestedLocale
         );
     }
 }

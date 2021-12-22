@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -232,8 +233,8 @@ public class RaptorPathToItineraryMapper {
         var transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = ((TransferWithDuration) pathLeg.transfer()).transfer();
 
-        Place from = Place.forStop(transferFromStop, null, null);
-        Place to = Place.forStop(transferToStop, null, null);
+        Place from = Place.forStop(transferFromStop, null, null, request.locale);
+        Place to = Place.forStop(transferToStop, null, null, request.locale);
         return mapNonTransitLeg(pathLeg, transfer, transferMode, from, to);
     }
 
@@ -331,7 +332,7 @@ public class RaptorPathToItineraryMapper {
      * Maps stops for transit legs.
      */
     private Place mapStopToPlace(StopLocation stop, Integer stopIndex, TripTimes tripTimes) {
-        return Place.forStop(stop, stopIndex, tripTimes.getOriginalGtfsStopSequence(stopIndex));
+        return Place.forStop(stop, stopIndex, tripTimes.getOriginalGtfsStopSequence(stopIndex), request.locale);
     }
 
     private Calendar createCalendar(int timeInSeconds) {

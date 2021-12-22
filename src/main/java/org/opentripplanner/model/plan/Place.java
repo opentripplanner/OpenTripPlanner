@@ -1,5 +1,6 @@
 package org.opentripplanner.model.plan;
 
+import java.util.Locale;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.base.ToStringBuilder;
@@ -141,9 +142,9 @@ public class Place {
         );
     }
 
-    public static Place forStop(StopLocation stop, Integer stopIndex, Integer stopSequence) {
+    public static Place forStop(StopLocation stop, Integer stopIndex, Integer stopSequence, Locale requestedLocale) {
         return new Place(
-                stop.getName().toString(),
+                stop.getName().toString(requestedLocale),
                 null,
                 stop.getCoordinate(),
                 VertexType.TRANSIT,
@@ -159,12 +160,13 @@ public class Place {
             StopLocation stop,
             Vertex vertex,
             Integer stopIndex,
-            Integer stopSequence
+            Integer stopSequence,
+            Locale requestedLocale
     ) {
         // The actual vertex is used because the StopLocation coordinates may not be equal to the vertex's
         // coordinates.
         return new Place(
-                stop.getName().toString(),
+                stop.getName().toString(requestedLocale),
                 null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.TRANSIT,
