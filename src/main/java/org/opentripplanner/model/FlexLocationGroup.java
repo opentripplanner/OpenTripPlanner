@@ -1,7 +1,5 @@
 package org.opentripplanner.model;
 
-import java.util.Collection;
-import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -25,6 +23,8 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
 
   private GeometryCollection geometry = new GeometryCollection(null, GeometryUtils.getGeometryFactory());
 
+  private Point centroid;
+
   public FlexLocationGroup(FeedScopedId id) {
     super(id);
   }
@@ -38,18 +38,42 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
     return name;
   }
 
+  @Override
+  public String getDescription() {
+    return null;
+  }
+
+  @Override
+  public I18NString getUrl() {
+    return null;
+  }
+
   /**
    * Returns the centroid of all stops and areas belonging to this location group.
    */
   @Override
   public WgsCoordinate getCoordinate() {
-    Point centroid = geometry.getCentroid();
     return new WgsCoordinate(centroid.getY(), centroid.getX());
   }
 
   @Override
   public String getFirstZoneAsString() {
     return null;
+  }
+
+  @Override
+  public Geometry getGeometry() {
+    return geometry;
+  }
+
+  @Override
+  public boolean isPartOfStation() {
+    return false;
+  }
+
+  @Override
+  public boolean isPartOfSameStationAs(StopLocation alternativeStop) {
+    return false;
   }
 
   /**
@@ -71,11 +95,12 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
       envelope.expandBy(100 / xscale, 100);
       newGeometries[numGeometries] = GeometryUtils.getGeometryFactory().toGeometry(envelope);
     } else if (location instanceof FlexStopLocation) {
-      newGeometries[numGeometries] = ((FlexStopLocation) location).getGeometry();
+      newGeometries[numGeometries] = location.getGeometry();
     } else {
       throw new RuntimeException("Unknown location type");
     }
     geometry = new GeometryCollection(newGeometries, GeometryUtils.getGeometryFactory());
+    centroid = geometry.getCentroid();
   }
 
   /**

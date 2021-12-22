@@ -20,13 +20,13 @@ public class TransitBoardingAreaVertex extends Vertex {
     super(
         graph,
         boardingArea.getId().toString(),
-        boardingArea.getLon(),
-        boardingArea.getLat()
+        boardingArea.getCoordinate().longitude(),
+        boardingArea.getCoordinate().latitude()
     );
     this.boardingArea = boardingArea;
     this.wheelchairAccessible = boardingArea.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
-    graph.expandToInclude(boardingArea.getLon(), boardingArea.getLat());
+    graph.expandToInclude(boardingArea.getCoordinate().longitude(), boardingArea.getCoordinate().latitude());
   }
 
   @Override

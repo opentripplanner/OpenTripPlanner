@@ -3,19 +3,20 @@ package org.opentripplanner.model.transfer;
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 
 public class StopTransferPoint implements TransferPoint, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private final Stop stop;
+  private final StopLocation stop;
 
-  public StopTransferPoint(Stop stop) {
+  public StopTransferPoint(StopLocation stop) {
     this.stop = stop;
   }
 
   @Override
-  public Stop getStop() {
+  public StopLocation getStop() {
     return stop;
   }
 

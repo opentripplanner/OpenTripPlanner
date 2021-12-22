@@ -109,6 +109,19 @@ public class LegacyGraphQLTypes {
         }
     }
 
+    public static class LegacyGraphQLBikeParkOpeningHoursArgs {
+
+        private Iterable<String> _dates;
+
+        public LegacyGraphQLBikeParkOpeningHoursArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._dates = (Iterable<String>) args.get("dates");
+            }
+        }
+
+        public Iterable<String> getLegacyGraphQLDates() {return this._dates;}
+    }
+
 
     public enum LegacyGraphQLBikesAllowed {
         Allowed("ALLOWED"),
@@ -132,6 +145,20 @@ public class LegacyGraphQLTypes {
         public static LegacyGraphQLBikesAllowed valueOfLabel(String label) {
             return BY_LABEL.get(label);
         }
+    }
+
+
+    public static class LegacyGraphQLCarParkOpeningHoursArgs {
+
+        private Iterable<String> _dates;
+
+        public LegacyGraphQLCarParkOpeningHoursArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._dates = (Iterable<String>) args.get("dates");
+            }
+        }
+
+        public Iterable<String> getLegacyGraphQLDates() {return this._dates;}
     }
 
 

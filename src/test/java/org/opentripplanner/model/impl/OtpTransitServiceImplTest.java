@@ -24,6 +24,7 @@ import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 
@@ -163,7 +164,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetStopsForStation() {
-        List<Stop> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
+        List<StopLocation> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
         assertEquals("[<Stop Z:A>]", stops.toString());
     }
 

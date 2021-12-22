@@ -1,5 +1,7 @@
 package org.opentripplanner.openstreetmap.model;
 
+import org.locationtech.jts.geom.Coordinate;
+
 public class OSMNode extends OSMWithTags {
 
     public double lat;
@@ -7,6 +9,10 @@ public class OSMNode extends OSMWithTags {
 
     public String toString() {
         return "osm node " + id;
+    }
+
+    public Coordinate getCoordinate() {
+        return new Coordinate(this.lon, this.lat);
     }
 
     /**

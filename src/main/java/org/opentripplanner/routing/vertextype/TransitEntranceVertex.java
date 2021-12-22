@@ -25,13 +25,13 @@ public class TransitEntranceVertex extends Vertex {
     super(
         graph,
         entrance.getId().toString(),
-        entrance.getLon(),
-        entrance.getLat()
+        entrance.getCoordinate().longitude(),
+        entrance.getCoordinate().latitude()
     );
     this.entrance = entrance;
     this.wheelchairEntrance = entrance.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
-    graph.expandToInclude(entrance.getLon(), entrance.getLat());
+    graph.expandToInclude(entrance.getCoordinate().longitude(), entrance.getCoordinate().latitude());
   }
 
   @Override

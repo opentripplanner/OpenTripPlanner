@@ -202,7 +202,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
             while (true) {
                 try {
                     if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
-                        LOG.info("OTP UPDATERS INITIALIZED - OTP is read for routing!");
+                        LOG.info("OTP UPDATERS INITIALIZED - OTP is ready for routing!");
                         return;
                     }
                     //noinspection BusyWait

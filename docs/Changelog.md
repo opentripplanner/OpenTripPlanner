@@ -95,6 +95,13 @@
 - Add mode from parent StopPlace for Quays in Netex mapper [#3751](https://github.com/opentripplanner/OpenTripPlanner/pull/3751)
 - Minor performance improvements [#3767](https://github.com/opentripplanner/OpenTripPlanner/pull/3767)
 - Parallelise computing of trip pattern geometries [#3766](https://github.com/opentripplanner/OpenTripPlanner/pull/3766)
+- Add flex stop to TripTimes, return geometries in GraphQL API [#3757](https://github.com/opentripplanner/OpenTripPlanner/pull/3757)
+- Fix checking allowed boarding/alighting for unscheduled flex trips [#3782](https://github.com/opentripplanner/OpenTripPlanner/pull/3782)
+- Calculating number of days to use in StopTimes-request [#3742](https://github.com/opentripplanner/OpenTripPlanner/pull/3742)
+- Walkable area builder improvements [#3765](https://github.com/opentripplanner/OpenTripPlanner/pull/3765)
+- Remove hardcoded alighting/boarding on first/last stop [#3784](https://github.com/opentripplanner/OpenTripPlanner/pull/3784)
+- Add support for include-file-directive in config files. [#3771](https://github.com/opentripplanner/OpenTripPlanner/pull/3771)
+- Remove build parameter 'useTransfersTxt' [#3791](https://github.com/opentripplanner/OpenTripPlanner/pull/3791)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

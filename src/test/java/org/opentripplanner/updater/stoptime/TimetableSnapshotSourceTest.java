@@ -269,7 +269,7 @@ public class TimetableSnapshotSourceTest {
 
         // THEN
         // Find new pattern in graph starting from stop A
-        Stop stopA = graph.index.getStopForId(new FeedScopedId(feedId, "A"));
+        var stopA = graph.index.getStopForId(new FeedScopedId(feedId, "A"));
         // Get trip pattern of last (most recently added) outgoing edge
         // FIXME create a new test to see that add-trip realtime updates work
         TripPattern tripPattern = null;

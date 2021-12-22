@@ -134,7 +134,7 @@ public class LegacyGraphQLQueryTypeImpl
           return null; //TODO
         case "stopAtDistance": {
           String[] parts = id.split(";");
-          Stop stop = routingService.getStopForId(FeedScopedId.parseId(parts[1]));
+          var stop = routingService.getStopForId(FeedScopedId.parseId(parts[1]));
 
           // TODO: Add geometry
           return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null, null);
@@ -142,7 +142,9 @@ public class LegacyGraphQLQueryTypeImpl
         case "TicketType":
           return null; //TODO
         case "Trip":
-          return routingService.getTripForId().get(FeedScopedId.parseId(id));
+          var scopedId = FeedScopedId.parseId(id);
+          var trip = routingService.getTripForId().get(scopedId);
+          return trip;
         case "VehicleParking":
           var vehicleParkingId = FeedScopedId.parseId(id);
           return vehicleParkingService == null ? null : vehicleParkingService
@@ -196,7 +198,7 @@ public class LegacyGraphQLQueryTypeImpl
             .collect(Collectors.toList());
       }
 
-      Stream<Stop> stopStream = routingService.getAllStops().stream();
+      var stopStream = routingService.getAllStops().stream();
 
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
