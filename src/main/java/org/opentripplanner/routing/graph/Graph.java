@@ -45,6 +45,8 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
@@ -287,6 +289,13 @@ public class Graph implements Serializable {
      * going to fail as soon as we load a base OSM graph and build transit on top of it.
      */
     public long nextSplitNumber = 0;
+
+    /**
+     * DataOverlay Sandbox module parameter bindings configured in the build-config, and needed
+     * when creating the data overlay context when routing.
+     */
+    public DataOverlayParameterBindings dataOverlayParameterBindings;
+
 
     public Graph(Graph basedOn) {
         this();
