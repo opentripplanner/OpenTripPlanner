@@ -319,6 +319,10 @@ public class IndexGraphQLSchema {
                     .name("date")
                     .type(Scalars.GraphQLString)
                     .build())
+                    .argument(GraphQLArgument.newArgument()
+                    .name("omitNonPickups")
+                    .type(Scalars.GraphQLBoolean)
+                    .build())
                 .dataFetcher(environment -> {
                     try {  // TODO: Add our own scalar types for at least serviceDate and FeedId
                         return index.getStopTimesForStop(
@@ -405,6 +409,16 @@ public class IndexGraphQLSchema {
                 .type(stopType)
                 .dataFetcher(environment -> index.stopForId
                     .get(((TripTimeShort) environment.getSource()).stopId))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stopIndex")
+                .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).stopIndex)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("blockId")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).blockId)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("scheduledArrival")
