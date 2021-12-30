@@ -1,5 +1,8 @@
 package org.opentripplanner.updater.vehicle_parking;
 
+import org.opentripplanner.ext.vehicleparking.kml.KmlBikeParkDataSource;
+import org.opentripplanner.ext.vehicleparking.parkapi.BicycleParkAPIUpdater;
+import org.opentripplanner.ext.vehicleparking.parkapi.CarParkAPIUpdater;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.updater.DataSource;
 

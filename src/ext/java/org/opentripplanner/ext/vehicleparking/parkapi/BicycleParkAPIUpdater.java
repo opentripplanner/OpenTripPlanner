@@ -1,17 +1,17 @@
-package org.opentripplanner.updater.vehicle_parking;
+package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.Collection;
 import java.util.Map;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import java.util.Collection;
 
 /**
- * Vehicle parking updater class that extends the {@link ParkAPIUpdater}. Meant for reading car
+ * Vehicle parking updater class that extends the {@link ParkAPIUpdater}. Meant for reading bicycle
  * parks from https://github.com/offenesdresden/ParkAPI format APIs.
  */
-public class CarParkAPIUpdater extends ParkAPIUpdater {
+public class BicycleParkAPIUpdater extends ParkAPIUpdater {
 
-    public CarParkAPIUpdater(
+    public BicycleParkAPIUpdater(
             String url,
             String feedId,
             Map<String, String> httpHeaders,
@@ -22,11 +22,11 @@ public class CarParkAPIUpdater extends ParkAPIUpdater {
 
     @Override
     protected VehicleParkingSpaces parseCapacity(JsonNode jsonNode) {
-        return parseVehicleSpaces(jsonNode, null, "total", "total:disabled");
+        return parseVehicleSpaces(jsonNode, "total", null, null);
     }
 
     @Override
     protected VehicleParkingSpaces parseAvailability(JsonNode jsonNode) {
-        return parseVehicleSpaces(jsonNode, null, "free", "free:disabled");
+        return parseVehicleSpaces(jsonNode, "free", null, null);
     }
 }

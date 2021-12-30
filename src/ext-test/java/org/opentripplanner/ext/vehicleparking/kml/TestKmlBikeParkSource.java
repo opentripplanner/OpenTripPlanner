@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_parking;
+package org.opentripplanner.ext.vehicleparking.kml;
 
 import junit.framework.TestCase;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -12,7 +12,7 @@ public class TestKmlBikeParkSource extends TestCase {
   public void testKML() {
 
     KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(
-        "file:src/test/resources/vehicle_parking/NSFietsenstallingen.kml",
+        "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen.kml",
         TEST_FEED_ID,
         null,
         false
@@ -33,7 +33,7 @@ public class TestKmlBikeParkSource extends TestCase {
   public void testKMLWithFolder() {
 
       KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(
-          "file:src/test/resources/vehicle_parking/NSFietsenstallingen_folder.kml",
+          "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen_folder.kml",
           TEST_FEED_ID,
           null,
           false

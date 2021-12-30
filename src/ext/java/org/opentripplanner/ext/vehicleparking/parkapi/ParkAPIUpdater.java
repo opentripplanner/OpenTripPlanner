@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_parking;
+package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;

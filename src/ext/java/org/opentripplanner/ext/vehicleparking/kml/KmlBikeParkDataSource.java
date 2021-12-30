@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_parking;
+package org.opentripplanner.ext.vehicleparking.kml;
 
 import static java.util.Locale.ROOT;
 
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * @author laurent
  * @author GoAbout
  */
-class KmlBikeParkDataSource implements DataSource<VehicleParking> {
+public class KmlBikeParkDataSource implements DataSource<VehicleParking> {
 
     private static final Logger LOG = LoggerFactory.getLogger(KmlBikeParkDataSource.class);
 

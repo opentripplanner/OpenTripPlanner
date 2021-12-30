@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_parking;
+package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -13,7 +13,8 @@ public class ParkAPIUpdaterTest {
     void parseCars() {
 
         var cwd = System.getProperty("user.dir");
-        var url = "file://" + cwd + "/src/test/resources/vehicle_parking/parkapi-reutlingen.json";
+        var url = "file://" + cwd
+                + "/src/ext-test/resources/vehicleparking/parkapi/parkapi-reutlingen.json";
 
         var updater = new CarParkAPIUpdater(url, "park-api", null, List.of());
 
@@ -26,7 +27,6 @@ public class ParkAPIUpdaterTest {
         assertEquals("Parkplatz Alenberghalle", first.getName().toString());
         assertTrue(first.hasAnyCarPlaces());
         assertNull(first.getCapacity());
-
 
         var last = parkingLots.get(29);
         assertEquals("Zehntscheuer Kegelgraben", last.getName().toString());
