@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import lombok.Setter;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ public class JsonDataListDownloader<T> {
 
   private static final Logger log = LoggerFactory.getLogger(JsonDataListDownloader.class);
 
-  @Setter
   private String url;
   private final String jsonParsePath;
   private final Map<String, String> headers;
@@ -99,6 +97,10 @@ public class JsonDataListDownloader<T> {
       }
     }
     return out;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
   }
 
   private static String convertStreamToString(java.io.InputStream is) {

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import lombok.SneakyThrows;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -140,7 +139,6 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     }
 
     // TODO
-    // @SneakyThrows
     // private TimeRestriction parseOpeningHours(JsonNode jsonNode) {
     //     if (jsonNode == null || jsonNode.asText().isBlank()) {
     //         return null;

@@ -3,18 +3,14 @@ package org.opentripplanner.updater;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.opentripplanner.util.xml.JsonDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Slf4j
 public abstract class GenericJsonDataSource<T> implements DataSource<T> {
 
   private static final Logger LOG = LoggerFactory.getLogger(GenericJsonDataSource.class);
 
-  @Getter
   private String url;
   private final JsonDataListDownloader<T> jsonDataListDownloader;
 
