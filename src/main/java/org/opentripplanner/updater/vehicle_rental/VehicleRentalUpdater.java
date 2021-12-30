@@ -51,12 +51,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
     private VehicleRentalStationService service;
 
-    public VehicleRentalUpdater(VehicleRentalUpdaterParameters parameters) throws IllegalArgumentException {
+    public VehicleRentalUpdater(VehicleRentalUpdaterParameters parameters, DataSource<VehicleRentalPlace> source) throws IllegalArgumentException {
         super(parameters);
         // Configure updater
         LOG.info("Setting up vehicle rental updater.");
-
-        DataSource<VehicleRentalPlace> source = VehicleRentalDataSourceFactory.create(parameters.sourceParameters());
 
         this.source = source;
         if (pollingPeriodSeconds <= 0) {

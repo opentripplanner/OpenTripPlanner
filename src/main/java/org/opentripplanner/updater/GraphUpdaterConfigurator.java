@@ -28,6 +28,7 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +113,8 @@ public abstract class GraphUpdaterConfigurator {
         List<GraphUpdater> updaters = new ArrayList<>();
 
         for (VehicleRentalUpdaterParameters configItem : config.getVehicleRentalParameters()) {
-            updaters.add(new VehicleRentalUpdater(configItem));
+            var source = VehicleRentalDataSourceFactory.create(configItem.sourceParameters());
+            updaters.add(new VehicleRentalUpdater(configItem, source));
         }
         for (GtfsRealtimeAlertsUpdaterParameters configItem : config.getGtfsRealtimeAlertsUpdaterParameters()) {
             updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
