@@ -1,5 +1,7 @@
 package org.opentripplanner.updater.vehicle_parking;
 
+import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdater;
+import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.kml.KmlBikeParkDataSource;
 import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.BicycleParkAPIUpdater;
@@ -17,6 +19,8 @@ public class VehicleParkingDataSourceFactory {
 
   public static DataSource<VehicleParking> create(VehicleParkingUpdaterParameters parameters) {
     switch (parameters.getSourceType()) {
+      case HSL_PARK:
+        return new HslParkUpdater((HslParkUpdaterParameters) parameters);
       case KML:
         return new KmlBikeParkDataSource((KmlUpdaterParameters) parameters);
       case PARK_API:

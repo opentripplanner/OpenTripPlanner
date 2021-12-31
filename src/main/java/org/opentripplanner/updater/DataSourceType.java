@@ -9,6 +9,7 @@ public enum DataSourceType {
   KML,
   PARK_API,
   BICYCLE_PARK_API,
+  HSL_PARK,
 
   // GTFS RT
   GTFS_RT_HTTP,
