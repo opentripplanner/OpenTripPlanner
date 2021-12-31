@@ -38,7 +38,7 @@ public class VehicleParkingUpdaterConfig {
         return new HslParkUpdaterParameters(
                 updaterRef, c.asInt("facilitiesFrequencySec", 3600),
                 c.asText("facilitiesUrl", null), feedId, sourceType,
-                c.asInt("utilizationsFrequencySec", 3600), c.asText("utilizationsUrl", null)
+                c.asInt("utilizationsFrequencySec", 600), c.asText("utilizationsUrl", null)
         );
       case KML:
         return new KmlUpdaterParameters(
