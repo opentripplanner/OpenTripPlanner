@@ -36,7 +36,7 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
       }
       return true;
     }
-    LOG.info("Can't update bike rental station list from: " + url + ", keeping current list.");
+    LOG.info("Can't update entities from: " + url + ", keeping current list.");
     return false;
   }
 
