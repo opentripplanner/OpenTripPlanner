@@ -38,11 +38,11 @@ public class KmlBikeParkDataSource implements DataSource<VehicleParking> {
 
     private List<VehicleParking> bikeParks;
 
-    public KmlBikeParkDataSource(String url, String feedId, String namePrefix, boolean zip) {
-        this.url = url;
-        this.feedId = feedId;
-        this.namePrefix = namePrefix;
-        this.zip = zip;
+    public KmlBikeParkDataSource(KmlUpdaterParameters parameters) {
+        this.url = parameters.getUrl();
+        this.feedId = parameters.getFeedId();
+        this.namePrefix = parameters.getNamePrefix();
+        this.zip = parameters.isZip();
 
         xmlDownloader = new XmlDataListDownloader<>();
         xmlDownloader

@@ -3,6 +3,8 @@ package org.opentripplanner.standalone.config.updaters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
+import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -27,16 +29,24 @@ public class VehicleParkingUpdaterConfig {
   }
 
   public static VehicleParkingUpdaterParameters create(String updaterRef, NodeAdapter c) {
-    return new VehicleParkingUpdaterParameters(
-        updaterRef,
-        c.asText("url", null),
-        c.asText("feedId", null),
-        c.asText("namePrefix", null),
-        c.asInt("frequencySec", 60),
-        c.asBoolean("zip", false),
-        c.asMap("headers", NodeAdapter::asText),
-        new ArrayList<>(c.asTextSet("tags", null)),
-        mapStringToSourceType(c.asText("sourceType"))
-    );
+    var sourceType = mapStringToSourceType(c.asText("sourceType"));
+    switch (sourceType) {
+      case KML:
+        return new KmlUpdaterParameters(
+                updaterRef, c.asText("url", null), c.asText("feedId", null),
+                c.asText("namePrefix", null), c.asInt("frequencySec", 60),
+                c.asBoolean("zip", false), sourceType
+        );
+      case PARK_API:
+      case BICYCLE_PARK_API:
+        return new ParkAPIUpdaterParameters(updaterRef, c.asText("url", null),
+                c.asText("feedId", null), c.asInt("frequencySec", 60),
+                c.asMap("headers", NodeAdapter::asText),
+                new ArrayList<>(c.asTextSet("tags", null)),
+                sourceType
+        );
+      default:
+        throw new OtpAppException("The updater source type is unhandled: " + sourceType);
+    }
   }
 }

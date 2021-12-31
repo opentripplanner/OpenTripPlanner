@@ -10,13 +10,11 @@ public class TestKmlBikeParkSource extends TestCase {
   private static final String TEST_FEED_ID = "testFeed";
 
   public void testKML() {
-
-    KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(
-        "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen.kml",
-        TEST_FEED_ID,
-        null,
-        false
+    var parameters = new KmlUpdaterParameters("",
+            "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen.kml", TEST_FEED_ID,
+            null, 60, false, null
     );
+    KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(parameters);
     assertTrue(kmlDataSource.update());
     List<VehicleParking> bikeParks = kmlDataSource.getUpdates();
     assertEquals(5, bikeParks.size());
@@ -31,13 +29,12 @@ public class TestKmlBikeParkSource extends TestCase {
   }
 
   public void testKMLWithFolder() {
-
-      KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(
-          "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen_folder.kml",
-          TEST_FEED_ID,
-          null,
-          false
-      );
+    var parameters = new KmlUpdaterParameters("",
+            "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen_folder.kml",
+            TEST_FEED_ID,
+            null, 60, false, null
+    );
+    KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(parameters);
     assertTrue(kmlDataSource.update());
     List<VehicleParking> bikeParks = kmlDataSource.getUpdates();
     assertEquals(5, bikeParks.size());

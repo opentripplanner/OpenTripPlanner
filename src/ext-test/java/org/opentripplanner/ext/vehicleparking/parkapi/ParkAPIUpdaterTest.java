@@ -16,7 +16,9 @@ public class ParkAPIUpdaterTest {
         var url = "file://" + cwd
                 + "/src/ext-test/resources/vehicleparking/parkapi/parkapi-reutlingen.json";
 
-        var updater = new CarParkAPIUpdater(url, "park-api", null, List.of());
+        var parameters =
+                new ParkAPIUpdaterParameters("", url, "park-api", 30, null, List.of(), null);
+        var updater = new CarParkAPIUpdater(parameters);
 
         assertTrue(updater.update());
         var parkingLots = updater.getUpdates();

@@ -26,15 +26,10 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     private final String feedId;
     private final Collection<String> staticTags;
 
-    public ParkAPIUpdater(
-            String url,
-            String feedId,
-            Map<String, String> httpHeaders,
-            Collection<String> staticTags
-    ) {
-        super(url, JSON_PARSE_PATH, httpHeaders);
-        this.feedId = feedId;
-        this.staticTags = staticTags;
+    public ParkAPIUpdater(ParkAPIUpdaterParameters parameters) {
+        super(parameters.getUrl(), JSON_PARSE_PATH, parameters.getHttpHeaders());
+        this.feedId = parameters.getFeedId();
+        this.staticTags = parameters.getTags();
     }
 
     @Override
