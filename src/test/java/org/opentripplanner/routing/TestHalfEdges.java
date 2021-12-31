@@ -1,5 +1,17 @@
 package org.opentripplanner.routing;
 
+import static com.google.common.collect.Iterables.filter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
+import java.time.Instant;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -9,6 +21,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Stop;
@@ -21,7 +34,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -34,18 +46,6 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TestUtils;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import static com.google.common.collect.Iterables.filter;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
 
 public class TestHalfEdges {
 
@@ -157,7 +157,7 @@ public class TestHalfEdges {
         assertEquals(2, edges.size());
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
-        options.dateTime = startTime;
+        options.setDateTime(Instant.ofEpochSecond(startTime));
         options.setRoutingContext(graph, br, end);
         ShortestPathTree spt1 = aStar.getShortestPathTree(options);
 
@@ -291,7 +291,7 @@ public class TestHalfEdges {
         assertEquals(2, edges.size());
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
-        options.dateTime = startTime;
+        options.setDateTime(Instant.ofEpochSecond(startTime));
         options.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
@@ -328,7 +328,7 @@ public class TestHalfEdges {
         assertEquals(1, edges.size());
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
-        options.dateTime = startTime;
+        options.setDateTime(Instant.ofEpochSecond(startTime));
         options.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 

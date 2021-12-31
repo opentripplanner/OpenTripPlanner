@@ -53,4 +53,5 @@ pages:
     - Interactive OTP Launcher: 'sandbox/InteractiveOtpMain.md'
     - Sandbox Extension Example: 'sandbox/Examples.md'
     - Park and Ride API: 'sandbox/ParkAndRideApi.md'
+    - Data Overlay: 'sandbox/DataOverlay.md'
     - Vehicle Parking Updaters: 'sandbox/VehicleParking.md'

@@ -16,12 +16,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
+import lombok.val;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.api.request.RequestFunctions;
@@ -149,6 +152,12 @@ public class NodeAdapter {
         return param(paramName).asDouble();
     }
 
+    public Optional<Double> asDoubleOptional(String paramName) {
+        JsonNode node = param(paramName);
+        if(node.isMissingNode()) { return Optional.empty(); }
+        return Optional.of(node.asDouble());
+    }
+
     public List<Double> asDoubles(String paramName, List<Double> defaultValue) {
         if(!exist(paramName)) return defaultValue;
         return arrayAsList(paramName, JsonNode::asDouble);
@@ -190,20 +199,31 @@ public class NodeAdapter {
         return param(paramName).asText();
     }
 
+    /** Get required enum value. Parser is not case sensitive. */
+    public <T extends Enum<T>> T asEnum(String paramName, Class<T> ofType) {
+        return asEnum(paramName, asText(paramName), ofType);
+    }
+
+    /** Get optional enum value. Parser is not case sensitive. */
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T asEnum(String paramName, T defaultValue) {
-        String valueAsString = asText(paramName, defaultValue.name());
-        try {
-            return Enum.valueOf((Class<T>) defaultValue.getClass(), valueAsString);
-        }
-        catch (IllegalArgumentException ignore) {
-            List<T> legalValues = (List<T>) Arrays.asList(defaultValue.getClass().getEnumConstants());
-            throw new OtpAppException(
-                    "The parameter '" + fullPath(paramName)
-                    + "': '" + valueAsString + "' is not in legal. Expected one of " + legalValues
-                    + ". Source: " + source + "."
-            );
-        }
+        var value = asText(paramName, defaultValue.name());
+        return asEnum(paramName, value, (Class<T>) defaultValue.getClass());
+    }
+
+    private <T extends Enum<T>> T asEnum(String paramName, String value, Class<T> ofType) {
+        val upperCaseValue = value.toUpperCase();
+        return Stream.of(ofType.getEnumConstants())
+                .filter(it -> it.name().toUpperCase().equals(upperCaseValue))
+                .findFirst()
+                .orElseThrow(() -> {
+                    List<T> legalValues =  List.of(ofType.getEnumConstants());
+                    throw new OtpAppException(
+                            "The parameter '" + fullPath(paramName)
+                            + "': '" + value + "' is not in legal. Expected one of "
+                            + legalValues + ". Source: " + source + "."
+                    );
+                });
     }
 
     /**
