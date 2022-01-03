@@ -51,6 +51,15 @@ The feature must be configured in `router-config.json` as follows
       "minZoom": 14,
       "cacheMaxSeconds": 60,
       "expansionFactor": 0.25
+    },
+    {
+      "name": "vehicleParking",
+      "type": "VehicleParking",
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60,
+      "expansionFactor": 0.25
     }
   ]
 }
