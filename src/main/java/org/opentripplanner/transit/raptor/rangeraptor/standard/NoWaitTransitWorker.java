@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 import java.util.function.IntConsumer;
-import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -100,5 +99,26 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     @Override
     public TransitArrival<T> previousTransit(int boardStopIndex) {
         return state.previousTransit(boardStopIndex);
+    }
+
+    @Override
+    public void boardSameTrip(int earliestBoardTime, int stopPos, int stopIndex) {
+        // If not boarded, return
+        if(onTripIndex == NOT_SET) { return; }
+
+        int tripBoardingTime = onTrip.departure(stopPos);
+
+        // Return if the current boarding time is after the earliest boarding time
+        if (calculator.isAfter(earliestBoardTime, tripBoardingTime)) { return; }
+
+        int tripTimeShift = tripBoardingTime - earliestBoardTime;
+
+        // Return if the previous boarding time is better than this (the previous boarding can be
+        // time-shifted more than this)
+        if (calculator.isBefore(tripTimeShift, onTripTimeShift)) { return; }
+
+        onTripBoardTime = earliestBoardTime;
+        onTripBoardStop = stopIndex;
+        onTripTimeShift = tripTimeShift;
     }
 }
