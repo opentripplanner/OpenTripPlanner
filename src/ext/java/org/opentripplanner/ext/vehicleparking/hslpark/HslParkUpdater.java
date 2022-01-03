@@ -159,12 +159,14 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
         Integer carSpaces = null;
         Integer wheelchairAccessibleCarSpaces = null;
         Integer bicycleSpaces = null;
+
         for (int i = 0; i < patches.size(); i++) {
             HslParkPatch patch = patches.get(i);
             String type = patch.getCapacityType();
+
             if (type != null) {
                 Integer spaces = patch.getSpacesAvailable();
-                ;
+
                 switch (type) {
                     case "CAR":
                         carSpaces = spaces;
