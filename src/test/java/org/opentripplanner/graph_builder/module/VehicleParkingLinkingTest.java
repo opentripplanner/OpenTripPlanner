@@ -12,18 +12,28 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestBase;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 
-public class VehicleParkingLinkingTest extends VehicleParkingTestBase {
+public class VehicleParkingLinkingTest {
+
+  private Graph graph;
+  private IntersectionVertex A;
+  private IntersectionVertex B;
 
   @BeforeEach
   public void setup() {
-    initGraph();
+    VehicleParkingTestGraphData graphData = new VehicleParkingTestGraphData();
+    graphData.initGraph();
+    graph = graphData.getGraph();
+    A = graphData.getAVertex();
+    B = graphData.getBVertex();
   }
 
   @Test
@@ -70,9 +80,9 @@ public class VehicleParkingLinkingTest extends VehicleParkingTestBase {
   public void carParkingEntranceToAllTraversableStreetLinkingTest() {
     var C = new IntersectionVertex(graph, "C", 0.0001, 0.0001);
     var D = new IntersectionVertex(graph, "D", 0.01, 0.01);
-    street(C, D, StreetTraversalPermission.CAR);
+    VehicleParkingTestUtil.createStreet(C, D, StreetTraversalPermission.CAR);
 
-    street(A, C, StreetTraversalPermission.NONE);
+    VehicleParkingTestUtil.createStreet(A, C, StreetTraversalPermission.NONE);
 
     var parking = VehicleParking.builder()
             .entrance(builder -> builder

@@ -14,6 +14,7 @@ import org.opentripplanner.common.geometry.GeometryDeserializer;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces.VehicleParkingSpacesBuilder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.util.I18NString;
@@ -41,8 +42,6 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
 
     private long lastFacilitiesFetchTime;
 
-    private Map<String, Integer> utilizations = Collections.EMPTY_MAP;
-
     private List<VehicleParking> parks;
 
     public HslParkUpdater(HslParkUpdaterParameters parameters) {
@@ -54,6 +53,62 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
                         parameters.getUtilizationsUrl(), "", this::parseUtilization, null);
         this.facilitiesFrequencySec = parameters.getFacilitiesFrequencySec();
         this.feedId = parameters.getFeedId();
+    }
+
+    /**
+     * Update the data from the sources. It first fetches parks from the facilities URL and then
+     * realtime updates from utilizations URL. If facilitiesFrequencySec is configured to be over 0,
+     * it also occasionally retches the parks as new parks might have been added or the state of the
+     * old parks might have changed.
+     *
+     * @return true if there might have been changes
+     */
+    @Override
+    public boolean update() {
+        List<VehicleParking> parks =
+                fetchFacilitiesNow() ? facilitiesDownloader.download() : this.parks;
+        if (parks != null) {
+            List<HslParkPatch> utilizations = utilizationsDownloader.download();
+            if (utilizations != null) {
+                Map<FeedScopedId, List<HslParkPatch>> patches = utilizations.stream()
+                        .collect(Collectors.groupingBy(utilization -> utilization.getId()));
+                parks.forEach(park -> {
+                    List<HslParkPatch> patchesForPark = patches.get(park.getId());
+                    if (patchesForPark != null) {
+                        park.updateAvailability(createVehicleAvailability(patchesForPark));
+                    }
+                });
+            }
+            else if (this.parks != null) {
+                return false;
+            }
+            synchronized (this) {
+                // Update atomically
+                this.parks = parks;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public synchronized List<VehicleParking> getUpdates() {
+        return parks;
+    }
+
+    /**
+     * @return true if facilities have not been successfully downloaded before, or
+     * facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last successful
+     * fetch
+     */
+    private boolean fetchFacilitiesNow() {
+        if (parks == null) {
+            return true;
+        }
+        if (facilitiesFrequencySec <= 0) {
+            return false;
+        }
+        return System.currentTimeMillis() > lastFacilitiesFetchTime + facilitiesFrequencySec * 1000;
     }
 
     private VehicleParking parsePark(JsonNode jsonNode) {
@@ -156,9 +211,8 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
     }
 
     private VehicleParkingSpaces createVehicleAvailability(List<HslParkPatch> patches) {
-        Integer carSpaces = null;
-        Integer wheelchairAccessibleCarSpaces = null;
-        Integer bicycleSpaces = null;
+        VehicleParkingSpacesBuilder availabilityBuilder = VehicleParkingSpaces.builder();
+        boolean hasHandledSpaces = false;
 
         for (int i = 0; i < patches.size(); i++) {
             HslParkPatch patch = patches.get(i);
@@ -169,21 +223,22 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
 
                 switch (type) {
                     case "CAR":
-                        carSpaces = spaces;
+                        availabilityBuilder.carSpaces(spaces);
+                        hasHandledSpaces = true;
                         break;
                     case "BICYCLE":
-                        bicycleSpaces = spaces;
+                        availabilityBuilder.bicycleSpaces(spaces);
+                        hasHandledSpaces = true;
                         break;
                     case "DISABLED":
-                        wheelchairAccessibleCarSpaces = spaces;
+                        availabilityBuilder.wheelchairAccessibleCarSpaces(spaces);
+                        hasHandledSpaces = true;
                         break;
                 }
             }
         }
-        if (bicycleSpaces == null && carSpaces == null && wheelchairAccessibleCarSpaces == null) {
-            return null;
-        }
-        return createVehiclePlaces(carSpaces, wheelchairAccessibleCarSpaces, bicycleSpaces);
+
+        return hasHandledSpaces ? availabilityBuilder.build() : null;
     }
 
     private VehicleParkingSpaces createVehiclePlaces(
@@ -241,50 +296,5 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
             tagList.add(feedId + ":PRICING_METHOD_" + node.path("pricingMethod").asText());
         }
         return tagList;
-    }
-
-    /**
-     * Update the data from the sources. It first fetches parks from the facilities URL and then
-     * realtime updates from utilizations URL. If facilitiesFrequencySec is configured to be over 0,
-     * it also occasionally retches the parks as new parks might have been added or the state of the
-     * old parks might have changed.
-     *
-     * @return true if there might have been changes
-     */
-    @Override
-    public boolean update() {
-        // Only refetch parks when facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last successful fetch
-        List<VehicleParking> parks =
-                this.parks == null || (
-                        facilitiesFrequencySec > 0 && System.currentTimeMillis()
-                                > lastFacilitiesFetchTime + facilitiesFrequencySec * 1000
-                ) ? facilitiesDownloader.download() : this.parks;
-        if (parks != null) {
-            List<HslParkPatch> utilizations = utilizationsDownloader.download();
-            if (utilizations != null) {
-                Map<FeedScopedId, List<HslParkPatch>> patches = utilizations.stream()
-                        .collect(Collectors.groupingBy(utilization -> utilization.getId()));
-                parks.forEach(park -> {
-                    List<HslParkPatch> patchesForPark = patches.get(park.getId());
-                    if (patchesForPark != null) {
-                        park.updateAvailability(createVehicleAvailability(patchesForPark));
-                    }
-                });
-            }
-            else if (this.parks != null) {
-                return false;
-            }
-            synchronized (this) {
-                // Update atomically
-                this.parks = parks;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public synchronized List<VehicleParking> getUpdates() {
-        return parks;
     }
 }

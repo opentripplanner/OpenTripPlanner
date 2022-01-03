@@ -14,22 +14,26 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestBase;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 
-class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
+class VehicleParkingUpdaterTest {
 
   private DataSource<VehicleParking> dataSource;
+  private Graph graph;
   private VehicleParkingUpdater vehicleParkingUpdater;
 
   @BeforeEach
   @SuppressWarnings("unchecked")
   public void setup() {
-    initGraph();
+    VehicleParkingTestGraphData graphData = new VehicleParkingTestGraphData();
+    graphData.initGraph();
+    this.graph = graphData.getGraph();
 
     dataSource = (DataSource<VehicleParking>) Mockito.mock(DataSource.class);
     when(dataSource.update()).thenReturn(true);
@@ -42,7 +46,7 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
   @Test
   public void addVehicleParkingTest() {
     var vehicleParkings = List.of(
-        createParkingWithEntrances("1", 0.0001, 0)
+            VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0)
     );
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
@@ -111,7 +115,7 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
         .build();
 
     var vehicleParkings = List.of(
-        createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
+            VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
     );
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
@@ -127,7 +131,7 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
         .bicycleSpaces(2)
         .build();
     vehicleParkings = List.of(
-        createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
+            VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
     );
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
@@ -143,8 +147,8 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
   @Test
   public void deleteVehicleParkingTest() {
     var vehicleParkings = List.of(
-        createParkingWithEntrances("1", 0.0001, 0),
-        createParkingWithEntrances("2", -0.0001, 0)
+            VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0),
+            VehicleParkingTestUtil.createParkingWithEntrances("2", -0.0001, 0)
     );
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
@@ -152,7 +156,7 @@ class VehicleParkingUpdaterTest extends VehicleParkingTestBase {
 
     assertVehicleParkingsInGraph(2);
 
-    vehicleParkings = List.of(createParkingWithEntrances("1", 0.0001, 0));
+    vehicleParkings = List.of(VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0));
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
     runUpdaterOnce();
