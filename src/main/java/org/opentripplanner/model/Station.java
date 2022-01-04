@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
@@ -47,14 +48,35 @@ public class Station extends TransitEntity implements StopCollection {
   private final Set<StopLocation> childStops = new HashSet<>();
 
   public Station(
-      FeedScopedId id,
-      I18NString name,
-      WgsCoordinate coordinate,
-      String code,
-      String description,
-      I18NString url,
-      TimeZone timezone,
-      StopTransferPriority priority
+          FeedScopedId id,
+          String name,
+          WgsCoordinate coordinate,
+          String code,
+          String description,
+          String url,
+          TimeZone timezone,
+          StopTransferPriority priority
+  ) {
+    super(id);
+    this.name = new NonLocalizedString(name);
+    this.coordinate = coordinate;
+    this.code = code;
+    this.description = description;
+    this.url = new NonLocalizedString(url);
+    this.timezone = timezone;
+    this.priority = priority == null ? DEFAULT_PRIORITY : priority;
+    this.geometry = computeGeometry(coordinate, childStops);
+  }
+
+  public Station(
+          FeedScopedId id,
+          I18NString name,
+          WgsCoordinate coordinate,
+          String code,
+          String description,
+          I18NString url,
+          TimeZone timezone,
+          StopTransferPriority priority
   ) {
     super(id);
     this.name = name;

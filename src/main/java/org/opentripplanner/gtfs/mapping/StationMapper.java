@@ -1,14 +1,12 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.Station;
+import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.util.TranslationHelper;
 
 /**
  * Responsible for mapping GTFS Stop into the OTP model.
@@ -26,27 +24,47 @@ class StationMapper {
 
   /** Map from GTFS to OTP model, {@code null} safe. */
   Station map(org.onebusaway.gtfs.model.Stop original) {
-    return map(original, null, null);
+    return map(original, null);
   }
 
-  Station map(org.onebusaway.gtfs.model.Stop original, I18NString nameTranslations, I18NString urlTranslations) {
-    return original == null ? null : mappedStops.computeIfAbsent(original, k -> doMap(original, nameTranslations, urlTranslations));
+  Station map(org.onebusaway.gtfs.model.Stop original, TranslationHelper translationHelper) {
+    return original == null ? null : mappedStops.computeIfAbsent(original, k -> doMap(original, translationHelper));
   }
 
-  private Station doMap(org.onebusaway.gtfs.model.Stop rhs, I18NString nameTranslations, I18NString urlTranslations) {
+  private Station doMap(org.onebusaway.gtfs.model.Stop rhs, TranslationHelper translationHelper) {
     if (rhs.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
       throw new IllegalArgumentException(
           "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION + ", but got "
               + rhs.getLocationType());
     }
 
+    if (translationHelper != null) {
+      return new Station(
+              mapAgencyAndId(rhs.getId()),
+              translationHelper.getTranslation(TranslationHelper.TABLE_STOPS,
+                      TranslationHelper.STOP_NAME, rhs.getId().getId(),
+                      null, rhs.getName()
+              ),
+              WgsCoordinateMapper.mapToDomain(rhs),
+              rhs.getCode(),
+              rhs.getDesc(),
+              translationHelper.getTranslation(TranslationHelper.TABLE_STOPS,
+                      TranslationHelper.STOP_URL, rhs.getId().getId(),
+                      null, rhs.getUrl()
+              ),
+              rhs.getTimezone() == null ? null : TimeZone.getTimeZone(rhs.getTimezone()),
+              // Use default cost priority
+              null
+      );
+    }
+
     return new Station(
         mapAgencyAndId(rhs.getId()),
-        nameTranslations == null ? new NonLocalizedString(rhs.getName()) : nameTranslations,
+        rhs.getName(),
         WgsCoordinateMapper.mapToDomain(rhs),
         rhs.getCode(),
         rhs.getDesc(),
-        urlTranslations == null ? new NonLocalizedString(rhs.getUrl()) : urlTranslations,
+        rhs.getUrl(),
         rhs.getTimezone() == null ? null : TimeZone.getTimeZone(rhs.getTimezone()),
         // Use default cost priority
         null

@@ -20,6 +20,7 @@ public class TranslationHelperTest {
     private static final Locale LOCALE_SV = new Locale("sv");
 
     private static Collection<Translation> ALL_TRANSLATIONS = new ArrayList<>();
+    private static Collection<FeedInfo> FEED_INFOS = new ArrayList<>();
 
     private static final String TABLE_FEED_INFO = "feed_info";
     private static final String TABLE_STOP_TIMES = "stop_times";
@@ -48,6 +49,10 @@ public class TranslationHelperTest {
     };
 
     static {
+        FeedInfo feedInfo = new FeedInfo();
+        feedInfo.setLang(LANGUAGE_FEED);
+        FEED_INFOS.add(feedInfo);
+
         for (int x = 0; x < translations.length; x++) {
             Translation t = new Translation();
             t.setId(x + 1);
@@ -60,7 +65,7 @@ public class TranslationHelperTest {
             t.setFieldValue(translations[x][6]);
             ALL_TRANSLATIONS.add(t);
         }
-        helper = new TranslationHelper(ALL_TRANSLATIONS, LANGUAGE_FEED);
+        helper = new TranslationHelper(ALL_TRANSLATIONS, FEED_INFOS);
     }
 
     @Test

@@ -2,6 +2,7 @@
 package org.opentripplanner.model;
 
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A place along a platform, where the vehicle van be boarded. Equivalent to GTFS stop location.
@@ -11,6 +12,26 @@ public final class BoardingArea extends StationElement {
   private static final long serialVersionUID = 2L;
 
   private Stop parentStop;
+
+  public BoardingArea(
+          FeedScopedId id,
+          String name,
+          String code,
+          String description,
+          WgsCoordinate coordinate,
+          WheelChairBoarding wheelchairBoarding,
+          StopLevel level
+  ) {
+    super(
+            id,
+            new NonLocalizedString(name),
+            code,
+            description,
+            coordinate,
+            wheelchairBoarding,
+            level
+    );
+  }
 
   public BoardingArea(
           FeedScopedId id,

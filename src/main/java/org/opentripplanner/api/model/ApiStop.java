@@ -3,7 +3,6 @@ package org.opentripplanner.api.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.util.I18NString;
 
 public class ApiStop implements Serializable {
     private static final long serialVersionUID = 1L;

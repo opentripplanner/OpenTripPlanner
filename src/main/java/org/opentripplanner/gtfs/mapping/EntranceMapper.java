@@ -1,15 +1,15 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.Entrance;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.MapUtils;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.model.Entrance;
+import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.TranslationHelper;
 
-/** Responsible for mapping GTFS Entrance into the OTP model. */
+/**
+ * Responsible for mapping GTFS Entrance into the OTP model.
+ */
 class EntranceMapper {
 
     private Map<org.onebusaway.gtfs.model.Stop, Entrance> mappedEntrances = new HashMap<>();
@@ -18,15 +18,24 @@ class EntranceMapper {
         return MapUtils.mapToList(allEntrances, this::map);
     }
 
-    /** Map from GTFS to OTP model, {@code null} safe. */
+    /**
+     * Map from GTFS to OTP model, {@code null} safe.
+     */
     Entrance map(org.onebusaway.gtfs.model.Stop original) {
         return map(original, null);
     }
-    Entrance map(org.onebusaway.gtfs.model.Stop original, I18NString nameTranslations) {
-        return original == null ? null : mappedEntrances.computeIfAbsent(original, k -> doMap(original, nameTranslations));
+
+    Entrance map(org.onebusaway.gtfs.model.Stop original, TranslationHelper translationHelper) {
+        return original == null
+                ? null
+                : mappedEntrances.computeIfAbsent(
+                        original, k -> doMap(original, translationHelper));
     }
 
-    private Entrance doMap(org.onebusaway.gtfs.model.Stop gtfsStop, I18NString nameTranslations) {
+    private Entrance doMap(
+            org.onebusaway.gtfs.model.Stop gtfsStop,
+            TranslationHelper translationHelper
+    ) {
         if (gtfsStop.getLocationType()
                 != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
             throw new IllegalArgumentException(
@@ -36,14 +45,29 @@ class EntranceMapper {
 
         StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
+        if (translationHelper != null) {
+            return new Entrance(
+                    base.getId(),
+                    translationHelper.getTranslation(TranslationHelper.TABLE_STOPS,
+                            TranslationHelper.STOP_NAME, base.getId().getId(),
+                            null, base.getName()
+                    ),
+                    base.getCode(),
+                    base.getDescription(),
+                    base.getCoordinate(),
+                    base.getWheelchairBoarding(),
+                    base.getLevel()
+            );
+        }
+
         return new Entrance(
-            base.getId(),
-            nameTranslations == null ? new NonLocalizedString(base.getName()) : nameTranslations,
-            base.getCode(),
-            base.getDescription(),
-            base.getCoordinate(),
-            base.getWheelchairBoarding(),
-            base.getLevel()
+                base.getId(),
+                base.getName(),
+                base.getCode(),
+                base.getDescription(),
+                base.getCoordinate(),
+                base.getWheelchairBoarding(),
+                base.getLevel()
         );
     }
 }

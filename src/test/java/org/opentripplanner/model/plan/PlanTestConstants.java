@@ -2,7 +2,7 @@ package org.opentripplanner.model.plan;
 
 import static org.opentripplanner.util.time.TimeUtils.time;
 
-import java.util.Locale;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
@@ -89,8 +89,6 @@ public interface PlanTestConstants {
             null,
             null
     );
-    return Place.forStop(
-            stop, null, null, new Locale("en", "US")
-    );
+    return Place.forStop(stop, null, null, ConstantsForTests.DEFAULT_LOCALE);
   }
 }

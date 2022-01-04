@@ -1,17 +1,15 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.FareZone;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.MapUtils;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.model.FareZone;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
@@ -24,16 +22,16 @@ class StopMapper {
 
   /** Map from GTFS to OTP model, {@code null} safe. */
   Stop map(org.onebusaway.gtfs.model.Stop original) {
-    return map(original, null, null);
+    return map(original, null);
   }
 
-  Stop map(org.onebusaway.gtfs.model.Stop original, I18NString nameTranslations, I18NString urlTranslations) {
+  Stop map(org.onebusaway.gtfs.model.Stop original, TranslationHelper translationHelper) {
     return original == null
             ? null
-            : mappedStops.computeIfAbsent(original, k -> doMap(original, nameTranslations, urlTranslations));
+            : mappedStops.computeIfAbsent(original, k -> doMap(original, translationHelper));
   }
 
-  private Stop doMap(org.onebusaway.gtfs.model.Stop gtfsStop, I18NString nameTranslations, I18NString urlTranslations) {
+  private Stop doMap(org.onebusaway.gtfs.model.Stop gtfsStop, TranslationHelper translationHelper) {
     if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
       throw new IllegalArgumentException(
           "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP + ", but got "
@@ -47,15 +45,36 @@ class StopMapper {
         gtfsStop.getId().getAgencyId()
     );
 
+    if (translationHelper != null) {
+      return new Stop(base.getId(),
+              translationHelper.getTranslation(TranslationHelper.TABLE_STOPS,
+                      TranslationHelper.STOP_NAME, base.getId().getId(),
+                      null, base.getName()
+              ),
+              base.getCode(),
+              base.getDescription(),
+              base.getCoordinate(),
+              base.getWheelchairBoarding(),
+              base.getLevel(),
+              gtfsStop.getPlatformCode(), fareZones,
+              translationHelper.getTranslation(TranslationHelper.TABLE_STOPS,
+                      TranslationHelper.STOP_URL, base.getId().getId(),
+                      null, gtfsStop.getUrl()
+              ),
+              gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
+              TransitModeMapper.mapMode(gtfsStop.getVehicleType())
+      );
+    }
+
     return new Stop(base.getId(),
-        nameTranslations == null ? new NonLocalizedString(base.getName()) : nameTranslations,
+        base.getName(),
         base.getCode(),
         base.getDescription(),
         base.getCoordinate(),
         base.getWheelchairBoarding(),
         base.getLevel(),
         gtfsStop.getPlatformCode(), fareZones,
-        urlTranslations == null ? new NonLocalizedString(gtfsStop.getUrl()) : urlTranslations,
+        gtfsStop.getUrl(),
         gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
         TransitModeMapper.mapMode(gtfsStop.getVehicleType())
     );

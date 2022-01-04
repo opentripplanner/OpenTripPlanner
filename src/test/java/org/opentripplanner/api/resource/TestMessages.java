@@ -2,6 +2,7 @@ package org.opentripplanner.api.resource;
 
 import junit.framework.TestCase;
 import org.opentripplanner.api.common.Message;
+import org.opentripplanner.ConstantsForTests;
 
 import java.util.Locale;
 
@@ -12,7 +13,7 @@ public class TestMessages extends TestCase {
         Locale sysDefaultLocale = Locale.getDefault();
         try {
             // Force default to make test work on non-US machines
-            Locale.setDefault(new Locale("en", "US"));
+            Locale.setDefault(ConstantsForTests.DEFAULT_LOCALE);
 
             String e = Message.PATH_NOT_FOUND.get();
             String f = Message.PATH_NOT_FOUND.get(Locale.CANADA_FRENCH);

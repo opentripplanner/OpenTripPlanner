@@ -4,8 +4,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Locale;
 import org.junit.Test;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
@@ -52,9 +52,9 @@ public class PlaceTest {
     }
 
     private static Stop stop(String stopId, double lat, double lon) {
-       return new Stop(
+        return new Stop(
                 new FeedScopedId("S", stopId),
-                null,
+                (String) null,
                 null,
                 null,
                 WgsCoordinate.creatOptionalCoordinate(lat, lon),
@@ -62,7 +62,7 @@ public class PlaceTest {
                 null,
                 null,
                 null,
-                null,
+                (String) null,
                 null,
                 null
         );
@@ -70,7 +70,7 @@ public class PlaceTest {
 
     private static Place place(Stop stop) {
         return Place.forStop(
-                stop, null, null, new Locale("en", "US")
+                stop, null, null, ConstantsForTests.DEFAULT_LOCALE
         );
     }
 }

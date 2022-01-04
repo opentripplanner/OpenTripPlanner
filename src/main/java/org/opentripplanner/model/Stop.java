@@ -45,6 +45,28 @@ public final class Stop extends StationElement implements StopLocation {
   private HashSet<BoardingArea> boardingAreas;
 
   public Stop(
+          FeedScopedId id,
+          String name,
+          String code,
+          String description,
+          WgsCoordinate coordinate,
+          WheelChairBoarding wheelchairBoarding,
+          StopLevel level,
+          String platformCode,
+          Collection<FareZone> fareZones,
+          String url,
+          TimeZone timeZone,
+          TransitMode vehicleType
+  ) {
+    super(id, new NonLocalizedString(name), code, description, coordinate, wheelchairBoarding, level);
+    this.platformCode = platformCode;
+    this.fareZones = fareZones;
+    this.url = new NonLocalizedString(url);
+    this.timeZone = timeZone;
+    this.vehicleType = vehicleType;
+  }
+
+  public Stop(
       FeedScopedId id,
       I18NString name,
       String code,
@@ -73,7 +95,7 @@ public final class Stop extends StationElement implements StopLocation {
   public static Stop stopForTest(String idAndName, double lat, double lon) {
     return new Stop(
         new FeedScopedId("F", idAndName),
-        new NonLocalizedString(idAndName),
+        idAndName,
         idAndName,
         null,
         new WgsCoordinate(lat, lon),

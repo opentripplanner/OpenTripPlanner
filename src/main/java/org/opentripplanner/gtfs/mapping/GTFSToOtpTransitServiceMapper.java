@@ -1,15 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.onebusaway.gtfs.model.Translation;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BoardingArea;
@@ -19,8 +9,6 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.TranslationHelper;
 
 /**
@@ -83,10 +71,6 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
-    private final String TABLE_STOPS = "stops";
-    private final String STOP_NAME = "stop_name";
-    private final String STOP_URL = "stop_url";
-
     public GTFSToOtpTransitServiceMapper(
             String feedId,
             DataImportIssueStore issueStore,
@@ -111,13 +95,8 @@ public class GTFSToOtpTransitServiceMapper {
     }
 
     public void mapStopTripAndRouteDatantoBuilder() {
-        String feedLanguage = null;
-        if (data.getAllFeedInfos().iterator().hasNext()) {
-            feedLanguage = data.getAllFeedInfos().iterator().next().getLang();
-        }
-
         TranslationHelper translationHelper =
-                new TranslationHelper(data.getAllTranslations(), feedLanguage);
+                new TranslationHelper(data.getAllTranslations(), data.getAllFeedInfos());
 
         builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
         builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
@@ -160,38 +139,23 @@ public class GTFSToOtpTransitServiceMapper {
         StopToParentStationLinker stopToParentStationLinker = new StopToParentStationLinker(issueStore);
         for (org.onebusaway.gtfs.model.Stop it : data.getAllStops()) {
             if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
-                Stop stop = stopMapper.map(it,
-                        translationHelper.getTranslation(TABLE_STOPS, STOP_NAME, it.getId().getId(),
-                                null, it.getName()
-                        ),
-                        translationHelper.getTranslation(TABLE_STOPS, STOP_URL, it.getId().getId(),
-                                null, it.getUrl()
-                        )
-                );
+                Stop stop = stopMapper.map(it, translationHelper);
                 builder.getStops().add(stop);
                 stopToParentStationLinker.addStationElement(stop, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
-                Station station = stationMapper.map(it);
+                Station station = stationMapper.map(it, translationHelper);
                 builder.getStations().add(station);
                 stopToParentStationLinker.addStation(station);
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
-                Entrance entrance = entranceMapper.map(it,
-                        translationHelper.getTranslation(TABLE_STOPS, STOP_NAME, it.getId().getId(),
-                                null, it.getName()
-                        )
-                );
+                Entrance entrance = entranceMapper.map(it, translationHelper);
                 builder.getEntrances().add(entrance);
                 stopToParentStationLinker.addStationElement(entrance, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE) {
-                PathwayNode pathwayNode = pathwayNodeMapper.map(it);
+                PathwayNode pathwayNode = pathwayNodeMapper.map(it, translationHelper);
                 builder.getPathwayNodes().add(pathwayNode);
                 stopToParentStationLinker.addStationElement(pathwayNode, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA) {
-                BoardingArea boardingArea = boardingAreaMapper.map(it,
-                        translationHelper.getTranslation(TABLE_STOPS, STOP_NAME, it.getId().getId(),
-                                null, it.getName()
-                        )
-                );
+                BoardingArea boardingArea = boardingAreaMapper.map(it, translationHelper);
                 builder.getBoardingAreas().add(boardingArea);
                 stopToParentStationLinker.addBoardingArea(boardingArea, it.getParentStation());
             }
