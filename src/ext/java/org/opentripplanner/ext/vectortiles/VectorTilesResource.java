@@ -160,7 +160,12 @@ public class VectorTilesResource {
           .collect(Collectors.joining(", "));
 
       tiles = new String[]{
-          getBaseAddress(uri, headers, layers) + "/otp/routers/" + ignoreRouterId + "/vectorTiles/{z}/{x}/{y}.pbf"
+              getBaseAddress(uri, headers, layers)
+                      + "/otp/routers/"
+                      + ignoreRouterId
+                      + "/vectorTiles/"
+                      + layers
+                      + "/{z}/{x}/{y}.pbf"
       };
 
       WorldEnvelope envelope = graph.getEnvelope();
