@@ -100,24 +100,24 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
     String exceedsTimeLimitReason();
 
     /**
-     * Forward search: Return {@code true} is the first argument ({@code subject}) is
+     * Forward search: Return {@code true} if the first argument ({@code subject}) is
      * BEFORE the second argument ({@code candidate}). If both are equal {@code false} is returned.
      * <p/>
-     * Reverse search: Return {@code true} is the first argument ({@code subject}) is
+     * Reverse search: Return {@code true} if the first argument ({@code subject}) is
      * AFTER the second argument ({@code candidate}). If both are equal {@code false} is returned.
      *
-     * @return true is subject is better than the candidate; if not false.
+     * @return true if subject is better than the candidate; if not false.
      */
     boolean isBefore(int subject, int candidate);
 
     /**
-     * Forward search: Return {@code true} is the first argument ({@code subject}) is
+     * Forward search: Return {@code true} if the first argument ({@code subject}) is
      * AFTER the second argument ({@code candidate}). If both are equal {@code false} is returned.
      * <p/>
-     * Reverse search: Return {@code true} is the first argument ({@code subject}) is
+     * Reverse search: Return {@code true} if the first argument ({@code subject}) is
      * BEFORE the second argument ({@code candidate}). If both are equal {@code false} is returned.
      *
-     * @return true is subject is better than the candidate; if not false.
+     * @return true if subject is better than the candidate; if not false.
      */
     boolean isAfter(int subject, int candidate);
 
