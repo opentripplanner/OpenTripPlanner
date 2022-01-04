@@ -32,8 +32,10 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
         vehicleParkingMapper = new HslParkToVehicleParkingMapper(parameters.getFeedId());
         facilitiesDownloader =
                 new JsonDataListDownloader<>(
-                        parameters.getFacilitiesUrl(), JSON_PARSE_PATH,
-                        vehicleParkingMapper::parsePark, null
+                        parameters.getFacilitiesUrl(),
+                        JSON_PARSE_PATH,
+                        vehicleParkingMapper::parsePark,
+                        null
                 );
         utilizationsDownloader =
                 new JsonDataListDownloader<>(
