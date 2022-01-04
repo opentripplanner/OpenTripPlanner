@@ -1,7 +1,15 @@
 package org.opentripplanner.routing.edgetype.loader;
 
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
@@ -14,10 +22,10 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcess
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
@@ -29,14 +37,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.TestUtils;
-
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
-
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
@@ -128,7 +128,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.transferSlack = 0;
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
-        options.dateTime = startTime;
+        options.setDateTime(Instant.ofEpochSecond(startTime));
 
         ShortestPathTree spt;
         GraphPath path;
@@ -185,7 +185,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         RoutingRequest options = new RoutingRequest();
 
         // Friday evening
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 23, 20, 0); 
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 23, 20, 0));
         options.setRoutingContext(graph, stop_g, stop_h);
         spt = aStar.getShortestPathTree(options);
 
@@ -195,7 +195,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
 
         // Saturday morning
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 0, 5, 0);
-        options.dateTime = startTime;
+        options.setDateTime(Instant.ofEpochSecond(startTime));
         options.setRoutingContext(graph, stop_g.getLabel(), stop_h.getLabel());
         spt = aStar.getShortestPathTree(options);
 
@@ -211,9 +211,8 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         Vertex stop_p = graph.getVertex(feedId + ":P");
         assertEquals(2, stop_o.getOutgoing().size());
 
-        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 0);
         RoutingRequest options = new RoutingRequest();
-        options.dateTime = startTime;
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 19, 12, 0, 0));
         options.setRoutingContext(graph, stop_o, stop_p);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
         GraphPath path = spt.getPath(stop_p, false);
@@ -221,8 +220,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 10, 0);
         assertEquals(endTime, path.getEndTime());
 
-        startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 1);
-        options.dateTime = startTime;
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 19, 12, 0, 1));
         options.setRoutingContext(graph, stop_o, stop_p);
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(stop_p, false);
@@ -239,7 +237,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
 
         RoutingRequest options = new RoutingRequest();
         options.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.TRAM,TraverseMode.RAIL,TraverseMode.SUBWAY,TraverseMode.FUNICULAR,TraverseMode.GONDOLA));
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 0, 0, 0, 0);
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 0, 0, 0, 0));
         options.setRoutingContext(graph, stop_a, stop_b);
         spt = aStar.getShortestPathTree(options );
 
@@ -256,7 +254,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         Vertex stop_d = graph.getVertex(feedId + ":D");
         Vertex stop_c = graph.getVertex(feedId + ":C");
         RoutingRequest options = new RoutingRequest();
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 10, 0, 0);
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 10, 0, 0));
         options.setRoutingContext(graph, stop_d, stop_c);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
@@ -275,7 +273,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.streetSubRequestModes.setWalk(false);
         options.streetSubRequestModes.setBicycle(true);
         options.streetSubRequestModes.setTransit(true);
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 0, 0);
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
         options.setRoutingContext(graph, stop_a, stop_b);
 
         ShortestPathTree spt;
@@ -316,7 +314,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         
         RoutingRequest options = new RoutingRequest();
         options.wheelchairAccessible = true;
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 0, 0);
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
 
         ShortestPathTree spt;
         GraphPath path;
@@ -346,7 +344,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
         GregorianCalendar time = new GregorianCalendar(2009, 8, 18, 0, 0, 0);
         time.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-        options.dateTime = TestUtils.toSeconds(time);
+        options.setDateTime(time.toInstant());
         options.setRoutingContext(graph, near_a, split_d);
         spt = aStar.getShortestPathTree(options);
         
@@ -370,7 +368,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.transferSlack = 0;
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
         startTime.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-        options.dateTime = TestUtils.toSeconds(startTime);
+        options.setDateTime(startTime.toInstant());
         options.setRoutingContext(graph, feedId + ":Q", destination.getLabel());
         ShortestPathTree spt = aStar.getShortestPathTree(options);
         GraphPath path = spt.getPath(destination, false);
@@ -390,7 +388,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
 
         RoutingRequest options = new RoutingRequest();
         options.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.TRANSIT));
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 0, 0, 0));
         options.setRoutingContext(graph, stop_u, stop_v);
         
         // U to V - original stop times - shouldn't be used
@@ -402,7 +400,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         assertEquals(endTime, path.getEndTime());
 
         // U to V - first frequency
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 0, 0);
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 7, 0, 0));
         options.setRoutingContext(graph, stop_u, stop_v);
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(stop_v, false);
@@ -412,7 +410,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         assertEquals(endTime, path.getEndTime());
 
         // U to V - second frequency
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 14, 0, 0);
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 14, 0, 0));
         options.setRoutingContext(graph, stop_u, stop_v);
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(stop_v, false);
@@ -430,7 +428,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         Vertex stop_d = graph.getVertex(feedId + ":D");
         RoutingRequest options = new RoutingRequest();
         options.bicycleOptimizeType = BicycleOptimizeType.QUICK;
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0);
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 16, 0, 0));
         options.setRoutingContext(graph, stop_c, stop_d);  
                 
         ShortestPathTree spt = aStar.getShortestPathTree(options);
@@ -458,7 +456,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         assertNotNull(stop);
 
         RoutingRequest options = new RoutingRequest();
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0); 
+        options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 16, 0, 0));
         options.setRoutingContext(graph, entrance, stop);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
         

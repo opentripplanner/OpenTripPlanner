@@ -33,7 +33,10 @@ public class ApiTripSearchMetadata {
      * If OTP for some reason is not able to calculate this value then it will be {@code null}.
      * <p>
      * Unit : epoch milliseconds
+     *
+     * @deprecated Use the request/response cursor instead.
      */
+    @Deprecated
     public Long nextDateTime;
 
     /**
@@ -50,6 +53,9 @@ public class ApiTripSearchMetadata {
      * If OTP for some reason is not able to calculate this value then it will be {@code null}.
      * <p>
      * Unit : epoch milliseconds
+     *
+     * @deprecated Use the request/response cursor instead.
      */
+    @Deprecated
     public Long prevDateTime;
 }

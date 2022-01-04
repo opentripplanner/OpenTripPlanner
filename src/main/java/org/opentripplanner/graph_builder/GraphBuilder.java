@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GraphBuilder implements Runnable {
 
-    private static Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
     private final List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
 
@@ -235,6 +236,14 @@ public class GraphBuilder implements Runnable {
                     )
             );
         }
+
+        if (OTPFeature.DataOverlay.isOn()) {
+            var module = DataOverlayFactory.create(config.dataOverlay);
+            if(module != null) {
+                graphBuilder.addModule(module);
+            }
+        }
+
         return graphBuilder;
     }
 }

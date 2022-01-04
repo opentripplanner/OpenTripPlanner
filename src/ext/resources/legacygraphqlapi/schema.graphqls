@@ -1556,12 +1556,31 @@ type Plan {
     messageStrings: [String]!
 
     """
+    Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
+    to the pageCursor query parameter and keep the original request otherwise as is.
+    This will enable you to search for itineraries in the next time-window.
+    The cursor based paging only support stepping to the next page, as it does not support jumping.
+    This is only usable when public transportation mode(s) are included in the query.
+    """
+    nextPageCursor: String
+
+    """
+    Use the cursor to go to the previous "page" of itineraries. Copy the cursor from the last
+    response to the pageCursor query parameter and keep the original request otherwise as is.
+    This will enable you to search for itineraries in the previous time-window.
+    The cursor based paging only support stepping to the previous page, as it does not support
+    jumping.
+    This is only usable when public transportation mode(s) are included in the query.
+    """
+    previousPageCursor: String
+
+    """
     This is the suggested search time for the "previous page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips preceding in the
     time-window BEFORE the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    prevDateTime: Long
+    prevDateTime: Long @deprecated(reason: "Use previousPageCursor instead")
 
     """
     This is the suggested search time for the "next page" or time window. Insert it together
@@ -1569,13 +1588,13 @@ type Plan {
     time-window AFTER the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    nextDateTime: Long
+    nextDateTime: Long @deprecated(reason: "Use nextPageCursor instead")
 
     """
     This is the time window used by the raptor search. The window is an optional parameter and
     OTP might override it/dynamically assign a new value. The unit is seconds.
     """
-    searchWindowUsed: Long
+    searchWindowUsed: Long @deprecated(reason: "Use previousPageCursor or nextPageCursor instead")
 
     """Information about the timings for the plan generation"""
     debugOutput: debugOutput!
@@ -2065,6 +2084,14 @@ type QueryType {
         options and realtime changes.
         """
         searchWindow: Long,
+
+        """
+        Use the cursor to get the next or previous page of results.
+        The next page is a set of itineraries departing after the last itinerary in this result and
+        the previous page is a set of itineraries departing before the first itinerary.
+        This is only usable when public transportation mode(s) are included in the query.
+        """
+        pageCursor: String
 
         """
         The maximum distance (in meters) the user is willing to walk per walking

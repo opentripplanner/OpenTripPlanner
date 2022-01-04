@@ -3,6 +3,7 @@ package org.opentripplanner.routing.street;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.io.IOException;
+import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -38,7 +39,7 @@ public class SplitEdgeTurnRestrictionsTest {
     static GenericLocation herrenbergerStrasse = new GenericLocation(48.68497, 9.00909);
     static GenericLocation steinbeissWeg = new GenericLocation(48.68172, 9.00599);
 
-    static long dateTime = TestUtils.dateInSeconds("Europe/Berlin", 2020, 3, 3, 7, 0, 0);
+    static final Instant dateTime = TestUtils.dateInstant("Europe/Berlin", 2020, 3, 3, 7, 0, 0);
 
     @Test
     public void shouldTakeDeufringenTurnRestrictionsIntoAccount() throws IOException {
@@ -140,7 +141,7 @@ public class SplitEdgeTurnRestrictionsTest {
             GenericLocation to
     ) {
         RoutingRequest request = new RoutingRequest();
-        request.dateTime = dateTime;
+        request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
 

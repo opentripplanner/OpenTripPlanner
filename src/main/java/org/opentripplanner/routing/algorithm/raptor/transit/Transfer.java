@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -84,7 +85,7 @@ public class Transfer {
     public static RoutingRequest prepareTransferRoutingRequest(RoutingRequest request) {
         RoutingRequest transferRoutingRequest = request.getStreetSearchRequest(request.modes.transferMode);
         transferRoutingRequest.arriveBy = false;
-        transferRoutingRequest.dateTime = 0;
+        transferRoutingRequest.setDateTime(Instant.ofEpochSecond(0));
         transferRoutingRequest.from = null;
         transferRoutingRequest.to = null;
 
