@@ -26,14 +26,14 @@ public class HslParkToVehicleParkingMapper {
 
     private static final Logger log = LoggerFactory.getLogger(HslParkToVehicleParkingMapper.class);
 
-    private static String feedId;
+    private String feedId;
 
     public HslParkToVehicleParkingMapper(String feedId) {
         this.feedId = feedId;
     }
 
     public VehicleParking parsePark(JsonNode jsonNode) {
-        var vehicleParkId = createIdForNode(jsonNode, "id");
+        var vehicleParkId = createIdForNode(jsonNode, "id", feedId);
         try {
             var capacity = parseVehicleSpaces(jsonNode.path("builtCapacity"), "BICYCLE", "CAR",
                     "DISABLED"
@@ -93,7 +93,7 @@ public class HslParkToVehicleParkingMapper {
         }
     }
 
-    public static FeedScopedId createIdForNode(JsonNode jsonNode, String idName) {
+    public static FeedScopedId createIdForNode(JsonNode jsonNode, String idName, String feedId) {
         String id = jsonNode.path(idName).asText();
         return new FeedScopedId(feedId, id);
     }

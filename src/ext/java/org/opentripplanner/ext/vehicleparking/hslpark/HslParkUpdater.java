@@ -23,13 +23,16 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
     private final int facilitiesFrequencySec;
     private final JsonDataListDownloader utilizationsDownloader;
     private final HslParkToVehicleParkingMapper vehicleParkingMapper;
+    private final HslParkUtilizationToPatchMapper parkPatchMapper;
 
     private long lastFacilitiesFetchTime;
 
     private List<VehicleParking> parks;
 
     public HslParkUpdater(HslParkUpdaterParameters parameters) {
-        vehicleParkingMapper = new HslParkToVehicleParkingMapper(parameters.getFeedId());
+        String feedId = parameters.getFeedId();
+        vehicleParkingMapper = new HslParkToVehicleParkingMapper(feedId);
+        parkPatchMapper = new HslParkUtilizationToPatchMapper(feedId);
         facilitiesDownloader =
                 new JsonDataListDownloader<>(
                         parameters.getFacilitiesUrl(),
@@ -39,7 +42,10 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
                 );
         utilizationsDownloader =
                 new JsonDataListDownloader<>(
-                        parameters.getUtilizationsUrl(), "", HslParkPatch::parseUtilization, null);
+                        parameters.getUtilizationsUrl(), "",
+                        parkPatchMapper::parseUtilization,
+                        null
+                );
         this.facilitiesFrequencySec = parameters.getFacilitiesFrequencySec();
     }
 
