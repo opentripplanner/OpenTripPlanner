@@ -549,6 +549,8 @@ otp.widgets.tripoptions.ModeSelector =
         for(i = 0; i < this.modeControls.length; i++) {
             this.modeControls[i].restorePlan(data);
         }
+
+        this.refreshModeControls();
     },
 
     controlPadding : "8px",
