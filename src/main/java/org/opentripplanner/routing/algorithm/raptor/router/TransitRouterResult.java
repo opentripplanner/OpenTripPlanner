@@ -3,32 +3,26 @@ package org.opentripplanner.routing.algorithm.raptor.router;
 import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
 
 public class TransitRouterResult {
 
     private final List<Itinerary> itineraries;
-    private final Instant filterOnLatestDepartureTime;
-    private final int searchWindowUsedInSeconds;
+    private final SearchParams searchParams;
 
     public TransitRouterResult(
             List<Itinerary> itineraries,
-            Instant filterOnLatestDepartureTime,
-            int searchWindowUsedInSeconds
+            SearchParams searchParams
     ) {
         this.itineraries = itineraries;
-        this.filterOnLatestDepartureTime = filterOnLatestDepartureTime;
-        this.searchWindowUsedInSeconds = searchWindowUsedInSeconds;
+        this.searchParams = searchParams;
     }
 
     public List<Itinerary> getItineraries() {
         return itineraries;
     }
 
-    public Instant getFilterOnLatestDepartureTime() {
-        return filterOnLatestDepartureTime;
-    }
-
-    public int getSearchWindowUsedInSeconds() {
-        return searchWindowUsedInSeconds;
+    public SearchParams getSearchParams() {
+        return searchParams;
     }
 }

@@ -1,15 +1,20 @@
 package org.opentripplanner.routing.edgetype.loader;
 
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+
 import com.google.common.collect.Lists;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
 import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -17,19 +22,17 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.TestUtils;
 
-import java.util.List;
-
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
  */
 @Ignore
 public class TestHopFactory extends TestCase {
+    private final ZoneId zoneId = ZoneId.of("America/New_York");
+
+    private final AStar aStar = new AStar();
 
     private Graph graph;
 
-    private AStar aStar = new AStar();
 
     private String feedId;
 
@@ -45,19 +48,19 @@ public class TestHopFactory extends TestCase {
         feedId = context.getFeedId().getId();
     }
 
-    public void testDwell() throws Exception {
+    public void testDwell() {
         Vertex stop_a = graph.getVertex(feedId + ":A_depart");
         Vertex stop_c = graph.getVertex(feedId + ":C_arrive");
 
         RoutingRequest options = new RoutingRequest();
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
+        options.setDateTime(ZonedDateTime.of(2009, 8, 7, 8, 0, 0, 0, zoneId).toInstant());
         options.setRoutingContext(graph, stop_a, stop_c);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
         GraphPath path = spt.getPath(stop_c, false);
         assertNotNull(path);
         assertEquals(6, path.states.size());
-        long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 30, 0);
+        long endTime = ZonedDateTime.of(2009, 8, 7, 8, 30, 0,0,zoneId).toInstant().getEpochSecond();
         assertEquals(endTime, path.getEndTime());
     }
 
@@ -70,7 +73,7 @@ public class TestHopFactory extends TestCase {
         Vertex stop_e = graph.getVertex(feedId + ":E");
 
         RoutingRequest options = new RoutingRequest();
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 
+        options.setDateTime(ZonedDateTime.of(2009, 8, 7, 0, 0, 0, 0, zoneId).toInstant());
 
         ShortestPathTree spt;
         GraphPath path;

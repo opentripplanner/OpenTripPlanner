@@ -1,5 +1,8 @@
 package org.opentripplanner.util;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
@@ -17,8 +20,15 @@ public class TestUtils {
     public static final int NOVEMBER = 10;
     public static final int DECEMBER = 11;
 
-    public static long dateInSeconds(String timeZoneId,
-            int year, int month, int day, int hour, int minute, int second) {
+    public static Instant dateInstant(
+            String zoneId, int year, int month, int day, int hour, int minute, int second
+    ) {
+        return ZonedDateTime.of(year, month, day, hour, minute, second, 0, ZoneId.of(zoneId)).toInstant();
+    }
+
+    public static long dateInSeconds(
+            String timeZoneId, int year, int month, int day, int hour, int minute, int second
+    ) {
         TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
         GregorianCalendar calendar = new GregorianCalendar(year, month, day, hour, minute, second);
         calendar.setTimeZone(timeZone);

@@ -105,6 +105,7 @@ public class NodeAdapterTest {
         // Then
         assertEquals("Get existing property", AnEnum.A, subject.asEnum("key", AnEnum.B));
         assertEquals("Get default value", AnEnum.B, subject.asEnum("missing-key", AnEnum.B));
+        assertEquals("Get existing property", AnEnum.A, subject.asEnum("key", AnEnum.class));
     }
 
     @Test(expected = OtpAppException.class)

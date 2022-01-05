@@ -5,11 +5,13 @@ import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapI
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +62,9 @@ public class TransmodelGraphQLPlanner {
             response.plan = res.getTripPlan();
             response.metadata = res.getMetadata();
             response.messages = res.getRoutingErrors();
-            response.debugOutput = res.getDebugAggregator().finishedRendering();
+            response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
+            response.previousPageCursor = res.getPreviousPageCursor();
+            response.nextPageCursor = res.getNextPageCursor();
         }
         catch (ParameterException e) {
             var msg = e.message.get();
@@ -104,8 +108,9 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
         callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
 
-        callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(new Date((long) millisSinceEpoch)), Date::new);
+        callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long)millisSinceEpoch)), Date::new);
         callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
+        callWith.argument("pageCursor", request::setPageCursor);
         callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
