@@ -166,17 +166,25 @@ class StopTimesMapper {
         stopTime.setTrip(trip);
         stopTime.setStopSequence(stopSequence);
         stopTime.setStop(stop);
-        // TODO PassingTimes containing EarliestArrivalTime or LatestDepartureTime only not yet
-        //      supported
-        if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
+        if (passingTime.getArrivalTime() != null || passingTime.getDepartureTime() != null) {
+            stopTime.setArrivalTime(calculateOtpTime(
+                passingTime.getArrivalTime(), passingTime.getArrivalDayOffset(),
+                passingTime.getDepartureTime(), passingTime.getDepartureDayOffset()
+            ));
+            stopTime.setDepartureTime(calculateOtpTime(
+                passingTime.getDepartureTime(), passingTime.getDepartureDayOffset(),
+                passingTime.getArrivalTime(), passingTime.getArrivalDayOffset()
+            ));
+        } else if (passingTime.getEarliestDepartureTime() != null && passingTime.getLatestArrivalTime() != null) {
+            stopTime.setFlexWindowStart(calculateOtpTime(
+                passingTime.getEarliestDepartureTime(), passingTime.getEarliestDepartureDayOffset()
+            ));
+            stopTime.setFlexWindowEnd(calculateOtpTime(
+                passingTime.getLatestArrivalTime(), passingTime.getLatestArrivalDayOffset()
+            ));
+        } else {
             return null;
         }
-        stopTime.setArrivalTime(
-                calculateOtpTime(passingTime.getArrivalTime(), passingTime.getArrivalDayOffset(),
-                        passingTime.getDepartureTime(), passingTime.getDepartureDayOffset()));
-        stopTime.setDepartureTime(calculateOtpTime(passingTime.getDepartureTime(),
-                passingTime.getDepartureDayOffset(), passingTime.getArrivalTime(),
-                passingTime.getArrivalDayOffset()));
 
         if (stopPoint != null) {
             if (isFalse(stopPoint.isForAlighting())) {
@@ -204,7 +212,9 @@ class StopTimesMapper {
             }
         }
 
-        if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
+        if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null &&
+            passingTime.getEarliestDepartureTime() == null && passingTime.getLatestArrivalTime() == null
+        ) {
             issueStore.add("TripWithoutTime","Time missing for trip %s", trip.getId());
         }
 
