@@ -22,11 +22,12 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  *
- * This test focus on testing access and egress with basic Raptor - NOT Range Raptor. All tests are
- * run with one iteration only. The Range Raptor make sure the best access/egress is used, but
- * without it, we should board at the first possible stop for the standard raptor, but not for the
- * no-wait-std. The reason for this is that the standard optimize on best arrival time, while the
- * no-wait-std optimize on finding the shortest travel time.
+ * This test focus on testing access and egress with Raptor and one iteration, not using _Range_
+ * Raptor. All tests are run with one iteration only. The Range Raptor iterations make sure the best
+ * access/egress wins, but without it, we should board at the first possible stop for the
+ * `StdTransitWorker`, but not for the `NoWaitTransitWorker`. The reason for this is that the
+ * standard optimize on best arrival time ignoring travel duration or departure time. The 
+ * no-wait on the other hand optimize on finding the shortest travel time.
  */
 public class A04_NoWaitTest implements RaptorTestConstants {
 
