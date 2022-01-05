@@ -153,6 +153,19 @@ public class LegacyGraphQLTypes {
         }
     }
 
+    public static class LegacyGraphQLBikeParkOpeningHoursArgs {
+
+        private Iterable<String> _dates;
+
+        public LegacyGraphQLBikeParkOpeningHoursArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._dates = (Iterable<String>) args.get("dates");
+            }
+        }
+
+        public Iterable<String> getLegacyGraphQLDates() {return this._dates;}
+    }
+
 
     public enum LegacyGraphQLBikesAllowed {
         Allowed("ALLOWED"),
@@ -176,6 +189,20 @@ public class LegacyGraphQLTypes {
         public static LegacyGraphQLBikesAllowed valueOfLabel(String label) {
             return BY_LABEL.get(label);
         }
+    }
+
+
+    public static class LegacyGraphQLCarParkOpeningHoursArgs {
+
+        private Iterable<String> _dates;
+
+        public LegacyGraphQLCarParkOpeningHoursArgs(Map<String, Object> args) {
+            if (args != null) {
+                this._dates = (Iterable<String>) args.get("dates");
+            }
+        }
+
+        public Iterable<String> getLegacyGraphQLDates() {return this._dates;}
     }
 
 
@@ -1042,6 +1069,7 @@ public class LegacyGraphQLTypes {
         private Integer _numItineraries;
         private Boolean _omitCanceled;
         private LegacyGraphQLOptimizeType _optimize;
+        private String _pageCursor;
         private LegacyGraphQLInputPreferredInput _preferred;
         private Boolean _reverseOptimizeOnTheFly;
         private Long _searchWindow;
@@ -1123,6 +1151,7 @@ public class LegacyGraphQLTypes {
                     this._optimize =
                             LegacyGraphQLOptimizeType.valueOfLabel((String) args.get("optimize"));
                 }
+                this._pageCursor = (String) args.get("pageCursor");
                 this._preferred = new LegacyGraphQLInputPreferredInput(
                         (Map<String, Object>) args.get("preferred"));
                 this._reverseOptimizeOnTheFly = (Boolean) args.get("reverseOptimizeOnTheFly");
@@ -1231,6 +1260,8 @@ public class LegacyGraphQLTypes {
         public Boolean getLegacyGraphQLOmitCanceled() {return this._omitCanceled;}
 
         public LegacyGraphQLOptimizeType getLegacyGraphQLOptimize() {return this._optimize;}
+
+        public String getLegacyGraphQLPageCursor() {return this._pageCursor;}
 
         public LegacyGraphQLInputPreferredInput getLegacyGraphQLPreferred() {return this._preferred;}
 

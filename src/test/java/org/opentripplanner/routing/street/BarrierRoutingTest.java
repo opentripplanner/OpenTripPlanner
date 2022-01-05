@@ -31,7 +31,7 @@ import org.opentripplanner.standalone.server.Router;
 
 public class BarrierRoutingTest {
 
-    private static final long dateTime = Instant.now().toEpochMilli();
+    private static final Instant dateTime = Instant.now();
 
     private static Graph graph;
 
@@ -134,7 +134,7 @@ public class BarrierRoutingTest {
             Function<List<Itinerary>, Stream<Executable>> assertions
     ) {
         RoutingRequest request = new RoutingRequest();
-        request.dateTime = dateTime;
+        request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
         request.streetSubRequestModes = new TraverseModeSet(traverseMode);

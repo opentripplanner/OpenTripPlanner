@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -224,11 +226,18 @@ public class ScheduledDeviatedTripTest extends FlexTest {
             Router router
     ) {
         RoutingRequest request = new RoutingRequest();
-        request.dateTime = TestUtils.dateInSeconds("America/Atlanta", 2021, 11, 25, 12, 0, 0);
+        Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 25, 12, 0, 0);
+        request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
 
-        var result = TransitRouter.route(request, router, new DebugTimingAggregator());
+        var result = TransitRouter.route(
+                request,
+                router,
+                dateTime.atZone(ZoneId.of("America/New_York")),
+                new DebugTimingAggregator()
+        );
+
         return result.getItineraries();
     }
 

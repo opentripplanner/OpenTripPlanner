@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
@@ -84,6 +86,8 @@ public class WalkableAreaBuilder {
     private OSMDatabase osmdb;
 
     private WayPropertySet wayPropertySet;
+
+    private Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
     private StreetEdgeFactory edgeFactory;
 
@@ -208,9 +212,11 @@ public class WalkableAreaBuilder {
                 Collection<OSMNode> nodes = osmdb.getStopsInArea(area.parent);
                 if (nodes != null) {
                     for (OSMNode node : nodes) {
-                        platformLinkingVertices.add(handler.getVertexForOsmNode(node, areaEntity));
+                        OsmVertex vertex = handler.getVertexForOsmNode(node, areaEntity);
+                        platformLinkingVertices.add(vertex);
                         visibilityNodes.add(node);
                         startingNodes.add(node);
+                        edgeList.visibilityVertices.add(vertex);
                     }
                 }
 
@@ -227,6 +233,7 @@ public class WalkableAreaBuilder {
                             OSMNode node = osmdb.getNode(v.nodeId);
                             visibilityNodes.add(node);
                             startingNodes.add(node);
+                            edgeList.visibilityVertices.add(v);
                         }
                     }
 
@@ -241,10 +248,15 @@ public class WalkableAreaBuilder {
                         );
                         edges.addAll(newEdges);
                         ringEdges.addAll(newEdges);
-                        // TODO: this is really needed only for convex nodes, could be a perf optimization
-                        visibilityNodes.add(node);
+                        // A node can only be a visibility node only if it is an entrance to the
+                        // area or a convex point, i.e. the angle is over 180 degrees.
+                        if (outerRing.isNodeConvex(i)) {
+                            visibilityNodes.add(node);
+                        }
                         if (isStartingNode(node, osmWayIds)) {
+                            visibilityNodes.add(node);
                             startingNodes.add(node);
+                            edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
                         }
                     }
                     for (Ring innerRing : outerRing.getHoles()) {
@@ -252,11 +264,16 @@ public class WalkableAreaBuilder {
                             OSMNode node = innerRing.nodes.get(j);
                             edges.addAll(createEdgesForRingSegment(edgeList, area, innerRing, j,
                                     alreadyAddedEdges));
-                            // TODO: this is really needed only for convex nodes, could be a perf optimization
-                            visibilityNodes.add(node);
+                            // A node can only be a visibility node only if it is an entrance to the
+                            // area or a convex point, i.e. the angle is over 180 degrees.
+                            // For holes, the internal angle is calculated, so we must swap the sign
+                            if (!innerRing.isNodeConvex(j)) {
+                                visibilityNodes.add(node);
+                            }
                             if (isStartingNode(node, osmWayIds)) {
+                                visibilityNodes.add(node);
                                 startingNodes.add(node);
-
+                                edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
                             }
                         }
                     }
@@ -274,16 +291,26 @@ public class WalkableAreaBuilder {
                 continue;
             }
 
+            if (edgeList.visibilityVertices.size() == 0) {
+                issueStore.add(
+                    "UnconnectedArea",
+                    "Area %s has no connection to street network",
+                    osmWayIds.stream().map(Object::toString).collect(Collectors.joining(", ")));
+            }
+
             createNamedAreas(edgeList, ring, group.areas);
 
             for (OSMNode nodeI : visibilityNodes) {
+                IntersectionVertex startEndpoint = handler.getVertexForOsmNode(nodeI, areaEntity);
+                if (startingNodes.contains(nodeI)) {
+                    startingVertices.add(startEndpoint);
+                }
+
                 for (OSMNode nodeJ : visibilityNodes) {
                     P2<OSMNode> nodePair = new P2<OSMNode>(nodeI, nodeJ);
                     if (alreadyAddedEdges.contains(nodePair))
                         continue;
 
-                    IntersectionVertex startEndpoint = handler.getVertexForOsmNode(nodeI,
-                            areaEntity);
                     IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nodeJ,
                             areaEntity);
 
@@ -300,23 +327,11 @@ public class WalkableAreaBuilder {
                             edgeList
                         );
                         edges.addAll(segments);
-                        if (startingNodes.contains(nodeI)) {
-                            startingVertices.add(startEndpoint);
-                            for (AreaEdge segment: segments) {
-                                segment.getArea().visibilityVertices.add(startEndpoint);
-                            }
-                            if (platformLinkingVertices.contains(startEndpoint)) {
-                                ringEdges.addAll(segments);
-                            }
+                        if (platformLinkingVertices.contains(startEndpoint)) {
+                            ringEdges.addAll(segments);
                         }
-                        if (startingNodes.contains(nodeJ)) {
-                            startingVertices.add(endEndpoint);
-                            for (AreaEdge segment: segments) {
-                                segment.getArea().visibilityVertices.add(endEndpoint);
-                            }
-                            if (platformLinkingVertices.contains(endEndpoint)) {
-                                ringEdges.addAll(segments);
-                            }
+                        if (platformLinkingVertices.contains(endEndpoint)) {
+                            ringEdges.addAll(segments);
                         }
                     }
                 }
@@ -484,8 +499,17 @@ public class WalkableAreaBuilder {
 
             backStreet.setStreetClass(cls);
 
-            WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
-            handler.applyWayProperties(street, backStreet, wayData, areaEntity);
+            if (!wayPropertiesCache.containsKey(areaEntity)) {
+                WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
+                wayPropertiesCache.put(areaEntity, wayData);
+            }
+
+            handler.applyWayProperties(
+                street,
+                backStreet,
+                wayPropertiesCache.get(areaEntity),
+                areaEntity
+            );
             return Set.of(street, backStreet);
         } else {
             // take the part that intersects with the start vertex
@@ -558,8 +582,12 @@ public class WalkableAreaBuilder {
             I18NString name = handler.getNameForWay(areaEntity, id);
             namedArea.setName(name);
 
-            WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
-            Double safety = wayData.getSafetyFeatures().first;
+            if (!wayPropertiesCache.containsKey(areaEntity)) {
+                WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
+                wayPropertiesCache.put(areaEntity, wayData);
+            }
+
+            Double safety = wayPropertiesCache.get(areaEntity).getSafetyFeatures().first;
             namedArea.setBicycleSafetyMultiplier(safety);
 
             namedArea.setOriginalEdges(intersection);

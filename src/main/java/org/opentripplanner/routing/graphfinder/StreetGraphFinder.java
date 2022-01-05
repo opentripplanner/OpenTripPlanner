@@ -79,6 +79,8 @@ public class StreetGraphFinder implements GraphFinder {
       astar.setTraverseVisitor(visitor);
       astar.setSkipEdgeStrategy(skipEdgeStrategy);
       astar.getShortestPathTree(rr);
+      // Destroy the routing context, to clean up the temporary edges & vertices
+      rr.rctx.destroy();
     }
   }
 }

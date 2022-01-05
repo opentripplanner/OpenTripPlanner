@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
  * A TripPlan is a set of ways to get from point A to point B at time T.
@@ -29,7 +30,11 @@ public class TripPlan {
 
     @Override
     public String toString() {
-        return "TripPlan{" + "date=" + date + ", from=" + from + ", to=" + to
-                + ", itineraries=" + itineraries + '}';
+        return ToStringBuilder.of(TripPlan.class)
+                .addObj("date", date)
+                .addObj("from", from)
+                .addObj("to", to)
+                .addObj("itineraries", itineraries)
+                .toString();
     }
 }

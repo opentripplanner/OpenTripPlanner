@@ -14,6 +14,9 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
+import static org.opentripplanner.util.time.DateConstants.ONE_DAY_SECONDS;
 
 public class StopTimesHelper {
   /**
@@ -53,11 +57,24 @@ public class StopTimesHelper {
       boolean includeCancelledTrips
   ) {
     if (startTime == 0) {
-      startTime = System.currentTimeMillis() / 1000;
+      startTime = Instant.now().getEpochSecond();
     }
     List<StopTimesInPattern> result = new ArrayList<>();
-    Date date = new Date(startTime * 1000);
-    ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
+
+    ZoneId zoneId = routingService.getTransitLayer().getTransitDataZoneId();
+    LocalDate date = Instant.ofEpochSecond(startTime).atZone(zoneId).toLocalDate();
+
+    // Number of days requested + the following day
+    int numberOfDays = timeRange / ONE_DAY_SECONDS + 1;
+
+    List<ServiceDate> dates = new ArrayList<>();
+
+    // Yesterday, today, number of requested days, following day
+    for (int i = -1; i <= numberOfDays; i++) {
+      dates.add(new ServiceDate(date).shift(i));
+    }
+
+    ServiceDate[] serviceDates = dates.toArray(new ServiceDate[dates.size()]);
 
     // TODO The following logic could probably be encapsulated in the TimetableSnapshot
     Collection<TripPattern> plannedPatterns = routingService.getPatternsForStop(stop, false);

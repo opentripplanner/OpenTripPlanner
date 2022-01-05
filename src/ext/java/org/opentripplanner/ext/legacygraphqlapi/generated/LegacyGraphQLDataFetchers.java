@@ -141,9 +141,13 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<String> name();
 
+        public DataFetcher<Iterable<Object>> openingHours();
+
         public DataFetcher<Boolean> realtime();
 
         public DataFetcher<Integer> spacesAvailable();
+
+        public DataFetcher<Iterable<String>> tags();
     }
 
     /**
@@ -240,9 +244,13 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<String> name();
 
+        public DataFetcher<Iterable<Object>> openingHours();
+
         public DataFetcher<Boolean> realtime();
 
         public DataFetcher<Integer> spacesAvailable();
+
+        public DataFetcher<Iterable<String>> tags();
     }
 
     /**
@@ -418,6 +426,26 @@ public class LegacyGraphQLDataFetchers {
     }
 
     /**
+     * A span of time.
+     */
+    public interface LegacyGraphQLLocalTimeSpan {
+
+        public DataFetcher<Integer> from();
+
+        public DataFetcher<Integer> to();
+    }
+
+    /**
+     * A date using the local timezone of the object that can contain timespans.
+     */
+    public interface LegacyGraphQLLocalTimeSpanDate {
+
+        public DataFetcher<String> date();
+
+        public DataFetcher<Iterable<Object>> timeSpans();
+    }
+
+    /**
      * An object with an ID
      */
     public interface LegacyGraphQLNode extends TypeResolver {
@@ -529,7 +557,11 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Long> nextDateTime();
 
+        public DataFetcher<String> nextPageCursor();
+
         public DataFetcher<Long> prevDateTime();
+
+        public DataFetcher<String> previousPageCursor();
 
         public DataFetcher<Long> searchWindowUsed();
 

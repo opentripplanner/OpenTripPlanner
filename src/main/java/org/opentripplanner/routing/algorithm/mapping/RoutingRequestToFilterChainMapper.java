@@ -19,6 +19,7 @@ public class RoutingRequestToFilterChainMapper {
       RoutingRequest request,
       Instant filterOnLatestDepartureTime,
       boolean removeWalkAllTheWayResults,
+      boolean reverseFilteringDirection,
       Consumer<Itinerary> maxLimitReachedSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.arriveBy);
@@ -52,6 +53,7 @@ public class RoutingRequestToFilterChainMapper {
         .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
         .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
         .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
+        .withReverseFilteringDirection(reverseFilteringDirection)
         .withDebugEnabled(p.debug);
 
     return builder.build();

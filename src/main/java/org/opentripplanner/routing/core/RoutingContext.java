@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
@@ -19,6 +20,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +69,11 @@ public class RoutingContext implements Cloneable {
     /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
     public boolean slopeRestrictionRemoved = false;
 
+    /**
+     * DataOverlay Sandbox module context.
+     */
+    public DataOverlayContext dataOverlayContext;
+
     /* CONSTRUCTORS */
 
     /**
@@ -107,6 +114,9 @@ public class RoutingContext implements Cloneable {
         this.opt = routingRequest;
         this.graph = graph;
         this.tempEdges = new HashSet<>();
+        this.dataOverlayContext = OTPFeature.DataOverlay.isOnElseNull(() ->
+            new DataOverlayContext(graph.dataOverlayParameterBindings, routingRequest.dataOverlay)
+        );
 
         Set<Vertex> fromVertices;
         Set<Vertex> toVertices;
