@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * geometries. It also does some other postprocessing involving fares and interlined blocks.
  *
  * <p>
- * THREAD SAFTY
+ * THREAD SAFETY
  * The computation runs in parallel so be careful about threadsafety when modifying the logic here.
  */
 public class GeometryAndBlockProcessor {
@@ -111,7 +111,7 @@ public class GeometryAndBlockProcessor {
     /**
      * Generate the edges. Assumes that there are already vertices in the graph for the stops.
      * <p>
-     * THREAD SAFTY
+     * THREAD SAFETY
      * The geometries for the trip patterns are computed in parallel. The collections needed for
      * this are concurrent implementations and therefore threadsafe but the issue store, the graph,
      * the OtpTransitService and others are not.
@@ -649,12 +649,6 @@ public class GeometryAndBlockProcessor {
             if (!point.isDistTraveledSet())
                 hasAllDistances = false;
             i++;
-        }
-
-        // If we don't have distances here, we can't calculate them ourselves because we can't
-        // assume the units will match
-        if (!hasAllDistances) {
-            distances = null;
         }
 
         CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
