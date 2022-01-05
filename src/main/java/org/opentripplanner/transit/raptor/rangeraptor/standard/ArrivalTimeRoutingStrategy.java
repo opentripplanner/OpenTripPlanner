@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 import java.util.function.IntConsumer;
-import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -12,11 +11,18 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 
 /**
- * The purpose of this class is to implement the "Standard" specific functionality of the worker.
+ * The purpose of this class is to implement a routing strategy for finding the best arrival-time.
+ * This class optimize the raptor search on a single criteria.
+ * <p>
+ * Note! Raptor give us number-of-transfer as a second pareto criteria - witch is outside the scope
+ * of this class.
+ * <p>
+ * Note! This strategy can be used with RangeRaptor - iterating over a time-window to get pareto
+ * optimal solution for departure time. Witch is outside the scope of this class.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class StdTransitWorker<T extends RaptorTripSchedule> implements RoutingStrategy<T> {
+public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule> implements RoutingStrategy<T> {
 
     private static final int NOT_SET = -1;
 
@@ -28,7 +34,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     private int onTripBoardStop;
     private T onTrip;
 
-    public StdTransitWorker(TransitCalculator<T> calculator, StdWorkerState<T> state) {
+    public ArrivalTimeRoutingStrategy(TransitCalculator<T> calculator, StdWorkerState<T> state) {
         this.calculator = calculator;
         this.state = state;
     }

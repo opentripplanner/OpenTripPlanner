@@ -11,12 +11,20 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 
 /**
- * The purpose of this class is to implement the "Standard" specific functionality of the worker
- * with NO WAIT TIME between transfer and transit, except the boardSlack.
- * <p/>
+ * The purpose of this class is to implement a routing strategy for finding the best minimum travel
+ * duration ignoring wait time(except board-/alight-slack). This class optimize on a single
+ * criteria: MINIMUM TRAVEL DURATION.
+ * <p>
+ * Note! Raptor give us number-of-transfer as a second pareto criteria - witch is outside the scope
+ * of this class.
+ * <p>
+ * Note! This strategy can be used with RangeRaptor, but that does not make any sense. The
+ * same result should be found in every iteration.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements RoutingStrategy<T> {
+public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule>
+        implements RoutingStrategy<T> {
 
     private static final int NOT_SET = -1;
 
@@ -29,7 +37,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     private T onTrip;
     private int onTripTimeShift;
 
-    public NoWaitTransitWorker(TransitCalculator<T> calculator, StdWorkerState<T> state) {
+    public MinTravelDurationRoutingStrategy(TransitCalculator<T> calculator, StdWorkerState<T> state) {
         this.calculator = calculator;
         this.state = state;
     }

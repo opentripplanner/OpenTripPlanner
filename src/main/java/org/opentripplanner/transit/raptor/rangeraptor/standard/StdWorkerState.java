@@ -5,7 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 
 /**
- * This interface define the methods used be the {@link StdTransitWorker}
+ * This interface define the methods used be the {@link ArrivalTimeRoutingStrategy}
  * to query and update the state of the algorithm.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.

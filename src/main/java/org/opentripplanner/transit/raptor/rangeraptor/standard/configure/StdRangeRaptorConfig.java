@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.configure;
 
+import java.util.function.BiFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
@@ -7,11 +8,11 @@ import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.path.configure.PathConfig;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivalTimeRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivedAtDestinationCheck;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.NoWaitTransitWorker;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.MinTravelDurationRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StdRangeRaptorWorkerState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StdTransitWorker;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StdWorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
@@ -26,8 +27,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stop
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
-
-import java.util.function.BiFunction;
 
 
 /**
@@ -80,10 +79,10 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         new VerifyRequestIsValid(ctx).verify();
         switch (ctx.profile()) {
             case STANDARD:
-            case NO_WAIT_STD:
+            case MIN_TRAVEL_DURATION:
                 return workerState(stdStopArrivalsState());
             case BEST_TIME:
-            case NO_WAIT_BEST_TIME:
+            case MIN_TRAVEL_DURATION_BEST_TIME:
                 return workerState(bestTimeStopArrivalsState());
         }
         throw new IllegalArgumentException(ctx.profile().toString());
@@ -93,10 +92,10 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         switch (ctx.profile()) {
             case STANDARD:
             case BEST_TIME:
-                return new StdTransitWorker<>(ctx.calculator(), state);
-            case NO_WAIT_STD:
-            case NO_WAIT_BEST_TIME:
-                return new NoWaitTransitWorker<>(ctx.calculator(), state);
+                return new ArrivalTimeRoutingStrategy<>(ctx.calculator(), state);
+            case MIN_TRAVEL_DURATION:
+            case MIN_TRAVEL_DURATION_BEST_TIME:
+                return new MinTravelDurationRoutingStrategy<>(ctx.calculator(), state);
         }
         throw new IllegalArgumentException(ctx.profile().toString());
     }
