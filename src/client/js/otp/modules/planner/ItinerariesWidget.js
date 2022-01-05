@@ -169,10 +169,10 @@ otp.widgets.ItinerariesWidget =
         this.renderHeaders();
         this_.itinsAccord.accordion("resize");
 
-        this.$().resize(function(){
+        this.$().resize(_.throttle(function(){
             this_.itinsAccord.accordion("resize");
             this_.renderHeaders();
-        });
+        }, 100, {leading: false}));
 
         this.$().draggable({ cancel: "#"+divId });
 
