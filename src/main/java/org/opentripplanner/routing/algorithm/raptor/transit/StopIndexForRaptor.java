@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTransferPriority;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 
 /**
@@ -56,6 +57,18 @@ public final class StopIndexForRaptor {
 
         for (int i = 0; i < stops.size(); i++) {
             stopIndex[i] = indexByStop.get(stops.get(i));
+        }
+        return stopIndex;
+    }
+
+    /**
+     * Create a list of stop indexes for a given list of stops.
+     */
+    public int[] listStopIndexesForPattern(TripPattern pattern) {
+        int[] stopIndex = new int[pattern.numberOfStops()];
+
+        for (int i = 0; i < pattern.numberOfStops(); i++) {
+            stopIndex[i] = indexByStop.get(pattern.getStop(i));
         }
         return stopIndex;
     }

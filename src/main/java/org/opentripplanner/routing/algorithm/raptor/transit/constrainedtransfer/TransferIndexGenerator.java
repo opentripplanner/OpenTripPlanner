@@ -8,15 +8,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
-import lombok.val;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.RouteTransferPoint;
+import org.opentripplanner.model.transfer.RouteStationTransferPoint;
+import org.opentripplanner.model.transfer.RouteStopTransferPoint;
 import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferPoint;
@@ -25,6 +26,8 @@ import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 
 public class TransferIndexGenerator {
+    private static final boolean BOARD = true;
+    private static final boolean ALIGHT = false;
 
     private final Collection<ConstrainedTransfer> constrainedTransfers;
     private final Map<Station, List<TripPatternWithRaptorStopIndexes>> patternsByStation = new HashMap<>();
@@ -51,15 +54,15 @@ public class TransferIndexGenerator {
             // transfers, but not in Raptor.
             if (!c.useInRaptorRouting()) { continue; }
 
-            for (var fromPoint : findTPoints(tx.getFrom())) {
-                if (fromPoint.canAlight()) {
-                    for (var toPoint : findTPoints(tx.getTo())) {
-                        if (toPoint.canBoard() && !fromPoint.equals(toPoint)) {
-                            fromPoint.addTransferConstraints(tx, toPoint);
+            findTPoints(tx.getFrom(), ALIGHT).stream()
+                    .filter(TPoint::canAlight)
+                    .forEachOrdered(fromPoint -> {
+                        for (var toPoint : findTPoints(tx.getTo(), BOARD)) {
+                            if (toPoint.canBoard() && !fromPoint.equals(toPoint)) {
+                                fromPoint.addTransferConstraints(tx, toPoint);
+                            }
                         }
-                    }
-                }
-            }
+                    });
         }
         sortAllTransfersByRanking();
     }
@@ -94,15 +97,18 @@ public class TransferIndexGenerator {
         }
     }
 
-    private Collection<TPoint> findTPoints(TransferPoint txPoint) {
+    private Collection<TPoint> findTPoints(TransferPoint txPoint, boolean boarding) {
         if (txPoint.isStationTransferPoint()) {
             return findTPoints(txPoint.asStationTransferPoint());
         }
         else if (txPoint.isStopTransferPoint()) {
             return findTPoints(txPoint.asStopTransferPoint());
         }
-        else if (txPoint.isRouteTransferPoint()) {
-            return findTPoint(txPoint.asRouteTransferPoint());
+        else if (txPoint.isRouteStationTransferPoint()) {
+            return findTPoint(txPoint.asRouteStationTransferPoint(), boarding);
+        }
+        else if (txPoint.isRouteStopTransferPoint()) {
+            return findTPoint(txPoint.asRouteStopTransferPoint(), boarding);
         }
         else {
             return findTPoints(txPoint.asTripTransferPoint());
@@ -133,7 +139,7 @@ public class TransferIndexGenerator {
 
         var result = new ArrayList<TPoint>();
         for (TripPatternWithRaptorStopIndexes pattern : patterns) {
-            val p = pattern.getPattern();
+            var p = pattern.getPattern();
             for (int pos = 0; pos < p.numberOfStops(); ++pos) {
                 if (point.getStop() == p.getStop(pos)) {
                     result.add(new TPoint(pattern, sourcePoint, null, pos));
@@ -143,15 +149,35 @@ public class TransferIndexGenerator {
         return result;
     }
 
-    private List<TPoint> findTPoint(RouteTransferPoint point) {
-        var route = point.getRoute();
+    private List<TPoint> findTPoint(RouteStationTransferPoint point, boolean boarding) {
+        return findTPointForRoute(
+                point.getRoute(),
+                boarding ? p -> p.findBoardingStopPositionInPattern(point.getStation())
+                         : p -> p.findAlightStopPositionInPattern(point.getStation())
+        );
+    }
+
+    private List<TPoint> findTPoint(RouteStopTransferPoint point, boolean boarding) {
+        return findTPointForRoute(
+                point.getRoute(),
+                boarding ? p -> p.findBoardingStopPositionInPattern(point.getStop())
+                         : p -> p.findAlightStopPositionInPattern(point.getStop())
+        );
+    }
+
+    private List<TPoint> findTPointForRoute(
+            Route route,
+            ToIntFunction<TripPattern> resolveStopPosInPattern
+    ) {
         var patterns = patternsByRoute.get(route);
-        int stopPosInPattern = point.getStopPositionInPattern();
-        int stopIndex = patterns.get(0).stopIndex(stopPosInPattern);
-        var sourcePoint = createTransferPointForPattern(route, stopIndex);
-        return patterns.stream()
-                .map(p -> new TPoint(p, sourcePoint, null, stopPosInPattern))
-                .collect(Collectors.toList());
+        var points = new ArrayList<TPoint>();
+        for (var pattern : patterns) {
+            int stopPosInPattern = resolveStopPosInPattern.applyAsInt(pattern.getPattern());
+            int stopIndex = pattern.stopIndex(stopPosInPattern);
+            var sourcePoint = createTransferPointForPattern(route, stopIndex);
+            points.add(new TPoint(pattern, sourcePoint, null, stopPosInPattern));
+        }
+        return points;
     }
 
     private List<TPoint> findTPoints(TripTransferPoint point) {

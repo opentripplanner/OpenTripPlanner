@@ -8,7 +8,7 @@ import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.util.time.DurationUtils;
 
-public class TransferConstraintTest implements TransferTestData {
+public class TransferConstraintTest {
 
   public static final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.duration("1h");
 

@@ -9991,8 +9991,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 1667.1475209896525,
-          "endTime": "2009-11-17T18:52:12.000+00:00",
+          "distanceMeters": 1355.2067620852858,
+          "endTime": "2009-11-17T18:51:01.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
@@ -10027,7 +10027,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "stopSequence": 35,
             "vertexType": "TRANSIT"
           },
-          "generalizedCost": 972,
+          "generalizedCost": 901,
           "headsign": "Rose Qtr TC",
           "interlinedWithPreviousLeg": false,
           "intermediateStops": [
@@ -10178,85 +10178,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "stopSequence": 39,
                 "vertexType": "TRANSIT"
               }
-            },
-            {
-              "arrival": "2009-11-17T18:51:01.000+00:00",
-              "departure": "2009-11-17T18:51:01.000+00:00",
-              "place": {
-                "coordinate": {
-                  "latitude": 45.531569,
-                  "longitude": -122.659045
-                },
-                "name": "NE Multnomah & 7th",
-                "stop": {
-                  "code": "4054",
-                  "coordinate": {
-                    "latitude": 45.531569,
-                    "longitude": -122.659045
-                  },
-                  "description": "Westbound stop in Portland (Stop ID 4054)",
-                  "fareZones": [
-                    {
-                      "id": {
-                        "feedId": "prt",
-                        "id": "0"
-                      }
-                    }
-                  ],
-                  "id": {
-                    "feedId": "prt",
-                    "id": "4054"
-                  },
-                  "name": "NE Multnomah & 7th",
-                  "partOfStation": false,
-                  "wheelchairBoarding": "NO_INFORMATION"
-                },
-                "stopIndex": 39,
-                "stopSequence": 40,
-                "vertexType": "TRANSIT"
-              }
-            },
-            {
-              "arrival": "2009-11-17T18:51:27.000+00:00",
-              "departure": "2009-11-17T18:51:27.000+00:00",
-              "place": {
-                "coordinate": {
-                  "latitude": 45.531586,
-                  "longitude": -122.660482
-                },
-                "name": "NE Multnomah & Grand",
-                "stop": {
-                  "code": "4043",
-                  "coordinate": {
-                    "latitude": 45.531586,
-                    "longitude": -122.660482
-                  },
-                  "description": "Westbound stop in Portland (Stop ID 4043)",
-                  "fareZones": [
-                    {
-                      "id": {
-                        "feedId": "prt",
-                        "id": "0"
-                      }
-                    }
-                  ],
-                  "id": {
-                    "feedId": "prt",
-                    "id": "4043"
-                  },
-                  "name": "NE Multnomah & Grand",
-                  "partOfStation": false,
-                  "wheelchairBoarding": "NO_INFORMATION"
-                },
-                "stopIndex": 40,
-                "stopSequence": 41,
-                "vertexType": "TRANSIT"
-              }
             }
           ],
           "legGeometry": {
-            "length": 46,
-            "points": "{fztG`xrkVwA?mCAmC?oCA}C?sDC??aBAm@@k@AY?uABU@I@IBQFb@fC}@d@OFO@q@???Q?]?gGA??[??nJ???b@?vK?rA???tBCfD???^?nE?V@Z?PH\\Nb@`@~@Rf@"
+            "length": 33,
+            "points": "{fztG`xrkVwA?mCAmC?oCA}C?sDC??aBAm@@k@AY?uABU@I@IBQFb@fC}@d@OFO@q@???Q?]?gGA??[??nJ???b@?vK?rA"
           },
           "mode": "BUS",
           "onStreetNonTransit": false,
@@ -10274,17 +10200,17 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "streetNotes": [ ],
           "to": {
             "coordinate": {
-              "latitude": 45.531159,
-              "longitude": -122.66293
+              "latitude": 45.531569,
+              "longitude": -122.659045
             },
-            "name": "NE Multnomah & 3rd",
+            "name": "NE Multnomah & 7th",
             "stop": {
-              "code": "11492",
+              "code": "4054",
               "coordinate": {
-                "latitude": 45.531159,
-                "longitude": -122.66293
+                "latitude": 45.531569,
+                "longitude": -122.659045
               },
-              "description": "Westbound stop in Portland (Stop ID 11492)",
+              "description": "Westbound stop in Portland (Stop ID 4054)",
               "fareZones": [
                 {
                   "id": {
@@ -10295,15 +10221,138 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               ],
               "id": {
                 "feedId": "prt",
-                "id": "11492"
+                "id": "4054"
               },
-              "name": "NE Multnomah & 3rd",
+              "name": "NE Multnomah & 7th",
               "partOfStation": false,
               "wheelchairBoarding": "NO_INFORMATION"
             },
-            "stopIndex": 41,
-            "stopSequence": 42,
+            "stopIndex": 39,
+            "stopSequence": 40,
             "vertexType": "TRANSIT"
+          },
+          "transferToNextLeg": {
+            "constraint": {
+              "facilitated": false,
+              "guaranteed": false,
+              "maxWaitTime": -1,
+              "notAllowed": false,
+              "priority": "RECOMMENDED",
+              "regularTransfer": false,
+              "staySeated": false
+            },
+            "from": {
+              "route": {
+                "agency": {
+                  "fareUrl": "http://trimet.org/fares/index.htm",
+                  "id": {
+                    "feedId": "prt",
+                    "id": "prt"
+                  },
+                  "lang": "en",
+                  "name": "TriMet",
+                  "phone": "503-238-7433",
+                  "timezone": "America/Los_Angeles",
+                  "url": "http://trimet.org"
+                },
+                "bikesAllowed": "UNKNOWN",
+                "id": {
+                  "feedId": "prt",
+                  "id": "70"
+                },
+                "longName": "12th Ave",
+                "mode": "BUS",
+                "shortName": "70",
+                "sortOrder": -999,
+                "sortOrderSet": false,
+                "type": 3,
+                "url": "http://trimet.org/schedules/r070.htm"
+              },
+              "routeStationTransferPoint": false,
+              "routeStopTransferPoint": true,
+              "stationTransferPoint": false,
+              "stop": {
+                "code": "4054",
+                "coordinate": {
+                  "latitude": 45.531569,
+                  "longitude": -122.659045
+                },
+                "description": "Westbound stop in Portland (Stop ID 4054)",
+                "fareZones": [
+                  {
+                    "id": {
+                      "feedId": "prt",
+                      "id": "0"
+                    }
+                  }
+                ],
+                "id": {
+                  "feedId": "prt",
+                  "id": "4054"
+                },
+                "name": "NE Multnomah & 7th",
+                "partOfStation": false,
+                "wheelchairBoarding": "NO_INFORMATION"
+              },
+              "stopTransferPoint": false,
+              "tripTransferPoint": false
+            },
+            "to": {
+              "route": {
+                "agency": {
+                  "fareUrl": "http://trimet.org/fares/index.htm",
+                  "id": {
+                    "feedId": "prt",
+                    "id": "prt"
+                  },
+                  "lang": "en",
+                  "name": "TriMet",
+                  "phone": "503-238-7433",
+                  "timezone": "America/Los_Angeles",
+                  "url": "http://trimet.org"
+                },
+                "bikesAllowed": "UNKNOWN",
+                "id": {
+                  "feedId": "prt",
+                  "id": "77"
+                },
+                "longName": "Broadway/Halsey",
+                "mode": "BUS",
+                "shortName": "77",
+                "sortOrder": -999,
+                "sortOrderSet": false,
+                "type": 3,
+                "url": "http://trimet.org/schedules/r077.htm"
+              },
+              "routeStationTransferPoint": false,
+              "routeStopTransferPoint": true,
+              "stationTransferPoint": false,
+              "stop": {
+                "code": "4054",
+                "coordinate": {
+                  "latitude": 45.531569,
+                  "longitude": -122.659045
+                },
+                "description": "Westbound stop in Portland (Stop ID 4054)",
+                "fareZones": [
+                  {
+                    "id": {
+                      "feedId": "prt",
+                      "id": "0"
+                    }
+                  }
+                ],
+                "id": {
+                  "feedId": "prt",
+                  "id": "4054"
+                },
+                "name": "NE Multnomah & 7th",
+                "partOfStation": false,
+                "wheelchairBoarding": "NO_INFORMATION"
+              },
+              "stopTransferPoint": false,
+              "tripTransferPoint": false
+            }
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -10359,22 +10408,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": 0,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distanceMeters": 3526.7741793792093,
+          "distanceMeters": 3838.714938283576,
           "endTime": "2009-11-17T19:08:50.000+00:00",
           "flexibleTrip": false,
           "from": {
             "coordinate": {
-              "latitude": 45.531159,
-              "longitude": -122.66293
+              "latitude": 45.531569,
+              "longitude": -122.659045
             },
-            "name": "NE Multnomah & 3rd",
+            "name": "NE Multnomah & 7th",
             "stop": {
-              "code": "11492",
+              "code": "4054",
               "coordinate": {
-                "latitude": 45.531159,
-                "longitude": -122.66293
+                "latitude": 45.531569,
+                "longitude": -122.659045
               },
-              "description": "Westbound stop in Portland (Stop ID 11492)",
+              "description": "Westbound stop in Portland (Stop ID 4054)",
               "fareZones": [
                 {
                   "id": {
@@ -10385,20 +10434,94 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               ],
               "id": {
                 "feedId": "prt",
-                "id": "11492"
+                "id": "4054"
               },
-              "name": "NE Multnomah & 3rd",
+              "name": "NE Multnomah & 7th",
               "partOfStation": false,
               "wheelchairBoarding": "NO_INFORMATION"
             },
-            "stopIndex": 83,
-            "stopSequence": 84,
+            "stopIndex": 81,
+            "stopSequence": 82,
             "vertexType": "TRANSIT"
           },
-          "generalizedCost": 1598,
+          "generalizedCost": 1669,
           "headsign": "Montgomery Park",
           "interlinedWithPreviousLeg": false,
           "intermediateStops": [
+            {
+              "arrival": "2009-11-17T18:55:05.000+00:00",
+              "departure": "2009-11-17T18:55:05.000+00:00",
+              "place": {
+                "coordinate": {
+                  "latitude": 45.531586,
+                  "longitude": -122.660482
+                },
+                "name": "NE Multnomah & Grand",
+                "stop": {
+                  "code": "4043",
+                  "coordinate": {
+                    "latitude": 45.531586,
+                    "longitude": -122.660482
+                  },
+                  "description": "Westbound stop in Portland (Stop ID 4043)",
+                  "fareZones": [
+                    {
+                      "id": {
+                        "feedId": "prt",
+                        "id": "0"
+                      }
+                    }
+                  ],
+                  "id": {
+                    "feedId": "prt",
+                    "id": "4043"
+                  },
+                  "name": "NE Multnomah & Grand",
+                  "partOfStation": false,
+                  "wheelchairBoarding": "NO_INFORMATION"
+                },
+                "stopIndex": 82,
+                "stopSequence": 83,
+                "vertexType": "TRANSIT"
+              }
+            },
+            {
+              "arrival": "2009-11-17T18:56:09.000+00:00",
+              "departure": "2009-11-17T18:56:09.000+00:00",
+              "place": {
+                "coordinate": {
+                  "latitude": 45.531159,
+                  "longitude": -122.66293
+                },
+                "name": "NE Multnomah & 3rd",
+                "stop": {
+                  "code": "11492",
+                  "coordinate": {
+                    "latitude": 45.531159,
+                    "longitude": -122.66293
+                  },
+                  "description": "Westbound stop in Portland (Stop ID 11492)",
+                  "fareZones": [
+                    {
+                      "id": {
+                        "feedId": "prt",
+                        "id": "0"
+                      }
+                    }
+                  ],
+                  "id": {
+                    "feedId": "prt",
+                    "id": "11492"
+                  },
+                  "name": "NE Multnomah & 3rd",
+                  "partOfStation": false,
+                  "wheelchairBoarding": "NO_INFORMATION"
+                },
+                "stopIndex": 83,
+                "stopSequence": 84,
+                "vertexType": "TRANSIT"
+              }
+            },
             {
               "arrival": "2009-11-17T18:58:00.000+00:00",
               "departure": "2009-11-17T18:58:00.000+00:00",
@@ -10857,8 +10980,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "legGeometry": {
-            "length": 96,
-            "points": "kx{tG~qtkV`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
+            "length": 109,
+            "points": "yz{tG`zskV?tBCfD???^?nE?V@Z?PH\\Nb@`@~@Rf@??`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
           },
           "mode": "BUS",
           "onStreetNonTransit": false,
@@ -10872,7 +10995,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "sequenceNumber": 20091117,
             "year": 2009
           },
-          "startTime": "2009-11-17T18:56:09.000+00:00",
+          "startTime": "2009-11-17T18:54:29.000+00:00",
           "streetNotes": [ ],
           "to": {
             "coordinate": {
@@ -10906,6 +11029,129 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "stopIndex": 93,
             "stopSequence": 94,
             "vertexType": "TRANSIT"
+          },
+          "transferFromPrevLeg": {
+            "constraint": {
+              "facilitated": false,
+              "guaranteed": false,
+              "maxWaitTime": -1,
+              "notAllowed": false,
+              "priority": "RECOMMENDED",
+              "regularTransfer": false,
+              "staySeated": false
+            },
+            "from": {
+              "route": {
+                "agency": {
+                  "fareUrl": "http://trimet.org/fares/index.htm",
+                  "id": {
+                    "feedId": "prt",
+                    "id": "prt"
+                  },
+                  "lang": "en",
+                  "name": "TriMet",
+                  "phone": "503-238-7433",
+                  "timezone": "America/Los_Angeles",
+                  "url": "http://trimet.org"
+                },
+                "bikesAllowed": "UNKNOWN",
+                "id": {
+                  "feedId": "prt",
+                  "id": "70"
+                },
+                "longName": "12th Ave",
+                "mode": "BUS",
+                "shortName": "70",
+                "sortOrder": -999,
+                "sortOrderSet": false,
+                "type": 3,
+                "url": "http://trimet.org/schedules/r070.htm"
+              },
+              "routeStationTransferPoint": false,
+              "routeStopTransferPoint": true,
+              "stationTransferPoint": false,
+              "stop": {
+                "code": "4054",
+                "coordinate": {
+                  "latitude": 45.531569,
+                  "longitude": -122.659045
+                },
+                "description": "Westbound stop in Portland (Stop ID 4054)",
+                "fareZones": [
+                  {
+                    "id": {
+                      "feedId": "prt",
+                      "id": "0"
+                    }
+                  }
+                ],
+                "id": {
+                  "feedId": "prt",
+                  "id": "4054"
+                },
+                "name": "NE Multnomah & 7th",
+                "partOfStation": false,
+                "wheelchairBoarding": "NO_INFORMATION"
+              },
+              "stopTransferPoint": false,
+              "tripTransferPoint": false
+            },
+            "to": {
+              "route": {
+                "agency": {
+                  "fareUrl": "http://trimet.org/fares/index.htm",
+                  "id": {
+                    "feedId": "prt",
+                    "id": "prt"
+                  },
+                  "lang": "en",
+                  "name": "TriMet",
+                  "phone": "503-238-7433",
+                  "timezone": "America/Los_Angeles",
+                  "url": "http://trimet.org"
+                },
+                "bikesAllowed": "UNKNOWN",
+                "id": {
+                  "feedId": "prt",
+                  "id": "77"
+                },
+                "longName": "Broadway/Halsey",
+                "mode": "BUS",
+                "shortName": "77",
+                "sortOrder": -999,
+                "sortOrderSet": false,
+                "type": 3,
+                "url": "http://trimet.org/schedules/r077.htm"
+              },
+              "routeStationTransferPoint": false,
+              "routeStopTransferPoint": true,
+              "stationTransferPoint": false,
+              "stop": {
+                "code": "4054",
+                "coordinate": {
+                  "latitude": 45.531569,
+                  "longitude": -122.659045
+                },
+                "description": "Westbound stop in Portland (Stop ID 4054)",
+                "fareZones": [
+                  {
+                    "id": {
+                      "feedId": "prt",
+                      "id": "0"
+                    }
+                  }
+                ],
+                "id": {
+                  "feedId": "prt",
+                  "id": "4054"
+                },
+                "name": "NE Multnomah & 7th",
+                "partOfStation": false,
+                "wheelchairBoarding": "NO_INFORMATION"
+              },
+              "stopTransferPoint": false,
+              "tripTransferPoint": false
+            }
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -11068,10 +11314,10 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "streetOnly": false,
       "systemNotices": [ ],
       "tooSloped": false,
-      "transferPriorityCost": 33,
-      "transitTimeSeconds": 1133,
-      "waitTimeOptimizedCost": -149,
-      "waitingTimeSeconds": 237,
+      "transferPriorityCost": 32,
+      "transitTimeSeconds": 1162,
+      "waitTimeOptimizedCost": -115,
+      "waitingTimeSeconds": 208,
       "walkOnly": false,
       "walkingAllTheWay": false
     },
@@ -11822,6 +12068,129 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "stopSequence": 109,
             "vertexType": "TRANSIT"
           },
+          "transferToNextLeg": {
+            "constraint": {
+              "facilitated": false,
+              "guaranteed": false,
+              "maxWaitTime": -1,
+              "notAllowed": false,
+              "priority": "RECOMMENDED",
+              "regularTransfer": false,
+              "staySeated": false
+            },
+            "from": {
+              "route": {
+                "agency": {
+                  "fareUrl": "http://trimet.org/fares/index.htm",
+                  "id": {
+                    "feedId": "prt",
+                    "id": "prt"
+                  },
+                  "lang": "en",
+                  "name": "TriMet",
+                  "phone": "503-238-7433",
+                  "timezone": "America/Los_Angeles",
+                  "url": "http://trimet.org"
+                },
+                "bikesAllowed": "UNKNOWN",
+                "id": {
+                  "feedId": "prt",
+                  "id": "20"
+                },
+                "longName": "Burnside/Stark",
+                "mode": "BUS",
+                "shortName": "20",
+                "sortOrder": -999,
+                "sortOrderSet": false,
+                "type": 3,
+                "url": "http://trimet.org/schedules/r020.htm"
+              },
+              "routeStationTransferPoint": false,
+              "routeStopTransferPoint": true,
+              "stationTransferPoint": false,
+              "stop": {
+                "code": "755",
+                "coordinate": {
+                  "latitude": 45.523512,
+                  "longitude": -122.698081
+                },
+                "description": "Westbound stop in Portland (Stop ID 755)",
+                "fareZones": [
+                  {
+                    "id": {
+                      "feedId": "prt",
+                      "id": "1"
+                    }
+                  }
+                ],
+                "id": {
+                  "feedId": "prt",
+                  "id": "755"
+                },
+                "name": "W Burnside & NW 23rd",
+                "partOfStation": false,
+                "wheelchairBoarding": "NO_INFORMATION"
+              },
+              "stopTransferPoint": false,
+              "tripTransferPoint": false
+            },
+            "to": {
+              "route": {
+                "agency": {
+                  "fareUrl": "http://trimet.org/fares/index.htm",
+                  "id": {
+                    "feedId": "prt",
+                    "id": "prt"
+                  },
+                  "lang": "en",
+                  "name": "TriMet",
+                  "phone": "503-238-7433",
+                  "timezone": "America/Los_Angeles",
+                  "url": "http://trimet.org"
+                },
+                "bikesAllowed": "UNKNOWN",
+                "id": {
+                  "feedId": "prt",
+                  "id": "15"
+                },
+                "longName": "Belmont/NW 23rd",
+                "mode": "BUS",
+                "shortName": "15",
+                "sortOrder": -999,
+                "sortOrderSet": false,
+                "type": 3,
+                "url": "http://trimet.org/schedules/r015.htm"
+              },
+              "routeStationTransferPoint": false,
+              "routeStopTransferPoint": true,
+              "stationTransferPoint": false,
+              "stop": {
+                "code": "755",
+                "coordinate": {
+                  "latitude": 45.523512,
+                  "longitude": -122.698081
+                },
+                "description": "Westbound stop in Portland (Stop ID 755)",
+                "fareZones": [
+                  {
+                    "id": {
+                      "feedId": "prt",
+                      "id": "1"
+                    }
+                  }
+                ],
+                "id": {
+                  "feedId": "prt",
+                  "id": "755"
+                },
+                "name": "W Burnside & NW 23rd",
+                "partOfStation": false,
+                "wheelchairBoarding": "NO_INFORMATION"
+              },
+              "stopTransferPoint": false,
+              "tripTransferPoint": false
+            }
+          },
           "transitAlerts": [ ],
           "transitLeg": true,
           "trip": {
@@ -12041,6 +12410,129 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "stopIndex": 73,
             "stopSequence": 74,
             "vertexType": "TRANSIT"
+          },
+          "transferFromPrevLeg": {
+            "constraint": {
+              "facilitated": false,
+              "guaranteed": false,
+              "maxWaitTime": -1,
+              "notAllowed": false,
+              "priority": "RECOMMENDED",
+              "regularTransfer": false,
+              "staySeated": false
+            },
+            "from": {
+              "route": {
+                "agency": {
+                  "fareUrl": "http://trimet.org/fares/index.htm",
+                  "id": {
+                    "feedId": "prt",
+                    "id": "prt"
+                  },
+                  "lang": "en",
+                  "name": "TriMet",
+                  "phone": "503-238-7433",
+                  "timezone": "America/Los_Angeles",
+                  "url": "http://trimet.org"
+                },
+                "bikesAllowed": "UNKNOWN",
+                "id": {
+                  "feedId": "prt",
+                  "id": "20"
+                },
+                "longName": "Burnside/Stark",
+                "mode": "BUS",
+                "shortName": "20",
+                "sortOrder": -999,
+                "sortOrderSet": false,
+                "type": 3,
+                "url": "http://trimet.org/schedules/r020.htm"
+              },
+              "routeStationTransferPoint": false,
+              "routeStopTransferPoint": true,
+              "stationTransferPoint": false,
+              "stop": {
+                "code": "755",
+                "coordinate": {
+                  "latitude": 45.523512,
+                  "longitude": -122.698081
+                },
+                "description": "Westbound stop in Portland (Stop ID 755)",
+                "fareZones": [
+                  {
+                    "id": {
+                      "feedId": "prt",
+                      "id": "1"
+                    }
+                  }
+                ],
+                "id": {
+                  "feedId": "prt",
+                  "id": "755"
+                },
+                "name": "W Burnside & NW 23rd",
+                "partOfStation": false,
+                "wheelchairBoarding": "NO_INFORMATION"
+              },
+              "stopTransferPoint": false,
+              "tripTransferPoint": false
+            },
+            "to": {
+              "route": {
+                "agency": {
+                  "fareUrl": "http://trimet.org/fares/index.htm",
+                  "id": {
+                    "feedId": "prt",
+                    "id": "prt"
+                  },
+                  "lang": "en",
+                  "name": "TriMet",
+                  "phone": "503-238-7433",
+                  "timezone": "America/Los_Angeles",
+                  "url": "http://trimet.org"
+                },
+                "bikesAllowed": "UNKNOWN",
+                "id": {
+                  "feedId": "prt",
+                  "id": "15"
+                },
+                "longName": "Belmont/NW 23rd",
+                "mode": "BUS",
+                "shortName": "15",
+                "sortOrder": -999,
+                "sortOrderSet": false,
+                "type": 3,
+                "url": "http://trimet.org/schedules/r015.htm"
+              },
+              "routeStationTransferPoint": false,
+              "routeStopTransferPoint": true,
+              "stationTransferPoint": false,
+              "stop": {
+                "code": "755",
+                "coordinate": {
+                  "latitude": 45.523512,
+                  "longitude": -122.698081
+                },
+                "description": "Westbound stop in Portland (Stop ID 755)",
+                "fareZones": [
+                  {
+                    "id": {
+                      "feedId": "prt",
+                      "id": "1"
+                    }
+                  }
+                ],
+                "id": {
+                  "feedId": "prt",
+                  "id": "755"
+                },
+                "name": "W Burnside & NW 23rd",
+                "partOfStation": false,
+                "wheelchairBoarding": "NO_INFORMATION"
+              },
+              "stopTransferPoint": false,
+              "tripTransferPoint": false
+            }
           },
           "transitAlerts": [ ],
           "transitLeg": true,
@@ -12288,7 +12780,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "streetOnly": false,
       "systemNotices": [ ],
       "tooSloped": false,
-      "transferPriorityCost": 33,
+      "transferPriorityCost": 32,
       "transitTimeSeconds": 953,
       "waitTimeOptimizedCost": -229,
       "waitingTimeSeconds": 307,

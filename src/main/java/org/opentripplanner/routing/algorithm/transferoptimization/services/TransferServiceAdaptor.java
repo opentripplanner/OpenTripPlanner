@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.function.IntFunction;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -55,12 +54,12 @@ public class TransferServiceAdaptor<T extends RaptorTripSchedule> {
     @Nullable
     protected ConstrainedTransfer findTransfer(TripStopTime<T> from, T toTrip, int toStop) {
         return transferService.findTransfer(
-                stop(from.stop()),
-                stop(toStop),
                 trip(from.trip()),
-                trip(toTrip),
                 from.stopPosition(),
-                toTrip.findDepartureStopPosition(from.time(), toStop)
+                stop(from.stop()),
+                trip(toTrip),
+                toTrip.findDepartureStopPosition(from.time(), toStop),
+                stop(toStop)
         );
     }
 

@@ -16,7 +16,8 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.RouteTransferPoint;
+import org.opentripplanner.model.transfer.RouteStationTransferPoint;
+import org.opentripplanner.model.transfer.RouteStopTransferPoint;
 import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
@@ -184,11 +185,8 @@ class TransferMapper {
       return stopPositionInPattern < 0 ? null : new TripTransferPoint(trip, stopPositionInPattern);
     }
     else if(route != null) {
-      var trips = tripsByRoute.get(route);
-      if(trips.isEmpty()) { throw new IllegalStateException("No trips found for route: " + route); }
-
-      int stopPositionInPattern = stopPosition(route, stop, station, boardTrip);
-      return new RouteTransferPoint(route, stopPositionInPattern);
+      if(stop != null) { return new RouteStopTransferPoint(route, stop); }
+      else if(station != null) { return new RouteStationTransferPoint(route, station); }
     }
     else if(stop != null) {
       return new StopTransferPoint(stop);

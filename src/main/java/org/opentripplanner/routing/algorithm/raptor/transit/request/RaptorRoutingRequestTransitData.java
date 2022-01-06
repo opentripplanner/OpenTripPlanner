@@ -6,10 +6,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
-import java.util.function.IntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
@@ -137,12 +136,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
               TripSchedule fromTrip, int fromStopPosition, TripSchedule toTrip, int toStopPosition
       ) {
         return transferService.findTransfer(
-                transitLayer.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
-                transitLayer.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition)),
                 fromTrip.getOriginalTripTimes().getTrip(),
-                toTrip.getOriginalTripTimes().getTrip(),
                 fromStopPosition,
-                toStopPosition
+                transitLayer.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
+                toTrip.getOriginalTripTimes().getTrip(),
+                toStopPosition,
+                transitLayer.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition))
         );
       }
     };

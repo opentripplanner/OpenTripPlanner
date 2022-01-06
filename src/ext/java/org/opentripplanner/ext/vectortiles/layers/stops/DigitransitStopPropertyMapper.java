@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.val;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opentripplanner.common.model.T2;
@@ -42,7 +41,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
 
     String patterns = JSONArray.toJSONString(patternsForStop.stream().map(tripPattern -> {
       int stopPos = tripPattern.findStopPosition(stop);
-      val headsign  = stopPos < 0 ? "Not Available" :
+      var headsign  = stopPos < 0 ? "Not Available" :
               tripPattern.getScheduledTimetable().getTripTimes().get(0).getHeadsign(stopPos);
       return new JSONObject(Map.of(
               "headsign", headsign,

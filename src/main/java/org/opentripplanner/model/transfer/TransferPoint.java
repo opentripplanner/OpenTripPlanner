@@ -18,30 +18,37 @@ import org.opentripplanner.model.Trip;
  *     {@link StationTransferPoint} This apply to all trip stopping at a stop part of the given
  *     station.
  *     <p>The specificity-ranking is above {@link StationTransferPoint}s and less than
- *     {@link RouteTransferPoint}.
+ *     {@link RouteStationTransferPoint}.
  *   </li>
  *   <li>
- *     A {@link RouteTransferPoint} is a from/to point for a Route at the given stop/station. This
+ *     A {@link RouteStationTransferPoint} is a from/to point for a Route at the given stop. This
  *     only exist in GTFS, not in the Nordic NeTex profile.
  *
  *     <p>The specificity-ranking is above {@link StopTransferPoint}s and less than
+ *     {@link RouteStopTransferPoint}.
+ *   </li>
+ *   <li>
+ *     A {@link RouteStopTransferPoint} is a from/to point for a Route at the given station. This
+ *     only exist in GTFS, not in the Nordic NeTex profile.
+ *
+ *     <p>The specificity-ranking is above {@link RouteStationTransferPoint}s and less than
  *     {@link TripTransferPoint}.
  *   </li>
  *   <li>
  *     {@link TripTransferPoint} A transfer from/to a Trip at the given stop position(not stop).
- *
- *     <p>This is the most specific point type, and will override both {@link RouteTransferPoint}
- *     and {@link StopTransferPoint} if more than one match exist.
+ *     The GTFS Transfers may specify a transfer from/to a trip and stop/station. But in OTP we
+ *     map the stop to a stop position in pattern. The OTP model {@link TripTransferPoint} do NOT
+ *     reference the stop/station, but the {@code stopPositionInPattern} instead. There is two
+ *     reasons for this. In NeTEx the an interchange is from a trip and stop-point, so this model
+ *     fits better with NeTEx. The second reson is that real-time updates could invalidate the
+ *     trip-transfer-point, since the stop could change to another platform(common for railway
+ *     stations). To account for this the RT-update would need to patch the trip-transfer-point.
+ *     We simplify the RT-updates by converting the stop to a stop-position-in-pattern.
+ *     <p>
+ *     This is the most specific point type.
  *   </li>
  * </ol>
  * <p>
- * The GTFS Transfers may specify a transfer from/to a route/trip and stop/station. But in OTP we
- * map the stop to a stop position in pattern. The OTP model {@link RouteTransferPoint} and
- * {@link TripTransferPoint} do NOT reference the stop/station, but the
- * {@code stopPositionInPattern} instead. The reason is that real-time updates could invalidate a
- * (route+stop) transfer-point, since the stop could change to another  platform(common for railway
- * stations). To account for this the RT-update would have to patch the (route&stop)-transfer-point.
- * We simplify the RT-updates by converting expanding (route+stop) to (trip+stop position).
  */
 public interface TransferPoint {
 
@@ -61,9 +68,18 @@ public interface TransferPoint {
   default TripTransferPoint asTripTransferPoint() { return (TripTransferPoint) this; }
 
   /** is a Route specific transfer point */
-  default boolean isRouteTransferPoint() { return false; }
+  default boolean isRouteStationTransferPoint() { return false; }
 
-  default RouteTransferPoint asRouteTransferPoint() { return (RouteTransferPoint) this; }
+  default RouteStationTransferPoint asRouteStationTransferPoint() {
+    return (RouteStationTransferPoint) this;
+  }
+
+  /** is a Route specific transfer point */
+  default boolean isRouteStopTransferPoint() { return false; }
+
+  default RouteStopTransferPoint asRouteStopTransferPoint() {
+    return (RouteStopTransferPoint) this;
+  }
 
   /** is a Stop specific transfer point (no Trip or Route) */
   default boolean isStopTransferPoint() { return false; }
@@ -92,8 +108,11 @@ public interface TransferPoint {
     if(point.isTripTransferPoint()) {
       return point.asTripTransferPoint().getTrip().getRoute();
     }
-    if(point.isRouteTransferPoint()) {
-      return point.asRouteTransferPoint().getRoute();
+    if(point.isRouteStopTransferPoint()) {
+      return point.asRouteStopTransferPoint().getRoute();
+    }
+    if(point.isRouteStationTransferPoint()) {
+      return point.asRouteStationTransferPoint().getRoute();
     }
     return null;
   }

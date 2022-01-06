@@ -5,7 +5,9 @@ import static java.util.Comparator.comparingInt;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
@@ -35,8 +37,13 @@ public class TransferService implements Serializable {
     }
 
     public void addAll(Collection<ConstrainedTransfer> transfers) {
+        Set<ConstrainedTransfer> set = new HashSet<>(transfersList);
+
         for (ConstrainedTransfer transfer : transfers) {
-            add(transfer);
+            if(!set.contains(transfer)) {
+                add(transfer);
+                set.add(transfer);
+            }
         }
     }
 
@@ -46,19 +53,17 @@ public class TransferService implements Serializable {
 
     @Nullable
     public ConstrainedTransfer findTransfer(
-            StopLocation fromStop,
-            StopLocation toStop,
             Trip fromTrip,
-            Trip toTrip,
             int fromStopPosition,
-            int toStopPosition
+            StopLocation fromStop,
+            Trip toTrip,
+            int toStopPosition,
+            StopLocation toStop
     ) {
         return transfersMap.get(fromTrip, fromStop, fromStopPosition).stream()
                 .map(map2 -> map2.get(toTrip, toStop, toStopPosition))
                 .flatMap(Collection::stream)
                 .max(comparingInt(ConstrainedTransfer::getSpecificityRanking))
-                .stream()
-                .findFirst()
                 .orElse(null);
     }
 

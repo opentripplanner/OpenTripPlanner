@@ -215,6 +215,22 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         return stopPattern.findStopPosition(stop);
     }
 
+    public int findBoardingStopPositionInPattern(Station station) {
+        return stopPattern.findBoardingPosition(station);
+    }
+
+    public int findAlightStopPositionInPattern(Station station) {
+        return stopPattern.findAlightPosition(station);
+    }
+
+    public int findBoardingStopPositionInPattern(StopLocation stop) {
+        return stopPattern.findBoardingPosition(stop);
+    }
+
+    public int findAlightStopPositionInPattern(StopLocation stop) {
+        return stopPattern.findAlightPosition(stop);
+    }
+
     /** Returns whether passengers can alight at a given stop */
     public boolean canAlight(int stopIndex) {
         return stopPattern.canAlight(stopIndex);

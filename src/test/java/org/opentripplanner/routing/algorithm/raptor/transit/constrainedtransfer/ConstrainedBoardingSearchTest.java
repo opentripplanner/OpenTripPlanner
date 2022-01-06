@@ -4,7 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.RAPTOR_STOP_INDEX;
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.STATION_B;
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.STOP_A;
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.STOP_B;
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.STOP_C;
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.STOP_D;
 import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.id;
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.stopIndex;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +21,8 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.RouteTransferPoint;
+import org.opentripplanner.model.transfer.RouteStationTransferPoint;
+import org.opentripplanner.model.transfer.RouteStopTransferPoint;
 import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
@@ -23,10 +31,9 @@ import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TestRouteData;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData;
 
 
-public class ConstrainedBoardingSearchTest implements TestTransitCaseData {
+public class ConstrainedBoardingSearchTest {
 
     private static final FeedScopedId ID = id("ID");
     private static final TransferConstraint GUARANTEED_CONSTRAINT =
@@ -137,11 +144,20 @@ public class ConstrainedBoardingSearchTest implements TestTransitCaseData {
     }
 
     @Test
-    void findGuaranteedTransferWithZeroConnectionTimeWithRouteTransfers() {
-        int sourceStopPos = route1.stopPosition(STOP_B);
-        int targetStopPos = route2.stopPosition(STOP_B);
-        var route1TxPoint = new RouteTransferPoint(route1.getRoute(), sourceStopPos);
-        var route2TxPoint = new RouteTransferPoint(route2.getRoute(), targetStopPos);
+    void findGuaranteedTransferWithZeroConnectionTimeWithRouteAndStopTransfers() {
+        var route1TxPoint = new RouteStopTransferPoint(route1.getRoute(), STOP_B);
+        var route2TxPoint = new RouteStopTransferPoint(route2.getRoute(), STOP_B);
+
+        var txGuaranteedTrip2Trip = new ConstrainedTransfer(
+                ID, route1TxPoint, route2TxPoint, GUARANTEED_CONSTRAINT
+        );
+        findGuaranteedTransferWithZeroConnectionTime(List.of(txGuaranteedTrip2Trip));
+    }
+
+    @Test
+    void findGuaranteedTransferWithZeroConnectionTimeWithRouteAndStationTransfers() {
+        var route1TxPoint = new RouteStationTransferPoint(route1.getRoute(), STATION_B);
+        var route2TxPoint = new RouteStationTransferPoint(route2.getRoute(), STATION_B);
 
         var txGuaranteedTrip2Trip = new ConstrainedTransfer(
                 ID, route1TxPoint, route2TxPoint, GUARANTEED_CONSTRAINT
@@ -167,7 +183,7 @@ public class ConstrainedBoardingSearchTest implements TestTransitCaseData {
         int sourceStopPos = route1.stopPosition(STOP_B);
         int targetStopPos = route2.stopPosition(STOP_B);
         var trip1TxPoint = new TripTransferPoint(route1.lastTrip().trip(), sourceStopPos);
-        var route1TxPoint = new RouteTransferPoint(route1.getRoute(), sourceStopPos);
+        var route1TxPoint = new RouteStopTransferPoint(route1.getRoute(), STOP_B);
         var trip2TxPoint = new TripTransferPoint(route2.firstTrip().trip(), targetStopPos);
 
 

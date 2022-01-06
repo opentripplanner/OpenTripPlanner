@@ -3,15 +3,15 @@ package org.opentripplanner.model.impl;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.Agency;
@@ -37,7 +37,7 @@ public class OtpTransitServiceImplTest {
     private static OtpTransitService subject;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() throws IOException {
         GtfsContextBuilder contextBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
         OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
@@ -107,12 +107,12 @@ public class OtpTransitServiceImplTest {
         );
 
         assertEquals(
-                "ConstrainedTransfer{from: <Route 2 @stopPos:2>, to: <Route 5 @stopPos:0>, constraint: {guaranteed}}\n"
+                "ConstrainedTransfer{from: <Route 2, stop D>, to: <Route 5, stop I>, constraint: {guaranteed}}\n"
                 + "ConstrainedTransfer{from: <Stop K>, to: <Stop L>, constraint: {priority: RECOMMENDED}}\n"
                 + "ConstrainedTransfer{from: <Stop K>, to: <Stop M>, constraint: {priority: NOT_ALLOWED}}\n"
                 + "ConstrainedTransfer{from: <Stop L>, to: <Stop K>, constraint: {priority: RECOMMENDED}}\n"
                 + "ConstrainedTransfer{from: <Stop M>, to: <Stop K>, constraint: {priority: NOT_ALLOWED}}\n"
-                + "ConstrainedTransfer{from: <Trip 1.1 @stopPos:1>, to: <Trip 2.2 @stopPos:0>, constraint: {guaranteed}}",
+                + "ConstrainedTransfer{from: <Trip 1.1, stopPos 1>, to: <Trip 2.2, stopPos 0>, constraint: {guaranteed}}",
                 result
         );
     }

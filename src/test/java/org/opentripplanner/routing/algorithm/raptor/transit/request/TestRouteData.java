@@ -1,6 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.DATE;
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.OFFSET;
 import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.id;
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.stopIndex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +28,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.util.time.TimeUtils;
 
-public class TestRouteData implements TestTransitCaseData {
+public class TestRouteData {
 
     private final Route route;
     private final List<Trip> trips;

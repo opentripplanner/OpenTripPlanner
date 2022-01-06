@@ -20,7 +20,8 @@ import org.opentripplanner.model.Trip;
  */
 class TransferPointMap<E> {
     private final Map<T2<Trip, Integer>, E> tripMap = new HashMap<>();
-    private final Map<T2<Route, Integer>, E> routeMap = new HashMap<>();
+    private final Map<T2<Route, StopLocation>, E> routeStopMap = new HashMap<>();
+    private final Map<T2<Route, Station>, E> routeStationMap = new HashMap<>();
     private final Map<StopLocation, E> stopMap = new HashMap<>();
     private final Map<Station, E> stationMap = new HashMap<>();
 
@@ -29,9 +30,13 @@ class TransferPointMap<E> {
             var tp = point.asTripTransferPoint();
             tripMap.put(tripKey(tp.getTrip(), tp.getStopPositionInPattern()), e);
         }
-        else if(point.isRouteTransferPoint()) {
-            var rp = point.asRouteTransferPoint();
-            routeMap.put(routeKey(rp.getRoute(), rp.getStopPositionInPattern()), e);
+        else if(point.isRouteStopTransferPoint()) {
+            var rp = point.asRouteStopTransferPoint();
+            routeStopMap.put(routeStopKey(rp.getRoute(), rp.getStop()), e);
+        }
+        else if(point.isRouteStationTransferPoint()) {
+            var rp = point.asRouteStationTransferPoint();
+            routeStationMap.put(routeStationKey(rp.getRoute(), rp.getStation()), e);
         }
         else if(point.isStopTransferPoint()) {
             stopMap.put(point.asStopTransferPoint().getStop(), e);
@@ -49,9 +54,13 @@ class TransferPointMap<E> {
             var tp = point.asTripTransferPoint();
             return tripMap.computeIfAbsent(tripKey(tp.getTrip(), tp.getStopPositionInPattern()), k -> creator.get());
         }
-        else if(point.isRouteTransferPoint()) {
-            var rp = point.asRouteTransferPoint();
-            return routeMap.computeIfAbsent(routeKey(rp.getRoute(), rp.getStopPositionInPattern()), k -> creator.get());
+        else if(point.isRouteStopTransferPoint()) {
+            var rp = point.asRouteStopTransferPoint();
+            return routeStopMap.computeIfAbsent(routeStopKey(rp.getRoute(), rp.getStop()), k -> creator.get());
+        }
+        else if(point.isRouteStationTransferPoint()) {
+            var rp = point.asRouteStationTransferPoint();
+            return routeStationMap.computeIfAbsent(routeStationKey(rp.getRoute(), rp.getStation()), k -> creator.get());
         }
         else if(point.isStopTransferPoint()) {
             var sp = point.asStopTransferPoint();
@@ -64,26 +73,31 @@ class TransferPointMap<E> {
         throw new IllegalArgumentException("Unknown TransferPoint type: " + point);
     }
 
-
     /**
      * List all elements witch matches any of the transfer points added to the map.
      */
     List<E> get(Trip trip, StopLocation stop, int stopPointInPattern) {
-        return Stream.of(
-                tripMap.get(tripKey(trip, stopPointInPattern)),
-                routeMap.get(routeKey(trip.getRoute(), stopPointInPattern)),
-                stopMap.get(stop),
-                stationMap.get(stop.getParentStation())
-        )
+        var list = Stream.of(
+                        tripMap.get(tripKey(trip, stopPointInPattern)),
+                        routeStopMap.get(routeStopKey(trip.getRoute(), stop)),
+                        routeStationMap.get(routeStationKey(trip.getRoute(), stop.getParentStation())),
+                        stopMap.get(stop),
+                        stationMap.get(stop.getParentStation())
+                )
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        return list;
     }
 
     private static T2<Trip, Integer> tripKey(Trip trip, int stopPositionInPattern) {
         return new T2<>(trip, stopPositionInPattern);
     }
 
-    private static T2<Route, Integer> routeKey(Route route, int stopPositionInPattern) {
-        return new T2<>(route, stopPositionInPattern);
+    private static T2<Route, StopLocation> routeStopKey(Route route, StopLocation stop) {
+        return new T2<>(route, stop);
+    }
+
+    private static T2<Route, Station> routeStationKey(Route route, Station station) {
+        return new T2<>(route, station);
     }
 }

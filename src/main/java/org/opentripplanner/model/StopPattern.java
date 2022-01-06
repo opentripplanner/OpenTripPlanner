@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * This class represents what is called a JourneyPattern in Transmodel: the sequence of stops at
@@ -75,6 +76,22 @@ public final class StopPattern implements Serializable {
             if(stops[i] == stop) { return i; }
         }
         return -1;
+    }
+
+    int findBoardingPosition(StopLocation stop) {
+        return findStopPosition(0, stops.length-1, (s) -> s == stop, stop);
+    }
+
+    int findAlightPosition(StopLocation stop) {
+        return findStopPosition(1, stops.length, (s) -> s == stop, stop);
+    }
+
+    int findBoardingPosition(Station station) {
+        return findStopPosition(0, stops.length-1, station::includes, station);
+    }
+
+    int findAlightPosition(Station station) {
+        return findStopPosition(1, stops.length, station::includes, station);
     }
 
     public boolean equals(Object other) {
@@ -179,5 +196,17 @@ public final class StopPattern implements Serializable {
     private static PickDrop computePickDrop(StopLocation stop, PickDrop pickDrop) {
         if(stop instanceof FlexStopLocation) { return PickDrop.NONE; }
         else { return pickDrop; }
+    }
+
+    private int findStopPosition(
+            final int start,
+            final int end,
+            final Predicate<StopLocation> match,
+            final Object entity
+    ) {
+        for (int i=start; i<end; ++i) {
+            if(match.test(stops[i])) { return i; }
+        }
+        throw new IllegalArgumentException("Stop/Station not found: " + entity);
     }
 }

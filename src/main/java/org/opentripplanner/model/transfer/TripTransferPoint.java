@@ -31,7 +31,7 @@ public final class TripTransferPoint implements TransferPoint, Serializable {
   }
 
   @Override
-  public int getSpecificityRanking() { return 3; }
+  public int getSpecificityRanking() { return 4; }
 
   @Override
   public boolean isTripTransferPoint() { return true; }
@@ -41,7 +41,7 @@ public final class TripTransferPoint implements TransferPoint, Serializable {
     return ValueObjectToStringBuilder.of()
             .addText("<Trip ")
             .addObj(trip.getId())
-            .addText(" @stopPos:")
+            .addText(", stopPos ")
             .addNum(stopPositionInPattern)
             .addText(">")
             .toString();
