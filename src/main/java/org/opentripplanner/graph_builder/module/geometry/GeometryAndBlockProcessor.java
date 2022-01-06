@@ -1,10 +1,18 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
-import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
@@ -32,28 +40,22 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
  * geometries. It also does some other postprocessing involving fares and interlined blocks.
+ *
+ * <p>
+ * THREAD SAFETY
+ * The computation runs in parallel so be careful about threadsafety when modifying the logic here.
  */
 public class GeometryAndBlockProcessor {
 
@@ -65,11 +67,14 @@ public class GeometryAndBlockProcessor {
 
     private OtpTransitService transitService;
 
-    private Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new HashMap<ShapeSegmentKey, LineString>();
+    // this is threadsafe implementation
+    private Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
 
-    private Map<FeedScopedId, LineString> geometriesByShapeId = new HashMap<FeedScopedId, LineString>();
+    // this is threadsafe implementation
+    private Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
 
-    private Map<FeedScopedId, double[]> distancesByShapeId = new HashMap<>();
+    // this is threadsafe implementation
+    private Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
 
     private FareServiceFactory fareServiceFactory;
 
@@ -103,7 +108,15 @@ public class GeometryAndBlockProcessor {
         run(graph, new DataImportIssueStore(false));
     }
 
-    /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
+    /**
+     * Generate the edges. Assumes that there are already vertices in the graph for the stops.
+     * <p>
+     * THREAD SAFETY
+     * The geometries for the trip patterns are computed in parallel. The collections needed for
+     * this are concurrent implementations and therefore threadsafe but the issue store, the graph,
+     * the OtpTransitService and others are not.
+     *
+     */
     @SuppressWarnings("Convert2MethodRef")
     public void run(Graph graph, DataImportIssueStore issueStore) {
         this.issueStore = issueStore;
@@ -186,7 +199,7 @@ public class GeometryAndBlockProcessor {
     private void interline(Collection<TripPattern> tripPatterns, Graph graph) {
 
         /* Record which Pattern each interlined TripTimes belongs to. */
-        Map<TripTimes, TripPattern> patternForTripTimes = Maps.newHashMap();
+        Map<TripTimes, TripPattern> patternForTripTimes = new HashMap<>();
 
         /* TripTimes grouped by the block ID and service ID of their trips. Must be a ListMultimap to allow sorting. */
         ListMultimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
@@ -638,16 +651,15 @@ public class GeometryAndBlockProcessor {
             i++;
         }
 
-        // If we don't have distances here, we can't calculate them ourselves because we can't
-        // assume the units will match
-        if (!hasAllDistances) {
-            distances = null;
-        }
-
         CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
         geometry = geometryFactory.createLineString(sequence);
         geometriesByShapeId.put(shapeId, geometry);
-        distancesByShapeId.put(shapeId, distances);
+
+        // If we don't have distances here, we can't calculate them ourselves because we can't
+        // assume the units will match
+        if(hasAllDistances) {
+            distancesByShapeId.put(shapeId, distances);
+        }
 
         return geometry;
     }
