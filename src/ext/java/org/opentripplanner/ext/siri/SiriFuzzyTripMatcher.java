@@ -220,12 +220,9 @@ public class SiriFuzzyTripMatcher {
                     mappedTripsCache.put(currentTripId, initialSet);
                 }
 
-                if (tripPattern != null && (
-                    tripPattern.getMode().equals(TransitMode.RAIL) || (
-                        tripPattern.getNetexSubmode() != null &&
-                        tripPattern.getNetexSubmode().equals("railReplacementBus")
-                ))) {
-
+                if (tripPattern != null &&
+                    tripPattern.matchesModeOrSubMode(TransitMode.RAIL, "railReplacementBus")
+                ) {
                     if (trip.getInternalPlanningCode() != null) {
                         String internalPlanningCode = trip.getInternalPlanningCode();
                         if (mappedVehicleRefCache.containsKey(internalPlanningCode)) {
@@ -386,15 +383,13 @@ public class SiriFuzzyTripMatcher {
 
     /**
      * Returns a match of tripIds that match the provided values.
-     *
-     * @param internalPlanningCode
-     * @param serviceDate
-     * @param mode
-     * @param transportSubmode
-     * @return
      */
-    public List<FeedScopedId> getTripIdForInternalPlanningCodeServiceDateAndMode(String internalPlanningCode, ServiceDate serviceDate, TransitMode mode, String transportSubmode) {
-
+    public List<FeedScopedId> getTripIdForInternalPlanningCodeServiceDateAndMode(
+            String internalPlanningCode, 
+            ServiceDate serviceDate,
+            TransitMode mode,
+            String transportSubmode
+    ) {
         Set<Trip> cachedTripsBySiriId = getCachedTripsBySiriId(internalPlanningCode);
 
         if (cachedTripsBySiriId.isEmpty()) {
@@ -404,13 +399,10 @@ public class SiriFuzzyTripMatcher {
         List<FeedScopedId> matches = new ArrayList<>();
         for (Trip trip : cachedTripsBySiriId) {
             final TripPattern tripPattern = routingService.getPatternForTrip().get(trip);
-            if (tripPattern.getMode().equals(mode) || (
-                tripPattern.getNetexSubmode() != null &&
-                tripPattern.getNetexSubmode().equals(transportSubmode)
-            )) {
-
-                Set<ServiceDate> serviceDates = routingService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
-
+            if (tripPattern.matchesModeOrSubMode(mode, transportSubmode)) {
+                Set<ServiceDate> serviceDates = routingService
+                        .getCalendarService()
+                        .getServiceDatesForServiceId(trip.getServiceId());
                 if (serviceDates.contains(serviceDate) &&
                     trip.getInternalPlanningCode() != null &&
                     trip.getInternalPlanningCode().equals(internalPlanningCode)) {
@@ -422,4 +414,5 @@ public class SiriFuzzyTripMatcher {
 
         return matches;
     }
+
 }

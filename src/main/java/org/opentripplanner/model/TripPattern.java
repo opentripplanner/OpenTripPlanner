@@ -555,6 +555,12 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
             .allMatch(t -> t != null && seen.add(t));
     }
 
+    public boolean matchesModeOrSubMode(TransitMode mode, String transportSubmode) {
+        return getMode().equals(mode) || (
+                getNetexSubmode() != null && getNetexSubmode().equals(transportSubmode)
+        );
+    }
+
     public String toString () {
         return String.format("<TripPattern %s>", this.getId());
     }

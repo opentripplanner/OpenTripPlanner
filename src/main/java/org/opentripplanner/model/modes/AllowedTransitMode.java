@@ -41,9 +41,7 @@ public class AllowedTransitMode {
   public static Set<AllowedTransitMode> getAllTransitModes() {
     return Arrays
         .stream(TransitMode.values())
-        .map(m -> new AllowedTransitMode(m,
-            null
-        ))
+        .map(m -> new AllowedTransitMode(m, null))
         .collect(Collectors.toSet());
   }
 
@@ -54,9 +52,7 @@ public class AllowedTransitMode {
     return Arrays
         .stream(TransitMode.values())
         .filter(t -> !t.equals(TransitMode.AIRPLANE))
-        .map(m -> new AllowedTransitMode(m,
-            null
-        ))
+        .map(m -> new AllowedTransitMode(m, null))
         .collect(Collectors.toSet());
   }
 }
