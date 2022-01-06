@@ -29,7 +29,7 @@ public class TripQuery {
             "Input type for executing a travel search for a trip between two locations. Returns "
             + "trip patterns describing suggested alternatives for the trip."
         )
-        .type(tripType)
+        .type(new GraphQLNonNull(tripType))
         .withDirective(gqlUtil.timingData)
         .argument(GraphQLArgument.newArgument()
             .name("dateTime")

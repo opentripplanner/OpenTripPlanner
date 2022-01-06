@@ -157,7 +157,7 @@ public class StopPlaceType {
             .name("estimatedCalls")
             .withDirective(gqlUtil.timingData)
             .description("List of visits to this stop place as part of vehicle journeys.")
-            .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
+            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
             .argument(GraphQLArgument.newArgument()
                 .name("startTime")
                 .type(gqlUtil.dateTimeScalar)
