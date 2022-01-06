@@ -42,7 +42,11 @@ public interface StopArrivalsState<T extends RaptorTripSchedule> {
 
     @Nullable
     default TransitArrival<T> previousTransit(int boardStopIndex) {
-        return null;
+        throw new IllegalStateException(
+                "The implementation of this interface is not compatible with the request" +
+                "configuration. For example the BestTimesOnlyStopArrivalsState can not be used " +
+                "with constrained transfers."
+        );
     }
 
     default Collection<Path<T>> extractPaths() { return List.of(); }

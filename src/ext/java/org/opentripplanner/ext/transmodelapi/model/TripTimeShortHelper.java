@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
@@ -41,11 +42,11 @@ public class TripTimeShortHelper {
          */
 
         if (leg.realTime) {
-            return tripTimes.stream().filter(tripTime -> tripTime.getRealtimeDeparture() == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId,
-                tripTime.getStopId(), routingService)).findFirst().orElse(null);
+            return tripTimes.stream().filter(tripTime -> tripTime.getRealtimeDeparture() == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stop,
+                tripTime.getStopId())).findFirst().orElse(null);
         }
-        return tripTimes.stream().filter(tripTime -> tripTime.getScheduledDeparture() == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId,
-            tripTime.getStopId(), routingService)).findFirst().orElse(null);
+        return tripTimes.stream().filter(tripTime -> tripTime.getScheduledDeparture() == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stop,
+            tripTime.getStopId())).findFirst().orElse(null);
     }
 
     /**
@@ -72,11 +73,11 @@ public class TripTimeShortHelper {
         */
 
         if (leg.realTime) {
-            return tripTimes.stream().filter(tripTime -> tripTime.getRealtimeArrival() == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId,
-                tripTime.getStopId(), routingService)).findFirst().orElse(null);
+            return tripTimes.stream().filter(tripTime -> tripTime.getRealtimeArrival() == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stop,
+                tripTime.getStopId())).findFirst().orElse(null);
         }
-        return tripTimes.stream().filter(tripTime -> tripTime.getScheduledArrival() == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId,
-            tripTime.getStopId(), routingService)).findFirst().orElse(null);
+        return tripTimes.stream().filter(tripTime -> tripTime.getScheduledArrival() == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stop,
+            tripTime.getStopId())).findFirst().orElse(null);
     }
 
 
@@ -108,20 +109,16 @@ public class TripTimeShortHelper {
         boolean boardingStopFound = false;
         for (TripTimeOnDate tripTime : tripTimes) {
 
-            long boardingTime = leg.realTime ? tripTime.getRealtimeDeparture()
-                : tripTime.getScheduledDeparture();
+            long boardingTime = leg.realTime ? tripTime.getRealtimeDeparture() : tripTime.getScheduledDeparture();
 
             if (!boardingStopFound) {
                 boardingStopFound = boardingTime == startTimeSeconds
-                    && matchesQuayOrSiblingQuay(leg.from.stopId,
-                    tripTime.getStopId(), routingService);
+                    && matchesQuayOrSiblingQuay(leg.from.stop, tripTime.getStopId());
                 continue;
             }
 
-            long arrivalTime = leg.realTime ? tripTime.getRealtimeArrival()
-                : tripTime.getScheduledArrival();
-            if (arrivalTime == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId,
-                tripTime.getStopId(), routingService)) {
+            long arrivalTime = leg.realTime ? tripTime.getRealtimeArrival() : tripTime.getScheduledArrival();
+            if (arrivalTime == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stop, tripTime.getStopId())) {
                 break;
             }
 
@@ -134,14 +131,13 @@ public class TripTimeShortHelper {
 
     /* private methods */
 
-    private static boolean matchesQuayOrSiblingQuay(FeedScopedId quayId, FeedScopedId candidate, RoutingService routingService) {
-        boolean foundMatch = quayId.equals(candidate);
-        if (!foundMatch) {
-            //Check parentStops
-            Stop stop = routingService.getStopForId(quayId);
-            if (stop != null && stop.isPartOfStation()) {
+    private static boolean matchesQuayOrSiblingQuay(StopLocation stop, FeedScopedId candidate) {
+        if (stop == null) return false;
+        boolean foundMatch = stop.getId().equals(candidate);
+        if (!foundMatch && stop instanceof Stop) {
+            if (stop.isPartOfStation()) {
                 Station parentStation = stop.getParentStation();
-                for (Stop childStop : parentStation.getChildStops()) {
+                for (var childStop : parentStation.getChildStops()) {
                     if (childStop.getId().equals(candidate)) {
                         return true;
                     }

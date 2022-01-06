@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -28,6 +29,7 @@ public class TripPatternMapperTest {
         NetexTestDataSample sample = new NetexTestDataSample();
 
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
+                new DataImportIssueStore(false),
                 MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 sample.getStopsById(),
@@ -55,7 +57,7 @@ public class TripPatternMapperTest {
         assertEquals(4, tripPattern.getStops().size());
         assertEquals(1, tripPattern.getTrips().size());
 
-        List<Stop> stops = tripPattern.getStops();
+        var stops = tripPattern.getStops();
         Trip trip = tripPattern.getTrips().get(0);
 
         assertEquals("RUT:ServiceJourney:1", trip.getId().getId());

@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
@@ -22,10 +23,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class
-TripScheduleAlightSearch<T extends RaptorTripSchedule>
-        implements TripScheduleSearch<T>, RaptorTripScheduleBoardOrAlightEvent<T>
-{
+public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
+        implements TripScheduleSearch<T>, RaptorTripScheduleBoardOrAlightEvent<T> {
+
     private final int nTripsBinarySearchThreshold;
     private final RaptorTimeTable<T> timeTable;
     private final int nTrips;
@@ -46,24 +46,28 @@ TripScheduleAlightSearch<T extends RaptorTripSchedule>
     /* TripScheduleBoardOrAlightEvent implementation using fly-weight pattern */
 
     @Override
-    public final T getTrip() {
+    public T getTrip() {
         return candidateTrip;
     }
 
     @Override
-    public final int getTripIndex() {
+    public int getTripIndex() {
         return candidateTripIndex;
     }
 
     @Override
-    public final int getTime() {
+    public int getTime() {
         return candidateTrip.arrival(stopPositionInPattern);
     }
 
     @Override
-    public final int getStopPositionInPattern() {
+    public int getStopPositionInPattern() {
         return stopPositionInPattern;
     }
+
+    @Nullable
+    @Override
+    public RaptorTransferConstraint getTransferConstraint() { return null; }
 
 
     /* TripScheduleSearch implementation */
@@ -77,7 +81,7 @@ TripScheduleAlightSearch<T extends RaptorTripSchedule>
      * @param tripIndexLowerBound   Upper bound for trip index to search for (exclusive).
      */
     @Override
-    public final RaptorTripScheduleBoardOrAlightEvent<T> search(
+    public RaptorTripScheduleBoardOrAlightEvent<T> search(
             int latestAlightTime,
             int stopPositionInPattern,
             int tripIndexLowerBound

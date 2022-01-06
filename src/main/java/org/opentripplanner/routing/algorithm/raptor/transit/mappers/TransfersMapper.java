@@ -1,14 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import com.google.common.collect.Multimap;
-import org.opentripplanner.model.SimpleTransfer;
+import java.util.ArrayList;
+import java.util.List;
+import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 class TransfersMapper {
 
@@ -17,34 +16,34 @@ class TransfersMapper {
      */
     static List<List<Transfer>> mapTransfers(
         StopIndexForRaptor stopIndex,
-        Multimap<StopLocation, SimpleTransfer> transfersByStop
+        Multimap<StopLocation, PathTransfer> transfersByStop
     ) {
 
         List<List<Transfer>> transferByStopIndex = new ArrayList<>();
 
         for (int i = 0; i < stopIndex.stopsByIndex.size(); ++i) {
-            Stop stop = stopIndex.stopsByIndex.get(i);
+            var stop = stopIndex.stopsByIndex.get(i);
             ArrayList<Transfer> list = new ArrayList<>();
             transferByStopIndex.add(list);
 
-            for (SimpleTransfer simpleTransfer : transfersByStop.get(stop)) {
-                if (simpleTransfer.to instanceof Stop) {
-                    int toStopIndex = stopIndex.indexByStop.get(simpleTransfer.to);
-                    Transfer transfer;
-                    if (simpleTransfer.getEdges() != null) {
-                        transfer = new Transfer(
+            for (PathTransfer pathTransfer : transfersByStop.get(stop)) {
+                if (pathTransfer.to instanceof Stop) {
+                    int toStopIndex = stopIndex.indexByStop.get(pathTransfer.to);
+                    Transfer newTransfer;
+                    if (pathTransfer.getEdges() != null) {
+                        newTransfer = new Transfer(
                             toStopIndex,
-                            simpleTransfer.getEdges()
+                            pathTransfer.getEdges()
                         );
                     }
                     else {
-                        transfer = new Transfer(
+                        newTransfer = new Transfer(
                             toStopIndex,
-                            (int) Math.ceil(simpleTransfer.getDistanceMeters())
+                            (int) Math.ceil(pathTransfer.getDistanceMeters())
                         );
                     }
 
-                    list.add(transfer);
+                    list.add(newTransfer);
                 }
             }
         }

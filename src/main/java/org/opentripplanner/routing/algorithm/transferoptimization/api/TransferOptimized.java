@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
-import org.opentripplanner.model.transfer.Transfer;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
+import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 
 /**
  * The transfer optimization is performed by calculating "cost" values:
@@ -15,8 +15,10 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
  * transit legs. The transfer-priority takes precedence over the wait-time-optimized-cost, and the
  * break-tie-cost is only used if the cost is the same using the two other filters. For example for
  * a given path the normal case is that the the transfer-priority-cost is
- * {@link Transfer#NEUTRAL_PRIORITY_COST}. Then we look at the wait-time-optimized-cost or the
- * generalized-cost (from routing) - if this is tha same, then we use the break-tie-cost.
+ * {@link org.opentripplanner.model.transfer.TransferPriority#NEUTRAL_PRIORITY_COST}. Then we look
+ * at the wait-time-optimized-cost or the generalized-cost (from routing) - if this is the same,
+ * then we use the break-tie-cost.
+ * <p>
  * The wait-time-optimized-cost is typically the same when we can do a in-station/same-stop transfer
  * at multiple locations. The break-tie-cost just looks at the transit departure-times and try to
  * do the transfers as early as possible in the journey to minimize risk.
@@ -40,7 +42,7 @@ public interface TransferOptimized {
      * <p>
      * Precedence: first
      *
-     * @see Transfer#priorityCost(Transfer)
+     * @see TransferConstraint#priorityCost()
      */
     int transferPriorityCost();
 
@@ -49,7 +51,7 @@ public interface TransferOptimized {
      * <p>
      * Precedence: second
      *
-     * @see TransferWaitTimeCalculator
+     * @see TransferWaitTimeCostCalculator
      */
     int waitTimeOptimizedCost();
 

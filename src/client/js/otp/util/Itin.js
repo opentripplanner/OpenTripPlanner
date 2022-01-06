@@ -187,6 +187,10 @@ otp.util.Itin = {
         return otp.util.Geo.distanceString(m);
     },
 
+    durationString : function (startTime, endTime) {
+      return otp.util.Time.secsToHrMin( (endTime - startTime)/1000.0 );
+    },
+
     modeStrings : {
         //TRANSLATORS: Walk distance to place (itinerary header)
         'WALK': _tr('Walk'),

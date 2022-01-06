@@ -1,11 +1,13 @@
 package org.opentripplanner.ext.flex.template;
 
 import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.core.State;
@@ -13,27 +15,26 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-
-import java.util.Collection;
-import java.util.List;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   public FlexEgressTemplate(
       NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
-      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator
+      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator,
+      FlexParameters config
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator);
+    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, config);
   }
 
-  protected List<Edge> getTransferEdges(SimpleTransfer simpleTransfer) {
-    return Lists.reverse(simpleTransfer.getEdges());
+  protected List<Edge> getTransferEdges(PathTransfer transfer) {
+    return Lists.reverse(transfer.getEdges());
   }
 
-  protected Stop getFinalStop(SimpleTransfer simpleTransfer) {
-    return simpleTransfer.from instanceof Stop ? (Stop) simpleTransfer.from : null;
+  protected Stop getFinalStop(PathTransfer transfer) {
+    return transfer.from instanceof Stop ? (Stop) transfer.from : null;
   }
 
-  protected Collection<SimpleTransfer> getTransfersFromTransferStop(Graph graph) {
+  protected Collection<PathTransfer> getTransfersFromTransferStop(Graph graph) {
     return graph.index.getFlexIndex().transfersToStop.get(transferStop);
   }
 

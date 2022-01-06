@@ -129,10 +129,14 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         int stopIndex = boardStopIndex;
         StopArrivalState<T> state = stops[prevRound][boardStopIndex];
 
+        // We check for transfer before access, since a FLEX arrive on-board
+        // can be followed by a transfer
         if(state.arrivedByTransfer()) {
             stopIndex = state.transferFromStop();
             state = stops[prevRound][stopIndex];
         }
+        if(state.arrivedByAccess()) { return null; }
+        
         return TransitArrival.create(state.trip(), stopIndex, state.transitTime());
     }
 }

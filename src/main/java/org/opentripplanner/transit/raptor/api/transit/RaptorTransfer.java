@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.api.transit;
 import org.opentripplanner.util.time.DurationUtils;
 
 /**
- * Encapsulate information about a access, transfer or egress path. We do not distinguish
+ * Encapsulate information about an access, transfer or egress path. We do not distinguish
  * between the access (origin to first stop), transfer (stop to stop) or egress (last stop to
  * destination), to Raptor - all these are the same thing.
  */
@@ -28,8 +28,6 @@ public interface RaptorTransfer {
      *
      * This methods is called many times, so care needs to be taken that the value is stored, not
      * calculated for each invocation.
-     *
-     * @see RaptorCostConverter#toRaptorCost(double)
      */
     int generalizedCost();
 
@@ -70,11 +68,14 @@ public interface RaptorTransfer {
         return requestedArrivalTime;
     };
 
-    /* ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS */
-    // The methods below should be only overridden when a RaptorTransfer contains information about
-    // public services, which were generated outside the RAPTOR algorithm. Examples of such schemes
-    // include flexible transit service and TNC. They should not be used for regular
-    // access/transfer/egress.
+    /*
+       ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
+
+       The methods below should be only overridden when a RaptorTransfer contains information about
+       public services, which were generated outside the RAPTOR algorithm. Examples of such schemes
+       include flexible transit service and TNC. They should not be used for regular
+       access/transfer/egress.
+    */
 
     /**
      * Some services involving multiple legs are not handled by the RAPTOR algorithm and need to be
@@ -98,13 +99,13 @@ public interface RaptorTransfer {
      * rental-bicycle |      0       | Picking up the bike and returning it is is best
      *                |              | accounted using time and cost penalties, not transfers.
      *     taxi       |     0/1      | Currently 0 in OTP(car), but this is definitely discussable.
-     *     flex       |      1       | Waking leg followed by a flex transit leg
-     * walk-flex-walk |      1       | Waking , then flex transit and then walking again
+     *     flex       |      1       | Walking leg followed by a flex transit leg
+     * walk-flex-walk |      1       | Walking , then flex transit and then walking again
      *   flex-flex    |      2       | Two flex transit legs after each other
      * </pre>
      * {@code flex} is used as a placeholder for any type of on-board public service.
      *
-     * @return the number transfers including thefirst boarding in the RAPTOR algorithm.
+     * @return the number transfers including the first boarding in the RAPTOR algorithm.
      */
     default int numberOfRides() {
         return 0;
@@ -133,6 +134,6 @@ public interface RaptorTransfer {
       String duration = DurationUtils.durationToStr(durationInSeconds());
         return hasRides()
             ? String.format("Flex %s %dx ~ %d", duration, numberOfRides(), stop())
-            : String.format("Walk %s ~ %d", duration, stop());
+            : String.format("On-Street %s ~ %d", duration, stop());
     }
 }

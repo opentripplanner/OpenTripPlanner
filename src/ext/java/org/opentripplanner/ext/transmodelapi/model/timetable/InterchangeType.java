@@ -6,7 +6,8 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.TransferConstraint;
 
 public class InterchangeType {
 
@@ -18,12 +19,12 @@ public class InterchangeType {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("staySeated")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> transfer(env).isStaySeated())
+                        .dataFetcher(env -> constraint(env).isStaySeated())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("guaranteed")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> transfer(env).isGuaranteed())
+                        .dataFetcher(env -> constraint(env).isGuaranteed())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("priority")
@@ -34,7 +35,7 @@ public class InterchangeType {
                                 + "transfer is preferred over a PREFERRED none-guarantied transfer."
                         )
                         .type(EnumTypes.INTERCHANGE_PRIORITY)
-                        .dataFetcher(env -> transfer(env).getPriority())
+                        .dataFetcher(env -> constraint(env).getPriority())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("maximumWaitTime")
@@ -44,36 +45,52 @@ public class InterchangeType {
                                 + "RESPECTED DURING ROUTING, JUST PASSED THROUGH]"
                         )
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(env -> transfer(env).getMaxWaitTime())
+                        .dataFetcher(env -> constraint(env).getMaxWaitTime())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("FromLine")
                         .deprecate(
-                                "This is the same as using the `FromServiceJourney { line }` field.")
+                                "This is the same as using the `fromServiceJourney { line }` field.")
                         .type(lineType)
                         .dataFetcher(env -> transfer(env).getFrom().getTrip().getRoute())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("ToLine")
                         .deprecate(
-                                "This is the same as using the `ToServiceJourney { line }` field.")
+                                "This is the same as using the `toServiceJourney { line }` field.")
                         .type(lineType)
                         .dataFetcher(env -> transfer(env).getTo().getTrip().getRoute())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("FromServiceJourney")
                         .type(serviceJourneyType)
+                        .deprecate("Use fromServiceJourney instead")
                         .dataFetcher(env -> transfer(env).getFrom().getTrip())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("ToServiceJourney")
+                        .type(serviceJourneyType)
+                        .deprecate("Use toServiceJourney instead")
+                        .dataFetcher(env -> transfer(env).getTo().getTrip())
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("fromServiceJourney")
+                        .type(serviceJourneyType)
+                        .dataFetcher(env -> transfer(env).getFrom().getTrip())
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("toServiceJourney")
                         .type(serviceJourneyType)
                         .dataFetcher(env -> transfer(env).getTo().getTrip())
                         .build())
                 .build();
     }
 
-    private static Transfer transfer(DataFetchingEnvironment environment) {
+    private static ConstrainedTransfer transfer(DataFetchingEnvironment environment) {
         return environment.getSource();
+    }
+
+    private static TransferConstraint constraint(DataFetchingEnvironment environment) {
+        return transfer(environment).getTransferConstraint();
     }
 }

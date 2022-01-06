@@ -6,12 +6,14 @@ import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 public class TripQuery {
 
@@ -28,6 +30,7 @@ public class TripQuery {
             + "trip patterns describing suggested alternatives for the trip."
         )
         .type(tripType)
+        .withDirective(gqlUtil.timingData)
         .argument(GraphQLArgument.newArgument()
             .name("dateTime")
             .description(
@@ -50,6 +53,16 @@ public class TripQuery {
                 + "realtime changes."
             )
             .type(Scalars.GraphQLInt)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
+            .name("pageCursor")
+            .description(
+                "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from "
+                + "the last response and keep the original request as is. This will enable you to "
+                + "search for itineraries in the next or previous time-window."
+            )
+            .type(Scalars.GraphQLString)
             .build()
         )
         .argument(GraphQLArgument.newArgument()
@@ -206,13 +219,23 @@ public class TripQuery {
             .build()
         )
         .argument(GraphQLArgument.newArgument()
+                .name("triangleFactors")
+                .description(
+                        "When setting the " + EnumTypes.BICYCLE_OPTIMISATION_METHOD.getName() + " to '" + enumValAsString(EnumTypes.BICYCLE_OPTIMISATION_METHOD,
+                                BicycleOptimizeType.TRIANGLE
+                        )+ "', use these values to tell the routing engine how important each of the factors is compared to the others. All values should add up to 1."
+                )
+                .type(TriangleFactorsInputType.INPUT_TYPE)
+                .build()
+        )
+        .argument(GraphQLArgument.newArgument()
             .name("useBikeRentalAvailabilityInformation")
             .description(
                 "Whether or not bike rental availability information will be used to plan bike "
                     + "rental trips."
             )
             .type(Scalars.GraphQLBoolean)
-            .defaultValue(routing.request.useBikeRentalAvailabilityInformation)
+            .defaultValue(routing.request.useVehicleRentalAvailabilityInformation)
             .build()
         )
         .argument(GraphQLArgument.newArgument()

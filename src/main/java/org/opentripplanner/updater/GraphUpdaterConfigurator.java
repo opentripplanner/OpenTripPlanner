@@ -1,7 +1,7 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
-import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
+import java.util.ArrayList;
+import java.util.List;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
@@ -10,13 +10,11 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
+import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
+import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.bike_park.BikeParkUpdater;
-import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
@@ -25,11 +23,12 @@ import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Sets up and starts all the graph updaters.
@@ -52,9 +51,9 @@ public abstract class GraphUpdaterConfigurator {
             createUpdatersFromConfig(updatersParameters)
         );
         updaters.addAll(
-            // Setup updaters using the BikeRentalServiceDirectoryFetcher(Sandbox)
-            fetchBikeRentalServicesFromOnlineDirectory(
-                updatersParameters.getBikeRentalServiceDirectoryFetcherParameters()
+            // Setup updaters using the VehicleRentalServiceDirectoryFetcher(Sandbox)
+            fetchVehicleRentalServicesFromOnlineDirectory(
+                updatersParameters.getVehicleRentalServiceDirectoryFetcherParameters()
             )
         );
 
@@ -63,7 +62,7 @@ public abstract class GraphUpdaterConfigurator {
         updaterManager.startUpdaters();
 
         // Stop the updater manager if it contains nothing
-        if (updaterManager.size() == 0) {
+        if (updaterManager.numberOfUpdaters() == 0) {
             updaterManager.stop();
         }
         // Otherwise add it to the graph
@@ -75,7 +74,7 @@ public abstract class GraphUpdaterConfigurator {
     public static void shutdownGraph(Graph graph) {
         GraphUpdaterManager updaterManager = graph.updaterManager;
         if (updaterManager != null) {
-            LOG.info("Stopping updater manager with " + updaterManager.size() + " updaters.");
+            LOG.info("Stopping updater manager with " + updaterManager.numberOfUpdaters() + " updaters.");
             updaterManager.stop();
         }
     }
@@ -94,13 +93,13 @@ public abstract class GraphUpdaterConfigurator {
     /* private methods */
 
     /**
-     * Use the online UpdaterDirectoryService to fetch BikeRental updaters.
+     * Use the online UpdaterDirectoryService to fetch VehicleRental updaters.
      */
-    private static List<GraphUpdater> fetchBikeRentalServicesFromOnlineDirectory(
-        BikeRentalServiceDirectoryFetcherParameters parameters
+    private static List<GraphUpdater> fetchVehicleRentalServicesFromOnlineDirectory(
+        VehicleRentalServiceDirectoryFetcherParameters parameters
     ) {
         if (parameters == null) { return List.of(); }
-        return BikeRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(parameters);
+        return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(parameters);
     }
 
     /**
@@ -111,8 +110,8 @@ public abstract class GraphUpdaterConfigurator {
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 
-        for (BikeRentalUpdaterParameters configItem : config.getBikeRentalParameters()) {
-            updaters.add(new BikeRentalUpdater(configItem));
+        for (VehicleRentalUpdaterParameters configItem : config.getVehicleRentalParameters()) {
+            updaters.add(new VehicleRentalUpdater(configItem));
         }
         for (GtfsRealtimeAlertsUpdaterParameters configItem : config.getGtfsRealtimeAlertsUpdaterParameters()) {
             updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
@@ -138,8 +137,8 @@ public abstract class GraphUpdaterConfigurator {
         for (MqttGtfsRealtimeUpdaterParameters configItem : config.getMqttGtfsRealtimeUpdaterParameters()) {
             updaters.add(new MqttGtfsRealtimeUpdater(configItem));
         }
-        for (BikeParkUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
-            updaters.add(new BikeParkUpdater(configItem));
+        for (VehicleParkingUpdaterParameters configItem : config.getVehicleParkingUpdaterParameters()) {
+            updaters.add(new VehicleParkingUpdater(configItem));
         }
         for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
             updaters.add(new WinkkiPollingGraphUpdater(configItem));

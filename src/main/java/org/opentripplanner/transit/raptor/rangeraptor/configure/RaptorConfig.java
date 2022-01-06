@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.configure;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
@@ -12,12 +14,13 @@ import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
+import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.service.RaptorSearchWindowCalculator;
-import org.opentripplanner.transit.raptor.service.WorkerPerformanceTimersCache;
+import org.opentripplanner.transit.raptor.service.RequestAlias;
 
 
 /**
@@ -32,21 +35,29 @@ import org.opentripplanner.transit.raptor.service.WorkerPerformanceTimersCache;
 public class RaptorConfig<T extends RaptorTripSchedule> {
     private final ExecutorService threadPool;
     private final RaptorTuningParameters tuningParameters;
-    private final WorkerPerformanceTimersCache timers;
+    private final MeterRegistry registry;
 
 
-    public RaptorConfig(RaptorTuningParameters tuningParameters) {
+    public RaptorConfig(
+            RaptorTuningParameters tuningParameters,
+            MeterRegistry registry
+    ) {
         this.tuningParameters = tuningParameters;
         this.threadPool = createNewThreadPool(tuningParameters.searchThreadPoolSize());
-        this.timers = new WorkerPerformanceTimersCache(isMultiThreaded());
+        this.registry = registry;
     }
 
     public static <T extends RaptorTripSchedule> RaptorConfig<T> defaultConfigForTest() {
-        return new RaptorConfig<>(new RaptorTuningParameters() {});
+        return new RaptorConfig<>(new RaptorTuningParameters() {}, Metrics.globalRegistry);
     }
 
     public SearchContext<T> context(RaptorTransitDataProvider<T> transit, RaptorRequest<T> request) {
-        return new SearchContext<>(request, tuningParameters, transit, timers.get(request));
+        return new SearchContext<>(
+            request,
+            tuningParameters,
+            transit,
+            new WorkerPerformanceTimers(RequestAlias.alias(request, isMultiThreaded()), registry)
+        );
     }
 
     public Worker<T> createStdWorker(RaptorTransitDataProvider<T> transitData, RaptorRequest<T> request) {
@@ -103,7 +114,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
                 ctx.calculator(),
                 ctx.createLifeCyclePublisher(),
                 ctx.timers(),
-                ctx.enableGuaranteedTransfers()
+                ctx.enableConstrainedTransfers()
         );
     }
 

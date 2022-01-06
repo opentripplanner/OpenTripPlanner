@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import lombok.experimental.Delegate;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -18,6 +19,8 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.standalone.server.Router;
 
 /**
@@ -49,8 +52,15 @@ public class RoutingService {
 
     // TODO We should probably not have the Router as a parameter here
     public RoutingResponse route(RoutingRequest request, Router router) {
-        RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
-        return worker.route(router);
+        try {
+            var zoneId = graph.getTransitLayer().getTransitDataZoneId();
+            RoutingWorker worker = new RoutingWorker(router, request, zoneId);
+            return worker.route();
+        } finally {
+            if (request != null) {
+                request.cleanup();
+            }
+        }
     }
 
     /**
@@ -66,11 +76,11 @@ public class RoutingService {
      * @param startTime             Start time for the search. Seconds from UNIX epoch
      * @param timeRange             Searches forward for timeRange seconds from startTime
      * @param numberOfDepartures    Number of departures to fetch per pattern
-     * @param omitNonPickups        If true, do not include vehicles that will not pick up passengers.
+     * @param arrivalDeparture      Filter by arrivals, departures, or both
      * @param includeCancelledTrips If true, cancelled trips will also be included in result.
      */
     public List<StopTimesInPattern> stopTimesForStop(
-            Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups, boolean includeCancelledTrips
+            StopLocation stop, long startTime, int timeRange, int numberOfDepartures, ArrivalDeparture arrivalDeparture, boolean includeCancelledTrips
     ) {
         return StopTimesHelper.stopTimesForStop(
                 this,
@@ -79,7 +89,7 @@ public class RoutingService {
                 startTime,
                 timeRange,
                 numberOfDepartures,
-                omitNonPickups,
+                arrivalDeparture,
                 includeCancelledTrips
         );
     }
@@ -92,9 +102,9 @@ public class RoutingService {
      * @param serviceDate Return all departures for the specified date
      */
     public List<StopTimesInPattern> getStopTimesForStop(
-            Stop stop, ServiceDate serviceDate, boolean omitNonPickups
+            StopLocation stop, ServiceDate serviceDate, ArrivalDeparture arrivalDeparture
     ) {
-        return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, omitNonPickups);
+        return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, arrivalDeparture);
     }
 
 
@@ -111,10 +121,10 @@ public class RoutingService {
      * @param startTime          Start time for the search. Seconds from UNIX epoch
      * @param timeRange          Searches forward for timeRange seconds from startTime
      * @param numberOfDepartures Number of departures to fetch per pattern
-     * @param omitNonPickups     If true, do not include vehicles that will not pick up passengers.
+     * @param arrivalDeparture   Filter by arrivals, departures, or both
      */
     public List<TripTimeOnDate> stopTimesForPatternAtStop(
-            Stop stop, TripPattern pattern, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
+            StopLocation stop, TripPattern pattern, long startTime, int timeRange, int numberOfDepartures, ArrivalDeparture arrivalDeparture
     ) {
         return StopTimesHelper.stopTimesForPatternAtStop(
                 this,
@@ -124,7 +134,7 @@ public class RoutingService {
                 startTime,
                 timeRange,
                 numberOfDepartures,
-                omitNonPickups
+                arrivalDeparture
         );
     }
 
@@ -132,7 +142,7 @@ public class RoutingService {
      * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
      * added by realtime updates are added to the collection.
      */
-    public Collection<TripPattern> getPatternsForStop(Stop stop, boolean includeRealtimeUpdates) {
+    public Collection<TripPattern> getPatternsForStop(StopLocation stop, boolean includeRealtimeUpdates) {
         return graph.index.getPatternsForStop(stop,
                 includeRealtimeUpdates ? lazyGetTimeTableSnapShot() : null
         );

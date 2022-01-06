@@ -2,6 +2,9 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -14,10 +17,6 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.util.model.EncodedPolylineBean;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLLeg {
 
@@ -94,7 +93,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Boolean> rentedBike() {
-    return environment -> getSource(environment).rentedBike;
+    return environment -> getSource(environment).rentedVehicle;
   }
 
   @Override
@@ -133,11 +132,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
     return environment -> {
       List<StopArrival> intermediateStops = getSource(environment).intermediateStops;
       if (intermediateStops == null) { return null; }
-      RoutingService routingService = getRoutingService(environment);
       return intermediateStops.stream()
-          .map(intermediateStop -> intermediateStop.place)
-          .filter(place -> place.stopId != null)
-          .map(place -> routingService.getStopForId(place.stopId))
+          .map(intermediateStop -> intermediateStop.place.stop)
           .filter(Objects::nonNull)
           .collect(Collectors.toList());
     };
@@ -187,7 +183,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Boolean> interlineWithPreviousLeg() {
-    return environment -> getSource(environment).interlineWithPreviousLeg;
+    return environment -> getSource(environment).isInterlinedWithPreviousLeg();
   }
 
   @Override

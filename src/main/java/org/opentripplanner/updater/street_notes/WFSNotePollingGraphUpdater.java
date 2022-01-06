@@ -2,6 +2,12 @@ package org.opentripplanner.updater.street_notes;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.wfs.WFSDataStore;
@@ -22,18 +28,11 @@ import org.opentripplanner.routing.services.notes.DynamicStreetNotesSource;
 import org.opentripplanner.routing.services.notes.MatcherAndStreetNote;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
-import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A graph updater that reads a WFS-interface and updates a DynamicStreetNotesSource.
@@ -50,7 +49,7 @@ import java.util.Map;
 public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
     protected Graph graph;
 
-    private GraphUpdaterManager updaterManager;
+    private WriteToGraphCallback saveResultOnGraph;
 
     private SetMultimap<Edge, MatcherAndStreetNote> notesForEdge;
 
@@ -96,8 +95,8 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * Here the updater gets to know its parent manager to execute GraphWriterRunnables.
      */
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+        this.saveResultOnGraph = saveResultOnGraph;
     }
 
     /**
@@ -151,7 +150,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
                 }
             }
         }
-        updaterManager.execute(new WFSGraphWriter());
+        saveResultOnGraph.execute(new WFSGraphWriter());
     }
 
     /**

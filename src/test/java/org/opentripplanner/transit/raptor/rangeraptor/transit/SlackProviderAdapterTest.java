@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
+
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
@@ -7,9 +10,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
 public class SlackProviderAdapterTest implements RaptorTestConstants {
 
@@ -33,19 +33,16 @@ public class SlackProviderAdapterTest implements RaptorTestConstants {
     var lifeCycle = new LifeCycleEventPublisher(subscriptions);
 
     lifeCycle.prepareForNextRound(0);
-    subject.setCurrentPattern(PATTERN);
-    assertEquals(ALIGHT_SLACK, subject.alightSlack());
-    assertEquals(BOARD_SLACK, subject.boardSlack());
+    assertEquals(ALIGHT_SLACK, subject.alightSlack(PATTERN));
+    assertEquals(BOARD_SLACK, subject.boardSlack(PATTERN));
 
     lifeCycle.prepareForNextRound(1);
-    subject.setCurrentPattern(PATTERN);
-    assertEquals(ALIGHT_SLACK, subject.alightSlack());
-    assertEquals(BOARD_SLACK, subject.boardSlack());
+    assertEquals(ALIGHT_SLACK, subject.alightSlack(PATTERN));
+    assertEquals(BOARD_SLACK, subject.boardSlack(PATTERN));
 
     lifeCycle.prepareForNextRound(2);
-    subject.setCurrentPattern(PATTERN);
-    assertEquals(ALIGHT_SLACK, subject.alightSlack());
-    assertEquals(BOARD_SLACK + TRANSFER_SLACK, subject.boardSlack());
+    assertEquals(ALIGHT_SLACK, subject.alightSlack(PATTERN));
+    assertEquals(BOARD_SLACK + TRANSFER_SLACK, subject.boardSlack(PATTERN));
   }
 
   @Test
@@ -58,18 +55,15 @@ public class SlackProviderAdapterTest implements RaptorTestConstants {
     var lifeCycle = new LifeCycleEventPublisher(subscriptions);
 
     lifeCycle.prepareForNextRound(0);
-    subject.setCurrentPattern(PATTERN);
-    assertEquals(BOARD_SLACK, subject.alightSlack());
-    assertEquals(ALIGHT_SLACK, subject.boardSlack());
+    assertEquals(BOARD_SLACK, subject.alightSlack(PATTERN));
+    assertEquals(ALIGHT_SLACK, subject.boardSlack(PATTERN));
 
     lifeCycle.prepareForNextRound(1);
-    subject.setCurrentPattern(PATTERN);
-    assertEquals(BOARD_SLACK, subject.alightSlack());
-    assertEquals(ALIGHT_SLACK, subject.boardSlack());
+    assertEquals(BOARD_SLACK, subject.alightSlack(PATTERN));
+    assertEquals(ALIGHT_SLACK, subject.boardSlack(PATTERN));
 
     lifeCycle.prepareForNextRound(2);
-    subject.setCurrentPattern(PATTERN);
-    assertEquals(BOARD_SLACK, subject.alightSlack());
-    assertEquals(ALIGHT_SLACK + TRANSFER_SLACK, subject.boardSlack());
+    assertEquals(BOARD_SLACK, subject.alightSlack(PATTERN));
+    assertEquals(ALIGHT_SLACK + TRANSFER_SLACK, subject.boardSlack(PATTERN));
   }
 }

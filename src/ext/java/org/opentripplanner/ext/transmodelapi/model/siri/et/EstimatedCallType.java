@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.transmodelapi.model.siri.et;
 
+import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
+import static org.opentripplanner.model.PickDrop.NONE;
+
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
@@ -7,25 +10,23 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
 
 public class EstimatedCallType {
   private static final String NAME = "EstimatedCall";
@@ -150,31 +151,21 @@ public class EstimatedCallType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("forBoarding")
                 .type(Scalars.GraphQLBoolean)
-                .description("Whether vehicle may be boarded at quay.")
-                .dataFetcher(environment -> {
-                    if (((TripTimeOnDate) environment.getSource()).getPickupType() >= 0) {
-                        //Realtime-updated
-                        return ((TripTimeOnDate) environment.getSource()).getPickupType() != NONE.getGtfsCode();
-                    }
-                  return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                        .get(((TripTimeOnDate) environment.getSource()).getTrip())
-                        .getBoardType(((TripTimeOnDate) environment.getSource()).getStopIndex()) != NONE;
-                })
-                .build())
+                .description("Whether vehicle may be boarded at quay according to the planned data. "
+                    + "If the cancellation flag is set, boarding is not possible, even if this field "
+                    + "is set to true.")
+                .dataFetcher(environment ->
+                    ((TripTimeOnDate) environment.getSource()).getPickupType() != NONE
+                ).build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("forAlighting")
                 .type(Scalars.GraphQLBoolean)
-                .description("Whether vehicle may be alighted at quay.")
-                .dataFetcher(environment -> {
-                    if (((TripTimeOnDate) environment.getSource()).getDropoffType() >= 0) {
-                        //Realtime-updated
-                        return ((TripTimeOnDate) environment.getSource()).getDropoffType() != NONE.getGtfsCode();
-                    }
-                    return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                            .get(((TripTimeOnDate) environment.getSource()).getTrip())
-                            .getAlightType(((TripTimeOnDate) environment.getSource()).getStopIndex()) != NONE;
-                })
-                .build())
+                .description("Whether vehicle may be alighted at quay according to the planned data. "
+                    + "If the cancellation flag is set, alighting is not possible, even if this field "
+                    + "is set to true.")
+                .dataFetcher(environment ->
+                    ((TripTimeOnDate) environment.getSource()).getDropoffType() != NONE
+                ).build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("requestStop")
                     .type(Scalars.GraphQLBoolean)
@@ -189,7 +180,11 @@ public class EstimatedCallType {
                     .newFieldDefinition()
                     .name("cancellation")
                     .type(Scalars.GraphQLBoolean)
-                    .description("Whether stop is cancelled.")
+                    .description("Whether stop is cancelled. This means that either the "
+                        + "ServiceJourney has a planned cancellation, the ServiceJourney has been "
+                        + "cancelled by realtime data, or this particular StopPoint has been "
+                        + "cancelled. This also means that both boarding and alighting has been "
+                        + "cancelled.")
                     .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).isCanceledEffectively())
             .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -219,6 +214,7 @@ public class EstimatedCallType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("situations")
+                    .withDirective(gqlUtil.timingData)
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                     .description("Get all relevant situations for this EstimatedCall.")
                     .dataFetcher(environment -> {
@@ -229,9 +225,10 @@ public class EstimatedCallType {
                     .build())
              .field(GraphQLFieldDefinition.newFieldDefinition()
                      .name("bookingArrangements")
-                     .description("Booking arrangements for flexible service. NOT IMPLEMENTED")
-                     .dataFetcher(environment ->  null)
+                     .description("Booking arrangements for this EstimatedCall.")
                      .type(bookingArrangementType)
+                     .dataFetcher(environment ->
+                             environment.<TripTimeOnDate>getSource().getPickupBookingInfo())
                      .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
 //                        .name("flexible")
@@ -257,23 +254,25 @@ public class EstimatedCallType {
 
     FeedScopedId stopId = tripTimeOnDate.getStopId();
 
-    Stop stop = routingService.getStopForId(stopId);
+    var stop = routingService.getStopForId(stopId);
     FeedScopedId parentStopId = stop.getParentStation().getId();
 
     Collection<TransitAlert> allAlerts = new HashSet<>();
 
     TransitAlertService alertPatchService = routingService.getTransitAlertService();
 
+    final ServiceDate serviceDate = new ServiceDate(LocalDate.ofEpochDay(1+tripTimeOnDate.getServiceDay()/(24*3600)));
+
     // Quay
     allAlerts.addAll(alertPatchService.getStopAlerts(stopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(stopId, tripId));
+    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(stopId, tripId, serviceDate));
     allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(stopId, routeId));
     // StopPlace
     allAlerts.addAll(alertPatchService.getStopAlerts(parentStopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(parentStopId, tripId));
+    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(parentStopId, tripId, serviceDate));
     allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(parentStopId, routeId));
     // Trip
-    allAlerts.addAll(alertPatchService.getTripAlerts(tripId));
+    allAlerts.addAll(alertPatchService.getTripAlerts(tripId, serviceDate));
     // Route
     allAlerts.addAll(alertPatchService.getRouteAlerts(routeId));
     // Agency
@@ -282,9 +281,9 @@ public class EstimatedCallType {
     // TripPattern
     allAlerts.addAll(alertPatchService.getTripPatternAlerts(routingService.getPatternForTrip().get(trip).getId()));
 
-    long serviceDayMillis = 1000 * tripTimeOnDate.getServiceDay();
-    long arrivalMillis = 1000 * tripTimeOnDate.getRealtimeArrival();
-    long departureMillis = 1000 * tripTimeOnDate.getRealtimeDeparture();
+    long serviceDayMillis = 1000L * tripTimeOnDate.getServiceDay();
+    long arrivalMillis = 1000L * tripTimeOnDate.getRealtimeArrival();
+    long departureMillis = 1000L * tripTimeOnDate.getRealtimeDeparture();
 
     filterSituationsByDateAndStopConditions(allAlerts,
         new Date(serviceDayMillis + arrivalMillis),
@@ -298,7 +297,7 @@ public class EstimatedCallType {
     if (alertPatches != null) {
 
       // First and last period
-      alertPatches.removeIf(alert -> alert.getEffectiveStartDate().after(toTime) ||
+      alertPatches.removeIf(alert -> (alert.getEffectiveStartDate() != null && alert.getEffectiveStartDate().after(toTime)) ||
           (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().before(fromTime)));
 
       // Handle repeating validityPeriods

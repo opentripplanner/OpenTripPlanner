@@ -1,24 +1,21 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
 import java.util.function.IntFunction;
-import java.util.function.ToIntFunction;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathService;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -26,23 +23,29 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * Responsible for assembly of the prioritized-transfer services.
  */
 public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedule> {
-  private final IntFunction<Stop> stopLookup;
+  private final IntFunction<StopLocation> stopLookup;
+  private final RaptorStopNameResolver stopNameResolver;
   private final TransferService transferService;
   private final RaptorTransitDataProvider<T> transitDataProvider;
+  private final int[] stopBoardAlightCosts;
   private final RaptorRequest<T> raptorRequest;
   private final TransferOptimizationParameters config;
 
 
-  public TransferOptimizationServiceConfigurator(
-      IntFunction<Stop> stopLookup,
+  private TransferOptimizationServiceConfigurator(
+      IntFunction<StopLocation> stopLookup,
+      RaptorStopNameResolver stopNameResolver,
       TransferService transferService,
       RaptorTransitDataProvider<T> transitDataProvider,
+      int[] stopBoardAlightCosts,
       RaptorRequest<T> raptorRequest,
       TransferOptimizationParameters config
   ) {
     this.stopLookup = stopLookup;
+    this.stopNameResolver = stopNameResolver;
     this.transferService = transferService;
     this.transitDataProvider = transitDataProvider;
+    this.stopBoardAlightCosts = stopBoardAlightCosts;
     this.raptorRequest = raptorRequest;
     this.config = config;
   }
@@ -51,26 +54,27 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
    * Scope: Request
    */
   public static <T extends RaptorTripSchedule> OptimizeTransferService<T> createOptimizeTransferService(
-      IntFunction<Stop> stopLookup,
+      IntFunction<StopLocation> stopLookup,
+      RaptorStopNameResolver stopNameResolver,
       TransferService transferService,
       RaptorTransitDataProvider<T> transitDataProvider,
+      int[] stopBoardAlightCosts,
       RaptorRequest<T> raptorRequest,
       TransferOptimizationParameters config
   ) {
     return new TransferOptimizationServiceConfigurator<T>(
         stopLookup,
+        stopNameResolver,
         transferService,
         transitDataProvider,
+        stopBoardAlightCosts,
         raptorRequest,
         config
     ).createOptimizeTransferService();
   }
 
   private OptimizeTransferService<T> createOptimizeTransferService() {
-    var pathTransferGenerator = createTransferGenerator(
-            config.optimizeTransferPriority()
-    );
-    var costCalculator = createCostCalculator();
+    var pathTransferGenerator = createTransferGenerator(config.optimizeTransferPriority());
     var filter = createTransferOptimizedFilter(
             config.optimizeTransferPriority(), config.optimizeTransferWaitTime()
     );
@@ -81,8 +85,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       var transfersPermutationService = createOptimizePathService(
               pathTransferGenerator,
               filter,
-              transferWaitTimeCalculator::cost,
-              costCalculator
+              transferWaitTimeCalculator,
+              transitDataProvider.multiCriteriaCostCalculator()
       );
 
       return new OptimizeTransferService<>(
@@ -95,25 +99,28 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       var transfersPermutationService = createOptimizePathService(
               pathTransferGenerator,
               filter,
-              PathLeg::generalizedCostTotal,
-              costCalculator
+              null,
+              transitDataProvider.multiCriteriaCostCalculator()
       );
       return new OptimizeTransferService<>(transfersPermutationService);
     }
   }
 
-  private OptimizePathService<T> createOptimizePathService(
+  private OptimizePathDomainService<T> createOptimizePathService(
           TransferGenerator<T> transferGenerator,
           MinCostFilterChain<OptimizedPathTail<T>> transferPointFilter,
-          ToIntFunction<PathLeg<?>> costCalcForWaitOptimization,
-          CostCalculator<T> costCalculator
+          TransferWaitTimeCostCalculator transferWaitTimeCostCalculator,
+          CostCalculator costCalculator
   ) {
-    return new OptimizePathService<>(
+    return new OptimizePathDomainService<>(
             transferGenerator,
             costCalculator,
             raptorRequest.slackProvider(),
-            costCalcForWaitOptimization,
-            transferPointFilter
+            transferWaitTimeCostCalculator,
+            stopBoardAlightCosts,
+            config.extraStopBoardAlightCostsFactor(),
+            transferPointFilter,
+            stopNameResolver
     );
   }
 
@@ -133,10 +140,9 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     );
   }
 
-  private TransferWaitTimeCalculator createTransferWaitTimeCalculator() {
-    return new TransferWaitTimeCalculator(
-            config.waitReluctanceRouting(),
-            config.inverseWaitReluctance(),
+  private TransferWaitTimeCostCalculator createTransferWaitTimeCalculator() {
+    return new TransferWaitTimeCostCalculator(
+            config.backTravelWaitTimeFactor(),
             config.minSafeWaitTimeFactor()
     );
   }
@@ -145,16 +151,5 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
           boolean transferPriority, boolean optimizeWaitTime
   ) {
     return TransferOptimizedFilterFactory.filter(transferPriority, optimizeWaitTime);
-  }
-
-  private DefaultCostCalculator<T> createCostCalculator() {
-    McCostParams p = raptorRequest.multiCriteriaCostFactors();
-    return new DefaultCostCalculator<>(
-        p.boardCost(),
-        p.transferCost(),
-        p.waitReluctanceFactor(),
-        transitDataProvider.stopBoarAlightCost(),
-        p.transitReluctanceFactors()
-    );
   }
 }

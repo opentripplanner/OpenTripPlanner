@@ -51,6 +51,7 @@ public class ServiceJourneyType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("activeDates")
+                    .withDirective(gqlUtil.timingData)
                     .type(new GraphQLNonNull(new GraphQLList(gqlUtil.dateScalar)))
                     .dataFetcher(environment -> {
                       return GqlUtil
@@ -135,6 +136,7 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("passingTimes")
                     .type(new GraphQLNonNull(new GraphQLList(timetabledPassingTimeType)))
+                    .withDirective(gqlUtil.timingData)
                     .description("Returns scheduled passing times only - without realtime-updates, for realtime-data use 'estimatedCalls'")
                     .dataFetcher(env -> {
                         Trip trip = trip(env);
@@ -151,6 +153,7 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("estimatedCalls")
                     .type(new GraphQLList(estimatedCallType))
+                    .withDirective(gqlUtil.timingData)
                     .description("Returns scheduled passingTimes for this ServiceJourney for a given date, updated with realtime-updates (if available). " +
                                          "NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is " +
                                          "known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead.")
@@ -158,7 +161,6 @@ public class ServiceJourneyType {
                             .name("date")
                             .type(gqlUtil.dateScalar)
                             .description("Date to get estimated calls for. Defaults to today.")
-                            .defaultValue(null)
                             .build())
                     .dataFetcher(environment -> {
                         final Trip trip = trip(environment);
@@ -200,7 +202,7 @@ public class ServiceJourneyType {
                     .dataFetcher(environment ->
                         GqlUtil.getRoutingService(environment)
                             .getTransitAlertService()
-                            .getTripAlerts(trip(environment).getId())
+                            .getTripAlerts(trip(environment).getId(), null)
                     )
                 .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -218,6 +220,7 @@ public class ServiceJourneyType {
                     .name("bookingArrangements")
                     .description("Booking arrangements for flexible services.")
                     .type(bookingArrangementType)
+                    .deprecate("BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
                     .build())
             .build();
   }

@@ -1,10 +1,16 @@
 package org.opentripplanner.ext.flex.template;
 
+import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -15,20 +21,15 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.spt.GraphPath;
-
-import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import org.opentripplanner.ext.flex.FlexParameters;
 
 public class FlexAccessTemplate extends FlexAccessEgressTemplate {
   public FlexAccessTemplate(
       NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
-      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator
+      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator,
+      FlexParameters flexParams
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator);
+    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, flexParams);
   }
 
   public Itinerary createDirectItinerary(
@@ -99,15 +100,15 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     return itinerary;
   }
 
-  protected List<Edge> getTransferEdges(SimpleTransfer simpleTransfer) {
-    return simpleTransfer.getEdges();
+  protected List<Edge> getTransferEdges(PathTransfer transfer) {
+    return transfer.getEdges();
   }
 
-  protected Stop getFinalStop(SimpleTransfer simpleTransfer) {
-    return simpleTransfer.to instanceof Stop ? (Stop) simpleTransfer.to : null;
+  protected Stop getFinalStop(PathTransfer transfer) {
+    return transfer.to instanceof Stop ? (Stop) transfer.to : null;
   }
 
-  protected Collection<SimpleTransfer> getTransfersFromTransferStop(Graph graph) {
+  protected Collection<PathTransfer> getTransfersFromTransferStop(Graph graph) {
     return graph.transfersByStop.get(transferStop);
   }
 

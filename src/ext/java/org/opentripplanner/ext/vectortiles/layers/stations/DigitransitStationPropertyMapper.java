@@ -7,6 +7,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.graph.Graph;
 
 import java.util.Collection;
@@ -25,7 +26,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
 
   @Override
   public Collection<T2<String, Object>> map(Station station) {
-    Collection<Stop> childStops = station.getChildStops();
+    var childStops = station.getChildStops();
 
     return List.of(
       new T2<>("gtfsId", station.getId().toString()),
@@ -38,7 +39,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
         .collect(Collectors.joining(","))),
       new T2<>("stops", JSONArray.toJSONString(childStops
         .stream()
-        .map(StationElement::getId)
+        .map(StopLocation::getId)
         .map(FeedScopedId::toString)
         .collect(Collectors.toUnmodifiableList()))),
       new T2<>("routes", JSONArray.toJSONString(childStops

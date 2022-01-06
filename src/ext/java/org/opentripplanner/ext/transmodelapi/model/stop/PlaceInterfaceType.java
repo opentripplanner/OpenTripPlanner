@@ -6,8 +6,9 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLSchema;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 
 public class PlaceInterfaceType {
 
@@ -47,11 +48,14 @@ public class PlaceInterfaceType {
           if (o instanceof MonoOrMultiModalStation) {
             return schema.getObjectType("StopPlace");
           }
-          if (o instanceof BikeRentalStation) {
+          if (o instanceof VehicleRentalStation) {
             return schema.getObjectType("BikeRentalStation");
           }
-          if (o instanceof BikePark) {
-            return schema.getObjectType("BikePark");
+          if (o instanceof VehicleRentalVehicle) {
+            return schema.getObjectType("RentalVehicle");
+          }
+          if (o instanceof VehicleParking) {
+            return schema.getObjectType(BikeParkType.NAME);
           }
           //if (o instanceof CarPark) {
           //    return (GraphQLObjectType) carParkType;

@@ -24,6 +24,7 @@ import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 
@@ -108,13 +109,13 @@ public class OtpTransitServiceImplTest {
         // There is 9 transfers, but because of the route to trip we get more
         // TODO TGR - Support Route to trip expansion
         assertEquals(
-                //"Transfer{from: (route: 2, trip: 2.1, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), guaranteed}\n"
-                //+ "Transfer{from: (route: 2, trip: 2.2, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), guaranteed}\n"
-                "Transfer{from: (stop: K), to: (stop: L), priority: RECOMMENDED}\n"
-                + "Transfer{from: (stop: K), to: (stop: M), priority: NOT_ALLOWED}\n"
-                + "Transfer{from: (stop: L), to: (stop: K), priority: RECOMMENDED}\n"
-                + "Transfer{from: (stop: M), to: (stop: K), priority: NOT_ALLOWED}\n"
-                + "Transfer{from: (trip: 1.1, stopPos: 1), to: (trip: 2.2, stopPos: 0), guaranteed}",
+                //"Transfer{from: (route: 2, trip: 2.1, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
+                //+ "Transfer{from: (route: 2, trip: 2.2, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), constraint: {guaranteed}}\n"
+                "ConstrainedTransfer{from: (stop: K), to: (stop: L), constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: (stop: K), to: (stop: M), constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: (stop: L), to: (stop: K), constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: (stop: M), to: (stop: K), constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: (trip: 1.1, stopPos: 1), to: (trip: 2.2, stopPos: 0), constraint: {guaranteed}}",
                 result
         );
     }
@@ -163,7 +164,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetStopsForStation() {
-        List<Stop> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
+        List<StopLocation> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
         assertEquals("[<Stop Z:A>]", stops.toString());
     }
 
@@ -208,8 +209,7 @@ public class OtpTransitServiceImplTest {
     }
 
     private static <T> T first(Collection<? extends T> c) {
-        //noinspection ConstantConditions
-        return c.stream().sorted(comparing(T::toString)).findFirst().get();
+        return c.stream().min(comparing(T::toString)).orElseThrow();
     }
 
     private static String toString(ShapePoint sp) {

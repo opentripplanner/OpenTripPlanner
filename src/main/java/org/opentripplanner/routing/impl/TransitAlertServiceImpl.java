@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Graph;
@@ -50,7 +51,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
         if (result.isEmpty()) {
             // Search for alerts on parent-stop
             if (graph != null && graph.index != null) {
-                Stop quay = graph.index.getStopForId(stopId);
+                var quay = graph.index.getStopForId(stopId);
                 if (quay != null) {
                     
                     // TODO - SIRI: Add alerts from parent- and multimodal-stops
@@ -76,8 +77,8 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     }
 
     @Override
-    public Collection<TransitAlert> getTripAlerts(FeedScopedId trip) {
-        return alerts.get(new EntitySelector.Trip(trip));
+    public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, ServiceDate serviceDate) {
+        return alerts.get(new EntitySelector.Trip(trip, serviceDate));
     }
 
     @Override
@@ -91,8 +92,8 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     }
 
     @Override
-    public Collection<TransitAlert> getStopAndTripAlerts(FeedScopedId stop, FeedScopedId trip) {
-        return alerts.get(new EntitySelector.StopAndTrip(stop, trip));
+    public Collection<TransitAlert> getStopAndTripAlerts(FeedScopedId stop, FeedScopedId trip, ServiceDate serviceDate) {
+        return alerts.get(new EntitySelector.StopAndTrip(stop, trip, serviceDate));
     }
 
     @Override

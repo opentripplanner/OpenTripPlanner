@@ -1,26 +1,25 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.api.model.ApiStop;
-import org.opentripplanner.api.model.ApiStopShort;
-import org.opentripplanner.model.StationElement;
-import org.opentripplanner.model.Stop;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.model.ApiStop;
+import org.opentripplanner.api.model.ApiStopShort;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 
 public class StopMapper {
 
-    public static List<ApiStop> mapToApi(Collection<Stop> domain) {
+    public static List<ApiStop> mapToApi(Collection<StopLocation> domain) {
         if(domain == null) { return null; }
         return domain.stream().map(StopMapper::mapToApi).collect(Collectors.toList());
     }
 
-    public static ApiStop mapToApi(Stop domain) {
+    public static ApiStop mapToApi(StopLocation domain) {
         return mapToApi(domain, true);
     }
 
-    public static ApiStop mapToApi(Stop domain, boolean extended) {
+    public static ApiStop mapToApi(StopLocation domain, boolean extended) {
         if(domain == null) { return null; }
 
         ApiStop api = new ApiStop();
@@ -45,7 +44,7 @@ public class StopMapper {
         return api;
     }
 
-    public static ApiStopShort mapToApiShort(Stop domain) {
+    public static ApiStopShort mapToApiShort(StopLocation domain) {
         if(domain == null) { return null; }
 
         ApiStopShort api = new ApiStopShort();
@@ -73,7 +72,7 @@ public class StopMapper {
         return api;
     }
 
-    public static List<ApiStopShort> mapToApiShort(Collection<Stop> domain) {
+    public static List<ApiStopShort> mapToApiShort(Collection<StopLocation> domain) {
         if(domain == null) { return null; }
         return domain.stream().map(StopMapper::mapToApiShort).collect(Collectors.toList());
     }
@@ -82,7 +81,7 @@ public class StopMapper {
      * Get the parent station id (without feed-scope) for the given station element,
      * this method should only be used to fetch old ids for beeing backward compatible.
      */
-    private static String mapToParentStationOldId(StationElement stop) {
+    private static String mapToParentStationOldId(StopLocation stop) {
         return stop.isPartOfStation() ? stop.getParentStation().getId().getId() : null;
     }
 }

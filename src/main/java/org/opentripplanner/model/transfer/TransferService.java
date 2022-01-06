@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,44 +29,44 @@ public class TransferService implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(TransferService.class);
 
     /** Index of guaranteed transfers by the to/destination point. */
-    private final Multimap<TripTransferPoint, Transfer> guaranteedTransferByToPoint;
+    private final Multimap<TripTransferPoint, ConstrainedTransfer> constrainedTransferByToPoint;
 
     /**
      * Table which contains transfers between two trips/routes
      */
-    private final Map<P2<TripTransferPoint>, Transfer> trip2tripTransfers;
+    private final Map<P2<TripTransferPoint>, ConstrainedTransfer> trip2tripTransfers;
 
     /**
      * Table which contains transfers between a trip/route and a stops
      */
-    private final Map<T2<TripTransferPoint, Stop>, Transfer> trip2StopTransfers;
+    private final Map<T2<TripTransferPoint, StopLocation>, ConstrainedTransfer> trip2StopTransfers;
 
     /**
      * Table which contains transfers between a stop and a trip/route
      */
-    private final Map<T2<Stop, TripTransferPoint>, Transfer> stop2TripTransfers;
+    private final Map<T2<StopLocation, TripTransferPoint>, ConstrainedTransfer> stop2TripTransfers;
 
     /**
      * Table which contains transfers between two stops
      */
-    private final Map<P2<Stop>, Transfer> stop2StopTransfers;
+    private final Map<P2<StopLocation>, ConstrainedTransfer> stop2StopTransfers;
 
     public TransferService() {
-        this.guaranteedTransferByToPoint = ArrayListMultimap.create();
+        this.constrainedTransferByToPoint = ArrayListMultimap.create();
         this.trip2tripTransfers = new HashMap<>();
         this.trip2StopTransfers = new HashMap<>();
         this.stop2TripTransfers = new HashMap<>();
         this.stop2StopTransfers = new HashMap<>();
     }
 
-    public void addAll(Collection<Transfer> transfers) {
-        for (Transfer transfer : transfers) {
+    public void addAll(Collection<ConstrainedTransfer> transfers) {
+        for (ConstrainedTransfer transfer : transfers) {
             add(transfer);
         }
     }
 
-    public List<Transfer> listAll() {
-        var list = new ArrayList<Transfer>();
+    public List<ConstrainedTransfer> listAll() {
+        var list = new ArrayList<ConstrainedTransfer>();
         list.addAll(trip2tripTransfers.values());
         list.addAll(trip2StopTransfers.values());
         list.addAll(stop2TripTransfers.values());
@@ -73,14 +74,14 @@ public class TransferService implements Serializable {
         return list;
     }
 
-    public Collection<Transfer> listGuaranteedTransfersTo(Trip toTrip, int toStopIndex) {
-        return guaranteedTransferByToPoint.get(new TripTransferPoint(toTrip, toStopIndex));
+    public Collection<ConstrainedTransfer> listConstrainedTransfersTo(Trip toTrip, int toStopIndex) {
+        return constrainedTransferByToPoint.get(new TripTransferPoint(toTrip, toStopIndex));
     }
 
     @Nullable
-    public Transfer findTransfer(
-            Stop fromStop,
-            Stop toStop,
+    public ConstrainedTransfer findTransfer(
+            StopLocation fromStop,
+            StopLocation toStop,
             Trip fromTrip,
             Trip toTrip,
             int fromStopPosition,
@@ -88,7 +89,7 @@ public class TransferService implements Serializable {
     ) {
         var fromTripKey = new TripTransferPoint(fromTrip, fromStopPosition);
         var toTripKey = new TripTransferPoint(toTrip, toStopPosition);
-        Transfer result;
+        ConstrainedTransfer result;
 
         // Check the highest specificity ranked transfers first (trip-2-trip)
         result = trip2tripTransfers.get(new P2<>(fromTripKey, toTripKey));
@@ -106,11 +107,11 @@ public class TransferService implements Serializable {
         return stop2StopTransfers.get(new P2<>(fromStop, toStop));
     }
 
-    void add(Transfer transfer) {
+    void add(ConstrainedTransfer transfer) {
         TransferPoint from = transfer.getFrom();
         TransferPoint to = transfer.getTo();
 
-        addGuaranteedTransfer(transfer);
+        addFacilitatedTransfer(transfer);
 
         if (from instanceof TripTransferPoint) {
             var fromTrip = (TripTransferPoint) from;
@@ -156,8 +157,8 @@ public class TransferService implements Serializable {
      * specificity-ranking, thus using maps instead of multi-maps.
      */
     private boolean doAddTransferBasedOnSpecificityRanking(
-            Transfer newTransfer,
-            Transfer existingTransfer
+            ConstrainedTransfer newTransfer,
+            ConstrainedTransfer existingTransfer
     ) {
         if (existingTransfer == null) { return true; }
 
@@ -177,11 +178,13 @@ public class TransferService implements Serializable {
         return false;
     }
 
-    private void addGuaranteedTransfer(Transfer transfer) {
+    private void addFacilitatedTransfer(ConstrainedTransfer transfer) {
+        var c = transfer.getTransferConstraint();
         var toPoint = transfer.getTo();
-        if(transfer.isStaySeated() || transfer.isGuaranteed()) {
+
+        if(c.isFacilitated()) {
             if(toPoint instanceof TripTransferPoint) {
-                guaranteedTransferByToPoint.put((TripTransferPoint) toPoint, transfer);
+                constrainedTransferByToPoint.put((TripTransferPoint) toPoint, transfer);
             }
         }
     }

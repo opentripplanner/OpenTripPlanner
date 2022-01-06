@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.api.response;
 
-import org.opentripplanner.model.base.ToStringBuilder;
-
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import javax.annotation.Nullable;
+import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
  * Meta-data about the trip search performed.
@@ -24,6 +23,7 @@ public class TripSearchMetadata {
      * time-window AFTER the current search. No duplicate trips should be returned, unless a trip
      * is delayed and new realtime-data is available.
      */
+    @Deprecated
     public Instant nextDateTime;
 
     /**
@@ -31,7 +31,11 @@ public class TripSearchMetadata {
      * with the {@link #searchWindowUsed} in the request to get a new set of trips preceding in the
      * time-window BEFORE the current search. No duplicate trips should be returned, unless a trip
      * is delayed and new realtime-data is available.
+     *
+     * @deprecated Use the PageInfo and request {@code nextCursor} and {@code previousCursor}
+     * instead.
      */
+    @Deprecated
     public Instant prevDateTime;
 
 

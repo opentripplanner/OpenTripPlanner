@@ -8,6 +8,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
@@ -136,6 +137,7 @@ public class LineType {
                         result.addAll(GqlUtil.getRoutingService(environment).getFlexIndex().tripById
                             .values()
                             .stream()
+                            .map(FlexTrip::getTrip)
                             .filter(t -> t.getRoute().equals((Route) environment.getSource()))
                             .collect(Collectors.toList()));
                       }
@@ -169,6 +171,7 @@ public class LineType {
                 .name("bookingArrangements")
                 .description("Booking arrangements for flexible line.")
                 .type(bookingArrangementType)
+                .deprecate("BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
                 .dataFetcher(environment -> null)
                 .build())
             .build();

@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 
 /**
@@ -19,6 +20,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
 
     private static final int NOT_SET = -1;
 
+    private final TransitCalculator<T> calculator;
     private final StdWorkerState<T> state;
 
     private int onTripIndex;
@@ -26,12 +28,13 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     private int onTripBoardStop;
     private T onTrip;
 
-    public StdTransitWorker(StdWorkerState<T> state) {
+    public StdTransitWorker(TransitCalculator<T> calculator, StdWorkerState<T> state) {
+        this.calculator = calculator;
         this.state = state;
     }
 
     @Override
-    public final void setAccessToStop(
+    public void setAccessToStop(
         RaptorTransfer accessPath,
         int iterationDepartureTime,
         int timeDependentDepartureTime
@@ -40,12 +43,12 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public final int onTripIndex() {
+    public int onTripIndex() {
         return onTripIndex;
     }
 
     @Override
-    public final void prepareForTransitWith(RaptorTripPattern pattern) {
+    public void prepareForTransitWith(RaptorTripPattern pattern) {
         this.onTripIndex = NOT_SET;
         this.onTripBoardTime = NOT_SET;
         this.onTripBoardStop = NOT_SET;
@@ -53,15 +56,15 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public final void alight(final int stopIndex, final int stopPos, ToIntFunction<T> stopArrivalTimeOp) {
+    public void alight(final int stopIndex, final int stopPos, final int alightSlack) {
         if (onTripIndex != NOT_SET) {
-            final int stopArrivalTime = stopArrivalTimeOp.applyAsInt(onTrip);
+            final int stopArrivalTime = calculator.stopArrivalTime(onTrip, stopPos, alightSlack);
             state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
         }
     }
 
     @Override
-    public final void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
+    public void forEachBoarding(int stopIndex, IntConsumer prevStopArrivalTimeConsumer) {
         // Don't attempt to board if this stop was not reached in the last round.
         // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
         if (state.isStopReachedInPreviousRound(stopIndex)) {
@@ -70,7 +73,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public final void board(
+    public void board(
             int stopIndex,
             final int earliestBoardTime,
             RaptorTripScheduleBoardOrAlightEvent<T> result
@@ -82,7 +85,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Rou
     }
 
     @Override
-    public final TransitArrival<T> previousTransit(int boardStopIndex) {
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
         return state.previousTransit(boardStopIndex);
     }
 }

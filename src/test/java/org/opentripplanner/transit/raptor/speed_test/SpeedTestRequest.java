@@ -17,7 +17,6 @@ import java.util.Set;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -70,7 +69,7 @@ public class SpeedTestRequest {
 
     Set<TransitMode> getTransitModes() {
         return new HashSet<>(EnumSet.of(
-            TransitMode.BUS, TransitMode.RAIL, TransitMode.SUBWAY, TransitMode.TRAM));
+            TransitMode.BUS, TransitMode.RAIL, TransitMode.SUBWAY, TransitMode.TRAM, TransitMode.TROLLEYBUS));
     }
 
     double getWalkSpeedMeterPrSecond() {
@@ -78,8 +77,8 @@ public class SpeedTestRequest {
         return config.walkSpeedMeterPrSecond;
     }
 
-    public double getAccessEgressMaxWalkDistanceMeters() {
-        return config.maxWalkDistanceMeters;
+    public double getAccessEgressMaxWalkDurationSeconds() {
+        return config.maxWalkDurationSeconds;
     }
 
 
@@ -139,10 +138,6 @@ public class SpeedTestRequest {
         );
         builder.searchParams().addEgressPaths(
             mapToAccessEgress(streetRouter.getEgressTimesInSecondsByStopIndex())
-        );
-
-        builder.mcCostFactors().transitReluctanceFactors(
-                RaptorRequestMapper.mapTransitReluctance(config.request.transitReluctanceForMode())
         );
 
         addDebugOptions(builder, opts);

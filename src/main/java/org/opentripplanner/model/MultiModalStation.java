@@ -88,7 +88,7 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
         this.url = url;
     }
 
-    public Collection<Stop> getChildStops() {
+    public Collection<StopLocation> getChildStops() {
         return this.childStations.stream()
                 .flatMap(s -> s.getChildStops().stream())
                 .collect(Collectors.toUnmodifiableList());

@@ -51,6 +51,6 @@ public interface NetexEntityIndexReadOnlyView {
     ReadOnlyHierarchicalMapById<ServiceJourneyInterchange> getServiceJourneyInterchangeById();
     ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById();
     ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
-    ReadOnlyHierarchicalMapById<TariffZone> getTariffZonesById();
+    ReadOnlyHierarchicalVersionMapById<TariffZone> getTariffZonesById();
     String getTimeZone();
 }

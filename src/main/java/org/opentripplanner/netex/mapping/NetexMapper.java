@@ -2,10 +2,13 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
@@ -34,7 +37,6 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.TariffZone;
 
 
 /**
@@ -60,6 +62,7 @@ public class NetexMapper {
     private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
     private final CalendarServiceBuilder calendarServiceBuilder;
     private final TripCalendarBuilder tripCalendarBuilder;
+    private final Set<String> ferryIdsNotAllowedForBicycle;
 
     /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
     private GroupNetexMapper groupMapper;
@@ -78,12 +81,14 @@ public class NetexMapper {
             OtpTransitServiceBuilder transitBuilder,
             String feedId,
             Deduplicator deduplicator,
-            DataImportIssueStore issueStore
+            DataImportIssueStore issueStore,
+            Set<String> ferryIdsNotAllowedForBicycle
     ) {
         this.transitBuilder = transitBuilder;
         this.deduplicator = deduplicator;
         this.idFactory = new FeedScopedIdFactory(feedId);
         this.issueStore = issueStore;
+        this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
         this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
         this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
     }
@@ -158,8 +163,12 @@ public class NetexMapper {
         mapAuthorities();
         mapOperators();
         mapShapePoints();
-        mapTariffZones();
-        mapStopPlaceAndQuays();
+
+        // The tariffZoneMapper is used to map all currently valid zones and to map the correct
+        // referenced zone in StopPlace - which may not be the most currently valid zone.
+        // This is a workaround until versioned entities are supported by OTP
+        var tariffZoneMapper = mapTariffZones();
+        mapStopPlaceAndQuays(tariffZoneMapper);
         mapMultiModalStopPlaces();
         mapGroupsOfStopPlaces();
         mapFlexibleStopPlaces();
@@ -226,31 +235,35 @@ public class NetexMapper {
         }
     }
 
-    private void mapTariffZones() {
-        TariffZoneMapper tariffZoneMapper = new TariffZoneMapper(idFactory);
-        for (TariffZone tariffZone : currentNetexIndex.getTariffZonesById().localValues()) {
-            transitBuilder.getFareZonesById().add(tariffZoneMapper.mapTariffZone(tariffZone));
-        }
+    private TariffZoneMapper mapTariffZones() {
+        TariffZoneMapper tariffZoneMapper = new TariffZoneMapper(
+                getStartOfPeriod(),
+                idFactory,
+                currentNetexIndex.getTariffZonesById()
+        );
+        transitBuilder.getFareZonesById().addAll(tariffZoneMapper.listAllCurrentFareZones());
+        return tariffZoneMapper;
     }
 
-    private void mapStopPlaceAndQuays() {
-        for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
-            Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex.getStopPlaceById().lookup(stopPlaceId);
-            StopAndStationMapper stopMapper = new StopAndStationMapper(
+    private void mapStopPlaceAndQuays(TariffZoneMapper tariffZoneMapper) {
+        StopAndStationMapper stopMapper = new StopAndStationMapper(
                 idFactory,
                 currentNetexIndex.getQuayById(),
-                transitBuilder.getFareZonesById(),
+                tariffZoneMapper,
                 issueStore
-            );
+        );
+        for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
+            Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex.getStopPlaceById().lookup(stopPlaceId);
             stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
-            transitBuilder.getStops().addAll(stopMapper.resultStops);
-            transitBuilder.getStations().addAll(stopMapper.resultStations);
-            stationsByMultiModalStationRfs.putAll(stopMapper.resultStationByMultiModalStationRfs);
         }
+        transitBuilder.getStops().addAll(stopMapper.resultStops);
+        transitBuilder.getStations().addAll(stopMapper.resultStations);
+        stationsByMultiModalStationRfs.putAll(stopMapper.resultStationByMultiModalStationRfs);
+
     }
 
     private void mapMultiModalStopPlaces() {
-        MultiModalStationMapper mapper = new MultiModalStationMapper(idFactory);
+        MultiModalStationMapper mapper = new MultiModalStationMapper(issueStore, idFactory);
         for (StopPlace multiModalStopPlace : currentNetexIndex.getMultiModalStopPlaceById().localValues()) {
             transitBuilder.getMultiModalStationsById().add(
                 mapper.map(
@@ -263,6 +276,7 @@ public class NetexMapper {
 
     private void mapGroupsOfStopPlaces() {
         GroupOfStationsMapper groupOfStationsMapper = new GroupOfStationsMapper(
+                issueStore,
                 idFactory,
                 transitBuilder.getMultiModalStationsById(),
                 transitBuilder.getStations()
@@ -273,9 +287,17 @@ public class NetexMapper {
     }
 
     private void mapFlexibleStopPlaces() {
+        Collection<FlexibleStopPlace> flexibleStopPlaces =
+                currentNetexIndex.getFlexibleStopPlacesById().localValues();
+
+        // Building the indices in FlexStopLocationMapper is expensive, so skip it if not needed
+        if (flexibleStopPlaces.size() == 0) {
+            return;
+        }
+
         FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(idFactory, transitBuilder.getStops().values());
 
-        for (FlexibleStopPlace flexibleStopPlace : currentNetexIndex.getFlexibleStopPlacesById().localValues()) {
+        for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {
             StopLocation stopLocation = flexStopLocationMapper.map(flexibleStopPlace);
             if (stopLocation instanceof FlexStopLocation) {
                 transitBuilder.getLocations().add((FlexStopLocation) stopLocation);
@@ -311,11 +333,13 @@ public class NetexMapper {
 
     private void mapRoute() {
         RouteMapper routeMapper = new RouteMapper(
+                issueStore,
                 idFactory,
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
                 currentNetexIndex,
-                currentNetexIndex.getTimeZone()
+                currentNetexIndex.getTimeZone(),
+                ferryIdsNotAllowedForBicycle
         );
         for (Line line : currentNetexIndex.getLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
@@ -329,6 +353,7 @@ public class NetexMapper {
 
     private void mapTripPatterns(Map<String, FeedScopedId> serviceIds) {
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
+                issueStore,
                 idFactory,
                 transitBuilder.getOperatorsById(),
                 transitBuilder.getStops(),
@@ -364,6 +389,7 @@ public class NetexMapper {
 
     private void mapNoticeAssignments() {
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
+                issueStore,
                 idFactory,
                 currentNetexIndex.getServiceJourneyById().localValues(),
                 currentNetexIndex.getNoticeById(),
@@ -383,5 +409,27 @@ public class NetexMapper {
             groupMapper.addInterchange(
                     currentNetexIndex.getServiceJourneyInterchangeById().localValues());
         }
+    }
+
+    /**
+     * The start of period is used to find the valid entities based on the current time.
+     * This should probably be configurable in the future, or even better incorporate the version
+     * number into the entity id, so we can operate with more than one version of an entity in OTPs
+     * internal model.
+     */
+    private LocalDateTime getStartOfPeriod() {
+        String timeZone = currentNetexIndex.getTimeZone();
+        if(timeZone == null) {
+            LocalDateTime time = LocalDateTime.now(ZoneId.of("UTC"));
+            issueStore.add(
+                    "NetexImportTimeZone",
+                    "No timezone set for the current NeTEx input data file. The import " +
+                    "start-of-period is set to " + time + " UTC, used to check entity validity " +
+                    "periods."
+            );
+            return time;
+
+        }
+        return LocalDateTime.now(ZoneId.of(timeZone));
     }
 }

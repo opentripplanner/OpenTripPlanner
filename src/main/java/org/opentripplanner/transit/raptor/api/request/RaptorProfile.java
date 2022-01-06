@@ -61,4 +61,14 @@ public enum RaptorProfile {
     public boolean isOneOf(RaptorProfile... candidates) {
         return Stream.of(candidates).anyMatch(this::is);
     }
+
+    /**
+     * The {@link org.opentripplanner.transit.raptor.rangeraptor.standard.NoWaitTransitWorker}
+     * will time-shift the arrival-times, so we need to use the approximate trip-times search in
+     * path construction. The BEST_TIME state should not have path construction, but we include it
+     * here anyway.
+     */
+    public boolean useApproximateTripSearch() {
+        return isOneOf(NO_WAIT_STD, NO_WAIT_BEST_TIME);
+    }
 }

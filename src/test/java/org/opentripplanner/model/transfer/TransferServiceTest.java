@@ -1,8 +1,6 @@
 package org.opentripplanner.model.transfer;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.model.transfer.Transfer.MAX_WAIT_TIME_NOT_SET;
-import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 
 import java.util.List;
 import org.junit.Test;
@@ -54,7 +52,8 @@ public class TransferServiceTest implements TransferTestData {
     }
 
 
-    Transfer transfer(TransferPoint from, TransferPoint to) {
-        return new Transfer(from, to, ALLOWED, false, false, MAX_WAIT_TIME_NOT_SET);
+    ConstrainedTransfer transfer(TransferPoint from, TransferPoint to) {
+        var c = TransferConstraint.create().build();
+        return new ConstrainedTransfer(null, from, to, c);
     }
 }

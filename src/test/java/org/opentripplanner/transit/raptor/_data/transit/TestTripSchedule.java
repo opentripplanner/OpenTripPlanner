@@ -177,7 +177,6 @@ public class TestTripSchedule implements RaptorTripSchedule {
             }
             if(pattern == null) {
                 pattern = TestTripPattern.pattern("DummyPattern", new int[arrivalTimes.length]);
-
             }
             if(arrivalTimes.length != pattern.numberOfStopsInPattern()) {
                 throw new IllegalStateException(

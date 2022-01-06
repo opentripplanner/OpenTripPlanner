@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -14,8 +14,10 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
 
     private final TestTripPattern pattern;
     private final List<TestTripSchedule> schedules = new ArrayList<>();
-    private final TestTransferProvider transfersFrom = new TestTransferProvider();
-    private final TestTransferProvider transfersTo = new TestTransferProvider();
+    private final TestConstrainedBoardingSearch transferConstraintsForwardSearch =
+            new TestConstrainedBoardingSearch();
+    private final TestConstrainedBoardingSearch transferConstraintsReverseSearch =
+            new TestConstrainedBoardingSearch();
 
 
     private TestRoute(TestTripPattern pattern) {
@@ -51,13 +53,17 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     }
 
     @Override
-    public RaptorGuaranteedTransferProvider<TestTripSchedule> getGuaranteedTransfersTo() {
-        return transfersTo;
+    public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch() {
+        return transferConstraintsForwardSearch;
     }
 
     @Override
-    public RaptorGuaranteedTransferProvider<TestTripSchedule> getGuaranteedTransfersFrom() {
-        return transfersFrom;
+    public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch() {
+        return transferConstraintsReverseSearch;
+    }
+
+    public List<TestConstrainedTransferBoarding> listTransferConstraintsForwardSearch() {
+        return transferConstraintsForwardSearch.constrainedBoardings();
     }
 
     public TestRoute withTimetable(TestTripSchedule ... trips) {
@@ -81,30 +87,35 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
                 .toString();
     }
 
-    void addGuaranteedTxFrom(
-            TestTripSchedule fromTrip,
-            int fromTripIndex,
-            int fromStopPos,
-            TestTripSchedule toTrip,
-            int toStopPos
+    void addGuaranteedTxForwardSearch(
+            TestTripSchedule sourceTrip,
+            int sourceStopPos,
+            TestTripSchedule targetTrip,
+            int targetTripIndex,
+            int targetStopPos
     ) {
-        int fromTime = fromTrip.arrival(fromStopPos);
-        this.transfersFrom.addGuaranteedTransfers(
-                toTrip, toStopPos, fromTrip, fromTripIndex, fromStopPos, fromTime
+        final int targetTime = targetTrip.arrival(targetStopPos);
+
+        this.transferConstraintsForwardSearch.addGuaranteedTransfers(
+                sourceTrip, sourceStopPos, targetTrip, targetTripIndex, targetStopPos, targetTime
         );
     }
 
-    void addGuaranteedTxTo(
-            TestTripSchedule fromTrip,
-            int fromStopPos,
-            TestTripSchedule toTrip,
-            int toTripIndex,
-            int toStopPos
-            ) {
-        final int toTime = toTrip.departure(toStopPos);
+    /**
+     * Reverse search transfer, the {@code source/target} is the trips in order of the reverse
+     * search, which is opposite from {@code from/to} in the result path.
+     */
+    void addGuaranteedTxReverseSearch(
+            TestTripSchedule sourceTrip,
+            int sourceStopPos,
+            TestTripSchedule targetTrip,
+            int targetTripIndex,
+            int targetStopPos
+    ) {
+        final int targetTime = targetTrip.departure(targetStopPos);
         // This is used in the revers search
-        this.transfersTo.addGuaranteedTransfers(
-                fromTrip, fromStopPos, toTrip, toTripIndex, toStopPos, toTime
+        this.transferConstraintsReverseSearch.addGuaranteedTransfers(
+                sourceTrip, sourceStopPos, targetTrip, targetTripIndex, targetStopPos, targetTime
         );
     }
 }

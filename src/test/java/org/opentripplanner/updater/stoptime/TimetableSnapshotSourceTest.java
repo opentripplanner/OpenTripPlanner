@@ -126,8 +126,8 @@ public class TimetableSnapshotSourceTest {
 
         final TripTimes tripTimes = forToday.getTripTimes(tripIndex);
         for (int i = 0; i < tripTimes.getNumStops(); i++) {
-            assertEquals(PickDrop.CANCELLED, tripTimes.getPickupType(i));
-            assertEquals(PickDrop.CANCELLED, tripTimes.getPickupType(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getPickup(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getDropoff(i));
         }
         assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
     }
@@ -269,7 +269,7 @@ public class TimetableSnapshotSourceTest {
 
         // THEN
         // Find new pattern in graph starting from stop A
-        Stop stopA = graph.index.getStopForId(new FeedScopedId(feedId, "A"));
+        var stopA = graph.index.getStopForId(new FeedScopedId(feedId, "A"));
         // Get trip pattern of last (most recently added) outgoing edge
         // FIXME create a new test to see that add-trip realtime updates work
         TripPattern tripPattern = null;

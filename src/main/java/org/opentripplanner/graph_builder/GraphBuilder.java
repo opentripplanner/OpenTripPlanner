@@ -13,12 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
+import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GraphBuilder implements Runnable {
 
-    private static Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
     private final List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
 
@@ -93,7 +94,9 @@ public class GraphBuilder implements Runnable {
     public static GraphBuilder create(
             BuildConfig config,
             GraphBuilderDataSources dataSources,
-            Graph baseGraph
+            Graph baseGraph,
+            boolean loadStreetGraph,
+            boolean saveStreetGraph
     ) {
 
         boolean hasOsm  = dataSources.has(OSM);
@@ -119,30 +122,18 @@ public class GraphBuilder implements Runnable {
             osmModule.setDefaultWayPropertySetSource(config.osmWayPropertySet);
             osmModule.skipVisibility = !config.areaVisibility;
             osmModule.platformEntriesLinking = config.platformEntriesLinking;
-            osmModule.staticBikeRental = config.staticBikeRental;
             osmModule.staticBikeParkAndRide = config.staticBikeParkAndRide;
             osmModule.staticParkAndRide = config.staticParkAndRide;
             osmModule.banDiscouragedWalking = config.banDiscouragedWalking;
             osmModule.banDiscouragedBiking = config.banDiscouragedBiking;
             osmModule.maxAreaNodes = config.maxAreaNodes;
             graphBuilder.addModule(osmModule);
-            PruneFloatingIslands pruneFloatingIslands = new PruneFloatingIslands();
-            pruneFloatingIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-            pruneFloatingIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-            graphBuilder.addModule(pruneFloatingIslands);
         }
         if ( hasGtfs ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
             for (DataSource gtfsData : dataSources.get(GTFS)) {
 
                 GtfsBundle gtfsBundle = new GtfsBundle((CompositeDataSource)gtfsData);
-
-                // TODO OTP2 - In OTP2 we have deleted the transfer edges from the street graph.
-                //           - The new transfer generation do not take this config param into
-                //           - account any more. This needs some investigation and probably
-                //           - a fix, but we are unsure if this is used any more. The Pathways.txt
-                //           - and osm import replaces this functionality.
-                gtfsBundle.setTransfersTxtDefinesStationPaths(config.useTransfersTxt);
 
                 if (config.parentStopLinking) {
                     gtfsBundle.linkStopsToParentStations = true;
@@ -173,6 +164,17 @@ public class GraphBuilder implements Runnable {
         StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
         streetLinkerModule.setAddExtraEdgesToAreas(config.areaVisibility);
         graphBuilder.addModule(streetLinkerModule);
+
+        // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
+        // existence of stops in islands. If an island has a stop, it actually may be a real island and should
+        // not be removed quite as easily
+        if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
+            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
+            pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+            pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+            graphBuilder.addModule(pruneNoThruIslands);
+        }
+
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
         List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
@@ -214,11 +216,10 @@ public class GraphBuilder implements Runnable {
             if (OTPFeature.FlexRouting.isOn()) {
                 graphBuilder.addModule(new FlexLocationsToStreetEdgesMapper());
             }
-            // The stops can be linked to each other once they are already linked to the street network.
-            if ( ! config.useTransfersTxt) {
-                // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds));
-            }
+
+            // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
+            graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds, config.transferRequests));
+
             // Analyze routing between stops to generate report
             if (OTPFeature.TransferAnalyzer.isOn()) {
                 graphBuilder.addModule(new DirectTransferAnalyzer(
@@ -235,7 +236,14 @@ public class GraphBuilder implements Runnable {
                     )
             );
         }
+
+        if (OTPFeature.DataOverlay.isOn()) {
+            var module = DataOverlayFactory.create(config.dataOverlay);
+            if(module != null) {
+                graphBuilder.addModule(module);
+            }
+        }
+
         return graphBuilder;
     }
 }
-

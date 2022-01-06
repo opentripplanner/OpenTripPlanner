@@ -102,6 +102,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
                 StreetMode.BIKE,
                 StreetMode.BIKE_TO_PARK,
                 StreetMode.BIKE_RENTAL,
+                StreetMode.SCOOTER_RENTAL,
                 StreetMode.FLEXIBLE,
                 StreetMode.CAR_PICKUP,
                 StreetMode.CAR_RENTAL

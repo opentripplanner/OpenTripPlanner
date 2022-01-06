@@ -33,7 +33,7 @@ public class GraphStatisticsResource {
     }
 
     GraphStatisticsResource(RoutingService routingService) {
-        this.graphQL = new GraphQL(StatisticsGraphQLSchemaFactory.createSchema(routingService));
+        this.graphQL = GraphQL.newGraphQL(StatisticsGraphQLSchemaFactory.createSchema(routingService)).build();
     }
 
     @POST @Path("/graphql")

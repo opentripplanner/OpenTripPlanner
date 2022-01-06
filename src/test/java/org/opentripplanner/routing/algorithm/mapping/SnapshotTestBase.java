@@ -8,6 +8,7 @@ import au.com.origin.snapshots.serializers.SerializerType;
 import au.com.origin.snapshots.serializers.SnapshotSerializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.core.util.Separators;
@@ -29,7 +30,6 @@ import java.util.TimeZone;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.SneakyThrows;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
@@ -84,7 +84,7 @@ public abstract class SnapshotTestBase {
         Router router = getRouter();
 
         RoutingRequest request = router.defaultRoutingRequest.clone();
-        request.dateTime = TestUtils.dateInSeconds(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second);
+        request.setDateTime(TestUtils.dateInstant(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second));
         request.maxTransfers = 6;
         request.numItineraries = 6;
         request.searchWindow = Duration.ofHours(5);
@@ -172,7 +172,7 @@ public abstract class SnapshotTestBase {
 
         RoutingRequest arriveBy = request.clone();
         arriveBy.setArriveBy(true);
-        arriveBy.dateTime = departByItineraries.get(0).lastLeg().endTime.toInstant().getEpochSecond();
+        arriveBy.setDateTime(departByItineraries.get(0).lastLeg().endTime.toInstant());
 
         List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy, router);
         sanitizeItinerariesForSnapshot(arriveByItineraries);
@@ -261,6 +261,8 @@ public abstract class SnapshotTestBase {
                 return new QualifiedMode(ApiRequestMode.BICYCLE, Qualifier.PARK);
             case BIKE_RENTAL:
                 return new QualifiedMode(ApiRequestMode.BICYCLE, Qualifier.RENT);
+            case SCOOTER_RENTAL:
+                return new QualifiedMode(ApiRequestMode.SCOOTER, Qualifier.RENT);
             case CAR:
                 return new QualifiedMode(ApiRequestMode.CAR);
             case CAR_TO_PARK:
@@ -332,9 +334,13 @@ public abstract class SnapshotTestBase {
         }
 
         @Override
-        @SneakyThrows
         public String apply(Object[] objects) {
-            return objectMapper.writer(pp).writeValueAsString(objects);
+            try {
+                return objectMapper.writer(pp).writeValueAsString(objects);
+            }
+            catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to process snapshot JSON", e);
+            }
         }
 
         @Override

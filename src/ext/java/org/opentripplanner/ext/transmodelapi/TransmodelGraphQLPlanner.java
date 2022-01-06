@@ -1,31 +1,11 @@
 package org.opentripplanner.ext.transmodelapi;
 
-import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.api.common.Message;
-import org.opentripplanner.api.common.ParameterException;
-import org.opentripplanner.api.mapping.PlannerErrorMapper;
-import org.opentripplanner.api.model.error.PlannerError;
-import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
-import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
-import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
-import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.api.request.BannedStopSet;
-import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.standalone.server.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 
+import graphql.GraphQLException;
+import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,8 +16,28 @@ import java.util.Map;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+import org.opentripplanner.api.common.ParameterException;
+import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
+import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
+import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
+import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
+import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
+import org.opentripplanner.routing.api.request.BannedStopSet;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.standalone.server.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransmodelGraphQLPlanner {
 
@@ -56,19 +56,19 @@ public class TransmodelGraphQLPlanner {
 
             response.plan = res.getTripPlan();
             response.metadata = res.getMetadata();
-
-            for (RoutingError routingError : res.getRoutingErrors()) {
-                response.messages.add(PlannerErrorMapper.mapMessage(routingError).message);
-            }
-
-            response.debugOutput = res.getDebugAggregator().finishedRendering();
+            response.messages = res.getRoutingErrors();
+            response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
+            response.previousPageCursor = res.getPreviousPageCursor();
+            response.nextPageCursor = res.getNextPageCursor();
+        }
+        catch (ParameterException e) {
+            var msg = e.message.get();
+            throw new GraphQLException(msg, e);
         }
         catch (Exception e) {
-            LOG.warn("System error");
-            LOG.error("Root cause: " + e.getMessage(), e);
-            PlannerError error = new PlannerError();
-            error.setMsg(Message.SYSTEM_ERROR);
-            response.messages.add(error.message);
+            LOG.error("System error: " + e.getMessage(), e);
+            response.plan = TripPlanMapper.mapTripPlan(request, List.of());
+            response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
         }
         return response;
     }
@@ -90,7 +90,8 @@ public class TransmodelGraphQLPlanner {
         return new GenericLocation(name, stopId, lat, lon);
     }
 
-    private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+    private RoutingRequest createRequest(DataFetchingEnvironment environment)
+    throws ParameterException {
         TransmodelRequestContext context = environment.getContext();
         Router router = context.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
@@ -102,8 +103,9 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
         callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
 
-        callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(new Date((long) millisSinceEpoch)), Date::new);
+        callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long)millisSinceEpoch)), Date::new);
         callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
+        callWith.argument("pageCursor", request::setPageCursor);
         callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
@@ -127,19 +129,15 @@ public class TransmodelGraphQLPlanner {
         BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
-            try {
-                RoutingRequest.assertTriangleParameters(
-                    request.bikeTriangleSafetyFactor,
-                    request.bikeTriangleTimeFactor,
-                    request.bikeTriangleSlopeFactor
-                );
-                // TODO These are not defined in the graphql schema
-                callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
-                callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
-                callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
-            } catch (ParameterException e) {
-                throw new RuntimeException(e);
-            }
+
+            // Arguments: [ safety, slope, time ]
+            final double[] args = new double[3];
+
+            callWith.argument("triangleFactors.safety", (Double v) -> args[0] = v);
+            callWith.argument("triangleFactors.slope", (Double v) -> args[1] = v);
+            callWith.argument("triangleFactors.time", (Double v) -> args[2] = v);
+
+            request.setTriangleNormalized(args[0], args[1], args[2]);
         }
 
         if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
@@ -175,7 +173,6 @@ public class TransmodelGraphQLPlanner {
         //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
         // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
         //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
-        callWith.argument("allowBikeRental", (Boolean v) -> request.bikeRental = v);
         callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
 
         callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
@@ -222,7 +219,7 @@ public class TransmodelGraphQLPlanner {
             }
         }*/
 
-        if (request.bikeRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
+        if (request.vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }
@@ -234,7 +231,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
         callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode = TransportModeSlack.mapToDomain(v));
         callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
-        callWith.argument("useBikeRentalAvailabilityInformation", (Boolean v) -> request.useBikeRentalAvailabilityInformation = v);
+        callWith.argument("useBikeRentalAvailabilityInformation", (Boolean v) -> request.useVehicleRentalAvailabilityInformation = v);
         callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
         callWith.argument("includePlannedCancellations", (Boolean v) -> request.includePlannedCancellations = v);
         //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);

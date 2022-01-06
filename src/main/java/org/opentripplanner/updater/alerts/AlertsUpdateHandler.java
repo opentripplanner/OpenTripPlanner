@@ -1,5 +1,9 @@
 package org.opentripplanner.updater.alerts;
 
+import static org.opentripplanner.updater.alerts.GtfsRealtimeCauseMapper.getAlertCauseForGtfsRtCause;
+import static org.opentripplanner.updater.alerts.GtfsRealtimeEffectMapper.getAlertEffectForGtfsRtEffect;
+import static org.opentripplanner.updater.alerts.GtfsRealtimeSeverityMapper.getAlertSeverityForGtfsRtSeverity;
+
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -100,7 +104,7 @@ public class AlertsUpdateHandler {
                 stopId = informed.getStopId();
             }
 
-            String agencyId = informed.getAgencyId();
+            String agencyId = null;
             if (informed.hasAgencyId()) {
                 agencyId = informed.getAgencyId().intern();
             }
@@ -130,6 +134,10 @@ public class AlertsUpdateHandler {
                 alertText.addEntity(new EntitySelector.Agency(new FeedScopedId(feedId, agencyId)));
             }
         }
+
+        alertText.severity = getAlertSeverityForGtfsRtSeverity(alert.getSeverityLevel());
+        alertText.cause = getAlertCauseForGtfsRtCause(alert.getCause());
+        alertText.effect = getAlertEffectForGtfsRtEffect(alert.getEffect());
 
         return alertText;
     }

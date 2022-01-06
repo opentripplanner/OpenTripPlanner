@@ -1,25 +1,20 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-import lombok.EqualsAndHashCode;
-import lombok.SneakyThrows;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 public class RaptorRequestTransferCache {
 
-    private final LoadingCache<CacheKey, List<List<RaptorTransfer>>> transferCache;
+    private final LoadingCache<CacheKey, RaptorTransferIndex> transferCache;
 
     public RaptorRequestTransferCache(int maximumSize) {
         transferCache = CacheBuilder.newBuilder()
@@ -27,45 +22,34 @@ public class RaptorRequestTransferCache {
             .build(cacheLoader());
     }
 
-    @SneakyThrows
-    public List<List<RaptorTransfer>> get(
+    public LoadingCache<CacheKey, RaptorTransferIndex> getTransferCache() {
+        return transferCache;
+    }
+
+    public RaptorTransferIndex get(
         List<List<Transfer>> transfersByStopIndex,
         RoutingRequest routingRequest
     ) {
-        return transferCache.get(new CacheKey(
-            transfersByStopIndex,
-            routingRequest
-        ));
+        try {
+            return transferCache.get(new CacheKey(
+                    transfersByStopIndex,
+                    routingRequest
+            ));
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Failed to get item from transfer cache", e);
+        }
     }
 
-    private CacheLoader<CacheKey, List<List<RaptorTransfer>>> cacheLoader() {
+    private CacheLoader<CacheKey, RaptorTransferIndex> cacheLoader() {
         return new CacheLoader<>() {
             @Override
-            public List<List<RaptorTransfer>> load(@javax.annotation.Nonnull CacheKey cacheKey) {
-                return createRaptorTransfersForRequest(
+            public RaptorTransferIndex load(@javax.annotation.Nonnull CacheKey cacheKey) {
+                return RaptorTransferIndex.create(
                         cacheKey.transfersByStopIndex,
                         cacheKey.routingRequest
                 );
             }
         };
-    }
-
-    static List<List<RaptorTransfer>> createRaptorTransfersForRequest(
-        List<List<Transfer>> transfersByStopIndex,
-        RoutingRequest routingRequest
-    ) {
-        return transfersByStopIndex
-            .stream()
-            .map(t -> new ArrayList<>(t
-                .stream()
-                .flatMap(s -> s.asRaptorTransfer(routingRequest).stream())
-                .collect(toMap(
-                    RaptorTransfer::stop,
-                    Function.identity(),
-                    (a, b) -> a.generalizedCost() < b.generalizedCost() ? a : b
-                ))
-                .values()))
-            .collect(toList());
     }
 
     private static class CacheKey {
@@ -108,7 +92,6 @@ public class RaptorRequestTransferCache {
      *
      * TODO: the bikeWalking options are not used.
      */
-    @EqualsAndHashCode
     private static class StreetRelevantOptions {
 
         private final StreetMode transferMode;
@@ -154,6 +137,42 @@ public class RaptorRequestTransferCache {
             this.elevatorBoardTime = routingRequest.elevatorBoardTime;
             this.elevatorHopCost = routingRequest.elevatorHopCost;
             this.elevatorHopTime = routingRequest.elevatorHopTime;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {return true;}
+            if (o == null || getClass() != o.getClass()) {return false;}
+            final StreetRelevantOptions that = (StreetRelevantOptions) o;
+            return Double.compare(that.bikeTriangleSafetyFactor, bikeTriangleSafetyFactor) == 0
+                    && Double.compare(that.bikeTriangleSlopeFactor, bikeTriangleSlopeFactor) == 0
+                    && Double.compare(that.bikeTriangleTimeFactor, bikeTriangleTimeFactor) == 0
+                    && Double.compare(that.maxWheelchairSlope, maxWheelchairSlope) == 0
+                    && Double.compare(that.walkSpeed, walkSpeed) == 0
+                    && Double.compare(that.bikeSpeed, bikeSpeed) == 0
+                    && Double.compare(that.walkReluctance, walkReluctance) == 0
+                    && Double.compare(that.stairsReluctance, stairsReluctance) == 0
+                    && Double.compare(that.turnReluctance, turnReluctance) == 0
+                    && wheelchairAccessible == that.wheelchairAccessible
+                    && elevatorBoardCost == that.elevatorBoardCost
+                    && elevatorBoardTime == that.elevatorBoardTime
+                    && elevatorHopCost == that.elevatorHopCost
+                    && elevatorHopTime == that.elevatorHopTime
+                    && bikeSwitchCost == that.bikeSwitchCost
+                    && bikeSwitchTime == that.bikeSwitchTime
+                    && transferMode == that.transferMode
+                    && optimize == that.optimize;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(
+                    transferMode, optimize, bikeTriangleSafetyFactor, bikeTriangleSlopeFactor,
+                    bikeTriangleTimeFactor, wheelchairAccessible, maxWheelchairSlope, walkSpeed,
+                    bikeSpeed, walkReluctance, stairsReluctance, turnReluctance, elevatorBoardCost,
+                    elevatorBoardTime, elevatorHopCost, elevatorHopTime, bikeSwitchCost,
+                    bikeSwitchTime
+            );
         }
     }
 }

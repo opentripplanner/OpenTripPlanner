@@ -1,52 +1,166 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
-import java.util.Map;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.model.transfer.Transfer;
+import static org.opentripplanner.transit.raptor.api.transit.CostCalculator.ZERO_COST;
+
+import javax.annotation.Nullable;
+import org.opentripplanner.model.base.ValueObjectToStringBuilder;
+import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimized;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
+import org.opentripplanner.transit.raptor.api.path.PathBuilder;
+import org.opentripplanner.transit.raptor.api.path.PathBuilderLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 
 /**
- * This class is used to decorate a {@link TransitPathLeg} with information about guaranteed
- * transfers, and also caches transfer-priority-cost and optimized-wait-time-transfer-cost.
+ * This class is used to decorate a {@link TransitPathLeg} with information about transfers
+ * constraints, and also caches transfer-priority-cost and optimized-wait-time-transfer-cost.
  * <p>
  * The class is only used inside the {@code transferoptimization} package to store temporary
  * path "tails", while building new paths with new transfer points.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class OptimizedPathTail<T extends RaptorTripSchedule> implements TransferOptimized {
+public class OptimizedPathTail<T extends RaptorTripSchedule>
+        extends PathBuilder<T> implements TransferOptimized
+{
 
-    private final TransitPathLeg<T> leg;
-    private final Map<PathLeg<T>, Transfer> transfersTo;
-    private final int transferPriorityCost;
-    private final int waitTimeOptimizedCost;
+    @Nullable
+    private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
+    private final StopPriorityCostCalculator stopPriorityCostCalculator;
+
+    private int transferPriorityCost = TransferConstraint.ZERO_COST;
+    private int waitTimeOptimizedCost = TransferWaitTimeCostCalculator.ZERO_COST;
 
     public OptimizedPathTail(
-            TransitPathLeg<T> leg,
-            Map<PathLeg<T>, Transfer> transfersTo,
-            int transferPriorityCost,
-            int waitTimeOptimizedCost
+            RaptorSlackProvider slackProvider,
+            CostCalculator costCalculator,
+            TransferWaitTimeCostCalculator waitTimeCostCalculator,
+            int[] stopBoardAlightCosts,
+            double extraStopBoardAlightCostsFactor,
+            RaptorStopNameResolver stopNameResolver
     ) {
-        this.transfersTo = transfersTo;
-        this.leg = leg;
-        this.transferPriorityCost = transferPriorityCost;
-        this.waitTimeOptimizedCost = waitTimeOptimizedCost;
+        super(null, slackProvider, costCalculator, stopNameResolver);
+        this.waitTimeCostCalculator = waitTimeCostCalculator;
+        this.stopPriorityCostCalculator = (stopBoardAlightCosts != null || extraStopBoardAlightCostsFactor > 0.01)
+            ? new StopPriorityCostCalculator(
+                extraStopBoardAlightCostsFactor,
+                stopBoardAlightCosts
+            )
+            : null;
     }
 
-    public TransitPathLeg<T> getLeg() {
-        return leg;
+    private OptimizedPathTail(OptimizedPathTail<T> other) {
+        super(other);
+        this.waitTimeCostCalculator = other.waitTimeCostCalculator;
+        this.waitTimeOptimizedCost = other.waitTimeOptimizedCost;
+        this.transferPriorityCost = other.transferPriorityCost;
+        this.stopPriorityCostCalculator = other.stopPriorityCostCalculator;
+    }
+
+    @Override
+    protected void add(PathBuilderLeg<T> newLeg) {
+        addHead(newLeg);
+        // Keep from- and to- times up to date by time-shifting access, transfer and egress legs.
+        newLeg.timeShiftThisAndNextLeg(slackProvider);
+        addTransferPriorityCost(newLeg);
+        addOptimizedWaitTimeCost(newLeg);
+    }
+
+    @Override
+    protected void updateAggregatedFields() {
+        /* Empty, aggregated fields are updated while adding new legs */
     }
 
     /**
-     * A map of all guaranteed transfers for all transfers within this tail. The potential
-     * set of keys are the transfer legs within this tail, but a key-value pair (k=transfer leg, v=
-     * guaranteed transfer) is only added if the guaranteed transfer exists.
+     * Create a deep-copy of this builder.
      */
-    public Map<PathLeg<T>, Transfer> getTransfersTo() {
-        return transfersTo;
+    public OptimizedPathTail<T> mutate() {
+        return new OptimizedPathTail<>(this);
+    }
+
+    /** Start by adding the last transit leg with the egress leg attached. */
+    public OptimizedPathTail<T> addTransitTail(TransitPathLeg<T> leg) {
+        var next = leg.nextLeg();
+        // this can also be a transfer leg to a flex trip
+        if(next.isTransferLeg()) {
+            next = next.nextLeg();
+        }
+        if (next.isEgressLeg()) {
+            egress(next.asEgressLeg().egress());
+            var times = new BoardAndAlightTime(
+                    leg.trip(),
+                    leg.getFromStopPosition(),
+                    leg.getToStopPosition()
+            );
+            transit(leg.trip(), times);
+        } else {
+            throw new IllegalStateException("We expect an egress leg at the end of the RAPTOR path.");
+        }
+        return this;
+    }
+
+    /**
+     * Insert a new transit leg at the head and return the new object. The new tail is returned
+     * with the given transit + transfer leg, earliest-departure-time and the current leg as a
+     * new tail.
+     */
+    public OptimizedPathTail<T> addTransitAndTransferLeg(
+            TransitPathLeg<T> originalLeg,
+            TripToTripTransfer<T> tx
+    ) {
+        head().changeBoardingPosition(tx.to().stopPosition());
+
+        if(!tx.sameStop()) {
+            transfer(tx.getPathTransfer(), tx.to().stop());
+        }
+
+        // The transfer may happen before the original boarding point. If so, the boarding must be
+        // changed so that the leg is valid (not traveling in reverse/back in time). Also, setting
+        // the boarding position to the first stop in the pattern makes sure that all paths start at the
+        // same place; hence the generalized-cost can be compared.
+        // The board position will be changed when a new head is inserted.
+        int boardStopPos = 0;
+
+        var trip = originalLeg.trip();
+        var times = new BoardAndAlightTime(trip, boardStopPos, tx.from().stopPosition());
+        transit(trip, times, tx.constrainedTransfer());
+
+        return this;
+    }
+
+    @Override
+    public OptimizedPath<T> build(int iterationDepartureTime) {
+        return new OptimizedPath<>(
+                createPathLegs(costCalculator, slackProvider),
+                iterationDepartureTime,
+                generalizedCost(),
+                transferPriorityCost,
+                waitTimeOptimizedCost,
+                breakTieCost()
+        );
+    }
+
+    /**
+     * Return the generalized cost for the current set of paths.
+     */
+    public int generalizedCost() {
+        if(skipCostCalc()) { return ZERO_COST; }
+        return legsAsStream()
+                .mapToInt(it -> it.generalizedCost(costCalculator, slackProvider))
+                .sum();
+    }
+
+    /**
+     * The latest possible time to board. We use the first transit leg arrival time
+     * as the limit, you need to board before you alight.
+     */
+    public int latestPossibleBoardingTime() {
+        return head().toTime();
     }
 
     @Override
@@ -65,16 +179,90 @@ public class OptimizedPathTail<T extends RaptorTripSchedule> implements Transfer
         // when more than one transfer point exists between two trips.
         // We calculate this on the fly, because it is not likely to be done very often and
         // the calculation is light-weight.
-        return leg.stream().filter(PathLeg::isTransitLeg).mapToInt(PathLeg::toTime).sum();
+        return legsAsStream()
+                .filter(PathBuilderLeg::isTransit)
+                .mapToInt(PathBuilderLeg::toTime)
+                .sum();
     }
 
     @Override
     public String toString() {
-        return ToStringBuilder.of(OptimizedPathTail.class)
-                .addNum("transferPriorityCost", transferPriorityCost)
-                .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost)
-                .addObj("leg", leg)
-                .addObj("transfersTo", transfersTo)
+        return ValueObjectToStringBuilder.of()
+                .addObj(super.toString())
+                .addText(" [")
+                .addCost(generalizedCost())
+                .addCost(transferPriorityCost, "pri")
+                .addCost(waitTimeOptimizedCost, "wtc")
+                .addText("]")
                 .toString();
+    }
+
+
+    /*private methods */
+
+    private void addTransferPriorityCost(PathBuilderLeg<T> pathLeg) {
+        boolean transferExist = pathLeg.isTransit() && pathLeg.nextTransitLeg() != null;
+        this.transferPriorityCost += OptimizedPath.priorityCost(
+                transferExist, pathLeg::constrainedTransferAfterLeg
+        );
+    }
+
+    /**
+     * Add cost of wait-time, if the given path leg is a transit leg and it is followed by
+     * another transit leg (with a optional transfer leg in between).
+     * <p>
+     *   Guaranteed and stay-seated transfers have zero wait-time cost.
+     * <p>
+     * We could argue that we should include cost for wait-time after FLEX access,
+     * and wait-time before FLEX egress. But since it can be time-shifted, it become almost
+     * impossible to do a proper cost calculation for it. For example, if the FLEX ride is
+     * pre-booked, then it might wait for the passenger.
+     */
+    private void addOptimizedWaitTimeCost(PathBuilderLeg<?> pathLeg) {
+        if(waitTimeCostCalculator == null) { return; }
+
+        waitTimeOptimizedCost += extraStopPriorityCost(pathLeg);
+
+        if(!pathLeg.isTransit() || pathLeg.nextTransitLeg() == null) { return; }
+
+        int waitTime = pathLeg.waitTimeBeforeNextTransitIncludingSlack();
+        if(waitTime < 0) { return; }
+
+        var tx = pathLeg.constrainedTransferAfterLeg();
+
+        if(tx != null) {
+            var c = (TransferConstraint)tx.getTransferConstraint();
+            // If the transfer is stay-seated or guaranteed, then no wait-time cost is added
+            if (c != null && c.isFacilitated()) {
+                if(c.isStaySeated()) {
+                    this.waitTimeOptimizedCost +=
+                            waitTimeCostCalculator.calculateStaySeatedTransferCost();
+                }
+                else if(c.isGuaranteed()) {
+                    this.waitTimeOptimizedCost +=
+                            waitTimeCostCalculator.calculateGuaranteedTransferCost();
+                }
+                return;
+            }
+        }
+
+        this.waitTimeOptimizedCost += waitTimeCostCalculator.calculateOptimizedWaitCost(waitTime);
+    }
+
+    private int extraStopPriorityCost(PathBuilderLeg<?> leg) {
+        if(stopPriorityCostCalculator == null) { return ZERO_COST; }
+
+        int extraCost = ZERO_COST;
+        // Ideally we would like to add the board- & alight-stop-cost when a new transit-leg
+        // is added to the path. But, the board stop is unknown until the leg before it is
+        // added. So, instead of adding the board-stop-cost when it is added, we wait and add it
+        // when a new leg is added in front of it.
+        if(leg.next() != null && leg.next().isTransit()) {
+            extraCost += stopPriorityCostCalculator.extraStopPriorityCost(leg.toStop());
+        }
+        if(leg.isTransit()) {
+            extraCost += stopPriorityCostCalculator.extraStopPriorityCost(leg.toStop());
+        }
+        return extraCost;
     }
 }

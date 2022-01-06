@@ -279,6 +279,19 @@ public final class StopTime implements Comparable<StopTime> {
         return this.getStopSequence() - o.getStopSequence();
     }
 
+    public void cancel() {
+        pickupType = PickDrop.CANCELLED;
+        dropOffType = PickDrop.CANCELLED;
+    }
+
+    public void cancelDropOff() {
+        dropOffType = PickDrop.CANCELLED;
+    }
+
+    public void cancelPickup() {
+        pickupType = PickDrop.CANCELLED;
+    }
+
     @Override
     public String toString() {
       return "StopTime(seq=" + getStopSequence() + " stop=" + getStop().getId() + " trip="

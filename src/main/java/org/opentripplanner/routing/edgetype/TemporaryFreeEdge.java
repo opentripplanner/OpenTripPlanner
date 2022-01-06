@@ -29,10 +29,10 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
         s1.incrementWeight(1);
         s1.setBackMode(null);
 
-        if (s0.isBikeRentingFromStation()
-                && s0.mayKeepRentedBicycleAtDestination()
-                && s0.getOptions().allowKeepingRentedBicycleAtDestination) {
-            s1.incrementWeight(s0.getOptions().keepingRentedBicycleAtDestinationCost);
+        if (s0.isRentingVehicleFromStation()
+                && s0.mayKeepRentedVehicleAtDestination()
+                && s0.getOptions().allowKeepingRentedVehicleAtDestination) {
+            s1.incrementWeight(s0.getOptions().keepingRentedVehicleAtDestinationCost);
         }
 
         return s1.makeState();

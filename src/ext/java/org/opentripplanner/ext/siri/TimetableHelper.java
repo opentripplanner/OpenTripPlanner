@@ -2,6 +2,7 @@ package org.opentripplanner.ext.siri;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
+import static java.util.Collections.EMPTY_LIST;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
@@ -81,19 +83,19 @@ public class TimetableHelper {
         if (journeyEstimatedCalls != null) {
             estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
         } else {
-            estimatedCalls = new ArrayList<>();
+            estimatedCalls = EMPTY_LIST;
         }
 
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {
             recordedCalls = journeyRecordedCalls.getRecordedCalls();
         } else {
-            recordedCalls = new ArrayList<>();
+            recordedCalls = EMPTY_LIST;
         }
 
         boolean stopPatternChanged = false;
 
-        Stop[] modifiedStops = timetable.getPattern().getStopPattern().getStops();
+        var modifiedStops = timetable.getPattern().getStopPattern().getStops();
 
         Trip trip = getTrip(tripId, timetable);
 
@@ -117,7 +119,7 @@ public class TimetableHelper {
         int departureFromPreviousStop = 0;
         int lastArrivalDelay = 0;
         int lastDepartureDelay = 0;
-        for (Stop stop : modifiedStops) {
+        for (var stop : modifiedStops) {
             boolean foundMatch = false;
 
             for (RecordedCall recordedCall : recordedCalls) {
@@ -128,7 +130,7 @@ public class TimetableHelper {
                 foundMatch = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
 
                 if (!foundMatch && stop.isPartOfStation()) {
-                    Stop alternativeStop = graph.index.getStopForId(
+                    var alternativeStop = graph.index.getStopForId(
                             new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue())
                     );
                     if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
@@ -153,7 +155,8 @@ public class TimetableHelper {
                     }
 
                     if (recordedCall.isCancellation() != null && recordedCall.isCancellation()) {
-                        newTimes.cancelStop(callCounter);
+                        modifiedStopTimes.get(callCounter).cancel();
+                        newTimes.setCancelled(callCounter);
                     }
 
                     int arrivalTime = newTimes.getArrivalTime(callCounter);
@@ -204,7 +207,7 @@ public class TimetableHelper {
                     foundMatch = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
                     if (!foundMatch && stop.isPartOfStation()) {
-                        Stop alternativeStop = graph.index
+                        var alternativeStop = graph.index
                             .getStopForId(
                                     new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue())
                             );
@@ -223,7 +226,8 @@ public class TimetableHelper {
                         }
 
                         if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
-                            newTimes.cancelStop(callCounter);
+                            modifiedStopTimes.get(callCounter).cancel();
+                            newTimes.setCancelled(callCounter);
                         }
 
                         boolean isCallPredictionInaccurate = estimatedCall.isPredictionInaccurate() != null && estimatedCall.isPredictionInaccurate();
@@ -234,12 +238,12 @@ public class TimetableHelper {
                         // Update dropoff-/pickuptype only if status is cancelled
                         CallStatusEnumeration arrivalStatus = estimatedCall.getArrivalStatus();
                         if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
-                            newTimes.cancelDropOffForStop(callCounter);
+                            modifiedStopTimes.get(callCounter).cancelDropOff();
                         }
 
                         CallStatusEnumeration departureStatus = estimatedCall.getDepartureStatus();
                         if (departureStatus == CallStatusEnumeration.CANCELLED) {
-                            newTimes.cancelPickupForStop(callCounter);
+                            modifiedStopTimes.get(callCounter).cancelPickup();
                         }
 
                         int arrivalTime = newTimes.getArrivalTime(callCounter);
@@ -345,7 +349,7 @@ public class TimetableHelper {
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
      */
-    public static List<Stop> createModifiedStops(Timetable timetable, EstimatedVehicleJourney journey, RoutingService routingService) {
+    public static List<StopLocation> createModifiedStops(Timetable timetable, EstimatedVehicleJourney journey, RoutingService routingService) {
         if (journey == null) {
             return null;
         }
@@ -357,26 +361,26 @@ public class TimetableHelper {
         if (journeyEstimatedCalls != null) {
             estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
         } else {
-            estimatedCalls = new ArrayList<>();
+            estimatedCalls = EMPTY_LIST;
         }
 
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {
             recordedCalls = journeyRecordedCalls.getRecordedCalls();
         } else {
-            recordedCalls = new ArrayList<>();
+            recordedCalls = EMPTY_LIST;
         }
 
         //Get all scheduled stops
-        Stop[] stops = timetable.getPattern().getStopPattern().getStops();
+        var stops = timetable.getPattern().getStopPattern().getStops();
 
         // Keeping track of visited stop-objects to allow multiple visits to a stop.
         List<Object> alreadyVisited = new ArrayList<>();
 
-        List<Stop> modifiedStops = new ArrayList<>();
+        List<StopLocation> modifiedStops = new ArrayList<>();
 
         for (int i = 0; i < stops.length; i++) {
-            Stop stop = stops[i];
+            StopLocation stop = stops[i];
 
             boolean foundMatch = false;
             if (i < recordedCalls.size()) {
@@ -389,7 +393,7 @@ public class TimetableHelper {
                     boolean stopsMatchById = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
 
                     if (!stopsMatchById && stop.isPartOfStation()) {
-                        Stop alternativeStop = routingService
+                        var alternativeStop = routingService
                             .getStopForId(new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
                             stopsMatchById = true;
@@ -414,7 +418,7 @@ public class TimetableHelper {
                     boolean stopsMatchById = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
                     if (!stopsMatchById && stop.isPartOfStation()) {
-                        Stop alternativeStop = routingService
+                        var alternativeStop = routingService
                             .getStopForId(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
                             stopsMatchById = true;
@@ -455,13 +459,14 @@ public class TimetableHelper {
 
         EstimatedVehicleJourney.EstimatedCalls journeyCalls = journey.getEstimatedCalls();
 
-        if (journeyCalls == null) {
-            return null;
+        List<EstimatedCall> estimatedCalls;
+        if (journeyCalls != null) {
+            estimatedCalls = journeyCalls.getEstimatedCalls();
+        } else {
+            estimatedCalls = EMPTY_LIST;
         }
 
-        List<EstimatedCall> estimatedCalls = journeyCalls.getEstimatedCalls();
-
-        List<Stop> stops = createModifiedStops(timetable, journey, routingService);
+        var stops = createModifiedStops(timetable, journey, routingService);
 
         List<StopTime> modifiedStops = new ArrayList<>();
 
@@ -470,7 +475,7 @@ public class TimetableHelper {
         Set<Object> alreadyVisited = new HashSet<>();
         // modify updated stop-times
         for (int i = 0; i < stops.size(); i++) {
-            Stop stop = stops.get(i);
+            StopLocation stop = stops.get(i);
 
             final StopTime stopTime = new StopTime();
             stopTime.setStop(stop);
@@ -499,7 +504,7 @@ public class TimetableHelper {
                     boolean stopsMatchById = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
                     if (!stopsMatchById && stop.isPartOfStation()) {
-                        Stop alternativeStop = routingService
+                        var alternativeStop = routingService
                             .getStopForId(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
                             stopsMatchById = true;
@@ -513,25 +518,25 @@ public class TimetableHelper {
 
                         CallStatusEnumeration arrivalStatus = estimatedCall.getArrivalStatus();
                         if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
-                            stopTime.setDropOffType(NONE);
+                            stopTime.cancelDropOff();
                         } else if (estimatedCall.getArrivalBoardingActivity() == ArrivalBoardingActivityEnumeration.ALIGHTING) {
                             stopTime.setDropOffType(SCHEDULED);
                         } else if (estimatedCall.getArrivalBoardingActivity() == ArrivalBoardingActivityEnumeration.NO_ALIGHTING) {
                             stopTime.setDropOffType(NONE);
                         } else if (estimatedCall.getArrivalBoardingActivity() == null && i == 0) {
-                            //First stop - default no pickup
+                            //First stop - default no dropoff
                             stopTime.setDropOffType(NONE);
                         }
 
                         CallStatusEnumeration departureStatus = estimatedCall.getDepartureStatus();
                         if (departureStatus == CallStatusEnumeration.CANCELLED) {
-                            stopTime.setPickupType(NONE);
+                            stopTime.cancelPickup();
                         } else if (estimatedCall.getDepartureBoardingActivity() == DepartureBoardingActivityEnumeration.BOARDING) {
                             stopTime.setPickupType(SCHEDULED);
                         } else if (estimatedCall.getDepartureBoardingActivity() == DepartureBoardingActivityEnumeration.NO_BOARDING) {
                             stopTime.setPickupType(NONE);
                         } else if (estimatedCall.getDepartureBoardingActivity() == null && i == (stops.size()-1)) {
-                            //Last stop - default no dropoff
+                            //Last stop - default no pickup
                             stopTime.setPickupType(NONE);
                         }
 
@@ -592,7 +597,7 @@ public class TimetableHelper {
         if (update == null) {
             return null;
         }
-        final List<Stop> stops = timetable.getPattern().getStops();
+        final List<StopLocation> stops = timetable.getPattern().getStops();
 
         VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
 
@@ -614,13 +619,13 @@ public class TimetableHelper {
                 for (int index = 0; index < newTimes.getNumStops(); ++index) {
                     if (!matchFound) {
                         // Delay is set on a single stop at a time. When match is found - propagate delay on all following stops
-                        final Stop stop = stops.get(index);
+                        final var stop = stops.get(index);
 
                         matchFound = stop.getId().getId().equals(monitoredCall.getStopPointRef().getValue());
 
                         if (!matchFound && stop.isPartOfStation()) {
                             FeedScopedId alternativeId = new FeedScopedId(stop.getId().getFeedId(), monitoredCall.getStopPointRef().getValue());
-                            Stop alternativeStop = graph.index.getStopForId(alternativeId);
+                            var alternativeStop = graph.index.getStopForId(alternativeId);
                             if (alternativeStop != null && alternativeStop.isPartOfStation()) {
                                 matchFound = stop.isPartOfSameStationAs(alternativeStop);
                             }

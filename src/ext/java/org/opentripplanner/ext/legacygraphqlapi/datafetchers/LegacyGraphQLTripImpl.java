@@ -169,8 +169,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
             getSource(environment).getRoute().getAgency().getId()
         );
 
-        Stop stop = timetable.getPattern().getStop(0);
-        return new TripTimeOnDate(triptimes, 0, stop, serviceDate
+        return new TripTimeOnDate(triptimes, 0, tripPattern, serviceDate
         );
       } catch (ParseException e) {
         //Invalid date format
@@ -200,8 +199,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
               getSource(environment).getRoute().getAgency().getId()
           );
 
-        Stop stop = timetable.getPattern().getStop(triptimes.getNumStops() - 1);
-        return new TripTimeOnDate(triptimes, triptimes.getNumStops() - 1, stop, serviceDate
+        return new TripTimeOnDate(triptimes, triptimes.getNumStops() - 1, tripPattern, serviceDate
         );
       } catch (ParseException e) {
         //Invalid date format

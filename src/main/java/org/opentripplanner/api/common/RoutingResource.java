@@ -1,28 +1,33 @@
 package org.opentripplanner.api.common;
 
-import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.BannedStopSet;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.util.ResourceBundleSingleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.Duration;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.plan.PageCursor;
+import org.opentripplanner.routing.api.request.BannedStopSet;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.ResourceBundleSingleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -88,6 +93,16 @@ public abstract class RoutingResource {
      */
     @QueryParam("searchWindow")
     protected Integer searchWindow;
+
+    /**
+     * Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last
+     * response and keep the original request as is. This will enable you to search for itineraries
+     * in the next or previous time-window.
+     * <p>
+     * This is an optional parameter.
+     */
+    @QueryParam("pageCursor")
+    public String pageCursor;
 
     /**
      * Search for the best trip options within a time window. If {@code true} two itineraries are
@@ -362,6 +377,38 @@ public abstract class RoutingResource {
     @QueryParam("keepingRentedBicycleAtDestinationCost")
     protected Double keepingRentedBicycleAtDestinationCost;
 
+    /** The vehicle rental networks which may be used. If empty all networks may be used. */
+    @QueryParam("allowedVehicleRentalNetworks")
+    protected Set<String> allowedVehicleRentalNetworks;
+
+    /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+    @QueryParam("bannedVehicleRentalNetworks")
+    protected Set<String> bannedVehicleRentalNetworks;
+
+    /** Time to park a bike */
+    @QueryParam("bikeParkTime")
+    protected Integer bikeParkTime;
+
+    /** Cost of parking a bike. */
+    @QueryParam("bikeParkCost")
+    protected Integer bikeParkCost;
+
+    /** Time to park a car */
+    @QueryParam("carParkTime")
+    protected Integer carParkTime = 60;
+
+    /** Cost of parking a car. */
+    @QueryParam("carParkCost")
+    protected Integer carParkCost = 120;
+
+    /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
+    @QueryParam("requiredVehicleParkingTags")
+    protected Set<String> requiredVehicleParkingTags = Set.of();
+
+    /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
+    @QueryParam("bannedVehicleParkingTags")
+    protected Set<String> bannedVehicleParkingTags = Set.of();
+
     /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
      * TriMet_100 (100 is route short name) or Trimet__42 (two underscores, 42 is the route
@@ -563,16 +610,20 @@ public abstract class RoutingResource {
     protected Boolean reverseOptimizeOnTheFly;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add before boarding a transit leg. It is recommended to use the
+     * `boardTimes` in the `router-config.json` to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("boardSlack")
     private Integer boardSlack;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add after alighting a transit leg. It is recommended to use the
+     * `alightTimes` in the `router-config.json` to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("alightSlack")
     private Integer alightSlack;
 
@@ -650,8 +701,9 @@ public abstract class RoutingResource {
      * Range/sanity check the query parameter fields and build a Request object from them.
      *
      * @throws ParameterException when there is a problem interpreting a query parameter
+     * @param queryParameters incoming request parameters
      */
-    protected RoutingRequest buildRequest() throws ParameterException {
+    protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) throws ParameterException {
         Router router = otpServer.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
 
@@ -677,8 +729,7 @@ public abstract class RoutingResource {
                     if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
                         gregCal.setTimeZone(tz);
                     }
-                    Date d2 = gregCal.getTime();
-                    request.setDateTime(d2);
+                    request.setDateTime(gregCal.toInstant());
                 } catch (DatatypeConfigurationException e) {
                     request.setDateTime(date, time, tz);
                 }
@@ -689,6 +740,9 @@ public abstract class RoutingResource {
 
         if(searchWindow != null) {
             request.searchWindow = Duration.ofSeconds(searchWindow);
+        }
+        if(pageCursor != null) {
+            request.pageCursor = PageCursor.decode(pageCursor);
         }
         if(timetableView != null) {
             request.timetableView = timetableView;
@@ -734,21 +788,40 @@ public abstract class RoutingResource {
             request.bikeSwitchCost = bikeSwitchCost;
 
         if (allowKeepingRentedBicycleAtDestination != null)
-            request.allowKeepingRentedBicycleAtDestination = allowKeepingRentedBicycleAtDestination;
+            request.allowKeepingRentedVehicleAtDestination = allowKeepingRentedBicycleAtDestination;
 
         if (keepingRentedBicycleAtDestinationCost != null)
-            request.keepingRentedBicycleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+            request.keepingRentedVehicleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+
+        if (allowedVehicleRentalNetworks != null)
+            request.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
+
+        if (bannedVehicleRentalNetworks != null)
+            request.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+
+        if (bikeParkCost != null)
+            request.bikeParkCost = bikeParkCost;
+
+        if (bikeParkTime != null)
+            request.bikeParkTime = bikeParkTime;
+
+        if (carParkCost != null)
+            request.carParkCost = carParkCost;
+
+        if (carParkTime != null)
+            request.carParkTime = carParkTime;
+
+        if (bannedVehicleParkingTags != null)
+            request.bannedVehicleParkingTags = bannedVehicleParkingTags;
+
+        if (requiredVehicleParkingTags != null)
+            request.requiredVehicleParkingTags = requiredVehicleParkingTags;
 
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setBicycleOptimizeType(optimize);
             if (optimize == BicycleOptimizeType.TRIANGLE) {
-                RoutingRequest.assertTriangleParameters(
-                        triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor
-                );
-                request.setBikeTriangleSafetyFactor(triangleSafetyFactor);
-                request.setBikeTriangleSlopeFactor(triangleSlopeFactor);
-                request.setBikeTriangleTimeFactor(triangleTimeFactor);
+                request.setTriangleNormalized(triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor);
             }
         }
 
@@ -815,7 +888,7 @@ public abstract class RoutingResource {
             request.modes = modes.getRequestModes();
         }
 
-        if (request.bikeRental && bikeSpeed == null) {
+        if (request.vehicleRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }
@@ -843,9 +916,7 @@ public abstract class RoutingResource {
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;
 
-        final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
-        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useBikeRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
+        request.useVehicleRentalAvailabilityInformation = request.isTripPlannedForNow();
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
             request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);
@@ -874,6 +945,14 @@ public abstract class RoutingResource {
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
+
+        if (OTPFeature.DataOverlay.isOn()) {
+            var queryDataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
+            if (!queryDataOverlayParameters.isEmpty()) {
+                request.dataOverlay = queryDataOverlayParameters;
+            }
+        }
+
         return request;
     }
 

@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
 
 import graphql.Scalars;
+import graphql.scalars.ExtendedScalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
@@ -93,13 +94,13 @@ public class LegType {
             .newFieldDefinition()
             .name("duration")
             .description("The legs's duration in seconds")
-            .type(Scalars.GraphQLLong)
+            .type(ExtendedScalars.GraphQLLong)
             .dataFetcher(env -> leg(env).getDuration())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("directDuration")
-            .type(Scalars.GraphQLLong)
+            .type(ExtendedScalars.GraphQLLong)
             .description("NOT IMPLEMENTED")
             .dataFetcher(env -> leg(env).getDuration())
             .build())
@@ -165,7 +166,7 @@ public class LegType {
             .name("rentedBike")
             .description("Whether this leg is with a rented bike.")
             .type(Scalars.GraphQLBoolean)
-            .dataFetcher(env -> leg(env).rentedBike)
+            .dataFetcher(env -> leg(env).rentedVehicle)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -184,6 +185,7 @@ public class LegType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("fromEstimatedCall")
+            .withDirective(gqlUtil.timingData)
             .description("EstimatedCall for the quay where the leg originates.")
             .type(estimatedCallType)
             .dataFetcher(env -> TripTimeShortHelper.getTripTimeShortForFromPlace(env
@@ -192,6 +194,7 @@ public class LegType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("toEstimatedCall")
+            .withDirective(gqlUtil.timingData)
             .description("EstimatedCall for the quay where the leg ends.")
             .type(estimatedCallType)
             .dataFetcher(env -> TripTimeShortHelper.getTripTimeShortForToPlace(
@@ -226,9 +229,7 @@ public class LegType {
               }
               else {
                 return (
-                    stops.stream().filter(stop -> stop.place.stopId != null).map(s -> {
-                      return GqlUtil.getRoutingService(env).getStopForId(s.place.stopId);
-                    }).filter(Objects::nonNull).collect(Collectors.toList())
+                    stops.stream().map(stop -> stop.place.stop).filter(Objects::nonNull).collect(Collectors.toList())
                 );
               }
             })
@@ -236,6 +237,7 @@ public class LegType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("intermediateEstimatedCalls")
+            .withDirective(gqlUtil.timingData)
             .description(
                 "For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list."
             )
@@ -247,6 +249,7 @@ public class LegType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("serviceJourneyEstimatedCalls")
+            .withDirective(gqlUtil.timingData)
             .description(
                 "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list.")
             .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
@@ -299,6 +302,9 @@ public class LegType {
             .newFieldDefinition()
             .name("bikeRentalNetworks")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+            .dataFetcher(env ->
+                    leg(env).vehicleRentalNetwork == null ? List.of() : List.of(leg(env).vehicleRentalNetwork)
+            )
             .build())
         .build();
   }

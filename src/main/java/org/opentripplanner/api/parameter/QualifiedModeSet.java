@@ -74,6 +74,9 @@ public class QualifiedModeSet implements Serializable {
                  case FUNICULAR:
                      transitModes.add(TransitMode.FUNICULAR);
                      break;
+                 case TROLLEYBUS:
+                     transitModes.add(TransitMode.TROLLEYBUS);
+                     break;
              }
         }
 
@@ -89,6 +92,7 @@ public class QualifiedModeSet implements Serializable {
                 .filter(m ->
                         m.mode == ApiRequestMode.WALK ||
                         m.mode == ApiRequestMode.BICYCLE ||
+                        m.mode == ApiRequestMode.SCOOTER ||
                         m.mode == ApiRequestMode.CAR)
                 .collect(Collectors.toList());
 
@@ -133,6 +137,17 @@ public class QualifiedModeSet implements Serializable {
                         directMode = StreetMode.BIKE;
                     }
                     break;
+                case SCOOTER:
+                    if (requestMode.qualifiers.contains(Qualifier.RENT)) {
+                        accessMode = StreetMode.SCOOTER_RENTAL;
+                        transferMode = StreetMode.SCOOTER_RENTAL;
+                        egressMode = StreetMode.SCOOTER_RENTAL;
+                        directMode = StreetMode.SCOOTER_RENTAL;
+                    } else {
+                        // Only supported as rental mode
+                        throw new IllegalArgumentException();
+                    }
+                    break;
                 case CAR:
                     if (requestMode.qualifiers.contains(Qualifier.RENT)) {
                         accessMode = StreetMode.CAR_RENTAL;
@@ -175,6 +190,11 @@ public class QualifiedModeSet implements Serializable {
                     directMode = StreetMode.FLEXIBLE;
                 }
             }
+        }
+
+        // If we search eg. Transit + flex access and egress, fallback to walking transfers
+        if (transferMode == null) {
+            transferMode = StreetMode.WALK;
         }
 
         return new RequestModes(

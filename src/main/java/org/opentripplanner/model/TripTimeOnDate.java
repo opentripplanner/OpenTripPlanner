@@ -18,44 +18,37 @@ public class TripTimeOnDate {
 
     private final TripTimes tripTimes;
     private final int stopIndex;
-    // This is only needed because TripTimes has no reference to TripPattern/Stop
-    private final Stop stop;
+    // This is only needed because TripTimes has no reference to TripPattern
+    private final TripPattern tripPattern;
     private final ServiceDay serviceDay;
 
-    /**
-     * This is stop-specific, so the index i is a stop index, not a hop index.
-     */
-    public TripTimeOnDate(TripTimes tripTimes, int stopIndex, Stop stop, ServiceDay serviceDay) {
+    public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern, ServiceDay serviceDay) {
         this.tripTimes = tripTimes;
         this.stopIndex = stopIndex;
-        this.stop = stop;
+        this.tripPattern = tripPattern;
         this.serviceDay = serviceDay;
     }
 
-    /**
-     * must pass in both table and trip, because tripTimes do not have stops.
-     */
+    /** Must pass in both Timetable and Trip, because TripTimes do not have a reference to StopPatterns. */
     public static List<TripTimeOnDate> fromTripTimes (Timetable table, Trip trip) {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));        
         List<TripTimeOnDate> out = new ArrayList<>();
-        // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
-            out.add(new TripTimeOnDate(times, i, table.getPattern().getStop(i), null));
+            out.add(new TripTimeOnDate(times, i, table.getPattern(), null));
         }
         return out;
     }
 
     /**
-     * must pass in both table and trip, because tripTimes do not have stops.
+     * Must pass in both Timetable and Trip, because TripTimes do not have a reference to StopPatterns.
      * @param serviceDay service day to set, if null none is set
      */
     public static List<TripTimeOnDate> fromTripTimes(Timetable table, Trip trip,
             ServiceDay serviceDay) {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));
         List<TripTimeOnDate> out = new ArrayList<>();
-        // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
-            out.add(new TripTimeOnDate(times, i, table.getPattern().getStop(i), serviceDay));
+            out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDay));
         }
         return out;
     }
@@ -65,7 +58,7 @@ public class TripTimeOnDate {
     }
 
     public FeedScopedId getStopId() {
-        return stop.getId();
+        return tripPattern.getStopPattern().getStop(stopIndex).getId();
     }
 
     public int getStopIndex() {
@@ -125,12 +118,16 @@ public class TripTimeOnDate {
     }
 
     public boolean isCancelledStop() {
-        return tripTimes.isCancelledStop(stopIndex);
+        return tripTimes.isCancelledStop(stopIndex) ||
+            tripPattern.getStopPattern().getPickup(stopIndex) == PickDrop.CANCELLED
+            && tripPattern.getStopPattern().getDropoff(stopIndex) == PickDrop.CANCELLED;
     }
 
     /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
     public boolean isCanceledEffectively() {
-        return tripTimes.isCancelledStop(stopIndex) || tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced();
+        return isCancelledStop()
+            || tripTimes.isCanceled()
+            || tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced();
     }
 
     public RealTimeState getRealtimeState() {
@@ -153,15 +150,27 @@ public class TripTimeOnDate {
         return tripTimes.getHeadsign(stopIndex);
     }
 
-    public int getPickupType() {
-        return tripTimes.getPickupType(stopIndex).getGtfsCode();
+    public PickDrop getPickupType() {
+        return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
+            ? PickDrop.CANCELLED
+            : tripPattern.getStopPattern().getPickup(stopIndex);
     }
 
-    public int getDropoffType() {
-        return tripTimes.getDropoffType(stopIndex).getGtfsCode();
+    public PickDrop getDropoffType() {
+        return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
+            ? PickDrop.CANCELLED
+            : tripPattern.getStopPattern().getDropoff(stopIndex);
     }
 
     public StopTimeKey getStopTimeKey() {
         return new StopTimeKey(tripTimes.getTrip().getId(), stopIndex);
+    }
+
+    public BookingInfo getPickupBookingInfo() {
+        return tripTimes.getPickupBookingInfo(stopIndex);
+    }
+
+    public BookingInfo getDropOffBookingInfo() {
+        return tripTimes.getDropOffBookingInfo(stopIndex);
     }
 }

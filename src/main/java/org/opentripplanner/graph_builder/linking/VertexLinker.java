@@ -135,6 +135,10 @@ public class VertexLinker {
     }
   }
 
+  public void removePermanentEdgeFromIndex(Edge edge) {
+    removeEdgeFromIndex(edge, Scope.PERMANENT);
+  }
+
   /**
    * This method will link the provided vertex into the street graph. This may involve splitting an
    * existing edge (if the scope is not PERMANENT, the existing edge will be kept).
@@ -329,12 +333,13 @@ public class VertexLinker {
     LineString transformed = equirectangularProject(orig, xScale);
     LocationIndexedLine il = new LocationIndexedLine(transformed);
     LinearLocation ll = il.project(new Coordinate(vertex.getLon() * xScale, vertex.getLat()));
+    double length = SphericalDistanceLibrary.length(orig);
 
     // if we're very close to one end of the line or the other, or endwise, don't bother to split,
     // cut to the chase and link directly
     // We use a really tiny epsilon here because we only want points that actually snap to exactly the same location on the
     // street to use the same vertices. Otherwise the order the stops are loaded in will affect where they are snapped.
-    if (ll.getSegmentIndex() == 0 && ll.getSegmentFraction() < 1e-8) {
+    if (ll.getSegmentIndex() == 0 && (ll.getSegmentFraction() < 1e-8 || ll.getSegmentFraction() * length < 0.1)) {
       return (StreetVertex) edge.getFromVertex();
     }
     // -1 converts from count to index. Because of the fencepost problem, npoints - 1 is the "segment"
@@ -344,8 +349,9 @@ public class VertexLinker {
     }
 
     // nPoints - 2: -1 to correct for index vs count, -1 to account for fencepost problem
-    else if (ll.getSegmentIndex() == orig.getNumPoints() - 2
-        && ll.getSegmentFraction() > 1 - 1e-8) {
+    else if (ll.getSegmentIndex() == orig.getNumPoints() - 2 && (
+      ll.getSegmentFraction() > 1 - 1e-8 || (1 - ll.getSegmentFraction()) * length < 0.1)
+    ) {
       return (StreetVertex) edge.getToVertex();
     }
 
@@ -357,7 +363,7 @@ public class VertexLinker {
       // edges that were missed by WalkableAreaBuilder
       // TODO Temporary code until we refactor the WalkableAreaBuilder (#3152)
       if (scope == Scope.PERMANENT && this.addExtraEdgesToAreas && edge instanceof AreaEdge) {
-        AreaVisibilityAdjuster.linkTransitToAreaVertices(v0, ((AreaEdge) edge).getArea());
+        ((AreaEdge) edge).getArea().addVertex(v0);
       }
 
       // TODO Consider moving this code

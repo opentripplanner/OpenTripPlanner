@@ -1,12 +1,9 @@
 package org.opentripplanner.model.plan;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -16,7 +13,7 @@ import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -108,11 +105,6 @@ public class Leg {
    public Integer routeType = null;
 
    /**
-    * For transit legs, if the rider should stay on the vehicle as it changes route names.
-    */
-   public Boolean interlineWithPreviousLeg;
-
-   /**
     * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
     */
    public String headsign = null;
@@ -173,18 +165,18 @@ public class Leg {
 
    public BookingInfo pickupBookingInfo = null;
 
-    public Transfer transferFromPrevLeg = null;
+    public ConstrainedTransfer transferFromPrevLeg = null;
 
-    public Transfer transferToNextLeg = null;
+    public ConstrainedTransfer transferToNextLeg = null;
 
     /**
      * Is this leg walking with a bike?
      */
     public Boolean walkingBike;
 
-    public Boolean rentedBike;
+    public Boolean rentedVehicle;
 
-   public List<String> bikeRentalNetworks = new ArrayList<>();
+    public String vehicleRentalNetwork;
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
@@ -217,6 +209,14 @@ public class Leg {
        return mode.isTransit();
    }
 
+    /**
+     * For transit legs, if the rider should stay on the vehicle as it changes route names.
+     * This is the same as a stay-seated transfer.
+     */
+    public Boolean isInterlinedWithPreviousLeg() {
+        if(transferFromPrevLeg == null) { return false; }
+        return transferFromPrevLeg.getTransferConstraint().isStaySeated();
+    }
 
   /**
    * A scheduled leg is a leg riding a public scheduled transport including frequency based
@@ -249,22 +249,12 @@ public class Leg {
         streetNotes.add(streetNote);
     }
 
-    public void setTimeZone(TimeZone timeZone) {
-        Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTime(startTime.getTime());
-        startTime = calendar;
-        calendar = Calendar.getInstance(timeZone);
-        calendar.setTime(endTime.getTime());
-        endTime = calendar;
-        agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
-    }
-
     public void addAlert(TransitAlert alert) {
       transitAlerts.add(alert);
     }
 
-    public void addBikeRentalNetworks(Collection<String> networks) {
-      bikeRentalNetworks.addAll(networks);
+    public void setVehicleRentalNetwork(String network) {
+      vehicleRentalNetwork = network;
     }
 
     /**
@@ -300,10 +290,10 @@ public class Leg {
     return isTransitLeg() ? trip.getOperator() : null;
   }
 
-  /** For transit legs, the the route. For non-transit legs, null. */
+  /** For transit legs, the route. For non-transit legs, null. */
   public Route getRoute() { return isTransitLeg() ? trip.getRoute() : null; }
 
-  /** For transit legs, the the trip. For non-transit legs, null. */
+  /** For transit legs, the trip. For non-transit legs, null. */
   public Trip getTrip() {  return trip; }
 
   /** Should be used for debug logging only */
@@ -312,8 +302,8 @@ public class Leg {
       return ToStringBuilder.of(Leg.class)
                 .addObj("from", from)
                 .addObj("to", to)
-                .addCalTime("startTime", startTime)
-                .addCalTime("endTime", endTime)
+                .addTimeCal("startTime", startTime)
+                .addTimeCal("endTime", endTime)
                 .addNum("departureDelay", departureDelay, 0)
                 .addNum("arrivalDelay", arrivalDelay, 0)
                 .addBool("realTime", realTime)
@@ -330,7 +320,6 @@ public class Leg {
                 .addEntityId("routeId", getRoute())
                 .addEntityId("tripId", trip)
                 .addStr("headsign", headsign)
-                .addBool("interlineWithPreviousLeg", interlineWithPreviousLeg)
                 .addObj("serviceDate", serviceDate)
                 .addStr("routeBrandingUrl", routeBrandingUrl)
                 .addCol("intermediateStops", intermediateStops)
@@ -341,8 +330,10 @@ public class Leg {
                 .addStr("boardRule", boardRule)
                 .addStr("alightRule", alightRule)
                 .addBool("walkingBike", walkingBike)
-                .addBool("rentedBike", rentedBike)
-                .addCol("bikeRentalNetworks", bikeRentalNetworks)
+                .addBool("rentedVehicle", rentedVehicle)
+                .addStr("bikeRentalNetwork", vehicleRentalNetwork)
+                .addObj("transferFromPrevLeg", transferFromPrevLeg)
+                .addObj("transferToNextLeg", transferToNextLeg)
                 .toString();
     }
 }

@@ -12,6 +12,7 @@ import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -19,13 +20,12 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
  * <p>
- * With FLEX access Raptor must support access paths with more then one leg.
+ * With FLEX access Raptor must support access paths with more than one leg.
  * These access paths have more transfers that regular paths, hence should not dominate
  * access walking, but only get accepted when they are better on time and/or cost.
  */
@@ -82,7 +82,7 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:20 ~ 6 ~ Walk 1m [0:10 0:21 11m]",
+        "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m]",
         pathsToString(response)
     );
   }
@@ -96,7 +96,7 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:20 ~ 6 ~ Walk 1m [0:10 0:21 11m]",
+        "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m]",
         pathsToString(response)
     );
   }
@@ -108,10 +108,10 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(""
-            + "Flex 3m 2x ~ 4 ~ BUS R1 0:14 0:20 ~ 6 ~ Walk 1m [0:10 0:21 11m $1500]\n"  // ldt
-            + "Flex 2m 2x ~ 3 ~ BUS R1 0:12 0:20 ~ 6 ~ Walk 1m [0:09 0:21 12m $1499]\n" // cost
-            + "Flex 7m 1x ~ 5 ~ BUS R1 0:16 0:20 ~ 6 ~ Walk 1m [0:08 0:21 13m $1500]\n" // tx+time
-            + "Walk 10m ~ 2 ~ BUS R1 0:10 0:20 ~ 6 ~ Walk 1m [0:00 0:21 21m $1500]",    // tx
+            + "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m $1500]\n"  // ldt
+            + "Flex 2m 2x ~ C ~ BUS R1 0:12 0:20 ~ F ~ Walk 1m [0:09 0:21 12m $1499]\n" // cost
+            + "Flex 7m 1x ~ E ~ BUS R1 0:16 0:20 ~ F ~ Walk 1m [0:08 0:21 13m $1500]\n" // tx+time
+            + "Walk 10m ~ B ~ BUS R1 0:10 0:20 ~ F ~ Walk 1m [0:00 0:21 21m $1500]",    // tx
         pathsToString(response)
     );
   }

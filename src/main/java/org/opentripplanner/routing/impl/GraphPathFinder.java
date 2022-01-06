@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.impl;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
@@ -15,10 +18,6 @@ import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
  * the graph until the requested number of them have been found.
@@ -26,10 +25,11 @@ import java.util.List;
  *
  * Its exact behavior will depend on whether the routing request allows transit.
  *
- * When using transit it will incorporate techniques from what we called "long distance" mode, which is designed to
- * provide reasonable response times when routing over large graphs (e.g. the entire Netherlands or New York State).
- * In this case it only uses the street network at the first and last legs of the trip, and all other transfers
- * between transit vehicles will occur via SimpleTransfer edges which are pre-computed by the graph builder.
+ * When using transit it will incorporate techniques from what we called "long distance" mode,
+ * which is designed to provide reasonable response times when routing over large graphs (e.g.
+ * the entire Netherlands or New York State). In this case it only uses the street network at the
+ * first and last legs of the trip, and all other transfers between transit vehicles will occur
+ * via PathTransfer edges which are pre-computed by the graph builder.
  * 
  * More information is available on the OTP wiki at:
  * https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs
@@ -114,16 +114,15 @@ public class GraphPathFinder {
 
     /**
      *  Try to find N paths through the Graph
-     * @throws RoutingValidationException
-     * @throws PathNotFoundException
      */
     public List<GraphPath> graphPathFinderEntryPoint (RoutingRequest request) {
+        long reqTime = request.getDateTimeCurrentPage().getEpochSecond();
 
         // We used to perform a protective clone of the RoutingRequest here.
         // There is no reason to do this if we don't modify the request.
         // Any code that changes them should be performing the copy!
 
-        List<GraphPath> paths = null;
+        List<GraphPath> paths;
         try {
             paths = getPaths(request);
             if (paths == null && request.wheelchairAccessible) {
@@ -148,12 +147,12 @@ public class GraphPathFinder {
                 GraphPath graphPath = gpi.next();
                 // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
                 if (request.arriveBy) {
-                    if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
+                    if (graphPath.states.getLast().getTimeSeconds() > reqTime) {
                         LOG.error("A graph path arrives after the requested time. This implies a bug.");
                         gpi.remove();
                     }
                 } else {
-                    if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
+                    if (graphPath.states.getFirst().getTimeSeconds() < reqTime) {
                         LOG.error("A graph path leaves before the requested time. This implies a bug.");
                         gpi.remove();
                     }

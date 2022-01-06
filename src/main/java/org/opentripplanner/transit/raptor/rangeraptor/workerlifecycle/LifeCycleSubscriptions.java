@@ -1,11 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle;
 
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
+import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 
 /**
@@ -15,6 +14,7 @@ import java.util.function.IntConsumer;
  * collected. This make it possible to decouple the publisher and subscriptions during setup.
  */
 public final class LifeCycleSubscriptions implements WorkerLifeCycle {
+    final List<Consumer<Boolean>> onRouteSearchListeners = new ArrayList<>();
     final List<IntConsumer> setupIterationListeners = new ArrayList<>();
     final List<IntConsumer> prepareForNextRoundListeners = new ArrayList<>();
     final List<Runnable> transitsForRoundCompleteListeners = new ArrayList<>();
@@ -23,6 +23,12 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
     final List<Runnable> iterationCompleteListeners = new ArrayList<>();
 
     private boolean openForSubscription = true;
+
+
+    @Override
+    public void onRouteSearch(Consumer<Boolean> routeSearchWithDirectionSubscriber) {
+        subscribe(onRouteSearchListeners, routeSearchWithDirectionSubscriber);
+    }
 
     @Override
     public void onSetupIteration(IntConsumer setupIterationWithDepartureTime) {

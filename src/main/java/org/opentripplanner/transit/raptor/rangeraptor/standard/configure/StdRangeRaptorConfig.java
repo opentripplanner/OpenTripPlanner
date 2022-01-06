@@ -93,10 +93,10 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         switch (ctx.profile()) {
             case STANDARD:
             case BEST_TIME:
-                return new StdTransitWorker<>(state);
+                return new StdTransitWorker<>(ctx.calculator(), state);
             case NO_WAIT_STD:
             case NO_WAIT_BEST_TIME:
-                return new NoWaitTransitWorker<>(state);
+                return new NoWaitTransitWorker<>(ctx.calculator(), state);
         }
         throw new IllegalArgumentException(ctx.profile().toString());
     }

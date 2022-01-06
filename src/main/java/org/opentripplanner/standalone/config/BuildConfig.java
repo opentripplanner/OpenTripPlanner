@@ -4,18 +4,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is an object representation of the 'build-config.json'.
@@ -75,11 +80,6 @@ public class BuildConfig {
      * Include all transit input files (GTFS) from scanned directory.
      */
     public final boolean transit;
-
-    /**
-     * Create direct transfer edges from transfers.txt in GTFS, instead of based on distance.
-     */
-    public final boolean useTransfersTxt;
 
     /**
      * Link GTFS stops to their parent stops.
@@ -157,11 +157,6 @@ public class BuildConfig {
      * value is {@code false}.
      */
     public final boolean osmCacheDataInMem;
-
-    /**
-     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
-     */
-    public boolean staticBikeRental;
 
     /**
      * Whether we should create car P+R stations from OSM data.
@@ -302,10 +297,17 @@ public class BuildConfig {
      */
     public final StorageConfig storage;
 
+    public final List<RoutingRequest> transferRequests;
+
     /**
      * Visibility calculations for an area will not be done if there are more nodes than this limit.
      */
     public final int maxAreaNodes;
+
+    /**
+     * Config for the DataOverlay Sandbox module
+     */
+    public final DataOverlayConfig dataOverlay;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -344,7 +346,6 @@ public class BuildConfig {
         platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
         readCachedElevations = c.asBoolean("readCachedElevations", true);
         staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
-        staticBikeRental = c.asBoolean("staticBikeRental", false);
         staticParkAndRide = c.asBoolean("staticParkAndRide", true);
         stationTransfers = c.asBoolean("stationTransfers", false);
         streets = c.asBoolean("streets", true);
@@ -352,7 +353,6 @@ public class BuildConfig {
         transit = c.asBoolean("transit", true);
         transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
-        useTransfersTxt = c.asBoolean("useTransfersTxt", false);
         writeCachedElevations = c.asBoolean("writeCachedElevations", false);
         maxAreaNodes = c.asInt("maxAreaNodes", 500);
 
@@ -361,6 +361,18 @@ public class BuildConfig {
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
         netex = new NetexConfig(c.path("netex"));
         storage = new StorageConfig(c.path("storage"));
+        dataOverlay = DataOverlayConfigMapper.map(c.path("dataOverlay"));
+
+        if (c.path("transferRequests") != null && !c.path("transferRequests").asList().isEmpty()) {
+            transferRequests = c
+                .path("transferRequests")
+                .asList()
+                .stream()
+                .map(RoutingRequestMapper::mapRoutingRequest)
+                .collect(Collectors.toUnmodifiableList());
+        } else {
+            transferRequests = List.of(new RoutingRequest());
+        }
 
         if(logUnusedParams) {
             c.logAllUnusedParameters(LOG);

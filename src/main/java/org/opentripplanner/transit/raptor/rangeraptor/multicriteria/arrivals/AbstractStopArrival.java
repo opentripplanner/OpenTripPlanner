@@ -45,17 +45,24 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
      * Transit or transfer.
      *
      * @param previous the previous arrival visited for the current trip
+     * @param paretoRoundIncrement the increment to add to the paretoRound
      * @param stop stop index for this arrival
      * @param arrivalTime the arrival time for this stop index
-     * @param additionalCost the accumulated cost at this stop arrival
+     * @param cost the total accumulated cost at this stop arrival
      */
-    AbstractStopArrival(AbstractStopArrival<T> previous, int stop, int arrivalTime, int additionalCost) {
+    AbstractStopArrival(
+            AbstractStopArrival<T> previous,
+            int paretoRoundIncrement,
+            int stop,
+            int arrivalTime,
+            int cost
+    ) {
         this.previous = previous;
-        this.paretoRound = previous.paretoRound + (isTransitFollowedByTransit() ? 2 : 1);
+        this.paretoRound = previous.paretoRound + paretoRoundIncrement;
         this.stop = stop;
         this.arrivalTime = arrivalTime;
-        this.travelDuration = previous.travelDuration + (arrivalTime - previous.arrivalTime);
-        this.cost = previous.cost + additionalCost;
+        this.travelDuration = previous.travelDuration() + (arrivalTime - previous.arrivalTime());
+        this.cost = cost;
     }
 
     /**
@@ -98,6 +105,7 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
      * @return previous state or throw a NPE if no previousArrival exist.
      */
     final int previousStop() {
+        //noinspection ConstantConditions
         return previous.stop;
     }
 
@@ -123,9 +131,5 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     @Override
     public final int hashCode() {
         throw new IllegalStateException("Avoid using hashCode() and equals() for this class.");
-    }
-
-    private boolean isTransitFollowedByTransit() {
-        return arrivedByTransit() && previous.arrivedByTransit();
     }
 }

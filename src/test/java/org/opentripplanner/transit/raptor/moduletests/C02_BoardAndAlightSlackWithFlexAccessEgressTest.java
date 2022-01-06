@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
@@ -9,8 +9,8 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.p
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -36,12 +36,12 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
 
   /** The expected result is tha same for all tests */
   private static final String EXPECTED_RESULT
-      = "Flex 2m 1x ~ 2 ~ "
-      + "BUS R1 0:04 0:06 ~ 3 ~ "
+      = "Flex 2m 1x ~ B ~ "
+      + "BUS R1 0:04 0:06 ~ C ~ "
       + "Flex 2m 1x "
       + "[0:00:30 0:09:10 8m40s]";
 
-  @Before
+  @BeforeEach
   public void setup() {
     //Given slack: transfer 1m, board 30s, alight 10s
     requestBuilder.slackProvider(

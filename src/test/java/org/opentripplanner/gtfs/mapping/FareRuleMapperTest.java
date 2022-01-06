@@ -8,6 +8,7 @@ import org.onebusaway.gtfs.model.Route;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -45,8 +46,10 @@ public class FareRuleMapperTest {
         FARE_RULE.setRoute(ROUTE);
     }
 
-    private FareRuleMapper subject = new FareRuleMapper(new RouteMapper(new AgencyMapper(FEED_ID)),
-            new FareAttributeMapper());
+    private FareRuleMapper subject = new FareRuleMapper(
+            new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)),
+            new FareAttributeMapper()
+    );
 
     @Test
     public void testMapCollection() throws Exception {

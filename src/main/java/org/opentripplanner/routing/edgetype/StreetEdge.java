@@ -46,6 +46,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
+    private StreetEdgeCostExtension costExtension;
+
     private static final long serialVersionUID = 1L;
 
     /* TODO combine these with OSM highway= flags? */
@@ -72,9 +74,10 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
     private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
     private static final int BICYCLE_NOTHRUTRAFFIC = 7;
+    private static final int WALK_NOTHRUTRAFFIC = 8;
 
     /** back, roundabout, stairs, ... */
-    private byte flags;
+    private short flags;
 
     /**
      * Length is stored internally as 32-bit fixed-point (millimeters). This allows edges of up to ~2100km.
@@ -123,6 +126,9 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         this.setBack(back);
         this.setGeometry(geometry);
         this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
+        if (this.length_mm == 0) {
+            LOG.warn("StreetEdge {} from {} to {} has length of 0. This is usually an error.", name, v1, v2);
+        }
         this.bicycleSafetyFactor = 1.0f;
         this.name = name;
         this.setPermission(permission);
@@ -164,6 +170,11 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
     }
 
+    public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry, I18NString name,
+            StreetTraversalPermission permission, boolean back
+    ) {
+        this(v1, v2, geometry, name, SphericalDistanceLibrary.length(geometry), permission, back);
+    }
 
     /**
      * Checks permissions of the street edge if specified modes are allowed to travel.
@@ -324,7 +335,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
         // Automobiles have variable speeds depending on the edge type
         double speed = calculateSpeed(options, traverseMode, walkingBike);
-        
+
         double time;
         double weight;
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
@@ -431,11 +442,11 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
                 realTurnCost = options.getIntersectionTraversalCostModel().computeTraversalCost(
                         traversedVertex, backPSE, this, traverseMode, options, (float) backSpeed,
-                        (float) speed);                
+                        (float) speed);
             } else {
                 // In case this is a temporary edge not connected to an IntersectionVertex
                 LOG.debug("Not computing turn cost for edge {}", this);
-                realTurnCost = 0; 
+                realTurnCost = 0;
             }
 
             if (!traverseMode.isDriving()) {
@@ -451,8 +462,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             s1.incrementWalkDistance(getEffectiveBikeDistance());
         }
 
+        if (costExtension != null) {
+           weight += costExtension.calculateExtraCost(options, length_mm, traverseMode);
+        }
+
         s1.incrementTimeInSeconds(roundedTime);
-        
+
         s1.incrementWeight(weight);
 
         return s1;
@@ -493,6 +508,10 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
         if (traverseMode.isDriving()) {
             return isMotorVehicleNoThruTraffic();
+        }
+
+        if (traverseMode.isWalking()) {
+            return isWalkNoThruTraffic();
         }
 
         return false;
@@ -682,21 +701,29 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 	    flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
 	}
 
-	public boolean isMotorVehicleNoThruTraffic() {
+        public boolean isWalkNoThruTraffic() {
+            return BitSetUtils.get(flags, WALK_NOTHRUTRAFFIC);
+        }
+
+        public void setWalkNoThruTraffic(boolean noThruTraffic) {
+            flags = BitSetUtils.set(flags, WALK_NOTHRUTRAFFIC, noThruTraffic);
+        }
+
+        public boolean isMotorVehicleNoThruTraffic() {
             return BitSetUtils.get(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC);
-	}
+        }
 
-	public void setMotorVehicleNoThruTraffic(boolean noThruTraffic) {
-	    flags = BitSetUtils.set(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC, noThruTraffic);
-	}
+        public void setMotorVehicleNoThruTraffic(boolean noThruTraffic) {
+            flags = BitSetUtils.set(flags, MOTOR_VEHICLE_NOTHRUTRAFFIC, noThruTraffic);
+        }
 
-    public boolean isBicycleNoThruTraffic() {
-        return BitSetUtils.get(flags, BICYCLE_NOTHRUTRAFFIC);
-    }
+        public boolean isBicycleNoThruTraffic() {
+            return BitSetUtils.get(flags, BICYCLE_NOTHRUTRAFFIC);
+        }
 
-    public void setBicycleNoThruTraffic(boolean noThruTraffic) {
-        flags = BitSetUtils.set(flags, BICYCLE_NOTHRUTRAFFIC, noThruTraffic);
-    }
+        public void setBicycleNoThruTraffic(boolean noThruTraffic) {
+            flags = BitSetUtils.set(flags, BICYCLE_NOTHRUTRAFFIC, noThruTraffic);
+        }
 
 	/**
 	 * This street is a staircase
@@ -742,17 +769,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         return graph.getTurnRestrictions(this);
     }
 
-    /** calculate the length of this street segement from its geometry */
-    protected void calculateLengthFromGeometry () {
-        double accumulatedMeters = 0;
-
-        LineString geom = getGeometry();
-
-        for (int i = 1; i < geom.getNumPoints(); i++) {
-            accumulatedMeters += SphericalDistanceLibrary.distance(geom.getCoordinateN(i - 1), geom.getCoordinateN(i));
-        }
-
-        length_mm = (int) (accumulatedMeters * 1000);
+    public void setCostExtension(StreetEdgeCostExtension costExtension) {
+        this.costExtension = costExtension;
     }
 
     /** Split this street edge and return the resulting street edges. After splitting, the original
@@ -760,16 +778,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     public P2<StreetEdge> splitDestructively(SplitterVertex v, Graph graph) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
-        StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, 0, permission, this.isBack());
-        StreetEdge e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, 0, permission, this.isBack());
+        StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, permission, this.isBack());
+        StreetEdge e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, permission, this.isBack());
 
         // copy the wayId to the split edges, so we can trace them back to their parent if need be
         e1.wayId = this.wayId;
         e2.wayId = this.wayId;
-
-        // figure the lengths, ensuring that they sum to the length of this edge
-        e1.calculateLengthFromGeometry();
-        e2.calculateLengthFromGeometry();
 
         // we have this code implemented in both directions, because splits are fudged half a millimeter
         // when the length of this is odd. We want to make sure the lengths of the split streets end up
@@ -789,11 +803,11 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         }
 
         // TODO: better handle this temporary fix to handle bad edge distance calculation
-        if (e1.length_mm < 0) {
+        if (e1.length_mm <= 0) {
             LOG.error("Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.", e1.wayId, v.getLat(), v.getLon(), e1.length_mm);
             e1.length_mm = 1;
         }
-        if (e2.length_mm < 0) {
+        if (e2.length_mm <= 0) {
             LOG.error("Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.", e2.wayId, v.getLat(), v.getLon(), e2.length_mm);
             e2.length_mm = 1;
         }
@@ -834,15 +848,17 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
         if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
             e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
-                e1.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
-                e1.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
+            e1.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
+            e1.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
+            e1.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e1.setStreetClass(this.getStreetClass());
             tempEdges.addEdge(e1);
         }
         if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
             e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
-                e2.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
-                e2.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
+            e2.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
+            e2.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
+            e2.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e2.setStreetClass(this.getStreetClass());
             tempEdges.addEdge(e2);
         }

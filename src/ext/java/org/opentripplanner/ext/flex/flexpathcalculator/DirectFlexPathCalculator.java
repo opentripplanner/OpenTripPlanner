@@ -33,7 +33,7 @@ public class DirectFlexPathCalculator implements FlexPathCalculator {
     return new FlexPath(
         (int) distance,
         (int) (distance / flexSpeed) + DIRECT_EXTRA_TIME,
-        geometry
+        () -> geometry
     );
   }
 }

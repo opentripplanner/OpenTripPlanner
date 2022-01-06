@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.util.Date;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -30,11 +31,10 @@ public class TripPlanMapper {
             from = legs.get(0).from;
             to = legs.get(legs.size() - 1).to;
         }
-
-        return new TripPlan(from, to, request.getDateTime(), itineraries);
+        return new TripPlan(from, to, Date.from(request.getDateTimeOriginalSearch()), itineraries);
     }
 
     private static Place placeFromGeoLocation(GenericLocation location) {
-        return new Place(location.lat, location.lng, location.label);
+        return Place.normal(location.lat, location.lng, location.label);
     }
 }

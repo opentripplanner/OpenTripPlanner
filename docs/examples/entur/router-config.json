@@ -57,7 +57,9 @@
       "PREFERRED" : 0
     }
   },
-  "bikeRentalServiceDirectoryUrl": "https://api.dev.entur.io/mobility/v1/bikes",
+  "vehicleRentalServiceDirectory": {
+    "url": "https://api.dev.entur.io/mobility/v2/gbfs"
+  },
   "transmodelApi": {
     "hideFeedId" : true
   },

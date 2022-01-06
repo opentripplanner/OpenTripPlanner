@@ -65,22 +65,21 @@ a *pareto-optimal* set of paths which simultaneously optimize at least these cri
 - travel duration (seconds)
 - generalized cost (scalar) (a function of anything other than the above criteria)
 
-We will also experiment with separating other criteria out from the _cost_, such as _walkingDistance_ or
-_operator_. The goal is to make this configurable so each deployment may tune this to their needs. 
-Due to performance reasons it might not be 100% dynamic.
+We will also experiment with separating other criteria out from the _cost_, such as 
+_walkingDistance_ or _operator_. The goal is to make this configurable so each deployment may tune
+this to their needs. Due to performance reasons it might not be 100% dynamic.
 
-Because plain _Raptor_ is much faster than _multi-criteria_ Raptor we will provide an option 
-(request parameter) to run both _RR_  and _McRR_. We use _RR_ as a heuristic 
-optimization, establishing travel time bounds that then feed into McRR. 
-In a bench mark test(SpeedTest), RR takes on average 80ms while McRR with 
-the same configuration takes 400ms. If we add _walking distance_ as an extra criteria the average 
-time increase to 1000ms. (This is based on early testing, the McRR is mutch faster today, because 
-of the optimizations - the numbers is just to give you a feeling of what to expect).
+Because plain _Raptor_ is much faster than _multi-criteria_ Raptor we will provide an option
+(request parameter) to run both _RR_  and _McRR_. We use a _single iteration Rator_ search as a
+heuristic optimization, establishing travel time bounds that then feed into McRR. In a benchmark
+test(SpeedTest), RR may take 80ms while the McRR with the same configuration typically takes 400ms. 
+If we add _walking distance_ as an extra criteria the average time increase to 1000ms. These times 
+are examples to give you an idea of the exponential growth of adding criteria to Raptor search. 
 
 ## Paths and Itineraries 
 In this context, Path and Itineraries are almost the same. We use *Path* to talk about the minimal
-set of data returned by Raptor. Those paths are decorated with information from the transit-layer and used
-to create the itineraries, which are returned from the routing code (to the end user).  
+set of data returned by Raptor. Those paths are decorated with information from the transit-layer 
+and used to create the itineraries, which are returned from the routing code (to the end user).  
 
 ## Pareto optimal/efficiency set
 All paths that are considered *pareto optimal* for a set of criteria are returned by McRR. This 
@@ -92,9 +91,9 @@ filtering capabilities.
 See [Wikipedia](https://en.wikipedia.org/wiki/Pareto_efficiency) A pareto-set of paths/itineraries 
 is a set where all elements are better than (usually less than) than all other elements in the set
 for at least one criterion. Given a set `{ [9,2], [5,6], [3, 8] }` then `[7, 4]` would be accepted 
-into the set. This is because  7 < 9 (comparing the 1st criterion of element 1), while 4 < 6 and 8 (comparing 
-with the 2nd criterion of elements 2 and 3). `[6,7]` would not make it into the set because the existig
-element `[5,6]` is better than the new element for both criteria.
+into the set. This is because  7 < 9 (comparing the 1st criterion of element 1), while 4 < 6 and 8
+(comparing with the 2nd criterion of elements 2 and 3). `[6,7]` would not make it into the set 
+because the existing element `[5,6]` is better than the new element for both criteria.
 
 # Features
 ## Algorithm implementation
