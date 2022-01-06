@@ -120,7 +120,7 @@ public final class Trip extends TransitEntity {
     }
 
     public void setNetexSubmode(String netexSubmode) {
-        this.netexSubmode = netexSubmode.equals(getRoute().getNetexSubmode()) ? null : netexSubmode;
+        this.netexSubmode = netexSubmode == null || netexSubmode.equals(getRoute().getNetexSubmode()) ? null : netexSubmode;
     }
 
     /**
