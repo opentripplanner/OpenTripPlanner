@@ -106,7 +106,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(AlertSeverity.SEVERE, transitAlert.severity);
     assertEquals(priorityValue, transitAlert.priority);
 
-    assertTrue(containsOnlyStopEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Stop.class));
     assertTrue(matchesEntity(transitAlert, stopId));
 
     assertTrue(transitAlert.getStopConditions().contains(StopCondition.DESTINATION));
@@ -208,13 +208,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     return createServiceDelivery(Arrays.asList(situationElement));
   }
 
-  private boolean containsOnlyTripEntities(TransitAlert transitAlert) {
+  private boolean containsOnlyEntitiesOfClass(TransitAlert transitAlert, Class cls) {
     long totalEntityCount = transitAlert.getEntities().size();
-    long tripEntityCount = transitAlert.getEntities()
+    long clsEntityCount = transitAlert.getEntities()
             .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
+            .filter(entitySelector -> cls.isInstance(entitySelector))
             .count();
-    return tripEntityCount > 0 && tripEntityCount == totalEntityCount;
+    return clsEntityCount > 0 && clsEntityCount == totalEntityCount;
   }
 
   private boolean matchesEntity(TransitAlert transitAlert, FeedScopedId feedScopedEntityId) {
@@ -389,7 +389,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertNotNull(stopPatches);
     assertEquals(1, stopPatches.size());
     TransitAlert transitAlert = stopPatches.iterator().next();
-    assertTrue(containsOnlyStopEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Stop.class));
     assertTrue(matchesEntity(transitAlert, stopId0));
 
     assertTrue(
@@ -407,7 +407,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(1, stopPatches.size());
     transitAlert = stopPatches.iterator().next();
 
-    assertTrue(containsOnlyStopEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Stop.class));
     assertTrue(matchesEntity(transitAlert, stopId1));
     ;
 
@@ -449,7 +449,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(1, tripPatches.size());
     final TransitAlert transitAlert = tripPatches.iterator().next();
 
-    assertTrue(containsOnlyTripEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Trip.class));
     assertTrue(matchesEntity(transitAlert, tripId));
 
     assertEquals(situationNumber, transitAlert.getId());
@@ -508,7 +508,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertEquals(transitAlert, datedTransitAlert);
 
-    assertTrue(containsOnlyTripEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Trip.class));
     assertTrue(matchesEntity(transitAlert, tripId));
 
     assertEquals(situationNumber, transitAlert.getId());
@@ -554,42 +554,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     return affects;
   }
 
-  private boolean containsOnlyRouteEntities(TransitAlert transitAlert) {
-    long totalEntityCount = transitAlert.getEntities().size();
-    long routeEntityCount = transitAlert.getEntities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
-            .count();
-    return routeEntityCount > 0 && routeEntityCount == totalEntityCount;
-  }
-
-  private boolean containsOnlyStopEntities(TransitAlert transitAlert) {
-    long totalEntityCount = transitAlert.getEntities().size();
-    long stopEntityCount = transitAlert.getEntities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
-            .count();
-    return stopEntityCount > 0 && stopEntityCount == totalEntityCount;
-  }
-
-  private boolean containsOnlyStopAndRouteEntities(TransitAlert transitAlert) {
-    long totalEntityCount = transitAlert.getEntities().size();
-    long stopAndRouteEntityCount = transitAlert.getEntities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.StopAndRoute)
-            .count();
-    return stopAndRouteEntityCount > 0 && stopAndRouteEntityCount == totalEntityCount;
-  }
-
-  private boolean containsOnlyStopAndTripEntities(TransitAlert transitAlert) {
-    long totalEntityCount = transitAlert.getEntities().size();
-    long stopAndTripEntityCount = transitAlert.getEntities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.StopAndTrip)
-            .count();
-    return stopAndTripEntityCount > 0 && stopAndTripEntityCount == totalEntityCount;
-  }
-
   private AffectedRouteStructure.StopPoints createAffectedStopPoints(String... stopIds) {
     AffectedRouteStructure.StopPoints stopPoints = new AffectedRouteStructure.StopPoints();
     for (String stopId : stopIds) {
@@ -632,7 +596,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final TransitAlert transitAlert = tripPatches.iterator().next();
 
     assertEquals(situationNumber, transitAlert.getId());
-    assertTrue(containsOnlyTripEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Trip.class));
     assertTrue(matchesEntity(transitAlert, tripId));
   }
 
@@ -705,7 +669,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     transitAlert = tripPatches.iterator().next();
 
     assertEquals(situationNumber, transitAlert.getId());
-    assertTrue(containsOnlyStopAndTripEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndTrip.class));
     assertTrue(matchesEntity(transitAlert, stopId1, tripId, serviceDate));
 
   }
@@ -772,7 +736,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(1, tripPatches.size());
     final TransitAlert transitAlert = tripPatches.iterator().next();
 
-    assertTrue(containsOnlyRouteEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Route.class));
     assertTrue(matchesEntity(transitAlert, lineRef));
     assertEquals(situationNumber, transitAlert.getId());
 
@@ -844,7 +808,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertNotNull(tripPatches);
     assertEquals(1, tripPatches.size());
     final TransitAlert transitAlert = tripPatches.iterator().next();
-    assertTrue(containsOnlyRouteEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Route.class));
     assertTrue(matchesEntity(transitAlert, lineRef));
     assertEquals(situationNumber, transitAlert.getId());
 
@@ -906,7 +870,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     TransitAlert transitAlert = tripPatches.iterator().next();
 
     assertEquals(situationNumber, transitAlert.getId());
-    assertTrue(containsOnlyStopAndTripEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndTrip.class));
     assertTrue(matchesEntity(transitAlert, stopId0, tripId, serviceDate));
 
     tripPatches = transitAlertService.getStopAndTripAlerts(stopId1, tripId, serviceDate);
@@ -915,7 +879,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(1, tripPatches.size());
     transitAlert = tripPatches.iterator().next();
     assertEquals(situationNumber, transitAlert.getId());
-    assertTrue(containsOnlyStopAndTripEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndTrip.class));
     assertTrue(matchesEntity(transitAlert, stopId1, tripId, serviceDate));
 
   }
@@ -968,7 +932,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertEquals(situationNumber, transitAlert.getId());
 
-    assertTrue(containsOnlyStopAndRouteEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndRoute.class));
     assertTrue(matchesEntity(transitAlert, feedStop_0_id, feedRouteId));
 
     final FeedScopedId feedStop_1_id = new FeedScopedId(FEED_ID, stopId1);
@@ -980,7 +944,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertEquals(situationNumber, transitAlert.getId());
 
-    assertTrue(containsOnlyStopAndRouteEntities(transitAlert));
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.StopAndRoute.class));
     assertTrue(matchesEntity(transitAlert, feedStop_1_id, feedRouteId));
 
   }
@@ -1169,11 +1133,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     Collection<TransitAlert> alerts = transitAlertService.getAllAlerts();
     assertEquals(1, alerts.size());
     TransitAlert transitAlert = alerts.iterator().next();
-    long unknownSelectorCount = transitAlert.getEntities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
-            .count();
-    assertEquals(1l, unknownSelectorCount);
+    assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Unknown.class));
   }
 
   private AffectsScopeStructure createAffectsLineWithExternallyDefinedStopPlaces(
