@@ -686,6 +686,9 @@ public abstract class RoutingResource {
     @QueryParam("pathComparator")
     private String pathComparator;
 
+    @QueryParam("useVehicleParkingAvailabilityInformation")
+    private Boolean useVehicleParkingAvailabilityInformation;
+
     /**
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -941,6 +944,10 @@ public abstract class RoutingResource {
 
         if(debugItineraryFilter != null ) {
             request.itineraryFilters.debug = debugItineraryFilter;
+        }
+
+        if (useVehicleParkingAvailabilityInformation != null) {
+            request.useVehicleParkingAvailabilityInformation = useVehicleParkingAvailabilityInformation;
         }
 
         //getLocale function returns defaultLocale if locale is null

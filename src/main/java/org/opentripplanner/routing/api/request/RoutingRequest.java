@@ -694,6 +694,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public Set<FormFactor> allowedRentalFormFactors = new HashSet<>();
 
+    /**
+     * If true vehicle parking availability information will be used to plan park and ride trips where it exists.
+     */
+    public boolean useVehicleParkingAvailabilityInformation = false;
+
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 

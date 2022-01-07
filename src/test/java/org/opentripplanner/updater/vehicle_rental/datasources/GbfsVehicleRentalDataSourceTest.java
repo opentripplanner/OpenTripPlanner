@@ -1,13 +1,13 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 
 /**
  * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station models.
@@ -26,7 +26,7 @@ class GbfsVehicleRentalDataSourceTest {
 
         assertTrue(dataSource.update());
 
-        List<VehicleRentalPlace> stations = dataSource.getStations();
+        List<VehicleRentalPlace> stations = dataSource.getUpdates();
         assertEquals(6, stations.size());
         assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.getName().toString().equals("TORVGATA")));
         assertTrue(stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.isAllowDropoff()));
@@ -49,7 +49,7 @@ class GbfsVehicleRentalDataSourceTest {
 
         assertTrue(dataSource.update());
 
-        List<VehicleRentalPlace> stations = dataSource.getStations();
+        List<VehicleRentalPlace> stations = dataSource.getUpdates();
         assertEquals(10, stations.size());
         assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.getName().toString().equals("Kasarmitori")));
         assertTrue(stations.stream().anyMatch(vehicleRentalStation -> vehicleRentalStation.isAllowDropoff()));
