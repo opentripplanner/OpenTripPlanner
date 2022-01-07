@@ -111,6 +111,8 @@ class TransferMapper {
   Collection<MinTimeTransfer> mapMinTimeTransfers(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
     return allTransfers.stream()
             .filter(t -> t.getTransferType() == MIN_TIME)
+            // only use transfers that are stop to stop
+            .filter(t -> t.getFromStop() != null && t.getToStop() != null)
             .filter(Transfer::isMinTransferTimeSet)
             .flatMap(this::expandMinTimeTransfers)
             .collect(Collectors.toList());
