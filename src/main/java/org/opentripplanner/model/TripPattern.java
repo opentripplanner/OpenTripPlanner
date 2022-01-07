@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For NeTEx the
  * JourneyPattern id is used.
  */
-public class TripPattern extends TransitEntity implements Cloneable, Serializable {
+public final class TripPattern extends TransitEntity implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
@@ -55,6 +54,12 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
     private final Route route;
 
+    /**
+     * The stop-pattern help us reuse the same stops in several trip-patterns; Hence
+     * saving memory. The field should not be accessible outside the class, and all access
+     * is done through method delegation, like the {@link #numberOfStops()} and
+     * {@link #canBoard(int)} methods.
+     */
     private final StopPattern stopPattern;
 
     private final Timetable scheduledTimetable = new Timetable(this);
@@ -84,28 +89,40 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         this.stopPattern = stopPattern;
     }
 
+    /** The human-readable, unique name for this trip pattern. */
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
     /**
+     * The GTFS Route of all trips in this pattern.
+     */
+    public Route getRoute() {
+        return route;
+    }
+
+    /**
      * Convenience method to get the route traverse mode, the mode for all trips in this pattern.
      */
-    public final TransitMode getMode() {
+    public TransitMode getMode() {
         return route.getMode();
     }
 
-    public LineString getHopGeometry(int stopIndex) {
+    public LineString getHopGeometry(int stopPosInPattern) {
         if (hopGeometries != null) {
             return CompactLineString.uncompactLineString(
-                    hopGeometries[stopIndex],
+                    hopGeometries[stopPosInPattern],
                     false
             );
         } else {
             return GeometryUtils.getGeometryFactory().createLineString(
                     new Coordinate[]{
-                            coordinate(stopPattern.getStops()[stopIndex]),
-                            coordinate(stopPattern.getStops()[stopIndex + 1])
+                            coordinate(stopPattern.getStop(stopPosInPattern)),
+                            coordinate(stopPattern.getStop(stopPosInPattern + 1))
                     }
             );
         }
@@ -131,13 +148,13 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      * @param other TripPattern to copy geometry from
      */
     public void setHopGeometriesFromPattern(TripPattern other) {
-        this.hopGeometries = new byte[this.getStops().size() - 1][];
+        this.hopGeometries = new byte[numberOfStops() - 1][];
 
         // This accounts for the new TripPattern provided by a real-time update and the one that is
         // being replaced having a different number of stops. In that case the geometry will be
         // preserved up until the first mismatching stop, and a straight line will be used for
         // all segments after that.
-        int sizeOfShortestPattern = Math.min(this.getStops().size(), other.getStops().size());
+        int sizeOfShortestPattern = Math.min(numberOfStops(), other.numberOfStops());
 
         for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
             if (other.getHopGeometry(i) != null
@@ -150,8 +167,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 this.setHopGeometry(i,
                     GeometryUtils.getGeometryFactory().createLineString(
                         new Coordinate[]{
-                            coordinate(getStopPattern().getStops()[i]),
-                            coordinate(getStopPattern().getStops()[i + 1])
+                            coordinate(stopPattern.getStop(i)),
+                            coordinate(stopPattern.getStop(i + 1))
                         }
                     )
                 );
@@ -173,43 +190,47 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         return hopGeometries.length;
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        // The serialized graph contains cyclic references TripPattern <--> Timetable.
-        // The Timetable must be indexed from here (rather than in its own readObject method)
-        // to ensure that the stops field it uses in TripPattern is already deserialized.
-        scheduledTimetable.finish();
+    public int numberOfStops() {
+        return stopPattern.getSize();
     }
 
-    public StopLocation getStop(int stopIndex) {
-        return stopPattern.getStops()[stopIndex];
+    public StopLocation getStop(int stopPosInPattern) {
+        return stopPattern.getStop(stopPosInPattern);
     }
 
-
-    public int getStopIndex(Stop stop) {
-        return Arrays.asList(stopPattern.getStops()).indexOf(stop);
+    public StopLocation firstStop() {
+        return getStop(0);
     }
 
+    public StopLocation lastStop() {
+        return getStop(stopPattern.getSize()-1);
+    }
+
+    /** Read only list of stops */
     public List<StopLocation> getStops() {
-        return Arrays.asList(stopPattern.getStops());
+        return stopPattern.getStops();
     }
 
-    public Trip getTrip(int tripIndex) {
-        return getTrips().get(tripIndex);
-    }
-
-    public int getTripIndex(Trip trip) {
-        return getTrips().indexOf(trip);
+    public int findStopPosition(StopLocation stop) {
+        return stopPattern.findStopPosition(stop);
     }
 
     /** Returns whether passengers can alight at a given stop */
     public boolean canAlight(int stopIndex) {
-        return stopPattern.getDropoff(stopIndex).isRoutable();
+        return stopPattern.canAlight(stopIndex);
     }
 
     /** Returns whether passengers can board at a given stop */
     public boolean canBoard(int stopIndex) {
-        return stopPattern.getPickup(stopIndex).isRoutable();
+        return stopPattern.canBoard(stopIndex);
+    }
+
+    /**
+     * Returns whether passengers can board at a given stop.
+     * This is an inefficient method iterating over the stops, do not use it in routing.
+     */
+    public boolean canBoard(StopLocation stop) {
+        return stopPattern.canBoard(stop);
     }
 
     /** Returns whether a given stop is wheelchair-accessible. */
@@ -223,6 +244,22 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
     public PickDrop getBoardType(int stopIndex) {
         return stopPattern.getPickup(stopIndex);
+    }
+
+    public boolean isBoardAndAlightAt(int stopIndex, PickDrop value) {
+        return getBoardType(stopIndex).is(value) && getAlightType(stopIndex).is(value);
+    }
+
+    public boolean stopPatternIsEqual(TripPattern other) {
+        return stopPattern.equals(other.stopPattern);
+    }
+
+    public Trip getTrip(int tripIndex) {
+        return getTrips().get(tripIndex);
+    }
+
+    public int getTripIndex(Trip trip) {
+        return getTrips().indexOf(trip);
     }
 
     /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
@@ -303,26 +340,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      */
     public List<Trip> getTrips() {
         return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList());
-    }
-
-    /** The human-readable, unique name for this trip pattern. */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * The GTFS Route of all trips in this pattern.
-     */
-    public Route getRoute() {
-        return route;
-    }
-
-    /**
-     * All trips in this pattern call at this sequence of stops. This includes information about GTFS
-     * pick-up and drop-off types.
-     */
-    public StopPattern getStopPattern() {
-        return stopPattern;
     }
 
     /**
@@ -429,19 +446,19 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
             Multimap<StopLocation, TripPattern> vias    = ArrayListMultimap.create();
 
             for (TripPattern pattern : routeTripPatterns) {
-                List<StopLocation> stops = pattern.getStops();
-                StopLocation start = stops.get(0);
-                StopLocation end   = stops.get(stops.size() - 1);
+                StopLocation start = pattern.firstStop();
+                StopLocation end   = pattern.lastStop();
                 starts.put(start, pattern);
                 ends.put(end, pattern);
-                for (StopLocation stop : stops) vias.put(stop, pattern);
+                for (StopLocation stop : pattern.getStops()) {
+                    vias.put(stop, pattern);
+                }
             }
             PATTERN : for (TripPattern pattern : routeTripPatterns) {
-                List<StopLocation> stops = pattern.getStops();
                 StringBuilder sb = new StringBuilder(routeName);
 
                 /* First try to name with destination. */
-                var end = stops.get(stops.size() - 1);
+                var end = pattern.lastStop();
                 sb.append(" to " + stopNameAndId(end));
                 if (ends.get(end).size() == 1) {
                     pattern.setName(sb.toString());
@@ -449,7 +466,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 }
 
                 /* Then try to name with origin. */
-                var start = stops.get(0);
+                var start = pattern.firstStop();
                 sb.append(" from " + stopNameAndId(start));
                 if (starts.get(start).size() == 1) {
                     pattern.setName((sb.toString()));
@@ -466,7 +483,7 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
                 }
 
                 /* Still not unique; try (end, start, via) for each via. */
-                for (var via : stops) {
+                for (var via : pattern.getStops()) {
                     if (via.equals(start) || via.equals(end)) continue;
                     Set<TripPattern> intersection = new HashSet<>();
                     intersection.addAll(remainingPatterns);
@@ -600,6 +617,14 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     public String getFeedId() {
         // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
         return route.getId().getFeedId();
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // The serialized graph contains cyclic references TripPattern <--> Timetable.
+        // The Timetable must be indexed from here (rather than in its own readObject method)
+        // to ensure that the stops field it uses in TripPattern is already deserialized.
+        scheduledTimetable.finish();
     }
 
     private static Coordinate coordinate(StopLocation s) {

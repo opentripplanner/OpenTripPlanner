@@ -201,7 +201,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
         var feedId = graph.getFeedIds().iterator().next();
         var pattern = graph.tripPatternForId.get(new FeedScopedId(feedId, "090z:0:01"));
 
-        assertEquals(3, pattern.getStops().size());
+        assertEquals(3, pattern.numberOfStops());
 
         var tripTimes = pattern.getScheduledTimetable().getTripTimes(0);
         var arrivalTime = tripTimes.getArrivalTime(1);

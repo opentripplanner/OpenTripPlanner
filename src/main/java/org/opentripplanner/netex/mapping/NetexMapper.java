@@ -22,7 +22,6 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
@@ -379,8 +378,8 @@ public class NetexMapper {
                 transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
                 transitBuilder.getTripsById().add(it.getKey());
             }
-            for (TripPattern it : result.tripPatterns) {
-                transitBuilder.getTripPatterns().put(it.getStopPattern(), it);
+            for (var it : result.tripPatterns.entries()) {
+                transitBuilder.getTripPatterns().put(it.getKey(), it.getValue());
             }
             stopTimesByNetexId.putAll(result.stopTimeByNetexId);
             groupMapper.scheduledStopPointsIndex.putAll(result.scheduledStopPointsIndex);

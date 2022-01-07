@@ -90,6 +90,10 @@ public class Station extends TransitEntity implements StopCollection {
     this.geometry = computeGeometry(coordinate, childStops);
   }
 
+  public boolean includes(StopLocation stop) {
+    return childStops.contains(stop);
+  }
+
   @Override
   public String toString() {
     return "<Station " + getId() + ">";

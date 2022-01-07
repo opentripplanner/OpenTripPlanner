@@ -150,7 +150,7 @@ public class TransfersReport {
             Trip trip,
             boolean arrival
     ) {
-        if(pattern == null || stopPosition >= pattern.getStopPattern().getSize()) {
+        if(pattern == null || stopPosition >= pattern.numberOfStops()) {
             r.loc += "[Stop position not found: " + stopPosition + "]";
             return;
         }

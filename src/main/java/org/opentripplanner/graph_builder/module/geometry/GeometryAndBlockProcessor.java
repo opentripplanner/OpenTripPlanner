@@ -5,6 +5,15 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
@@ -32,24 +41,14 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
@@ -225,8 +224,8 @@ public class GeometryAndBlockProcessor {
                     }
                     TripPattern prevPattern = patternForTripTimes.get(prev);
                     TripPattern currPattern = patternForTripTimes.get(curr);
-                    var fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
-                    var toStop = currPattern.getStop(0);
+                    var fromStop = prevPattern.lastStop();
+                    var toStop = currPattern.firstStop();
                     double teleportationDistance = SphericalDistanceLibrary.fastDistance(
                             fromStop.getLat(),
                             fromStop.getLon(),

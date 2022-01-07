@@ -1,9 +1,14 @@
 package org.opentripplanner.ext.siri;
 
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
@@ -17,14 +22,6 @@ import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
-
-import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class is used for matching TripDescriptors without trip_ids to scheduled GTFS data and to
@@ -237,7 +234,7 @@ public class SiriFuzzyTripMatcher {
                         }
                     }
                 }
-                String lastStopId = tripPattern.getStops().get(tripPattern.getStops().size()-1).getId().getId();
+                String lastStopId = tripPattern.lastStop().getId().getId();
 
                 TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
                 if (tripTimes != null) {

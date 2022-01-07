@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.val;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopLocation;
@@ -115,9 +116,9 @@ public class TransferIndexGenerator {
         var result = new ArrayList<TPoint>();
 
         for (TripPatternWithRaptorStopIndexes pattern : patterns) {
-            var stops = pattern.getPattern().getStopPattern().getStops();
-            for (int pos = 0; pos < stops.length; ++pos) {
-                if (point.getStation() == stops[pos].getParentStation()) {
+            var tripPattern = pattern.getPattern();
+            for (int pos = 0; pos < tripPattern.numberOfStops(); ++pos) {
+                if (point.getStation() == tripPattern.getStop(pos).getParentStation()) {
                     result.add(new TPoint(pattern, sourcePoint, null, pos));
                 }
             }
@@ -132,9 +133,9 @@ public class TransferIndexGenerator {
 
         var result = new ArrayList<TPoint>();
         for (TripPatternWithRaptorStopIndexes pattern : patterns) {
-            var stops = pattern.getPattern().getStopPattern().getStops();
-            for (int pos = 0; pos < stops.length; ++pos) {
-                if (point.getStop() == stops[pos]) {
+            val p = pattern.getPattern();
+            for (int pos = 0; pos < p.numberOfStops(); ++pos) {
+                if (point.getStop() == p.getStop(pos)) {
                     result.add(new TPoint(pattern, sourcePoint, null, pos));
                 }
             }
@@ -185,7 +186,7 @@ public class TransferIndexGenerator {
         boolean canBoard() {
             // We prevent boarding at the last stop, this might be enforced by the
             // canBoard method, but we do not trust it here.
-            int lastStopPosition = pattern.getPattern().getStopPattern().getSize() - 1;
+            int lastStopPosition = pattern.getPattern().numberOfStops() - 1;
             return stopPosition != lastStopPosition && pattern.getPattern().canBoard(stopPosition);
         }
 

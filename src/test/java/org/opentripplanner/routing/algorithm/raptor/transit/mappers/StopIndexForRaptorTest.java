@@ -33,18 +33,18 @@ public class StopIndexForRaptorTest {
     @Test public void listStopIndexesForEmptyTripPattern() {
         StopIndexForRaptor stopIndex = new StopIndexForRaptor(STOPS, TransitTuningParameters.FOR_TEST);
 
-        int[] result = stopIndex.listStopIndexesForStops(new Stop[0]);
+        int[] result = stopIndex.listStopIndexesForStops(List.of());
 
         assertEquals(result.length, 0);
     }
 
 
     @Test public void listStopIndexesForTripPattern() {
-        StopLocation[] input = new Stop[] {
+        List<StopLocation> input = List.of(
                 STOP_0,
                 STOP_2,
                 STOP_4
-        };
+        );
 
         StopIndexForRaptor stopIndex = new StopIndexForRaptor(STOPS, TransitTuningParameters.FOR_TEST);
 

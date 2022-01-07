@@ -51,11 +51,11 @@ public final class StopIndexForRaptor {
     /**
      * Create a list of stop indexes for a given list of stops.
      */
-    public int[] listStopIndexesForStops(StopLocation[] stops) {
-        int[] stopIndex = new int[stops.length];
+    public int[] listStopIndexesForStops(List<StopLocation> stops) {
+        int[] stopIndex = new int[stops.size()];
 
-        for (int i = 0; i < stops.length; i++) {
-            stopIndex[i] = indexByStop.get(stops[i]);
+        for (int i = 0; i < stops.size(); i++) {
+            stopIndex[i] = indexByStop.get(stops.get(i));
         }
         return stopIndex;
     }
