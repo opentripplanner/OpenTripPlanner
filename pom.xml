@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>14</otp.serialization.version.id>
+        <otp.serialization.version.id>15</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>25.2</geotools.version>
         <jackson.version>2.12.5</jackson.version>
@@ -458,6 +458,12 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-jersey2</artifactId>
             <version>${micrometer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-influx</artifactId>
+            <version>${micrometer.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- netcdf4 -->

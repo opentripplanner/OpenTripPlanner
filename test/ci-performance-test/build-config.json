@@ -1,0 +1,37 @@
+{
+  "dataImportReport": true,
+  "transit": true,
+  "useTransfersTxt": false,
+  "parentStopLinking": true,
+  "stationTransfers": false,
+  "subwayAccessTime": 0,
+  "streets": true,
+  "embedRouterConfig": true,
+  "areaVisibility": true,
+  "platformEntriesLinking": true,
+  "matchBusRoutesToStreets": false,
+  "osmWayPropertySet": "norway",
+  "staticParkAndRide": true,
+  "staticBikeParkAndRide": true,
+  "maxDataImportIssuesPerFile": 1000,
+  "maxInterlineDistance": 200,
+  "islandWithoutStopsMaxSize": 5,
+  "islandWithStopsMaxSize": 5,
+  "banDiscouragedWalking": false,
+  "banDiscouragedBiking": false,
+  "maxTransferDistance": 2000,
+  "extraEdgesStopPlatformLink": true,
+  "distanceBetweenElevationSamples": 25,
+  "multiThreadElevationCalculations": true,
+  "netex": {
+    "sharedFilePattern": "_stops.xml",
+    "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
+    "groupFilePattern": "(\\w{3})_.*\\.xml",
+    "netexFeedId": "RB",
+    "ferryIdsNotAllowedForBicycle": [
+      "NYC:Line:1",
+      "NYC:Line:012fc5c4-131b-4dfc-8160-4e49136e531a",
+      "NYC:Line:8bfef12a-ac98-4376-8a2a-eb5a336d107b"
+    ]
+  }
+}

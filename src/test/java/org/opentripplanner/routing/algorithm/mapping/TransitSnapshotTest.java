@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -94,7 +94,7 @@ public class TransitSnapshotTest
         RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
-                Set.of(TransitMode.values())
+            AllowedTransitMode.getAllTransitModes()
         );
         request.from = p1;
         request.to = p2;
@@ -107,7 +107,7 @@ public class TransitSnapshotTest
         RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
-                Set.of(TransitMode.values())
+            AllowedTransitMode.getAllTransitModes()
         );
         request.from = ps;
         request.to = p3;
@@ -120,7 +120,7 @@ public class TransitSnapshotTest
         RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
         request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, StreetMode.WALK,
-                Set.of(TransitMode.values())
+            AllowedTransitMode.getAllTransitModes()
         );
         request.from = ptc;
         request.to = p3;

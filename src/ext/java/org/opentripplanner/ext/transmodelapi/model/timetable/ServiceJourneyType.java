@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.timetable;
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
+import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -13,6 +14,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -21,6 +23,7 @@ import org.opentripplanner.util.PolylineEncoder;
 
 import java.util.stream.Collectors;
 
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
 
 public class ServiceJourneyType {
@@ -71,10 +74,17 @@ public class ServiceJourneyType {
 //                        .build())
 
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("transportMode")
+                    .type(TRANSPORT_MODE)
+                    .dataFetcher(environment -> ((trip(environment)).getMode()))
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("transportSubmode")
                     .type(TRANSPORT_SUBMODE)
-                    .description("The transport submode of the journey, if different from lines transport submode. NOT IMPLEMENTED")
-                    .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
+                    .dataFetcher(environment -> {
+                        final String netexSubmode = ((trip(environment))).getNetexSubmode();
+                        return netexSubmode != null ? TransmodelTransportSubmode.fromValue(netexSubmode): null;
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("publicCode")

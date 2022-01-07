@@ -857,11 +857,7 @@ public class TransmodelGraphQLSchema {
                     .filter(route -> publicCodes.contains(route.getShortName()));
               }
               if (environment.getArgument("transportModes") != null) {
-
-                Set<TraverseMode> modes = (
-                    (List<TraverseMode>) environment.getArgument("transportModes")
-                ).stream().filter(TraverseMode::isTransit).collect(Collectors.toSet());
-                // TODO OTP2 - FIX THIS, THIS IS A BUG
+                Set<TransitMode> modes = Set.copyOf(environment.getArgument("transportModes"));
                 stream = stream.filter(route -> modes.contains(route.getMode()));
               }
               if ((environment.getArgument("authorities") instanceof Collection)) {

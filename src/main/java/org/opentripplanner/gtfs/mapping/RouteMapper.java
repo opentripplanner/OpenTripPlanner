@@ -38,7 +38,7 @@ class RouteMapper {
         lhs.setShortName(rhs.getShortName());
         lhs.setLongName(rhs.getLongName());
         int routeType = rhs.getType();
-        lhs.setType(routeType);
+        lhs.setGtfsType(routeType);
         TransitMode mode = TransitModeMapper.mapMode(routeType);
         if (mode == null) {
             issueStore.add(

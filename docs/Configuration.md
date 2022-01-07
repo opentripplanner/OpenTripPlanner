@@ -990,6 +990,10 @@ or position relative to their scheduled stops.
 Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks including the number
 of bikes and free parking spaces at each station. We support vehicle rental systems from using GBFS feed format.
 
+### Vehicle parking (sandbox feature)
+
+Vehicle parking options and configuration is documented in its [sandbox documentation](sandbox/VehicleParking.md).
+
 ### Configuring real-time updaters
 
 Real-time data can be provided using either a pull or push system. In a pull configuration, the GTFS-RT consumer polls the
