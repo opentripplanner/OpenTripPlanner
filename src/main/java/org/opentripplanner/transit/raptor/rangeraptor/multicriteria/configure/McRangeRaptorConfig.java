@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McTransitWorker;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.Stops;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -46,7 +46,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     /* private factory methods */
 
     private RoutingStrategy<T> createTransitWorkerStrategy(McRangeRaptorWorkerState<T> state) {
-        return new McTransitWorker<>(
+        return new MultiCriteriaRoutingStrategy<>(
                 state,
                 context.slackProvider(),
                 context.costCalculator(),

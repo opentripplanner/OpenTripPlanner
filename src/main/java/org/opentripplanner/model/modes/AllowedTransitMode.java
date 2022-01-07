@@ -49,9 +49,7 @@ public class AllowedTransitMode {
    * Returns a set of AllowedModes that will cover all available TransitModes except airplane.
    */
   public static Set<AllowedTransitMode> getAllTransitModesExceptAirplane() {
-    return Arrays
-        .stream(TransitMode.values())
-        .filter(t -> !t.equals(TransitMode.AIRPLANE))
+    return TransitMode.transitModesExceptAirplane().stream()
         .map(m -> new AllowedTransitMode(m, null))
         .collect(Collectors.toSet());
   }

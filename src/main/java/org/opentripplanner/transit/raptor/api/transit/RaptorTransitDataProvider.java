@@ -6,10 +6,10 @@ import javax.validation.constraints.NotNull;
 
 
 /**
- * This interface defines the data needed for the StdTransitWorker to do transit. This interface
- * defines that role, and make it possible to write small adapter in between the "OTP Transit Layer"
- * and the Raptor algorithm. This also simplify the use of the Worker with other data sources,
- * importing and adapting this code into other software like OTP.
+ * This interface defines the data needed by Raptor. It is the main/top-level interface and together
+ * with the {@link org.opentripplanner.transit.raptor.api.request.RaptorRequest} if provide all
+ * information needed by Raptor to perform the search. It makes it possible to write small adapter
+ * between the "OTP Transit Layer" and the Raptor algorithm.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
