@@ -326,7 +326,7 @@ public class NycFareServiceImpl implements FareService {
 
 			Ride ride = RideMapper.rideForTransitPathLeg(leg);
 			Route route = leg.getRoute();
-			int routeType = route.getType();
+			int routeType = route.getGtfsType();
 
 			// Note the old implementation directly used the ints as classifiers here.
 			if (routeType == 1) {

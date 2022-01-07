@@ -92,7 +92,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         subject.getStops().add(STOP_2);
 
         // Add Route
-        route.setType(3);
+        route.setGtfsType(3);
         route.setMode(TransitMode.BUS);
         subject.getRoutes().add(route);
 

@@ -2,6 +2,9 @@ package org.opentripplanner.model;
 
 import java.util.EnumSet;
 
+/**
+ * Equivalent to GTFS route_type or to NeTEx TransportMode.
+ */
 public enum TransitMode {
   RAIL,
   COACH,

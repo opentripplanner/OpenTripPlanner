@@ -40,6 +40,8 @@ public final class Stop extends StationElement implements StopLocation {
    */
   private final TransitMode vehicleType;
 
+  private final String netexSubmode;
+
   private HashSet<BoardingArea> boardingAreas;
 
   public Stop(
@@ -54,7 +56,8 @@ public final class Stop extends StationElement implements StopLocation {
       Collection<FareZone> fareZones,
       String url,
       TimeZone timeZone,
-      TransitMode vehicleType
+      TransitMode vehicleType,
+      String netexSubmode
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
     this.platformCode = platformCode;
@@ -62,6 +65,7 @@ public final class Stop extends StationElement implements StopLocation {
     this.url = url;
     this.timeZone = timeZone;
     this.vehicleType = vehicleType;
+    this.netexSubmode = netexSubmode;
   }
 
   /**
@@ -75,6 +79,7 @@ public final class Stop extends StationElement implements StopLocation {
         idAndName,
         null,
         new WgsCoordinate(lat, lon),
+        null,
         null,
         null,
         null,
@@ -134,5 +139,10 @@ public final class Stop extends StationElement implements StopLocation {
   @Override
   public Geometry getGeometry() {
     return GeometryUtils.getGeometryFactory().createPoint(getCoordinate().asJtsCoordinate());
+  }
+
+  @Override
+  public String getVehicleSubmode() {
+    return netexSubmode;
   }
 }

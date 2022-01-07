@@ -1353,6 +1353,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "15"
@@ -1362,7 +1363,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "15",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r015.htm"
             },
             "serviceId": {
@@ -2608,6 +2608,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "15"
@@ -2617,7 +2618,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "15",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r015.htm"
             },
             "serviceId": {
@@ -3863,6 +3863,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "15"
@@ -3872,7 +3873,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "15",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r015.htm"
             },
             "serviceId": {
@@ -5118,6 +5118,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "15"
@@ -5127,7 +5128,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "15",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r015.htm"
             },
             "serviceId": {
@@ -6373,6 +6373,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "15"
@@ -6382,7 +6383,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "15",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r015.htm"
             },
             "serviceId": {
@@ -7642,6 +7642,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "20"
@@ -7651,7 +7652,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "20",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r020.htm"
             },
             "serviceId": {
@@ -8641,6 +8641,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "20"
@@ -8650,7 +8651,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "20",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r020.htm"
             },
             "serviceId": {
@@ -9640,6 +9640,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "20"
@@ -9649,7 +9650,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "20",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r020.htm"
             },
             "serviceId": {
@@ -10330,6 +10330,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "70"
@@ -10339,7 +10340,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "70",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r070.htm"
             },
             "serviceId": {
@@ -10932,6 +10932,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "77"
@@ -10941,7 +10942,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "77",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r077.htm"
             },
             "serviceId": {
@@ -11847,6 +11847,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "20"
@@ -11856,7 +11857,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "20",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r020.htm"
             },
             "serviceId": {
@@ -12067,6 +12067,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                 "url": "http://trimet.org"
               },
               "bikesAllowed": "UNKNOWN",
+              "gtfsType": 3,
               "id": {
                 "feedId": "prt",
                 "id": "15"
@@ -12076,7 +12077,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "shortName": "15",
               "sortOrder": -999,
               "sortOrderSet": false,
-              "type": 3,
               "url": "http://trimet.org/schedules/r015.htm"
             },
             "serviceId": {
