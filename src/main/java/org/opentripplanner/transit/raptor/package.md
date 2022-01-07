@@ -160,8 +160,9 @@ There are three `RoutingStrategy` implementations:
    _forward_ and _reverse_ search and is used to find the path with the best _arrival-time_.
 2. The `MinTravelDurationRoutingStrategy` is the same as the standard, but optimize on 
    travel-duration, eliminating _wait-time_ (except board and alight slack). It supports both
-   _forward_ and _reverse_ search. The main usage for this is to compute heuristics used to improve
-   the performance in the multi-criteria search. It is used to compute various heuristics, like
+   _forward_ and _reverse_ search, but only one Range Raptor iteration (no search window). 
+   The main usage for this is to compute heuristics used to improve the performance in the
+   multi-criteria search. It is used to compute various heuristics, like
    _minimum-number-of-transfers_, _minimum-travel-time_ and _earliest-possible-arrival-time_.
 3. The `McTransitWorker` is the _Multi-Criteria Range Raptor_ implementation. It does **not**
    support _reverse_ search - so far there has not been a need for it.

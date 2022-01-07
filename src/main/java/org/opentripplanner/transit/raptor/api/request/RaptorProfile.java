@@ -30,7 +30,7 @@ public enum RaptorProfile {
 
     /**
      * Used by Raptor to find the shortest travel duration ignoring wait-time. It also finds
-     * number transfers.
+     * number transfers. This profile can only be used with one Raptor iteration - no {code searchWindow}. 
      */
     MIN_TRAVEL_DURATION("MinTravelDuration"),
 

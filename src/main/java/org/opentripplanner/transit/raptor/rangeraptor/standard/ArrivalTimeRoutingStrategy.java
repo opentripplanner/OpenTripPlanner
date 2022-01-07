@@ -18,7 +18,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  * of this class.
  * <p>
  * Note! This strategy can be used with RangeRaptor - iterating over a time-window to get pareto
- * optimal solution for departure time. Witch is outside the scope of this class.
+ * optimal solution for departure time. Which is outside the scope of this class.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

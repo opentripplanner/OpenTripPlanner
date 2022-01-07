@@ -18,8 +18,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  * Note! Raptor give us number-of-transfer as a second pareto criteria - witch is outside the scope
  * of this class.
  * <p>
- * Note! This strategy can be used with RangeRaptor, but that does not make any sense. The
- * same result should be found in every iteration.
+ * Note! This strategy should only be used with one Range Raptor iteration (no searchWindow).
+ * Multiple iterations are not allowed and would produce the same result in every iteration.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
