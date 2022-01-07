@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
-import org.opentripplanner.updater.vehicle_rental.datasources.GenericJsonVehicleRentalDataSource;
+import org.opentripplanner.updater.GenericJsonDataSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +14,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of a VehicleRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
  *
- * @see VehicleRentalDataSource
+ * @see org.opentripplanner.updater.DataSource
  */
-public class SmooveBikeRentalDataSource
-        extends GenericJsonVehicleRentalDataSource<SmooveBikeRentalDataSourceParameters> {
+public class SmooveBikeRentalDataSource extends GenericJsonDataSource<VehicleRentalPlace> {
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
@@ -29,7 +28,7 @@ public class SmooveBikeRentalDataSource
     private final RentalVehicleType vehicleType;
 
     public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
-        super(config, "result");
+        super(config.getUrl(),"result", config.getHttpHeaders());
         networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
         vehicleType = RentalVehicleType.getDefaultType(networkName);
         allowOverloading = config.isAllowOverloading();
@@ -53,7 +52,8 @@ public class SmooveBikeRentalDataSource
      * }
      * </pre>
      */
-    public VehicleRentalStation makeStation(JsonNode node) {
+    @Override
+    protected VehicleRentalStation parseElement(JsonNode node) {
         VehicleRentalStation station = new VehicleRentalStation();
         String[] nameParts = node.path("name").asText().split("\\s", 2);
         station.id = new FeedScopedId(networkName, nameParts[0]);
