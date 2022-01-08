@@ -168,20 +168,30 @@ class StopTimesMapper {
         stopTime.setStop(stop);
         if (passingTime.getArrivalTime() != null || passingTime.getDepartureTime() != null) {
             stopTime.setArrivalTime(calculateOtpTime(
-                passingTime.getArrivalTime(), passingTime.getArrivalDayOffset(),
-                passingTime.getDepartureTime(), passingTime.getDepartureDayOffset()
+                passingTime.getArrivalTime(),                 
+                passingTime.getArrivalDayOffset(),
+                passingTime.getDepartureTime(),
+                passingTime.getDepartureDayOffset()
             ));
             stopTime.setDepartureTime(calculateOtpTime(
-                passingTime.getDepartureTime(), passingTime.getDepartureDayOffset(),
-                passingTime.getArrivalTime(), passingTime.getArrivalDayOffset()
+                passingTime.getDepartureTime(),
+                passingTime.getDepartureDayOffset(),
+                passingTime.getArrivalTime(),
+                passingTime.getArrivalDayOffset()
             ));
         } else if (passingTime.getEarliestDepartureTime() != null && passingTime.getLatestArrivalTime() != null) {
-            stopTime.setFlexWindowStart(calculateOtpTime(
-                passingTime.getEarliestDepartureTime(), passingTime.getEarliestDepartureDayOffset()
-            ));
-            stopTime.setFlexWindowEnd(calculateOtpTime(
-                passingTime.getLatestArrivalTime(), passingTime.getLatestArrivalDayOffset()
-            ));
+            stopTime.setFlexWindowStart(
+                    calculateOtpTime(
+                            passingTime.getEarliestDepartureTime(),
+                            passingTime.getEarliestDepartureDayOffset()
+                    )
+            );
+            stopTime.setFlexWindowEnd(
+                    calculateOtpTime(
+                            passingTime.getLatestArrivalTime(),
+                            passingTime.getLatestArrivalDayOffset()
+                    )
+            );
         } else {
             return null;
         }
