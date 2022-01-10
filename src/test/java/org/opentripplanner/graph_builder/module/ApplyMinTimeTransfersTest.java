@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.PathTransfer;
@@ -55,7 +56,7 @@ class ApplyMinTimeTransfersTest {
         assertEquals(2, stop1Transfers.size());
 
         // we have both a BIKE and WALK,BIKE transfer and expect the latter one to be modified
-        var adjustedTransfer = stop1Transfers.get(1);
+        var adjustedTransfer = stop1Transfers.stream().filter(t -> t.hasMode(WALK)).findFirst().get();
         assertEquals(100, adjustedTransfer.getDistanceMeters());
         assertEquals(List.of(), adjustedTransfer.getEdges());
     }
