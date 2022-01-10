@@ -108,6 +108,7 @@
 - Add support for sandboxed realtime vehicle parking updaters [#3796](https://github.com/opentripplanner/OpenTripPlanner/pull/3796)
 - Add reading and exposing of Netex submodes [#3793](https://github.com/opentripplanner/OpenTripPlanner/pull/3793)
 - Fix: Account for wait-time in no-wait Raptor strategy  [#3798](https://github.com/opentripplanner/OpenTripPlanner/pull/3798)
+- Read in flex window from Netex feeds [#3800](https://github.com/opentripplanner/OpenTripPlanner/pull/3800)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
