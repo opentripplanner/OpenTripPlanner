@@ -1,11 +1,14 @@
 package org.opentripplanner.graph_builder.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
+import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.PathTransfer;
@@ -25,11 +28,13 @@ class ApplyMinTimeTransfersTest {
     public void shouldOverrideDistanceOfExistingTransfer() {
         var issueStore = new DataImportIssueStore(true);
         var graph = new Graph();
-        var transfer1 = new PathTransfer(stop1, stop2, 10, List.of());
-        var transfer2 = new PathTransfer(stop2, stop1, 10, List.of());
-        var transfer3 = new PathTransfer(stop3, stop1, 10, List.of());
+        var transfer1 = new PathTransfer(stop1, stop2, Set.of(BIKE), 10, List.of());
+        var transfer2 = new PathTransfer(stop2, stop1, Set.of(WALK), 10, List.of());
+        var transfer3 = new PathTransfer(stop3, stop1, Set.of(WALK), 10, List.of());
+        var transfer4 = new PathTransfer(stop1, stop2, Set.of(WALK, BIKE), 50, List.of());
 
         graph.transfersByStop.put(stop1, transfer1);
+        graph.transfersByStop.put(stop1, transfer4);
         graph.transfersByStop.put(stop2, transfer2);
         graph.transfersByStop.put(stop3, transfer3);
 
@@ -47,9 +52,10 @@ class ApplyMinTimeTransfersTest {
 
         var stop1Transfers = new ArrayList<>(graph.transfersByStop.get(stop1));
 
-        assertEquals(1, stop1Transfers.size());
+        assertEquals(2, stop1Transfers.size());
 
-        var adjustedTransfer = stop1Transfers.get(0);
+        // we have both a BIKE and WALK,BIKE transfer and expect the latter one to be modified
+        var adjustedTransfer = stop1Transfers.get(1);
         assertEquals(100, adjustedTransfer.getDistanceMeters());
         assertEquals(List.of(), adjustedTransfer.getEdges());
     }

@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableSet;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
@@ -31,12 +33,12 @@ public class PathTransfer implements Serializable {
 
     private final Set<StreetMode> modes;
 
-    public PathTransfer(StopLocation from, StopLocation to, Set<StreetMode> mode, double distanceMeters, List<Edge> edges) {
+    public PathTransfer(StopLocation from, StopLocation to, Set<StreetMode> modes, double distanceMeters, List<Edge> edges) {
         this.from = from;
         this.to = to;
         this.distanceMeters = distanceMeters;
         this.edges = edges;
-        this.modes = mode;
+        this.modes = new HashSet<>(modes);
     }
 
     public String getName() {
@@ -48,6 +50,8 @@ public class PathTransfer implements Serializable {
     }
 
     public List<Edge> getEdges() { return this.edges; }
+
+    public boolean hasMode(StreetMode mode) { return modes.contains(mode); }
 
     public PathTransfer copyWithDistanceMeters(double meters){
         return new PathTransfer(from, to, modes, meters, edges);
@@ -64,6 +68,7 @@ public class PathTransfer implements Serializable {
         return ToStringBuilder.of(getClass())
                 .addObj("from", from)
                 .addObj("to", to)
+                .addObj("modes", modes)
                 .addNum("distance", distanceMeters)
                 .addColSize("edges", edges)
                 .toString();

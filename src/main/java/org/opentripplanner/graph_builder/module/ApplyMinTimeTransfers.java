@@ -4,10 +4,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Set;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.graph_builder.model.MinTimeTransfer;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
@@ -42,10 +44,13 @@ public class ApplyMinTimeTransfers implements GraphBuilderModule {
                     .filter(pathTransfer -> pathTransfer.to.getId()
                             .equals(minTimeTransfer.to.getId()));
 
-            // we can have potentially multiple transfers if we compute them for bicycle or wheelchair users, for example,
-            // so we use the shortest and assume it's the walking one
+            // we can have potentially multiple transfers if we compute them for bicycle or and walking example.
+            // we find the walking one and apply the time there.
+            // since there can even be multiple walking ones if you compute them for wheelchair users
+            // we select the shortest one.
             var shortestTransfer =
-                    pathTransfers.min(Comparator.comparingDouble(PathTransfer::getDistanceMeters));
+                    pathTransfers.filter(t -> t.hasMode(StreetMode.WALK))
+                        .min(Comparator.comparingDouble(PathTransfer::getDistanceMeters));
 
             // transfers don't have a fixed time but a distance so the time for traversal depends
             // on the walking speed. here we convert the minimum time back to a distance so that
@@ -65,7 +70,10 @@ public class ApplyMinTimeTransfers implements GraphBuilderModule {
                 // no path found on OSM network, so we generate one with a straight line instead.
                 // this is likely a problem in the OSM data.
                 var directLineTransfer =
-                        new PathTransfer(minTimeTransfer.from, minTimeTransfer.to, meters, null);
+                        new PathTransfer(
+                                minTimeTransfer.from, minTimeTransfer.to, Set.of(StreetMode.WALK),
+                                meters, null
+                        );
                 transfers.add(directLineTransfer);
                 issueStore.add(
                         "NoTransferStreetPath",
