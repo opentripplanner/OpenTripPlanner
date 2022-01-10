@@ -41,7 +41,7 @@ import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.MinTimeTransfer;
+import org.opentripplanner.graph_builder.model.MinTimeTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

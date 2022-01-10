@@ -1,4 +1,4 @@
-package org.opentripplanner.model.transfer;
+package org.opentripplanner.graph_builder.model;
 
 import com.google.common.base.MoreObjects;
 import java.time.Duration;

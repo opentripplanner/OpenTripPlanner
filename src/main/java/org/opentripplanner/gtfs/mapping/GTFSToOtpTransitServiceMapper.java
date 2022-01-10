@@ -1,7 +1,10 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.model.MinTimeTransfer;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.PathwayNode;
@@ -12,7 +15,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
- * General mapping code or reusable bussiness logic should be moved into the Builder; hence
+ * General mapping code or reusable business logic should be moved into the Builder; hence
  * reusable for other import modules.
  */
 public class GTFSToOtpTransitServiceMapper {
@@ -70,6 +73,7 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
+    private final Collection<MinTimeTransfer> minTimeTransfers = new ArrayList<>();
 
     public GTFSToOtpTransitServiceMapper(
             String feedId,
@@ -131,7 +135,7 @@ public class GTFSToOtpTransitServiceMapper {
                 builder.getStopTimesSortedByTrip()
         );
         builder.getConstrainedTransfers().addAll(transferMapper.mapConstrainedTransfers(data.getAllTransfers()));
-        builder.getMinTimeTransfers().addAll(transferMapper.mapMinTimeTransfers(data.getAllTransfers()));
+        minTimeTransfers.addAll(transferMapper.mapMinTimeTransfers(data.getAllTransfers()));
     }
 
 
@@ -162,5 +166,9 @@ public class GTFSToOtpTransitServiceMapper {
         }
 
         stopToParentStationLinker.link();
+    }
+
+    public Collection<MinTimeTransfer> getMinTimeTransfers() {
+        return minTimeTransfers;
     }
 }

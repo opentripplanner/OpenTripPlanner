@@ -39,7 +39,7 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.model.transfer.MinTimeTransfer;
+import org.opentripplanner.graph_builder.model.MinTimeTransfer;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -107,7 +107,7 @@ public class GtfsModule implements GraphBuilderModule {
                 );
                 mapper.mapStopTripAndRouteDataIntoBuilder();
 
-                OtpTransitServiceBuilder builder =  mapper.getBuilder();
+                OtpTransitServiceBuilder builder = mapper.getBuilder();
 
                 builder.limitServiceDays(transitPeriodLimit);
 
@@ -130,7 +130,7 @@ public class GtfsModule implements GraphBuilderModule {
 
                 createGeometryAndBlockProcessor(gtfsBundle, transitService).run(graph, issueStore);
 
-                minTimeTransfers.addAll(transitService.getMinTimeTransfers());
+                minTimeTransfers.addAll(mapper.getMinTimeTransfers());
 
             }
         } catch (IOException e) {

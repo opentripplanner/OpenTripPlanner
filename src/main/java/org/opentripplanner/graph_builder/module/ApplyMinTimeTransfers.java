@@ -7,7 +7,7 @@ import java.util.HashMap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.transfer.MinTimeTransfer;
+import org.opentripplanner.graph_builder.model.MinTimeTransfer;
 import org.opentripplanner.routing.graph.Graph;
 
 /**

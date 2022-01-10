@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.model.transfer.MinTimeTransfer;
+import org.opentripplanner.graph_builder.model.MinTimeTransfer;
 import org.opentripplanner.routing.graph.Graph;
 
 class GtfsModuleTest {
