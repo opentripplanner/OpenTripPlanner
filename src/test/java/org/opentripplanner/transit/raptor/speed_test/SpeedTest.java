@@ -7,8 +7,10 @@ import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.URI;
@@ -70,8 +72,10 @@ public class SpeedTest {
     private final Graph graph;
     private final TransitLayer transitLayer;
 
-    private final MeterRegistry registry = RegistrySetup.chooseRegistry();
-    private final Clock clock = registry.config().clock();
+    private final Clock clock = Clock.SYSTEM;
+    private final MeterRegistry loggerRegistry = new SimpleMeterRegistry();
+    private final CompositeMeterRegistry registry = new CompositeMeterRegistry(clock, List.of(loggerRegistry));
+    private final MeterRegistry uploadRegistry = RegistrySetup.getRegistry().orElse(null);
 
     private final SpeedTestCmdLineOpts opts;
     private final SpeedTestConfig config;
@@ -107,7 +111,7 @@ public class SpeedTest {
         ));
 
         // record the lowest percentile of times
-        registry.config().meterFilter(
+        loggerRegistry.config().meterFilter(
                 new MeterFilter() {
                     @Override
                     public DistributionStatisticConfig configure(
@@ -168,7 +172,7 @@ public class SpeedTest {
         printProfileStatistics();
 
         // close() sends the results to influxdb
-        registry.close();
+        uploadRegistry.close();
 
         service.shutdown();
         System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
@@ -208,9 +212,14 @@ public class SpeedTest {
         }
 
         ResultPrinter.logSingleTestHeader(routeProfile);
+
+        // Clear registry after first run
         registry.clear();
 
-        //Need to create timer again after clearing registry
+        if (uploadRegistry != null) {
+            registry.add(uploadRegistry);
+        }
+
         Timer totalTimer = Timer.builder(SPEED_TEST_ROUTE).register(registry);
 
         for (TestCase testCase : testCasesToRun) {
@@ -221,8 +230,13 @@ public class SpeedTest {
         workerResults.get(routeProfile).add((int) Timer.builder(ROUTE_WORKER).register(registry).mean(TimeUnit.MILLISECONDS));
         totalResults.get(routeProfile).add((int) totalTimer.mean(TimeUnit.MILLISECONDS));
 
+        if (uploadRegistry != null) {
+            registry.remove(uploadRegistry);
+        }
+
         ResultPrinter.logSingleTestResult(
-                routeProfile, numOfPathsFound, sample, nSamples, nSuccess, tcSize, totalTimer.totalTime(TimeUnit.SECONDS), registry
+                routeProfile, numOfPathsFound, sample, nSamples, nSuccess, tcSize, totalTimer.totalTime(TimeUnit.SECONDS),
+                loggerRegistry
         );
 
         tcIO.writeResultsToFile(testCases);

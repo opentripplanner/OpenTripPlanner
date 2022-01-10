@@ -15,7 +15,7 @@ public class RegistrySetup {
     static Optional<String> influxPassword() {
         return Optional
                 .ofNullable(System.getenv(influxPasswordEnvVariable))
-                .filter(s -> !s.strip().isEmpty());
+                .filter(s -> !s.isBlank());
     }
 
     static MeterRegistry influxRegistry(String password) {
@@ -24,7 +24,7 @@ public class RegistrySetup {
 
             @Override
             public Duration step() {
-                return Duration.ofSeconds(10);
+                return Duration.ofMinutes(10);
             }
 
             @Override
@@ -56,16 +56,11 @@ public class RegistrySetup {
         return new InfluxMeterRegistry(influxConfig, Clock.SYSTEM);
     }
 
-    static MeterRegistry chooseRegistry() {
+    static Optional<MeterRegistry> getRegistry() {
         return influxPassword()
                 .map(password -> {
                     System.err.println("Selecting InfluxDB as metrics registry. Sending data at end of speed test.");
                     return RegistrySetup.influxRegistry(password);
-                })
-                .orElseGet(() -> {
-                    System.err.println("Environment variable " + influxPasswordEnvVariable
-                            + " not set. Not sending result data to InfluxDB.");
-                    return new SimpleMeterRegistry();
                 });
     }
 }
