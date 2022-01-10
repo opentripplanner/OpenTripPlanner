@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
@@ -15,6 +16,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -79,7 +81,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         var transfersByStop = Multimaps.<StopLocation, PathTransfer>synchronizedMultimap(HashMultimap.create());
 
         stops.stream().parallel().forEach(ts0 -> {
-            /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
+            /* Make transfers to each nearby stop that has the lowest weight on some trip pattern.
              * Use map based on the list of edges, so that only distinct transfers are stored. */
             Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
             Stop stop = ts0.getStop();
@@ -90,11 +92,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
                 for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, streetRequest, false)) {
                     // Skip the origin stop, loop transfers are not needed.
-                    if (sd.stop == stop) { continue; }
-                    distinctTransfers.put(
-                        new TransferKey(stop, sd.stop, sd.edges),
-                        new PathTransfer(stop, sd.stop, sd.distance, sd.edges)
-                    );
+                    if (sd.stop == stop) {continue;}
+                    updateDistinctTransfers(distinctTransfers, stop, transferProfile.modes.transferMode, sd);
                 }
                 if (OTPFeature.FlexRouting.isOn()) {
                     // This code is for finding transfers from FlexStopLocations to Stops, transfers
@@ -103,10 +102,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                         // Skip the origin stop, loop transfers are not needed.
                         if (sd.stop == stop) { continue; }
                         if (sd.stop instanceof Stop) { continue; }
-                        distinctTransfers.put(
-                            new TransferKey(sd.stop, stop, sd.edges),
-                            new PathTransfer(sd.stop, stop, sd.distance, sd.edges)
-                        );
+                        updateDistinctTransfers(distinctTransfers, stop, transferProfile.modes.transferMode, sd);
                     }
                 }
             }
@@ -131,6 +127,34 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         LOG.info(progress.completeMessage());
         LOG.info("Done connecting stops to one another. Created a total of {} transfers from {} stops.", nTransfersTotal, nLinkedStops);
         graph.hasDirectTransfers = true;
+    }
+
+    /**
+     * Add the computed transfer to the list of distinct ones for the two stops. If the identical
+     * one has already been computed for another mode (for example when the walking and cycling
+     * transfers use the same edges) then the new mode is added to the existing transfer.
+     */
+    private void updateDistinctTransfers(
+            Map<TransferKey, PathTransfer> distinctTransfers,
+            Stop stop,
+            StreetMode mode,
+            NearbyStop sd
+    ) {
+        var key = new TransferKey(stop, sd.stop, sd.edges);
+        if (distinctTransfers.containsKey(key)) {
+            var existingIdenticalTransfer = distinctTransfers.get(key);
+            var updatedTransfer = existingIdenticalTransfer.copyWithAddedMode(mode);
+            distinctTransfers.put(key, updatedTransfer);
+        }
+        else {
+            distinctTransfers.put(
+                    key,
+                    new PathTransfer(
+                            stop, sd.stop, Set.of(mode),
+                            sd.distance, sd.edges
+                    )
+            );
+        }
     }
 
     @Override
