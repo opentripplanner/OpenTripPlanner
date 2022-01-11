@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryCollection;
-import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
 
 /**

@@ -5,12 +5,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.graph_builder.model.MinTimeTransfer;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Transit data (for example transfers.txt) can describe how long a transfer between two stops can
@@ -22,6 +25,8 @@ import org.opentripplanner.routing.graph.Graph;
  * with the one from the transit data.
  */
 public class ApplyMinTimeTransfers implements GraphBuilderModule {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ApplyMinTimeTransfers.class);
 
     // https://en.wikipedia.org/wiki/Preferred_walking_speed
     public final float AVERAGE_WALKING_SPEED = 1.4f;
@@ -38,6 +43,9 @@ public class ApplyMinTimeTransfers implements GraphBuilderModule {
                         Collections.EMPTY_LIST
                 );
 
+        final AtomicInteger numReplacedTransfers = new AtomicInteger();
+        final AtomicInteger numStraightLineTransfers = new AtomicInteger();
+
         minTimeTransfers.forEach(minTimeTransfer -> {
             var transfers = graph.transfersByStop.get(minTimeTransfer.from);
             var pathTransfers = transfers.stream()
@@ -50,7 +58,7 @@ public class ApplyMinTimeTransfers implements GraphBuilderModule {
             // we select the shortest one.
             var shortestTransfer =
                     pathTransfers.filter(t -> t.hasMode(StreetMode.WALK))
-                        .min(Comparator.comparingDouble(PathTransfer::getDistanceMeters));
+                            .min(Comparator.comparingDouble(PathTransfer::getDistanceMeters));
 
             // transfers don't have a fixed time but a distance so the time for traversal depends
             // on the walking speed. here we convert the minimum time back to a distance so that
@@ -64,6 +72,7 @@ public class ApplyMinTimeTransfers implements GraphBuilderModule {
                 var adjustedTransfer = existingPathTransfer.copyWithDistanceMeters(meters);
                 transfers.remove(existingPathTransfer);
                 transfers.add(adjustedTransfer);
+                numReplacedTransfers.getAndIncrement();
             });
 
             if (shortestTransfer.isEmpty()) {
@@ -80,9 +89,15 @@ public class ApplyMinTimeTransfers implements GraphBuilderModule {
                         "Transit data contains transfer %s but no path found on street network.",
                         minTimeTransfer
                 );
-            }
 
+                numStraightLineTransfers.getAndIncrement();
+            }
         });
+
+        LOG.info(
+                "Applied minimum transfer times: replaced {} PathTransfers, created {} straight-line transfers",
+                numReplacedTransfers.get(), numStraightLineTransfers.get()
+        );
 
     }
 
