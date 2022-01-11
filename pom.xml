@@ -33,6 +33,10 @@
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
+        <!-- Set argLine to an empty string so that running the tests without the coverage agent works.
+             When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
+        -->
+        <argLine></argLine>
     </properties>
 
     <distributionManagement>
