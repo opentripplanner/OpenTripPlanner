@@ -2,13 +2,11 @@ package org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
@@ -33,7 +31,7 @@ public final class ConstrainedBoardingSearch
     private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY = new ConstrainedBoardingSearchReverse();
 
     /** Handle forward and reverse specific tasks */
-    private final ConstrainedBoardingSearchStrategy translator;
+    private final ConstrainedBoardingSearchStrategy fwdRvsStrategy;
 
     /**
      * List of transfers for each stop position in pattern
@@ -43,12 +41,17 @@ public final class ConstrainedBoardingSearch
     private List<TransferForPattern> currentTransfers;
     private int currentTargetStopPos;
 
+    // If we find a trip these variables are used to cache the result
+    private int onTripEarliestBoardTime;
+    private int onTripIndex;
+    private TransferConstraint onTripTxConstraint;
+
     public ConstrainedBoardingSearch(
             boolean forwardSearch,
             TransferForPatternByStopPos transfers
     ) {
         this.transfers = transfers;
-        this.translator = forwardSearch ? FORWARD_STRATEGY : REVERSE_STRATEGY;
+        this.fwdRvsStrategy = forwardSearch ? FORWARD_STRATEGY : REVERSE_STRATEGY;
     }
 
     @Override
@@ -66,29 +69,33 @@ public final class ConstrainedBoardingSearch
             RaptorTimeTable<TripSchedule> timetable,
             TripSchedule sourceTripSchedule,
             int sourceStopIndex,
-            int sourceArrivalTime
+            int prevTransitArrivalTime,
+            int earliestBoardTime
     ) {
         var transfers = findMatchingTransfers(sourceTripSchedule, sourceStopIndex);
 
         if(transfers.isEmpty()) { return null; }
 
-        T2<Integer, RaptorTransferConstraint> tripInfo = findTimetableTripInfo(
+        boolean found = findTimetableTripInfo(
                 timetable,
                 transfers,
                 currentTargetStopPos,
-                sourceArrivalTime
+                prevTransitArrivalTime,
+                earliestBoardTime
         );
 
-        if(tripInfo == null) { return null; }
+        if(!found) { return null; }
 
-        final int tripIndex = tripInfo.first;
-        final var transferConstraint = tripInfo.second;
-
-        var trip = timetable.getTripSchedule(tripIndex);
-        int departureTime = translator.time(trip, currentTargetStopPos);
+        var trip = timetable.getTripSchedule(onTripIndex);
+        int departureTime = fwdRvsStrategy.time(trip, currentTargetStopPos);
 
         return new ConstrainedTransferBoarding<>(
-                transferConstraint, tripIndex, trip, currentTargetStopPos, departureTime
+                onTripTxConstraint,
+                onTripIndex,
+                trip,
+                currentTargetStopPos,
+                departureTime,
+                onTripEarliestBoardTime
         );
     }
 
@@ -103,52 +110,90 @@ public final class ConstrainedBoardingSearch
     }
 
     /**
-     * Find the trip to board (trip index) and the transfer constraint
+     * Find the trip to board (trip index) and the transfer constraint.
+     * <p>
+     * This method set the following parameter if successful:
+     * <ul>
+     *     <li>{@code onTripIndex}
+     *     <li>{@code onTripIndex}
+     *     <li>{@code onTripIndex}
+     * </ul>
+     *
+     * @return {@code true} if a matching trip is found
      */
-    public T2<Integer, RaptorTransferConstraint> findTimetableTripInfo(
+    public boolean findTimetableTripInfo(
             RaptorTimeTable<TripSchedule> timetable,
             List<TransferForPattern> transfers,
             int stopPos,
-            int sourceTime
+            int sourceTransitArrivalTime,
+            int earliestBoardTime
     ) {
         int nAllowedBoardings = 0;
         boolean useNextNormalTrip = false;
 
-        var index = translator.scheduleIndexIterator(timetable);
+        var index = fwdRvsStrategy.scheduleIndexIterator(timetable);
         outer:
         while (index.hasNext()) {
-            final int i = index.next();
-            var it = timetable.getTripSchedule(i);
+            onTripIndex = index.next();
+            var it = timetable.getTripSchedule(onTripIndex);
 
             // Forward: boardTime, Reverse: alightTime
-            int time = translator.time(it, stopPos);
+            int time = fwdRvsStrategy.time(it, stopPos);
 
-            if (translator.timeIsBefore(time, sourceTime)) { continue; }
+            if (fwdRvsStrategy.timeIsBefore(time, sourceTransitArrivalTime)) { continue; }
+
             ++nAllowedBoardings;
 
             var targetTrip = it.getOriginalTripTimes().getTrip();
 
             for (TransferForPattern tx : transfers) {
+                onTripTxConstraint = (TransferConstraint)tx.getTransferConstraint();
+
+                if(onTripTxConstraint.isFacilitated()) {
+                    onTripEarliestBoardTime = sourceTransitArrivalTime;
+                }
+                // If NOT guaranteed or stay-seated the boarding is only allowed if there is
+                // enough time to do the transfer
+                else {
+                    if(onTripTxConstraint.isMinTransferTimeSet()) {
+                        int minTransferBoardTime = fwdRvsStrategy.plus(
+                                sourceTransitArrivalTime,
+                                onTripTxConstraint.getMinTransferTime()
+                        );
+                        onTripEarliestBoardTime = fwdRvsStrategy.maxTime(
+                                earliestBoardTime,
+                                minTransferBoardTime
+                        );
+                    } else {
+                        onTripEarliestBoardTime = earliestBoardTime;
+                    }
+
+                    if (fwdRvsStrategy.timeIsBefore(time, onTripEarliestBoardTime)) { continue; }
+                }
+
+
                 if (tx.applyToAllTargetTrips()) {
-                    return new T2<>(i, tx.getTransferConstraint());
+                    return true;
                 }
                 else if (tx.applyToTargetTrip(targetTrip)) {
-                    if (tx.getTransferConstraint().isNotAllowed()) {
+                    if (onTripTxConstraint.isNotAllowed()) {
                         useNextNormalTrip = true;
                         continue outer;
                     }
                     else {
-                        return new T2<>(i, tx.getTransferConstraint());
+                        return true;
                     }
                 }
             }
             if (useNextNormalTrip) {
-                return new T2<>(i, TransferConstraint.REGULAR_TRANSFER);
+                onTripEarliestBoardTime = earliestBoardTime;
+                onTripTxConstraint = TransferConstraint.REGULAR_TRANSFER;
+                return true;
             }
             if(nAllowedBoardings == ABORT_SEARCH_AFTER_N_VAILD_NORMAL_TRIPS) {
-                return null;
+                return false;
             }
         }
-        return null;
+        return false;
     }
 }

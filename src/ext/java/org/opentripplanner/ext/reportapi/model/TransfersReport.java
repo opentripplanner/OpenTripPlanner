@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.reportapi.model;
 
-import static org.opentripplanner.model.transfer.TransferConstraint.MAX_WAIT_TIME_NOT_SET;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 
 import java.util.List;
@@ -15,6 +14,7 @@ import org.opentripplanner.model.transfer.RouteStationTransferPoint;
 import org.opentripplanner.model.transfer.RouteStopTransferPoint;
 import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
+import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -91,7 +91,7 @@ public class TransfersReport {
             buf.addText(duration);
             buf.addText(dist);
             buf.addEnum(c.getPriority());
-            buf.addDuration(c.getMaxWaitTime(), MAX_WAIT_TIME_NOT_SET);
+            buf.addDuration(c.getMaxWaitTime(), TransferConstraint.NOT_SET);
             buf.addOptText(c.isStaySeated(), "YES");
             buf.addOptText(c.isGuaranteed(), "YES");
             buf.newLine();

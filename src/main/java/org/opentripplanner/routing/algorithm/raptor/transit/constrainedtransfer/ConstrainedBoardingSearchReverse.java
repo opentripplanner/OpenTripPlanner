@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 
-class ConstrainedBoardingSearchReverse implements ConstrainedBoardingSearchStrategy {
+final class ConstrainedBoardingSearchReverse implements ConstrainedBoardingSearchStrategy {
 
     @Override
     public int time(RaptorTripSchedule schedule, int stopPos) {
@@ -21,5 +21,10 @@ class ConstrainedBoardingSearchReverse implements ConstrainedBoardingSearchStrat
     @Override
     public IntIterator scheduleIndexIterator(RaptorTimeTable<TripSchedule> timetable) {
         return IntIterators.intDecIterator(timetable.numberOfTripSchedules(), 0);
+    }
+
+    @Override
+    public int plus(int v, int u) {
+        return v - u;
     }
 }

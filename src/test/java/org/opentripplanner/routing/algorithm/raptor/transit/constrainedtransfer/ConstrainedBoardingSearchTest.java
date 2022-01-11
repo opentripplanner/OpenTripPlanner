@@ -51,6 +51,12 @@ public class ConstrainedBoardingSearchTest {
     public static final StationTransferPoint STATION_B_TX_POINT =
             new StationTransferPoint(STATION_B);
 
+    /**
+     * 2 minutes alight slack is used in this test, no slack provider is involved - but
+     * the test pass in times to the search with slack added.
+     */
+    private static final int ALIGHT_SLACK = 120;
+
     private TestRouteData route1;
     private TestRouteData route2;
     private TripPatternWithRaptorStopIndexes pattern1;
@@ -292,7 +298,8 @@ public class ConstrainedBoardingSearchTest {
                 route2.getTimetable(),
                 route1.lastTrip().getTripSchedule(),
                 stopIndex,
-                sourceArrivalTime
+                sourceArrivalTime,
+                sourceArrivalTime + ALIGHT_SLACK
         );
         assertBoarding(stopIndex, targetStopPos, expectedTripIndex, expectedConstraint, boarding);
     }
@@ -317,7 +324,8 @@ public class ConstrainedBoardingSearchTest {
                 route1.getTimetable(),
                 route2.firstTrip().getTripSchedule(),
                 stopIndex,
-                sourceArrivalTime
+                sourceArrivalTime,
+                sourceArrivalTime + ALIGHT_SLACK
         );
 
         assertBoarding(stopIndex, targetStopPos, expectedTripIndex, expectedConstraint, boarding);

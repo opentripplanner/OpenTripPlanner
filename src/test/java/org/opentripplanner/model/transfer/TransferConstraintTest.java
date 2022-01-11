@@ -50,10 +50,10 @@ public class TransferConstraintTest {
 
   @Test
   public void useInRaptorRouting() {
-    assertTrue(GUARANTIED.useInRaptorRouting());
-    assertTrue(STAY_SEATED.useInRaptorRouting());
-    assertFalse(NO_CONSTRAINS.useInRaptorRouting());
-    assertTrue(NOT_ALLOWED.useInRaptorRouting());
+    assertTrue(GUARANTIED.includeInRaptorRouting());
+    assertTrue(STAY_SEATED.includeInRaptorRouting());
+    assertFalse(NO_CONSTRAINS.includeInRaptorRouting());
+    assertTrue(NOT_ALLOWED.includeInRaptorRouting());
   }
 
   @Test

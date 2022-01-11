@@ -16,7 +16,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
@@ -101,8 +100,6 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
    private boolean hasTimeDependentAccess = false;
 
     private int iterationDepartureTime;
-
-    private int earliestBoardTime;
 
 
     public RangeRaptorWorker(
@@ -239,13 +236,22 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
 
                             boolean handled = boardWithConstrainedTransfer(
-                                    txSearch, route.timetable(), stopIndex, stopPos
+                                    txSearch,
+                                    route.timetable(),
+                                    stopIndex,
+                                    stopPos,
+                                    prevArrivalTime,
+                                    boardSlack
                             );
 
                             // Find the best trip and board [no guaranteed transfer exist]
                             if(!handled) {
                                 boardWithRegularTransfer(
-                                        tripSearch, stopPos, stopIndex, prevArrivalTime, boardSlack
+                                        tripSearch,
+                                        stopIndex,
+                                        stopPos,
+                                        prevArrivalTime,
+                                        boardSlack
                                 );
                             }
                         });
@@ -258,16 +264,15 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private void boardWithRegularTransfer(
             TripScheduleSearch<T> tripSearch,
-            int stopPos,
             int stopIndex,
+            int stopPos,
             int prevArrivalTime,
             int boardSlack
     ) {
-        RaptorTripScheduleBoardOrAlightEvent<T> result;
-        this.earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
+        int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
         // check if we can back up to an earlier trip due to this stop
         // being reached earlier
-        result = tripSearch.search(
+        var result = tripSearch.search(
                 earliestBoardTime,
                 stopPos,
                 transitWorker.onTripIndex()
@@ -288,7 +293,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             RaptorConstrainedTripScheduleBoardingSearch<T> txSearch,
             RaptorTimeTable<T> targetTimetable,
             int targetStopIndex,
-            int targetStopPos
+            int targetStopPos,
+            int prevArrivalTime,
+            int boardSlack
     ) {
         if(!enableTransferConstraints) { return false; }
 
@@ -298,30 +305,34 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
         if(sourceStopArrival == null) { return false; }
 
-        int prevStopArrivalTime = sourceStopArrival.arrivalTime();
+        int prevTransitStopArrivalTime = sourceStopArrival.arrivalTime();
 
-        int earliestBoardTime = calculator.minusDuration(
-                prevStopArrivalTime,
+        int prevTransitArrivalTime = calculator.minusDuration(
+                prevTransitStopArrivalTime,
                 slackProvider.alightSlack(sourceStopArrival.trip().pattern())
         );
+
+        int earliestBoardTime = earliestBoardTime(prevArrivalTime, boardSlack);
 
         var result = txSearch.find(
                 targetTimetable,
                 sourceStopArrival.trip(),
                 sourceStopArrival.stop(),
+                prevTransitArrivalTime,
                 earliestBoardTime
         );
 
         if (result == null) { return false; }
 
-        if (result.getTransferConstraint().isNotAllowed()) {
+        var constraint = result.getTransferConstraint();
+
+        if (constraint.isNotAllowed()) {
             // We are blocking a normal trip search here by returning
             // true without boarding the trip
             return true;
         }
 
-        this.earliestBoardTime = earliestBoardTime;
-        transitWorker.board(targetStopIndex, earliestBoardTime, result);
+        transitWorker.board(targetStopIndex, result.getEarliestBoardTimeForConstrainedTransfer(), result);
 
         return true;
     }
