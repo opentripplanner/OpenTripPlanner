@@ -1,8 +1,13 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
 import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.cumulative.CumulativeTimer;
+import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
+import io.micrometer.core.instrument.distribution.HistogramGauges;
+import io.micrometer.core.instrument.distribution.pause.PauseDetector;
 import io.micrometer.influx.InfluxConfig;
 import io.micrometer.influx.InfluxMeterRegistry;
 import java.time.Duration;
@@ -15,7 +20,7 @@ public class RegistrySetup {
     static Optional<String> influxPassword() {
         return Optional
                 .ofNullable(System.getenv(influxPasswordEnvVariable))
-                .filter(s -> !s.strip().isEmpty());
+                .filter(s -> !s.isBlank());
     }
 
     static MeterRegistry influxRegistry(String password) {
@@ -24,7 +29,7 @@ public class RegistrySetup {
 
             @Override
             public Duration step() {
-                return Duration.ofSeconds(10);
+                return Duration.ofMinutes(10);
             }
 
             @Override
@@ -53,19 +58,38 @@ public class RegistrySetup {
             }
         };
 
-        return new InfluxMeterRegistry(influxConfig, Clock.SYSTEM);
+        return new CustomInfluxRegistry(influxConfig, Clock.SYSTEM);
     }
 
-    static MeterRegistry chooseRegistry() {
+    static Optional<MeterRegistry> getRegistry() {
         return influxPassword()
                 .map(password -> {
                     System.err.println("Selecting InfluxDB as metrics registry. Sending data at end of speed test.");
                     return RegistrySetup.influxRegistry(password);
-                })
-                .orElseGet(() -> {
-                    System.err.println("Environment variable " + influxPasswordEnvVariable
-                            + " not set. Not sending result data to InfluxDB.");
-                    return new SimpleMeterRegistry();
                 });
+    }
+
+    /**
+     * So the regular InfluxDB doesn't compute the mean times when you close the registry at the end
+     * of the test run because it converts every timer into an instance of StepTimer. We actually
+     * want to have a CumulativeTimer which collects the avg as it goes along, not at the end of the
+     * step time.
+     */
+    public static class CustomInfluxRegistry extends InfluxMeterRegistry {
+
+        public CustomInfluxRegistry(InfluxConfig config, Clock clock) {
+            super(config, clock);
+        }
+
+        @Override
+        protected Timer newTimer(
+                Id id,
+                DistributionStatisticConfig distributionStatisticConfig,
+                PauseDetector pauseDetector
+        ) {
+            Timer timer = new CumulativeTimer(id, clock, distributionStatisticConfig, pauseDetector, getBaseTimeUnit());
+            HistogramGauges.registerWithCommonFormat(timer, this);
+            return timer;
+        }
     }
 }
