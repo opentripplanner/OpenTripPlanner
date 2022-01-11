@@ -158,10 +158,9 @@ public class LineType {
                     .name("situations")
                     .description("Get all situations active for the line.")
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                .dataFetcher(environment -> {
-                  return GqlUtil.getRoutingService(environment).getTransitAlertService().getRouteAlerts(
-                      environment.getSource());
-                })
+                .dataFetcher(environment -> GqlUtil.getRoutingService(environment)
+                        .getTransitAlertService()
+                        .getRouteAlerts(((Route) environment.getSource()).getId()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("flexibleLineType")
