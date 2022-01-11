@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.impl;
 
+import com.esotericsoftware.minlog.Log;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.opentripplanner.model.Route;
@@ -13,6 +14,7 @@ import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -49,11 +51,14 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
         SKAGIT_TRANSIT,
         SEATTLE_STREET_CAR,
         SOUND_TRANSIT,
+        SOUND_TRANSIT_SOUNDER,
+        SOUND_TRANSIT_LINK,
         WASHINGTON_STATE_FERRIES
     }
 
     private static final Map<String, Function<Route, RideType>> classificationStrategy = new HashMap<>();
     private static final Map<String, Map<Fare.FareType, Float>> washingtonStateFerriesFares = new HashMap<>();
+    private static final Map<String, Map<Fare.FareType, Float>> soundTransitLinkFares = new HashMap<>();
 
     // If set to true, the test ride price is used instead of the actual agency cash fare.
     public boolean IS_TEST;
@@ -79,10 +84,10 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             KC_METRO_AGENCY_ID,
             routeData -> {
                 if (routeData.getType() == ROUTE_TYPE_FERRY &&
-                    routeData.getLongName().contains("Water Taxi: West Seattle")) {
+                        routeData.getLongName().contains("Water Taxi: West Seattle")) {
                     return RideType.KC_WATER_TAXI_WEST_SEATTLE;
                 } else if (routeData.getType() == ROUTE_TYPE_FERRY &&
-                    routeData.getDesc().contains("Water Taxi: Vashon Island")) {
+                        routeData.getDesc().contains("Water Taxi: Vashon Island")) {
                     return RideType.KC_WATER_TAXI_VASHON_ISLAND;
                 }
                 return RideType.KC_METRO;
@@ -153,6 +158,11 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             "Southworth-VashonIsland",
             ImmutableMap.of(Fare.FareType.regular, 5.95f, Fare.FareType.youth, 2.95f, Fare.FareType.senior, 2.95f)
         );
+        // Section for SoundTransit Link Fares
+        soundTransitLinkFares.put(
+            "int'l dist/chinatown-roosevelt",
+            ImmutableMap.of(Fare.FareType.electronicRegular, 2.50f)
+        );
     }
 
     public OrcaFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
@@ -170,12 +180,11 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
      * some cases the route description and short name are needed to define inner agency ride types. For Kitsap, the
      * route data is enough to define the agency, but addition trip id checks are needed to define the fast ferry direction.
      */
-    private static RideType classify(Route routeData, String tripId) {
+    private RideType classify(Route routeData, String tripId) {
         Function<Route, RideType> classifier = classificationStrategy.get(routeData.getAgency().getId());
         if (classifier == null) {
             return null;
         }
-
         RideType rideType = classifier.apply(routeData);
         if (rideType == RideType.KITSAP_TRANSIT &&
             routeData.getId().getId().equalsIgnoreCase("Kitsap Fast Ferry") &&
@@ -187,6 +196,10 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             } else if (tripId.contains("west")) {
                 rideType = RideType.KITSAP_TRANSIT_FAST_FERRY_WESTBOUND;
             }
+        } else if (rideType == RideType.SOUND_TRANSIT &&
+            routeData.getShortName().equalsIgnoreCase("1-Line")
+        ) {
+            rideType = RideType.SOUND_TRANSIT_LINK;
         }
         return rideType;
     }
@@ -195,22 +208,22 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
      * Define which discount fare should be applied based on the fare type. If the ride type is unknown the discount
      * fare can not be applied, use the default fare.
      */
-    private float getLegFare(Fare.FareType fareType, RideType rideType, float defaultFare, Route route) {
+    private float getLegFare(Fare.FareType fareType, RideType rideType, float defaultFare, Ride ride) {
         if (rideType == null) {
             return defaultFare;
         }
         switch (fareType) {
             case youth:
             case electronicYouth:
-                return getYouthFare(fareType, rideType, defaultFare, route);
+                return getYouthFare(fareType, rideType, defaultFare, ride.routeData);
             case electronicSpecial:
                 return getLiftFare(rideType, defaultFare);
             case electronicSenior:
             case senior:
-                return getSeniorFare(fareType, rideType, defaultFare, route);
+                return getSeniorFare(fareType, rideType, defaultFare, ride.routeData);
             case regular:
             case electronicRegular:
-                return getRegularFare(fareType, rideType, defaultFare, route);
+                return getRegularFare(fareType, rideType, defaultFare, ride.routeData, ride);
             default:
                 return defaultFare;
         }
@@ -219,7 +232,7 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
     /**
      * Apply regular discount fares. If the ride type cannot be matched the default fare is used.
      */
-    private float getRegularFare(Fare.FareType fareType, RideType rideType, float defaultFare, Route route) {
+    private float getRegularFare(Fare.FareType fareType, RideType rideType, float defaultFare, Route route, Ride ride) {
         switch (rideType) {
             case KC_WATER_TAXI_VASHON_ISLAND: return 5.75f;
             case KC_WATER_TAXI_WEST_SEATTLE: return 5.00f;
@@ -227,8 +240,28 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
             case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND: return 10.00f;
             case WASHINGTON_STATE_FERRIES:
                 return getWashingtonStateFerriesFare(route.getLongName(), fareType, defaultFare);
+            case SOUND_TRANSIT_LINK:
+                return getSoundTransitLinkFare(ride, fareType, defaultFare);
+            // TODO: Add case for Sounder
             default: return defaultFare;
         }
+    }
+
+    /**
+     *  Calculate the correct Link fare from a "ride" including start and end stations.
+     */
+    private float getSoundTransitLinkFare(Ride ride, Fare.FareType fareType, float defaultFare) {
+        String start = ride.firstStop.getName().replaceAll(" Station", "").toLowerCase();
+        String end = ride.lastStop.getName().replaceAll(" Station", "").toLowerCase();
+        // Fares are the same no matter the order of the stations
+        // Therefore, the fares DB only contains each station pair once
+        // If no match is found, try the reversed order
+        String lookupKey = String.format("%s-%s", start, end);
+        String reverseLookupKey = String.format("%s-%s", end, start);
+        Map<Fare.FareType, Float> fare = Optional.ofNullable(soundTransitLinkFares.get(lookupKey))
+            .orElseGet(() -> soundTransitLinkFares.get(reverseLookupKey));
+
+        return (fare != null) ? fare.get(fareType) : defaultFare;
     }
 
     /**
@@ -366,7 +399,7 @@ public class OrcaFareServiceImpl extends DefaultFareServiceImpl {
                 freeTransferStartTime = ride.startTime;
             }
             float singleLegPrice = getRidePrice(ride, fareType, fareRules);
-            float legFare = getLegFare(fareType, rideType, singleLegPrice, ride.routeData);
+            float legFare = getLegFare(fareType, rideType, singleLegPrice, ride);
             boolean inFreeTransferWindow = inFreeTransferWindow(freeTransferStartTime, ride.startTime);
             if (hasFreeTransfers(fareType, rideType) && inFreeTransferWindow) {
                 // If using Orca (free transfers), the total fare should be equivalent to the
