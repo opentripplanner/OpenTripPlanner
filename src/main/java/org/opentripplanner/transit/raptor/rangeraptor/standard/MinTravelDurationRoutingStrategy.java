@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 import java.util.function.IntConsumer;
-import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -12,12 +11,20 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 
 /**
- * The purpose of this class is to implement the "Standard" specific functionality of the worker
- * with NO WAIT TIME between transfer and transit, except the boardSlack.
- * <p/>
+ * The purpose of this class is to implement a routing strategy for finding the best minimum travel
+ * duration ignoring wait time(except board-/alight-slack). This class optimize on a single
+ * criteria: MINIMUM TRAVEL DURATION.
+ * <p>
+ * Note! Raptor give us number-of-transfer as a second pareto criteria - witch is outside the scope
+ * of this class.
+ * <p>
+ * Note! This strategy should only be used with one Range Raptor iteration (no searchWindow).
+ * Multiple iterations are not allowed and would produce the same result in every iteration.
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements RoutingStrategy<T> {
+public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule>
+        implements RoutingStrategy<T> {
 
     private static final int NOT_SET = -1;
 
@@ -30,7 +37,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     private T onTrip;
     private int onTripTimeShift;
 
-    public NoWaitTransitWorker(TransitCalculator<T> calculator, StdWorkerState<T> state) {
+    public MinTravelDurationRoutingStrategy(TransitCalculator<T> calculator, StdWorkerState<T> state) {
         this.calculator = calculator;
         this.state = state;
     }
@@ -100,5 +107,26 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     @Override
     public TransitArrival<T> previousTransit(int boardStopIndex) {
         return state.previousTransit(boardStopIndex);
+    }
+
+    @Override
+    public void boardSameTrip(int earliestBoardTime, int stopPos, int stopIndex) {
+        // If not boarded, return
+        if(onTripIndex == NOT_SET) { return; }
+
+        int tripBoardingTime = onTrip.departure(stopPos);
+
+        // Return if the current boarding time is after the earliest boarding time
+        if (calculator.isAfter(earliestBoardTime, tripBoardingTime)) { return; }
+
+        int tripTimeShift = tripBoardingTime - earliestBoardTime;
+
+        // Return if the previous boarding time is better than this (the previous boarding can be
+        // time-shifted more than this)
+        if (calculator.isBefore(tripTimeShift, onTripTimeShift)) { return; }
+
+        onTripBoardTime = earliestBoardTime;
+        onTripBoardStop = stopIndex;
+        onTripTimeShift = tripTimeShift;
     }
 }

@@ -3,8 +3,8 @@ package org.opentripplanner.netex.mapping;
 import java.util.Set;
 import javax.annotation.Nullable;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.Operator;
@@ -61,22 +61,12 @@ class RouteMapper {
         otpRoute.setOperator(findOperator(line));
         otpRoute.setLongName(line.getName().getValue());
         otpRoute.setShortName(line.getPublicCode());
-        int transportType = transportModeMapper.getTransportMode(
+        T2<TransitMode, String> mode = transportModeMapper.map(
                 line.getTransportMode(),
                 line.getTransportSubmode()
         );
-        otpRoute.setType(transportType);
-        TransitMode mode = TransitModeMapper.mapMode(transportType);
-        if (mode == null) {
-            issueStore.add(
-                    "RouteMapper", "Treating %s route type for route %s as BUS.", transportType,
-                    otpRoute.getId().toString()
-            );
-            otpRoute.setMode(TransitMode.BUS);
-        }
-        else {
-            otpRoute.setMode(mode);
-        }
+        otpRoute.setMode(mode.first);
+        otpRoute.setNetexSubmode(mode.second);
         if (line instanceof FlexibleLine_VersionStructure) {
             otpRoute.setFlexibleLineType(((FlexibleLine_VersionStructure) line)
                 .getFlexibleLineType().value());

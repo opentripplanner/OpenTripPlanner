@@ -65,7 +65,7 @@ public class VehicleParkingEdge extends Edge {
 
     private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
         RoutingRequest options = s0.getOptions();
-        if (!isSpacesAvailable(mode, options.wheelchairAccessible)) {
+        if (!vehicleParking.hasSpacesAvailable(mode, options.wheelchairAccessible, options.useVehicleParkingAvailabilityInformation)) {
             return null;
         }
 
@@ -100,7 +100,7 @@ public class VehicleParkingEdge extends Edge {
     private State traversePark(State s0, int parkingCost, int parkingTime) {
         RoutingRequest options = s0.getOptions();
 
-        if (!isSpacesAvailable(s0.getNonTransitMode(), options.wheelchairAccessible)) {
+        if (!vehicleParking.hasSpacesAvailable(s0.getNonTransitMode(), options.wheelchairAccessible, options.useVehicleParkingAvailabilityInformation)) {
             return null;
         }
 
@@ -109,17 +109,6 @@ public class VehicleParkingEdge extends Edge {
         s0e.incrementTimeInSeconds(parkingTime);
         s0e.setVehicleParked(true, TraverseMode.WALK);
         return s0e.makeState();
-    }
-
-    private boolean isSpacesAvailable(TraverseMode traverseMode, boolean wheelchairAccessible) {
-        switch (traverseMode) {
-            case BICYCLE:
-                return vehicleParking.hasBicyclePlaces();
-            case CAR:
-                return wheelchairAccessible ? vehicleParking.hasWheelchairAccessibleCarPlaces() : vehicleParking.hasCarPlaces();
-            default:
-                return false;
-        }
     }
 
     @Override

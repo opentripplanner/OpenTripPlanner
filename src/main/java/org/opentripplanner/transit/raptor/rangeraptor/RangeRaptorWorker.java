@@ -275,6 +275,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         if (result != null) {
             transitWorker.board(stopIndex, earliestBoardTime, result);
         }
+        else {
+            transitWorker.boardSameTrip(earliestBoardTime, stopPos, stopIndex);
+        }
     }
 
     private boolean boardWithConstrainedTransfer(

@@ -52,7 +52,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<Integer> type() {
-    return environment -> getSource(environment).getType();
+    return environment -> getSource(environment).getGtfsType();
   }
 
   @Override

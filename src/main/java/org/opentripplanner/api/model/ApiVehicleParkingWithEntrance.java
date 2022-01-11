@@ -78,6 +78,11 @@ public class ApiVehicleParkingWithEntrance {
      */
     public final ApiVehicleParkingSpaces availability;
 
+    /**
+     * True if realtime information is used for checking availability.
+     */
+    public final boolean realtime;
+
     ApiVehicleParkingWithEntrance(
             String id,
             String name,
@@ -92,7 +97,8 @@ public class ApiVehicleParkingWithEntrance {
             boolean hasCarPlaces,
             boolean hasWheelchairAccessibleCarPlaces,
             ApiVehicleParkingSpaces capacity,
-            ApiVehicleParkingSpaces availability
+            ApiVehicleParkingSpaces availability,
+            boolean realtime
     ) {
         this.id = id;
         this.name = name;
@@ -108,6 +114,7 @@ public class ApiVehicleParkingWithEntrance {
         this.hasWheelchairAccessibleCarPlaces = hasWheelchairAccessibleCarPlaces;
         this.capacity = capacity;
         this.availability = availability;
+        this.realtime = realtime;
     }
 
     public static ApiVehicleParkingWithEntranceBuilder builder() {
@@ -130,6 +137,7 @@ public class ApiVehicleParkingWithEntrance {
         private boolean hasWheelchairAccessibleCarPlaces;
         private ApiVehicleParkingSpaces capacity;
         private ApiVehicleParkingSpaces availability;
+        private boolean realtime;
 
         ApiVehicleParkingWithEntranceBuilder() {}
 
@@ -213,11 +221,19 @@ public class ApiVehicleParkingWithEntrance {
             return this;
         }
 
+
+        public ApiVehicleParkingWithEntranceBuilder realtime(
+                boolean realtime
+        ) {
+            this.realtime = realtime;
+            return this;
+        }
+
         public ApiVehicleParkingWithEntrance build() {
             return new ApiVehicleParkingWithEntrance(
                     id, name, entranceId, entranceName, detailsUrl,
                     imageUrl, note, tags, hasBicyclePlaces, hasAnyCarPlaces, hasCarPlaces,
-                    hasWheelchairAccessibleCarPlaces, capacity, availability
+                    hasWheelchairAccessibleCarPlaces, capacity, availability, realtime
             );
         }
     }

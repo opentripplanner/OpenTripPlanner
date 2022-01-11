@@ -155,8 +155,9 @@ public class TripQuery {
         )
         .argument(GraphQLArgument.newArgument()
             .name("modes")
-            .description("The set of access/egress/direct/transit modes to be used for this search."
-                + "Defaults to access/egress/direct mode foot and all transportModes.")
+            .description("The set of access/egress/direct/transit modes to be used for this search. "
+                + "Note that this only works at the Line level. If individual ServiceJourneys have "
+                + "modes that differ from the Line mode, this will NOT be accounted for.")
             .type(ModeInputType.INPUT_TYPE)
             .build()
         )
