@@ -943,6 +943,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               Remove the previous realtime-added TripPattern from buffer.
               Only one version of the realtime-update should exist
              */
+            buffer.removeLastAddedTripPattern(feedScopedTripId, serviceDate);
             buffer.removeRealtimeUpdatedTripTimes(pattern, feedScopedTripId, serviceDate);
             success = true;
 
