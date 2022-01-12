@@ -123,9 +123,6 @@ public class Timetable implements Serializable {
             if (tt.getTrip().getId().equals(tripId)) { return ret; }
             ret += 1;
         }
-        LOG.warn("TripId {} not found in Timetable for pattern {} on {}, with {} tripTimes",
-                tripId, pattern.getId(), serviceDate, tripTimes.size()
-        );
         return -1;
     }
 
