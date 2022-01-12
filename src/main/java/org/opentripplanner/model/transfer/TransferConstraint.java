@@ -152,7 +152,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     public boolean isRegularTransfer() {
         // Note! The 'maxWaitTime' is only valid with the guaranteed flag set, so we
         // do not need to check it here
-        return !(staySeated || guaranteed || priority.isConstrained());
+        return !(isFacilitated() || isMinTransferTimeSet() || priority.isConstrained());
     }
 
 
@@ -208,6 +208,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
                 .addEnum("priority", priority, ALLOWED)
                 .addBoolIfTrue("staySeated", staySeated)
                 .addBoolIfTrue("guaranteed", guaranteed)
+                .addDurationSec("minTransferTime", minTransferTime, NOT_SET)
                 .addDurationSec("maxWaitTime", maxWaitTime, NOT_SET)
                 .toString();
     }
