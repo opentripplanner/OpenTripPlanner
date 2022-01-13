@@ -144,7 +144,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
      * Maximum time after scheduled departure time the connecting transport is guarantied to wait
      * for the delayed trip.
      * <p>
-     * THIS IS NOT CONSIDERED IN RAPTOR. Otp relay on real-time data for this, so if the "from"
+     * THIS IS NOT CONSIDERED IN RAPTOR. OTP relies on real-time data for this, so if the "from"
      * vehicle is delayed, then the real time system is also responsible for propagating the delay
      * onto the "to" trip.
      */

@@ -99,7 +99,7 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
      * Case 1: from trip to stop :=  11 * 3 + 10 * 1 = 43
      * Case 2: from route to route :=  11 * 2 + 10 * 2 = 42
      * </pre>
-     *         Case 1 have the highest ranking.
+     *         Case 1 has the highest ranking.
      *     </li>
      * </ul>
      */
