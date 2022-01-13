@@ -118,6 +118,9 @@ public class TransferIndexGenerator {
     private List<TPoint> findTPoints(StationTransferPoint point) {
         var station = point.getStation();
         var patterns = patternsByStation.get(station);
+
+        if(patterns == null) { return List.of(); }
+
         var sourcePoint = createTransferPointForPattern(station, stopIndex);
         var result = new ArrayList<TPoint>();
 
@@ -135,9 +138,12 @@ public class TransferIndexGenerator {
     private List<TPoint> findTPoints(StopTransferPoint point) {
         var stop = point.asStopTransferPoint().getStop();
         var patterns = patternsByStop.get(stop);
-        var sourcePoint = createTransferPointForPattern(stopIndex.indexOf(stop));
 
+        if(patterns == null) { return List.of(); }
+
+        var sourcePoint = createTransferPointForPattern(stopIndex.indexOf(stop));
         var result = new ArrayList<TPoint>();
+
         for (TripPatternWithRaptorStopIndexes pattern : patterns) {
             var p = pattern.getPattern();
             for (int pos = 0; pos < p.numberOfStops(); ++pos) {
@@ -170,7 +176,12 @@ public class TransferIndexGenerator {
             ToIntFunction<TripPattern> resolveStopPosInPattern
     ) {
         var patterns = patternsByRoute.get(route);
+
+        // A route should have a pattern(trip), but it does not hurt to check here
+        if(patterns == null) { return List.of(); }
+
         var points = new ArrayList<TPoint>();
+
         for (var pattern : patterns) {
             int stopPosInPattern = resolveStopPosInPattern.applyAsInt(pattern.getPattern());
             int stopIndex = pattern.stopIndex(stopPosInPattern);
@@ -182,6 +193,7 @@ public class TransferIndexGenerator {
 
     private List<TPoint> findTPoints(TripTransferPoint point) {
         var trip = point.getTrip();
+        // All trips have at least one pattern, no need to chech for null here
         var patterns = patternsByTrip.get(trip);
         int stopPosInPattern = point.getStopPositionInPattern();
         int stopIndex = patterns.get(0).stopIndex(stopPosInPattern);
