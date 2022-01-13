@@ -26,7 +26,7 @@ public final class RouteStationTransferPoint implements TransferPoint, Serializa
   }
 
   @Override
-  public boolean applyToAllTrips() {
+  public boolean appliesToAllTrips() {
     return true;
   }
 

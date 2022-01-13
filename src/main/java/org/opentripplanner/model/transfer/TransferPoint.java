@@ -53,7 +53,7 @@ import org.opentripplanner.model.Trip;
 public interface TransferPoint {
 
   /** Return {@code true} if this transfer point apply to all trips in pattern */
-  boolean applyToAllTrips();
+  boolean appliesToAllTrips();
 
   /**
    * <a href="https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">

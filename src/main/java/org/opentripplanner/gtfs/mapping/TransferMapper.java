@@ -181,6 +181,8 @@ class TransferMapper {
       station = stationMapper.map(rhsStopOrStation);
     }
     if(trip != null) {
+      // A trip may visit the same stop twice, but we ignore that and only add the first stop
+      // we find. Pattern that start and end at the same stop is supported.
       int stopPositionInPattern = stopPosition(trip, stop, station, boardTrip);
       return stopPositionInPattern < 0 ? null : new TripTransferPoint(trip, stopPositionInPattern);
     }
@@ -197,24 +199,6 @@ class TransferMapper {
 
     throw new IllegalStateException("Should not get here!");
   }
-
-
-  private int stopPosition(Route route, Stop stop, Station station, boolean boardTrip) {
-    var stopPosList = tripsByRoute.get(route).stream()
-            .map(t -> stopPosition(t, stop, station, boardTrip))
-            .distinct()
-            .collect(Collectors.toList());
-
-    if(stopPosList.size() == 1) { return stopPosList.get(0); }
-
-    FIXED_ROUTE_ERROR.error(
-        "In GTFS 'transfers.txt' a transfer-point can be a combination of route and stop/station!"
-        + "OTP only support this case, if the stop/station have the same stop point in trip-"
-        + "pattern for all trips in the route. Route: " + route
-    );
-    return -1;
-  }
-
 
   private int stopPosition(Trip trip, Stop stop, Station station, boolean boardTrip) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);

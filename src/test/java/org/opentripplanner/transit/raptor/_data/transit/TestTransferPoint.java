@@ -20,7 +20,7 @@ public class TestTransferPoint implements TransferPoint {
     }
 
     @Override
-    public boolean applyToAllTrips() {
+    public boolean appliesToAllTrips() {
         return applyToAllTrips;
     }
 

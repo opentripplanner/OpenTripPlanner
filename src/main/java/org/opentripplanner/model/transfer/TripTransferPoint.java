@@ -26,7 +26,7 @@ public final class TripTransferPoint implements TransferPoint, Serializable {
   }
 
   @Override
-  public boolean applyToAllTrips() {
+  public boolean appliesToAllTrips() {
     return false;
   }
 

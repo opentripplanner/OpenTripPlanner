@@ -79,11 +79,11 @@ public class TransferPointTest {
 
     @Test
     public void applyToAllTrips() {
-        assertTrue(STATION_POINT.applyToAllTrips());
-        assertTrue(STOP_POINT_A.applyToAllTrips());
-        assertTrue(ROUTE_POINT_1A.applyToAllTrips());
-        assertTrue(ROUTE_POINT_1S.applyToAllTrips());
-        assertFalse(TRIP_POINT_11_1.applyToAllTrips());
+        assertTrue(STATION_POINT.appliesToAllTrips());
+        assertTrue(STOP_POINT_A.appliesToAllTrips());
+        assertTrue(ROUTE_POINT_1A.appliesToAllTrips());
+        assertTrue(ROUTE_POINT_1S.appliesToAllTrips());
+        assertFalse(TRIP_POINT_11_1.appliesToAllTrips());
     }
 
     @Test

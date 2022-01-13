@@ -19,7 +19,7 @@ public class StopTransferPoint implements TransferPoint, Serializable {
   }
 
   @Override
-  public boolean applyToAllTrips() {
+  public boolean appliesToAllTrips() {
     return true;
   }
 
