@@ -8,6 +8,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.util.OTPFeature;
 
 
 /**
@@ -160,10 +161,22 @@ public final class ConstrainedBoardingSearch
                                 sourceTransitArrivalTime,
                                 onTripTxConstraint.getMinTransferTime()
                         );
-                        onTripEarliestBoardTime = fwdRvsStrategy.maxTime(
-                                earliestBoardTime,
-                                minTransferBoardTime
-                        );
+                        // If the feature flag is switched on, then the minimum transfer time is
+                        // not the minimum transfer time, but the definitive transfer time. Use
+                        // this to override what we think the transfer will take according to OSM
+                        // data.
+                        if (OTPFeature.MinimumTransferTimeIsDefinitive.isOn()) {
+                            onTripEarliestBoardTime = minTransferBoardTime;
+                        }
+                        // Here we take the max(minTransferTime, osmWalkTransferTime) as the
+                        // transfer time
+                        else {
+                            onTripEarliestBoardTime = fwdRvsStrategy.maxTime(
+                                    earliestBoardTime,
+                                    minTransferBoardTime
+                            );
+                        }
+
                     } else {
                         onTripEarliestBoardTime = earliestBoardTime;
                     }
