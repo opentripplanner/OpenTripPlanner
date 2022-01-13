@@ -57,7 +57,7 @@ public class RoutingService {
             RoutingWorker worker = new RoutingWorker(router, request, zoneId);
             return worker.route();
         } finally {
-            if (request != null && request.rctx != null) {
+            if (request != null) {
                 request.cleanup();
             }
         }
