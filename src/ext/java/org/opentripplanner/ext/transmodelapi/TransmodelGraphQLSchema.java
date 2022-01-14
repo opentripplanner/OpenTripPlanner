@@ -760,8 +760,10 @@ public class TransmodelGraphQLSchema {
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .build())
             .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment).getRouteForId(TransitIdMapper
-                  .mapIDToDomain(environment.getArgument("id")));
+                final String id = environment.getArgument("id");
+                if (id.isBlank()) { return null; }
+                return GqlUtil.getRoutingService(environment)
+                        .getRouteForId(TransitIdMapper.mapIDToDomain(id));
             })
             .build())
         .field(GraphQLFieldDefinition

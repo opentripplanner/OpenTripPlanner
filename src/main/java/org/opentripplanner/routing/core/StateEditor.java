@@ -47,6 +47,11 @@ public class StateEditor {
             child.backState = null;
             child.vertex = parent.vertex;
             child.stateData = child.stateData.clone();
+        } else if (e.getFromVertex() == null || e.getToVertex() == null) {
+            child.vertex = parent.vertex;
+            child.stateData = child.stateData.clone();
+            LOG.error("From or to vertex is null for {}", e);
+            defectiveTraversal = true;
         } else {
             // be clever
             // Note that we use equals(), not ==, here to allow for dynamically
