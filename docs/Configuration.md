@@ -251,7 +251,7 @@ config key | description | value type | value default | notes
 `streets` | Include street input files (OSM/PBF) | boolean | true | 
 `storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null | 
 `subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
-`transferRequests` | Routing requests to use for pre-calculating stop-to-stop transfers. | object | `[ { mode: WALK } ]` |
+`transferRequests` | Routing requests to use for pre-calculating stop-to-stop transfers. | array | `[ { modes: ["WALK"] } ]` |
 `transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
 `transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | date or period | &minus;P1Y | _2020&#8209;01&#8209;01, &minus;P1M3D, &minus;P3W_
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
