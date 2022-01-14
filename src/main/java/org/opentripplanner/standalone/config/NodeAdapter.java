@@ -99,6 +99,10 @@ public class NodeAdapter {
         return result;
     }
 
+    public boolean isNonEmptyList() {
+        return json.isArray() && json.size() > 0;
+    }
+
     public String getSource() {
         return source;
     }
