@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.configure;
 
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
+
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
-
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.NO_WAIT_BEST_TIME;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.NO_WAIT_STD;
 
 
 /**
@@ -19,14 +19,14 @@ class VerifyRequestIsValid  {
     }
 
     void verify() {
-        verifyNoWaitWorkersIsOneIterationOnly();
+        verifyMinTravelDurationIsOneIterationOnly();
     }
 
 
     /* private methods */
 
-    private void verifyNoWaitWorkersIsOneIterationOnly() {
-        verify(noWaitWorker() && !oneIteration(), "The profile %s is only defined for one iteration.", profile());
+    private void verifyMinTravelDurationIsOneIterationOnly() {
+        verify(minTravelDurationStrategy() && !oneIteration(), "The profile %s is only defined for one iteration.", profile());
     }
 
     private void verify(boolean condition, String format, Object... args) {
@@ -39,8 +39,8 @@ class VerifyRequestIsValid  {
         return context.profile();
     }
 
-    private boolean noWaitWorker() {
-        return profile().isOneOf(NO_WAIT_STD, NO_WAIT_BEST_TIME);
+    private boolean minTravelDurationStrategy() {
+        return profile().isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME);
     }
 
     private boolean oneIteration() {

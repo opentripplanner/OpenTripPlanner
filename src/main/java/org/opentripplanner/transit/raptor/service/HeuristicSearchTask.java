@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.service;
 
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.NO_WAIT_BEST_TIME;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.NO_WAIT_STD;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -136,12 +136,12 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
 
   private void createHeuristicSearchIfNotExist(RaptorRequest<T> request) {
     if (search == null) {
-      var profile = NO_WAIT_BEST_TIME;
+      var profile = MIN_TRAVEL_DURATION_BEST_TIME;
 
       if(request.searchParams().constrainedTransfersEnabled()) {
         // We need to look up the previous transit arrival, this is not possible with the
         // BEST_TIMES only states.
-        profile = NO_WAIT_STD;
+        profile = MIN_TRAVEL_DURATION;
       }
 
       heuristicReq = request

@@ -58,6 +58,6 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule>
     }
 
     private boolean isWithinSlack(int timeLimit, int time) {
-        return calculator.isBest(time, timeLimit + slack);
+        return calculator.isBefore(time, timeLimit + slack);
     }
 }
