@@ -19,6 +19,7 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -38,7 +39,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         false,
-        Set.of(TransitMode.BUS),
+        Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
         Set.of()
     );
 
@@ -55,7 +56,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         false,
-        Set.of(TransitMode.BUS),
+        Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
         Set.of(TEST_ROUTE_ID)
     );
 

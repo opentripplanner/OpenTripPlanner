@@ -11,6 +11,7 @@ import static org.opentripplanner.routing.core.TraverseMode.WALK;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +41,8 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class FlexIntegrationTest {
 
-    static long dateTime = ZonedDateTime.parse("2021-12-02T12:00:00-05:00[America/New_York]")
-            .toInstant()
-            .getEpochSecond();
+    static Instant dateTime = ZonedDateTime.parse("2021-12-02T12:00:00-05:00[America/New_York]")
+            .toInstant();
 
     static Graph graph;
     static RoutingService service;
@@ -129,7 +129,7 @@ public class FlexIntegrationTest {
 
     private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {
         RoutingRequest request = new RoutingRequest();
-        request.dateTime = dateTime;
+        request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
         request.numItineraries = 10;

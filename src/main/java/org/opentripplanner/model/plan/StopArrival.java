@@ -1,8 +1,7 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.model.base.ToStringBuilder;
-
 import java.util.Calendar;
+import org.opentripplanner.model.base.ToStringBuilder;
 
 
 /**
@@ -31,8 +30,8 @@ public class StopArrival {
     @Override
     public String toString() {
         return ToStringBuilder.of(StopArrival.class)
-                .addCalTime("arrival",arrival)
-                .addCalTime("departure", departure)
+                .addTimeCal("arrival",arrival)
+                .addTimeCal("departure", departure)
                 .addObj("place", place)
                 .toString();
     }

@@ -145,6 +145,7 @@ public class FlexStopLocationMapperTest {
         null,
         null,
         null,
+        null,
         null
     );
   }

@@ -172,7 +172,10 @@ class TripPatternMapper {
         }
 
         // Create StopPattern from any trip (since they are part of the same JourneyPattern)
-        StopPattern stopPattern = new StopPattern(result.tripStopTimes.get(trips.get(0)));
+        StopPattern stopPattern = deduplicator.deduplicateObject(
+                StopPattern.class,
+                new StopPattern(result.tripStopTimes.get(trips.get(0)))
+        );
 
         TripPattern tripPattern = new TripPattern(
             idFactory.createId(journeyPattern.getId()),

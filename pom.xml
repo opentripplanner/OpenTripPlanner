@@ -29,6 +29,7 @@
         <jersey.version>2.34</jersey.version>
         <junit.version>5.7.2</junit.version>
         <micrometer.version>1.7.4</micrometer.version>
+        <netcdf4.version>5.3.2</netcdf4.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -458,7 +459,20 @@
             <artifactId>micrometer-jersey2</artifactId>
             <version>${micrometer.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-influx</artifactId>
+            <version>${micrometer.version}</version>
+            <scope>test</scope>
+        </dependency>
 
+        <!-- netcdf4 -->
+
+        <dependency>
+            <groupId>edu.ucar</groupId>
+            <artifactId>netcdf4</artifactId>
+            <version>${netcdf4.version}</version>
+        </dependency>
         <!--
             Netex XML document - JAXB generated Java model.
             This is generated using the official Netex schema(v1.0) and support the entire model,
@@ -718,6 +732,11 @@
             <groupId>com.wdtinc</groupId>
             <artifactId>mapbox-vector-tile</artifactId>
             <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.objecthunter</groupId>
+            <artifactId>exp4j</artifactId>
+            <version>0.4.8</version>
         </dependency>
     </dependencies>
 

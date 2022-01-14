@@ -23,6 +23,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -35,7 +37,7 @@ import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.WalkStep;
@@ -84,7 +86,7 @@ public abstract class SnapshotTestBase {
         Router router = getRouter();
 
         RoutingRequest request = router.defaultRoutingRequest.clone();
-        request.dateTime = TestUtils.dateInSeconds(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second);
+        request.setDateTime(TestUtils.dateInstant(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second));
         request.maxTransfers = 6;
         request.numItineraries = 6;
         request.searchWindow = Duration.ofHours(5);
@@ -172,7 +174,7 @@ public abstract class SnapshotTestBase {
 
         RoutingRequest arriveBy = request.clone();
         arriveBy.setArriveBy(true);
-        arriveBy.dateTime = departByItineraries.get(0).lastLeg().endTime.toInstant().getEpochSecond();
+        arriveBy.setDateTime(departByItineraries.get(0).lastLeg().endTime.toInstant());
 
         List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy, router);
         sanitizeItinerariesForSnapshot(arriveByItineraries);
@@ -200,15 +202,30 @@ public abstract class SnapshotTestBase {
         }
     }
 
+    private static List<ApiRequestMode> mapModes(Collection<AllowedTransitMode> reqModes) {
+        List<ApiRequestMode> result = new ArrayList<>();
+
+        if(ApiRequestMode.TRANSIT.getTransitModes().equals(reqModes)) {
+            return List.of(ApiRequestMode.TRANSIT);
+        }
+
+        for (AllowedTransitMode allowedTransitMode : reqModes) {
+            Collection<AllowedTransitMode> allowedTransitModes = Set.of(allowedTransitMode);
+            for (ApiRequestMode apiCandidate : ApiRequestMode.values()) {
+                if(allowedTransitModes.equals(apiCandidate.getTransitModes())) {
+                    result.add(apiCandidate);
+                }
+            }
+        }
+        return result;
+    }
+
     private String createDebugUrlForRequest(RoutingRequest request) {
         var dateTime = Instant.ofEpochSecond(request.getSecondsSinceEpoch())
                 .atZone(getRouter().graph.getTimeZone().toZoneId())
                 .toLocalDateTime();
 
-        var transitModes = Objects.equals(request.modes.transitModes, Set.of(TransitMode.values())) ?
-                Stream.of(ApiRequestMode.TRANSIT) :
-                        request.modes.transitModes.stream()
-                                .map(ApiRequestMode::fromTransitMode);
+        var transitModes = mapModes(request.modes.transitModes);
 
         var modes = Stream.concat(
                 Stream.of(
@@ -218,7 +235,7 @@ public abstract class SnapshotTestBase {
                 )
                         .filter(Objects::nonNull)
                         .map(QualifiedMode::toString),
-                transitModes
+                transitModes.stream()
                         .map(ApiRequestMode::name)
         )
                 .distinct()

@@ -22,7 +22,7 @@ and arrival times (initial _stop-arrivals_). Then for each _route_ serving these
 trip is explored. Each _trip_ will take you to a new set of _stops_ with new _stop-arrivals_. 
 Then transfers from all stops reached are used to further reach new stops. This process is repeated, 
 each iteration of transit and transfers is called a _round_. For every _round_ a new list of 
-_stop-arrivals_ is found. This new list of _stop-arrivals_ is used as input for the next round. 
+_stop-arrivals_ are found. This new list of _stop-arrivals_ are used as input for the next round. 
 The algorithm will terminate by itself (when all reachable stops are visited), or can be stopped when 
 you have the desired results. The reason this is much faster than the current OTP A* is that there 
 is no need to maintain a priority queue of edges to explore. For each stop we keep the best 
@@ -154,20 +154,22 @@ stops/routes that can be used as a filter for the _McRR_. _RR_ is super fast, mo
 than McRR with 4 criteria.
 
 ## Understanding the search (range-raptor algorithm implementation)
-The `RangeRaptorWorker` and the `RoutingStrategy` together implement the _range-raptor_ 
-algorithm. There are 3 `RoutingStrategy` implementations:
-1. The `StdTransitWorker` is the standard Range Raptor implementation. Support both _forward_ and 
-_reverse_ search.
-1. The `NoWaitTransitWorker` is the same as the standard, but it eliminates _wait-time_. It support 
-both _forward_ and _reverse_ search. It is very fast, and can be used to compute various 
-heuristics, like _minimum-number-of-transfers_, _minimum-travel-time_ and 
-_earliest-possible-arrival-time_.
-1. The `McTransitWorker` is the _Multi-Criteria Range Raptor_ implementation. It does **not** 
-support _reverse_ search - so far there has not been a need for it.
+The `RangeRaptorWorker` and the `RoutingStrategy` together implement the _range-raptor_ algorithm. 
+There are three `RoutingStrategy` implementations:
+1. The `ArrivalTimeRoutingStrategy` is the standard Range Raptor implementation. It supports both
+   _forward_ and _reverse_ search and is used to find the path with the best _arrival-time_.
+2. The `MinTravelDurationRoutingStrategy` is the same as the standard, but optimize on 
+   travel-duration, eliminating _wait-time_ (except board and alight slack). It supports both
+   _forward_ and _reverse_ search, but only one Range Raptor iteration (no search window). 
+   The main usage for this is to compute heuristics used to improve the performance in the
+   multi-criteria search. It is used to compute various heuristics, like
+   _minimum-number-of-transfers_, _minimum-travel-time_ and _earliest-possible-arrival-time_.
+3. The `McTransitWorker` is the _Multi-Criteria Range Raptor_ implementation. It does **not**
+   support _reverse_ search - so far there has not been a need for it.
  
 The Range Raptor Search supports both _Forward_ and _Reverse_ search. In the diagram below, the same 
 journey is shown using the _forward_ and _reverse_ search. The two trips have the exact same 
-legs, but some of the calculated times are slightly different. Note! If you remove or time-shift
+legs, but the calculated times are slightly different. Note! If you remove or time-shift
 the _Wait_ parts you will get the exact same result.  
 
 ![Raptor Time Line](RaptorTimeLine.svg)

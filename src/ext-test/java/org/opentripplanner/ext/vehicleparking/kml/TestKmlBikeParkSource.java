@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_parking;
+package org.opentripplanner.ext.vehicleparking.kml;
 
 import junit.framework.TestCase;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -10,23 +10,13 @@ public class TestKmlBikeParkSource extends TestCase {
   private static final String TEST_FEED_ID = "testFeed";
 
   public void testKML() {
-
-    KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(new KmlBikeParkDataSource.Parameters() {
-      @Override public String getNamePrefix() {
-        return null;
-      }
-      @Override public String getFeedId() {
-        return TEST_FEED_ID;
-      }
-      @Override public boolean zip() {
-        return false;
-      }
-      @Override public String getUrl() {
-        return "file:src/test/resources/bike/NSFietsenstallingen.kml";
-      }
-    });
+    var parameters = new KmlUpdaterParameters("",
+            "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen.kml", TEST_FEED_ID,
+            null, 60, false, null
+    );
+    KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(parameters);
     assertTrue(kmlDataSource.update());
-    List<VehicleParking> bikeParks = kmlDataSource.getVehicleParkings();
+    List<VehicleParking> bikeParks = kmlDataSource.getUpdates();
     assertEquals(5, bikeParks.size());
     VehicleParking alkmaar = bikeParks.get(0);
     VehicleParking zwolle = bikeParks.get(4);
@@ -39,23 +29,14 @@ public class TestKmlBikeParkSource extends TestCase {
   }
 
   public void testKMLWithFolder() {
-
-      KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(new KmlBikeParkDataSource.Parameters() {
-          @Override public String getNamePrefix() {
-              return null;
-          }
-        @Override public String getFeedId() {
-          return TEST_FEED_ID;
-        }
-          @Override public boolean zip() {
-              return false;
-          }
-          @Override public String getUrl() {
-              return "file:src/test/resources/bike/NSFietsenstallingen_folder.kml";
-          }
-      });
+    var parameters = new KmlUpdaterParameters("",
+            "file:src/ext-test/resources/vehicleparking/kml/NSFietsenstallingen_folder.kml",
+            TEST_FEED_ID,
+            null, 60, false, null
+    );
+    KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(parameters);
     assertTrue(kmlDataSource.update());
-    List<VehicleParking> bikeParks = kmlDataSource.getVehicleParkings();
+    List<VehicleParking> bikeParks = kmlDataSource.getUpdates();
     assertEquals(5, bikeParks.size());
     VehicleParking alkmaar = bikeParks.get(0);
     VehicleParking almere = bikeParks.get(4);

@@ -63,6 +63,12 @@ public class DateMapperTest {
   }
 
   @Test
+  public void testAsStartOfServiceWithInstance() {
+    var time = Instant.parse("2019-03-30T10:00:00Z");
+    assertEquals("2019-03-30T00:00+01:00[Europe/Paris]", asStartOfService(time, ZONE_ID).toString());
+  }
+
+  @Test
   public void secondsSinceStartOfTime() {
     assertEquals(0, DateMapper.secondsSinceStartOfTime(Z0, D2019_03_30));
     assertEquals(23*3600, DateMapper.secondsSinceStartOfTime(Z0, D2019_03_31));

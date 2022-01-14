@@ -2,6 +2,8 @@ package org.opentripplanner.util;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +34,8 @@ public enum OTPFeature {
     SandboxAPIMapboxVectorTilesApi(false),
     SandboxExampleAPIGraphStatistics(false),
     SandboxAPIParkAndRideApi(false),
-    TransferAnalyzer(false);
+    TransferAnalyzer(false),
+    DataOverlay(false);
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 
@@ -72,6 +75,13 @@ public enum OTPFeature {
      */
     void set(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * If feature is turned on, then return supplied object if not return {@code null}.
+     */
+    public <T> T isOnElseNull(Supplier<T> supplier) {
+        return isOn() ? supplier.get() : null;
     }
 
 

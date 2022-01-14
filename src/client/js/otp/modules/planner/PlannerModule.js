@@ -416,6 +416,8 @@ otp.modules.planner.PlannerModule =
                 }
 
                 if(data.plan) {
+                    data.plan.nextPageCursor = data.nextPageCursor;
+                    data.plan.previousPageCursor = data.previousPageCursor;
                     // allow for optional pre-processing step (used by Fieldtrip module)
                     if(typeof this_.preprocessPlan == 'function') {
                         this_.preprocessPlan(data.plan, queryParams, function() {
@@ -438,8 +440,9 @@ otp.modules.planner.PlannerModule =
 
     planReceived : function(plan, url, queryParams, successCallback) {
         // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
-        otp.config.timeOffset = (otp.config.timeOffset) ||
-            (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(plan.date))/3600000;
+        otp.config.timeOffset = (otp.config.timeOffset !== undefined)
+            ? otp.config.timeOffset
+            : (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(plan.date))/3600000;
 
         var tripPlan = new otp.modules.planner.TripPlan(plan, queryParams);
 

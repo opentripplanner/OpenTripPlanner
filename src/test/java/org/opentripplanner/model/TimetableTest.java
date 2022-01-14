@@ -10,6 +10,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -136,7 +137,7 @@ public class TimetableTest {
         //---
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 0, 0);
         long endTime;
-        options.dateTime = startTime;
+        options.setDateTime(Instant.ofEpochSecond(startTime));
 
         //---
         options.setRoutingContext(graph, stop_a, stop_c);

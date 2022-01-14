@@ -76,7 +76,7 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
 
     @Override
     public boolean exceedsTimeLimit(int time) {
-        return isBest(latestAcceptableArrivalTime, time);
+        return isBefore(latestAcceptableArrivalTime, time);
     }
 
     @Override
@@ -86,8 +86,13 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public boolean isBest(final int subject, final int candidate) {
+    public boolean isBefore(final int subject, final int candidate) {
         return subject < candidate;
+    }
+
+    @Override
+    public boolean isAfter(int subject, int candidate) {
+        return subject > candidate;
     }
 
     @Override
