@@ -99,7 +99,7 @@ public class NodeAdapter {
         return result;
     }
 
-    public boolean isNonEmptyList() {
+    public boolean isNonEmptyArray() {
         return json.isArray() && json.size() > 0;
     }
 

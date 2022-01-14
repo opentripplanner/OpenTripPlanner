@@ -363,7 +363,7 @@ public class BuildConfig {
         storage = new StorageConfig(c.path("storage"));
         dataOverlay = DataOverlayConfigMapper.map(c.path("dataOverlay"));
 
-        if (c.path("transferRequests").isNonEmptyList()) {
+        if (c.path("transferRequests").isNonEmptyArray()) {
             transferRequests = c
                 .path("transferRequests")
                 .asList()
