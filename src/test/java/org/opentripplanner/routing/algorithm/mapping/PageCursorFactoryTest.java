@@ -18,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
+import org.opentripplanner.util.time.TimeUtils;
 
 class PageCursorFactoryTest implements PlanTestConstants {
 
@@ -25,10 +26,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
     static final Instant time = Instant.parse("2020-02-02T12:00:00Z");
     static final ZonedDateTime startOfTime = DateMapper.asStartOfService(LocalDate.ofInstant(time, zoneId), zoneId);
 
-    static final int T12_00 = 12 * 60 * 60;
-    static final int T12_30 = (int) (12.5 * 60 * 60);
-    static final int T13_00 = 13 * 60 * 60;
-    static final int T13_30 = (int) (13.5 * 60 * 60);
+    static final int T12_00 = TimeUtils.hm2time(12, 0);
+    static final int T12_30 = TimeUtils.hm2time(12, 30);
+    static final int T13_00 = TimeUtils.hm2time(13, 0);
+    static final int T13_30 = TimeUtils.hm2time(13, 30);
     public static final Duration D1H = Duration.ofHours(1);
     public static final Duration D30M = Duration.ofMinutes(30);
     public static final Duration D1H30M = Duration.ofMinutes(90);

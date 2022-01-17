@@ -62,62 +62,53 @@ public class PageCursorFactory {
 
         Instant edtPrev, edtNext, latPrev, latNext;
 
-        if (forwards) {
-            if (arriveBy) {
+        if (arriveBy) {
+            if (forwards) {
                 // Previous
                 edtPrev = edt.minus(sw);
                 latPrev = lat.minus(sw);
 
                 // Next
-                if (firstRemovedItinerary != null) {
-                    edtNext = getItineraryStartTime();
-                    latNext = lat.plus(Duration.between(edtNext, edt));
-                } else {
+                if (firstRemovedItinerary == null) {
                     edtNext = edt.plus(sw);
                     latNext = lat.plus(sw);
+                } else {
+                    edtNext = getItineraryStartTime();
+                    latNext = lat.plus(Duration.between(edtNext, edt));
                 }
-
-                previous = PageCursor.arriveByCursor(edtPrev, latPrev, sw, false);
-                next = PageCursor.arriveByCursor(edtNext, latNext, sw, true);
             }
             else {
+                // Previous
+                latPrev = firstRemovedItinerary == null ? lat.minus(sw) : getItineraryEndTime();
+                edtPrev = edt.minus(Duration.between(latPrev, lat));
+
+                // Next
+                latNext = lat.plus(sw);
+                edtNext = edt.plus(sw);
+            }
+            previous = PageCursor.arriveByCursor(edtPrev, latPrev, sw, false);
+            next = PageCursor.arriveByCursor(edtNext, latNext, sw, true);
+        }
+        // Switching direction, no need to take filtered itineraries into account
+        else {
+            if (forwards) {
                 // Previous
                 edtPrev = this.edt.minus(sw);
 
                 // Next
-                if (firstRemovedItinerary != null) {
+                if (firstRemovedItinerary == null) {
+                    edtNext = edt.plus(sw);
+                } else {
                     Instant endOfSearchWindow = edt.plus(sw);
                     edtNext = getItineraryStartTime();
                     // If EDT would be outside SW, revert to end of SW
                     if (edt.isAfter(endOfSearchWindow)) {
                         edtNext = endOfSearchWindow;
                     }
-                } else {
-                    edtNext = edt.plus(sw);
                 }
-
                 previous = PageCursor.departAfterCursor(edtPrev, sw, true);
-                next = PageCursor.departAfterCursor(edtNext, sw, false);
             }
-        }
-        // Switching direction, no need to take filtered itineraries into account
-        else {
-            if (arriveBy) {
-                // Previous
-                if (firstRemovedItinerary != null) {
-                    latPrev = getItineraryEndTime();
-                } else {
-                    latPrev = lat.minus(sw);
-                }
-                edtPrev = edt.minus(Duration.between(latPrev, lat));
-
-                // Next
-                edtNext = edt.plus(sw);
-                latNext = lat.plus(sw);
-
-                previous = PageCursor.arriveByCursor(edtPrev, latPrev, sw, false);
-                next = PageCursor.arriveByCursor(edtNext, latNext, sw, true);
-            } else {
+            else {
                 // Previous
                 if (firstRemovedItinerary != null) {
                     latPrev = getItineraryEndTime();
@@ -132,9 +123,8 @@ public class PageCursorFactory {
 
                 // Next
                 edtNext = edt.plus(sw);
-
-                next = PageCursor.departAfterCursor(edtNext, sw, false);
             }
+            next = PageCursor.departAfterCursor(edtNext, sw, false);
         }
     }
 
