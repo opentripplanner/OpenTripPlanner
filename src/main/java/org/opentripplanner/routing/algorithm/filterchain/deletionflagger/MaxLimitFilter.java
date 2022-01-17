@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
+import com.google.common.collect.Lists;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 
@@ -19,15 +20,22 @@ public class MaxLimitFilter implements ItineraryDeletionFlagger {
 
     private final String name;
     private final int maxLimit;
+    private final boolean reverseFilteringDirection;
     private final Consumer<Itinerary> changedSubscriber;
 
     public MaxLimitFilter(String name, int maxLimit) {
-        this(name, maxLimit, null);
+        this(name, maxLimit, false, null);
     }
 
-    public MaxLimitFilter(String name, int maxLimit, Consumer<Itinerary> changedSubscriber) {
+    public MaxLimitFilter(
+            String name,
+            int maxLimit,
+            boolean reverseFilteringDirection,
+            Consumer<Itinerary> changedSubscriber
+    ) {
         this.name = name;
         this.maxLimit = maxLimit;
+        this.reverseFilteringDirection = reverseFilteringDirection;
         this.changedSubscriber = changedSubscriber == null ? IGNORE_SUBSCRIBER : changedSubscriber;
     }
 
@@ -39,7 +47,10 @@ public class MaxLimitFilter implements ItineraryDeletionFlagger {
     @Override
     public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
         if(itineraries.size() <= maxLimit) { return List.of(); }
-        changedSubscriber.accept(itineraries.get(maxLimit));
-        return itineraries.stream().skip(maxLimit).collect(Collectors.toList());
+        List<Itinerary> possiblyReversedItineraries = reverseFilteringDirection
+                ? Lists.reverse(itineraries)
+                : itineraries;
+        changedSubscriber.accept(possiblyReversedItineraries.get(maxLimit));
+        return possiblyReversedItineraries.stream().skip(maxLimit).collect(Collectors.toList());
     }
 }

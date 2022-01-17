@@ -14,7 +14,7 @@ public interface StopCollection {
          * Implementations should go down the hierarchy and return all the underlying stops
          * recursively.
          */
-        Collection<Stop> getChildStops();
+        Collection<StopLocation> getChildStops();
 
         double getLat();
 

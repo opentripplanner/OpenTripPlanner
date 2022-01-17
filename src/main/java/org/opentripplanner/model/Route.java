@@ -15,9 +15,11 @@ public final class Route extends TransitEntity {
 
     private String longName;
 
-    private int type;
-
     private TransitMode mode;
+
+    // TODO: consolidate these
+    private Integer gtfsType;
+    private String netexSubmode;
 
     private String desc;
 
@@ -87,12 +89,12 @@ public final class Route extends TransitEntity {
         this.desc = desc;
     }
 
-    public int getType() {
-        return type;
+    public Integer getGtfsType() {
+        return gtfsType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setGtfsType(int gtfsType) {
+        this.gtfsType = gtfsType;
     }
 
     public TransitMode getMode() {
@@ -174,5 +176,13 @@ public final class Route extends TransitEntity {
     @Override
     public String toString() {
         return "<Route " + getId() + " " + shortName + ">";
+    }
+
+    public String getNetexSubmode() {
+        return netexSubmode;
+    }
+
+    public void setNetexSubmode(String netexSubmode) {
+        this.netexSubmode = netexSubmode;
     }
 }

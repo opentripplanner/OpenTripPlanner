@@ -91,7 +91,7 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
 
     @Override
     public boolean exceedsTimeLimit(int time) {
-        return isBest(earliestAcceptableDepartureTime, time);
+        return isBefore(earliestAcceptableDepartureTime, time);
     }
 
     @Override
@@ -101,9 +101,13 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public boolean isBest(final int subject, final int candidate) {
-        // The latest time is the best when searching in reverse
+    public boolean isBefore(final int subject, final int candidate) {
         return subject > candidate;
+    }
+
+    @Override
+    public boolean isAfter(int subject, int candidate) {
+        return subject < candidate;
     }
 
     @Override

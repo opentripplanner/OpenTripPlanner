@@ -31,10 +31,6 @@ class TripMapper {
         return orginal == null ? null : mappedTrips.computeIfAbsent(orginal, this::doMap);
     }
 
-    Collection<Trip> mappedTrips() {
-        return mappedTrips.values();
-    }
-
     private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
         Trip lhs = new Trip(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 

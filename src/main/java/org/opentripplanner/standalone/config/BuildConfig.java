@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -11,6 +12,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,11 +80,6 @@ public class BuildConfig {
      * Include all transit input files (GTFS) from scanned directory.
      */
     public final boolean transit;
-
-    /**
-     * Create direct transfer edges from transfers.txt in GTFS, instead of based on distance.
-     */
-    public final boolean useTransfersTxt;
 
     /**
      * Link GTFS stops to their parent stops.
@@ -308,6 +305,11 @@ public class BuildConfig {
     public final int maxAreaNodes;
 
     /**
+     * Config for the DataOverlay Sandbox module
+     */
+    public final DataOverlayConfig dataOverlay;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -351,7 +353,6 @@ public class BuildConfig {
         transit = c.asBoolean("transit", true);
         transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
-        useTransfersTxt = c.asBoolean("useTransfersTxt", false);
         writeCachedElevations = c.asBoolean("writeCachedElevations", false);
         maxAreaNodes = c.asInt("maxAreaNodes", 500);
 
@@ -360,6 +361,7 @@ public class BuildConfig {
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
         netex = new NetexConfig(c.path("netex"));
         storage = new StorageConfig(c.path("storage"));
+        dataOverlay = DataOverlayConfigMapper.map(c.path("dataOverlay"));
 
         if (c.path("transferRequests") != null && !c.path("transferRequests").asList().isEmpty()) {
             transferRequests = c

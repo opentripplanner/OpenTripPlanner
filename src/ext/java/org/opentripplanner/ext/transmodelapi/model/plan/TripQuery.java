@@ -6,6 +6,7 @@ import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
@@ -28,7 +29,7 @@ public class TripQuery {
             "Input type for executing a travel search for a trip between two locations. Returns "
             + "trip patterns describing suggested alternatives for the trip."
         )
-        .type(tripType)
+        .type(new GraphQLNonNull(tripType))
         .withDirective(gqlUtil.timingData)
         .argument(GraphQLArgument.newArgument()
             .name("dateTime")
@@ -52,6 +53,16 @@ public class TripQuery {
                 + "realtime changes."
             )
             .type(Scalars.GraphQLInt)
+            .build()
+        )
+        .argument(GraphQLArgument.newArgument()
+            .name("pageCursor")
+            .description(
+                "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from "
+                + "the last response and keep the original request as is. This will enable you to "
+                + "search for itineraries in the next or previous time-window."
+            )
+            .type(Scalars.GraphQLString)
             .build()
         )
         .argument(GraphQLArgument.newArgument()
@@ -144,8 +155,9 @@ public class TripQuery {
         )
         .argument(GraphQLArgument.newArgument()
             .name("modes")
-            .description("The set of access/egress/direct/transit modes to be used for this search."
-                + "Defaults to access/egress/direct mode foot and all transportModes.")
+            .description("The set of access/egress/direct/transit modes to be used for this search. "
+                + "Note that this only works at the Line level. If individual ServiceJourneys have "
+                + "modes that differ from the Line mode, this will NOT be accounted for.")
             .type(ModeInputType.INPUT_TYPE)
             .build()
         )

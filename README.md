@@ -16,6 +16,8 @@ Additional information and instructions are available in the [main documentation
 
 ## Development 
 
+[![codecov](https://codecov.io/gh/opentripplanner/OpenTripPlanner/branch/dev-2.x/graph/badge.svg?token=ak4PbIKgZ1)](https://codecov.io/gh/opentripplanner/OpenTripPlanner)
+
 OpenTripPlanner is a collaborative project incorporating code, translation, and documentation from contributors around the world. We welcome new contributions. Further [development guidelines](http://docs.opentripplanner.org/en/latest/Developers-Guide/) can be found in the documentation.
 
 ### Development history

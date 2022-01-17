@@ -31,7 +31,7 @@ public class EgressAccessRouter {
         routeTimer.record(() -> {
             // Search for access to / egress from transit on streets.
             NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
-                    graph, request.getAccessEgressMaxWalkDistanceMeters(), true
+                    graph, request.getAccessEgressMaxWalkDurationSeconds(), true
             );
             accessSearch = new StreetSearch(transitLayer, graph, linker, nearbyStopFinder);
             egressSearch = new StreetSearch(transitLayer, graph, linker, nearbyStopFinder);

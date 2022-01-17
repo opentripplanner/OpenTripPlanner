@@ -68,7 +68,7 @@ public class RoutingServiceTest extends GtfsTest {
                 assertEquals(pattern.getRoute(), route);
             }
         }
-        for (Stop stop : graph.index.getAllStops()) {
+        for (var stop : graph.index.getAllStops()) {
             for (TripPattern pattern : graph.index.getPatternsForStop(stop)) {
                 assertTrue(pattern.getStopPattern().containsStop(stop.getId().toString()));
             }
@@ -77,9 +77,9 @@ public class RoutingServiceTest extends GtfsTest {
 
     public void testSpatialIndex() {
         String feedId = graph.getFeedIds().iterator().next();
-        Stop stopJ = graph.index.getStopForId(new FeedScopedId(feedId, "J"));
-        Stop stopL = graph.index.getStopForId(new FeedScopedId(feedId, "L"));
-        Stop stopM = graph.index.getStopForId(new FeedScopedId(feedId, "M"));
+        var stopJ = graph.index.getStopForId(new FeedScopedId(feedId, "J"));
+        var stopL = graph.index.getStopForId(new FeedScopedId(feedId, "L"));
+        var stopM = graph.index.getStopForId(new FeedScopedId(feedId, "M"));
         TransitStopVertex stopvJ = graph.index.getStopVertexForStop().get(stopJ);
         TransitStopVertex stopvL = graph.index.getStopVertexForStop().get(stopL);
         TransitStopVertex stopvM = graph.index.getStopVertexForStop().get(stopM);

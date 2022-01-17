@@ -1,16 +1,35 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+
 import graphql.GraphQLException;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.DoubleFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
+import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.BannedStopSet;
@@ -24,20 +43,6 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.time.Duration;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.DoubleFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 
 public class TransmodelGraphQLPlanner {
 
@@ -57,7 +62,9 @@ public class TransmodelGraphQLPlanner {
             response.plan = res.getTripPlan();
             response.metadata = res.getMetadata();
             response.messages = res.getRoutingErrors();
-            response.debugOutput = res.getDebugAggregator().finishedRendering();
+            response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
+            response.previousPageCursor = res.getPreviousPageCursor();
+            response.nextPageCursor = res.getNextPageCursor();
         }
         catch (ParameterException e) {
             var msg = e.message.get();
@@ -101,8 +108,9 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
         callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
 
-        callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(new Date((long) millisSinceEpoch)), Date::new);
+        callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long)millisSinceEpoch)), Date::new);
         callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
+        callWith.argument("pageCursor", request::setPageCursor);
         callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
@@ -177,28 +185,9 @@ public class TransmodelGraphQLPlanner {
         //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
         //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
-        if (GqlUtil.hasArgument(environment, "modes")) {
-            ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
-            ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
-            ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
-            ElementWrapper<List<TransitMode>> transitModes = new ElementWrapper<>();
-            callWith.argument("modes.accessMode", accessMode::set);
-            callWith.argument("modes.egressMode", egressMode::set);
-            callWith.argument("modes.directMode", directMode::set);
-            callWith.argument("modes.transportMode", transitModes::set);
-
-            if (transitModes.get() == null) {
-                // Default to no transport modes if transport modes not specified
-                transitModes.set(List.of());
-            }
-
-            request.modes = new RequestModes(
-                accessMode.get(),
-                accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK,
-                egressMode.get(),
-                directMode.get(),
-                new HashSet<>(transitModes.get())
-            );
+        RequestModes modes = getModes(environment, callWith);
+        if (modes != null) {
+            request.modes = modes;
         }
 
         ItineraryFiltersInputType.mapToRequest(environment, callWith, request.itineraryFilters);
@@ -234,6 +223,56 @@ public class TransmodelGraphQLPlanner {
         //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 
         return request;
+    }
+
+    @SuppressWarnings("unchecked")
+    private RequestModes getModes(
+        DataFetchingEnvironment environment, DataFetcherDecorator callWith
+    ) {
+        if (GqlUtil.hasArgument(environment, "modes")) {
+            ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
+            ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
+            ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
+            ElementWrapper<List<LinkedHashMap<String, ?>>> transportModes = new ElementWrapper<>();
+            callWith.argument("modes.accessMode", accessMode::set);
+            callWith.argument("modes.egressMode", egressMode::set);
+            callWith.argument("modes.directMode", directMode::set);
+            callWith.argument("modes.transportModes", transportModes::set);
+
+            List<AllowedTransitMode> transitModes = new ArrayList<>();
+            if (transportModes.get() == null) {
+                transitModes.addAll(Collections.emptyList());
+            }
+            else {
+                for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
+                    if (modeWithSubmodes.containsKey("transportMode")) {
+                        TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
+                        if (modeWithSubmodes.containsKey("transportSubModes")) {
+                            List<TransmodelTransportSubmode> transportSubModes =
+                                    (List<TransmodelTransportSubmode>) modeWithSubmodes.get("transportSubModes");
+                            for (TransmodelTransportSubmode transitMode : transportSubModes) {
+                                transitModes.add(new AllowedTransitMode(
+                                        mainMode,
+                                        transitMode.getValue()
+                                ));
+                            }
+                        }
+                        else {
+                            transitModes.add(AllowedTransitMode.fromMainModeEnum(mainMode));
+                        }
+                    }
+                }
+            }
+
+            return new RequestModes(
+                accessMode.get(),
+                accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK,
+                egressMode.get(),
+                directMode.get(),
+                transitModes
+            );
+        }
+        return null;
     }
 
     private HashMap<FeedScopedId, BannedStopSet> toBannedTrips(Collection<String> serviceJourneyIds) {

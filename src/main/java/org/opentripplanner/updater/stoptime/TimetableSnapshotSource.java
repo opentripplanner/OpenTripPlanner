@@ -7,7 +7,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -396,7 +396,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         }
 
         // Check whether all stop times are available and all stops exist
-        final List<Stop> stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdate);
+        final var stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdate);
         if (stops == null) {
             return false;
         }
@@ -417,11 +417,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @param tripUpdate trip update
      * @return stops when stop time updates are correct; null if there are errors
      */
-    private List<Stop> checkNewStopTimeUpdatesAndFindStops(final String feedId, final TripUpdate tripUpdate) {
+    private List<StopLocation> checkNewStopTimeUpdatesAndFindStops(final String feedId, final TripUpdate tripUpdate) {
         Integer previousStopSequence = null;
         Long previousTime = null;
         final List<StopTimeUpdate> stopTimeUpdates = tripUpdate.getStopTimeUpdateList();
-        final List<Stop> stops = new ArrayList<>(stopTimeUpdates.size());
+        final List<StopLocation> stops = new ArrayList<>(stopTimeUpdates.size());
         for (int index = 0; index < stopTimeUpdates.size(); ++index) {
             final StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
 
@@ -451,7 +451,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             // Find stops
             if (stopTimeUpdate.hasStopId()) {
                 // Find stop
-                final Stop stop = getStopForStopId(feedId, stopTimeUpdate.getStopId());
+                final var stop = getStopForStopId(feedId, stopTimeUpdate.getStopId());
                 if (stop != null) {
                     // Remember stop
                     stops.add(stop);
@@ -542,7 +542,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @param serviceDate service date for added trip
      * @return true iff successful
      */
-    private boolean handleAddedTrip(final Graph graph, final TripUpdate tripUpdate, final List<Stop> stops,
+    private boolean handleAddedTrip(final Graph graph, final TripUpdate tripUpdate, final List<StopLocation> stops,
             final String feedId, final ServiceDate serviceDate) {
         // Preconditions
         Preconditions.checkNotNull(stops);
@@ -581,7 +581,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             route.setAgency(dummyAgency);
             // Guess the route type as it doesn't exist yet in the specifications
             // Bus. Used for short- and long-distance bus routes.
-            route.setType(3);
+            route.setGtfsType(3);
             route.setMode(TransitMode.BUS);
             // Create route name
             route.setLongName(tripId);
@@ -604,7 +604,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             trip.setServiceId(serviceIds.iterator().next());
         }
 
-        final boolean success = addTripToGraphAndBuffer(feedId, graph, trip, tripUpdate, stops, serviceDate, RealTimeState.ADDED);
+        final boolean success = addTripToGraphAndBuffer(graph, trip, tripUpdate, stops, serviceDate, RealTimeState.ADDED);
         return success;
     }
 
@@ -619,8 +619,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @param realTimeState real-time state of new trip
      * @return true iff successful
      */
-    private boolean addTripToGraphAndBuffer(final String feedId, final Graph graph, final Trip trip,
-            final TripUpdate tripUpdate, final List<Stop> stops, final ServiceDate serviceDate,
+    private boolean addTripToGraphAndBuffer(final Graph graph, final Trip trip,
+            final TripUpdate tripUpdate, final List<StopLocation> stops, final ServiceDate serviceDate,
             final RealTimeState realTimeState) {
 
         // Preconditions
@@ -636,7 +636,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         final List<StopTime> stopTimes = new ArrayList<>(tripUpdate.getStopTimeUpdateCount());
         for (int index = 0; index < tripUpdate.getStopTimeUpdateCount(); ++index) {
             final StopTimeUpdate stopTimeUpdate = tripUpdate.getStopTimeUpdate(index);
-            final Stop stop = stops.get(index);
+            final var stop = stops.get(index);
 
             // Determine whether stop is skipped
             final boolean skippedStop = isStopSkipped(stopTimeUpdate);
@@ -852,7 +852,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         }
 
         // Check whether all stop times are available and all stops exist
-        List<Stop> stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdate);
+        var stops = checkNewStopTimeUpdatesAndFindStops(feedId, tripUpdate);
         if (stops == null) {
             return false;
         }
@@ -877,7 +877,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @param serviceDate service date for modified trip
      * @return true iff successful
      */
-    private boolean handleModifiedTrip(final Graph graph, final Trip trip, final TripUpdate tripUpdate, final List<Stop> stops,
+    private boolean handleModifiedTrip(final Graph graph, final Trip trip, final TripUpdate tripUpdate, final List<StopLocation> stops,
             final String feedId, final ServiceDate serviceDate) {
         // Preconditions
         Preconditions.checkNotNull(stops);
@@ -895,7 +895,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Add new trip
         final boolean success =
-                addTripToGraphAndBuffer(feedId, graph, trip, tripUpdate, stops, serviceDate, RealTimeState.MODIFIED);
+                addTripToGraphAndBuffer(graph, trip, tripUpdate, stops, serviceDate, RealTimeState.MODIFIED);
         return success;
     }
 
@@ -980,7 +980,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @param stopId trip id without the agency
      * @return stop or null if stop doesn't exist
      */
-    private Stop getStopForStopId(String feedId, String stopId) {
+    private StopLocation getStopForStopId(String feedId, String stopId) {
         return routingService.getStopForId(new FeedScopedId(feedId, stopId));
     }
 }

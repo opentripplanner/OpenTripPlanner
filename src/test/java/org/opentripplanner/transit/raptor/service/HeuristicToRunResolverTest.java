@@ -55,7 +55,7 @@ public class HeuristicToRunResolverTest {
     @Test
     public void resolveHeuristicOffForNoneRangeRaptorProfile() {
         RaptorRequestBuilder<TestTripSchedule> b = new RaptorRequestBuilder<>();
-        b.profile(RaptorProfile.NO_WAIT_BEST_TIME);
+        b.profile(RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME);
         // Add some dummy legs
         b.searchParams().accessPaths().add(dummyAccessEgress());
         b.searchParams().egressPaths().add(dummyAccessEgress());

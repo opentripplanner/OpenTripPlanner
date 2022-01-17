@@ -45,6 +45,7 @@ public class ItineraryListFilterChainBuilder {
     private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
+    private boolean reverseFilteringDirection;
 
 
     /**
@@ -159,7 +160,7 @@ public class ItineraryListFilterChainBuilder {
 
     /**
      * Max departure time. This is a absolute filter on the itinerary departure time from the
-     * origin.
+     * origin. The filter is ignored if the value is {@code null}.
      */
     public ItineraryListFilterChainBuilder withLatestDepartureTimeLimit(Instant latestDepartureTimeLimit) {
         this.latestDepartureTimeLimit = latestDepartureTimeLimit;
@@ -188,6 +189,15 @@ public class ItineraryListFilterChainBuilder {
      */
     public ItineraryListFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
         this.removeWalkAllTheWayResults = enable;
+        return this;
+    }
+
+    /**
+     * Should the direction of the final filtering for max number of itineraries be swapped.
+     * This is used to be able to paginate to the opposite direction of the main search.
+     */
+    public ItineraryListFilterChainBuilder withReverseFilteringDirection(boolean enable) {
+        this.reverseFilteringDirection = enable;
         return this;
     }
 
@@ -245,6 +255,7 @@ public class ItineraryListFilterChainBuilder {
                     new MaxLimitFilter(
                         "number-of-itineraries-filter",
                         maxNumberOfItineraries,
+                        reverseFilteringDirection,
                         maxLimitReachedSubscriber
                     )
                 )

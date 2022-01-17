@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
@@ -759,8 +760,10 @@ public class TransmodelGraphQLSchema {
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .build())
             .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment).getRouteForId(TransitIdMapper
-                  .mapIDToDomain(environment.getArgument("id")));
+                final String id = environment.getArgument("id");
+                if (id.isBlank()) { return null; }
+                return GqlUtil.getRoutingService(environment)
+                        .getRouteForId(TransitIdMapper.mapIDToDomain(id));
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -856,11 +859,7 @@ public class TransmodelGraphQLSchema {
                     .filter(route -> publicCodes.contains(route.getShortName()));
               }
               if (environment.getArgument("transportModes") != null) {
-
-                Set<TraverseMode> modes = (
-                    (List<TraverseMode>) environment.getArgument("transportModes")
-                ).stream().filter(TraverseMode::isTransit).collect(Collectors.toSet());
-                // TODO OTP2 - FIX THIS, THIS IS A BUG
+                Set<TransitMode> modes = Set.copyOf(environment.getArgument("transportModes"));
                 stream = stream.filter(route -> modes.contains(route.getMode()));
               }
               if ((environment.getArgument("authorities") instanceof Collection)) {
@@ -920,7 +919,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> {
               List<FeedScopedId> lineIds = mapIDsToDomain(environment.getArgument("lines"));
-              //List<String> privateCodes=environment.getArgument("privateCodes");
+              List<String> privateCodes = environment.getArgument("privateCodes");
               List<Long> activeDates = environment.getArgument("activeDates");
               // TODO OTP2 - Use FeedScoped ID
               List<String> authorities = environment.getArgument("authorities");
@@ -931,7 +930,7 @@ public class TransmodelGraphQLSchema {
                   .filter(t -> lineIds == null || lineIds.isEmpty() || lineIds.contains(t
                       .getRoute()
                       .getId()))
-                  //.filter(t -> CollectionUtils.isEmpty(privateCodes) || privateCodes.contains(t.getTripPrivateCode()))
+                  .filter(t -> CollectionUtils.isEmpty(privateCodes) || privateCodes.contains(t.getInternalPlanningCode()))
                   .filter(t -> authorities == null || authorities.isEmpty()  || authorities.contains(t
                       .getRoute()
                       .getAgency()

@@ -19,6 +19,7 @@ import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopCollection;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
@@ -91,15 +92,24 @@ public class StopPlaceType {
             .type(new GraphQLList(TRANSPORT_MODE))
             .dataFetcher(environment ->
                 ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
-                    .stream().map(Stop::getVehicleType).collect(Collectors.toSet())
+                    .stream()
+                    .map(StopLocation::getVehicleType)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet())
                 )
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("transportSubmode")
-            .description("The transport submode serviced by this stop place. NOT IMPLEMENTED")
-            .deprecate("Submodes not implemented")
-            .type(TRANSPORT_SUBMODE)
-            .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
+            .description("The transport submode serviced by this stop place.")
+            .type(new GraphQLList(TRANSPORT_SUBMODE))
+            .dataFetcher(environment ->
+                ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
+                    .stream()
+                    .map(StopLocation::getVehicleSubmode)
+                    .filter(Objects::nonNull)
+                    .map(TransmodelTransportSubmode::fromValue)
+                    .collect(Collectors.toList())
+            )
             .build())
         //                .field(GraphQLFieldDefinition.newFieldDefinition()
         //                        .name("adjacentSites")
@@ -121,7 +131,7 @@ public class StopPlaceType {
                 .defaultValue(Boolean.FALSE)
                 .build())
             .dataFetcher(environment -> {
-              Collection<Stop> quays = ((MonoOrMultiModalStation) environment.getSource()).getChildStops();
+              var quays = ((MonoOrMultiModalStation) environment.getSource()).getChildStops();
               if (TRUE.equals(environment.getArgument("filterByInUse"))) {
                 quays=quays.stream().filter(stop -> {
                   return !GqlUtil.getRoutingService(environment)
@@ -156,7 +166,7 @@ public class StopPlaceType {
             .name("estimatedCalls")
             .withDirective(gqlUtil.timingData)
             .description("List of visits to this stop place as part of vehicle journeys.")
-            .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
+            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
             .argument(GraphQLArgument.newArgument()
                 .name("startTime")
                 .type(gqlUtil.dateTimeScalar)
@@ -242,7 +252,7 @@ public class StopPlaceType {
   }
 
   public static Stream<TripTimeOnDate> getTripTimesForStop(
-      Stop stop,
+      StopLocation stop,
       Long startTimeSeconds,
       int timeRage,
       ArrivalDeparture arrivalDeparture,
@@ -340,7 +350,7 @@ public class StopPlaceType {
     Stream<Station> stations = routingService
         .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon)
         .stream()
-        .map(Stop::getParentStation)
+        .map(StopLocation::getParentStation)
         .filter(Objects::nonNull)
         .distinct();
 
@@ -393,7 +403,7 @@ public class StopPlaceType {
   }
 
   public static boolean isStopPlaceInUse(StopCollection station, RoutingService routingService) {
-    for (Stop quay : station.getChildStops()) {
+    for (var quay : station.getChildStops()) {
       if (!routingService.getPatternsForStop(quay, true).isEmpty()) {
         return true;
       }

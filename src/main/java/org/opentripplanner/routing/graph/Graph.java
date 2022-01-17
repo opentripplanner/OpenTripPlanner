@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -44,6 +45,8 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
@@ -286,6 +289,13 @@ public class Graph implements Serializable {
      * going to fail as soon as we load a base OSM graph and build transit on top of it.
      */
     public long nextSplitNumber = 0;
+
+    /**
+     * DataOverlay Sandbox module parameter bindings configured in the build-config, and needed
+     * when creating the data overlay context when routing.
+     */
+    public DataOverlayParameterBindings dataOverlayParameterBindings;
+
 
     public Graph(Graph basedOn) {
         this();
@@ -562,10 +572,12 @@ public class Graph implements Serializable {
                 }
                 // assume feed is unreliable after midnight on last service day
                 long u = t + SEC_IN_DAY;
-                if (t < this.transitServiceStarts)
+                if (t < this.transitServiceStarts) {
                     this.transitServiceStarts = t;
-                if (u > this.transitServiceEnds)
+                }
+                if (u > this.transitServiceEnds) {
                     this.transitServiceEnds = u;
+                }
             }
         }
         for (String agency : agencies) {
@@ -576,7 +588,8 @@ public class Graph implements Serializable {
     }
 
     // Check to see if we have transit information for a given date
-    public boolean transitFeedCovers(long t) {
+    public boolean transitFeedCovers(Instant time) {
+        long t = time.getEpochSecond();
         return t >= this.transitServiceStarts && t < this.transitServiceEnds;
     }
 
@@ -911,7 +924,7 @@ public class Graph implements Serializable {
         return transitAlertService;
     }
 
-    private Collection<Stop> getStopsForId(FeedScopedId id) {
+    private Collection<StopLocation> getStopsForId(FeedScopedId id) {
 
         // GroupOfStations
         GroupOfStations groupOfStations = groupOfStationsById.get(id);
@@ -931,7 +944,7 @@ public class Graph implements Serializable {
             return station.getChildStops();
         }
         // Single stop
-        Stop stop = index.getStopForId(id);
+        var stop = index.getStopForId(id);
         if (stop != null) {
             return Collections.singleton(stop);
         }
@@ -945,7 +958,7 @@ public class Graph implements Serializable {
      * @return The associated TransitStopVertex or all underlying TransitStopVertices
      */
     public Set<Vertex> getStopVerticesById(FeedScopedId id) {
-        Collection<Stop> stops = getStopsForId(id);
+        var stops = getStopsForId(id);
 
         if (stops == null) {
             return null;
@@ -991,7 +1004,7 @@ public class Graph implements Serializable {
     }
 
     /** Get all stops within a given bounding box. */
-    public Collection<Stop> getStopsByBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
+    public Collection<StopLocation> getStopsByBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
         Envelope envelope = new Envelope(
                 new Coordinate(minLon, minLat),
                 new Coordinate(maxLon, maxLat)

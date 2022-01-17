@@ -1,6 +1,6 @@
 package org.opentripplanner.model.transfer;
 
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 
 
@@ -46,7 +46,7 @@ public interface TransferPoint {
 
   int NOT_AVAILABLE = -1;
 
-  default Stop getStop() {
+  default StopLocation getStop() {
     return null;
   }
 

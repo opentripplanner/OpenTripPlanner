@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -46,7 +46,7 @@ public class BikeRentalSnapshotTest
     @DisplayName("Direct BIKE_RENTAL")
     @Test
     public void directBikeRental() {
-        RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
+        RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
         request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
         request.from = p1;
@@ -74,7 +74,7 @@ public class BikeRentalSnapshotTest
      */
     @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with departAt")
     @Test public void directBikeRentalArrivingAtDestinationWithDepartAt() {
-        RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
+        RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
         request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
         request.allowKeepingRentedVehicleAtDestination = true;
@@ -86,7 +86,7 @@ public class BikeRentalSnapshotTest
 
     @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with arriveBy")
     @Test public void directBikeRentalArrivingAtDestinationWithArriveBy() {
-        RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
+        RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
         request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
         request.allowKeepingRentedVehicleAtDestination = true;
@@ -99,9 +99,9 @@ public class BikeRentalSnapshotTest
 
     @DisplayName("Access BIKE_RENTAL")
     @Test public void accessBikeRental() {
-        RoutingRequest request = createTestRequest(2009, 9, 21, 16, 14, 0);
+        RoutingRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
 
-        request.modes = new RequestModes(StreetMode.BIKE_RENTAL, StreetMode.WALK,  StreetMode.WALK, null, Set.of(TransitMode.values()));
+        request.modes = new RequestModes(StreetMode.BIKE_RENTAL, StreetMode.WALK,  StreetMode.WALK, null, AllowedTransitMode.getAllTransitModes());
         request.from = p1;
         request.to = p3;
 
@@ -110,9 +110,9 @@ public class BikeRentalSnapshotTest
 
     @DisplayName("Egress BIKE_RENTAL")
     @Test public void egressBikeRental() {
-        RoutingRequest request = createTestRequest(2009, 9, 21, 16, 10, 0);
+        RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-        request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.BIKE_RENTAL, null, Set.of(TransitMode.values()));
+        request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.BIKE_RENTAL, null, AllowedTransitMode.getAllTransitModes());
         request.from = p3;
         request.to = p1;
 
