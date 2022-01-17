@@ -1,7 +1,6 @@
 package org.opentripplanner.api.common;
 
 import java.time.Duration;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -84,12 +83,10 @@ public abstract class RoutingResource {
      * This is sometimes referred to as the Range Raptor Search Window - but should apply to all
      * scheduled/time dependent travels.
      * <p>
-     * Optional - it is NOT recommended to set this value, unless you use the value returned by the
-     * previous search. Then it can be used to get the next/previous "page". The value is
-     * dynamically assigned a suitable value, if not set. In a small to medium size operation
-     * you may use a fixed value, like 60 minutes. If you have a mixture of high frequency cities
-     * routes and infrequent long distant journeys, the best option is normally to use the dynamic
-     * auto assignment.
+     * Optional - The value is dynamically assigned a suitable value, if not set. In a small to
+     * medium size operation you may use a fixed value, like 60 minutes. If you have a mixture of
+     * high frequency cities routes and infrequent long distant journeys, the best option is
+     * normally to use the dynamic auto assignment.
      */
     @QueryParam("searchWindow")
     protected Integer searchWindow;

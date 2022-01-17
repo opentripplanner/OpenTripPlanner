@@ -1591,10 +1591,10 @@ type Plan {
     nextDateTime: Long @deprecated(reason: "Use nextPageCursor instead")
 
     """
-    This is the time window used by the raptor search. The window is an optional parameter and
-    OTP might override it/dynamically assign a new value. The unit is seconds.
+    This is the time window used by the raptor search. The input searchWindow is an optional
+    parameter and is dynamically assign if not set. The unit is seconds.
     """
-    searchWindowUsed: Long @deprecated(reason: "Use previousPageCursor or nextPageCursor instead")
+    searchWindowUsed: Long
 
     """Information about the timings for the plan generation"""
     debugOutput: debugOutput!
