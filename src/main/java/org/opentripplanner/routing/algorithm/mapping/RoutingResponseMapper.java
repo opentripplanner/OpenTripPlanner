@@ -32,7 +32,7 @@ public class RoutingResponseMapper {
         // Create response
         var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
 
-        var previousPageCursor = PageCursorFactory.getPreviousPageCursor(
+        var pageCursorFactory = new PageCursorFactory(
                 request.arriveBy,
                 startOfTimeTransit,
                 searchParams,
@@ -40,22 +40,17 @@ public class RoutingResponseMapper {
                 reverseFilteringDirection
         );
 
+        var previousPageCursor = pageCursorFactory.createPreviousPageCursor();
+        var nextPageCursor = pageCursorFactory.createNextPageCursor();
 
-        var nextPageCursor = PageCursorFactory.getNextPageCursor(
-                request.arriveBy,
-                startOfTimeTransit,
-                searchParams,
-                firstRemovedItinerary,
-                reverseFilteringDirection
-        );
-
-        LOG.debug("PageCursor in:  " + request.pageCursor);
+        LOG.debug("PageCursor in: " + request.pageCursor);
         LOG.debug("PageCursor out(previous) : " + previousPageCursor);
         LOG.debug("PageCursor out(next) : " + nextPageCursor);
 
         var metadata = createTripSearchMetadata(
                 request, searchParams, firstRemovedItinerary
         );
+
         return new RoutingResponse(
                 tripPlan,
                 previousPageCursor,

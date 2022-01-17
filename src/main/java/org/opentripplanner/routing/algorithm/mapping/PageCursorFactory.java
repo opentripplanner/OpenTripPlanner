@@ -11,127 +11,144 @@ import org.opentripplanner.transit.raptor.api.request.SearchParams;
 
 public class PageCursorFactory {
 
-    @Nullable
-    public static PageCursor getPreviousPageCursor(
+    private final boolean arriveBy;
+    private final Itinerary firstRemovedItinerary;
+    private final boolean forwards;
+    private final Instant edt;
+    private final Instant lat;
+    private final Duration sw;
+    private PageCursor next = null;
+    private PageCursor previous = null;
+
+    public PageCursorFactory(
             boolean arriveBy,
             ZonedDateTime startOfTime,
             SearchParams searchParams,
             Itinerary firstRemovedItinerary,
             boolean reverseFilteringDirection
     ) {
-        if(searchParams == null) {
-            return null;
+        this.arriveBy = arriveBy;
+        this.forwards = arriveBy == reverseFilteringDirection;
+        this.firstRemovedItinerary = firstRemovedItinerary;
+
+        if(searchParams != null) {
+            long startOfTimeSec = startOfTime.toEpochSecond();
+            this.edt = Instant.ofEpochSecond(startOfTimeSec + searchParams.earliestDepartureTime());
+            this.lat = Instant.ofEpochSecond(startOfTimeSec + searchParams.latestArrivalTime());
+            this.sw = Duration.ofSeconds(searchParams.searchWindowInSeconds());
         }
-        boolean forwards = arriveBy == reverseFilteringDirection;
-
-        long startOfTimeSec = startOfTime.toEpochSecond();
-        Instant edt = Instant.ofEpochSecond(startOfTimeSec + searchParams.earliestDepartureTime());
-        Instant lat = Instant.ofEpochSecond(startOfTimeSec + searchParams.latestArrivalTime());
-        Duration sw = Duration.ofSeconds(searchParams.searchWindowInSeconds());
-
-        // Switching direction, no need to take filtered itineraries into account
-        if (forwards) {
-            edt = edt.minus(sw);
-            if (arriveBy) {
-                lat = lat.minus(sw);
-                return PageCursor.arriveByCursor(edt, lat, sw, false);
-            } else {
-                return PageCursor.departAfterCursor(edt, sw, true);
-            }
-        } else {
-            if (arriveBy) {
-                if (firstRemovedItinerary != null) {
-                    Instant previousLat = lat;
-                    lat = firstRemovedItinerary.endTime().toInstant();
-                    // Get start of next minute
-                    lat = lat
-                        .minusSeconds(1)
-                        .truncatedTo(ChronoUnit.MINUTES)
-                        .plus(1, ChronoUnit.MINUTES);
-
-                    Duration shift = Duration.between(lat, previousLat);
-                    edt = edt.minus(shift);
-                } else {
-                    lat = lat.minus(sw);
-                    edt = edt.minus(sw);
-                }
-                return PageCursor.arriveByCursor(edt, lat, sw, false);
-            } else {
-                if (firstRemovedItinerary != null) {
-                    lat = firstRemovedItinerary.endTime().toInstant();
-                    // Get start of next minute
-                    lat = lat
-                            .minusSeconds(1)
-                            .truncatedTo(ChronoUnit.MINUTES)
-                            .plus(1, ChronoUnit.MINUTES);
-                    //TODO: we don't know what time to start at
-                    edt = edt.minus(sw);
-                    return PageCursor.arriveByCursor(edt, lat, sw, true);
-                }
-                else {
-                    edt = edt.minus(sw);
-                    return PageCursor.departAfterCursor(edt, sw, true);
-                }
-            }
+        else {
+            this.edt = null;
+            this.lat = null;
+            this.sw = null;
         }
-
     }
 
+    @Nullable
+    public PageCursor createPreviousPageCursor() {
+        createPageCursors();
+        return previous;
+    }
 
     @Nullable
-    public static PageCursor getNextPageCursor(
-            boolean arriveBy,
-            ZonedDateTime startOfTime,
-            SearchParams searchParams,
-            Itinerary firstRemovedItinerary,
-            boolean reverseFilteringDirection
-    ) {
-        if(searchParams == null) {
-            return null;
-        }
-        boolean forwards = arriveBy == reverseFilteringDirection;
+    public  PageCursor createNextPageCursor() {
+        createPageCursors();
+        return next;
+    }
 
-        long startOfTimeSec = startOfTime.toEpochSecond();
-        Instant edt = Instant.ofEpochSecond(startOfTimeSec + searchParams.earliestDepartureTime());
-        Instant lat = Instant.ofEpochSecond(startOfTimeSec + searchParams.latestArrivalTime());
-        Duration sw = Duration.ofSeconds(searchParams.searchWindowInSeconds());
+    /** Create page cursor pair (next and previous) */
+    private void createPageCursors() {
+        if(edt == null || next != null || previous != null) { return; }
+
+        Instant edtPrev, edtNext, latPrev, latNext;
 
         if (forwards) {
             if (arriveBy) {
+                // Previous
+                edtPrev = edt.minus(sw);
+                latPrev = lat.minus(sw);
+
+                // Next
                 if (firstRemovedItinerary != null) {
-                    Instant previousEdt = edt;
-                    edt = firstRemovedItinerary.startTime().toInstant();
-                    edt = edt.truncatedTo(ChronoUnit.MINUTES);
-                    Duration shift = Duration.between(edt, previousEdt);
-                    lat = lat.plus(shift);
+                    edtNext = getItineraryStartTime();
+                    latNext = lat.plus(Duration.between(edtNext, edt));
                 } else {
-                    lat = lat.plus(sw);
-                    edt = edt.plus(sw);
+                    edtNext = edt.plus(sw);
+                    latNext = lat.plus(sw);
                 }
-                return PageCursor.arriveByCursor(edt, lat, sw, true);
-            } else {
+
+                previous = PageCursor.arriveByCursor(edtPrev, latPrev, sw, false);
+                next = PageCursor.arriveByCursor(edtNext, latNext, sw, true);
+            }
+            else {
+                // Previous
+                edtPrev = this.edt.minus(sw);
+
+                // Next
                 if (firstRemovedItinerary != null) {
                     Instant endOfSearchWindow = edt.plus(sw);
-                    edt = firstRemovedItinerary.startTime().toInstant();
-                    edt = edt.truncatedTo(ChronoUnit.MINUTES);
+                    edtNext = getItineraryStartTime();
                     // If EDT would be outside SW, revert to end of SW
                     if (edt.isAfter(endOfSearchWindow)) {
-                        edt = endOfSearchWindow;
+                        edtNext = endOfSearchWindow;
                     }
                 } else {
-                    edt = edt.plus(sw);
+                    edtNext = edt.plus(sw);
                 }
-                return PageCursor.departAfterCursor(edt, sw, false);
-            }
-        // Switching direction, no need to take filtered itineraries into account
-        } else {
-            edt = edt.plus(sw);
-            if (arriveBy) {
-                lat = lat.plus(sw);
-                return PageCursor.arriveByCursor(edt, lat, sw, true);
-            } else {
-                return PageCursor.departAfterCursor(edt, sw, false);
+
+                previous = PageCursor.departAfterCursor(edtPrev, sw, true);
+                next = PageCursor.departAfterCursor(edtNext, sw, false);
             }
         }
+        // Switching direction, no need to take filtered itineraries into account
+        else {
+            if (arriveBy) {
+                // Previous
+                if (firstRemovedItinerary != null) {
+                    latPrev = getItineraryEndTime();
+                } else {
+                    latPrev = lat.minus(sw);
+                }
+                edtPrev = edt.minus(Duration.between(latPrev, lat));
+
+                // Next
+                edtNext = edt.plus(sw);
+                latNext = lat.plus(sw);
+
+                previous = PageCursor.arriveByCursor(edtPrev, latPrev, sw, false);
+                next = PageCursor.arriveByCursor(edtNext, latNext, sw, true);
+            } else {
+                // Previous
+                if (firstRemovedItinerary != null) {
+                    latPrev = getItineraryEndTime();
+                    //TODO: we don't know what time to start at
+                    edtPrev = this.edt.minus(sw);
+                    previous = PageCursor.arriveByCursor(edtPrev, latPrev, sw, true);
+                }
+                else {
+                    edtPrev = edt.minus(sw);
+                    previous = PageCursor.departAfterCursor(edtPrev, sw, true);
+                }
+
+                // Next
+                edtNext = edt.plus(sw);
+
+                next = PageCursor.departAfterCursor(edtNext, sw, false);
+            }
+        }
+    }
+
+    /** Find the endTime for the {@code firstRemovedItinerary}, round down to the closest minute. */
+    private Instant getItineraryStartTime() {
+        return firstRemovedItinerary.startTime().toInstant()
+                .truncatedTo(ChronoUnit.MINUTES);
+    }
+
+    /** Find the endTime for the {@code firstRemovedItinerary}, round up to the closest minute. */
+    private Instant getItineraryEndTime() {
+        return firstRemovedItinerary.endTime().toInstant()
+                .minusSeconds(1)
+                .truncatedTo(ChronoUnit.MINUTES)
+                .plus(1, ChronoUnit.MINUTES);
     }
 }
