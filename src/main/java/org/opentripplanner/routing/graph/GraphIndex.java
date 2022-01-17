@@ -188,7 +188,7 @@ public class GraphIndex {
     }
 
     /**
-     * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
+     * Returns all the patterns for a specific stop. If timetableSnapshot is included, new patterns
      * added by realtime updates are added to the collection. A set is used here because trip
      * patterns that were updated by realtime data is both part of the GraphIndex and the
      * TimetableSnapshot.
