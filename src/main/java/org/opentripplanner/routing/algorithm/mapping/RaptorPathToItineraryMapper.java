@@ -204,6 +204,9 @@ public class RaptorPathToItineraryMapper {
         leg.transferToNextLeg = (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg();
         leg.transferFromPrevLeg = prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg;
 
+        leg.boardStopPosInPattern = boardStopIndexInPattern;
+        leg.alightStopPosInPattern = alightStopIndexInPattern;
+
         // TODO OTP2 - alightRule and boardRule needs mapping
         //    Under Raptor, for transit trips, ItineraryMapper converts Path<TripSchedule> directly to Itinerary
         //    (the old API response element, within TripPlan). Non-transit trips still use GraphPathToTripPlanConverter
