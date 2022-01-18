@@ -197,7 +197,7 @@ public class Leg {
   }
 
   public Leg(Trip trip) {
-    this.mode = TraverseMode.fromTransitMode(trip.getRoute().getMode());
+    this.mode = TraverseMode.fromTransitMode(trip.getMode());
     this.trip = trip;
   }
 
