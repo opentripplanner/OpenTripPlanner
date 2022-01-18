@@ -104,6 +104,14 @@
 - Remove build parameter 'useTransfersTxt' [#3791](https://github.com/opentripplanner/OpenTripPlanner/pull/3791)
 - Add cursor-based paging [#3759](https://github.com/opentripplanner/OpenTripPlanner/pull/3759)
 - Data overlay sandbox feature [#3760](https://github.com/opentripplanner/OpenTripPlanner/pull/3760)
+- Run automatic performance tests [#3783](https://github.com/opentripplanner/OpenTripPlanner/pull/3783)
+- Add support for sandboxed realtime vehicle parking updaters [#3796](https://github.com/opentripplanner/OpenTripPlanner/pull/3796)
+- Add reading and exposing of Netex submodes [#3793](https://github.com/opentripplanner/OpenTripPlanner/pull/3793)
+- Fix: Account for wait-time in no-wait Raptor strategy  [#3798](https://github.com/opentripplanner/OpenTripPlanner/pull/3798)
+- Read in flex window from Netex feeds [#3800](https://github.com/opentripplanner/OpenTripPlanner/pull/3800)
+- Fix NPE when routing on a graph without transit data. [#3804](https://github.com/opentripplanner/OpenTripPlanner/pull/3804)
+- Capture code coverage with jacoco and codecov.io [#3811](https://github.com/opentripplanner/OpenTripPlanner/pull/3811)
+- Read leg mode from trip, instead of route [#3819](https://github.com/opentripplanner/OpenTripPlanner/pull/3819)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

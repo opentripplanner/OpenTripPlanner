@@ -63,6 +63,7 @@ public class PlaceTest {
                 null,
                 null,
                 null,
+                null,
                 null
         );
     }

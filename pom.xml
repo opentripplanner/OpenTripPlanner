@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>14</otp.serialization.version.id>
+        <otp.serialization.version.id>15</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>25.2</geotools.version>
         <jackson.version>2.12.5</jackson.version>
@@ -33,6 +33,10 @@
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
+        <!-- Set argLine to an empty string so that running the tests without the coverage agent works.
+             When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
+        -->
+        <argLine></argLine>
     </properties>
 
     <distributionManagement>
@@ -222,8 +226,11 @@
                 <configuration>
                     <!-- we have to fork the JVM during tests so that the argLine is passed along -->
                     <forkCount>3</forkCount>
-                    <!-- enable the restricted reflection under Java 11 so that the ObjectDiffer works -->
+                    <!-- enable the restricted reflection under Java 11 so that the ObjectDiffer works
+                         the @{argLine} part is there to allow jacoco to insert its arguments as well
+                    -->
                     <argLine>
+                        @{argLine}
                         -Xmx2G
                         -Dfile.encoding=UTF-8
                         --illegal-access=permit
@@ -240,6 +247,12 @@
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
                 </configuration>
+            </plugin>
+            <!-- code coverage report -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -458,6 +471,12 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-jersey2</artifactId>
             <version>${micrometer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-influx</artifactId>
+            <version>${micrometer.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- netcdf4 -->

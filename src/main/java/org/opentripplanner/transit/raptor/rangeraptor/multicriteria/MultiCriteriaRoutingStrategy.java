@@ -22,7 +22,8 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class McTransitWorker<T extends RaptorTripSchedule> implements RoutingStrategy<T> {
+public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
+        implements RoutingStrategy<T> {
 
     private final McRangeRaptorWorkerState<T> state;
     private final CostCalculator costCalculator;
@@ -31,7 +32,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
 
     private AbstractStopArrival<T> prevArrival;
 
-    public McTransitWorker(
+    public MultiCriteriaRoutingStrategy(
         McRangeRaptorWorkerState<T> state,
         SlackProvider slackProvider,
         CostCalculator costCalculator,

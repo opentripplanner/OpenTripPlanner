@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,9 +31,10 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
@@ -150,7 +150,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        EnumSet.allOf(TransitMode.class)
+        AllowedTransitMode.getAllTransitModes()
     );
 
     /**
@@ -694,6 +694,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public Set<FormFactor> allowedRentalFormFactors = new HashSet<>();
 
+    /**
+     * If true vehicle parking availability information will be used to plan park and ride trips where it exists.
+     */
+    public boolean useVehicleParkingAvailabilityInformation = false;
+
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 
@@ -1234,11 +1239,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     /** Tear down any routing context (remove temporary edges from edge lists) */
     public void cleanup() {
-        if (this.rctx == null)
-            LOG.warn("routing context was not set, cannot destroy it.");
-        else {
-            rctx.destroy();
-            LOG.debug("routing context destroyed");
+        if (this.rctx != null) {
+            try {
+                rctx.destroy();
+            }
+            catch (Exception e) {
+                LOG.error("Could not destroy the routing context", e);
+            }
         }
     }
 

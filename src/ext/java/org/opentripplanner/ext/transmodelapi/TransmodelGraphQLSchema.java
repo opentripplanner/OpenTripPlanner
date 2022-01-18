@@ -760,8 +760,10 @@ public class TransmodelGraphQLSchema {
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .build())
             .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment).getRouteForId(TransitIdMapper
-                  .mapIDToDomain(environment.getArgument("id")));
+                final String id = environment.getArgument("id");
+                if (id.isBlank()) { return null; }
+                return GqlUtil.getRoutingService(environment)
+                        .getRouteForId(TransitIdMapper.mapIDToDomain(id));
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -857,11 +859,7 @@ public class TransmodelGraphQLSchema {
                     .filter(route -> publicCodes.contains(route.getShortName()));
               }
               if (environment.getArgument("transportModes") != null) {
-
-                Set<TraverseMode> modes = (
-                    (List<TraverseMode>) environment.getArgument("transportModes")
-                ).stream().filter(TraverseMode::isTransit).collect(Collectors.toSet());
-                // TODO OTP2 - FIX THIS, THIS IS A BUG
+                Set<TransitMode> modes = Set.copyOf(environment.getArgument("transportModes"));
                 stream = stream.filter(route -> modes.contains(route.getMode()));
               }
               if ((environment.getArgument("authorities") instanceof Collection)) {

@@ -88,7 +88,12 @@ public class LegType {
             .description(
                 "The transport sub mode (e.g., localBus or expressBus) used when traversing this leg. Null if leg is not a ride")
             .type(EnumTypes.TRANSPORT_SUBMODE)
-            .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
+            .dataFetcher(environment ->
+                ((Leg) environment.getSource()).getTrip() != null &&
+                    ((Leg) environment.getSource()).getTrip().getNetexSubmode() != null
+                    ? TransmodelTransportSubmode.fromValue(((Leg) environment.getSource()).getTrip().getNetexSubmode())
+                    : null
+            )
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
