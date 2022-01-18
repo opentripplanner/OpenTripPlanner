@@ -786,7 +786,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
                         cancelScheduledTrip(feedId, trip.getId().getId(), serviceDate);
 
-                        // Check whether trip id has been used for previously ADDED/MODIFIED trip message and cancel
+                        // Check whether trip id has been used for previously ADDED/MODIFIED trip message and remove
                         // previously created trip
                         removePreviousRealtimeUpdate(feedId, trip.getId().getId(), serviceDate);
 
