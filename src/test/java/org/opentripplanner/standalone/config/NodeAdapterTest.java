@@ -337,4 +337,13 @@ public class NodeAdapterTest {
                 subject.asTextSet("nonExisting", Set.of("X"))
         );
     }
+
+    @Test
+    public void isNonEmptyArray() {
+        NodeAdapter subject = newNodeAdapterForTest("{ foo : ['A'], bar: [], foobar: true }");
+        assertTrue(subject.path("foo").isNonEmptyArray());
+        assertFalse(subject.path("bar").isNonEmptyArray());
+        assertFalse(subject.path("foobar").isNonEmptyArray());
+        assertFalse(subject.path("missing").isNonEmptyArray());
+    }
 }

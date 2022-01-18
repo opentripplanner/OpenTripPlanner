@@ -111,6 +111,7 @@
 - Read in flex window from Netex feeds [#3800](https://github.com/opentripplanner/OpenTripPlanner/pull/3800)
 - Fix NPE when routing on a graph without transit data. [#3804](https://github.com/opentripplanner/OpenTripPlanner/pull/3804)
 - Capture code coverage with jacoco and codecov.io [#3811](https://github.com/opentripplanner/OpenTripPlanner/pull/3811)
+- Read leg mode from trip, instead of route [#3819](https://github.com/opentripplanner/OpenTripPlanner/pull/3819)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
