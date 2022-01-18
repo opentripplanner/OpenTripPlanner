@@ -287,7 +287,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
               alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
               break;
             case RouteType:
-              int routeType = getRoute(environment).getType();
+              int routeType = getRoute(environment).getGtfsType();
               alerts.addAll(alertService.getRouteTypeAlerts(
                       routeType,
                       getSource(environment).getId().getFeedId()

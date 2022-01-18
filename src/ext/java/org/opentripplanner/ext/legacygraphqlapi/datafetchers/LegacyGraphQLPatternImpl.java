@@ -147,7 +147,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
               alerts.addAll(alertService.getRouteAlerts(getRoute(environment).getId()));
               break;
             case RouteType:
-              int routeType = getRoute(environment).getType();
+              int routeType = getRoute(environment).getGtfsType();
               alerts.addAll(alertService.getRouteTypeAlerts(
                       routeType,
                       getSource(environment).getId().getFeedId()

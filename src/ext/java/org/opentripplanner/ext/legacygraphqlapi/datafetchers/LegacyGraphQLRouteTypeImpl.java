@@ -31,7 +31,7 @@ public class LegacyGraphQLRouteTypeImpl
                     .stream()
                     .filter(route ->
                             route.getId().getFeedId().equals(getSource(environment).getFeedId())
-                                    && route.getType() == getSource(environment).getRouteType() && (
+                                    && route.getGtfsType() == getSource(environment).getRouteType() && (
                                     agency == null || route.getAgency()
                                             .equals(agency)
                             ))

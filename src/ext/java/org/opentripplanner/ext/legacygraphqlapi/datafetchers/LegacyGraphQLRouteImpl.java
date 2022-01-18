@@ -124,12 +124,12 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
               break;
             case RouteType:
               alerts.addAll(alertService.getRouteTypeAlerts(
-                      getSource(environment).getType(),
+                      getSource(environment).getGtfsType(),
                       getSource(environment).getId()
                               .getFeedId()
               ));
               alerts.addAll(alertService.getRouteTypeAndAgencyAlerts(
-                      getSource(environment).getType(),
+                      getSource(environment).getGtfsType(),
                       getSource(environment).getAgency().getId()
               ));
               break;
