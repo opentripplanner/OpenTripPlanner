@@ -1,6 +1,24 @@
 package org.opentripplanner.graph_builder.module.ned;
 
+import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
+
 import com.fasterxml.jackson.databind.JsonNode;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.geotools.geometry.DirectPosition2D;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -13,6 +31,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;
+import org.opentripplanner.graph_builder.issues.ElevationProfileFailure;
 import org.opentripplanner.graph_builder.issues.ElevationPropagationLimit;
 import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
@@ -28,24 +47,6 @@ import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
-import static org.opentripplanner.util.logging.ThrottleLogger.throttle;
-
 /**
  * THIS CLASS IS MULTI-THREADED
  * (When configured to do so, it uses parallel streams to distribute elevation calculation tasks for edges.)
@@ -60,12 +61,6 @@ import static org.opentripplanner.util.logging.ThrottleLogger.throttle;
 public class ElevationModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(ElevationModule.class);
-
-    /**
-     * Wrap LOG with a Throttle logger for elevation edge warnings, this will prevent thousands
-     * of log events, and just log one message every 3 second.
-     */
-    private static final Logger ELEVATION_EDGE_ERROR_LOG = throttle(LOG);
 
 
     /** The elevation data to be used in calculating elevations. */
@@ -173,6 +168,7 @@ public class ElevationModule implements GraphBuilderModule {
             HashMap<Class<?>, Object> extra,
             DataImportIssueStore issueStore
     ) {
+        Instant start = Instant.now();
         this.issueStore = issueStore;
         this.graph = graph;
         gridCoverageFactory.fetchData(graph);
@@ -274,6 +270,8 @@ public class ElevationModule implements GraphBuilderModule {
         @SuppressWarnings("unchecked")
         HashMap<Vertex, Double> extraElevation = (HashMap<Vertex, Double>) extra.get(ElevationPoint.class);
         assignMissingElevations(graph, edgesWithCalculatedElevations, extraElevation);
+
+        LOG.info("Finished elevation processing in {}s", Duration.between(start, Instant.now()).toSeconds());
     }
 
     static class ElevationRepairState {
@@ -487,7 +485,7 @@ public class ElevationModule implements GraphBuilderModule {
 
                     if (fromElevation == null || toElevation == null) {
                         if (!edge.isElevationFlattened() && !edge.isSlopeOverride()) {
-                            LOG.warn("Unexpectedly missing elevation for edge " + edge);
+                            issueStore.add(new ElevationProfileFailure(edge, "Unexpectedly missing elevation data"));
                         }
                         continue;
                     }
@@ -502,8 +500,12 @@ public class ElevationModule implements GraphBuilderModule {
 
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
-                    if (edge.setElevationProfile(profile, true)) {
-                        issueStore.add(new ElevationFlattened(edge));
+                    try {
+                        if (edge.setElevationProfile(profile, true)) {
+                            issueStore.add(new ElevationFlattened(edge));
+                        }
+                    } catch (Exception ex) {
+                        issueStore.add(new ElevationProfileFailure(edge, ex.getMessage()));
                     }
                 }
             }
@@ -613,10 +615,7 @@ public class ElevationModule implements GraphBuilderModule {
 
             setEdgeElevationProfile(ee, elevPCS, graph);
         } catch (ElevationLookupException e) {
-            // only catch known elevation lookup exceptions
-            ELEVATION_EDGE_ERROR_LOG.warn(
-                    "Error processing elevation for edge: {} due to error: {}", ee, e
-            );
+            issueStore.add(new ElevationProfileFailure(ee, e.getMessage()));
         }
     }
 
@@ -645,7 +644,7 @@ public class ElevationModule implements GraphBuilderModule {
                     try {
                         getElevation(coverage, examplarCoordinate);
                     } catch (ElevationLookupException e) {
-                        ELEVATION_EDGE_ERROR_LOG.warn(
+                        LOG.warn(
                             "Error processing elevation for coordinate: {} due to error: {}",
                             examplarCoordinate,
                             e
@@ -664,10 +663,14 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     private void setEdgeElevationProfile(StreetWithElevationEdge ee, PackedCoordinateSequence elevPCS, Graph graph) {
-        if(ee.setElevationProfile(elevPCS, false)) {
-            synchronized (graph) {
-                issueStore.add(new ElevationFlattened(ee));
+        try {
+            if (ee.setElevationProfile(elevPCS, false)) {
+                synchronized (graph) {
+                    issueStore.add(new ElevationFlattened(ee));
+                }
             }
+        } catch (Exception e) {
+            issueStore.add(new ElevationProfileFailure(ee, e.getMessage()));
         }
     }
 

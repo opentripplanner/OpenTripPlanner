@@ -72,8 +72,12 @@ public class StreetWithElevationEdge extends StreetEdge {
         flattened = costs.flattened;
         effectiveWalkDistanceFactor = costs.effectiveWalkFactor;
 
-        bicycleSafetyFactor *= costs.lengthMultiplier;
-        bicycleSafetyFactor += costs.slopeSafetyCost / getDistanceMeters();
+        float updatedBicycleSafetyFactor = (float) (bicycleSafetyFactor * costs.lengthMultiplier + costs.slopeSafetyCost / getDistanceMeters());
+        if (Double.isInfinite(updatedBicycleSafetyFactor) || Double.isNaN(updatedBicycleSafetyFactor)) {
+            throw new IllegalStateException("Elevation updated bicycleSafetyFactor is " + updatedBicycleSafetyFactor);
+        } else {
+            bicycleSafetyFactor = updatedBicycleSafetyFactor;
+        }
         return costs.flattened;
     }
 
