@@ -47,8 +47,20 @@ public class LegMapper {
         api.endTime = domain.endTime;
 
         // Set the arrival and departure times, even if this is redundant information
-        api.from = placeMapper.mapPlace(domain.from, arrivalTimeFromPlace, api.startTime);
-        api.to = placeMapper.mapPlace(domain.to, api.endTime, departureTimeToPlace);
+        api.from = placeMapper.mapPlace(
+                domain.from,
+                arrivalTimeFromPlace,
+                api.startTime,
+                domain.boardStopPosInPattern,
+                domain.boardingStopSequence
+        );
+        api.to = placeMapper.mapPlace(
+                domain.to,
+                api.endTime,
+                departureTimeToPlace,
+                domain.alightStopPosInPattern,
+                domain.alightStopSequence
+        );
 
         api.departureDelay = domain.departureDelay;
         api.arrivalDelay = domain.arrivalDelay;

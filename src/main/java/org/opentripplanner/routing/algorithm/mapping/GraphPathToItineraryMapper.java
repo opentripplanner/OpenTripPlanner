@@ -499,7 +499,7 @@ public abstract class GraphPathToItineraryMapper {
         }
 
         if (vertex instanceof TransitStopVertex) {
-            return Place.forStop((TransitStopVertex) vertex, name);
+            return Place.forStop(((TransitStopVertex) vertex).getStop());
         } else if(vertex instanceof VehicleRentalStationVertex) {
             return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex, name);
         } else if (vertex instanceof VehicleParkingEntranceVertex) {

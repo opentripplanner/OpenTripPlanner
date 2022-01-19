@@ -40,16 +40,6 @@ public class Place {
     public final StopLocation stop;
 
     /**
-     * For transit trips, the stop index (numbered from zero from the start of the trip).
-     */
-    public final Integer stopIndex;
-
-    /**
-     * For transit trips, the sequence number of the stop. Per GTFS, these numbers are increasing.
-     */
-    public final Integer stopSequence;
-
-    /**
      * The vehicle rental place if the type is {@link VertexType#VEHICLERENTAL}.
      */
     public final VehicleRentalPlace vehicleRentalPlace;
@@ -65,8 +55,6 @@ public class Place {
             WgsCoordinate coordinate,
             VertexType vertexType,
             StopLocation stop,
-            Integer stopIndex,
-            Integer stopSequence,
             VehicleRentalPlace vehicleRentalPlace,
             VehicleParkingWithEntrance vehicleParkingWithEntrance
     ) {
@@ -75,8 +63,6 @@ public class Place {
         this.coordinate = coordinate;
         this.vertexType = vertexType;
         this.stop = stop;
-        this.stopIndex = stopIndex;
-        this.stopSequence = stopSequence;
         this.vehicleRentalPlace = vehicleRentalPlace;
         this.vehicleParkingWithEntrance = vehicleParkingWithEntrance;
     }
@@ -115,8 +101,6 @@ public class Place {
                 .addObj("stop", stop)
                 .addObj("coordinate", coordinate)
                 .addStr("orig", orig)
-                .addNum("stopIndex", stopIndex)
-                .addNum("stopSequence", stopSequence)
                 .addEnum("vertexType", vertexType)
                 .addObj("vehicleRentalPlace", vehicleRentalPlace)
                 .addObj("vehicleParkingEntrance", vehicleParkingWithEntrance)
@@ -129,7 +113,7 @@ public class Place {
                 null,
                 WgsCoordinate.creatOptionalCoordinate(lat, lon),
                 VertexType.NORMAL,
-                null, null, null, null, null
+                null, null, null
         );
     }
 
@@ -139,30 +123,23 @@ public class Place {
                 null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.NORMAL,
-                null, null, null, null, null
+                null, null, null
         );
     }
 
-    public static Place forStop(StopLocation stop, Integer stopIndex, Integer stopSequence) {
+    public static Place forStop(StopLocation stop) {
         return new Place(
                 stop.getName(),
                 null,
                 stop.getCoordinate(),
                 VertexType.TRANSIT,
                 stop,
-                stopIndex,
-                stopSequence,
                 null,
                 null
         );
     }
 
-    public static Place forFlexStop(
-            StopLocation stop,
-            Vertex vertex,
-            Integer stopIndex,
-            Integer stopSequence
-    ) {
+    public static Place forFlexStop(StopLocation stop, Vertex vertex) {
         // The actual vertex is used because the StopLocation coordinates may not be equal to the vertex's
         // coordinates.
         return new Place(
@@ -171,22 +148,6 @@ public class Place {
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.TRANSIT,
                 stop,
-                stopIndex,
-                stopSequence,
-                null,
-                null
-        );
-    }
-
-    public static Place forStop(TransitStopVertex vertex, String name) {
-        return new Place(
-                name,
-                null,
-                WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
-                VertexType.TRANSIT,
-                vertex.getStop(),
-                null,
-                null,
                 null,
                 null
         );
@@ -198,8 +159,6 @@ public class Place {
                 null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.VEHICLERENTAL,
-                null,
-                null,
                 null,
                 vertex.getStation(),
                 null
@@ -221,8 +180,6 @@ public class Place {
                 null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.VEHICLEPARKING,
-                null,
-                null,
                 null,
                 null,
                 VehicleParkingWithEntrance.builder()

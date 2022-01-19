@@ -161,10 +161,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private Leg leg(
           Leg leg, int startTime, int endTime, Place to, Integer fromStopIndex, Integer toStopIndex, int legCost
   ) {
-    leg.from = stop(lastPlace, fromStopIndex);
+    leg.from = stop(lastPlace);
     leg.startTime = GregorianCalendar.from(newTime(startTime));
-    leg.to = stop(to, toStopIndex);
+    leg.to = stop(to);
     leg.endTime = GregorianCalendar.from(newTime(endTime));
+    leg.boardStopPosInPattern = fromStopIndex;
+    leg.alightStopPosInPattern = toStopIndex;
     leg.distanceMeters = speed(leg.mode) * (endTime - startTime);
     leg.generalizedCost = legCost;
     legs.add(leg);
@@ -210,11 +212,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return route;
   }
 
-  private static Place stop(Place source, Integer stopIndex) {
-    return Place.forStop(
-            source.stop,
-            stopIndex,
-            null
-    );
+  private static Place stop(Place source) {
+    return Place.forStop(source.stop);
   }
 }

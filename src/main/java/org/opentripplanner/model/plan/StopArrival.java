@@ -20,11 +20,28 @@ public class StopArrival {
      */
     public final Calendar departure;
 
+    /**
+     * For transit trips, the stop index (numbered from zero from the start of the trip).
+     */
+    public final Integer stopIndex;
 
-    public StopArrival(Place place, Calendar arrival, Calendar departure) {
+    /**
+     * For transit trips, the sequence number of the stop. Per GTFS, these numbers are increasing.
+     */
+    public final Integer stopSequence;
+
+    public StopArrival(
+            Place place,
+            Calendar arrival,
+            Calendar departure,
+            Integer stopIndex,
+            Integer stopSequence
+    ) {
         this.place = place;
         this.arrival = arrival;
         this.departure = departure;
+        this.stopIndex = stopIndex;
+        this.stopSequence = stopSequence;
     }
 
     @Override

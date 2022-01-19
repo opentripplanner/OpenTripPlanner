@@ -173,6 +173,10 @@ public class Leg {
 
     public Integer alightStopPosInPattern = null;
 
+    public Integer boardingStopSequence = null;
+
+    public Integer alightStopSequence = null;
+
     /**
      * Is this leg walking with a bike?
      */
@@ -277,7 +281,8 @@ public class Leg {
       if(!trip.getId().equals(other.trip.getId())) { return false; }
 
       // Return true if legs overlap
-      return this.from.stopIndex < other.to.stopIndex && to.stopIndex > other.from.stopIndex;
+      return boardStopPosInPattern < other.alightStopPosInPattern &&
+             alightStopPosInPattern > other.boardStopPosInPattern;
     }
 
   /** For transit legs, the route agency. For non-transit legs {@code null}. */

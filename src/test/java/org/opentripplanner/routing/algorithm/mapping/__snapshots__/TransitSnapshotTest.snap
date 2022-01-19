@@ -338,8 +338,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 16th",
             "stopCode": "5060",
             "stopId": "prt:5060",
-            "stopIndex": 92,
-            "stopSequence": 93,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -600,8 +598,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW King",
             "stopCode": "747",
             "stopId": "prt:747",
-            "stopIndex": 107,
-            "stopSequence": 108,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -762,8 +758,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE Morrison & 16th",
             "stopCode": "4019",
             "stopId": "prt:4019",
-            "stopIndex": 50,
-            "stopSequence": 51,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1128,8 +1122,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW 23rd & Lovejoy",
             "stopCode": "7163",
             "stopId": "prt:7163",
-            "stopIndex": 73,
-            "stopSequence": 74,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1350,8 +1342,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 16th",
             "stopCode": "5060",
             "stopId": "prt:5060",
-            "stopIndex": 92,
-            "stopSequence": 93,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1612,8 +1602,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW King",
             "stopCode": "747",
             "stopId": "prt:747",
-            "stopIndex": 107,
-            "stopSequence": 108,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1774,8 +1762,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE Morrison & 16th",
             "stopCode": "4019",
             "stopId": "prt:4019",
-            "stopIndex": 50,
-            "stopSequence": 51,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -2140,8 +2126,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW 23rd & Lovejoy",
             "stopCode": "7163",
             "stopId": "prt:7163",
-            "stopIndex": 73,
-            "stopSequence": 74,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -2342,8 +2326,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE 12th & Morrison",
             "stopCode": "6588",
             "stopId": "prt:6588",
-            "stopIndex": 31,
-            "stopSequence": 32,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -2701,8 +2683,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW Northrup & 22nd",
             "stopCode": "10778",
             "stopId": "prt:10778",
-            "stopIndex": 92,
-            "stopSequence": 93,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3042,8 +3022,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 12th",
             "stopCode": "5055",
             "stopId": "prt:5055",
-            "stopIndex": 94,
-            "stopSequence": 95,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3304,8 +3282,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW 23rd Pl",
             "stopCode": "9555",
             "stopId": "prt:9555",
-            "stopIndex": 109,
-            "stopSequence": 110,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3505,8 +3481,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 12th",
             "stopCode": "5055",
             "stopId": "prt:5055",
-            "stopIndex": 94,
-            "stopSequence": 95,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3767,8 +3741,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW 23rd Pl",
             "stopCode": "9555",
             "stopId": "prt:9555",
-            "stopIndex": 109,
-            "stopSequence": 110,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3968,8 +3940,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 12th",
             "stopCode": "5055",
             "stopId": "prt:5055",
-            "stopIndex": 94,
-            "stopSequence": 95,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4230,8 +4200,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW 23rd Pl",
             "stopCode": "9555",
             "stopId": "prt:9555",
-            "stopIndex": 109,
-            "stopSequence": 110,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4423,8 +4391,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE 12th & Sandy",
             "stopCode": "6592",
             "stopId": "prt:6592",
-            "stopIndex": 34,
-            "stopSequence": 35,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4756,8 +4722,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW 23rd & Overton",
             "stopCode": "8981",
             "stopId": "prt:8981",
-            "stopIndex": 93,
-            "stopSequence": 94,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4925,8 +4889,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 12th",
             "stopCode": "5055",
             "stopId": "prt:5055",
-            "stopIndex": 94,
-            "stopSequence": 95,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -5258,8 +5220,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW 23rd & Lovejoy",
             "stopCode": "7163",
             "stopId": "prt:7163",
-            "stopIndex": 73,
-            "stopSequence": 74,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },

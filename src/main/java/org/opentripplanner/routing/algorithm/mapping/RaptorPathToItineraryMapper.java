@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.TimeZone;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
@@ -184,8 +183,8 @@ public class RaptorPathToItineraryMapper {
         leg.serviceDate = new ServiceDate(tripSchedule.getServiceDate());
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());
-        leg.from = mapStopToPlace(boardStop, boardStopIndexInPattern, tripTimes);
-        leg.to = mapStopToPlace(alightStop, alightStopIndexInPattern, tripTimes);
+        leg.from = Place.forStop(boardStop);
+        leg.to = Place.forStop(alightStop);
         List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(pathLeg, boardStopIndexInPattern, alightStopIndexInPattern);
         leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
         leg.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
@@ -206,6 +205,9 @@ public class RaptorPathToItineraryMapper {
 
         leg.boardStopPosInPattern = boardStopIndexInPattern;
         leg.alightStopPosInPattern = alightStopIndexInPattern;
+
+        leg.boardingStopSequence = tripTimes.getOriginalGtfsStopSequence(boardStopIndexInPattern);
+        leg.alightStopSequence = tripTimes.getOriginalGtfsStopSequence(alightStopIndexInPattern);
 
         // TODO OTP2 - alightRule and boardRule needs mapping
         //    Under Raptor, for transit trips, ItineraryMapper converts Path<TripSchedule> directly to Itinerary
@@ -235,8 +237,8 @@ public class RaptorPathToItineraryMapper {
         var transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = ((TransferWithDuration) pathLeg.transfer()).transfer();
 
-        Place from = Place.forStop(transferFromStop, null, null);
-        Place to = Place.forStop(transferToStop, null, null);
+        Place from = Place.forStop(transferFromStop);
+        Place to = Place.forStop(transferToStop);
         return mapNonTransitLeg(pathLeg, transfer, transferMode, from, to);
     }
 
@@ -330,13 +332,6 @@ public class RaptorPathToItineraryMapper {
         }
     }
 
-    /**
-     * Maps stops for transit legs.
-     */
-    private Place mapStopToPlace(StopLocation stop, Integer stopIndex, TripTimes tripTimes) {
-        return Place.forStop(stop, stopIndex, tripTimes.getOriginalGtfsStopSequence(stopIndex));
-    }
-
     private Calendar createCalendar(int timeInSeconds) {
         ZonedDateTime zdt = startOfTime.plusSeconds(timeInSeconds);
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));
@@ -352,11 +347,12 @@ public class RaptorPathToItineraryMapper {
         for (int i = boardStopIndexInPattern + 1; i < alightStopIndexInPattern; i++) {
             var stop = tripPattern.getStopPattern().getStops()[i];
 
-            Place place = mapStopToPlace(stop, i, tripSchedule.getOriginalTripTimes());
             StopArrival visit = new StopArrival(
-                place,
+                Place.forStop(stop),
                 createCalendar(tripSchedule.arrival(i)),
-                createCalendar(tripSchedule.departure(i))
+                createCalendar(tripSchedule.departure(i)),
+                i,
+                tripSchedule.getOriginalTripTimes().getOriginalGtfsStopSequence(i)
             );
             visits.add(visit);
         }

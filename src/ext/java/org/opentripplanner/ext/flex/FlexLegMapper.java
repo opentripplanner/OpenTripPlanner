@@ -20,22 +20,15 @@ public class FlexLegMapper {
       leg.boardRule = GraphPathToItineraryMapper.getBoardAlightMessage(2);
       leg.alightRule = GraphPathToItineraryMapper.getBoardAlightMessage(3);
 
-      leg.dropOffBookingInfo = flexTripEdge.getFlexTrip().getDropOffBookingInfo(leg.from.stopIndex);
-      leg.pickupBookingInfo = flexTripEdge.getFlexTrip().getPickupBookingInfo(leg.from.stopIndex);
+      leg.boardStopPosInPattern = flexTripEdge.flexTemplate.fromStopIndex;
+      leg.alightStopPosInPattern = flexTripEdge.flexTemplate.toStopIndex;
+
+      leg.dropOffBookingInfo = flexTripEdge.getFlexTrip().getDropOffBookingInfo(leg.boardStopPosInPattern);
+      leg.pickupBookingInfo = flexTripEdge.getFlexTrip().getPickupBookingInfo(leg.alightStopPosInPattern);
   }
 
     public static void addFlexPlaces(Leg leg, FlexTripEdge flexEdge, Locale requestedLocale) {
-        leg.from = Place.forFlexStop(
-                flexEdge.s1,
-                flexEdge.getFromVertex(),
-                flexEdge.flexTemplate.fromStopIndex,
-                null
-        );
-        leg.to = Place.forFlexStop(
-                flexEdge.s2,
-                flexEdge.getToVertex(),
-                flexEdge.flexTemplate.toStopIndex,
-                null
-        );
+        leg.from = Place.forFlexStop(flexEdge.s1, flexEdge.getFromVertex());
+        leg.to = Place.forFlexStop(flexEdge.s2, flexEdge.getToVertex());
     }
 }

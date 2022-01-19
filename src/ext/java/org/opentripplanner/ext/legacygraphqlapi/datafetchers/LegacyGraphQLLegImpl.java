@@ -100,7 +100,13 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   public DataFetcher<StopArrival> from() {
     return environment -> {
       Leg source = getSource(environment);
-      return new StopArrival(source.from, source.startTime, source.startTime);
+      return new StopArrival(
+              source.from,
+              source.startTime,
+              source.startTime,
+              source.boardStopPosInPattern,
+              source.boardingStopSequence
+      );
     };
   }
 
@@ -108,7 +114,13 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   public DataFetcher<StopArrival> to() {
     return environment -> {
       Leg source = getSource(environment);
-      return new StopArrival(source.to, source.endTime, source.endTime);
+      return new StopArrival(
+              source.to,
+              source.endTime,
+              source.endTime,
+              source.alightStopPosInPattern,
+              source.alightStopSequence
+      );
     };
   }
 
