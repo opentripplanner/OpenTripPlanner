@@ -2,7 +2,7 @@
 set -e
 
 DOCKER_IMAGE="hsldevcom/opentripplanner"
-DOCKER_TAG="otp2"
+DOCKER_TAG="v2"
 
 COMMIT_HASH=$(git rev-parse --short "$GITHUB_SHA")
 

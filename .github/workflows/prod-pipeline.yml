@@ -1,20 +1,29 @@
-name: Build otp2-prod from release
+name: Build v2-prod from release
 on:
-  push:
-    branches:
-      - otp2-prod
-  pull_request:
-    branches:
-      - otp2-prod
+  release:
+    types:
+      - published
 jobs:
-  docker-push:
-    if: github.ref == 'refs/heads/otp2-prod'
+  v2-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build docker image from otp2-prod and push it
-        run: ./.github/workflows/scripts/build_and_push_prod.sh
+      - name: Set time zone to Europe/Helsinki
+        uses: zcong1993/setup-timezone@master
+        with:
+          timezone: "Europe/Helsinki"
+      - name: Check Tag
+        id: check-tag
+        run: |
+          if [[ ${GITHUB_REF##*/} =~ ^202[0-9][0-1][0-9][0-3][0-9] ]]; then
+              echo ::set-output name=match::true
+          fi
+      - name: Push latest image as v2-prod
+        if: steps.check-tag.outputs.match == 'true'
+        run: ./.github/workflows/scripts/push_prod.sh
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_AUTH: ${{ secrets.DOCKER_AUTH }}
+          DOCKER_BASE_TAG: v2-prod
+          DOCKER_DEV_TAG: v2
