@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.core.TimeRestriction;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.I18NString;
 
@@ -50,6 +51,18 @@ public class VehicleParking implements Serializable {
    * park_and_ride, bike_lockers, or static_osm_data.
    */
   private final Set<String> tags;
+
+  /**
+   * The opening hours of this vehicle parking, when it is possible to drop off / pickup a vehicle.
+   * May be {@code null}.
+   */
+  private final TimeRestriction openingHours;
+
+  /**
+   * The fee hours of this vehicle parking, when a fee is required for drop off / pickup.
+   * May be {@code null}.
+   */
+  private final TimeRestriction feeHours;
 
   /**
    * A short translatable note containing details of this vehicle parking.
@@ -99,6 +112,8 @@ public class VehicleParking implements Serializable {
           String detailsUrl,
           String imageUrl,
           Set<String> tags,
+          TimeRestriction openingHours,
+          TimeRestriction feeHours,
           I18NString note,
           VehicleParkingState state,
           boolean bicyclePlaces,
@@ -114,6 +129,8 @@ public class VehicleParking implements Serializable {
     this.detailsUrl = detailsUrl;
     this.imageUrl = imageUrl;
     this.tags = tags;
+    this.openingHours = openingHours;
+    this.feeHours = feeHours;
     this.note = note;
     this.state = state;
     this.bicyclePlaces = bicyclePlaces;
@@ -149,6 +166,14 @@ public class VehicleParking implements Serializable {
 
   public Set<String> getTags() {
     return tags;
+  }
+
+  public TimeRestriction getOpeningHours() {
+    return openingHours;
+  }
+
+  public TimeRestriction getFeeHours() {
+    return feeHours;
   }
 
   public I18NString getNote() {
@@ -300,6 +325,8 @@ public class VehicleParking implements Serializable {
     private double y;
     private String detailsUrl;
     private String imageUrl;
+    private TimeRestriction openingHours;
+    private TimeRestriction feeHours;
     private I18NString note;
     private VehicleParkingState state$value;
     private boolean state$set;
@@ -356,6 +383,16 @@ public class VehicleParking implements Serializable {
       return this;
     }
 
+    public VehicleParkingBuilder openingHours(TimeRestriction openingHours) {
+      this.openingHours = openingHours;
+      return this;
+    }
+
+    public VehicleParkingBuilder feeHours(TimeRestriction feeHours) {
+      this.feeHours = feeHours;
+      return this;
+    }
+
     public VehicleParkingBuilder note(I18NString note) {
       this.note = note;
       return this;
@@ -399,7 +436,7 @@ public class VehicleParking implements Serializable {
       }
 
       var vehicleParking = new VehicleParking(
-              id, name, x, y, detailsUrl, imageUrl, tags, note, state$value,
+              id, name, x, y, detailsUrl, imageUrl, tags, openingHours, feeHours, note, state$value,
               bicyclePlaces, carPlaces, wheelchairAccessibleCarPlaces, capacity, availability
       );
       this.entranceCreators.forEach(vehicleParking::addEntrance);

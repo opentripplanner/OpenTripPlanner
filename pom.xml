@@ -704,6 +704,11 @@
             <version>3.6.1</version>
         </dependency>
         <dependency>
+            <groupId>io.leonard</groupId>
+            <artifactId>opening-hours-evaluator</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
             <version>17.2</version>

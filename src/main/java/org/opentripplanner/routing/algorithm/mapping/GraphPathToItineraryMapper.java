@@ -503,7 +503,17 @@ public abstract class GraphPathToItineraryMapper {
         } else if(vertex instanceof VehicleRentalStationVertex) {
             return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex, name);
         } else if (vertex instanceof VehicleParkingEntranceVertex) {
-            return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, name, state.getOptions());
+            var vehicleParking = ((VehicleParkingEntranceVertex) vertex).getVehicleParking();
+            var limit = state.getTimeAsZonedDateTime()
+                    .plusSeconds(state.getOptions().vehicleParkingClosesSoonSeconds);
+            var closesSoon = false;
+            if (vehicleParking.getOpeningHours() != null) {
+                // This ignores the parking being closed for less than vehicleParkingClosesSoonSeconds
+                closesSoon = !vehicleParking.getOpeningHours()
+                        .isTraverseableAt(limit.toLocalDateTime());
+            }
+            return Place.forVehicleParkingEntrance(
+                    (VehicleParkingEntranceVertex) vertex, name, closesSoon, state.getOptions());
         } else {
             return Place.normal(vertex, name);
         }

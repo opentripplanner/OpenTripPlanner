@@ -52,7 +52,7 @@ public class CarParkAndRideTest extends ParkAndRideTest {
                         )
                 );
 
-                vehicleParking("CarPark #2", 47.530, 19.001, false, true, true,
+                vehicleParking("CarPark #2", 47.530, 19.001, false, true, true, null,
                         List.of(
                                 vehicleParkingEntrance(D, "CarPark #2 Entrance", true, true)
                         )

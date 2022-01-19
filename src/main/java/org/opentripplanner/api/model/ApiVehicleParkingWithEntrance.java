@@ -79,6 +79,14 @@ public class ApiVehicleParkingWithEntrance {
     public final ApiVehicleParkingSpaces availability;
 
     /**
+     * True if the difference of visiting time for a  {@link org.opentripplanner.routing.vehicle_parking.VehicleParking
+     * VehicleParking} and the closing time is inside the request's {@link
+     * org.opentripplanner.routing.api.request.RoutingRequest#vehicleParkingClosesSoonSeconds
+     * RoutingRequest#vehicleParkingClosesSoonSeconds} interval.
+     */
+    public final boolean closesSoon;
+
+    /**
      * True if realtime information is used for checking availability.
      */
     public final boolean realtime;
@@ -98,6 +106,7 @@ public class ApiVehicleParkingWithEntrance {
             boolean hasWheelchairAccessibleCarPlaces,
             ApiVehicleParkingSpaces capacity,
             ApiVehicleParkingSpaces availability,
+            boolean closesSoon,
             boolean realtime
     ) {
         this.id = id;
@@ -114,6 +123,7 @@ public class ApiVehicleParkingWithEntrance {
         this.hasWheelchairAccessibleCarPlaces = hasWheelchairAccessibleCarPlaces;
         this.capacity = capacity;
         this.availability = availability;
+        this.closesSoon = closesSoon;
         this.realtime = realtime;
     }
 
@@ -137,6 +147,7 @@ public class ApiVehicleParkingWithEntrance {
         private boolean hasWheelchairAccessibleCarPlaces;
         private ApiVehicleParkingSpaces capacity;
         private ApiVehicleParkingSpaces availability;
+        private boolean closesSoon;
         private boolean realtime;
 
         ApiVehicleParkingWithEntranceBuilder() {}
@@ -221,6 +232,12 @@ public class ApiVehicleParkingWithEntrance {
             return this;
         }
 
+        public ApiVehicleParkingWithEntranceBuilder closesSoon(
+                boolean closesSoon
+        ) {
+            this.closesSoon = closesSoon;
+            return this;
+        }
 
         public ApiVehicleParkingWithEntranceBuilder realtime(
                 boolean realtime
@@ -233,7 +250,7 @@ public class ApiVehicleParkingWithEntrance {
             return new ApiVehicleParkingWithEntrance(
                     id, name, entranceId, entranceName, detailsUrl,
                     imageUrl, note, tags, hasBicyclePlaces, hasAnyCarPlaces, hasCarPlaces,
-                    hasWheelchairAccessibleCarPlaces, capacity, availability, realtime
+                    hasWheelchairAccessibleCarPlaces, capacity, availability, closesSoon, realtime
             );
         }
     }

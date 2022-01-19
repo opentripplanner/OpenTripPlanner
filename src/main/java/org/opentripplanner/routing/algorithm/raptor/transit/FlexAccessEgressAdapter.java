@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import java.time.ZonedDateTime;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 
 /**
@@ -9,11 +10,15 @@ public class FlexAccessEgressAdapter extends AccessEgress {
   private final FlexAccessEgress flexAccessEgress;
 
   public FlexAccessEgressAdapter(
-          FlexAccessEgress flexAccessEgress, boolean isEgress, StopIndexForRaptor stopIndex
+          FlexAccessEgress flexAccessEgress,
+          StopIndexForRaptor stopIndex,
+          ZonedDateTime startOfTime,
+          boolean isEgress
   ) {
     super(
         stopIndex.indexByStop.get(flexAccessEgress.stop),
-        isEgress ? flexAccessEgress.lastState.reverse() : flexAccessEgress.lastState
+        isEgress ? flexAccessEgress.lastState.reverse() : flexAccessEgress.lastState,
+        startOfTime
     );
 
     this.flexAccessEgress = flexAccessEgress;

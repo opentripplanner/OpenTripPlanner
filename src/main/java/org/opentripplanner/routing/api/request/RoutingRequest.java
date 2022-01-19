@@ -40,6 +40,7 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TimeRestrictionWithOffset;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
@@ -397,6 +398,19 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public Set<String> bannedVehicleParkingTags = Set.of();
 
     /**
+     * If the opening hours should be taken into account for vehicle parkings. If true, it is not
+     * possible to park outside of opening hours.
+     */
+    public boolean useVehicleParkingOpeningHours = true;
+
+    /**
+     * If the visiting time for a {@link org.opentripplanner.routing.vehicle_parking.VehicleParking VehicleParking}
+     * is inside this interval, then the {@link org.opentripplanner.api.model.ApiVehicleParkingWithEntrance#closesSoon ApiVehicleParkingWithEntrance#closesSoon}
+     * flag will be marked true. Defaults to 30 minutes.
+     */
+    public int vehicleParkingClosesSoonSeconds = 30 * 60;
+
+    /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
      * (time to park, switch off, pick your stuff, lock the car, etc...)
      */
@@ -693,6 +707,14 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public boolean carPickup = false;
 
     public Set<FormFactor> allowedRentalFormFactors = new HashSet<>();
+
+    /**
+     * If {@code true}, then {@link org.opentripplanner.routing.core.TimeRestriction} on edges will
+     * be ignored and collected using {@link org.opentripplanner.routing.core.StateEditor#addTimeRestriction(TimeRestrictionWithOffset,
+     * Object)}. This is used to construct {@link org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress}
+     * objects for RAPTOR.
+     */
+    public boolean ignoreAndCollectTimeRestrictions = false;
 
     /**
      * If true vehicle parking availability information will be used to plan park and ride trips where it exists.
