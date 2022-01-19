@@ -45,6 +45,7 @@ import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.ext.transmodelapi.model.framework.AuthorityType;
+import org.opentripplanner.ext.transmodelapi.model.framework.BrandingType;
 import org.opentripplanner.ext.transmodelapi.model.framework.InfoLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.MultilingualStringType;
 import org.opentripplanner.ext.transmodelapi.model.framework.NoticeType;
@@ -144,6 +145,7 @@ public class TransmodelGraphQLSchema {
     GraphQLOutputType serverInfoType = ServerInfoType.create();
     GraphQLOutputType authorityType = AuthorityType.create(LineType.REF, PtSituationElementType.REF, gqlUtil);
     GraphQLOutputType operatorType = OperatorType.create(LineType.REF, ServiceJourneyType.REF, gqlUtil);
+    GraphQLOutputType brandingType = BrandingType.create();
     GraphQLOutputType noticeType = NoticeType.create();
     GraphQLOutputType rentalVehicleTypeType = RentalVehicleTypeType.create();
 
@@ -185,7 +187,8 @@ public class TransmodelGraphQLSchema {
           presentationType,
           JourneyPatternType.REF,
           ServiceJourneyType.REF,
-          PtSituationElementType.REF
+          PtSituationElementType.REF,
+          brandingType
       );
       GraphQLOutputType interchangeType = InterchangeType.create(lineType, ServiceJourneyType.REF);
 

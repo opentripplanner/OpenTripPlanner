@@ -6,6 +6,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.model.Branding;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -93,7 +94,10 @@ public class RouteMapperTest {
         assertEquals(TEXT_COLOR, result.getTextColor());
         assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
         assertEquals(SORT_ORDER, result.getSortOrder());
-        assertEquals(BRANDING_URL, result.getBrandingUrl());
+
+        Branding branding = result.getBranding();
+        assertNotNull(branding);
+        assertEquals(BRANDING_URL, branding.getUrl());
     }
 
     @Test
@@ -115,7 +119,9 @@ public class RouteMapperTest {
         assertNull(result.getTextColor());
         assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
         assertFalse(result.isSortOrderSet());
-        assertNull(result.getBrandingUrl());
+
+        Branding branding = result.getBranding();
+        assertNull(branding);
     }
 
     /**
