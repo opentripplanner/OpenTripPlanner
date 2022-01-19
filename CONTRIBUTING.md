@@ -5,7 +5,7 @@ Thank you for your interest in contributing to OpenTripPlanner. This document wi
 
 ## Primary Channels of Communication
 
-If you have any questions about problems you are encountering with code, deployment, documentation, or development coordination please don't hesitate to post to the OpenTripPlanner discussion groups. These are Google Groups which can be accessed as web forums or as traditional email mailing lists:
+If you have any questions about problems you are encountering with code, deployment, documentation, or development coordination, please don't hesitate to post to the OpenTripPlanner discussion groups. These are Google Groups which can be accessed as web forums or as traditional email mailing lists:
 
 - https://groups.google.com/g/opentripplanner-dev (opentripplanner-dev@googlegroups.com)
 - https://groups.google.com/g/opentripplanner-users (opentripplanner-users@googlegroups.com)
@@ -14,7 +14,7 @@ Any message posted there will be seen by most of the contributors, some of whom 
 
 OTP development meetings usually occur twice a week. These meetings are open to anyone who wants to join, even if you simply want to observe the process or ask a few questions. The most effective way to advance pull requests and collaborate is to participate directly in these meetings. The meeting times have been deliberately chosen to allow participation during regular business hours across as many time zones as possible, from the eastern Americas through Europe and Africa to Asia. If these times are not suitable for you, please let us know and we will attempt to schedule a call at a time that suits you.
 
-Check the specific times on [this calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com) which will be updated to reflect holidays or changes to meeting times. Note that time zones on this calendar are expressed in the Central European time zone by default. There is also an [iCal link to import this calendar](https://calendar.google.com/calendar/ical/ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com/public/basic.ics) into calendar apps. Check the details of the calendar events for the Google Meet link, which is different on different days of the week.
+Check the specific times on [this calendar](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com) which will be updated to reflect holidays or changes to meeting times. Note that times on this calendar are expressed in the Central European time zone by default. There is also an [iCal link to import this calendar](https://calendar.google.com/calendar/ical/ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com/public/basic.ics) into calendar apps. Check the details of the calendar events for the Google Meet link, which is different on different days of the week.
 
 Our primary tools for organizing development are Github issues and pull requests. When creating issues and pull requests, please follow the instructions in the template: always specify the version of OTP you are running and provide command lines and configuration files, do not leave remnants of the instructions in your submitted text etc.
 
