@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.opentripplanner.model.branding.Branding;
+
 public final class Route extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
@@ -10,6 +12,8 @@ public final class Route extends TransitEntity {
     private Agency agency;
 
     private Operator operator;
+
+    private Branding branding;
 
     private String shortName;
 
@@ -33,12 +37,18 @@ public final class Route extends TransitEntity {
 
     private int sortOrder = MISSING_VALUE;
 
-    private String brandingUrl;
-
     private String flexibleLineType;
 
     public Route(FeedScopedId id) {
         super(id);
+    }
+
+    public Branding getBranding() {
+        return branding;
+    }
+
+    public void setBranding(Branding branding) {
+        this.branding = branding;
     }
 
     /**
@@ -147,14 +157,6 @@ public final class Route extends TransitEntity {
 
     public void setSortOrder(int sortOrder) {
         this.sortOrder = sortOrder;
-    }
-
-    public String getBrandingUrl() {
-        return brandingUrl;
-    }
-
-    public void setBrandingUrl(String brandingUrl) {
-        this.brandingUrl = brandingUrl;
     }
 
     /**
