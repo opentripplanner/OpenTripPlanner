@@ -56,8 +56,8 @@ public class BikeRentalSnapshotTest
             /* The cost for switching between walking/biking is added the edge where switching occurs,
              * because of this the times for departAt / arriveBy itineraries differ.
              */
-            arriveBy.legs.get(1).endTime = departAt.legs.get(1).endTime;
-            arriveBy.legs.get(2).startTime = departAt.legs.get(2).startTime;
+            arriveBy.legs.get(1).setEndTime(departAt.legs.get(1).getEndTime());
+            arriveBy.legs.get(2).setStartTime(departAt.legs.get(2).getStartTime());
 
             handleGeneralizedCost(departAt, arriveBy);
         });

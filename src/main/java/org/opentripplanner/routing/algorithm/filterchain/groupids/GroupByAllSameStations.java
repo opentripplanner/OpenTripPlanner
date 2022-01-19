@@ -24,7 +24,8 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
     public GroupByAllSameStations(Itinerary itinerary) {
         keySet = itinerary.legs.stream()
                 .filter(Leg::isTransitLeg)
-                .map(leg -> new P2<>(getStopOrStationId(leg.from.stop), getStopOrStationId(leg.to.stop)))
+                .map(leg -> new P2<>(getStopOrStationId(leg.getFrom().stop), getStopOrStationId(
+                        leg.getTo().stop)))
                 .collect(Collectors.toList());
     }
 

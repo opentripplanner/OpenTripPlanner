@@ -10,25 +10,27 @@ import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 public class FlexLegMapper {
 
   static public void fixFlexTripLeg(Leg leg, FlexTripEdge flexTripEdge) {
-      leg.intermediateStops = new ArrayList<>();
-      leg.distanceMeters = flexTripEdge.getDistanceMeters();
+      leg.setIntermediateStops(new ArrayList<>());
+      leg.setDistanceMeters(flexTripEdge.getDistanceMeters());
 
-      leg.serviceDate = flexTripEdge.flexTemplate.serviceDate;
-      leg.headsign = flexTripEdge.getTrip().getTripHeadsign();
-      leg.walkSteps = new ArrayList<>();
+      leg.setServiceDate(flexTripEdge.flexTemplate.serviceDate);
+      leg.setHeadsign(flexTripEdge.getTrip().getTripHeadsign());
+      leg.setWalkSteps(new ArrayList<>());
 
-      leg.boardRule = GraphPathToItineraryMapper.getBoardAlightMessage(2);
-      leg.alightRule = GraphPathToItineraryMapper.getBoardAlightMessage(3);
+      leg.setBoardRule(GraphPathToItineraryMapper.getBoardAlightMessage(2));
+      leg.setAlightRule(GraphPathToItineraryMapper.getBoardAlightMessage(3));
 
-      leg.boardStopPosInPattern = flexTripEdge.flexTemplate.fromStopIndex;
-      leg.alightStopPosInPattern = flexTripEdge.flexTemplate.toStopIndex;
+      leg.setBoardStopPosInPattern(flexTripEdge.flexTemplate.fromStopIndex);
+      leg.setAlightStopPosInPattern(flexTripEdge.flexTemplate.toStopIndex);
 
-      leg.dropOffBookingInfo = flexTripEdge.getFlexTrip().getDropOffBookingInfo(leg.boardStopPosInPattern);
-      leg.pickupBookingInfo = flexTripEdge.getFlexTrip().getPickupBookingInfo(leg.alightStopPosInPattern);
+      leg.setDropOffBookingInfo(
+              flexTripEdge.getFlexTrip().getDropOffBookingInfo(leg.getBoardStopPosInPattern()));
+      leg.setPickupBookingInfo(
+              flexTripEdge.getFlexTrip().getPickupBookingInfo(leg.getAlightStopPosInPattern()));
   }
 
     public static void addFlexPlaces(Leg leg, FlexTripEdge flexEdge, Locale requestedLocale) {
-        leg.from = Place.forFlexStop(flexEdge.s1, flexEdge.getFromVertex());
-        leg.to = Place.forFlexStop(flexEdge.s2, flexEdge.getToVertex());
+        leg.setFrom(Place.forFlexStop(flexEdge.s1, flexEdge.getFromVertex()));
+        leg.setTo(Place.forFlexStop(flexEdge.s2, flexEdge.getToVertex()));
     }
 }

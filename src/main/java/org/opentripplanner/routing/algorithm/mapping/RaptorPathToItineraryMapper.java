@@ -175,39 +175,41 @@ public class RaptorPathToItineraryMapper {
 
         // Include real-time information in the Leg.
         if (!tripTimes.isScheduled()) {
-            leg.realTime = true;
-            leg.departureDelay = tripTimes.getDepartureDelay(boardStopIndexInPattern);
-            leg.arrivalDelay = tripTimes.getArrivalDelay(alightStopIndexInPattern);
+            leg.setRealTime(true);
+            leg.setDepartureDelay(tripTimes.getDepartureDelay(boardStopIndexInPattern));
+            leg.setArrivalDelay(tripTimes.getArrivalDelay(alightStopIndexInPattern));
         }
 
-        leg.serviceDate = new ServiceDate(tripSchedule.getServiceDate());
-        leg.startTime = createCalendar(pathLeg.fromTime());
-        leg.endTime = createCalendar(pathLeg.toTime());
-        leg.from = Place.forStop(boardStop);
-        leg.to = Place.forStop(alightStop);
+        leg.setServiceDate(new ServiceDate(tripSchedule.getServiceDate()));
+        leg.setStartTime(createCalendar(pathLeg.fromTime()));
+        leg.setEndTime(createCalendar(pathLeg.toTime()));
+        leg.setFrom(Place.forStop(boardStop));
+        leg.setTo(Place.forStop(alightStop));
         List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(pathLeg, boardStopIndexInPattern, alightStopIndexInPattern);
-        leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
-        leg.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
+        leg.setLegGeometry(PolylineEncoder.createEncodings(transitLegCoordinates));
+        leg.setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
 
         // intermediate stops are required for fare calculation that's why we always add them here
         // and remove them in the API layers after the fare calculation if they were not requested.
-        leg.intermediateStops = extractIntermediateStops(pathLeg, boardStopIndexInPattern, alightStopIndexInPattern);
+        leg.setIntermediateStops(
+                extractIntermediateStops(pathLeg, boardStopIndexInPattern, alightStopIndexInPattern));
 
-        leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
-        leg.walkSteps = new ArrayList<>();
-        leg.generalizedCost = toOtpDomainCost(pathLeg.generalizedCost());
+        leg.setHeadsign(tripTimes.getHeadsign(boardStopIndexInPattern));
+        leg.setWalkSteps(new ArrayList<>());
+        leg.setGeneralizedCost(toOtpDomainCost(pathLeg.generalizedCost()));
 
-        leg.dropOffBookingInfo = tripTimes.getDropOffBookingInfo(boardStopIndexInPattern);
-        leg.pickupBookingInfo = tripTimes.getPickupBookingInfo(boardStopIndexInPattern);
+        leg.setDropOffBookingInfo(tripTimes.getDropOffBookingInfo(boardStopIndexInPattern));
+        leg.setPickupBookingInfo(tripTimes.getPickupBookingInfo(boardStopIndexInPattern));
 
-        leg.transferToNextLeg = (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg();
-        leg.transferFromPrevLeg = prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg;
+        leg.setTransferToNextLeg((ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg());
+        leg.setTransferFromPrevLeg(
+                prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg());
 
-        leg.boardStopPosInPattern = boardStopIndexInPattern;
-        leg.alightStopPosInPattern = alightStopIndexInPattern;
+        leg.setBoardStopPosInPattern(boardStopIndexInPattern);
+        leg.setAlightStopPosInPattern(alightStopIndexInPattern);
 
-        leg.boardingStopSequence = tripTimes.getOriginalGtfsStopSequence(boardStopIndexInPattern);
-        leg.alightStopSequence = tripTimes.getOriginalGtfsStopSequence(alightStopIndexInPattern);
+        leg.setBoardingStopSequence(tripTimes.getOriginalGtfsStopSequence(boardStopIndexInPattern));
+        leg.setAlightStopSequence(tripTimes.getOriginalGtfsStopSequence(alightStopIndexInPattern));
 
         // TODO OTP2 - alightRule and boardRule needs mapping
         //    Under Raptor, for transit trips, ItineraryMapper converts Path<TripSchedule> directly to Itinerary
@@ -269,14 +271,14 @@ public class RaptorPathToItineraryMapper {
         List<Edge> edges = transfer.getEdges();
         if (edges == null || edges.isEmpty()) {
             Leg leg = new Leg(transferMode);
-            leg.from = from;
-            leg.to = to;
-            leg.startTime = createCalendar(pathLeg.fromTime());
-            leg.endTime = createCalendar(pathLeg.toTime());
-            leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
-            leg.distanceMeters = (double) transfer.getDistanceMeters();
-            leg.walkSteps = Collections.emptyList();
-            leg.generalizedCost = toOtpDomainCost(pathLeg.generalizedCost());
+            leg.setFrom(from);
+            leg.setTo(to);
+            leg.setStartTime(createCalendar(pathLeg.fromTime()));
+            leg.setEndTime(createCalendar(pathLeg.toTime()));
+            leg.setLegGeometry(PolylineEncoder.createEncodings(transfer.getCoordinates()));
+            leg.setDistanceMeters((double) transfer.getDistanceMeters());
+            leg.setWalkSteps(Collections.emptyList());
+            leg.setGeneralizedCost(toOtpDomainCost(pathLeg.generalizedCost()));
 
             return List.of(leg);
         } else {
@@ -323,11 +325,11 @@ public class RaptorPathToItineraryMapper {
             Leg nextLeg = legs.get(i + 1);
 
             if (currLeg.isTransitLeg() && !nextLeg.isTransitLeg()) {
-                nextLeg.from = currLeg.to;
+                nextLeg.setFrom(currLeg.getTo());
             }
 
             if (!currLeg.isTransitLeg() && nextLeg.isTransitLeg()) {
-                currLeg.to = nextLeg.from;
+                currLeg.setTo(nextLeg.getFrom());
             }
         }
     }

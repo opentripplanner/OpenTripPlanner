@@ -49,14 +49,16 @@ public class LegType {
             .type(gqlUtil.dateTimeScalar)
             .dataFetcher(
                 // startTime is already adjusted for realtime - need to subtract delay to get aimed time
-                env -> leg(env).startTime.getTimeInMillis() - (1000L * leg(env).departureDelay))
+                env -> leg(env).getStartTime().getTimeInMillis() - (1000L * leg(
+                        env).getDepartureDelay()
+                ))
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("expectedStartTime")
             .description("The expected, realtime adjusted date and time this leg starts.")
             .type(gqlUtil.dateTimeScalar)
-            .dataFetcher(env -> leg(env).startTime.getTimeInMillis())
+            .dataFetcher(env -> leg(env).getStartTime().getTimeInMillis())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -65,14 +67,14 @@ public class LegType {
             .type(gqlUtil.dateTimeScalar)
             .dataFetcher(
                 // endTime is already adjusted for realtime - need to subtract delay to get aimed time
-                env -> leg(env).endTime.getTimeInMillis() - 1000L * leg(env).arrivalDelay)
+                env -> leg(env).getEndTime().getTimeInMillis() - 1000L * leg(env).getArrivalDelay())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("expectedEndTime")
             .description("The expected, realtime adjusted date and time this leg ends.")
             .type(gqlUtil.dateTimeScalar)
-            .dataFetcher(env -> leg(env).endTime.getTimeInMillis())
+            .dataFetcher(env -> leg(env).getEndTime().getTimeInMillis())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -80,7 +82,7 @@ public class LegType {
             .description(
                 "The mode of transport or access (e.g., foot) used when traversing this leg.")
             .type(MODE)
-            .dataFetcher(env -> leg(env).mode)
+            .dataFetcher(env -> leg(env).getMode())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -114,7 +116,7 @@ public class LegType {
             .name("pointsOnLink")
             .description("The legs's geometry.")
             .type(linkGeometryType)
-            .dataFetcher(env -> leg(env).legGeometry)
+            .dataFetcher(env -> leg(env).getLegGeometry())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -136,21 +138,21 @@ public class LegType {
             .name("realtime")
             .description("Whether there is real-time data about this leg")
             .type(Scalars.GraphQLBoolean)
-            .dataFetcher(env -> leg(env).realTime)
+            .dataFetcher(env -> leg(env).getRealTime())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("distance")
             .description("The distance traveled while traversing the leg in meters.")
             .type(Scalars.GraphQLFloat)
-            .dataFetcher(env -> leg(env).distanceMeters)
+            .dataFetcher(env -> leg(env).getDistanceMeters())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("generalizedCost")
             .description("Generalized cost or weight of the leg. Used for debugging.")
             .type(Scalars.GraphQLInt)
-            .dataFetcher(env -> leg(env).generalizedCost)
+            .dataFetcher(env -> leg(env).getGeneralizedCost())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -164,28 +166,28 @@ public class LegType {
             .name("walkingBike")
             .description("Whether this leg is walking with a bike.")
             .type(Scalars.GraphQLBoolean)
-            .dataFetcher(env -> leg(env).walkingBike)
+            .dataFetcher(env -> leg(env).getWalkingBike())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("rentedBike")
             .description("Whether this leg is with a rented bike.")
             .type(Scalars.GraphQLBoolean)
-            .dataFetcher(env -> leg(env).rentedVehicle)
+            .dataFetcher(env -> leg(env).getRentedVehicle())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("fromPlace")
             .description("The Place where the leg originates.")
             .type(new GraphQLNonNull(placeType))
-            .dataFetcher(env -> leg(env).from)
+            .dataFetcher(env -> leg(env).getFrom())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("toPlace")
             .description("The Place where the leg ends.")
             .type(new GraphQLNonNull(placeType))
-            .dataFetcher(env -> leg(env).to)
+            .dataFetcher(env -> leg(env).getTo())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -228,7 +230,7 @@ public class LegType {
                 "For ride legs, intermediate quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list.")
             .type(new GraphQLNonNull(new GraphQLList(quayType)))
             .dataFetcher(env -> {
-              List<StopArrival> stops = ((Leg) env.getSource()).intermediateStops;
+              List<StopArrival> stops = ((Leg) env.getSource()).getIntermediateStops();
               if (stops == null || stops.isEmpty()) {
                 return List.of();
               }
@@ -276,39 +278,40 @@ public class LegType {
             .name("situations")
             .description("All relevant situations for this leg")
             .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-            .dataFetcher(env -> leg(env).transitAlerts)
+            .dataFetcher(env -> leg(env).getTransitAlerts())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("steps")
             .description("Do we continue from a specified via place")
             .type(new GraphQLNonNull(new GraphQLList(pathGuidanceType)))
-            .dataFetcher(env -> leg(env).walkSteps)
+            .dataFetcher(env -> leg(env).getWalkSteps())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("interchangeFrom")
             .type(interchangeType)
-            .dataFetcher(env -> leg(env).transferFromPrevLeg)
+            .dataFetcher(env -> leg(env).getTransferFromPrevLeg())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("interchangeTo")
             .type(interchangeType)
-            .dataFetcher(env -> leg(env).transferToNextLeg)
+            .dataFetcher(env -> leg(env).getTransferToNextLeg())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("bookingArrangements")
             .type(bookingArrangementType)
-            .dataFetcher(env -> leg(env).pickupBookingInfo)
+            .dataFetcher(env -> leg(env).getPickupBookingInfo())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("bikeRentalNetworks")
             .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
             .dataFetcher(env ->
-                    leg(env).vehicleRentalNetwork == null ? List.of() : List.of(leg(env).vehicleRentalNetwork)
+                    leg(env).getVehicleRentalNetwork() == null ? List.of() : List.of(
+                            leg(env).getVehicleRentalNetwork())
             )
             .build())
         .build();

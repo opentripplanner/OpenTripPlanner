@@ -98,7 +98,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to, legCost);
-    this.legs.get(0).rentedVehicle = true;
+    this.legs.get(0).setRentedVehicle(true);
     return this;
   }
 
@@ -150,7 +150,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
     legCost += cost(1.0f, end - start) + BOARD_COST;
     Leg leg = leg(new Leg(trip(tripId, route)), start, end, to, fromStopIndex, toStopIndex, legCost);
-    leg.serviceDate = SERVICE_DATE;
+    leg.setServiceDate(SERVICE_DATE);
     return this;
   }
 
@@ -159,16 +159,22 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   private Leg leg(
-          Leg leg, int startTime, int endTime, Place to, Integer fromStopIndex, Integer toStopIndex, int legCost
+          Leg leg,
+          int startTime,
+          int endTime,
+          Place to,
+          Integer boardStopPosInPattern,
+          Integer alightStopPosInPattern,
+          int legCost
   ) {
-    leg.from = stop(lastPlace);
-    leg.startTime = GregorianCalendar.from(newTime(startTime));
-    leg.to = stop(to);
-    leg.endTime = GregorianCalendar.from(newTime(endTime));
-    leg.boardStopPosInPattern = fromStopIndex;
-    leg.alightStopPosInPattern = toStopIndex;
-    leg.distanceMeters = speed(leg.mode) * (endTime - startTime);
-    leg.generalizedCost = legCost;
+    leg.setFrom(stop(lastPlace));
+    leg.setStartTime(GregorianCalendar.from(newTime(startTime)));
+    leg.setTo(stop(to));
+    leg.setEndTime(GregorianCalendar.from(newTime(endTime)));
+    leg.setBoardStopPosInPattern(boardStopPosInPattern);
+    leg.setAlightStopPosInPattern(alightStopPosInPattern);
+    leg.setDistanceMeters(speed(leg.getMode()) * (endTime - startTime));
+    leg.setGeneralizedCost(legCost);
     legs.add(leg);
     cost += legCost;
 
