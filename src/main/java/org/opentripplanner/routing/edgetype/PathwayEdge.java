@@ -130,7 +130,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
         }
 
         if (time <= 0) {
-            return null;
+
+            time = 20; //HACK TO MAKE PATHWAYS WORK
         }
 
         double weight = time * s0.getOptions().getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
