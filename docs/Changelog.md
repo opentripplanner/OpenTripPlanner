@@ -112,6 +112,7 @@
 - Fix NPE when routing on a graph without transit data. [#3804](https://github.com/opentripplanner/OpenTripPlanner/pull/3804)
 - Capture code coverage with jacoco and codecov.io [#3811](https://github.com/opentripplanner/OpenTripPlanner/pull/3811)
 - Read leg mode from trip, instead of route [#3819](https://github.com/opentripplanner/OpenTripPlanner/pull/3819)
+- Use API mapping in snapshot tests [#3823](https://github.com/opentripplanner/OpenTripPlanner/pull/3823)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
