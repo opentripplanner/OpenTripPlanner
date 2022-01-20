@@ -226,7 +226,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
             Router router
     ) {
         RoutingRequest request = new RoutingRequest();
-        Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 25, 12, 0, 0);
+        Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 26, 12, 0, 0);
         request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
