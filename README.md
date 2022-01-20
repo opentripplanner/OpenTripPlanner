@@ -9,7 +9,7 @@ If you do not want to test or explore this version, please switch to the final 1
 
 ## Performance Test
 
-[📊 Speed Bench Mark](https://otp-performance.leonard.io/) We run the SpeedTest (incloded in the code) to measure the performance for every PR merged into OTP. The Grapfana report run a set of test-cases for a fixed Norwegian Netex data set.
+[📊 Speed Bench Mark](https://otp-performance.leonard.io/) We run the SpeedTest (included in the code) to measure the performance for every PR merged into OTP. The test uses a fixed Norwegian Netex data set and Grafana is used to display the results.
 
 
 ## Repository layout
