@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
@@ -242,8 +241,8 @@ public class TransitRouter {
                     graph.getTransferService(),
                     transitLayer,
                     searchStartTime,
-                    request.arriveBy ? request.additionalSearchDaysBeforeToday : 0,
-                    request.arriveBy ? 0 : request.additionalSearchDaysAfterToday,
+                    request.arriveBy ? request.additionalDaysBeforeSearchTime : 0,
+                    request.arriveBy ? 0 : request.additionalDaysAfterSearchTime,
                     createRequestTransitDataProviderFilter(graph.index),
                     transferRoutingRequest
             );

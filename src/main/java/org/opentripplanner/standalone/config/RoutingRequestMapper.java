@@ -99,6 +99,8 @@ public class RoutingRequestMapper {
         request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
         request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
         request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
+        request.additionalDaysAfterSearchTime = c.asInt("additionalDaysAfterSearchTime", dft.additionalDaysAfterSearchTime);
+        request.additionalDaysBeforeSearchTime = c.asInt("additionalDaysBeforeSearchTime", dft.additionalDaysBeforeSearchTime);
 
         mapTransferOptimization(
             (TransferOptimizationRequest)request.transferOptimization,
