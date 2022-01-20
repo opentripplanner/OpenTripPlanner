@@ -225,7 +225,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     public void timeShiftThisAndNextLeg(RaptorSlackProvider slackProvider) {
         if(isAccess()) { timeShiftAccessTime(slackProvider); }
         if(next != null) {
-            if (next.isTransfer()) { next.timeShiftTransferTime(slackProvider); }
+            if (next.isTransfer() && (this.isAccess() || this.isTransit())) { next.timeShiftTransferTime(slackProvider); }
             else if (next.isEgress()) { next.timeShiftEgressTime(slackProvider); }
         }
     }

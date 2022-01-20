@@ -22,7 +22,8 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>15</otp.serialization.version.id>
+        <defaultValueOfSkip>true</defaultValueOfSkip>
+        <otp.serialization.version.id>16</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>25.2</geotools.version>
         <jackson.version>2.12.5</jackson.version>
@@ -489,7 +490,7 @@
         <!--
             Netex XML document - JAXB generated Java model.
             This is generated using the official Netex schema(v1.0) and support the entire model,
-            not just the Nordic/Norwegian profile witch is currently supported by OTP.
+            not just the Nordic/Norwegian profile which is currently supported by OTP.
          -->
         <dependency>
             <groupId>org.entur</groupId>
@@ -728,13 +729,6 @@
             <groupId>net.sourceforge.javacsv</groupId>
             <artifactId>javacsv</artifactId>
             <version>2.0</version>
-        </dependency>
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.paho</groupId>

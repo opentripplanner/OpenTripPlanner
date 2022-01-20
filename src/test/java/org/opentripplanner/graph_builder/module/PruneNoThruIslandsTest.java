@@ -73,7 +73,7 @@ public class PruneNoThruIslandsTest {
             osmModule.skipVisibility = true;
             osmModule.buildGraph(graph, new HashMap<>());
             // Prune floating islands and set noThru where necessary
-            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(null);
+            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands();
             pruneNoThruIslands.setPruningThresholdIslandWithoutStops(40);
             pruneNoThruIslands.setPruningThresholdIslandWithStops(5);
             pruneNoThruIslands.buildGraph(graph, new HashMap<>());
