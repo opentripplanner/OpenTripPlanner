@@ -155,6 +155,21 @@ public class PageCursorFactory {
         }
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(PageCursorFactory.class)
+                .addBool("arriveBy", arriveBy)
+                .addBool("reverseFilteringDirection", reverseFilteringDirection)
+                .addObj("original", original)
+                .addDuration("originalSearchWindow", originalSearchWindow)
+                .addBool("swCropped", swCropped)
+                .addTime("firstRemovedItineraryStartTime", removedItineraryStartTime)
+                .addTime("firstRemovedItineraryEndTime", removedItineraryEndTime)
+                .addObj("nextCursor", nextCursor)
+                .addObj("prevCursor", prevCursor)
+                .toString();
+    }
+
     /** Temporary data class used to hold a pair of edt and lat */
     private static class Search {
         Instant edt;
@@ -172,20 +187,5 @@ public class PageCursorFactory {
                 .addTime("lat", lat)
                 .toString();
         }
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(PageCursorFactory.class)
-                .addBool("arriveBy", arriveBy)
-                .addBool("reverseFilteringDirection", reverseFilteringDirection)
-                .addObj("original", original)
-                .addDuration("originalSearchWindow", originalSearchWindow)
-                .addBool("swCropped", swCropped)
-                .addTime("firstRemovedItineraryStartTime", removedItineraryStartTime)
-                .addTime("firstRemovedItineraryEndTime", removedItineraryEndTime)
-                .addObj("nextCursor", nextCursor)
-                .addObj("prevCursor", prevCursor)
-                .toString();
     }
 }
