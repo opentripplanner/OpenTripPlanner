@@ -5,13 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 public class GroupByFilterTest implements PlanTestConstants {
 
@@ -95,7 +94,7 @@ public class GroupByFilterTest implements PlanTestConstants {
         return new GroupByFilter<>(
             i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
             List.of(
-                new SortingFilter(new OtpDefaultSortOrder(false)),
+                new SortingFilter(SortOrderComparator.defaultComparatorDepartAfter()),
                 new DeletionFlaggingFilter(new MaxLimitFilter("test", maxNumberOfItinerariesPrGroup))
             )
         );

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.SortOrder;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.FilterTransitWhenDirectModeIsEmpty;
@@ -89,7 +90,9 @@ public class RoutingWorker {
 
         // Filter itineraries
         ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
-            request,
+            request.arriveBy ? SortOrder.STREET_AND_DEPARTURE_TIME : SortOrder.STREET_AND_ARRIVAL_TIME,
+            request.itineraryFilters,
+            request.numItineraries,
             filterOnLatestDepartureTime(),
             emptyDirectModeHandler.removeWalkAllTheWayResults(),
             reverseFilteringDirection,

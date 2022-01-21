@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.generalizedCostComparator;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,8 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
@@ -32,7 +33,7 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdA
 public class ItineraryListFilterChainBuilder {
     private static final int NOT_SET = -1;
 
-    private final boolean arriveBy;
+    private final SortOrder sortOrder;
     private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
 
     private boolean debug = false;
@@ -48,12 +49,8 @@ public class ItineraryListFilterChainBuilder {
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
 
-    /**
-     * @param arriveBy Used to set the correct sort order. This si the same flag as the
-     *        {@link org.opentripplanner.routing.api.request.RoutingRequest#arriveBy}.
-     */
-    public ItineraryListFilterChainBuilder(boolean arriveBy) {
-        this.arriveBy = arriveBy;
+    public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
     }
 
     /**
@@ -209,6 +206,7 @@ public class ItineraryListFilterChainBuilder {
         return this;
     }
 
+    @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
     public ItineraryListFilterChain build() {
         List<ItineraryListFilter> filters = new ArrayList<>();
 
@@ -257,7 +255,7 @@ public class ItineraryListFilterChainBuilder {
 
         // Remove itineraries if max limit is set
         if (maxNumberOfItineraries > 0) {
-            filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
+            filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
             filters.add(
                     new DeletionFlaggingFilter(
                             new MaxLimitFilter(
@@ -271,7 +269,7 @@ public class ItineraryListFilterChainBuilder {
         }
 
         // Do the final itineraries sort
-        filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
+        filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
 
         return new ItineraryListFilterChain(filters, debug);
     }
@@ -305,7 +303,7 @@ public class ItineraryListFilterChainBuilder {
                 nested.add(new GroupByFilter<>(
                     GroupByAllSameStations::new,
                     List.of(
-                        new SortingFilter(new SortOnGeneralizedCost()),
+                        new SortingFilter(generalizedCostComparator()),
                         new DeletionFlaggingFilter( new MaxLimitFilter(innerGroupName, 1))
                     )
                 ));
@@ -317,7 +315,7 @@ public class ItineraryListFilterChainBuilder {
                 )));
             }
 
-            nested.add(new SortingFilter(new SortOnGeneralizedCost()));
+            nested.add(new SortingFilter(generalizedCostComparator()));
             nested.add(new DeletionFlaggingFilter(new MaxLimitFilter(
                 name,
                 it.maxNumOfItinerariesPerGroup

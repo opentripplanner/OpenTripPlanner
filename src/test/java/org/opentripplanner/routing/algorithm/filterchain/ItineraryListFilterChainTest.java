@@ -1,5 +1,16 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.model.plan.Itinerary.toStr;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
+import static org.opentripplanner.routing.algorithm.filterchain.SortOrder.STREET_AND_ARRIVAL_TIME;
+import static org.opentripplanner.routing.algorithm.filterchain.SortOrder.STREET_AND_DEPARTURE_TIME;
+
+import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,17 +19,6 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.plan.Itinerary.toStr;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 
 /**
@@ -225,7 +225,8 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   /* private methods */
 
   private ItineraryListFilterChainBuilder createBuilder(boolean arriveBy, boolean debug, int numOfItineraries) {
-    return new ItineraryListFilterChainBuilder(arriveBy)
+    var sortOrder = arriveBy ? STREET_AND_DEPARTURE_TIME : STREET_AND_ARRIVAL_TIME;
+    return new ItineraryListFilterChainBuilder(sortOrder)
         .withMaxNumberOfItineraries(numOfItineraries)
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
         .withDebugEnabled(debug);
