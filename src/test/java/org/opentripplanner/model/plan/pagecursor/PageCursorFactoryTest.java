@@ -1,422 +1,149 @@
 package org.opentripplanner.model.plan.pagecursor;
 
-import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.model.plan.TestItineraryBuilder;
-import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.util.time.TimeUtils;
 
+@SuppressWarnings("ConstantConditions")
 class PageCursorFactoryTest implements PlanTestConstants {
+    static final boolean ARRIVE_BY = true;
+    static final boolean DEPART_AFTER = false;
 
-    static final ZoneId zoneId = UTC;
-    static final Instant time = Instant.parse("2020-02-02T12:00:00Z");
-    static final ZonedDateTime startOfTime = DateMapper.asStartOfService(LocalDate.ofInstant(time, zoneId), zoneId);
+    static final boolean REVERSE = true;
+    static final boolean FORWARDS = false;
 
-    static final int T12_00 = TimeUtils.hm2time(12, 0);
-    static final int T12_30 = TimeUtils.hm2time(12, 30);
-    static final int T13_00 = TimeUtils.hm2time(13, 0);
-    static final int T13_30 = TimeUtils.hm2time(13, 30);
+    static final Instant TIME_ZERO = Instant.parse("2020-02-02T00:00:00Z");
+
     public static final Duration D1H = Duration.ofHours(1);
-    public static final Duration D30M = Duration.ofMinutes(30);
-    public static final Duration D1H30M = Duration.ofMinutes(90);
-    public static final Duration D2H30M = Duration.ofMinutes(150);
+
+    private static final Instant T10_30 = time("10:30");
+    private static final Instant T11_00 = time("11:00");
+    private static final Instant T11_30 = time("11:30");
+    private static final Instant T12_00 = time("12:00");
+    private static final Instant T12_30 = time("12:30");
+    private static final Instant T13_00 = time("13:00");
+    private static final Instant T13_30 = time("13:30");
+    private static final Instant T14_30 = time("14:30");
+
 
     @Test
-    public void testDepartAtNoRemovedNextPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .searchWindow(D1H)
-                .buildSearchParam();
+    public void departAfter() {
+        var factory = new PageCursorFactory(DEPART_AFTER, FORWARDS)
+                .withOriginalSearch(T12_00, null, D1H);
 
+        var nextPage = factory.nextPageCursor();
+        assetPageCursor(nextPage, T13_00, null, D1H, FORWARDS);
 
-        PageCursor pageCursor = newPageCursorFactory(
-                false,
-                startOfTime,
-                searchParams,
-                null,
-                false
-        ).nextPageCursor();
-
-        assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
-        assertNull(pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
+        var prevPage = factory.previousPageCursor();
+        assetPageCursor(prevPage, T11_00, null, D1H, REVERSE);
     }
 
     @Test
-    public void testDepartAtNoRemovedPreviousPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .searchWindow(D1H)
-                .buildSearchParam();
+    public void departAfterCropSearchWindow() {
+        var factory = new PageCursorFactory(DEPART_AFTER, FORWARDS)
+                .withOriginalSearch(T12_00, null, D1H)
+                .withRemovedItineraries(T12_30, T13_30);
 
+        var nextPage = factory.nextPageCursor();
+        assetPageCursor(nextPage, T12_30, null, D1H, FORWARDS);
 
-        PageCursor pageCursor = newPageCursorFactory(
-                false,
-                startOfTime,
-                searchParams,
-                null,
-                false
-        ).previousPageCursor();
-
-        assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
-        assertNull(pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
+        var prevPage = factory.previousPageCursor();
+        assetPageCursor(prevPage, T11_00, null, D1H, REVERSE);
     }
 
     @Test
-    public void testDepartAtRemovedInsideNextPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .searchWindow(D1H)
-                .buildSearchParam();
+    public void departAfterReversedFilter() {
+        var factory = new PageCursorFactory(DEPART_AFTER, REVERSE)
+                .withOriginalSearch(T12_00, null, D1H);
 
-        Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
+        var nextPage = factory.nextPageCursor();
+        assetPageCursor(nextPage, T13_00, null, D1H, FORWARDS);
 
-        PageCursor pageCursor = newPageCursorFactory(
-                false,
-                startOfTime,
-                searchParams,
-                itinerary,
-                false
-        ).nextPageCursor();
-
-        assertEquals(time.plus(D30M), pageCursor.earliestDepartureTime);
-        assertNull(pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
+        var prevPage = factory.previousPageCursor();
+        assetPageCursor(prevPage, T11_00, null, D1H, REVERSE);
     }
 
     @Test
-    public void testDepartAtRemovedInsidePreviousPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .searchWindow(D1H)
-                .buildSearchParam();
+    public void departAfterCropSearchWindowReversedFilter() {
+        var factory = new PageCursorFactory(DEPART_AFTER, REVERSE)
+                .withOriginalSearch(T12_00, null, D1H)
+                .withRemovedItineraries(T12_30, T13_30);
 
-        Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
+        var nextPage = factory.nextPageCursor();
+        assetPageCursor(nextPage, T13_00, null, D1H, FORWARDS);
 
-        PageCursor pageCursor = newPageCursorFactory(
-                false,
-                startOfTime,
-                searchParams,
-                itinerary,
-                false
-        ).previousPageCursor();
-
-        assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
-        assertNull(pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
+        var prevPage = factory.previousPageCursor();
+        assetPageCursor(prevPage, T11_00, T13_30, D1H, REVERSE);
     }
 
     @Test
-    public void testDepartAtReversedNoRemovedNextPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .searchWindow(D1H)
-                .buildSearchParam();
+    public void arriveBy() {
+        var factory = new PageCursorFactory(ARRIVE_BY, FORWARDS)
+                .withOriginalSearch(T12_00, T13_30, D1H);
 
+        var nextPage = factory.nextPageCursor();
+        assetPageCursor(nextPage, T13_00, T14_30, D1H, REVERSE);
 
-        PageCursor pageCursor = newPageCursorFactory(
-                false,
-                startOfTime,
-                searchParams,
-                null,
-                true
-        ).nextPageCursor();
-
-        assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
-        assertNull(pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
+        var prevPage = factory.previousPageCursor();
+        assetPageCursor(prevPage, T11_00, T12_30, D1H, FORWARDS);
     }
 
     @Test
-    public void testDepartAtReversedNoRemovedPreviousPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .searchWindow(D1H)
-                .buildSearchParam();
+    public void arriveByReversedFilter() {
+        var factory = new PageCursorFactory(ARRIVE_BY, REVERSE)
+                .withOriginalSearch(T12_00, T13_30, D1H);
 
+        var nextPage = factory.nextPageCursor();
+        assetPageCursor(nextPage, T13_00, T14_30, D1H, REVERSE);
 
-        PageCursor pageCursor = newPageCursorFactory(
-                false,
-                startOfTime,
-                searchParams,
-                null,
-                true
-        ).previousPageCursor();
-
-        assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
-        assertNull(pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
+        var prevPage = factory.previousPageCursor();
+        assetPageCursor(prevPage, T11_00, T12_30, D1H, FORWARDS);
     }
 
     @Test
-    public void testDepartAtReversedRemovedInsideNextPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .searchWindow(D1H)
-                .buildSearchParam();
+    public void arriveByCropSearchWindow() {
+        var factory = new PageCursorFactory(ARRIVE_BY, FORWARDS)
+                .withOriginalSearch(T12_00, T13_30, D1H)
+                .withRemovedItineraries(T12_30, T13_00);
 
-        Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
+        var nextPage = factory.nextPageCursor();
+        assetPageCursor(nextPage, T13_00, T14_30, D1H, REVERSE);
 
-        PageCursor pageCursor = newPageCursorFactory(
-                false,
-                startOfTime,
-                searchParams,
-                itinerary,
-                true
-        ).nextPageCursor();
-
-        assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
-        assertNull(pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
+        var prevPage = factory.previousPageCursor();
+        assetPageCursor(prevPage, T11_30, T13_00, D1H, FORWARDS);
     }
 
     @Test
-    public void testDepartAtReversedRemovedInsidePreviousPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .searchWindow(D1H)
-                .buildSearchParam();
+    public void arriveByCropSearchWindowReversedFilter() {
+        var factory = new PageCursorFactory(ARRIVE_BY, REVERSE)
+                .withOriginalSearch(T12_00, T13_30, D1H)
+                .withRemovedItineraries(T12_30, T13_00);
 
-        Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
+        var nextPage = factory.nextPageCursor();
+        assetPageCursor(nextPage, T12_30, T13_00, D1H, REVERSE);
 
-        PageCursor pageCursor = newPageCursorFactory(
-                false,
-                startOfTime,
-                searchParams,
-                itinerary,
-                true
-        ).previousPageCursor();
-
-        assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
-        assertEquals(time.plus(D1H30M), pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
+        var prevPage = factory.previousPageCursor();
+        assetPageCursor(prevPage, T11_00, T12_30, D1H, FORWARDS);
     }
 
-    @Test
-    public void testArriveByNoRemovedNextPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .latestArrivalTime(T13_30)
-                .searchWindow(D1H)
-                .buildSearchParam();
-
-
-        PageCursor pageCursor = newPageCursorFactory(
-                true,
-                startOfTime,
-                searchParams,
-                null,
-                false
-        ).nextPageCursor();
-
-        assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
-        assertEquals(time.plus(D2H30M), pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
-    }
-
-    @Test
-    public void testArriveByNoRemovedPreviousPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .latestArrivalTime(T13_30)
-                .searchWindow(D1H)
-                .buildSearchParam();
-
-
-        PageCursor pageCursor = newPageCursorFactory(
-                true,
-                startOfTime,
-                searchParams,
-                null,
-                false
-        ).previousPageCursor();
-
-        assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
-        assertEquals(time.plus(D30M), pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
-    }
-
-    @Test
-    public void testArriveByRemovedInsideNextPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .latestArrivalTime(T13_30)
-                .searchWindow(D1H)
-                .buildSearchParam();
-
-        Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
-
-        PageCursor pageCursor = newPageCursorFactory(
-                true,
-                startOfTime,
-                searchParams,
-                itinerary,
-                false
-        ).nextPageCursor();
-
-        assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
-        assertEquals(time.plus(D2H30M), pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
-    }
-
-    @Test
-    public void testArriveByRemovedInsidePreviousPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .latestArrivalTime(T13_30)
-                .searchWindow(D1H)
-                .buildSearchParam();
-
-        Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
-
-        PageCursor pageCursor = newPageCursorFactory(
-                true,
-                startOfTime,
-                searchParams,
-                itinerary,
-                false
-        ).previousPageCursor();
-
-        assertEquals(time.minus(D30M), pageCursor.earliestDepartureTime);
-        assertEquals(time.plus(D1H), pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
-    }
-
-    @Test
-    public void testArriveByReversedNoRemovedNextPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .latestArrivalTime(T13_30)
-                .searchWindow(D1H)
-                .buildSearchParam();
-
-
-        PageCursor pageCursor = newPageCursorFactory(
-                true,
-                startOfTime,
-                searchParams,
-                null,
-                true
-        ).nextPageCursor();
-
-        assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
-        assertEquals(time.plus(D2H30M), pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
-    }
-
-    @Test
-    public void testArriveByReversedNoRemovedPreviousPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .latestArrivalTime(T13_30)
-                .searchWindow(D1H)
-                .buildSearchParam();
-
-
-        PageCursor pageCursor = newPageCursorFactory(
-                true,
-                startOfTime,
-                searchParams,
-                null,
-                true
-        ).previousPageCursor();
-
-        assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
-        assertEquals(time.plus(D30M), pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
-    }
-
-    @Test
-    public void testArriveByReversedRemovedInsideNextPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .latestArrivalTime(T13_30)
-                .searchWindow(D1H)
-                .buildSearchParam();
-
-        Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
-
-        PageCursor pageCursor = newPageCursorFactory(
-                true,
-                startOfTime,
-                searchParams,
-                itinerary,
-                true
-        ).nextPageCursor();
-
-        assertEquals(time.plus(D30M), pageCursor.earliestDepartureTime);
-        assertEquals(time.plus(D1H), pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
-    }
-
-    @Test
-    public void testArriveByReversedRemovedInsidePreviousPage() {
-        SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-                .searchParams()
-                .earliestDepartureTime(T12_00)
-                .latestArrivalTime(T13_30)
-                .searchWindow(D1H)
-                .buildSearchParam();
-
-        Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
-
-        PageCursor pageCursor = newPageCursorFactory(
-                true,
-                startOfTime,
-                searchParams,
-                itinerary,
-                true
-        ).previousPageCursor();
-
-        assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
-        assertEquals(time.plus(D30M), pageCursor.latestArrivalTime);
-        assertEquals(D1H, pageCursor.searchWindow);
-    }
-
-    private PageCursorFactory newPageCursorFactory(
-            boolean arriveBy,
-            ZonedDateTime startOfTimeTransit,
-            SearchParams searchParams,
-            Itinerary firstRemovedItinerary,
-            boolean reverseFilteringDirection
+    private void assetPageCursor(
+            PageCursor pageCursor,
+            Instant expEdt,
+            Instant expLat,
+            Duration expSearchWindow,
+            boolean expReverseFilter
     ) {
-        return RoutingResponseMapper.mapIntoPageCursorFactory(
-                arriveBy,
-                startOfTimeTransit,
-                searchParams,
-                firstRemovedItinerary,
-                reverseFilteringDirection
-        );
+        assertEquals(expEdt, pageCursor.earliestDepartureTime);
+        assertEquals(expLat, pageCursor.latestArrivalTime);
+        assertEquals(expSearchWindow, pageCursor.searchWindow);
+        assertEquals(expReverseFilter, pageCursor.reverseFilteringDirection);
     }
 
+    private static Instant time(String input) {
+        return TIME_ZERO.plusSeconds(TimeUtils.time(input));
+    }
 }
