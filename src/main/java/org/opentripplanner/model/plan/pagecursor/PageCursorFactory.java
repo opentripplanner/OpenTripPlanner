@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.mapping;
+package org.opentripplanner.model.plan.pagecursor;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -6,7 +6,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 
 public class PageCursorFactory {
