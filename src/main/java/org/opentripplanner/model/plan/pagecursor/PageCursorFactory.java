@@ -82,77 +82,70 @@ public class PageCursorFactory {
     private void createPageCursors() {
         if(original == null || nextCursor != null || prevCursor != null) { return; }
 
-        boolean forwards = arriveBy == reverseFilteringDirection;
+        Search prev = new Search(null, null);
+        Search next = new Search(null, null);
 
-        Instant edtPrev, edtNext, latPrev, latNext;
-
-        if (arriveBy) {
-            if (forwards) {
+        // Depart after
+        if (!arriveBy) {
+            if (!reverseFilteringDirection) {
                 // Previous
-                edtPrev = original.edt.minus(originalSearchWindow);
-                latPrev = original.lat.minus(originalSearchWindow);
+                prev.edt = original.edt.minus(originalSearchWindow);
 
                 // Next
                 if (!swCropped) {
-                    edtNext = original.edt.plus(originalSearchWindow);
-                    latNext = original.lat.plus(originalSearchWindow);
-                } else {
-                    edtNext = removedItineraryStartTime;
-                    latNext = original.lat.plus(Duration.between(edtNext, original.edt));
-                }
-            }
-            else {
-                // Previous
-                latPrev = swCropped
-                        ? removedItineraryEndTime
-                        : original.lat.minus(originalSearchWindow);
-
-                edtPrev = original.edt.minus(Duration.between(latPrev, original.lat));
-
-                // Next
-                latNext = original.lat.plus(originalSearchWindow);
-                edtNext = original.edt.plus(originalSearchWindow);
-            }
-            prevCursor = new PageCursor(edtPrev, latPrev, originalSearchWindow, false);
-            nextCursor = new PageCursor(edtNext, latNext, originalSearchWindow, true);
-        }
-        // Switching direction, no need to take filtered itineraries into account
-        else {
-            if (forwards) {
-                // Previous
-                edtPrev = original.edt.minus(originalSearchWindow);
-
-                // Next
-                if (!swCropped) {
-                    edtNext = original.edt.plus(originalSearchWindow);
+                    next.edt = original.edt.plus(originalSearchWindow);
                 } else {
                     Instant endOfSearchWindow = original.edt.plus(originalSearchWindow);
-                    edtNext = removedItineraryStartTime;
+                    next.edt = removedItineraryStartTime;
                     // If EDT would be outside originalSearchWindow, revert to end of SW
                     if (original.edt.isAfter(endOfSearchWindow)) {
-                        edtNext = endOfSearchWindow;
+                        next.edt = endOfSearchWindow;
                     }
                 }
-                prevCursor = new PageCursor(edtPrev, null, originalSearchWindow, true);
             }
             else {
                 // Previous
                 if (swCropped) {
-                    latPrev = removedItineraryEndTime;
+                    prev.lat = removedItineraryEndTime;
                     //TODO: we don't know what time to start at
-                    edtPrev = original.edt.minus(originalSearchWindow);
-                    prevCursor = new PageCursor(edtPrev, latPrev, originalSearchWindow, true);
+                    prev.edt = original.edt.minus(originalSearchWindow);
                 }
                 else {
-                    edtPrev = original.edt.minus(originalSearchWindow);
-                    prevCursor = new PageCursor(edtPrev, null, originalSearchWindow, true);
+                    prev.edt = original.edt.minus(originalSearchWindow);
                 }
 
                 // Next
-                edtNext = original.edt.plus(originalSearchWindow);
+                next.edt = original.edt.plus(originalSearchWindow);
             }
-            nextCursor = new PageCursor(edtNext, null, originalSearchWindow, false);
         }
+        // Arrive-by
+        else {
+            // reverse sort and removal itinerary-filter
+            if (!reverseFilteringDirection) {
+                prev.lat = swCropped
+                        ? removedItineraryEndTime
+                        : original.lat.minus(originalSearchWindow);
+                prev.edt = original.edt.minus(Duration.between(prev.lat, original.lat));
+
+                next.lat = original.lat.plus(originalSearchWindow);
+                next.edt = original.edt.plus(originalSearchWindow);
+            }
+            // Use normal sort and removal in ItineraryFilterChain
+            else {
+                prev.edt = original.edt.minus(originalSearchWindow);
+                prev.lat = original.lat.minus(originalSearchWindow);
+
+                if (!swCropped) {
+                    next.edt = original.edt.plus(originalSearchWindow);
+                    next.lat = original.lat.plus(originalSearchWindow);
+                } else {
+                    next.edt = removedItineraryStartTime;
+                    next.lat = original.lat.plus(Duration.between(next.edt, original.edt));
+                }
+            }
+        }
+        prevCursor = new PageCursor(prev.edt, prev.lat, originalSearchWindow, !arriveBy);
+        nextCursor = new PageCursor(next.edt, next.lat, originalSearchWindow, arriveBy);
     }
 
     @Override
