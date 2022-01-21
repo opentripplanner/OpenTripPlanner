@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.SearchWindowUtils;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -112,10 +114,15 @@ public class RoutingWorker {
         // Restore original directMode.
         request.modes.directMode = emptyDirectModeHandler.originalDirectMode();
 
+        // Adjust the search-window for the next search if the current search-window
+        // is off (too few or too many results found).
+        var searchWindowNextSearch = findSearchWindowNextSearch(filteredItineraries);
+
         return RoutingResponseMapper.map(
                 request,
                 searchTransitTimeZero,
                 raptorSearchParamsUsed,
+                searchWindowNextSearch,
                 firstRemovedItinerary,
                 filteredItineraries,
                 routingErrors,
@@ -193,5 +200,24 @@ public class RoutingWorker {
         } finally {
             debugTimingAggregator.finishedTransitRouter();
         }
+    }
+
+    private Duration findSearchWindowNextSearch(List<Itinerary> itineraries) {
+        // No transit search performed
+        if(raptorSearchParamsUsed == null) { return null; }
+
+        var sw = Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
+        var edt = searchStartTime().plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
+        var ldt = firstRemovedItinerary == null
+                ? null : firstRemovedItinerary.startTime().toInstant();
+        int n = (int) itineraries.stream()
+                .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())
+                .count();
+
+        return SearchWindowUtils.calculateNewSearchWindow(sw, edt, ldt, n);
+    }
+
+    private Instant searchStartTime() {
+        return searchTransitTimeZero.toInstant();
     }
 }

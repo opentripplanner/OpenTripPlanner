@@ -28,6 +28,7 @@ public class RoutingResponseMapper {
             RoutingRequest request,
             ZonedDateTime startOfTimeTransit,
             SearchParams searchParams,
+            Duration searchWindowForNextSearch,
             Itinerary firstRemovedItinerary,
             List<Itinerary> itineraries,
             Set<RoutingError> routingErrors,
@@ -40,6 +41,7 @@ public class RoutingResponseMapper {
                 request.getItinerariesSortOrder(),
                 startOfTimeTransit,
                 searchParams,
+                searchWindowForNextSearch,
                 firstRemovedItinerary,
                 request.pageCursor == null ? null : request.pageCursor.type
         );
@@ -99,10 +101,11 @@ public class RoutingResponseMapper {
             SortOrder sortOrder,
             ZonedDateTime startOfTimeTransit,
             SearchParams searchParams,
+            Duration searchWindowNextSearch,
             Itinerary firstRemovedItinerary,
             @Nullable PageType currentPageType
     ) {
-        var factory = new PageCursorFactory(sortOrder);
+        var factory = new PageCursorFactory(sortOrder, searchWindowNextSearch);
 
         if(searchParams != null) {
             if(!searchParams.isSearchWindowSet()) {

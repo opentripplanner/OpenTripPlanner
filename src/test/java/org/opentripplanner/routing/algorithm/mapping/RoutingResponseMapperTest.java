@@ -26,8 +26,9 @@ public class RoutingResponseMapperTest {
     static final int T12_30 = TimeUtils.hm2time(12, 30);
     static final int T13_00 = TimeUtils.hm2time(13, 0);
     static final int T13_30 = TimeUtils.hm2time(13, 30);
-    
+
     static final Duration D1H = Duration.ofHours(1);
+    static final Duration D90M = Duration.ofMinutes(90);
 
     private static final SearchParams SEARCH_PARAMS = new RaptorRequestBuilder<TestTripSchedule>()
             .searchParams()
@@ -48,6 +49,7 @@ public class RoutingResponseMapperTest {
                 TRANSIT_TIME_ZERO,
                 null,
                 null,
+                null,
                 PageType.NEXT_PAGE
         );
 
@@ -63,6 +65,7 @@ public class RoutingResponseMapperTest {
                 SortOrder.STREET_AND_ARRIVAL_TIME,
                 TRANSIT_TIME_ZERO,
                 SEARCH_PARAMS,
+                D90M,
                 null,
                 PageType.NEXT_PAGE
         );
@@ -73,7 +76,8 @@ public class RoutingResponseMapperTest {
                         + "sortOrder: STREET_AND_ARRIVAL_TIME, "
                         + "currentPageType: NEXT_PAGE, "
                         + "current: SearchTime{edt: 2020-02-02T12:00:00Z, lat: 2020-02-02T13:30:00Z}, "
-                        + "currentSearchWindow: 1h"
+                        + "currentSearchWindow: 1h, "
+                        + "newSearchWindow: 1h30m"
                         + "}",
                 factory.toString()
         );
@@ -86,6 +90,7 @@ public class RoutingResponseMapperTest {
                 SortOrder.STREET_AND_DEPARTURE_TIME,
                 TRANSIT_TIME_ZERO,
                 SEARCH_PARAMS,
+                D90M,
                 REMOVED_ITINERARY,
                 PageType.NEXT_PAGE
         );
@@ -97,6 +102,7 @@ public class RoutingResponseMapperTest {
                         + "currentPageType: NEXT_PAGE, "
                         + "current: SearchTime{edt: 2020-02-02T12:00:00Z, lat: 2020-02-02T13:30:00Z}, "
                         + "currentSearchWindow: 1h, "
+                        + "newSearchWindow: 1h30m, "
                         + "searchWindowCropped, "
                         + "removedItineraryStartTime: 2020-02-02T12:30:00Z, "
                         + "removedItineraryEndTime: 2020-02-02T13:00:00Z"

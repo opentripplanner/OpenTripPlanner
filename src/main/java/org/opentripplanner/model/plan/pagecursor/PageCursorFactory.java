@@ -12,6 +12,7 @@ import org.opentripplanner.model.plan.SortOrder;
 
 public class PageCursorFactory {
     private final SortOrder sortOrder;
+    private final Duration newSearchWindow;
     private PageType currentPageType;
     private SearchTime current = null;
     private Duration currentSearchWindow = null;
@@ -22,8 +23,9 @@ public class PageCursorFactory {
     private PageCursor nextCursor = null;
     private PageCursor prevCursor = null;
 
-    public PageCursorFactory(SortOrder sortOrder) {
+    public PageCursorFactory(SortOrder sortOrder, Duration newSearchWindow) {
         this.sortOrder = sortOrder;
+        this.newSearchWindow = newSearchWindow;
     }
 
     /**
@@ -99,7 +101,7 @@ public class PageCursorFactory {
         // Depart after, sort on arrival time with the earliest first
         if (sortOrder.isSortedByArrivalTimeAcceding()) {
             if (currentPageType == NEXT_PAGE) {
-                prev.edt = current.edt.minus(currentSearchWindow);
+                prev.edt = current.edt.minus(newSearchWindow);
                 next.edt = holeSwUsed
                         ? current.edt.plus(currentSearchWindow)
                         : removedItineraryStartTime;
@@ -123,7 +125,7 @@ public class PageCursorFactory {
         else {
             if (currentPageType == PREVIOUS_PAGE) {
                 if(holeSwUsed) {
-                    prev.edt = current.edt.minus(currentSearchWindow);
+                    prev.edt = current.edt.minus(newSearchWindow);
                     prev.lat = current.lat;
                 }
                 else {
@@ -135,7 +137,7 @@ public class PageCursorFactory {
             }
             // Use normal sort and removal in ItineraryFilterChain
             else {
-                prev.edt = current.edt.minus(currentSearchWindow);
+                prev.edt = current.edt.minus(newSearchWindow);
                 prev.lat = current.lat;
 
                 if (holeSwUsed) {
@@ -146,8 +148,8 @@ public class PageCursorFactory {
                 }
             }
         }
-        prevCursor = new PageCursor(PREVIOUS_PAGE, sortOrder, prev.edt, prev.lat, currentSearchWindow);
-        nextCursor = new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, currentSearchWindow);
+        prevCursor = new PageCursor(PREVIOUS_PAGE, sortOrder, prev.edt, prev.lat, newSearchWindow);
+        nextCursor = new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, newSearchWindow);
     }
 
     @Override
@@ -157,6 +159,7 @@ public class PageCursorFactory {
                 .addEnum("currentPageType", currentPageType)
                 .addObj("current", current)
                 .addDuration("currentSearchWindow", currentSearchWindow)
+                .addDuration("newSearchWindow", newSearchWindow)
                 .addBoolIfTrue("searchWindowCropped", !holeSwUsed)
                 .addTime("removedItineraryStartTime", removedItineraryStartTime)
                 .addTime("removedItineraryEndTime", removedItineraryEndTime)
