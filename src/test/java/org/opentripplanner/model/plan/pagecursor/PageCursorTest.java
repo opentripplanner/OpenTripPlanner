@@ -28,8 +28,8 @@ public class PageCursorTest {
         originalTimeZone = TimeZone.getDefault();
         TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
 
-        subjectDepartAfter = PageCursor.departAfterCursor(EDT, SEARCH_WINDOW, false);
-        subjectArriveBy = PageCursor.arriveByCursor(EDT, LAT, SEARCH_WINDOW, false);
+        subjectDepartAfter = new PageCursor(EDT, null, SEARCH_WINDOW, false);
+        subjectArriveBy = new PageCursor(EDT, LAT, SEARCH_WINDOW, false);
     }
 
     @After

@@ -85,8 +85,8 @@ public class PageCursorFactory {
                 latNext = lat.plus(sw);
                 edtNext = edt.plus(sw);
             }
-            previous = PageCursor.arriveByCursor(edtPrev, latPrev, sw, false);
-            next = PageCursor.arriveByCursor(edtNext, latNext, sw, true);
+            previous = new PageCursor(edtPrev, latPrev, sw, false);
+            next = new PageCursor(edtNext, latNext, sw, true);
         }
         // Switching direction, no need to take filtered itineraries into account
         else {
@@ -105,7 +105,7 @@ public class PageCursorFactory {
                         edtNext = endOfSearchWindow;
                     }
                 }
-                previous = PageCursor.departAfterCursor(edtPrev, sw, true);
+                previous = new PageCursor(edtPrev, null, sw, true);
             }
             else {
                 // Previous
@@ -113,17 +113,17 @@ public class PageCursorFactory {
                     latPrev = getItineraryEndTime();
                     //TODO: we don't know what time to start at
                     edtPrev = this.edt.minus(sw);
-                    previous = PageCursor.arriveByCursor(edtPrev, latPrev, sw, true);
+                    previous = new PageCursor(edtPrev, latPrev, sw, true);
                 }
                 else {
                     edtPrev = edt.minus(sw);
-                    previous = PageCursor.departAfterCursor(edtPrev, sw, true);
+                    previous = new PageCursor(edtPrev,null, sw,true);
                 }
 
                 // Next
                 edtNext = edt.plus(sw);
             }
-            next = PageCursor.departAfterCursor(edtNext, sw, false);
+            next = new PageCursor(edtNext, null, sw, false);
         }
     }
 
