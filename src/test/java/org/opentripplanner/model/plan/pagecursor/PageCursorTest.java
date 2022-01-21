@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.pagecursor;
 
 import static org.junit.Assert.assertEquals;
 

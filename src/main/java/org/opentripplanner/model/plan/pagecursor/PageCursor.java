@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.pagecursor;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
