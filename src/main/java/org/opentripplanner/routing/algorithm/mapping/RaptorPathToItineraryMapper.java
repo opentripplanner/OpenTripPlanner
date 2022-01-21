@@ -57,26 +57,26 @@ public class RaptorPathToItineraryMapper {
 
     private final RoutingRequest request;
 
-    private final ZonedDateTime startOfTime;
+    private final ZonedDateTime searchTransitTimeZero;
 
 
     /**
      * Constructs an itinerary mapper for a request and a set of results
      *
      * @param transitLayer the currently active transit layer (may have real-time data applied)
-     * @param startOfTime the point in time all times in seconds are counted from
+     * @param searchTransitTimeZero the point in time all times in seconds are counted from
      * @param request the current routing request
      */
     public RaptorPathToItineraryMapper(
             Graph graph,
             TransitLayer transitLayer,
-            ZonedDateTime startOfTime,
+            ZonedDateTime searchTransitTimeZero,
             RoutingRequest request
     ) {
 
         this.graph = graph;
         this.transitLayer = transitLayer;
-        this.startOfTime = startOfTime;
+        this.searchTransitTimeZero = searchTransitTimeZero;
         this.request = request;
     }
 
@@ -335,7 +335,7 @@ public class RaptorPathToItineraryMapper {
     }
 
     private Calendar createCalendar(int timeInSeconds) {
-        ZonedDateTime zdt = startOfTime.plusSeconds(timeInSeconds);
+        ZonedDateTime zdt = searchTransitTimeZero.plusSeconds(timeInSeconds);
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));
         c.setTimeInMillis(zdt.toInstant().toEpochMilli());
         return c;

@@ -26,14 +26,14 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRapto
 class RaptorRoutingRequestTransitDataCreator {
 
   private final TransitLayer transitLayer;
-  private final ZonedDateTime searchStartTime;
+  private final ZonedDateTime transitTimeZero;
   private final LocalDate departureDate;
 
 
-  RaptorRoutingRequestTransitDataCreator(TransitLayer transitLayer, ZonedDateTime searchStartTime) {
+  RaptorRoutingRequestTransitDataCreator(TransitLayer transitLayer, ZonedDateTime transitTimeZero) {
     this.transitLayer = transitLayer;
-    this.departureDate = searchStartTime.toLocalDate();
-    this.searchStartTime = searchStartTime;
+    this.departureDate = transitTimeZero.toLocalDate();
+    this.transitTimeZero = transitTimeZero;
   }
 
   List<List<TripPatternForDates>> createTripPatternsPerStop(
@@ -48,7 +48,7 @@ class RaptorRoutingRequestTransitDataCreator {
         filter
     );
 
-    List<TripPatternForDates> tripPatternForDateList = merge(searchStartTime, tripPatternForDates);
+    List<TripPatternForDates> tripPatternForDateList = merge(transitTimeZero, tripPatternForDates);
 
     return createTripPatternsPerStop(tripPatternForDateList, transitLayer.getStopCount());
   }
@@ -81,7 +81,7 @@ class RaptorRoutingRequestTransitDataCreator {
    * performance for searching, as each TripPattern is searched only once per round.
    */
   static List<TripPatternForDates> merge(
-      ZonedDateTime searchStartTime, List<TripPatternForDate> patternForDateList
+      ZonedDateTime transitTimeZero, List<TripPatternForDate> patternForDateList
   ) {
 
     // Group TripPatternForDate objects by TripPattern
@@ -106,7 +106,7 @@ class RaptorRoutingRequestTransitDataCreator {
       // Calculate offsets per date
       List<Integer> offsets = new ArrayList<>();
       for (TripPatternForDate tripPatternForDate : patternsSorted) {
-        offsets.add(secondsSinceStartOfTime(searchStartTime, tripPatternForDate.getLocalDate()));
+        offsets.add(secondsSinceStartOfTime(transitTimeZero, tripPatternForDate.getLocalDate()));
       }
 
       // Combine TripPatternForDate objects

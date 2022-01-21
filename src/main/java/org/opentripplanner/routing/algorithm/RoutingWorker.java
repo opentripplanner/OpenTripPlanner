@@ -45,7 +45,12 @@ public class RoutingWorker {
     private final RoutingRequest request;
     private final Router router;
     private FilterTransitWhenDirectModeIsEmpty emptyDirectModeHandler;
-    private final ZonedDateTime searchStartTime;
+
+    /**
+     * Transit service time-zero. Usually midnight before the request dateTime, but NOT on days
+     * witch has DST adjustments.
+     */
+    private final ZonedDateTime searchTransitTimeZero;
     private SearchParams raptorSearchParamsUsed = null;
     private Itinerary firstRemovedItinerary = null;
     private boolean reverseFilteringDirection = false;
@@ -53,7 +58,7 @@ public class RoutingWorker {
     public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
         this.request = request;
         this.router = router;
-        this.searchStartTime = DateMapper.asStartOfService(request.getDateTimeCurrentPage(), zoneId);
+        this.searchTransitTimeZero = DateMapper.asStartOfService(request.getDateTimeCurrentPage(), zoneId);
     }
 
     public RoutingResponse route() {
@@ -112,7 +117,7 @@ public class RoutingWorker {
 
         return RoutingResponseMapper.map(
                 request,
-                searchStartTime,
+                searchTransitTimeZero,
                 raptorSearchParamsUsed,
                 firstRemovedItinerary,
                 filteredItineraries,
@@ -151,7 +156,7 @@ public class RoutingWorker {
         ) {
             int ldt = raptorSearchParamsUsed.earliestDepartureTime()
                     + raptorSearchParamsUsed.searchWindowInSeconds();
-            return searchStartTime.plusSeconds(ldt).toInstant();
+            return searchTransitTimeZero.plusSeconds(ldt).toInstant();
         }
         return null;
     }
@@ -197,7 +202,7 @@ public class RoutingWorker {
             var transitResults = TransitRouter.route(
                     request,
                     router,
-                    searchStartTime,
+                    searchTransitTimeZero,
                     debugTimingAggregator
             );
             raptorSearchParamsUsed = transitResults.getSearchParams();

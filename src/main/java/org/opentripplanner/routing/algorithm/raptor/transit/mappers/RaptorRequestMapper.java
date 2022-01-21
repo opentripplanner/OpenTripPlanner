@@ -17,23 +17,23 @@ public class RaptorRequestMapper {
     private final RoutingRequest request;
     private final Collection<? extends RaptorTransfer> accessPaths;
     private final Collection<? extends RaptorTransfer> egressPaths;
-    private final long startOfTime;
+    private final long transitTimeZeroEpocSecond;
 
     private RaptorRequestMapper(
             RoutingRequest request,
             Collection<? extends RaptorTransfer> accessPaths,
             Collection<? extends RaptorTransfer> egressPaths,
-            long startOfTime
+            long transitTimeZeroEpocSecond
     ) {
         this.request = request;
         this.accessPaths = accessPaths;
         this.egressPaths = egressPaths;
-        this.startOfTime = startOfTime;
+        this.transitTimeZeroEpocSecond = transitTimeZeroEpocSecond;
     }
 
     public static RaptorRequest<TripSchedule> mapRequest(
             RoutingRequest request,
-            ZonedDateTime startOfTime,
+            ZonedDateTime transitTimeZero,
             Collection<? extends RaptorTransfer> accessPaths,
             Collection<? extends RaptorTransfer> egressPaths
     ) {
@@ -41,7 +41,7 @@ public class RaptorRequestMapper {
                 request,
                 accessPaths,
                 egressPaths,
-                startOfTime.toEpochSecond()
+                transitTimeZero.toEpochSecond()
         ).doMap();
     }
 
@@ -102,6 +102,6 @@ public class RaptorRequestMapper {
     }
 
     private int relativeTime(Instant time) {
-        return (int)(time.getEpochSecond() - startOfTime);
+        return (int)(time.getEpochSecond() - transitTimeZeroEpocSecond);
     }
 }
