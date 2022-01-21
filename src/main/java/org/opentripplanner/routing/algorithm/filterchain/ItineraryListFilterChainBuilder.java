@@ -37,6 +37,7 @@ public class ItineraryListFilterChainBuilder {
 
     private boolean debug = false;
     private int maxNumberOfItineraries = NOT_SET;
+    private ListSection maxNumberOfItinerariesCrop;
     private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
     private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
@@ -45,7 +46,6 @@ public class ItineraryListFilterChainBuilder {
     private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
-    private boolean reverseFilteringDirection;
 
 
     /**
@@ -60,10 +60,26 @@ public class ItineraryListFilterChainBuilder {
      * The maximum number of itineraries returned. This will remove all itineraries at the
      * end of the list AFTER the final sort of the itineraries.
      * <p>
+     * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change witch
+     * end of the list is cropped.
+     *
      * Use {@code -1} to disable.
      */
     public ItineraryListFilterChainBuilder withMaxNumberOfItineraries(int value) {
         this.maxNumberOfItineraries = value;
+        return this;
+    }
+
+    /**
+     * Remove itineraries from the tail or head of the list in the final filtering. The
+     * {@link #maxNumberOfItineraries} is used together with this parameter to reduce the
+     * number of itineraries down to the requested size.
+     * <p>
+     * The default is to crop the tail. But, we need to crop the head to be able to paginate
+     * to the opposite direction of the main search.
+     */
+    public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCrop(ListSection section) {
+        this.maxNumberOfItinerariesCrop = section;
         return this;
     }
 
@@ -170,9 +186,10 @@ public class ItineraryListFilterChainBuilder {
     /**
      * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
      * To get notified about this a subscriber can be added. The first itinerary removed by the
-     * {@code maxLimit} is retuned. The 'maxLimit' check is last thing happening in the
-     * filter-chain after the final sort. So, if another filter remove an itinerary, the
-     * itinerary is not considered with the respect to this feature.
+     * {@code maxLimit} is returned. The 'maxLimit' check is the last thing happening in the
+     * filter-chain after the final sort. So, if another filter remove an itinerary, the itinerary
+     * is not considered with the respect to this the {@link #withMaxNumberOfItineraries(int)}
+     * limit.
      *
      * @param maxLimitReachedSubscriber the subscriber to notify in case any elements are removed.
      *                                  Only the first element removed is passed to the subscriber.
@@ -189,15 +206,6 @@ public class ItineraryListFilterChainBuilder {
      */
     public ItineraryListFilterChainBuilder withRemoveWalkAllTheWayResults(boolean enable) {
         this.removeWalkAllTheWayResults = enable;
-        return this;
-    }
-
-    /**
-     * Should the direction of the final filtering for max number of itineraries be swapped.
-     * This is used to be able to paginate to the opposite direction of the main search.
-     */
-    public ItineraryListFilterChainBuilder withReverseFilteringDirection(boolean enable) {
-        this.reverseFilteringDirection = enable;
         return this;
     }
 
@@ -251,14 +259,14 @@ public class ItineraryListFilterChainBuilder {
         if (maxNumberOfItineraries > 0) {
             filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
             filters.add(
-                new DeletionFlaggingFilter(
-                    new MaxLimitFilter(
-                        "number-of-itineraries-filter",
-                        maxNumberOfItineraries,
-                        reverseFilteringDirection,
-                        maxLimitReachedSubscriber
+                    new DeletionFlaggingFilter(
+                            new MaxLimitFilter(
+                                    "number-of-itineraries-filter",
+                                    maxNumberOfItineraries,
+                                    maxNumberOfItinerariesCrop,
+                                    maxLimitReachedSubscriber
+                            )
                     )
-                )
             );
         }
 

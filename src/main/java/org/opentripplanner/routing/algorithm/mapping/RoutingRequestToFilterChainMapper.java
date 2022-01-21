@@ -6,6 +6,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
+import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 public class RoutingRequestToFilterChainMapper {
@@ -43,6 +44,10 @@ public class RoutingRequestToFilterChainMapper {
       );
     }
 
+    if(reverseFilteringDirection) {
+      builder.withMaxNumberOfItinerariesCrop(ListSection.HEAD);
+    }
+
     builder
         .withMaxNumberOfItineraries(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES))
         .withTransitGeneralizedCostLimit(p.transitGeneralizedCostLimit)
@@ -53,7 +58,6 @@ public class RoutingRequestToFilterChainMapper {
         .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
         .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
         .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
-        .withReverseFilteringDirection(reverseFilteringDirection)
         .withDebugEnabled(p.debug);
 
     return builder.build();
