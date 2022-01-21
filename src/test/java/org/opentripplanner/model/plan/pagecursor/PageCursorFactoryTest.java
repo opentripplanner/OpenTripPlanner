@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
@@ -43,13 +44,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 false,
                 startOfTime,
                 searchParams,
                 null,
                 false
-        ).createNextPageCursor();
+        ).nextPageCursor();
 
         assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
         assertNull(pageCursor.latestArrivalTime);
@@ -65,13 +66,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 false,
                 startOfTime,
                 searchParams,
                 null,
                 false
-        ).createPreviousPageCursor();
+        ).previousPageCursor();
 
         assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
         assertNull(pageCursor.latestArrivalTime);
@@ -88,13 +89,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 false,
                 startOfTime,
                 searchParams,
                 itinerary,
                 false
-        ).createNextPageCursor();
+        ).nextPageCursor();
 
         assertEquals(time.plus(D30M), pageCursor.earliestDepartureTime);
         assertNull(pageCursor.latestArrivalTime);
@@ -111,13 +112,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 false,
                 startOfTime,
                 searchParams,
                 itinerary,
                 false
-        ).createPreviousPageCursor();
+        ).previousPageCursor();
 
         assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
         assertNull(pageCursor.latestArrivalTime);
@@ -133,13 +134,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 false,
                 startOfTime,
                 searchParams,
                 null,
                 true
-        ).createNextPageCursor();
+        ).nextPageCursor();
 
         assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
         assertNull(pageCursor.latestArrivalTime);
@@ -155,13 +156,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 false,
                 startOfTime,
                 searchParams,
                 null,
                 true
-        ).createPreviousPageCursor();
+        ).previousPageCursor();
 
         assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
         assertNull(pageCursor.latestArrivalTime);
@@ -178,13 +179,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 false,
                 startOfTime,
                 searchParams,
                 itinerary,
                 true
-        ).createNextPageCursor();
+        ).nextPageCursor();
 
         assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
         assertNull(pageCursor.latestArrivalTime);
@@ -201,13 +202,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_30, B).build();
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 false,
                 startOfTime,
                 searchParams,
                 itinerary,
                 true
-        ).createPreviousPageCursor();
+        ).previousPageCursor();
 
         assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
         assertEquals(time.plus(D1H30M), pageCursor.latestArrivalTime);
@@ -224,13 +225,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 true,
                 startOfTime,
                 searchParams,
                 null,
                 false
-        ).createNextPageCursor();
+        ).nextPageCursor();
 
         assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
         assertEquals(time.plus(D2H30M), pageCursor.latestArrivalTime);
@@ -247,13 +248,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 true,
                 startOfTime,
                 searchParams,
                 null,
                 false
-        ).createPreviousPageCursor();
+        ).previousPageCursor();
 
         assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
         assertEquals(time.plus(D30M), pageCursor.latestArrivalTime);
@@ -271,13 +272,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 true,
                 startOfTime,
                 searchParams,
                 itinerary,
                 false
-        ).createNextPageCursor();
+        ).nextPageCursor();
 
         assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
         assertEquals(time.plus(D2H30M), pageCursor.latestArrivalTime);
@@ -295,13 +296,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 true,
                 startOfTime,
                 searchParams,
                 itinerary,
                 false
-        ).createPreviousPageCursor();
+        ).previousPageCursor();
 
         assertEquals(time.minus(D30M), pageCursor.earliestDepartureTime);
         assertEquals(time.plus(D1H), pageCursor.latestArrivalTime);
@@ -318,13 +319,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 true,
                 startOfTime,
                 searchParams,
                 null,
                 true
-        ).createNextPageCursor();
+        ).nextPageCursor();
 
         assertEquals(time.plus(D1H), pageCursor.earliestDepartureTime);
         assertEquals(time.plus(D2H30M), pageCursor.latestArrivalTime);
@@ -341,13 +342,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .buildSearchParam();
 
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 true,
                 startOfTime,
                 searchParams,
                 null,
                 true
-        ).createPreviousPageCursor();
+        ).previousPageCursor();
 
         assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
         assertEquals(time.plus(D30M), pageCursor.latestArrivalTime);
@@ -365,13 +366,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 true,
                 startOfTime,
                 searchParams,
                 itinerary,
                 true
-        ).createNextPageCursor();
+        ).nextPageCursor();
 
         assertEquals(time.plus(D30M), pageCursor.earliestDepartureTime);
         assertEquals(time.plus(D1H), pageCursor.latestArrivalTime);
@@ -389,16 +390,33 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
         Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T12_30).bus(1, T12_30, T13_00, B).build();
 
-        PageCursor pageCursor = new PageCursorFactory(
+        PageCursor pageCursor = newPageCursorFactory(
                 true,
                 startOfTime,
                 searchParams,
                 itinerary,
                 true
-        ).createPreviousPageCursor();
+        ).previousPageCursor();
 
         assertEquals(time.minus(D1H), pageCursor.earliestDepartureTime);
         assertEquals(time.plus(D30M), pageCursor.latestArrivalTime);
         assertEquals(D1H, pageCursor.searchWindow);
     }
+
+    private PageCursorFactory newPageCursorFactory(
+            boolean arriveBy,
+            ZonedDateTime startOfTimeTransit,
+            SearchParams searchParams,
+            Itinerary firstRemovedItinerary,
+            boolean reverseFilteringDirection
+    ) {
+        return RoutingResponseMapper.mapIntoPageCursorFactory(
+                arriveBy,
+                startOfTimeTransit,
+                searchParams,
+                firstRemovedItinerary,
+                reverseFilteringDirection
+        );
+    }
+
 }

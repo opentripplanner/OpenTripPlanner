@@ -33,6 +33,9 @@
 
 
   <logger name="org.opentripplanner.routing" level="info"/>
+
+  <logger name="org.opentripplanner.routing.algorithm" level="debug" />
+
   <logger name="org.opentripplanner.routing.algorithm.transferoptimization" level="info"/>
   
   <logger name="org.opentripplanner.routing.algorithm.GenericAStar" level="info"/>
