@@ -3,11 +3,11 @@ package org.opentripplanner.routing.algorithm.mapping;
 import java.time.Instant;
 import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
-import org.opentripplanner.routing.algorithm.filterchain.SortOrder;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
 
 public class RoutingRequestToFilterChainMapper {
@@ -23,7 +23,7 @@ public class RoutingRequestToFilterChainMapper {
       int maxNumOfItineraries,
       Instant filterOnLatestDepartureTime,
       boolean removeWalkAllTheWayResults,
-      boolean reverseFilteringDirection,
+      boolean maxNumberOfItinerariesCropHead,
       Consumer<Itinerary> maxLimitReachedSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(sortOrder);
@@ -46,7 +46,7 @@ public class RoutingRequestToFilterChainMapper {
       );
     }
 
-    if(reverseFilteringDirection) {
+    if(maxNumberOfItinerariesCropHead) {
       builder.withMaxNumberOfItinerariesCrop(ListSection.HEAD);
     }
 

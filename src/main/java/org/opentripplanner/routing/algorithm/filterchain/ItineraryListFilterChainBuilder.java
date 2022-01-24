@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
@@ -38,7 +39,7 @@ public class ItineraryListFilterChainBuilder {
 
     private boolean debug = false;
     private int maxNumberOfItineraries = NOT_SET;
-    private ListSection maxNumberOfItinerariesCrop;
+    private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
     private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
     private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
@@ -73,7 +74,7 @@ public class ItineraryListFilterChainBuilder {
      * number of itineraries down to the requested size.
      * <p>
      * The default is to crop the tail. But, we need to crop the head to be able to paginate
-     * to the opposite direction of the main search.
+     * in the opposite direction of the main sort-order of the original search.
      */
     public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCrop(ListSection section) {
         this.maxNumberOfItinerariesCrop = section;

@@ -33,7 +33,9 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
+import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -987,11 +989,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * the time-window used.
      */
     public Instant getDateTimeCurrentPage() {
-        return pageCursor == null ? Instant.ofEpochSecond(dateTime) : (
-                arriveBy
-                        ? pageCursor.latestArrivalTime
-                        : pageCursor.earliestDepartureTime
-        );
+        if(pageCursor == null) {
+            return getDateTimeOriginalSearch();
+        }
+        return arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime;
     }
 
     public void setDateTime(Instant dateTime) {
@@ -1013,12 +1014,38 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /**
      * Currently only one itinerary is returned for a direct street search
      */
-    public int getNumItineraries() {
+    public int getNumItinerariesForDirectStreetSearch() {
         return 1;
     }
 
     public void setPageCursor(String pageCursor) {
         this.pageCursor = PageCursor.decode(pageCursor);
+    }
+
+    public SortOrder getItinerariesSortOrder() {
+        if(pageCursor != null) {
+            return pageCursor.originalSortOrder;
+        }
+        return arriveBy
+                ? SortOrder.STREET_AND_DEPARTURE_TIME
+                : SortOrder.STREET_AND_ARRIVAL_TIME;
+    }
+
+    /**
+     * When paging we must crop the list of itineraries in the right end according to the
+     * sorting of the original search and according to the page cursor type (next or previous).
+     * <p>
+     * We need to flip the cropping and crop the head/start of the itineraries when:
+     * <ul>
+     * <li>Paging to the previous page for a {@code depart-after/sort-on-arrival-time} search.
+     * <li>Paging to the next page for a {@code arrive-by/sort-on-departure-time} search.
+     * </ul>
+     */
+    public boolean maxNumberOfItinerariesCropHead() {
+        if(pageCursor == null) { return false; }
+
+        var previousPage = pageCursor.type == PageType.PREVIOUS_PAGE;
+        return pageCursor.originalSortOrder.isSortedByArrivalTimeAcceding() == previousPage;
     }
 
     public void setNumItineraries(int numItineraries) {
@@ -1032,7 +1059,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public String toString(String sep) {
         return from + sep + to + sep + getDateTimeOriginalSearch() + sep
                 + arriveBy + sep + bicycleOptimizeType + sep + streetSubRequestModes.getAsStr() + sep
-                + getNumItineraries();
+                + getNumItinerariesForDirectStreetSearch();
     }
 
     public void removeMode(TraverseMode mode) {

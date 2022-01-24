@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageCursorFactory;
+import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -29,19 +31,19 @@ public class RoutingResponseMapper {
             Itinerary firstRemovedItinerary,
             List<Itinerary> itineraries,
             Set<RoutingError> routingErrors,
-            DebugTimingAggregator debugTimingAggregator,
-            boolean reverseFilteringDirection
+            DebugTimingAggregator debugTimingAggregator
     ) {
         // Create response
         var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
 
         var factory= mapIntoPageCursorFactory(
-                request.arriveBy,
+                request.getItinerariesSortOrder(),
                 startOfTimeTransit,
                 searchParams,
                 firstRemovedItinerary,
-                reverseFilteringDirection
+                request.pageCursor == null ? null : request.pageCursor.type
         );
+
         PageCursor nextPageCursor = factory.nextPageCursor();
         PageCursor prevPageCursor = factory.previousPageCursor();
 
@@ -94,13 +96,13 @@ public class RoutingResponseMapper {
     }
 
     public static PageCursorFactory mapIntoPageCursorFactory(
-            boolean arriveBy,
+            SortOrder sortOrder,
             ZonedDateTime startOfTimeTransit,
             SearchParams searchParams,
             Itinerary firstRemovedItinerary,
-            boolean reverseFilteringDirection
+            @Nullable PageType currentPageType
     ) {
-        var factory = new PageCursorFactory(arriveBy, reverseFilteringDirection);
+        var factory = new PageCursorFactory(sortOrder);
 
         if(searchParams != null) {
             if(!searchParams.isSearchWindowSet()) {
@@ -116,7 +118,7 @@ public class RoutingResponseMapper {
                     ? Instant.ofEpochSecond(startOfTimeSec + searchParams.latestArrivalTime())
                     : null;
             var searchWindow = Duration.ofSeconds(searchParams.searchWindowInSeconds());
-            factory.withOriginalSearch(edt, lat, searchWindow);
+            factory.withOriginalSearch(currentPageType, edt, lat, searchWindow);
         }
 
         if(firstRemovedItinerary != null) {

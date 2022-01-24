@@ -5,7 +5,7 @@ import static java.util.Comparator.comparingInt;
 
 import java.util.Comparator;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.SortOrder;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.util.CompositeComparator;
 
 /**

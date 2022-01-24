@@ -4,39 +4,45 @@ import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.plan.SortOrder;
 
 /**
  * This class hold all the information needed to page to the next/previous page. It is
  * serialized as base64 when passed on to the client. The base64 encoding is done to prevent the
  * client from using the information inside the cursor.
  * <p>
- * This class is internal to the router, only the serialized string is passed to/from the clients.
+ * The PageCursor class is internal to the router, only the serialized string is passed to/from the
+ * clients.
  */
 public class PageCursor {
+    public final PageType type;
+    public final SortOrder originalSortOrder;
     public final Instant earliestDepartureTime;
     public final Instant latestArrivalTime;
     public final Duration searchWindow;
-    public final boolean reverseFilteringDirection;
 
     PageCursor(
+            PageType type,
+            SortOrder originalSortOrder,
             Instant earliestDepartureTime,
             Instant latestArrivalTime,
-            Duration searchWindow,
-            boolean reverseFilteringDirection
+            Duration searchWindow
     ) {
+        this.type = type;
+        this.searchWindow = searchWindow;
         this.earliestDepartureTime = earliestDepartureTime;
         this.latestArrivalTime = latestArrivalTime;
-        this.searchWindow = searchWindow;
-        this.reverseFilteringDirection = reverseFilteringDirection;
+        this.originalSortOrder = originalSortOrder;
     }
 
     @Override
     public String toString() {
         return ToStringBuilder.of(PageCursor.class)
+                .addEnum("type", type)
+                .addEnum("sortOrder", originalSortOrder)
                 .addTime("edt", earliestDepartureTime)
                 .addTime("lat", latestArrivalTime)
                 .addDuration("searchWindow", searchWindow)
-                .addBoolIfTrue("reverseFilteringDirection", reverseFilteringDirection)
                 .toString();
     }
 

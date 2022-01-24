@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
+import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
+import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
-import static org.opentripplanner.routing.algorithm.filterchain.SortOrder.STREET_AND_ARRIVAL_TIME;
-import static org.opentripplanner.routing.algorithm.filterchain.SortOrder.STREET_AND_DEPARTURE_TIME;
 
 import java.time.Instant;
 import java.util.List;

@@ -1,6 +1,10 @@
 package org.opentripplanner.model.plan.pagecursor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
+import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
+import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
+import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -10,17 +14,11 @@ import org.opentripplanner.util.time.TimeUtils;
 
 @SuppressWarnings("ConstantConditions")
 class PageCursorFactoryTest implements PlanTestConstants {
-    static final boolean ARRIVE_BY = true;
-    static final boolean DEPART_AFTER = false;
-
-    static final boolean REVERSE = true;
-    static final boolean FORWARDS = false;
 
     static final Instant TIME_ZERO = Instant.parse("2020-02-02T00:00:00Z");
 
     public static final Duration D1H = Duration.ofHours(1);
 
-    private static final Instant T10_30 = time("10:30");
     private static final Instant T11_00 = time("11:00");
     private static final Instant T11_30 = time("11:30");
     private static final Instant T12_00 = time("12:00");
@@ -31,103 +29,103 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
 
     @Test
-    public void departAfter() {
-        var factory = new PageCursorFactory(DEPART_AFTER, FORWARDS)
-                .withOriginalSearch(T12_00, null, D1H);
+    public void sortByArrival() {
+        var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME)
+                .withOriginalSearch(null, T12_00, null, D1H);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T13_00, null, D1H, FORWARDS);
+        assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, null, D1H, REVERSE);
+        assetPageCursor(prevPage, T11_00, null, D1H, PREVIOUS_PAGE);
     }
 
     @Test
-    public void departAfterCropSearchWindow() {
-        var factory = new PageCursorFactory(DEPART_AFTER, FORWARDS)
-                .withOriginalSearch(T12_00, null, D1H)
+    public void sortByArrivalCropSearchWindow() {
+        var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME)
+                .withOriginalSearch(NEXT_PAGE, T12_00, null, D1H)
                 .withRemovedItineraries(T12_30, T13_30);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T12_30, null, D1H, FORWARDS);
+        assetPageCursor(nextPage, T12_30, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, null, D1H, REVERSE);
+        assetPageCursor(prevPage, T11_00, null, D1H, PREVIOUS_PAGE);
     }
 
     @Test
-    public void departAfterReversedFilter() {
-        var factory = new PageCursorFactory(DEPART_AFTER, REVERSE)
-                .withOriginalSearch(T12_00, null, D1H);
+    public void sortByArrivalPreviousPage() {
+        var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME)
+                .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T13_00, null, D1H, FORWARDS);
+        assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, null, D1H, REVERSE);
+        assetPageCursor(prevPage, T11_00, null, D1H, PREVIOUS_PAGE);
     }
 
     @Test
-    public void departAfterCropSearchWindowReversedFilter() {
-        var factory = new PageCursorFactory(DEPART_AFTER, REVERSE)
-                .withOriginalSearch(T12_00, null, D1H)
+    public void sortByArrivalCropSearchWindowPreviousPage() {
+        var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME)
+                .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H)
                 .withRemovedItineraries(T12_30, T13_30);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T13_00, null, D1H, FORWARDS);
+        assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, T13_30, D1H, REVERSE);
+        assetPageCursor(prevPage, T11_00, T13_30, D1H, PREVIOUS_PAGE);
     }
 
     @Test
-    public void arriveBy() {
-        var factory = new PageCursorFactory(ARRIVE_BY, FORWARDS)
-                .withOriginalSearch(T12_00, T13_30, D1H);
+    public void sortByDeparture() {
+        var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME)
+                .withOriginalSearch(null, T12_00, T13_30, D1H);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T13_00, T14_30, D1H, REVERSE);
+        assetPageCursor(nextPage, T13_00, T14_30, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, T12_30, D1H, FORWARDS);
+        assetPageCursor(prevPage, T11_00, T12_30, D1H, PREVIOUS_PAGE);
     }
 
     @Test
-    public void arriveByReversedFilter() {
-        var factory = new PageCursorFactory(ARRIVE_BY, REVERSE)
-                .withOriginalSearch(T12_00, T13_30, D1H);
-
-        var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T13_00, T14_30, D1H, REVERSE);
-
-        var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, T12_30, D1H, FORWARDS);
-    }
-
-    @Test
-    public void arriveByCropSearchWindow() {
-        var factory = new PageCursorFactory(ARRIVE_BY, FORWARDS)
-                .withOriginalSearch(T12_00, T13_30, D1H)
+    public void sortByDepartureCropSearchWindow() {
+        var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME)
+                .withOriginalSearch(PREVIOUS_PAGE, T12_00, T13_30, D1H)
                 .withRemovedItineraries(T12_30, T13_00);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T13_00, T14_30, D1H, REVERSE);
+        assetPageCursor(nextPage, T13_00, T14_30, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_30, T13_00, D1H, FORWARDS);
+        assetPageCursor(prevPage, T11_30, T13_00, D1H, PREVIOUS_PAGE);
     }
 
     @Test
-    public void arriveByCropSearchWindowReversedFilter() {
-        var factory = new PageCursorFactory(ARRIVE_BY, REVERSE)
-                .withOriginalSearch(T12_00, T13_30, D1H)
+    public void sortByDepartureNextPage() {
+        var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME)
+                .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H);
+
+        var nextPage = factory.nextPageCursor();
+        assetPageCursor(nextPage, T13_00, T14_30, D1H, NEXT_PAGE);
+
+        var prevPage = factory.previousPageCursor();
+        assetPageCursor(prevPage, T11_00, T12_30, D1H, PREVIOUS_PAGE);
+    }
+
+    @Test
+    public void sortByDepartureCropSearchWindowNextPage() {
+        var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME)
+                .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H)
                 .withRemovedItineraries(T12_30, T13_00);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T12_30, T13_00, D1H, REVERSE);
+        assetPageCursor(nextPage, T12_30, T13_00, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, T12_30, D1H, FORWARDS);
+        assetPageCursor(prevPage, T11_00, T12_30, D1H, PREVIOUS_PAGE);
     }
 
     private void assetPageCursor(
@@ -135,12 +133,12 @@ class PageCursorFactoryTest implements PlanTestConstants {
             Instant expEdt,
             Instant expLat,
             Duration expSearchWindow,
-            boolean expReverseFilter
+            PageType expPageType
     ) {
         assertEquals(expEdt, pageCursor.earliestDepartureTime);
         assertEquals(expLat, pageCursor.latestArrivalTime);
         assertEquals(expSearchWindow, pageCursor.searchWindow);
-        assertEquals(expReverseFilter, pageCursor.reverseFilteringDirection);
+        assertEquals(expPageType, pageCursor.type);
     }
 
     private static Instant time(String input) {

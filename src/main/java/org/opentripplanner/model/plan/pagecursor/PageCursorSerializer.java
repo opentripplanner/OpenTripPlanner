@@ -11,12 +11,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Base64;
 import javax.annotation.Nullable;
+import org.opentripplanner.model.plan.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 final class PageCursorSerializer {
     private static final int NOT_SET = Integer.MIN_VALUE;
-    private static final long TIME_0 = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")).toEpochSecond();
+    private static final byte VERSION = 1;
+    private static final long TIME_ZERO = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")).toEpochSecond();
     private static final Logger LOG = LoggerFactory.getLogger(PageCursor.class);
 
     /** private constructor to prevent instantiating this utility class */
@@ -27,10 +29,12 @@ final class PageCursorSerializer {
         var buf = new ByteArrayOutputStream();
         try(var out = new ObjectOutputStream(buf)){
             // The order must be the same in the encode and decode function
+            writeByte(VERSION, out);
+            writeEnum(cursor.type, out);
             writeTime(cursor.earliestDepartureTime, out);
             writeTime(cursor.latestArrivalTime, out);
             writeDuration(cursor.searchWindow, out);
-            writeBoolean(cursor.reverseFilteringDirection, out);
+            writeEnum(cursor.originalSortOrder, out);
             out.flush();
             return Base64.getUrlEncoder().encodeToString(buf.toByteArray());
         }
@@ -49,11 +53,17 @@ final class PageCursorSerializer {
 
         try(var in = new ObjectInputStream(input)) {
             // The order must be the same in the encode and decode function
+
+            // The version should be used to make serialization read/write forward and backward
+            // compatible in the future.
+            var version = readByte(in);
+            var type = readEnum(in, PageType.class);
             var edt = readTime(in);
             var lat = readTime(in);
             var searchWindow = readDuration(in);
-            var reverseFilteringDirection = readBoolean(in);
-            return new PageCursor(edt, lat, searchWindow, reverseFilteringDirection);
+            var originalSortOrder = readEnum(in, SortOrder.class);
+
+            return new PageCursor(type, originalSortOrder, edt, lat, searchWindow);
         }
         catch (IOException e) {
             LOG.error("Unable to decode page cursor: '" + cursor + "'", e);
@@ -61,14 +71,22 @@ final class PageCursorSerializer {
         }
     }
 
+    private static void writeByte(byte value, ObjectOutputStream out) throws IOException {
+        out.writeByte(value);
+    }
+
+    private static byte readByte(ObjectInputStream in) throws IOException {
+        return in.readByte();
+    }
+
     private static void writeTime(Instant time, ObjectOutputStream out) throws IOException {
-        out.writeInt(time == null ? NOT_SET : (int)(time.getEpochSecond() - TIME_0));
+        out.writeInt(time == null ? NOT_SET : (int)(time.getEpochSecond() - TIME_ZERO));
     }
 
     @Nullable
     private static Instant readTime(ObjectInputStream in) throws IOException {
         var value = in.readInt();
-        return value == NOT_SET ? null : Instant.ofEpochSecond(TIME_0 + value);
+        return value == NOT_SET ? null : Instant.ofEpochSecond(TIME_ZERO + value);
     }
 
     private static void writeDuration(Duration duration, ObjectOutputStream out) throws IOException {
@@ -85,5 +103,19 @@ final class PageCursorSerializer {
 
     private static boolean readBoolean(ObjectInputStream in) throws IOException {
         return in.readBoolean();
+    }
+
+    private static <T extends Enum<T>> void writeEnum(T value, ObjectOutputStream out)
+    throws IOException
+    {
+        out.writeUTF(value.name());
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static <T extends Enum<T>> T readEnum(ObjectInputStream in, Class<T> enumType)
+    throws IOException
+    {
+        String value = in.readUTF();
+        return Enum.valueOf(enumType, value);
     }
 }

@@ -10,8 +10,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.pagecursor.PageCursor;
+import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
-import org.opentripplanner.routing.algorithm.filterchain.SortOrder;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.FilterTransitWhenDirectModeIsEmpty;
@@ -53,7 +54,6 @@ public class RoutingWorker {
     private final ZonedDateTime searchTransitTimeZero;
     private SearchParams raptorSearchParamsUsed = null;
     private Itinerary firstRemovedItinerary = null;
-    private boolean reverseFilteringDirection = false;
 
     public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
         this.request = request;
@@ -95,12 +95,12 @@ public class RoutingWorker {
 
         // Filter itineraries
         ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
-            request.arriveBy ? SortOrder.STREET_AND_DEPARTURE_TIME : SortOrder.STREET_AND_ARRIVAL_TIME,
+            request.getItinerariesSortOrder(),
             request.itineraryFilters,
             request.numItineraries,
             filterOnLatestDepartureTime(),
             emptyDirectModeHandler.removeWalkAllTheWayResults(),
-            reverseFilteringDirection,
+            request.maxNumberOfItinerariesCropHead(),
             it -> firstRemovedItinerary = it
         );
 
@@ -122,8 +122,7 @@ public class RoutingWorker {
                 firstRemovedItinerary,
                 filteredItineraries,
                 routingErrors,
-                debugTimingAggregator,
-                reverseFilteringDirection
+                debugTimingAggregator
         );
     }
 
@@ -131,12 +130,31 @@ public class RoutingWorker {
      * Adjust the 'dateTime' if the page cursor is set to "goto next page".
      * The date-time is used for many things, for example finding the days to search,
      * but the transit search is using the cursor[if exist], not the date-time.
+     *
+     *          * The {@code dateTime}, {@code arriveBy} and {@code pageCursor} depend on each other, to
+     *          * enforce the integrity of the theses three variables, we set them all with this method.
+     *          *
+     *          * @param dateTime The earliest-departure-time {@code arriveBy=false} or latest-arrival-time
+     *          *                 {@code arriveBy=true} for this search. If {@code null} now is used.
+     *          * @param pageCursor The pageCursor will override the dateTime.
      */
     private void applyPageCursor() {
-        if(request.pageCursor != null) {
+        PageCursor cursor = request.pageCursor;
+        if(cursor != null) {
+            if(cursor.type == PageType.NEXT_PAGE) {
+                request.arriveBy = false;
+                request.setDateTime(cursor.earliestDepartureTime);
+            }
+            else {
+                request.setDateTime(
+                        request.arriveBy
+                                ? cursor.latestArrivalTime
+                                : cursor.earliestDepartureTime
+                );
+            }
             Instant dateTimeCurrentPage = request.getDateTimeCurrentPage();
             request.setDateTime(dateTimeCurrentPage);
-            reverseFilteringDirection = request.pageCursor.reverseFilteringDirection;
+
             request.modes.directMode = StreetMode.NOT_SET;
             LOG.debug("Request dateTime={} set from pageCursor.", dateTimeCurrentPage);
         }

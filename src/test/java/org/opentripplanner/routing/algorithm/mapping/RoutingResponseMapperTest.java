@@ -10,7 +10,9 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
@@ -42,11 +44,11 @@ public class RoutingResponseMapperTest {
     @Test
     void mapIntoPageCursorFactoryNoTransitSearchParams() {
         var factory = RoutingResponseMapper.mapIntoPageCursorFactory(
-                false,
+                SortOrder.STREET_AND_ARRIVAL_TIME,
                 TRANSIT_TIME_ZERO,
                 null,
                 null,
-                false
+                PageType.NEXT_PAGE
         );
 
         assertNull(factory.nextPageCursor());
@@ -58,21 +60,21 @@ public class RoutingResponseMapperTest {
     void mapIntoPageCursorFactoryWithSearchParamsNoItineraryRemoved() {
 
         var factory = RoutingResponseMapper.mapIntoPageCursorFactory(
-                false,
+                SortOrder.STREET_AND_ARRIVAL_TIME,
                 TRANSIT_TIME_ZERO,
                 SEARCH_PARAMS,
                 null,
-                false
+                PageType.NEXT_PAGE
         );
 
         // There is no way to access the internals of the factory, so we use the toString()
         assertEquals(
                 "PageCursorFactory{"
-                        + "arriveBy: false, "
-                        + "reverseFilteringDirection: false, "
-                        + "original: Search{edt: 2020-02-02T12:00:00Z, lat: 2020-02-02T13:30:00Z}, "
-                        + "originalSearchWindow: 1h, "
-                        + "swCropped: false"
+                        + "sortOrder: STREET_AND_ARRIVAL_TIME, "
+                        + "currentPageType: NEXT_PAGE, "
+                        + "current: SearchTime{edt: 2020-02-02T12:00:00Z, lat: 2020-02-02T13:30:00Z}, "
+                        + "currentSearchWindow: 1h, "
+                        + "searchWindowCropped: false"
                         + "}",
                 factory.toString()
         );
@@ -82,23 +84,23 @@ public class RoutingResponseMapperTest {
     public void testArriveByReversedRemovedInsidePreviousPage() {
 
         var factory = RoutingResponseMapper.mapIntoPageCursorFactory(
-                true,
+                SortOrder.STREET_AND_DEPARTURE_TIME,
                 TRANSIT_TIME_ZERO,
                 SEARCH_PARAMS,
                 REMOVED_ITINERARY,
-                true
+                PageType.NEXT_PAGE
         );
 
         // There is no way to access the internals of the factory, so we use the toString()
         assertEquals(
                 "PageCursorFactory{"
-                        + "arriveBy: true, "
-                        + "reverseFilteringDirection: true, "
-                        + "original: Search{edt: 2020-02-02T12:00:00Z, lat: 2020-02-02T13:30:00Z}, "
-                        + "originalSearchWindow: 1h, "
-                        + "swCropped: true, "
-                        + "firstRemovedItineraryStartTime: 2020-02-02T12:30:00Z, "
-                        + "firstRemovedItineraryEndTime: 2020-02-02T13:00:00Z"
+                        + "sortOrder: STREET_AND_DEPARTURE_TIME, "
+                        + "currentPageType: NEXT_PAGE, "
+                        + "current: SearchTime{edt: 2020-02-02T12:00:00Z, lat: 2020-02-02T13:30:00Z}, "
+                        + "currentSearchWindow: 1h, "
+                        + "searchWindowCropped: true, "
+                        + "removedItineraryStartTime: 2020-02-02T12:30:00Z, "
+                        + "removedItineraryEndTime: 2020-02-02T13:00:00Z"
                         + "}",
                 factory.toString()
         );

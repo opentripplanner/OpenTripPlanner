@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain;
+package org.opentripplanner.model.plan;
 
 
 /**
@@ -18,6 +18,7 @@ public enum SortOrder {
      * This is the default for a depart-after search ({@code arriveBy=false}).
      */
     STREET_AND_ARRIVAL_TIME,
+
     /**
      * Sort itineraries in order and break ties by:
      * <ol>
@@ -29,5 +30,17 @@ public enum SortOrder {
      * </ol>
      * This is the default for an arrive-by search ({@code arriveBy=true}).
      */
-    STREET_AND_DEPARTURE_TIME
+    STREET_AND_DEPARTURE_TIME;
+
+    /**
+     * The itineraries are sorted with by arrival time with the earliest arrival time first. When
+     * paging we need to know witch end of the list of itineraries we should crop. This method is
+     * used to decide that together with the current page type (next/previous).
+     * <p>
+     * This return {@code true} for the default depart-after search, and {@code false} for an
+     * arrive-by search.
+     */
+    public boolean isSortedByArrivalTimeAcceding() {
+        return this == STREET_AND_ARRIVAL_TIME;
+    }
 }
