@@ -10,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.pagecursor.PageCursor;
-import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -21,7 +19,6 @@ import org.opentripplanner.routing.algorithm.raptor.router.street.DirectFlexRout
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -56,13 +53,13 @@ public class RoutingWorker {
     private Itinerary firstRemovedItinerary = null;
 
     public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
+        request.applyPageCursor();
         this.request = request;
         this.router = router;
         this.searchTransitTimeZero = DateMapper.asStartOfService(request.getDateTimeCurrentPage(), zoneId);
     }
 
     public RoutingResponse route() {
-        applyPageCursor();
 
         // If no direct mode is set, then we set one.
         // See {@link FilterTransitWhenDirectModeIsEmpty}
@@ -124,40 +121,6 @@ public class RoutingWorker {
                 routingErrors,
                 debugTimingAggregator
         );
-    }
-
-    /**
-     * Adjust the 'dateTime' if the page cursor is set to "goto next page".
-     * The date-time is used for many things, for example finding the days to search,
-     * but the transit search is using the cursor[if exist], not the date-time.
-     *
-     *          * The {@code dateTime}, {@code arriveBy} and {@code pageCursor} depend on each other, to
-     *          * enforce the integrity of the theses three variables, we set them all with this method.
-     *          *
-     *          * @param dateTime The earliest-departure-time {@code arriveBy=false} or latest-arrival-time
-     *          *                 {@code arriveBy=true} for this search. If {@code null} now is used.
-     *          * @param pageCursor The pageCursor will override the dateTime.
-     */
-    private void applyPageCursor() {
-        PageCursor cursor = request.pageCursor;
-        if(cursor != null) {
-            if(cursor.type == PageType.NEXT_PAGE) {
-                request.arriveBy = false;
-                request.setDateTime(cursor.earliestDepartureTime);
-            }
-            else {
-                request.setDateTime(
-                        request.arriveBy
-                                ? cursor.latestArrivalTime
-                                : cursor.earliestDepartureTime
-                );
-            }
-            Instant dateTimeCurrentPage = request.getDateTimeCurrentPage();
-            request.setDateTime(dateTimeCurrentPage);
-
-            request.modes.directMode = StreetMode.NOT_SET;
-            LOG.debug("Request dateTime={} set from pageCursor.", dateTimeCurrentPage);
-        }
     }
 
     /**

@@ -73,8 +73,7 @@ public class RoutingResponseMapperTest {
                         + "sortOrder: STREET_AND_ARRIVAL_TIME, "
                         + "currentPageType: NEXT_PAGE, "
                         + "current: SearchTime{edt: 2020-02-02T12:00:00Z, lat: 2020-02-02T13:30:00Z}, "
-                        + "currentSearchWindow: 1h, "
-                        + "searchWindowCropped: false"
+                        + "currentSearchWindow: 1h"
                         + "}",
                 factory.toString()
         );
@@ -98,7 +97,7 @@ public class RoutingResponseMapperTest {
                         + "currentPageType: NEXT_PAGE, "
                         + "current: SearchTime{edt: 2020-02-02T12:00:00Z, lat: 2020-02-02T13:30:00Z}, "
                         + "currentSearchWindow: 1h, "
-                        + "searchWindowCropped: true, "
+                        + "searchWindowCropped, "
                         + "removedItineraryStartTime: 2020-02-02T12:30:00Z, "
                         + "removedItineraryEndTime: 2020-02-02T13:00:00Z"
                         + "}",

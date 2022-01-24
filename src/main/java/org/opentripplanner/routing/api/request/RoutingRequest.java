@@ -1032,6 +1032,32 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     /**
+     * Adjust the 'dateTime' if the page cursor is set to "goto next/previous page".
+     * The date-time is used for many things, for example finding the days to search,
+     * but the transit search is using the cursor[if exist], not the date-time.
+     */
+    public void applyPageCursor() {
+        if(pageCursor != null) {
+            // We switch to "depart-after" search when paging next, it does not make sense anymore
+            // to keep the latest-arrival-time.
+            if(pageCursor.type == PageType.NEXT_PAGE) {
+                this.arriveBy = false;
+                setDateTime(pageCursor.earliestDepartureTime);
+            }
+            else {
+                setDateTime(
+                        this.arriveBy
+                                ? pageCursor.latestArrivalTime
+                                : pageCursor.earliestDepartureTime
+                );
+            }
+            modes.directMode = StreetMode.NOT_SET;
+            LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
+        }
+    }
+
+
+    /**
      * When paging we must crop the list of itineraries in the right end according to the
      * sorting of the original search and according to the page cursor type (next or previous).
      * <p>

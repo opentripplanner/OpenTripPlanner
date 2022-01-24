@@ -102,17 +102,9 @@ public class PageCursorFactory {
         if (sortOrder.isSortedByArrivalTimeAcceding()) {
             if (currentPageType == NEXT_PAGE) {
                 prev.edt = current.edt.minus(currentSearchWindow);
-
-                if (holeSwUsed) {
-                    next.edt = current.edt.plus(currentSearchWindow);
-                } else {
-                    Instant endOfSearchWindow = current.edt.plus(currentSearchWindow);
-                    next.edt = removedItineraryStartTime;
-
-                    if (current.edt.isAfter(endOfSearchWindow)) {
-                        next.edt = endOfSearchWindow;
-                    }
-                }
+                next.edt = holeSwUsed
+                        ? current.edt.plus(currentSearchWindow)
+                        : removedItineraryStartTime;
             }
             // current page type == PREV_PAGE
             else {
@@ -120,9 +112,11 @@ public class PageCursorFactory {
                     prev.edt = current.edt.minus(currentSearchWindow);
                 }
                 else {
+                    //TODO: The start time for the removed itinerary is not the best thing to use
+                    //      here. We should take the LATEST start time of all removed itineraries
+                    //      instead.
+                    prev.edt = removedItineraryStartTime.minus(currentSearchWindow);
                     prev.lat = removedItineraryEndTime;
-                    //TODO: we don't know what time to start at
-                    prev.edt = current.edt.minus(currentSearchWindow);
                 }
                 next.edt = current.edt.plus(currentSearchWindow);
             }
@@ -130,12 +124,15 @@ public class PageCursorFactory {
         // Arrive-by, sort on departure time with the latest first
         else {
             if (currentPageType == PREVIOUS_PAGE) {
-                prev.lat = holeSwUsed
-                        ? current.lat.minus(currentSearchWindow)
-                        : removedItineraryEndTime;
-                prev.edt = current.edt.minus(Duration.between(prev.lat, current.lat));
-
-                next.lat = current.lat.plus(currentSearchWindow);
+                if(holeSwUsed) {
+                    prev.edt = current.edt.minus(currentSearchWindow);
+                    prev.lat = current.lat;
+                }
+                else {
+                    prev.edt = removedItineraryStartTime.minus(currentSearchWindow);
+                    // TODO: Replace this by hashing removed itineraries
+                    prev.lat = removedItineraryEndTime;
+                }
                 next.edt = current.edt.plus(currentSearchWindow);
             }
             // Use normal sort and removal in ItineraryFilterChain
@@ -145,10 +142,9 @@ public class PageCursorFactory {
 
                 if (holeSwUsed) {
                     next.edt = current.edt.plus(currentSearchWindow);
-                    next.lat = current.lat.plus(currentSearchWindow);
-                } else {
+                }
+                else {
                     next.edt = removedItineraryStartTime;
-                    next.lat = current.lat.plus(Duration.between(next.edt, current.edt));
                 }
             }
         }
@@ -163,7 +159,7 @@ public class PageCursorFactory {
                 .addEnum("currentPageType", currentPageType)
                 .addObj("current", current)
                 .addDuration("currentSearchWindow", currentSearchWindow)
-                .addBool("searchWindowCropped", holeSwUsed)
+                .addBoolIfTrue("searchWindowCropped", !holeSwUsed)
                 .addTime("removedItineraryStartTime", removedItineraryStartTime)
                 .addTime("removedItineraryEndTime", removedItineraryEndTime)
                 .addObj("nextCursor", nextCursor)

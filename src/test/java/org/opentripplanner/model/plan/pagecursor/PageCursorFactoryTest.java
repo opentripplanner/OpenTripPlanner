@@ -75,7 +75,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
         assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, T13_30, D1H, PREVIOUS_PAGE);
+        assetPageCursor(prevPage, T11_30, T13_30, D1H, PREVIOUS_PAGE);
     }
 
     @Test
@@ -84,10 +84,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .withOriginalSearch(null, T12_00, T13_30, D1H);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T13_00, T14_30, D1H, NEXT_PAGE);
+        assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, T12_30, D1H, PREVIOUS_PAGE);
+        assetPageCursor(prevPage, T11_00, T13_30, D1H, PREVIOUS_PAGE);
     }
 
     @Test
@@ -97,7 +97,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .withRemovedItineraries(T12_30, T13_00);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T13_00, T14_30, D1H, NEXT_PAGE);
+        assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
         assetPageCursor(prevPage, T11_30, T13_00, D1H, PREVIOUS_PAGE);
@@ -109,7 +109,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T13_00, T14_30, D1H, NEXT_PAGE);
+        assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
         assetPageCursor(prevPage, T11_00, T12_30, D1H, PREVIOUS_PAGE);
@@ -122,7 +122,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
                 .withRemovedItineraries(T12_30, T13_00);
 
         var nextPage = factory.nextPageCursor();
-        assetPageCursor(nextPage, T12_30, T13_00, D1H, NEXT_PAGE);
+        assetPageCursor(nextPage, T12_30, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
         assetPageCursor(prevPage, T11_00, T12_30, D1H, PREVIOUS_PAGE);
