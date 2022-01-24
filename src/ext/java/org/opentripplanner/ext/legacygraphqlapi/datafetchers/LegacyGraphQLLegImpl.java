@@ -5,6 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -56,7 +57,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<EncodedPolylineBean> legGeometry() {
+  public DataFetcher<Geometry> legGeometry() {
     return environment -> getSource(environment).getLegGeometry();
   }
 
