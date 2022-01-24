@@ -65,7 +65,7 @@ public class TransitRouter {
             return new TransitRouterResult(List.of(), null);
         }
 
-        if (!router.graph.transitFeedCovers(request.getDateTimeOriginalSearch())) {
+        if (!router.graph.transitFeedCovers(request.getDateTime())) {
             throw new RoutingValidationException(List.of(
                     new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME)
             ));

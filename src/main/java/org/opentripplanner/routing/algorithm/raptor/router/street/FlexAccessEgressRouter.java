@@ -34,7 +34,7 @@ public class FlexAccessEgressRouter {
     FlexRouter flexRouter = new FlexRouter(
         request.rctx.graph,
         params,
-        request.getDateTimeCurrentPage(),
+        request.getDateTime(),
         request.arriveBy,
         request.additionalSearchDaysBeforeToday,
         request.additionalSearchDaysAfterToday,

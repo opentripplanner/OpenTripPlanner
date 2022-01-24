@@ -221,7 +221,7 @@ public abstract class SnapshotTestBase {
     }
 
     private String createDebugUrlForRequest(RoutingRequest request) {
-        var dateTime = Instant.ofEpochSecond(request.getSecondsSinceEpoch())
+        var dateTime = Instant.ofEpochSecond(request.getDateTime().getEpochSecond())
                 .atZone(getRouter().graph.getTimeZone().toZoneId())
                 .toLocalDateTime();
 

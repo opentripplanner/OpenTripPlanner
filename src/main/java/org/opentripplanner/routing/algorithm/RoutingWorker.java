@@ -56,7 +56,7 @@ public class RoutingWorker {
         request.applyPageCursor();
         this.request = request;
         this.router = router;
-        this.searchTransitTimeZero = DateMapper.asStartOfService(request.getDateTimeCurrentPage(), zoneId);
+        this.searchTransitTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
     }
 
     public RoutingResponse route() {

@@ -73,7 +73,7 @@ public class RoutingResponseMapper {
     ) {
         if(searchParams == null) { return null; }
 
-        Instant reqTime = request.getDateTimeCurrentPage();
+        Instant reqTime = request.getDateTime();
 
         if (request.arriveBy) {
             return TripSearchMetadata.createForArriveBy(

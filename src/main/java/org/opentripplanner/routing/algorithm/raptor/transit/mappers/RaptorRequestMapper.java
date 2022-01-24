@@ -51,7 +51,7 @@ public class RaptorRequestMapper {
         var searchParams = builder.searchParams();
 
         if(request.pageCursor ==  null) {
-            int time = relativeTime(request.getDateTimeCurrentPage());
+            int time = relativeTime(request.getDateTime());
             if (request.arriveBy) {
                 searchParams.latestArrivalTime(time);
             }

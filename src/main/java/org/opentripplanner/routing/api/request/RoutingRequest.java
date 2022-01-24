@@ -170,7 +170,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
      * arriveBy is true)
      */
-    private long dateTime = new Date().getTime() / 1000;
+    private Instant dateTime = Instant.now();
 
     /**
      * This is the time/duration in seconds from the earliest-departure-time(EDT) to
@@ -803,10 +803,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return streetSubRequestModes.isTransit();
     }
 
-    public long getSecondsSinceEpoch() {
-        return dateTime;
-    }
-
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
     }
@@ -976,27 +972,16 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     /**
-     * When a client perform the first search it supply a search time - its is that
-     * time. The client may go to the next page, but the original datetime stay unchanged.
+     * The search time for the current request. If the client have moved to the next page
+     * then this is the adjusted search time - the dateTime passed in is ignored and replaced with
+     * by a time from the pageToken.
      */
-    public Instant getDateTimeOriginalSearch() {
-        return Instant.ofEpochSecond(dateTime);
-    }
-
-    /**
-     * The search time for the current page. If the client have moved to the next page
-     * then this is the adjusted search time. The search time is adjusted with according to
-     * the time-window used.
-     */
-    public Instant getDateTimeCurrentPage() {
-        if(pageCursor == null) {
-            return getDateTimeOriginalSearch();
-        }
-        return arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime;
+    public Instant getDateTime() {
+        return dateTime;
     }
 
     public void setDateTime(Instant dateTime) {
-        this.dateTime = dateTime.getEpochSecond();
+        this.dateTime = dateTime;
     }
 
     public void setDateTime(String date, String time, TimeZone tz) {
@@ -1008,7 +993,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * Is the trip originally planned withing the previous/next 15h?
      */
     public boolean isTripPlannedForNow() {
-        return Math.abs(Instant.now().getEpochSecond() - dateTime) < NOW_THRESHOLD_SEC;
+        return Duration.between(dateTime, Instant.now()).abs().toSeconds() < NOW_THRESHOLD_SEC;
     }
 
     /**
@@ -1083,7 +1068,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     public String toString(String sep) {
-        return from + sep + to + sep + getDateTimeOriginalSearch() + sep
+        return from + sep + to + sep + dateTime + sep
                 + arriveBy + sep + bicycleOptimizeType + sep + streetSubRequestModes.getAsStr() + sep
                 + getNumItinerariesForDirectStreetSearch();
     }
