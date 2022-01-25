@@ -21,6 +21,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
     private static final Instant T11_00 = time("11:00");
     private static final Instant T11_30 = time("11:30");
+    private static final Instant T11_31 = time("11:31");
     private static final Instant T12_00 = time("12:00");
     private static final Instant T12_30 = time("12:30");
     private static final Instant T13_00 = time("13:00");
@@ -75,7 +76,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
         assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_30, T13_30, D1H, PREVIOUS_PAGE);
+        assetPageCursor(prevPage, T11_31, T13_30, D1H, PREVIOUS_PAGE);
     }
 
     @Test
@@ -100,7 +101,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
         assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_30, T13_00, D1H, PREVIOUS_PAGE);
+        assetPageCursor(prevPage, T11_31, T13_00, D1H, PREVIOUS_PAGE);
     }
 
     @Test
@@ -112,7 +113,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
         assetPageCursor(nextPage, T13_00, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, T12_30, D1H, PREVIOUS_PAGE);
+        assetPageCursor(prevPage, T11_00, T13_30, D1H, PREVIOUS_PAGE);
     }
 
     @Test
@@ -125,7 +126,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
         assetPageCursor(nextPage, T12_30, null, D1H, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, T12_30, D1H, PREVIOUS_PAGE);
+        assetPageCursor(prevPage, T11_00, T13_30, D1H, PREVIOUS_PAGE);
     }
 
     private void assetPageCursor(

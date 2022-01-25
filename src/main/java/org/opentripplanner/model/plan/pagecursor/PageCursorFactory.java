@@ -73,9 +73,7 @@ public class PageCursorFactory {
     ) {
         this.holeSwUsed = false;
         this.removedItineraryStartTime = startTime.truncatedTo(ChronoUnit.MINUTES);
-        this.removedItineraryEndTime = endTime.minusSeconds(1)
-                .truncatedTo(ChronoUnit.MINUTES)
-                .plus(1, ChronoUnit.MINUTES);
+        this.removedItineraryEndTime = endTime.plusSeconds(59).truncatedTo(ChronoUnit.MINUTES);
         return this;
     }
 
@@ -115,7 +113,7 @@ public class PageCursorFactory {
                     //TODO: The start time for the removed itinerary is not the best thing to use
                     //      here. We should take the LATEST start time of all removed itineraries
                     //      instead.
-                    prev.edt = removedItineraryStartTime.minus(currentSearchWindow);
+                    prev.edt = calcStartOfSearchWindow(removedItineraryStartTime);
                     prev.lat = removedItineraryEndTime;
                 }
                 next.edt = current.edt.plus(currentSearchWindow);
@@ -129,7 +127,7 @@ public class PageCursorFactory {
                     prev.lat = current.lat;
                 }
                 else {
-                    prev.edt = removedItineraryStartTime.minus(currentSearchWindow);
+                    prev.edt = calcStartOfSearchWindow(removedItineraryStartTime);
                     // TODO: Replace this by hashing removed itineraries
                     prev.lat = removedItineraryEndTime;
                 }
@@ -138,7 +136,7 @@ public class PageCursorFactory {
             // Use normal sort and removal in ItineraryFilterChain
             else {
                 prev.edt = current.edt.minus(currentSearchWindow);
-                prev.lat = current.lat.minus(currentSearchWindow);
+                prev.lat = current.lat;
 
                 if (holeSwUsed) {
                     next.edt = current.edt.plus(currentSearchWindow);
@@ -165,6 +163,15 @@ public class PageCursorFactory {
                 .addObj("nextCursor", nextCursor)
                 .addObj("prevCursor", prevCursor)
                 .toString();
+    }
+
+    /**
+     * The search-window start and end is [inclusive, exclusive], so to calculate the start of the
+     * search-window from the last time included in the search window we need to include one extra
+     * minute at the end.
+     */
+    private Instant calcStartOfSearchWindow(Instant lastMinuteInSearchWindow) {
+        return lastMinuteInSearchWindow.minus(currentSearchWindow).plusSeconds(60);
     }
 
     /** Temporary data class used to hold a pair of edt and lat */
