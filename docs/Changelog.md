@@ -115,6 +115,7 @@
 - Use API mapping in snapshot tests [#3823](https://github.com/opentripplanner/OpenTripPlanner/pull/3823)
 - Store stop indices in leg and use them to simplify logic in TripTimeShortHelper [#3820](https://github.com/opentripplanner/OpenTripPlanner/pull/3820)
 - Include all trips in `stopTimesForStop` [#3817](https://github.com/opentripplanner/OpenTripPlanner/pull/3817)
+- Store all alerts and add support for route_type and direction_id selectors [#3780](https://github.com/opentripplanner/OpenTripPlanner/pull/3780)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
