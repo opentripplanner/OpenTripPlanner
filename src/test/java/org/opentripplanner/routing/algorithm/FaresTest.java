@@ -75,7 +75,7 @@ public class FaresTest {
 
         // long trip
 
-        startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
+        startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 2, 14, 0, 0);
 
         from = GenericLocation.fromStopId("Origin", portlandId, "8389");
         to = GenericLocation.fromStopId("Destination", portlandId, "1252");
