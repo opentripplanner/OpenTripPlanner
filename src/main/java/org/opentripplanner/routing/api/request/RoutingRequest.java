@@ -1023,19 +1023,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     public void applyPageCursor() {
         if(pageCursor != null) {
-            // We switch to "depart-after" search when paging next, it does not make sense anymore
-            // to keep the latest-arrival-time.
-            if(pageCursor.type == PageType.NEXT_PAGE) {
-                this.arriveBy = false;
-                setDateTime(pageCursor.earliestDepartureTime);
+            // We switch to "depart-after" search when paging next(lat==null). It does not make
+            // sense anymore to keep the latest-arrival-time when going to the "next page".
+            if(pageCursor.latestArrivalTime == null) {
+                arriveBy = false;
             }
-            else {
-                setDateTime(
-                        this.arriveBy
-                                ? pageCursor.latestArrivalTime
-                                : pageCursor.earliestDepartureTime
-                );
-            }
+            setDateTime(arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime);
             modes.directMode = StreetMode.NOT_SET;
             LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
         }
