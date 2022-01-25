@@ -520,8 +520,10 @@ public class IndexAPI {
     public Collection<ApiAlert> getAlertsForPattern(@PathParam("patternId") String patternId) {
         RoutingService routingService = createRoutingService();
         AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
-        FeedScopedId id = createId("patternId", patternId);
-        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripPatternAlerts(id));
+        TripPattern pattern = getTripPattern(createRoutingService(), patternId);
+        return alertMapper.mapToApi(routingService.getTransitAlertService()
+                .getDirectionAndRouteAlerts(
+                        pattern.getDirection().gtfsCode, pattern.getRoute().getId()));
     }
 
     // TODO include pattern ID for each trip in responses

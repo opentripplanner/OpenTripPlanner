@@ -3,7 +3,6 @@ package org.opentripplanner.routing.impl;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -97,8 +96,18 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     }
 
     @Override
-    public Collection<TransitAlert> getTripPatternAlerts(FeedScopedId pattern) {
-        return alerts.get(new EntitySelector.TripPattern(pattern));
+    public Collection<TransitAlert> getRouteTypeAndAgencyAlerts(int routeType, FeedScopedId agency) {
+        return alerts.get(new EntitySelector.RouteTypeAndAgency(routeType, agency));
+    }
+
+    @Override
+    public Collection<TransitAlert> getRouteTypeAlerts(int routeType, String feedId) {
+        return alerts.get(new EntitySelector.RouteType(routeType, feedId));
+    }
+
+    @Override
+    public Collection<TransitAlert> getDirectionAndRouteAlerts(int directionId, FeedScopedId route) {
+        return alerts.get(new EntitySelector.DirectionAndRoute(directionId, route));
     }
 
     @Override

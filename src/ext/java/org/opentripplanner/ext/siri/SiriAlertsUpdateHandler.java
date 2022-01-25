@@ -104,11 +104,16 @@ public class SiriAlertsUpdateHandler {
                         addedCounter++;
                         if (alert != null) {
                             alert.setId(situationNumber);
+                            if (alert.getEntities().isEmpty()) {
+                                LOG.info(
+                                        "No match found for Alert - setting Unknown entity for situation with situationNumber {}",
+                                        situationNumber
+                                );
+                                alert.addEntity(new EntitySelector.Unknown(
+                                        "Alert had no entities that could be handled"));
+                            }
                             alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
                             alerts.add(alert);
-                            if (alert.getEntities().isEmpty()) {
-                                LOG.info("No match found for Alert - ignoring situation with situationNumber {}", situationNumber);
-                            }
                         }
                     }
                 }

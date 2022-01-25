@@ -102,6 +102,8 @@ class LegacyGraphQLIndex {
           .type("AlertEntity", type -> type.typeResolver(new LegacyGraphQLAlertEntityTypeResolver()))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnRouteImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLStopOnTripImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLUnknownImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLRouteTypeImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLStopGeometriesImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();

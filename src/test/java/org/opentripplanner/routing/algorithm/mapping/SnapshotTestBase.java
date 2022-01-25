@@ -33,6 +33,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.api.mapping.ItineraryMapper;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
@@ -62,6 +63,7 @@ public abstract class SnapshotTestBase {
     private static final DateTimeFormatter apiDateFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
     private static final DateTimeFormatter apiTimeFormatter = DateTimeFormatter.ofPattern("H:mm%20a");
     private static final SnapshotSerializer snapshotSerializer = new SnapshotItinerarySerializer();
+    private static final ItineraryMapper itineraryMapper = new ItineraryMapper(null, true);
 
     static final boolean verbose = Boolean.getBoolean("otp.test.verbose");
 
@@ -169,7 +171,6 @@ public abstract class SnapshotTestBase {
 
         logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
 
-        sanitizeItinerariesForSnapshot(departByItineraries);
         logDebugInformationOnFailure(departAt, () -> expectItinerariesToMatchSnapshot(departByItineraries));
 
         RoutingRequest arriveBy = request.clone();
@@ -177,18 +178,19 @@ public abstract class SnapshotTestBase {
         arriveBy.setDateTime(departByItineraries.get(0).lastLeg().endTime.toInstant());
 
         List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy, router);
-        sanitizeItinerariesForSnapshot(arriveByItineraries);
 
         var departAtItinerary = departByItineraries.get(0);
         var arriveByItinerary = arriveByItineraries.get(0);
 
         arriveByCorrecter.accept(departAtItinerary, arriveByItinerary);
-        logDebugInformationOnFailure(arriveBy, () -> assertEquals(asJsonString(departAtItinerary), asJsonString(arriveByItinerary)));
+        logDebugInformationOnFailure(arriveBy, () -> assertEquals(
+                asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
+                asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
+        ));
     }
 
     protected void expectItinerariesToMatchSnapshot(List<Itinerary> itineraries) {
-        sanitizeItinerariesForSnapshot(itineraries);
-        expect(itineraries).serializer(snapshotSerializer).toMatchSnapshot();
+        expect(itineraryMapper.mapItineraries(itineraries)).serializer(snapshotSerializer).toMatchSnapshot();
     }
 
     protected void logDebugInformationOnFailure(RoutingRequest request, Runnable task) {
@@ -293,16 +295,6 @@ public abstract class SnapshotTestBase {
             default:
                 return null;
         }
-    }
-
-    private void sanitizeItinerariesForSnapshot(List<Itinerary> itineraries) {
-        itineraries.forEach(itinerary -> itinerary.legs.forEach(leg -> sanitizeWalkStepsForSnapshot(leg.walkSteps)));
-    }
-
-    private void sanitizeWalkStepsForSnapshot(List<WalkStep> walkSteps) {
-        walkSteps.forEach(walkStep -> {
-            walkStep.edges.clear();
-        });
     }
 
     private static String asJsonString(Object object) {

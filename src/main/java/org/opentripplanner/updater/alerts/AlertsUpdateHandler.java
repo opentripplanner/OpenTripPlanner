@@ -17,8 +17,6 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.TranslatedString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,9 +29,9 @@ import java.util.Map;
  *
  */
 public class AlertsUpdateHandler {
-    private static final Logger log = LoggerFactory.getLogger(AlertsUpdateHandler.class);
-
     private String feedId;
+
+    private static final int MISSING_INT_FIELD_VALUE = -1;
 
     private TransitAlertService transitAlertService;
 
@@ -87,14 +85,11 @@ public class AlertsUpdateHandler {
                 routeId = informed.getRouteId();
             }
 
-            int direction;
-            if (informed.hasTrip() && informed.getTrip().hasDirectionId()) {
-                direction = informed.getTrip().getDirectionId();
-            } else {
-                direction = -1;
+            int directionId = MISSING_INT_FIELD_VALUE;
+            if (informed.hasDirectionId()) {
+                directionId = informed.getDirectionId();
             }
 
-            // TODO: The other elements of a TripDescriptor are ignored...
             String tripId = null;
             if (informed.hasTrip() && informed.getTrip().hasTripId()) {
                 tripId = informed.getTrip().getTripId();
@@ -109,6 +104,11 @@ public class AlertsUpdateHandler {
                 agencyId = informed.getAgencyId().intern();
             }
 
+            int routeType = MISSING_INT_FIELD_VALUE;
+            if (informed.hasRouteType()) {
+                routeType = informed.getRouteType();
+            }
+
             if (tripId != null) {
                 if (stopId != null) {
                     alertText.addEntity(new EntitySelector.StopAndTrip(
@@ -119,11 +119,15 @@ public class AlertsUpdateHandler {
                     alertText.addEntity(new EntitySelector.Trip(new FeedScopedId(feedId, tripId)));
                 }
             } else if (routeId != null) {
-                // TODO: Handle direction
                 if (stopId != null) {
                     alertText.addEntity(new EntitySelector.StopAndRoute(
                         new FeedScopedId(feedId, stopId),
                         new FeedScopedId(feedId, routeId)
+                    ));
+                } else if (directionId != MISSING_INT_FIELD_VALUE) {
+                    alertText.addEntity(new EntitySelector.DirectionAndRoute(
+                            directionId,
+                            new FeedScopedId(feedId, routeId)
                     ));
                 } else {
                     alertText.addEntity(new EntitySelector.Route(new FeedScopedId(feedId, routeId)));
@@ -131,8 +135,24 @@ public class AlertsUpdateHandler {
             } else if (stopId != null) {
                 alertText.addEntity(new EntitySelector.Stop(new FeedScopedId(feedId, stopId)));
             } else if (agencyId != null) {
-                alertText.addEntity(new EntitySelector.Agency(new FeedScopedId(feedId, agencyId)));
+                FeedScopedId feedScopedAgencyId = new FeedScopedId(feedId, agencyId);
+                if (routeType != MISSING_INT_FIELD_VALUE) {
+                    alertText.addEntity(
+                            new EntitySelector.RouteTypeAndAgency(routeType, feedScopedAgencyId));
+                } else {
+                    alertText.addEntity(new EntitySelector.Agency(feedScopedAgencyId));
+                }
             }
+            else if (routeType != MISSING_INT_FIELD_VALUE) {
+                alertText.addEntity(new EntitySelector.RouteType(routeType, feedId));
+            } else {
+                String description = "Entity selector: "+informed;
+                alertText.addEntity(new EntitySelector.Unknown(description));
+            }
+        }
+
+        if (alertText.getEntities().isEmpty()) {
+            alertText.addEntity(new EntitySelector.Unknown("Alert had no entities"));
         }
 
         alertText.severity = getAlertSeverityForGtfsRtSeverity(alert.getSeverityLevel());
