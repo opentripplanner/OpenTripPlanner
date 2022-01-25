@@ -99,25 +99,6 @@ public interface EntitySelector {
     }
   }
 
-  class TripPattern implements EntitySelector {
-    public final FeedScopedId tripPatternId;
-
-    public TripPattern(FeedScopedId tripPatternId) {this.tripPatternId = tripPatternId;}
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) { return true; }
-      if (o == null || getClass() != o.getClass()) { return false; }
-      TripPattern that = (TripPattern) o;
-      return tripPatternId.equals(that.tripPatternId);
-    }
-
-    @Override
-    public int hashCode() {
-      return tripPatternId.hashCode();
-    }
-  }
-
   class StopAndRoute implements EntitySelector {
     public final StopAndRouteOrTripKey stopAndRoute;
 
@@ -161,6 +142,109 @@ public interface EntitySelector {
     @Override
     public int hashCode() {
       return stopAndTrip.hashCode();
+    }
+  }
+
+  class Unknown implements EntitySelector {
+
+    public final String description;
+
+    public Unknown(String description) {
+      this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      Unknown that = (Unknown) o;
+      return description.equals(that.description);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(description);
+    }
+  }
+
+  class RouteType implements EntitySelector {
+
+    public final int routeType;
+
+    public final String feedId;
+
+    public RouteType(int routeType, String feedId) {
+      this.routeType = routeType;
+      this.feedId = feedId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {return true;}
+      if (o == null || getClass() != o.getClass()) {return false;}
+      RouteType that = (RouteType) o;
+      return routeType == that.routeType && feedId.equals(that.feedId);
+    }
+
+    @Override
+    public int hashCode() {
+      return 37 * routeType * Objects.hash(feedId);
+    }
+  }
+
+  class RouteTypeAndAgency implements EntitySelector {
+
+    public final int routeType;
+
+    public final FeedScopedId agencyId;
+
+    public RouteTypeAndAgency(int routeType, FeedScopedId agencyId) {
+      this.routeType = routeType;
+      this.agencyId = agencyId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {return true;}
+      if (o == null || getClass() != o.getClass()) {return false;}
+      RouteTypeAndAgency that = (RouteTypeAndAgency) o;
+      return routeType == that.routeType && agencyId.equals(that.agencyId);
+    }
+
+    @Override
+    public int hashCode() {
+      int agencyHash = Objects.hash(agencyId);
+      return 37 * routeType * agencyHash;
+    }
+  }
+
+  class DirectionAndRoute implements EntitySelector {
+
+    public final int directionId;
+
+    public final FeedScopedId routeId;
+
+    public DirectionAndRoute(int directionId, FeedScopedId routeId) {
+      this.directionId = directionId;
+      this.routeId = routeId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {return true;}
+      if (o == null || getClass() != o.getClass()) {return false;}
+      DirectionAndRoute that = (DirectionAndRoute) o;
+      return directionId == that.directionId && routeId.equals(that.routeId);
+    }
+
+    @Override
+    public int hashCode() {
+      int routeHash = Objects.hash(routeId);
+      return 41 * directionId * routeHash;
     }
   }
 

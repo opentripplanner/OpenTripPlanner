@@ -16,6 +16,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
@@ -26,9 +27,12 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
+import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRoute;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
@@ -208,20 +212,12 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Iterable<Route>> routes() {
-    return environment -> getValue(
-        environment,
-        stop -> getRoutingService(environment).getRoutesForStop(stop),
-        station -> null
-    );
+    return this::getRoutes;
   }
 
   @Override
   public DataFetcher<Iterable<TripPattern>> patterns() {
-    return environment -> getValue(
-        environment,
-        stop -> getRoutingService(environment).getPatternsForStop(stop, true),
-        station -> null
-    );
+    return this::getPatterns;
   }
 
   @Override
@@ -357,10 +353,92 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     };
   }
 
-  // TODO
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
-    return environment -> List.of();
+    return environment -> {
+      TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
+      var args = new LegacyGraphQLTypes.LegacyGraphQLStopAlertsArgs(
+              environment.getArguments());
+      List<LegacyGraphQLTypes.LegacyGraphQLStopAlertType> types =
+              (List) args.getLegacyGraphQLTypes();
+      FeedScopedId id = getValue(
+              environment,
+              stop -> stop.getId(),
+              station -> station.getId()
+      );
+      if (types != null) {
+        Collection<TransitAlert> alerts = new ArrayList<>();
+        if (types.contains(LegacyGraphQLStopAlertType.Stop)) {
+          alerts.addAll(alertService.getStopAlerts(id));
+        }
+        if (types.contains(LegacyGraphQLStopAlertType.StopOnRoutes) || types.contains(
+                LegacyGraphQLStopAlertType.StopOnTrips)) {
+          alerts.addAll(alertService.getAllAlerts()
+                  .stream()
+                  .filter(alert -> alert.getEntities()
+                          .stream()
+                          .anyMatch(entity -> (
+                                  types.contains(LegacyGraphQLStopAlertType.StopOnRoutes) &&
+                                          entity instanceof EntitySelector.StopAndRoute
+                                          && ((StopAndRoute) entity).stopAndRoute.stop.equals(id)
+                          ) || (
+                                  types.contains(
+                                          LegacyGraphQLStopAlertType.StopOnTrips) &&
+                                          entity instanceof EntitySelector.StopAndTrip
+                                          && ((EntitySelector.StopAndTrip) entity).stopAndTrip.stop.equals(
+                                          id)
+                          )))
+                  .collect(Collectors.toList()));
+        }
+        if (types.contains(LegacyGraphQLStopAlertType.Patterns) || types.contains(
+                LegacyGraphQLStopAlertType.Trips)) {
+          getPatterns(environment).forEach(pattern -> {
+            if (types.contains(LegacyGraphQLStopAlertType.Patterns)) {
+              alerts.addAll(alertService.getDirectionAndRouteAlerts(
+                      pattern.getDirection().gtfsCode,
+                      pattern.getRoute().getId()
+              ));
+            }
+            if (types.contains(LegacyGraphQLStopAlertType.Trips)) {
+              pattern.getTrips().forEach(trip -> {
+                alerts.addAll(alertService.getTripAlerts(trip.getId(), null));
+              });
+            }
+          });
+        }
+        if (types.contains(LegacyGraphQLStopAlertType.Routes) || types.contains(
+                LegacyGraphQLStopAlertType.AgenciesOfRoutes)) {
+          getRoutes(environment).forEach(route -> {
+            if (types.contains(LegacyGraphQLStopAlertType.Routes)) {
+              alerts.addAll(alertService.getRouteAlerts(route.getId()));
+            }
+            if (types.contains(LegacyGraphQLStopAlertType.AgenciesOfRoutes)) {
+              alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
+            }
+          });
+        }
+        return alerts.stream().distinct().collect(Collectors.toList());
+      }
+      else {
+        return alertService.getStopAlerts(id);
+      }
+    };
+  }
+
+  private Collection<TripPattern> getPatterns(DataFetchingEnvironment environment) {
+    return getValue(
+            environment,
+            stop -> getRoutingService(environment).getPatternsForStop(stop, true),
+            station -> null
+    );
+  }
+
+  private Collection<Route> getRoutes(DataFetchingEnvironment environment) {
+    return getValue(
+            environment,
+            stop -> getRoutingService(environment).getRoutesForStop(stop),
+            station -> null
+    );
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
