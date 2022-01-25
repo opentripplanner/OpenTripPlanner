@@ -169,6 +169,10 @@ public class Leg {
 
     public ConstrainedTransfer transferToNextLeg = null;
 
+    public Integer boardStopPosInPattern = null;
+
+    public Integer alightStopPosInPattern = null;
+
     /**
      * Is this leg walking with a bike?
      */
