@@ -122,6 +122,9 @@ public class RouterConfig implements Serializable {
         return flexConfig.toFlexParameters(request);
     }
 
+    /**
+     * How many days that are prior to the search date time should be searched for transit.
+     */
     public int additionalSearchDaysInPast(RoutingRequest req) {
         if(req.arriveBy) {
             var sw = getMaximumSearchWindow(req);
@@ -134,6 +137,9 @@ public class RouterConfig implements Serializable {
         }
     }
 
+    /**
+     * How many days that are after to the search date time should be searched for transit.
+     */
     public int additionalSearchDaysInFuture(RoutingRequest req) {
         if(req.arriveBy) {
             return 0;
@@ -142,7 +148,7 @@ public class RouterConfig implements Serializable {
             var requestTime = req.getZonedDateTime();
             var lastArrival = requestTime.plus(MAX_TRIP_SEARCH_PERIOD.plus(sw));
 
-            return Period.between(requestTime.toLocalDate(), lastArrival.toLocalDate()).getDays();
+            return daysInBetween(requestTime, lastArrival);
         }
     }
 
