@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.response;
 
 import java.util.Objects;
+import org.opentripplanner.model.base.ToStringBuilder;
 
 public class RoutingError {
   public final RoutingErrorCode code;
@@ -22,5 +23,13 @@ public class RoutingError {
   @Override
   public int hashCode() {
     return Objects.hash(code, inputField);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(RoutingError.class)
+            .addEnum("code", code)
+            .addEnum("inputField", inputField)
+            .toString();
   }
 }

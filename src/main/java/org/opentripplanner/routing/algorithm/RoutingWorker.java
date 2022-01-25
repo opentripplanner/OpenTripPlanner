@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.SearchWindowUtils;
+import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -41,10 +41,10 @@ public class RoutingWorker {
 
     /** An object that accumulates profiling and debugging info for inclusion in the response. */
     public final DebugTimingAggregator debugTimingAggregator = new DebugTimingAggregator();
+    public final PagingSearchWindowAdjuster pagingSearchWindowAdjuster;
 
     private final RoutingRequest request;
     private final Router router;
-    private FilterTransitWhenDirectModeIsEmpty emptyDirectModeHandler;
 
     /**
      * Transit service time-zero. Usually midnight before the request dateTime, but NOT on days
@@ -59,13 +59,16 @@ public class RoutingWorker {
         this.request = request;
         this.router = router;
         this.searchTransitTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
+        this.pagingSearchWindowAdjuster = new PagingSearchWindowAdjuster(
+                router.routerConfig.transitTuningParameters().pagingSearchWindowAdjustments()
+        );
     }
 
     public RoutingResponse route() {
-
         // If no direct mode is set, then we set one.
         // See {@link FilterTransitWhenDirectModeIsEmpty}
-        this.emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
+        var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
+
         request.modes.directMode = emptyDirectModeHandler.resolveDirectMode();
 
         this.debugTimingAggregator.finishedPrecalculating();
@@ -107,7 +110,12 @@ public class RoutingWorker {
 
         routingErrors.addAll(filterChain.getRoutingErrors());
 
-        LOG.debug("Return TripPlan with {} filtered itineraries out of {} total.", filteredItineraries.size(), itineraries.size());
+        if(LOG.isDebugEnabled()) {
+            LOG.debug(
+                    "Return TripPlan with {} filtered itineraries out of {} total.",
+                    filteredItineraries.stream().filter(it -> !it.isFlaggedForDeletion()).count(),
+                    itineraries.size());
+        }
 
         this.debugTimingAggregator.finishedFiltering();
 
@@ -116,7 +124,7 @@ public class RoutingWorker {
 
         // Adjust the search-window for the next search if the current search-window
         // is off (too few or too many results found).
-        var searchWindowNextSearch = findSearchWindowNextSearch(filteredItineraries);
+        var searchWindowNextSearch = calculateSearchWindowNextSearch(filteredItineraries);
 
         return RoutingResponseMapper.map(
                 request,
@@ -202,7 +210,7 @@ public class RoutingWorker {
         }
     }
 
-    private Duration findSearchWindowNextSearch(List<Itinerary> itineraries) {
+    private Duration calculateSearchWindowNextSearch(List<Itinerary> itineraries) {
         // No transit search performed
         if(raptorSearchParamsUsed == null) { return null; }
 
@@ -213,8 +221,8 @@ public class RoutingWorker {
         int n = (int) itineraries.stream()
                 .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())
                 .count();
-
-        return SearchWindowUtils.calculateNewSearchWindow(sw, edt, ldt, n);
+        System.out.println("n=" + n);
+        return pagingSearchWindowAdjuster.calculateNewSearchWindow( sw, edt, ldt, n);
     }
 
     private Instant searchStartTime() {

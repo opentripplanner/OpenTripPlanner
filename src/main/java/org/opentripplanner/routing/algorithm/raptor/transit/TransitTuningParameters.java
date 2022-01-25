@@ -1,8 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import java.time.Duration;
+import java.util.List;
 import org.opentripplanner.model.StopTransferPriority;
+import org.opentripplanner.util.time.DurationUtils;
 
 public interface TransitTuningParameters {
+
+  List<Duration> PAGING_SEARCH_WINDOW_ADJUSTMENTS = DurationUtils.durations("4h 2h 1h 30m 20m 10m");
+
   /**
    * These tuning parameters are typically used in unit tests. The values are:
    * <pre>
@@ -16,8 +22,11 @@ public interface TransitTuningParameters {
    * </pre>
    */
   TransitTuningParameters FOR_TEST = new TransitTuningParameters() {
-    @Override public boolean enableStopTransferPriority() { return true; }
-    @Override public Integer stopTransferCost(StopTransferPriority key) {
+    @Override
+    public boolean enableStopTransferPriority() { return true; }
+
+    @Override
+    public Integer stopTransferCost(StopTransferPriority key) {
       switch (key) {
         case DISCOURAGED: return 3600;
         case ALLOWED:     return 60;
@@ -27,7 +36,13 @@ public interface TransitTuningParameters {
       throw new IllegalArgumentException("Unknown key: " + key);
     }
 
-    @Override public int transferCacheMaxSize() { return 5; }
+    @Override
+    public int transferCacheMaxSize() {return 5;}
+
+    @Override
+    public List<Duration> pagingSearchWindowAdjustments() {
+      return PAGING_SEARCH_WINDOW_ADJUSTMENTS;
+    }
   };
 
   /**
@@ -43,9 +58,35 @@ public interface TransitTuningParameters {
   Integer stopTransferCost(StopTransferPriority key);
 
   /**
-   * The maximum number of transfer RoutingRequests for which the pre-calculated transfers should be
-   * cached. If too small, the average request may be slower due to the required re-calculating. If
-   * too large, more memory may be used than needed.
+   * The maximum number of transfer RoutingRequests for which the pre-calculated transfers should
+   * be cached. If too small, the average request may be slower due to the required
+   * re-calculating. If too large, more memory may be used than needed.
    */
   int transferCacheMaxSize();
+
+  /**
+   * This parameter is used to reduce the number of pages a client have to step through for
+   * journey where there are few alternatives/low frequency. This also work well to adjust for
+   * periods with infrequent results, like paging through the night. If there are at least
+   * 10 trip pr hour during the day and none at night, then this feature will adjust the
+   * search-window to around 2 hours during the day ({@code numItineraries=20}) and up to 8h during
+   * the night.
+   * <p>
+   * The provided array of durations is used to increase the search-window for the next/previous
+   * page when the current page return few options. If ZERO results is returned the first duration
+   * in the list is used, if ONE result is returned then the second duration is used and so on. The
+   * duration is added to the existing search-window.
+   * <p>
+   * This parameter controls how the search-window is increased. OTP also reduces the
+   * search-window when more than the requested itineraries are fetched. This is done
+   * automatically and acn not be configured. Do not be afraid of scaling up fast, it will be
+   * reduced to the appropriate level in the next search.
+   * <p>
+   * The extra time is added to the search-window for the next request if the current result have
+   * few itineraries.
+   * <p>
+   *
+   * The default values are: {@link #PAGING_SEARCH_WINDOW_ADJUSTMENTS}
+   */
+  List<Duration> pagingSearchWindowAdjustments();
 }

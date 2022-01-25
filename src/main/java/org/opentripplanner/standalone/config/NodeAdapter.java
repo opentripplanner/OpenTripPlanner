@@ -3,11 +3,11 @@ package org.opentripplanner.standalone.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -30,6 +30,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 
 
@@ -334,6 +335,21 @@ public class NodeAdapter {
                     + "Source: " + source + ". Details: " + e.getLocalizedMessage()
             );
         }
+    }
+
+    public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {
+        JsonNode array = param(paramName);
+
+        if(array.isMissingNode()) {
+            return defaultValues;
+        }
+        assertIsArray(paramName, array);
+
+        List<Duration> durations = new ArrayList<>();
+        for (JsonNode it : array) {
+            durations.add(DurationUtils.duration(it.asText()));
+        }
+        return durations;
     }
 
     public Pattern asPattern(String paramName, String defaultValue) {

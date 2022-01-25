@@ -2,36 +2,30 @@ package org.opentripplanner.model.plan;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 
 
-public class SearchWindowUtils {
+public final class PagingSearchWindowAdjuster {
     /**
      * Extra time is added to the search-window for the next request if the current
-     * result have few itineraries:
-     * <pre>
-     *  0: 6h
-     *  1: 4h
-     *  2: 2h
-     *  3: 1h
-     *  4: 30m
-     *  5: 20m
-     *  6: 10m
-     * </pre>
-     * Note!
-     *
+     * result have few itineraries.
+     * <p>
      * Unit: minutes
      */
-    private static final int[] EXTRA_TIME_ITINERARIES = new int[]{
-            //0,   1,   2,  3,  4,  5,  6
-            360, 240, 120, 60, 30, 20, 10
-    };
+    private final int[] pagingSearchWindowAdjustments;
+
+    public PagingSearchWindowAdjuster(List<Duration> pagingSearchWindowAdjustments) {
+        this.pagingSearchWindowAdjustments = pagingSearchWindowAdjustments.stream()
+                .mapToInt(d -> (int)d.toMinutes())
+                .toArray();
+    }
 
     /**
      * We look at the search data after the trip search to see if we should adjust the search-
      * window. This is done to avoid short-search-windows in low frequency areas, where the client
      * would need to request the
      */
-    public static Duration calculateNewSearchWindow(
+    public Duration calculateNewSearchWindow(
             Duration usedSearchWindow,
             Instant earliestDepartureTime,
             Instant latestDepartureTime,
@@ -52,9 +46,9 @@ public class SearchWindowUtils {
             // Round down to minutes
             return normalizeSearchWindow(newSearchWindow / 60);
         }
-        if (nItinerariesInSearchWindow < EXTRA_TIME_ITINERARIES.length) {
+        if (nItinerariesInSearchWindow < pagingSearchWindowAdjustments.length) {
             return normalizeSearchWindow(
-                    sw + EXTRA_TIME_ITINERARIES[nItinerariesInSearchWindow]
+                    sw + pagingSearchWindowAdjustments[nItinerariesInSearchWindow]
             );
         }
         // No change

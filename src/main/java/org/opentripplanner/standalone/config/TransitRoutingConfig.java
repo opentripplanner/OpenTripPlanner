@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
@@ -20,6 +22,8 @@ public final class TransitRoutingConfig
     private final int iterationDepartureStepInSeconds;
     private final int searchThreadPoolSize;
     private final int transferCacheMaxSize;
+    private final List<Duration> pagingSearchWindowAdjustments;
+
     private final Map<StopTransferPriority, Integer> stopTransferCost;
     private final DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients;
 
@@ -43,17 +47,22 @@ public final class TransitRoutingConfig
             dft.searchThreadPoolSize()
         );
         // Dynamic Search Window
-        this.dynamicSearchWindowCoefficients = new DynamicSearchWindowConfig(
-            c.path("dynamicSearchWindow")
-        );
         this.stopTransferCost = c.asEnumMapAllKeysRequired(
             "stopTransferCost",
             StopTransferPriority.class,
             NodeAdapter::asInt
         );
         this.transferCacheMaxSize = c.asInt(
-                "transferCacheMaxSize",
-                25
+            "transferCacheMaxSize",
+            25
+        );
+
+        this.pagingSearchWindowAdjustments = c.asDurations(
+            "pagingSearchWindowAdjustments", PAGING_SEARCH_WINDOW_ADJUSTMENTS
+        );
+
+        this.dynamicSearchWindowCoefficients = new DynamicSearchWindowConfig(
+            c.path("dynamicSearchWindow")
         );
     }
 
@@ -96,6 +105,12 @@ public final class TransitRoutingConfig
     public int transferCacheMaxSize() {
         return transferCacheMaxSize;
     }
+
+    @Override
+    public List<Duration> pagingSearchWindowAdjustments() {
+        return pagingSearchWindowAdjustments;
+    }
+
 
     private static class DynamicSearchWindowConfig
             implements DynamicSearchWindowCoefficients
