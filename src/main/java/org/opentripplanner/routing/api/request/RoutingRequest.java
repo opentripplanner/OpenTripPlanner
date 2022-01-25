@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -56,7 +58,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
-import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
-    private static final long NOW_THRESHOLD_SEC = DurationUtils.duration("15h");
+    private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 

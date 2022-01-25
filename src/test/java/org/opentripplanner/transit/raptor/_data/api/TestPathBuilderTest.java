@@ -20,7 +20,7 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_COST;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_DURATION;
-import static org.opentripplanner.util.time.DurationUtils.duration;
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class TestPathBuilderTest implements RaptorTestConstants {
 
   @Test
   public void testSimplePathWithOneTransit() {
-    int transitDuration = duration("5m");
+    int transitDuration = durationInSeconds("5m");
 
     var path = subject
         .access(time("10:00:15"), D1m, STOP_A)

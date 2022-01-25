@@ -5,7 +5,7 @@ import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCo
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.util.time.DurationUtils.duration;
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
             RaptorSlackProvider.defaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK);
 
     // FLEX Access 5m tx 1 ~ A. Note! The actual times might get time-shifted.
-    public static final int ACCESS_DURATION = duration("5m15s");
+    public static final int ACCESS_DURATION = durationInSeconds("5m15s");
     public static final int ACCESS_COST = toRaptorCost(600);
     // Using transfer reluctance is incorrect, we should use the cost from the access path
     public static final TestTransfer ACCESS = flex(STOP_A, ACCESS_DURATION, ONE_RIDE, ACCESS_COST);
@@ -98,7 +98,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
 
     // Wait 15s (ALIGHT_SLACK)
     // D ~ FLEX Egress 6m tx 1 . Note! The actual times might get time-shifted.
-    public static final int EGRESS_DURATION = duration("6m");
+    public static final int EGRESS_DURATION = durationInSeconds("6m");
     public static final int EGRESS_COST = toRaptorCost(800);
     // Using transfer reluctance is incorrect, we should use the cost from the egress path
     public static final TestTransfer EGRESS = flex(STOP_D, EGRESS_DURATION, ONE_RIDE, EGRESS_COST);
@@ -110,9 +110,9 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     public static final int EGRESS_COST_W_1M_SLACK = EGRESS_COST +
             toRaptorCost(TRANSFER_COST_SEC) + COST_CALCULATOR.waitCost(TRANSFER_SLACK);
     public static final int EGRESS_COST_W_7M45S_SLACK = EGRESS_COST_W_1M_SLACK +
-            COST_CALCULATOR.waitCost(duration("6m45s"));
+            COST_CALCULATOR.waitCost(durationInSeconds("6m45s"));
     public static final int EGRESS_COST_W_9M45S_SLACK = EGRESS_COST_W_1M_SLACK +
-            COST_CALCULATOR.waitCost(duration("8m45s"));
+            COST_CALCULATOR.waitCost(durationInSeconds("8m45s"));
 
     public static final String LINE_A = "A";
     public static final String LINE_B = "B";
@@ -131,9 +131,9 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     private static final int TOT_COST_W_OPENING_HOURS_B = toRaptorCost(3728);
     // Wait before 12m45s + ALIGHT SLACK 15s
     private static final int L1_COST_INC_WAIT_W_OPENING_HOURS_A
-            = L1_COST_EX_WAIT + COST_CALCULATOR.waitCost(duration("13m"));
+            = L1_COST_EX_WAIT + COST_CALCULATOR.waitCost(durationInSeconds("13m"));
     private static final int L1_COST_INC_WAIT_W_OPENING_HOURS_B
-            = L1_COST_EX_WAIT + COST_CALCULATOR.waitCost(duration("12m"));
+            = L1_COST_EX_WAIT + COST_CALCULATOR.waitCost(durationInSeconds("12m"));
 
 
     /* TEST CASES WITH EXPECTED TO-STRING TEXTS */

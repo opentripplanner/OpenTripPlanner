@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.mapping;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -52,6 +51,7 @@ public class RoutingResponseMapper {
         LOG.debug("PageCursor current  : " + request.pageCursor);
         LOG.debug("PageCursor previous : " + prevPageCursor);
         LOG.debug("PageCursor next ... : " + nextPageCursor);
+        LOG.debug("Errors ............ : " + routingErrors);
 
         var metadata = createTripSearchMetadata(
                 request, searchParams, firstRemovedItinerary
@@ -62,7 +62,7 @@ public class RoutingResponseMapper {
                 prevPageCursor,
                 nextPageCursor,
                 metadata,
-                new ArrayList<>(routingErrors),
+                List.copyOf(routingErrors),
                 debugTimingAggregator
         );
     }

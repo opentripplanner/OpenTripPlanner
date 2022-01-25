@@ -10,7 +10,7 @@ import org.opentripplanner.util.time.DurationUtils;
 
 public class TransferConstraintTest implements TransferTestData {
 
-  public static final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.duration("1h");
+  public static final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.durationInSeconds("1h");
 
   private final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
   private final TransferConstraint RECOMMENDED = TransferConstraint.create().recommended().build();
