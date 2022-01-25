@@ -8,6 +8,7 @@ import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.config.RouterConfig;
 
 public class FlexAccessEgressRouter {
 
@@ -15,7 +16,7 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
       RoutingRequest request,
-      FlexParameters params,
+      RouterConfig routerConfig,
       boolean isEgress
   ) {
 
@@ -33,11 +34,11 @@ public class FlexAccessEgressRouter {
 
     FlexRouter flexRouter = new FlexRouter(
         request.rctx.graph,
-        params,
+        routerConfig.flexParameters(request),
         request.getDateTimeCurrentPage(),
         request.arriveBy,
-        request.additionalDaysBeforeSearchTime,
-        request.additionalDaysAfterSearchTime,
+        routerConfig.additionalSearchDaysInPast(request),
+        routerConfig.additionalSearchDaysInFuture(request),
         accessStops,
         egressStops
     );

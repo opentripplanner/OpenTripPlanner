@@ -218,7 +218,7 @@ public class TransitRouter {
             if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
                 var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
                         accessRequest,
-                        router.routerConfig.flexParameters(request),
+                        router.routerConfig,
                         isEgress
                 );
 
@@ -236,13 +236,14 @@ public class TransitRouter {
 
         try (RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request)) {
             transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
+            request.setRoutingContext(graph);
 
             return new RaptorRoutingRequestTransitData(
                     graph.getTransferService(),
                     transitLayer,
                     searchStartTime,
-                    request.arriveBy ? request.additionalDaysBeforeSearchTime : 0,
-                    request.arriveBy ? 0 : request.additionalDaysAfterSearchTime,
+                    router.routerConfig.additionalSearchDaysInPast(request),
+                    router.routerConfig.additionalSearchDaysInFuture(request),
                     createRequestTransitDataProviderFilter(graph.index),
                     transferRoutingRequest
             );

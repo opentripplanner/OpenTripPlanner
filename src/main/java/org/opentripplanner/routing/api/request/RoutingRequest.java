@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -731,26 +733,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public ItineraryFilterParameters itineraryFilters = ItineraryFilterParameters.createDefault();
 
     /**
-     * The numbers of days before the search date time to consider when filtering trips for this search.
-     * This is set to 1 to account for trips finishing before midnight on the day before the search
-     * day.
-     *
-     * If you use an arriveBy search and want to return trips starting multiple days before your search
-     * date time, increase this number.
-     */
-    public int additionalDaysBeforeSearchTime = 1;
-
-    /**
-     * The number of days after the search date time to consider when filtering trips for this search.
-     * This is set to 1 to include patterns that start after midnight of the search date, hence allowing the destination arrival to be on the next day. Set this to 2 to allow trips to take more than 24 hours.
-     *
-     * If you want to return trips spanning multiple days or ones which are multiple days in the future,
-     * increase this number.
-     */
-    public int additionalDaysAfterSearchTime = 1;
-
-
-    /**
      * The filled request parameters for penalties and thresholds values
      */
     public DataOverlayParameters dataOverlay = null;
@@ -806,6 +788,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public long getSecondsSinceEpoch() {
         return dateTime;
+    }
+
+    public ZonedDateTime getZonedDateTime() {
+        var zoneId = rctx.graph.getTimeZone().toZoneId();
+        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(dateTime), zoneId);
     }
 
     public void setArriveBy(boolean arriveBy) {

@@ -41,8 +41,8 @@ public class DirectFlexRouter {
               router.routerConfig.flexParameters(request),
               directRequest.getDateTimeCurrentPage(),
               directRequest.arriveBy,
-              directRequest.additionalDaysBeforeSearchTime,
-              directRequest.additionalDaysAfterSearchTime,
+              router.routerConfig.additionalSearchDaysInPast(request),
+              router.routerConfig.additionalSearchDaysInFuture(request),
               accessStops,
               egressStops
       );

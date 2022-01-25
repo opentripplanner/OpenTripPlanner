@@ -2,7 +2,10 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import java.time.Duration;
+import java.time.Period;
+import java.time.ZonedDateTime;
+import java.util.Optional;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
@@ -29,6 +32,8 @@ public class RouterConfig implements Serializable {
     public static final RouterConfig DEFAULT = new RouterConfig(
             MissingNode.getInstance(), "DEFAULT", false
     );
+    // TODO: this should be retrieved from the heuristic
+    public static final Duration MAX_TRIP_SEARCH_PERIOD = Duration.ofHours(6);
 
     /**
      * The raw JsonNode three kept for reference and (de)serialization.
@@ -115,6 +120,40 @@ public class RouterConfig implements Serializable {
 
     public FlexParameters flexParameters(RoutingRequest request) { 
         return flexConfig.toFlexParameters(request);
+    }
+
+    public int additionalSearchDaysInPast(RoutingRequest req) {
+        if(req.arriveBy) {
+            var sw = getMaximumSearchWindow(req);
+            var requestTime = req.getZonedDateTime();
+            var earliestStart= requestTime.minus(MAX_TRIP_SEARCH_PERIOD.plus(sw));
+
+            return daysInBetween(requestTime, earliestStart);
+        } else {
+            return 0;
+        }
+    }
+
+    public int additionalSearchDaysInFuture(RoutingRequest req) {
+        if(req.arriveBy) {
+            return 0;
+        } else {
+            var sw = getMaximumSearchWindow(req);
+            var requestTime = req.getZonedDateTime();
+            var lastArrival = requestTime.plus(MAX_TRIP_SEARCH_PERIOD.plus(sw));
+
+            return Period.between(requestTime.toLocalDate(), lastArrival.toLocalDate()).getDays();
+        }
+    }
+
+    private Duration getMaximumSearchWindow(RoutingRequest req) {
+        return Optional.ofNullable(req.searchWindow)
+                .orElse(Duration.ofMinutes(
+                        transitConfig.dynamicSearchWindowCoefficients().maxWinTimeMinutes()));
+    }
+
+    private int daysInBetween(ZonedDateTime requestTime, ZonedDateTime earliestStart) {
+        return Math.abs(Period.between(requestTime.toLocalDate(), earliestStart.toLocalDate()).getDays());
     }
 
     /**
