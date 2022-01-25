@@ -171,7 +171,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
         var itineraries = getItineraries(from, to, router);
 
-        assertEquals(1, itineraries.size());
+        assertEquals(2, itineraries.size());
 
         var itin = itineraries.get(0);
         var leg = itin.legs.get(0);
@@ -226,7 +226,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
             Router router
     ) {
         RoutingRequest request = new RoutingRequest();
-        Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 26, 12, 0, 0);
+        Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
         request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
