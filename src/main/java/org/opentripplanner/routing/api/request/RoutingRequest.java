@@ -742,7 +742,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     /**
      * The number of days after the search date time to consider when filtering trips for this search.
-     * This is set to 1 to account for searches that start after midnight of the search date.
+     * This is set to 1 to include patterns that start after midnight of the search date, hence allowing the destination arrival to be on the next day. Set this to 2 to allow trips to take more than 24 hours.
      *
      * If you want to return trips spanning multiple days or ones which are multiple days in the future,
      * increase this number.
