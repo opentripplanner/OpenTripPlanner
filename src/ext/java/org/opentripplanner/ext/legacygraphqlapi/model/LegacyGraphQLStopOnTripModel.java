@@ -2,12 +2,11 @@ package org.opentripplanner.ext.legacygraphqlapi.model;
 
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.Stop;
 
 /**
  * Class that contains a {@link Stop} on a {@link Trip}.
  */
-public class LegacyGraphQLStopOnTrip {
+public class LegacyGraphQLStopOnTripModel {
 
     /**
      * Stop that should be on the trip but technically it's possible that it isn't or that it's
@@ -21,7 +20,7 @@ public class LegacyGraphQLStopOnTrip {
      */
     private final Trip trip;
 
-    public LegacyGraphQLStopOnTrip(StopLocation stop, Trip trip) {
+    public LegacyGraphQLStopOnTripModel(StopLocation stop, Trip trip) {
         this.stop = stop;
         this.trip = trip;
     }

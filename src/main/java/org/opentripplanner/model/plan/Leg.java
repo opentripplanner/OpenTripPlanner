@@ -169,6 +169,10 @@ public class Leg {
 
     public ConstrainedTransfer transferToNextLeg = null;
 
+    public Integer boardStopPosInPattern = null;
+
+    public Integer alightStopPosInPattern = null;
+
     /**
      * Is this leg walking with a bike?
      */
@@ -197,7 +201,7 @@ public class Leg {
   }
 
   public Leg(Trip trip) {
-    this.mode = TraverseMode.fromTransitMode(trip.getRoute().getMode());
+    this.mode = TraverseMode.fromTransitMode(trip.getMode());
     this.trip = trip;
   }
 
