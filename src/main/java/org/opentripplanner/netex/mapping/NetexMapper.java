@@ -30,6 +30,7 @@ import org.opentripplanner.netex.mapping.calendar.DatedServiceJourneyMapper;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.Branding;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
@@ -163,6 +164,7 @@ public class NetexMapper {
         mapAuthorities();
         mapOperators();
         mapShapePoints();
+        mapBrandings();
 
         // The tariffZoneMapper is used to map all currently valid zones and to map the correct
         // referenced zone in StopPlace - which may not be the most currently valid zone.
@@ -209,6 +211,13 @@ public class NetexMapper {
         for (Authority authority : currentNetexIndex.getAuthoritiesById().localValues()) {
             Agency agency = agencyMapper.mapAuthorityToAgency(authority);
             transitBuilder.getAgenciesById().add(agency);
+        }
+    }
+
+    private void mapBrandings() {
+        BrandingMapper mapper = new BrandingMapper(idFactory);
+        for (Branding branding : currentNetexIndex.getBrandingById().localValues()) {
+            transitBuilder.getBrandingsById().add(mapper.mapBranding(branding));
         }
     }
 
@@ -337,6 +346,7 @@ public class NetexMapper {
                 idFactory,
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
+                transitBuilder.getBrandingsById(),
                 currentNetexIndex,
                 currentNetexIndex.getTimeZone(),
                 ferryIdsNotAllowedForBicycle

@@ -37,7 +37,8 @@ public class LineType {
       GraphQLObjectType presentationType,
       GraphQLOutputType journeyPatternType,
       GraphQLOutputType serviceJourneyType,
-      GraphQLOutputType ptSituationElementType
+      GraphQLOutputType ptSituationElementType,
+      GraphQLOutputType brandingType
   ) {
     return GraphQLObjectType.newObject()
             .name(NAME)
@@ -57,6 +58,10 @@ public class LineType {
                     .type(operatorType)
                     .dataFetcher(environment -> (((Route) environment.getSource()).getOperator()))
                     .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("branding")
+                    .type(brandingType)
+                    .dataFetcher(environment -> ((Route) environment.getSource()).getBranding()))
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("publicCode")
                     .type(Scalars.GraphQLString)
