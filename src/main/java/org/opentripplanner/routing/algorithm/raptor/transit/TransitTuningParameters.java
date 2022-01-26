@@ -65,7 +65,7 @@ public interface TransitTuningParameters {
   int transferCacheMaxSize();
 
   /**
-   * This parameter is used to reduce the number of pages a client have to step through for
+   * This parameter is used to reduce the number of pages a client have to step through for a
    * journey where there are few alternatives/low frequency. This also work well to adjust for
    * periods with infrequent results, like paging through the night. If there are at least
    * 10 trip pr hour during the day and none at night, then this feature will adjust the
@@ -75,7 +75,8 @@ public interface TransitTuningParameters {
    * The provided array of durations is used to increase the search-window for the next/previous
    * page when the current page return few options. If ZERO results is returned the first duration
    * in the list is used, if ONE result is returned then the second duration is used and so on. The
-   * duration is added to the existing search-window.
+   * duration is added to the existing search-window and inserted into the next and previous page
+   * cursor.
    * <p>
    * This parameter controls how the search-window is increased. OTP also reduces the
    * search-window when more than the requested itineraries are fetched. This is done
