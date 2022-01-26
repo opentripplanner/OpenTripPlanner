@@ -225,7 +225,6 @@ public class RoutingWorker {
         int n = (int) itineraries.stream()
                 .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())
                 .count();
-        System.out.println("n=" + n);
         return pagingSearchWindowAdjuster.calculateNewSearchWindow( sw, edt, ldt, n);
     }
 
