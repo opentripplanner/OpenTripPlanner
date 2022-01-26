@@ -909,8 +909,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 if (node.isTagFalse("wheelchair")) {
                     wheelchairAccessible = false;
                 }
+
                 createElevatorHopEdges(
-                        onboardVertices, wheelchairAccessible, levels.length, travelTime);
+                        onboardVertices, wheelchairAccessible, node.isTagTrue("bicycle"),
+                        levels.length, travelTime
+                );
             } // END elevator edge loop
 
             // Add highway=elevators to graph as elevators
@@ -950,6 +953,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 createElevatorHopEdges(
                         onboardVertices,
                         wheelchairAccessible,
+                        elevatorWay.isTagTrue("bicycle"),
                         levels,
                         travelTime
                 );
@@ -987,6 +991,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         private void createElevatorHopEdges(
                 ArrayList<Vertex> onboardVertices,
                 boolean wheelchairAccessible,
+                boolean bicycleAllowed,
                 int levels,
                 int travelTime
         ) {
@@ -995,9 +1000,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 Vertex from = onboardVertices.get(i);
                 Vertex to = onboardVertices.get(i + 1);
 
-                // default permissions: pedestrian, wheelchair
+                // default permissions: pedestrian, wheelchair, check tag bicycle=yes
                 StreetTraversalPermission permission =
-                        StreetTraversalPermission.PEDESTRIAN;
+                        bicycleAllowed
+                                ? StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
+                                : StreetTraversalPermission.PEDESTRIAN;
 
                 ElevatorHopEdge foreEdge;
                 ElevatorHopEdge backEdge;
