@@ -22,6 +22,13 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
 public final class ConstrainedBoardingSearch
         implements RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> {
 
+    /**
+     * Abort the search after looking at 5 valid boardings. In the case where this happens, one of
+     * these trips are probably a better match. We abort to avoid stepping through all trips,
+     * possibly a large number (several days).
+     */
+    private static final int ABORT_SEARCH_AFTER_N_VAILD_NORMAL_TRIPS = 5;
+
     private static final ConstrainedBoardingSearchStrategy FORWARD_STRATEGY = new ConstrainedBoardingSearchForward();
     private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY = new ConstrainedBoardingSearchReverse();
 
@@ -104,7 +111,7 @@ public final class ConstrainedBoardingSearch
             int stopPos,
             int sourceTime
     ) {
-        // Abort after 6 hours
+        int nAllowedBoardings = 0;
         boolean useNextNormalTrip = false;
 
         var index = translator.scheduleIndexIterator(timetable);
@@ -117,6 +124,7 @@ public final class ConstrainedBoardingSearch
             int time = translator.time(it, stopPos);
 
             if (translator.timeIsBefore(time, sourceTime)) { continue; }
+            ++nAllowedBoardings;
 
             var targetTrip = it.getOriginalTripTimes().getTrip();
 
@@ -136,6 +144,9 @@ public final class ConstrainedBoardingSearch
             }
             if (useNextNormalTrip) {
                 return new T2<>(i, TransferConstraint.REGULAR_TRANSFER);
+            }
+            if(nAllowedBoardings == ABORT_SEARCH_AFTER_N_VAILD_NORMAL_TRIPS) {
+                return null;
             }
         }
         return null;
