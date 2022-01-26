@@ -105,7 +105,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
               source.getStartTime(),
               source.getStartTime(),
               source.getBoardStopPosInPattern(),
-              source.getBoardingStopSequence()
+              source.getBoardingGtfsStopSequence()
       );
     };
   }
@@ -119,7 +119,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
               source.getEndTime(),
               source.getEndTime(),
               source.getAlightStopPosInPattern(),
-              source.getAlightStopSequence()
+              source.getAlightGtfsStopSequence()
       );
     };
   }

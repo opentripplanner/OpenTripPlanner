@@ -90,9 +90,9 @@ public class Leg {
 
     public Integer alightStopPosInPattern = null;
 
-    private Integer boardingStopSequence = null;
+    private Integer boardingGtfsStopSequence = null;
 
-    private Integer alightStopSequence = null;
+    private Integer alightGtfsStopSequence = null;
 
     private Boolean walkingBike;
 
@@ -596,20 +596,20 @@ public class Leg {
         this.alightStopPosInPattern = alightStopPosInPattern;
     }
 
-    public Integer getBoardingStopSequence() {
-        return boardingStopSequence;
+    public Integer getBoardingGtfsStopSequence() {
+        return boardingGtfsStopSequence;
     }
 
-    public void setBoardingStopSequence(Integer boardingStopSequence) {
-        this.boardingStopSequence = boardingStopSequence;
+    public void setBoardingGtfsStopSequence(Integer boardingGtfsStopSequence) {
+        this.boardingGtfsStopSequence = boardingGtfsStopSequence;
     }
 
-    public Integer getAlightStopSequence() {
-        return alightStopSequence;
+    public Integer getAlightGtfsStopSequence() {
+        return alightGtfsStopSequence;
     }
 
-    public void setAlightStopSequence(Integer alightStopSequence) {
-        this.alightStopSequence = alightStopSequence;
+    public void setAlightGtfsStopSequence(Integer alightGtfsStopSequence) {
+        this.alightGtfsStopSequence = alightGtfsStopSequence;
     }
 
     /**

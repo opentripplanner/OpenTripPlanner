@@ -21,7 +21,8 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<StopArrival> from() {
-    return environment -> new StopArrival(getSource(environment).getTripPlan().from,
+    return environment -> new StopArrival(
+            getSource(environment).getTripPlan().from,
             null,
             null,
             null,

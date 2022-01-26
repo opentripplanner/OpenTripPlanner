@@ -72,9 +72,8 @@ public class AlertToLegMapper {
         Collection<TransitAlert> patches;
 
         // trips - alerts tagged on ServiceDate
-        patches = alertPatchService(graph).getTripAlerts(leg.getTrip().getId(),
-                leg.getServiceDate()
-        );
+        patches = alertPatchService(graph)
+                .getTripAlerts(leg.getTrip().getId(), leg.getServiceDate());
         addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
 
         // trips - alerts tagged on any date
@@ -90,9 +89,12 @@ public class AlertToLegMapper {
         addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
 
         // Filter alerts when there are multiple timePeriods for each alert
-        leg.getTransitAlerts()
-                .removeIf(alertPatch ->  !alertPatch.displayDuring(
-                        leg.getStartTime().getTimeInMillis()/1000, leg.getEndTime().getTimeInMillis()/1000));
+        leg.getTransitAlerts().removeIf(alertPatch ->  
+                !alertPatch.displayDuring(
+                        leg.getStartTime().getTimeInMillis()/1000,
+                        leg.getEndTime().getTimeInMillis()/1000
+                )
+        );
     }
 
     private static TransitAlertService alertPatchService(Graph g) {

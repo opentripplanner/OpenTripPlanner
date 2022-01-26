@@ -34,8 +34,8 @@ public class PlaceMapper {
                 domain.place,
                 domain.arrival,
                 domain.departure,
-                domain.stopIndex,
-                domain.stopSequence
+                domain.stopPosInPattern,
+                domain.gtfsStopSequence
         );
     }
 
@@ -44,7 +44,7 @@ public class PlaceMapper {
             Calendar arrival,
             Calendar departure,
             Integer stopIndex,
-            Integer stopSequence
+            Integer gtfsStopSequence
     ) {
         if(domain == null) { return null; }
 
@@ -68,7 +68,7 @@ public class PlaceMapper {
         api.departure = departure;
         api.orig = domain.orig;
         api.stopIndex = stopIndex;
-        api.stopSequence = stopSequence;
+        api.stopSequence = gtfsStopSequence;
         api.vertexType = VertexTypeMapper.mapVertexType(domain.vertexType);
         if (domain.vehicleRentalPlace != null) {
             api.bikeShareId = domain.vehicleRentalPlace.getStationId();

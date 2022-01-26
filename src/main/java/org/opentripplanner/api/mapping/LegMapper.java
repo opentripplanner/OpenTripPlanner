@@ -53,14 +53,14 @@ public class LegMapper {
                 arrivalTimeFromPlace,
                 api.startTime,
                 domain.getBoardStopPosInPattern(),
-                domain.getBoardingStopSequence()
+                domain.getBoardingGtfsStopSequence()
         );
         api.to = placeMapper.mapPlace(
                 domain.getTo(),
                 api.endTime,
                 departureTimeToPlace,
                 domain.getAlightStopPosInPattern(),
-                domain.getAlightStopSequence()
+                domain.getAlightGtfsStopSequence()
         );
 
         api.departureDelay = domain.getDepartureDelay();

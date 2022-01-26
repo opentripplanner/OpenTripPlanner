@@ -208,8 +208,8 @@ public class RaptorPathToItineraryMapper {
         leg.setBoardStopPosInPattern(boardStopIndexInPattern);
         leg.setAlightStopPosInPattern(alightStopIndexInPattern);
 
-        leg.setBoardingStopSequence(tripTimes.getOriginalGtfsStopSequence(boardStopIndexInPattern));
-        leg.setAlightStopSequence(tripTimes.getOriginalGtfsStopSequence(alightStopIndexInPattern));
+        leg.setBoardingGtfsStopSequence(tripTimes.getOriginalGtfsStopSequence(boardStopIndexInPattern));
+        leg.setAlightGtfsStopSequence(tripTimes.getOriginalGtfsStopSequence(alightStopIndexInPattern));
 
         // TODO OTP2 - alightRule and boardRule needs mapping
         //    Under Raptor, for transit trips, ItineraryMapper converts Path<TripSchedule> directly to Itinerary
