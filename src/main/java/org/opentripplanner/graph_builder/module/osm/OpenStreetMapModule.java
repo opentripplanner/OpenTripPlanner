@@ -897,7 +897,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     String sourceVertexLabel = sourceVertex.getLabel();
                     String levelName = level.longName;
 
-                    getOnboardVertex(
+                    createElevatorVertices(
                             graph, onboardVertices, sourceVertex, sourceVertexLabel,
                             levelName
                     );
