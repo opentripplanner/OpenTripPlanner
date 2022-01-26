@@ -961,7 +961,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
         }
 
-        private void getOnboardVertex(
+        private void createElevatorVertices(
                 Graph graph,
                 ArrayList<Vertex> onboardVertices,
                 OsmVertex sourceVertex,
