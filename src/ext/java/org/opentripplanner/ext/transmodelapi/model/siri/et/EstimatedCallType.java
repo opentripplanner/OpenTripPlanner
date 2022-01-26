@@ -278,8 +278,9 @@ public class EstimatedCallType {
     // Agency
     // TODO OTP2 This should probably have a FeedScopeId argument instead of string
     allAlerts.addAll(alertPatchService.getAgencyAlerts(trip.getRoute().getAgency().getId()));
-    // TripPattern
-    allAlerts.addAll(alertPatchService.getTripPatternAlerts(routingService.getPatternForTrip().get(trip).getId()));
+    // Route's direction
+      allAlerts.addAll(
+              alertPatchService.getDirectionAndRouteAlerts(trip.getDirection().gtfsCode, routeId));
 
     long serviceDayMillis = 1000L * tripTimeOnDate.getServiceDay();
     long arrivalMillis = 1000L * tripTimeOnDate.getRealtimeArrival();

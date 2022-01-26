@@ -7,6 +7,11 @@ Note that this branch contains **OpenTripPlanner 2**, the second major version o
 If you do not want to test or explore this version, please switch to the final 1.x release tag `v1.5.0` or the `dev-1.x` branch for any patches and bugfixes applied to the v1.5.0 release.
 
 
+## Performance Test
+
+[📊 Speed Bench Mark](https://otp-performance.leonard.io/) We run the SpeedTest (included in the code) to measure the performance for every PR merged into OTP. The test uses a fixed Norwegian Netex data set and Grafana is used to display the results.
+
+
 ## Repository layout
 
 The main Java server code is in `src/main/`. OTP also includes a Javascript client based on the Leaflet mapping library in `src/client/`. This client is now primarily used for testing, with most major deployments building custom clients from reusable components. The Maven build produces a unified ("shaded") JAR file at `target/otp-VERSION.jar` containing all necessary code and dependencies to run OpenTripPlanner.

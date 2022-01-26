@@ -111,6 +111,14 @@
 - Read in flex window from Netex feeds [#3800](https://github.com/opentripplanner/OpenTripPlanner/pull/3800)
 - Fix NPE when routing on a graph without transit data. [#3804](https://github.com/opentripplanner/OpenTripPlanner/pull/3804)
 - Capture code coverage with jacoco and codecov.io [#3811](https://github.com/opentripplanner/OpenTripPlanner/pull/3811)
+- Read leg mode from trip, instead of route [#3819](https://github.com/opentripplanner/OpenTripPlanner/pull/3819)
+- Use API mapping in snapshot tests [#3823](https://github.com/opentripplanner/OpenTripPlanner/pull/3823)
+- Store stop indices in leg and use them to simplify logic in TripTimeShortHelper [#3820](https://github.com/opentripplanner/OpenTripPlanner/pull/3820)
+- Include all trips in `stopTimesForStop` [#3817](https://github.com/opentripplanner/OpenTripPlanner/pull/3817)
+- Store all alerts and add support for route_type and direction_id selectors [#3780](https://github.com/opentripplanner/OpenTripPlanner/pull/3780)
+- Remove outdated realtime-update from TimetableSnapshot [#3770](https://github.com/opentripplanner/OpenTripPlanner/pull/3770)
+- Contributing Guide [#3769](https://github.com/opentripplanner/OpenTripPlanner/pull/3769)
+- OTP support for NeTEx branding [#3829](https://github.com/opentripplanner/OpenTripPlanner/pull/3829)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

@@ -9,10 +9,12 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Branding;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.BrandingRefStructure;
 import org.rutebanken.netex.model.FlexibleLine_VersionStructure;
 import org.rutebanken.netex.model.Line_VersionStructure;
 import org.rutebanken.netex.model.Network;
@@ -31,6 +33,7 @@ class RouteMapper {
     private final FeedScopedIdFactory idFactory;
     private final EntityById<Agency> agenciesById;
     private final EntityById<Operator> operatorsById;
+    private final EntityById<Branding> brandingsById;
     private final NetexEntityIndexReadOnlyView netexIndex;
     private final AuthorityToAgencyMapper authorityMapper;
     private final Set<String> ferryIdsNotAllowedForBicycle;
@@ -40,6 +43,7 @@ class RouteMapper {
             FeedScopedIdFactory idFactory,
             EntityById<Agency> agenciesById,
             EntityById<Operator> operatorsById,
+            EntityById<Branding> brandingsById,
             NetexEntityIndexReadOnlyView netexIndex,
             String timeZone,
             Set<String> ferryIdsNotAllowedForBicycle
@@ -48,6 +52,7 @@ class RouteMapper {
         this.idFactory = idFactory;
         this.agenciesById = agenciesById;
         this.operatorsById = operatorsById;
+        this.brandingsById = brandingsById;
         this.netexIndex = netexIndex;
         this.authorityMapper = new AuthorityToAgencyMapper(idFactory, timeZone);
         this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
@@ -59,6 +64,7 @@ class RouteMapper {
         );
         otpRoute.setAgency(findOrCreateAuthority(line));
         otpRoute.setOperator(findOperator(line));
+        otpRoute.setBranding(findBranding(line));
         otpRoute.setLongName(line.getName().getValue());
         otpRoute.setShortName(line.getPublicCode());
         T2<TransitMode, String> mode = transportModeMapper.map(
@@ -146,5 +152,16 @@ class RouteMapper {
             return null;
         }
         return operatorsById.get(idFactory.createId(opeRef.getRef()));
+    }
+
+    @Nullable
+    private Branding findBranding(Line_VersionStructure line) {
+        BrandingRefStructure brandingRef = line.getBrandingRef();
+
+        if(brandingRef == null) {
+            return null;
+        }
+
+        return brandingsById.get(idFactory.createId(brandingRef.getRef()));
     }
 }

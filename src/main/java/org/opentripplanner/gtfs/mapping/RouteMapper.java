@@ -12,6 +12,7 @@ import java.util.Map;
 /** Responsible for mapping GTFS Route into the OTP model. */
 class RouteMapper {
     private final AgencyMapper agencyMapper;
+    private final BrandingMapper brandingMapper;
 
     private final DataImportIssueStore issueStore;
 
@@ -20,6 +21,7 @@ class RouteMapper {
     RouteMapper(AgencyMapper agencyMapper, DataImportIssueStore issueStore) {
         this.agencyMapper = agencyMapper;
         this.issueStore = issueStore;
+        this.brandingMapper = new BrandingMapper();
     }
 
     Collection<Route> map(Collection<org.onebusaway.gtfs.model.Route> agencies) {
@@ -56,7 +58,7 @@ class RouteMapper {
         lhs.setTextColor(rhs.getTextColor());
         lhs.setBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
         lhs.setSortOrder(rhs.getSortOrder());
-        lhs.setBrandingUrl(rhs.getBrandingUrl());
+        lhs.setBranding(brandingMapper.map(rhs));
 
         return lhs;
     }

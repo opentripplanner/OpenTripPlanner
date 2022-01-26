@@ -35,6 +35,7 @@ import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.model.Branding;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
@@ -106,6 +107,8 @@ public class OtpTransitServiceBuilder {
     private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
     private final EntityById<FlexTrip> flexTripsById = new EntityById<>();
+
+    private final EntityById<Branding> brandingsById = new EntityById<>();
 
     public OtpTransitServiceBuilder() {
     }
@@ -222,6 +225,9 @@ public class OtpTransitServiceBuilder {
         return flexTripsById;
     }
 
+    public EntityById<Branding> getBrandingsById() {
+        return brandingsById;
+    }
 
     /**
      * Find all serviceIds in both CalendarServices and CalendarServiceDates.

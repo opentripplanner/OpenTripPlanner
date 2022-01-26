@@ -2,11 +2,11 @@ package org.opentripplanner.routing.stoptimes;
 
 import com.google.common.collect.MinMaxPriorityQueue;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -22,9 +22,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
 import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
@@ -76,29 +74,10 @@ public class StopTimesHelper {
 
     ServiceDate[] serviceDates = dates.toArray(new ServiceDate[dates.size()]);
 
-    // TODO The following logic could probably be encapsulated in the TimetableSnapshot
-    Collection<TripPattern> plannedPatterns = routingService.getPatternsForStop(stop, false);
-    Collection<TripPattern> realTimePatterns = routingService.getPatternsForStop(stop, true);
+    // Fetch all patterns, including those from realtime sources
+    Collection<TripPattern> patterns = routingService.getPatternsForStop(stop, timetableSnapshot);
 
-    // Only include the planned patterns that are not also part of the collection of realtime
-    // patterns. These may have been cancelled with no replacement.
-    plannedPatterns.removeAll(realTimePatterns);
-
-    // Realtime patterns may have been cancelled and replaced. Do not include the patterns that
-    // have been replaced
-    Collection<TripPattern> replacedPatterns = realTimePatterns
-        .stream()
-        .map(TripPattern::getOriginalTripPattern)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
-
-    realTimePatterns.removeAll(replacedPatterns);
-
-    /*
-     First, check all the TripPatterns that are planned, but not part of the realtime patterns. This
-     is so that we catch TripPatterns that have been cancelled by realtime updates.
-     */
-    for (TripPattern pattern : plannedPatterns) {
+    for (TripPattern pattern : patterns) {
       Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
           routingService,
           timetableSnapshot,
@@ -109,26 +88,7 @@ public class StopTimesHelper {
           numberOfDepartures,
           arrivalDeparture,
           includeCancelledTrips,
-          serviceDates
-      );
-
-      result.addAll(getStopTimesInPattern(pattern, pq));
-    }
-
-    /*
-    Second, check all the realtime-updated TripPatterns.
-     */
-    for (TripPattern pattern : realTimePatterns) {
-      Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
-          routingService,
-          timetableSnapshot,
-          stop,
-          pattern,
-          startTime,
-          timeRange,
-          numberOfDepartures,
-          arrivalDeparture,
-          includeCancelledTrips,
+          false,
           serviceDates
       );
 
@@ -235,6 +195,7 @@ public class StopTimesHelper {
         numberOfDepartures,
         arrivalDeparture,
         false,
+        true,
         serviceDates
     );
 
@@ -251,6 +212,7 @@ public class StopTimesHelper {
       int numberOfDepartures,
       ArrivalDeparture arrivalDeparture,
       boolean includeCancellations,
+      boolean includeReplaced,
       ServiceDate[] serviceDates
   ) {
 
@@ -293,6 +255,14 @@ public class StopTimesHelper {
           for (TripTimes tripTimes : timetable.getTripTimes()) {
             if (!sd.serviceRunning(tripTimes.getServiceCode())) { continue; }
             if (skipByTripCancellation(tripTimes, includeCancellations)) { continue; }
+            if (
+                    !includeReplaced && 
+                    isReplacedByAnotherPattern(
+                            tripTimes.getTrip(), serviceDate, pattern, timetableSnapshot
+                    )
+            ) {
+              continue;
+            }
 
             boolean departureTimeInRange =
                 tripTimes.getDepartureTime(stopIndex) >= secondsSinceMidnight
@@ -317,6 +287,17 @@ public class StopTimesHelper {
       }
     }
     return pq;
+  }
+
+  private static boolean isReplacedByAnotherPattern(
+          Trip trip,
+          ServiceDate serviceDate,
+          TripPattern pattern,
+          TimetableSnapshot snapshot
+  ) {
+    if (snapshot == null) { return false; }
+    final TripPattern replacement = snapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
+    return replacement != null && !replacement.equals(pattern);
   }
 
   private static boolean skipByTripCancellation(TripTimes tripTimes, boolean includeCancellations) {

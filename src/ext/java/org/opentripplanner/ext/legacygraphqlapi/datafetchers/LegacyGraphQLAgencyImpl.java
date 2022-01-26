@@ -4,16 +4,20 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.ArrayList;
+import java.util.Collection;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.routing.services.TransitAlertService;
 
 public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAgency {
 
@@ -61,17 +65,55 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
 
   @Override
   public DataFetcher<Iterable<Route>> routes() {
-    return environment -> getRoutingService(environment)
-        .getAllRoutes()
-        .stream()
-        .filter(route -> route.getAgency().equals(getSource(environment)))
-        .collect(Collectors.toList());
+    return environment -> getRoutes(environment);
   }
 
   @Override
-  //TODO
   public DataFetcher<Iterable<TransitAlert>> alerts() {
-    return environment -> List.of();
+    return environment -> {
+      TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
+      var args = new LegacyGraphQLTypes.LegacyGraphQLAgencyAlertsArgs(
+              environment.getArguments());
+      Iterable<LegacyGraphQLTypes.LegacyGraphQLAgencyAlertType> types =
+              args.getLegacyGraphQLTypes();
+      if (types != null) {
+        Collection<TransitAlert> alerts = new ArrayList<>();
+        types.forEach(type -> {
+          switch (type) {
+            case Agency:
+              alerts.addAll(alertService.getAgencyAlerts(getSource(environment).getId()));
+              break;
+            case RouteTypes:
+              alertService.getAllAlerts()
+                      .stream()
+                      .filter(alert -> alert.getEntities()
+                              .stream()
+                              .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteTypeAndAgency)
+                              .map(EntitySelector.RouteTypeAndAgency.class::cast)
+                              .anyMatch(entity -> entity.agencyId.equals(
+                                      getSource(environment).getId())))
+                      .forEach(alert -> alerts.add(alert));
+              break;
+            case Routes:
+              getRoutes(environment).forEach(
+                      route -> alerts.addAll(alertService.getRouteAlerts(route.getId())));
+              break;
+          }
+        });
+        return alerts.stream().distinct().collect(Collectors.toList());
+      }
+      else {
+        return alertService.getAgencyAlerts(getSource(environment).getId());
+      }
+    };
+  }
+
+  private List<Route> getRoutes(DataFetchingEnvironment environment) {
+    return getRoutingService(environment)
+            .getAllRoutes()
+            .stream()
+            .filter(route -> route.getAgency().equals(getSource(environment)))
+            .collect(Collectors.toList());
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

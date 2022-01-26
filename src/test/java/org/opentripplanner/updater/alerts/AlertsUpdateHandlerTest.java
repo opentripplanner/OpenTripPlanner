@@ -12,6 +12,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -377,6 +378,98 @@ public class AlertsUpdateHandlerTest {
                 .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
                 .count();
         assertEquals(1l, routeSelectorCount);
+    }
+
+    @Test
+    public void testMissingSelector() {
+        GtfsRealtime.Alert alert = Alert.newBuilder().build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        List<EntitySelector> selectors = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
+                .collect(Collectors.toList());
+        assertEquals(1l, selectors.size());
+        assertEquals(
+                "Alert had no entities", ((EntitySelector.Unknown) selectors.get(0)).description);
+    }
+
+    @Test
+    public void testUnknownSelector() {
+        // Setting just direction is not supported and should result in entity not being handled
+        GtfsRealtime.Alert alert = Alert.newBuilder()
+                .addInformedEntity(
+                        GtfsRealtime.EntitySelector.newBuilder().setDirectionId(1).build())
+                .build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        List<EntitySelector> selectors = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
+                .collect(Collectors.toList());
+        assertEquals(1l, selectors.size());
+        assertEquals(
+                "Entity selector: direction_id: 1\n",
+                ((EntitySelector.Unknown) selectors.get(0)).description
+        );
+    }
+
+    @Test
+    public void testDirectionAndRouteSelector() {
+        GtfsRealtime.Alert alert = Alert.newBuilder()
+                .addInformedEntity(
+                        GtfsRealtime.EntitySelector.newBuilder()
+                                .setDirectionId(1)
+                                .setRouteId("1")
+                                .build())
+                .build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        long directionAndRouteSelectorCount = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.DirectionAndRoute)
+                .count();
+        assertEquals(1l, directionAndRouteSelectorCount);
+    }
+
+    @Test
+    public void testRouteTypeSelector() {
+        GtfsRealtime.Alert alert = Alert.newBuilder()
+                .addInformedEntity(
+                        GtfsRealtime.EntitySelector.newBuilder()
+                                .setRouteType(1)
+                                .build())
+                .build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        long RouteTypeSelectorCount = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteType)
+                .count();
+        assertEquals(1l, RouteTypeSelectorCount);
+    }
+
+    @Test
+    public void testRouteTypeAndAgencySelector() {
+        GtfsRealtime.Alert alert = Alert.newBuilder()
+                .addInformedEntity(
+                        GtfsRealtime.EntitySelector.newBuilder()
+                                .setRouteType(1)
+                                .setAgencyId("1")
+                                .build())
+                .build();
+        TransitAlert transitAlert = processOneAlert(alert);
+        long totalSelectorCount = transitAlert.getEntities().size();
+        assertEquals(1l, totalSelectorCount);
+        long RouteTypeAndAgencySelectorCount = transitAlert.getEntities()
+                .stream()
+                .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteTypeAndAgency)
+                .count();
+        assertEquals(1l, RouteTypeAndAgencySelectorCount);
     }
 
     private TransitAlert processOneAlert(GtfsRealtime.Alert alert) {
