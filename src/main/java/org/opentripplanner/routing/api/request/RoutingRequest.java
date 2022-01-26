@@ -328,6 +328,20 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public double carReluctance = 2.0;
 
+    /** Zero means turned off. HACK SØRLANDSBANEN */
+    public double extraSearchCoachReluctance = 0.0;
+
+    /**
+     * How much more time does it take to walk a flight of stairs compared to walking a similar
+     * horizontal length
+     *
+     * Default value is based on:
+     * Fujiyama, T., & Tyler, N. (2010).
+     * Predicting the walking speed of pedestrians on stairs.
+     * Transportation Planning and Technology, 33(2), 177–202.
+     */
+    public double stairsTimeFactor = 3.0;
+
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
 

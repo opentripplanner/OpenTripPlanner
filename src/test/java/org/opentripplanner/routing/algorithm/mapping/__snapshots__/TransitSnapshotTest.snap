@@ -5846,22 +5846,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
   [
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 2361,
+      "duration": 2370,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
-      "endTime": "2009-11-17T18:39:21.000+00:00",
+      "endTime": "2009-11-17T18:39:30.000+00:00",
       "fare": {
         "details": { },
         "fare": { }
       },
-      "generalizedCost": 4557,
+      "generalizedCost": 4621,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2989.7960000000003,
-          "endTime": "2009-11-17T18:39:21.000+00:00",
+          "distance": 3052.902,
+          "endTime": "2009-11-17T18:39:30.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
             "lat": 45.530244,
@@ -5872,11 +5872,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
-          "generalizedCost": 4557,
+          "generalizedCost": 4621,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 173,
-            "points": "_s{tGvpukV??c@tADDFDDDHHYx@Wt@{@lBS^MROZ]h@Y`@[`@k@r@kAtASVEDa@f@EDm@l@s@p@JVA@GOCBzEfKxF`M|AfDJRLPVb@DBBBBBDBB@CRE\\C?A@A@ABAB?DAHATC\\AXAVCZATAPAPATG`AATAPAL?J?F?F?D?F@x@AJ@D@B@DAB?RK@I??TBlBCJ?D?BAFAB?DADABEFCDA@CDC?c@@{@@O?K??LCDC??LC?G?E@GBE?KCI?EFC@?N?F?D?BABA@AD?D?B?D@B@BABAB?D?DADABABABC@A@I@IZCFIJ?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
+            "length": 137,
+            "points": "_s{tGvpukV??c@tAIIMb@ADIZM\\KZWr@Ud@Ud@IRSb@k@x@_@h@a@f@_AfAYXKQMUIKGGIGKEOCI?I?KBKBQHqAxAONL\\j@rA@R?FVh@~EpKxFzLdA|B^x@BD@@BDHLHJBFBDBF@DBF?J?HAF?HGbAK~AGz@IlAEd@?TAP?L?L@Z?`@?R?T?TBlBCJ?D?BAFAB?DADABEFCDA@CDC?c@@{@@O?K?eBBM?M@@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
           },
           "mode": "WALK",
           "pathway": false,
@@ -5898,98 +5898,74 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "streetName": "Interstate/Rose Quarter Northbound Yellow Line MAX Platform"
             },
             {
-              "absoluteDirection": "SOUTHWEST",
+              "absoluteDirection": "NORTHEAST",
               "area": false,
               "bogusName": true,
-              "distance": 20.608,
+              "distance": 5.991,
               "elevation": "",
               "lat": 45.530427100000004,
               "lon": -122.66822160000001,
-              "relativeDirection": "LEFT",
+              "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 125785939 from 4"
+              "streetName": "way 125785939 from 1"
             },
             {
               "absoluteDirection": "NORTHWEST",
               "area": false,
               "bogusName": false,
-              "distance": 410.023,
+              "distance": 292.244,
               "elevation": "",
-              "lat": 45.5302724,
-              "lon": -122.66836730000001,
-              "relativeDirection": "RIGHT",
+              "lat": 45.530472100000004,
+              "lon": -122.6681793,
+              "relativeDirection": "LEFT",
               "stayOn": false,
               "streetName": "North Interstate Avenue"
             },
             {
-              "absoluteDirection": "SOUTHWEST",
+              "absoluteDirection": "NORTHEAST",
               "area": false,
-              "bogusName": true,
-              "distance": 40.36,
+              "bogusName": false,
+              "distance": 160.69199999999998,
               "elevation": "",
-              "lat": 45.532912800000005,
-              "lon": -122.67197920000001,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "way 117315127 from 2"
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "area": false,
-              "bogusName": true,
-              "distance": 2.245,
-              "elevation": "",
-              "lat": 45.532907900000005,
-              "lon": -122.67202800000001,
+              "lat": 45.5322204,
+              "lon": -122.670929,
               "relativeDirection": "RIGHT",
-              "stayOn": true,
-              "streetName": "way 117315115 from 0"
+              "stayOn": false,
+              "streetName": "North Larrabee Avenue"
             },
             {
               "absoluteDirection": "SOUTHWEST",
               "area": false,
               "bogusName": false,
-              "distance": 543.668,
+              "distance": 55.036,
               "elevation": "",
-              "lat": 45.5329251,
-              "lon": -122.67204310000001,
+              "lat": 45.5334329,
+              "lon": -122.67115310000001,
               "relativeDirection": "LEFT",
+              "stayOn": false,
+              "streetName": "North Broadway"
+            },
+            {
+              "absoluteDirection": "WEST",
+              "area": false,
+              "bogusName": false,
+              "distance": 584.674,
+              "elevation": "",
+              "lat": 45.533143,
+              "lon": -122.67172570000001,
+              "relativeDirection": "SLIGHTLY_RIGHT",
               "stayOn": false,
               "streetName": "Broadway Bridge"
             },
             {
-              "absoluteDirection": "SOUTHWEST",
+              "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
-              "distance": 14.158,
+              "distance": 301.763,
               "elevation": "",
-              "lat": 45.5298506,
-              "lon": -122.67746670000001,
-              "relativeDirection": "CONTINUE",
-              "stayOn": false,
-              "streetName": "Northwest Broadway"
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "area": false,
-              "bogusName": false,
-              "distance": 23.666,
-              "elevation": "",
-              "lat": 45.5297871,
-              "lon": -122.67780010000001,
-              "relativeDirection": "UTURN_RIGHT",
-              "stayOn": true,
-              "streetName": "Northwest Broadway"
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 298.376,
-              "elevation": "",
-              "lat": 45.529817200000004,
-              "lon": -122.6778163,
-              "relativeDirection": "SLIGHTLY_LEFT",
+              "lat": 45.5298997,
+              "lon": -122.67760050000001,
+              "relativeDirection": "SLIGHTLY_RIGHT",
               "stayOn": false,
               "streetName": "Northwest Lovejoy Street"
             },
@@ -5997,7 +5973,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection": "NORTH",
               "area": false,
               "bogusName": false,
-              "distance": 71.22,
+              "distance": 143.231,
               "elevation": "",
               "lat": 45.5302432,
               "lon": -122.6813836,
@@ -6009,65 +5985,17 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
-              "distance": 5.54,
+              "distance": 1470.2359999999999,
               "elevation": "",
-              "lat": 45.5308835,
-              "lon": -122.68140700000001,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Northwest Marshall Street"
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "area": false,
-              "bogusName": true,
-              "distance": 5.888,
-              "elevation": "",
-              "lat": 45.530882000000005,
-              "lon": -122.6814781,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "way 117751890 from 1"
-            },
-            {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 7.364,
-              "elevation": "",
-              "lat": 45.5309273,
-              "lon": -122.6815085,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Tanner Springs Park"
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "area": false,
-              "bogusName": false,
-              "distance": 116.77899999999998,
-              "elevation": "",
-              "lat": 45.530944000000005,
-              "lon": -122.6815772,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "Tanner Springs Park Trail"
-            },
-            {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 1390.866,
-              "elevation": "",
-              "lat": 45.5315117,
-              "lon": -122.68244770000001,
+              "lat": 45.5315309,
+              "lon": -122.6814307,
               "relativeDirection": "LEFT",
               "stayOn": false,
               "streetName": "Northwest Northrup Street"
             }
           ],
           "to": {
-            "arrival": "2009-11-17T18:39:21.000+00:00",
+            "arrival": "2009-11-17T18:39:30.000+00:00",
             "lat": 45.531,
             "lon": -122.70029,
             "name": "NW Northrup St. & NW 24th Ave. (P3)",
@@ -6082,9 +6010,9 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 2989.7960000000003,
+      "walkDistance": 3052.902,
       "walkLimitExceeded": false,
-      "walkTime": 2361
+      "walkTime": 2370
     }
   ]
 ]

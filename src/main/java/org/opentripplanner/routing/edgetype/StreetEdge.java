@@ -539,7 +539,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             // NOTE: Automobiles have variable speeds depending on the edge type
             return calculateCarSpeed(options);
         }
-        return options.getSpeed(traverseMode, walkingBike);
+        final double speed = options.getSpeed(traverseMode, walkingBike);
+        return isStairs() ? (speed / options.stairsTimeFactor) : speed;
     }
 
     /**

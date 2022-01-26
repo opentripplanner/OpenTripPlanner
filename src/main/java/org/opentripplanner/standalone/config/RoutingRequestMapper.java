@@ -84,6 +84,7 @@ public class RoutingRequestMapper {
         request.requiredVehicleParkingTags = c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
         request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
         request.stairsReluctance = c.asDouble("stairsReluctance", dft.stairsReluctance);
+        request.stairsTimeFactor = c.asDouble("stairsTimeFactor", dft.stairsTimeFactor);
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
         request.transferCost = c.asInt("transferPenalty", dft.transferCost);
         request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
