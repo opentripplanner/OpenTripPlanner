@@ -26,9 +26,9 @@ public class DateMapper {
                 .minusHours(12);
     }
 
-    public static int secondsSinceStartOfTime(ZonedDateTime startOfTime, LocalDate localDate) {
-        ZonedDateTime startOfDay = asStartOfService(localDate, startOfTime.getZone());
-        return (int) Duration.between(startOfTime, startOfDay).getSeconds();
+    public static int secondsSinceStartOfTime(ZonedDateTime timeZero, LocalDate localDate) {
+        ZonedDateTime startOfDay = asStartOfService(localDate, timeZero.getZone());
+        return (int) Duration.between(timeZero, startOfDay).getSeconds();
     }
 
     public static int secondsSinceStartOfTime(ZonedDateTime startOfTime, Instant instant) {

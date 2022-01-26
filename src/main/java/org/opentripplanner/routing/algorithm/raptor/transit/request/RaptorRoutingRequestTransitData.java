@@ -46,7 +46,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
    */
   private final RaptorTransferIndex transfers;
 
-  private final ZonedDateTime transitTimeZero;
+  private final ZonedDateTime transitSearchTimeZero;
 
   private final CostCalculator generalizedCostCalculator;
 
@@ -57,7 +57,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   public RaptorRoutingRequestTransitData(
       TransferService transferService,
       TransitLayer transitLayer,
-      ZonedDateTime transitTimeZero,
+      ZonedDateTime transitSearchTimeZero,
       int additionalPastSearchDays,
       int additionalFutureSearchDays,
       TransitDataProviderFilter filter,
@@ -66,13 +66,13 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
     this.transferService = transferService;
     this.transitLayer = transitLayer;
-    this.transitTimeZero = transitTimeZero;
+    this.transitSearchTimeZero = transitSearchTimeZero;
 
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolate this code to only be available at
     // the time of construction
     var transitDataCreator = new RaptorRoutingRequestTransitDataCreator(
-            transitLayer, transitTimeZero
+            transitLayer, transitSearchTimeZero
     );
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(
         additionalPastSearchDays,
@@ -85,13 +85,13 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
             transitLayer.getStopIndex().stopBoardAlightCosts
     );
     this.validTransitDataStartTime = DateMapper.secondsSinceStartOfTime(
-            this.transitTimeZero,
-        this.transitTimeZero.minusDays(additionalPastSearchDays).toInstant()
+            this.transitSearchTimeZero,
+        this.transitSearchTimeZero.minusDays(additionalPastSearchDays).toInstant()
     );
     // The +1 is due to the validity being to the end of the day
     this.validTransitDataEndTime = DateMapper.secondsSinceStartOfTime(
-            this.transitTimeZero,
-        this.transitTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
+            this.transitSearchTimeZero,
+        this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
     );
   }
 

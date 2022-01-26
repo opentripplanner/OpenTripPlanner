@@ -16,7 +16,7 @@ public class PageCursorFactory {
     private PageType currentPageType;
     private SearchTime current = null;
     private Duration currentSearchWindow = null;
-    private boolean holeSwUsed = true;
+    private boolean wholeSwUsed = true;
     private Instant removedItineraryStartTime = null;
     private Instant removedItineraryEndTime = null;
 
@@ -73,7 +73,7 @@ public class PageCursorFactory {
             Instant startTime,
             Instant endTime
     ) {
-        this.holeSwUsed = false;
+        this.wholeSwUsed = false;
         this.removedItineraryStartTime = startTime.truncatedTo(ChronoUnit.MINUTES);
         this.removedItineraryEndTime = endTime.plusSeconds(59).truncatedTo(ChronoUnit.MINUTES);
         return this;
@@ -102,13 +102,13 @@ public class PageCursorFactory {
         if (sortOrder.isSortedByArrivalTimeAcceding()) {
             if (currentPageType == NEXT_PAGE) {
                 prev.edt = current.edt.minus(newSearchWindow);
-                next.edt = holeSwUsed
+                next.edt = wholeSwUsed
                         ? current.edt.plus(currentSearchWindow)
                         : removedItineraryStartTime;
             }
             // current page type == PREV_PAGE
             else {
-                if (holeSwUsed) {
+                if (wholeSwUsed) {
                     prev.edt = current.edt.minus(currentSearchWindow);
                 }
                 else {
@@ -124,7 +124,7 @@ public class PageCursorFactory {
         // Arrive-by, sort on departure time with the latest first
         else {
             if (currentPageType == PREVIOUS_PAGE) {
-                if(holeSwUsed) {
+                if(wholeSwUsed) {
                     prev.edt = current.edt.minus(newSearchWindow);
                     prev.lat = current.lat;
                 }
@@ -140,7 +140,7 @@ public class PageCursorFactory {
                 prev.edt = current.edt.minus(newSearchWindow);
                 prev.lat = current.lat;
 
-                if (holeSwUsed) {
+                if (wholeSwUsed) {
                     next.edt = current.edt.plus(currentSearchWindow);
                 }
                 else {
@@ -160,7 +160,7 @@ public class PageCursorFactory {
                 .addObj("current", current)
                 .addDuration("currentSearchWindow", currentSearchWindow)
                 .addDuration("newSearchWindow", newSearchWindow)
-                .addBoolIfTrue("searchWindowCropped", !holeSwUsed)
+                .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
                 .addTime("removedItineraryStartTime", removedItineraryStartTime)
                 .addTime("removedItineraryEndTime", removedItineraryEndTime)
                 .addObj("nextCursor", nextCursor)

@@ -25,7 +25,7 @@ public class RoutingResponseMapper {
 
     public static RoutingResponse map(
             RoutingRequest request,
-            ZonedDateTime startOfTimeTransit,
+            ZonedDateTime transitSearchTimeZero,
             SearchParams searchParams,
             Duration searchWindowForNextSearch,
             Itinerary firstRemovedItinerary,
@@ -38,7 +38,7 @@ public class RoutingResponseMapper {
 
         var factory= mapIntoPageCursorFactory(
                 request.getItinerariesSortOrder(),
-                startOfTimeTransit,
+                transitSearchTimeZero,
                 searchParams,
                 searchWindowForNextSearch,
                 firstRemovedItinerary,
@@ -48,10 +48,9 @@ public class RoutingResponseMapper {
         PageCursor nextPageCursor = factory.nextPageCursor();
         PageCursor prevPageCursor = factory.previousPageCursor();
 
-        LOG.debug("PageCursor current  : " + request.pageCursor);
-        LOG.debug("PageCursor previous : " + prevPageCursor);
-        LOG.debug("PageCursor next ... : " + nextPageCursor);
-        LOG.debug("Errors ............ : " + routingErrors);
+        if(LOG.isDebugEnabled()) {
+            logPagingInformation(request.pageCursor, prevPageCursor, nextPageCursor, routingErrors);
+        }
 
         var metadata = createTripSearchMetadata(
                 request, searchParams, firstRemovedItinerary
@@ -99,7 +98,7 @@ public class RoutingResponseMapper {
 
     public static PageCursorFactory mapIntoPageCursorFactory(
             SortOrder sortOrder,
-            ZonedDateTime startOfTimeTransit,
+            ZonedDateTime transitSearchTimeZero,
             SearchParams searchParams,
             Duration searchWindowNextSearch,
             Itinerary firstRemovedItinerary,
@@ -115,10 +114,10 @@ public class RoutingResponseMapper {
                 throw new IllegalArgumentException("Earliest departure time not set");
             }
 
-            long startOfTimeSec = startOfTimeTransit.toEpochSecond();
-            var edt = Instant.ofEpochSecond(startOfTimeSec + searchParams.earliestDepartureTime());
+            long t0 = transitSearchTimeZero.toEpochSecond();
+            var edt = Instant.ofEpochSecond(t0 + searchParams.earliestDepartureTime());
             var lat = searchParams.isLatestArrivalTimeSet()
-                    ? Instant.ofEpochSecond(startOfTimeSec + searchParams.latestArrivalTime())
+                    ? Instant.ofEpochSecond(t0 + searchParams.latestArrivalTime())
                     : null;
             var searchWindow = Duration.ofSeconds(searchParams.searchWindowInSeconds());
             factory.withOriginalSearch(currentPageType, edt, lat, searchWindow);
@@ -132,5 +131,17 @@ public class RoutingResponseMapper {
         }
 
         return factory;
+    }
+
+    private static void logPagingInformation(
+            PageCursor currentPageCursor,
+            PageCursor prevPageCursor,
+            PageCursor nextPageCursor,
+            Set<RoutingError> errors
+    ) {
+        LOG.debug("PageCursor current  : " + currentPageCursor);
+        LOG.debug("PageCursor previous : " + prevPageCursor);
+        LOG.debug("PageCursor next ... : " + nextPageCursor);
+        LOG.debug("Errors ............ : " + errors);
     }
 }

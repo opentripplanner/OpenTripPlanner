@@ -8,7 +8,7 @@ import java.util.List;
 public final class PagingSearchWindowAdjuster {
     /**
      * Extra time is added to the search-window for the next request if the current
-     * result have few itineraries.
+     * result has few itineraries.
      * <p>
      * Unit: minutes
      */
@@ -22,8 +22,8 @@ public final class PagingSearchWindowAdjuster {
 
     /**
      * We look at the search data after the trip search to see if we should adjust the search-
-     * window. This is done to avoid short-search-windows in low frequency areas, where the client
-     * would need to request the
+     * window. This is done to avoid short search windows in low frequency areas, where the client
+     * would need to do multiple new request to fetch the next trips.
      */
     public Duration calculateNewSearchWindow(
             Duration usedSearchWindow,

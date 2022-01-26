@@ -45,12 +45,16 @@ public class RoutingWorker {
 
     private final RoutingRequest request;
     private final Router router;
-
     /**
-     * Transit service time-zero. Usually midnight before the request dateTime, but NOT on days
-     * witch has DST adjustments.
+     * The transit service time-zero normalized for the current search. All transit times are 
+     * relative to a "time-zero". This enables us to use an integer(small memory footprint). The
+     * times are number for seconds past the {@code transitSearchTimeZero}. In the internal model
+     * all times are stored relative to the {@link org.opentripplanner.model.calendar.ServiceDate},
+     * but to be able to compare trip times for different service days we normalize all times by
+     * calculating an offset. Now all times for the selected trip patterns become relative to the
+     * {@code transitSearchTimeZero}.
      */
-    private final ZonedDateTime searchTransitTimeZero;
+    private final ZonedDateTime transitSearchTimeZero;
     private SearchParams raptorSearchParamsUsed = null;
     private Itinerary firstRemovedItinerary = null;
 
@@ -58,7 +62,7 @@ public class RoutingWorker {
         request.applyPageCursor();
         this.request = request;
         this.router = router;
-        this.searchTransitTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
+        this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
         this.pagingSearchWindowAdjuster = new PagingSearchWindowAdjuster(
                 router.routerConfig.transitTuningParameters().pagingSearchWindowAdjustments()
         );
@@ -128,7 +132,7 @@ public class RoutingWorker {
 
         return RoutingResponseMapper.map(
                 request,
-                searchTransitTimeZero,
+                transitSearchTimeZero,
                 raptorSearchParamsUsed,
                 searchWindowNextSearch,
                 firstRemovedItinerary,
@@ -152,7 +156,7 @@ public class RoutingWorker {
         ) {
             int ldt = raptorSearchParamsUsed.earliestDepartureTime()
                     + raptorSearchParamsUsed.searchWindowInSeconds();
-            return searchTransitTimeZero.plusSeconds(ldt).toInstant();
+            return transitSearchTimeZero.plusSeconds(ldt).toInstant();
         }
         return null;
     }
@@ -198,7 +202,7 @@ public class RoutingWorker {
             var transitResults = TransitRouter.route(
                     request,
                     router,
-                    searchTransitTimeZero,
+                    transitSearchTimeZero,
                     debugTimingAggregator
             );
             raptorSearchParamsUsed = transitResults.getSearchParams();
@@ -226,6 +230,6 @@ public class RoutingWorker {
     }
 
     private Instant searchStartTime() {
-        return searchTransitTimeZero.toInstant();
+        return transitSearchTimeZero.toInstant();
     }
 }

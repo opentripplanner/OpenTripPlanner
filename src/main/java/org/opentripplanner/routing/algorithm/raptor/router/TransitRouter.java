@@ -46,18 +46,18 @@ public class TransitRouter {
     private final RoutingRequest request;
     private final Router router;
     private final DebugTimingAggregator debugTimingAggregator;
-    private final ZonedDateTime searchTransitTimeZero;
+    private final ZonedDateTime transitSearchTimeZero;
 
     private TransitRouter(
             RoutingRequest request,
             Router router,
-            ZonedDateTime searchTransitTimeZero,
+            ZonedDateTime transitSearchTimeZero,
             DebugTimingAggregator debugTimingAggregator
     ) {
         this.request = request;
         this.router = router;
         this.debugTimingAggregator = debugTimingAggregator;
-        this.searchTransitTimeZero = searchTransitTimeZero;
+        this.transitSearchTimeZero = transitSearchTimeZero;
     }
 
     private TransitRouterResult route() {
@@ -93,7 +93,7 @@ public class TransitRouter {
         // Prepare transit search
         var raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
-                searchTransitTimeZero,
+                transitSearchTimeZero,
                 accessEgresses.getAccesses(),
                 accessEgresses.getEgresses()
         );
@@ -125,7 +125,7 @@ public class TransitRouter {
         RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
                 router.graph,
                 transitLayer,
-                searchTransitTimeZero,
+                transitSearchTimeZero,
                 request
         );
         FareService fareService = router.graph.getService(FareService.class);
@@ -240,7 +240,7 @@ public class TransitRouter {
             return new RaptorRoutingRequestTransitData(
                     graph.getTransferService(),
                     transitLayer,
-                    searchTransitTimeZero,
+                    transitSearchTimeZero,
                     request.arriveBy ? request.additionalSearchDaysBeforeToday : 0,
                     request.arriveBy ? 0 : request.additionalSearchDaysAfterToday,
                     createRequestTransitDataProviderFilter(graph.index),
@@ -290,9 +290,9 @@ public class TransitRouter {
     public static TransitRouterResult route(
             RoutingRequest request,
             Router router,
-            ZonedDateTime searchTransitTimeZero,
+            ZonedDateTime transitSearchTimeZero,
             DebugTimingAggregator debugTimingAggregator
     ) {
-        return new TransitRouter(request, router, searchTransitTimeZero, debugTimingAggregator).route();
+        return new TransitRouter(request, router, transitSearchTimeZero, debugTimingAggregator).route();
     }
 }
