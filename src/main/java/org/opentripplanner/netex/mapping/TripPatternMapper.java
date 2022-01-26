@@ -188,7 +188,7 @@ class TripPatternMapper {
 
         createTripTimes(trips, tripPattern);
 
-        result.tripPatterns.add(tripPattern);
+        result.tripPatterns.put(stopPattern, tripPattern);
 
         return result;
     }

@@ -10,7 +10,6 @@ import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
@@ -328,6 +327,48 @@ public class TransferGeneratorTest implements RaptorTestConstants {
                         + "]]",
                 result.toString()
         );
+    }
+
+    @Test
+    void findTransferWithNotAllowedConstrainedTransfer() {
+        // given 3 possible expected transfers
+        var expBxB = "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}";
+        var expCxD = "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: On-Street 1m ~ 4}";
+        var expExE = "TripToTripTransfer{from: [5 10:30 BUS L1], to: [5 10:40 BUS L2]}";
+
+        var l1 = route("L1", STOP_A, STOP_B, STOP_C, STOP_E)
+                .withTimetable(schedule("10:00 10:10 10:20 10:30"));
+
+        var l2 = route("L2", STOP_B, STOP_D, STOP_E, STOP_F)
+                .withTimetable(schedule("10:20 10:30 10:40 10:50"));
+
+        data.withRoutes(l1, l2).withTransfer(STOP_C, walk(STOP_D, D1m));
+
+        final Path<TestTripSchedule> path = pathBuilder
+                .access(ACCESS_START, ACCESS_DURATION, STOP_A)
+                .bus(l1.getTripSchedule(0), STOP_C)
+                .walk(D1m, STOP_D)
+                .bus(l2.getTripSchedule(0), STOP_F)
+                .egress(D1m);
+
+        var transitLegs = path.transitLegs().collect(Collectors.toList());
+        var subject = new TransferGenerator<>(TS_ADAPTOR, SLACK_PROVIDER, data);
+
+        var tripA = l1.getTripSchedule(0);
+        var tripB = l2.getTripSchedule(0);
+
+        data.withConstrainedTransfer(tripA, STOP_B, tripB, STOP_B, TestTransitData.TX_NOT_ALLOWED);
+        var result = subject.findAllPossibleTransfers(transitLegs);
+
+        // The same stop transfer is no longer an option
+        assertEquals("[[" + expCxD + ", " + expExE + "]]", result.toString());
+
+        data.clearConstrainedTransfers();
+        data.withConstrainedTransfer(tripA, STOP_C, tripB, STOP_D, TestTransitData.TX_NOT_ALLOWED);
+        result = subject.findAllPossibleTransfers(transitLegs);
+
+        // The same stop transfer is no longer an option
+        assertEquals("[[" + expBxB + ", " + expExE + "]]", result.toString());
     }
 
     @Test

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.asStartOfService;
 
 import java.time.Instant;
@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DateMapperTest {
   private static final ZoneId ZONE_ID = ZoneId.of("Europe/Paris");

@@ -6,13 +6,22 @@ import org.opentripplanner.model.transfer.TransferPoint;
 public class TestTransferPoint implements TransferPoint {
     private final int stop;
     private final TestTripSchedule schedule;
+    private final boolean applyToAllTrips;
 
     public TestTransferPoint(
             int stop,
-            TestTripSchedule schedule
+            TestTripSchedule schedule,
+            boolean applyToAllTrips
+
     ) {
         this.stop = stop;
         this.schedule = schedule;
+        this.applyToAllTrips = applyToAllTrips;
+    }
+
+    @Override
+    public boolean appliesToAllTrips() {
+        return applyToAllTrips;
     }
 
     public int getStopPosition() {

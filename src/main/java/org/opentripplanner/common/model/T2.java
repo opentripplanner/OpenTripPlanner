@@ -1,6 +1,7 @@
 package org.opentripplanner.common.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * An ordered pair of objects of potentially different types
@@ -25,22 +26,8 @@ public class T2<E1, E2> implements Serializable {
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof T2)) { return false; }
-
-        var other = (T2) object;
-
-        if (first == null) {
-            if (other.first != null) { return false; }
-        } else {
-            if (!first.equals(other.first)) { return false; }
-        }
-
-        if (second == null) {
-            if (other.second != null) { return false; }
-        } else {
-            if (!second.equals(other.second)) { return false; }
-        }
-
-        return true;
+        var other = (T2<?,?>) object;
+        return Objects.equals(first, other.first) && Objects.equals(second, other.second);
     }
 
     @Override

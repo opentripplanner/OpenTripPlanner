@@ -3,6 +3,11 @@ package org.opentripplanner.ext.siri;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
@@ -12,12 +17,6 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.validation.constraints.NotNull;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
@@ -129,9 +128,10 @@ public class SiriTripPatternCache {
              * Remove previously added TripPatterns for the trip currently being updated - if the stopPattern does not match
              */
             TripPattern cachedTripPattern = updatedTripPatternsForTripCache.get(tripServiceDateKey);
-            if (cachedTripPattern != null && !tripPattern
-                .getStopPattern()
-                .equals(cachedTripPattern.getStopPattern())) {
+            if (
+                    cachedTripPattern != null &&
+                    !tripPattern.stopPatternIsEqual(cachedTripPattern)
+            ) {
                 int sizeBefore = patternsForStop.values().size();
                 long t1 = System.currentTimeMillis();
                 patternsForStop.values().removeAll(Arrays.asList(cachedTripPattern));

@@ -6,5 +6,26 @@ package org.opentripplanner.transit.raptor.api.transit;
  * instance in a callback to the cost calculator.
  */
 public interface RaptorTransferConstraint {
-    /* This is intentionally empty */
+
+    /**
+     * A regular transfer is a transfer with no constraints.
+     */
+    RaptorTransferConstraint REGULAR_TRANSFER = new RaptorTransferConstraint() {
+        @Override public boolean isNotAllowed() { return false; }
+        @Override public boolean isRegularTransfer() { return true; }
+    };
+
+
+    /**
+     * Return {@code true} if the constrained transfer is not allowed between the two routes.
+     * Note! If a constraint only apply to specific trips, then the
+     * {@link RaptorConstrainedTripScheduleBoardingSearch} is reponsible for NOT returning the
+     * NOT-ALLOWED transfer, and finding the next ALLOWED trip.
+     */
+    boolean isNotAllowed();
+
+    /**
+     * Returns {@code true} if this is a regular transfer without any constrains.
+     */
+    boolean isRegularTransfer();
 }

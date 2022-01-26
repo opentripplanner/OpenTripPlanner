@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
@@ -426,7 +427,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
         var txBeforeLeg = prevTransit == null
                 ? null
                 : prevTransit.constrainedTransferAfterLeg();
-        var transferConstraint = txBeforeLeg == null ? null : txBeforeLeg.getTransferConstraint();
+        var transferConstraint = txBeforeLeg == null
+                ? RaptorTransferConstraint.REGULAR_TRANSFER
+                : txBeforeLeg.getTransferConstraint();
         boolean firstBoarding = prev != null && prev.isAccessWithoutRides();
 
         int boardCost = costCalculator.boardingCost(

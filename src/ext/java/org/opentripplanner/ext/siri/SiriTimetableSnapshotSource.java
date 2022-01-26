@@ -1,6 +1,21 @@
 package org.opentripplanner.ext.siri;
 
+import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
+import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
+import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.SCHEDULED;
+
 import com.google.common.base.Preconditions;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantLock;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
@@ -787,7 +802,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         for (TripTimes tripTimes : times) {
             Trip trip = tripTimes.getTrip();
             for (TripPattern pattern : patterns) {
-                if (tripTimes.getNumStops() == pattern.getStopPattern().getStops().length) {
+                if (tripTimes.getNumStops() == pattern.numberOfStops()) {
                     if (!tripTimes.isCanceled()) {
                         /*
                           UPDATED and MODIFIED tripTimes should be handled the same way to always allow latest realtime-update
@@ -1015,7 +1030,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             }
 
             var firstStop = tripPattern.getStop(0);
-            var lastStop = tripPattern.getStop(tripPattern.getStops().size() - 1);
+            var lastStop = tripPattern.lastStop();
 
             String siriOriginRef = monitoredVehicleJourney.getOriginRef().getValue();
 
@@ -1130,8 +1145,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
 
 
-        var firstStop = tripPattern.getStop(0);
-        var lastStop = tripPattern.getStop(tripPattern.getStops().size() - 1);
+        var firstStop = tripPattern.firstStop();
+        var lastStop = tripPattern.lastStop();
 
         if (serviceDates.contains(journeyDate)) {
             boolean firstStopIsMatch = firstStop.getId().getId().equals(journeyFirstStopId);
@@ -1256,9 +1271,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
                 TripPattern pattern = routingService.getPatternForTrip().get(trip);
 
-                if (stopNumber < pattern.getStopPattern().getStops().length) {
+                if (stopNumber < pattern.numberOfStops()) {
                     boolean firstReportedStopIsFound = false;
-                    var stop = pattern.getStopPattern().getStops()[stopNumber - 1];
+                    var stop = pattern.getStop(stopNumber - 1);
                     if (firstStopId.equals(stop.getId().getId())) {
                         firstReportedStopIsFound = true;
                     }

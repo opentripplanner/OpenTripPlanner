@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryCollection;
-import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.GeometryUtils;
 
 /**
@@ -68,12 +66,17 @@ public final class Stop extends StationElement implements StopLocation {
     this.netexSubmode = netexSubmode;
   }
 
-  /**
-   * Create a minimal Stop object for unit-test use, where the test only care about id, name and
-   * coordinate. The feedId is static set to "TEST"
-   */
+  /** @see #stopForTest(String, double, double, Station) */
   public static Stop stopForTest(String idAndName, double lat, double lon) {
-    return new Stop(
+    return stopForTest(idAndName, lat, lon, null);
+  }
+
+    /**
+     * Create a minimal Stop object for unit-test use, where the test only care about id, name and
+     * coordinate. The feedId is static set to "F"
+     */
+  public static Stop stopForTest(String idAndName, double lat, double lon, Station parent) {
+    var stop = new Stop(
         new FeedScopedId("F", idAndName),
         idAndName,
         idAndName,
@@ -88,8 +91,9 @@ public final class Stop extends StationElement implements StopLocation {
         null,
         null
     );
+    stop.setParentStation(parent);
+    return stop;
   }
-
 
   public void addBoardingArea(BoardingArea boardingArea) {
     if (boardingAreas == null) {

@@ -21,14 +21,14 @@ class TransfersMapper {
 
         List<List<Transfer>> transferByStopIndex = new ArrayList<>();
 
-        for (int i = 0; i < stopIndex.stopsByIndex.size(); ++i) {
-            var stop = stopIndex.stopsByIndex.get(i);
+        for (int i = 0; i < stopIndex.size(); ++i) {
+            var stop = stopIndex.stopByIndex(i);
             ArrayList<Transfer> list = new ArrayList<>();
             transferByStopIndex.add(list);
 
             for (PathTransfer pathTransfer : transfersByStop.get(stop)) {
                 if (pathTransfer.to instanceof Stop) {
-                    int toStopIndex = stopIndex.indexByStop.get(pathTransfer.to);
+                    int toStopIndex = stopIndex.indexOf((Stop)pathTransfer.to);
                     Transfer newTransfer;
                     if (pathTransfer.getEdges() != null) {
                         newTransfer = new Transfer(
