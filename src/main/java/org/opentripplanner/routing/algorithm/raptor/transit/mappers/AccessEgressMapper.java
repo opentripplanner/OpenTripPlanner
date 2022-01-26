@@ -21,10 +21,9 @@ public class AccessEgressMapper {
 
   public AccessEgress mapNearbyStop(NearbyStop nearbyStop, boolean isEgress) {
     if (!(nearbyStop.stop instanceof Stop)) { return null; }
+
     return new AccessEgress(
-        // TODO: This cast is potentially causing problems look into if it is possible
-        //       to improve the code and get rid of the cast
-        stopIndex.indexOf((Stop)nearbyStop.stop),
+        stopIndex.indexOf(nearbyStop.stop),
         isEgress ? nearbyStop.state.reverse() : nearbyStop.state
     );
   }
