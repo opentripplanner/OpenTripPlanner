@@ -137,7 +137,7 @@ public class LegType {
             .newFieldDefinition()
             .name("realtime")
             .description("Whether there is real-time data about this leg")
-            .type(Scalars.GraphQLBoolean)
+            .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
             .dataFetcher(env -> leg(env).getRealTime())
             .build())
         .field(GraphQLFieldDefinition
@@ -158,21 +158,21 @@ public class LegType {
             .newFieldDefinition()
             .name("ride")
             .description("Whether this leg is a ride leg or not.")
-            .type(Scalars.GraphQLBoolean)
+            .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
             .dataFetcher(env -> leg(env).isTransitLeg())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("walkingBike")
             .description("Whether this leg is walking with a bike.")
-            .type(Scalars.GraphQLBoolean)
+            .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
             .dataFetcher(env -> leg(env).getWalkingBike())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("rentedBike")
             .description("Whether this leg is with a rented bike.")
-            .type(Scalars.GraphQLBoolean)
+            .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
             .dataFetcher(env -> leg(env).getRentedVehicle())
             .build())
         .field(GraphQLFieldDefinition
