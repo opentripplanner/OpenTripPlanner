@@ -126,8 +126,7 @@ public final class DefaultCostCalculator implements CostCalculator {
 
     @Override
     public int calculateMinCost(int minTravelTime, int minNumTransfers) {
-        return  boardCostOnly
-            + boardAndTransferCost * minNumTransfers
+        return boardAndTransferCost * minNumTransfers
             + transitFactors.minFactor() * minTravelTime;
     }
 

@@ -61,25 +61,25 @@ public class DefaultCostCalculatorTest {
         //   - Transfer cost:  200
         //   - Transit factor:  80 (min of 80 and 100)
 
-        // Board cost is 500:
-        assertEquals(500, subject.calculateMinCost(0, 0));
-        // The transfer 1s * 80 = 80 + board cost 500
-        assertEquals(580, subject.calculateMinCost(1, 0));
-        // Board 2 times and transfer 1: 2 * 500 + 200
-        assertEquals(1200, subject.calculateMinCost(0, 1));
+        // Board cost is 0:
+        assertEquals(0, subject.calculateMinCost(0, 0));
+        // The transfer 1s * 80 = 80
+        assertEquals(80, subject.calculateMinCost(1, 0));
+        // Board 2 times and transfer 1: 1 * 500 + 200
+        assertEquals(700, subject.calculateMinCost(0, 1));
 
-        // Transit 200s * 80 + Board 4 * 500 + Transfer 3 * 200
-        assertEquals(18_600, subject.calculateMinCost(200, 3));
+        // Transit 200s * 80 + Board 3 * 500 + Transfer 3 * 200
+        assertEquals(18_100, subject.calculateMinCost(200, 3));
     }
 
     @Test
     public void testConvertBetweenRaptorAndMainOtpDomainModel() {
         assertEquals(
-                RaptorCostConverter.toRaptorCost(BOARD_COST_SEC),
-                subject.calculateMinCost(0,0)
+                RaptorCostConverter.toRaptorCost(BOARD_COST_SEC + TRANSFER_COST_SEC),
+                subject.calculateMinCost(0,1)
         );
         assertEquals(
-            RaptorCostConverter.toRaptorCost(0.8 * 20 + BOARD_COST_SEC),
+            RaptorCostConverter.toRaptorCost(0.8 * 20),
             subject.calculateMinCost(20,0)
         );
     }
