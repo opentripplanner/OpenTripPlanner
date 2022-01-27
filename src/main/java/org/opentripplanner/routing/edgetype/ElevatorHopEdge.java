@@ -38,7 +38,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
         super(from, to);
         this.permission = permission;
     }
-    
+
     @Override
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
@@ -46,7 +46,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
         if (options.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
-        
+
         TraverseMode mode = s0.getNonTransitMode();
 
         if (mode == TraverseMode.WALK && 
@@ -88,7 +88,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     public String getName() {
         return null;
     }
-    
+
+    public StreetTraversalPermission getPermission() {
+        return permission;
+    }
+
     public String toString() {
         return "ElevatorHopEdge(" + fromv + " -> " + tov + ")";
     }

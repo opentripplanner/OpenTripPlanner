@@ -147,6 +147,8 @@ public class OSMDatabase {
         return Collections.unmodifiableCollection(waysById.valueCollection());
     }
 
+    public boolean isAreaWay(Long wayId) { return areaWayIds.contains(wayId); }
+
     public int nodeCount() {
         return nodesById.size();
     }
