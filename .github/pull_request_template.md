@@ -28,7 +28,7 @@ Write a few words on how the new code is tested.
 - Do all tests pass [the continuous integration service](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Developers-Guide.md#continuous-integration)?
 
 ### Code style
-Have you followed the [suggested code style](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Developers-Guide.md#code-style)?
+Have you followed the [suggested code style](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Codestyle.md)?
 
 ### Documentation
 - Have you added documentation in code covering design and rationale behind the code?
