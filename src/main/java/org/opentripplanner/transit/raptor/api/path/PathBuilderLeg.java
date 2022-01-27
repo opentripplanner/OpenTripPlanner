@@ -389,7 +389,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
             newFromTime = prev.toTime();
         }
         else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Unexpected leg type before TransferLeg: " + this);
         }
         setTime(newFromTime, newFromTime + asTransferLeg().streetPath.durationInSeconds());
     }
