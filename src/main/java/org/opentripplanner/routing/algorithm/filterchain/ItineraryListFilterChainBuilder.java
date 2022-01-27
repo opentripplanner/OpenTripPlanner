@@ -23,6 +23,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveW
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
@@ -321,6 +322,8 @@ public class ItineraryListFilterChainBuilder {
                 name,
                 it.maxNumOfItinerariesPerGroup
             )));
+
+            nested.add(new RemoveDeletionFlagForLeastTransfersItinerary());
 
             groupByFilters.add(
                 new GroupByFilter<>(
