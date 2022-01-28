@@ -61,13 +61,13 @@ public class BarrierRoutingTest {
                                 () -> assertEquals(
                                         List.of(BICYCLE, WALK, BICYCLE, WALK, BICYCLE),
                                         i.legs.stream()
-                                                .map(leg -> leg.mode)
+                                                .map(leg -> leg.getMode())
                                                 .collect(Collectors.toList())
                                 ),
                                 () -> assertEquals(
                                         List.of(false, true, false, true, false),
                                         i.legs.stream()
-                                                .map(leg -> leg.walkingBike)
+                                                .map(leg -> leg.getWalkingBike())
                                                 .collect(Collectors.toList())
                                 )
                         ))
@@ -120,7 +120,7 @@ public class BarrierRoutingTest {
                 (itineraries) -> itineraries.stream()
                         .flatMap(i -> i.legs.stream())
                         .map(l -> () -> assertEquals(
-                                traverseMode, l.mode, "Allow only " + traverseMode + " legs"
+                                traverseMode, l.getMode(), "Allow only " + traverseMode + " legs"
                         ))
         );
     }
@@ -150,6 +150,6 @@ public class BarrierRoutingTest {
 
         assertAll(assertions.apply(itineraries));
 
-        return itineraries.get(0).legs.get(0).legGeometry.getPoints();
+        return itineraries.get(0).legs.get(0).getLegGeometry().getPoints();
     }
 }

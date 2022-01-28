@@ -5,7 +5,6 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -30,32 +29,36 @@ public class AlertToLegMapper {
                 ? StopCondition.DEPARTURE
                 : StopCondition.FIRST_DEPARTURE;
 
-        Date legStartTime = leg.startTime.getTime();
-        Date legEndTime = leg.endTime.getTime();
-        StopLocation fromStop = leg.from == null ? null : leg.from.stop;
-        StopLocation toStop = leg.to == null ? null : leg.to.stop;
+        Date legStartTime = leg.getStartTime().getTime();
+        Date legEndTime = leg.getEndTime().getTime();
+        StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
+        StopLocation toStop = leg.getTo() == null ? null : leg.getTo().stop;
 
         FeedScopedId routeId = leg.getRoute().getId();
         FeedScopedId tripId = leg.getTrip().getId();
         if (fromStop instanceof Stop) {
             Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, (Stop) fromStop, routeId);
-            alerts.addAll(getAlertsForStopAndTrip(graph, (Stop) fromStop, tripId, leg.serviceDate));
+            alerts.addAll(getAlertsForStopAndTrip(graph, (Stop) fromStop, tripId,
+                    leg.getServiceDate()
+            ));
             alerts.addAll(getAlertsForStop(graph, (Stop) fromStop));
             addTransitAlertPatchesToLeg(leg, departingStopConditions, alerts, requestedLocale, legStartTime, legEndTime);
         }
         if (toStop instanceof Stop) {
             Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, (Stop) toStop, routeId);
-            alerts.addAll(getAlertsForStopAndTrip(graph, (Stop) toStop, tripId, leg.serviceDate));
+            alerts.addAll(getAlertsForStopAndTrip(graph, (Stop) toStop, tripId,
+                    leg.getServiceDate()
+            ));
             alerts.addAll(getAlertsForStop(graph, (Stop) toStop));
             addTransitAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, requestedLocale, legStartTime, legEndTime);
         }
 
-        if (leg.intermediateStops != null) {
-            for (StopArrival visit : leg.intermediateStops) {
+        if (leg.getIntermediateStops() != null) {
+            for (StopArrival visit : leg.getIntermediateStops()) {
                 if (visit.place.stop instanceof Stop) {
                     Stop stop = (Stop) visit.place.stop;
                     Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, stop, routeId);
-                    alerts.addAll(getAlertsForStopAndTrip(graph, stop, tripId, leg.serviceDate));
+                    alerts.addAll(getAlertsForStopAndTrip(graph, stop, tripId, leg.getServiceDate()));
                     alerts.addAll(getAlertsForStop(graph, stop));
 
                     Date stopArrival = visit.arrival.getTime();
@@ -69,7 +72,8 @@ public class AlertToLegMapper {
         Collection<TransitAlert> patches;
 
         // trips - alerts tagged on ServiceDate
-        patches = alertPatchService(graph).getTripAlerts(leg.getTrip().getId(), leg.serviceDate);
+        patches = alertPatchService(graph)
+                .getTripAlerts(leg.getTrip().getId(), leg.getServiceDate());
         addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
 
         // trips - alerts tagged on any date
@@ -85,7 +89,12 @@ public class AlertToLegMapper {
         addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
 
         // Filter alerts when there are multiple timePeriods for each alert
-        leg.transitAlerts.removeIf(alertPatch ->  !alertPatch.displayDuring(leg.startTime.getTimeInMillis()/1000, leg.endTime.getTimeInMillis()/1000));
+        leg.getTransitAlerts().removeIf(alertPatch ->  
+                !alertPatch.displayDuring(
+                        leg.getStartTime().getTimeInMillis()/1000,
+                        leg.getEndTime().getTimeInMillis()/1000
+                )
+        );
     }
 
     private static TransitAlertService alertPatchService(Graph g) {
