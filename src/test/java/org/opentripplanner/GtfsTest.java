@@ -156,22 +156,22 @@ public abstract class GtfsTest extends TestCase {
             String fromStopId,
             String alert
     ) {
-        assertEquals(startTime, leg.startTime.getTimeInMillis());
-        assertEquals(endTime, leg.endTime.getTimeInMillis());
-        assertEquals(toStopId, leg.to.stop.getId().getId());
-        assertEquals(feedId.getId(), leg.to.stop.getId().getFeedId());
+        assertEquals(startTime, leg.getStartTime().getTimeInMillis());
+        assertEquals(endTime, leg.getEndTime().getTimeInMillis());
+        assertEquals(toStopId, leg.getTo().stop.getId().getId());
+        assertEquals(feedId.getId(), leg.getTo().stop.getId().getFeedId());
         if (fromStopId != null) {
-            assertEquals(feedId.getId(), leg.from.stop.getId().getFeedId());
-            assertEquals(fromStopId, leg.from.stop.getId().getId());
+            assertEquals(feedId.getId(), leg.getFrom().stop.getId().getFeedId());
+            assertEquals(fromStopId, leg.getFrom().stop.getId().getId());
         } else {
-            assertNull(leg.from.stop.getId());
+            assertNull(leg.getFrom().stop.getId());
         }
         if (alert != null) {
-            assertNotNull(leg.streetNotes);
-            assertEquals(1, leg.streetNotes.size());
-            assertEquals(alert, leg.streetNotes.iterator().next().note.toString());
+            assertNotNull(leg.getStreetNotes());
+            assertEquals(1, leg.getStreetNotes().size());
+            assertEquals(alert, leg.getStreetNotes().iterator().next().note.toString());
         } else {
-            assertNull(leg.streetNotes);
+            assertNull(leg.getStreetNotes());
         }
     }
 }

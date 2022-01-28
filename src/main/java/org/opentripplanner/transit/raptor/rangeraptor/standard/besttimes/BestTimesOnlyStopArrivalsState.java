@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
 
 /**
@@ -59,5 +60,14 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule> implem
     @Override
     public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
         bestNumberOfTransfers.arriveAtStop(transfer.stop());
+    }
+
+    @Override
+    public TransitArrival<T> previousTransit(int boardStopIndex) {
+        throw new IllegalStateException(
+                "The implementation of this interface is not compatible with the request" +
+                        "configuration. For example the BestTimesOnlyStopArrivalsState can not be used " +
+                        "with constrained transfers."
+        );
     }
 }

@@ -1,7 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
@@ -15,15 +23,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
   public static final FeedScopedId TP_ID_1 = new FeedScopedId("F", "1");
@@ -36,7 +35,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
           new StopPattern(List.of())
   );
 
-  @Before
+  @BeforeEach
   public void setup() {
     TP.getRoute().setMode(TransitMode.BUS);
   }

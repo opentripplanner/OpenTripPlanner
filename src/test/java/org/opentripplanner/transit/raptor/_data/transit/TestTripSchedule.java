@@ -18,7 +18,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
     private final int transitReluctanceIndex;
 
 
-    private TestTripSchedule(
+    protected TestTripSchedule(
         TestTripPattern pattern,
         int[] arrivalTimes,
         int[] departureTimes,

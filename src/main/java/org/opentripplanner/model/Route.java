@@ -11,6 +11,8 @@ public final class Route extends TransitEntity {
 
     private Operator operator;
 
+    private Branding branding;
+
     private String shortName;
 
     private String longName;
@@ -33,12 +35,18 @@ public final class Route extends TransitEntity {
 
     private int sortOrder = MISSING_VALUE;
 
-    private String brandingUrl;
-
     private String flexibleLineType;
 
     public Route(FeedScopedId id) {
         super(id);
+    }
+
+    public Branding getBranding() {
+        return branding;
+    }
+
+    public void setBranding(Branding branding) {
+        this.branding = branding;
     }
 
     /**
@@ -149,14 +157,6 @@ public final class Route extends TransitEntity {
         this.sortOrder = sortOrder;
     }
 
-    public String getBrandingUrl() {
-        return brandingUrl;
-    }
-
-    public void setBrandingUrl(String brandingUrl) {
-        this.brandingUrl = brandingUrl;
-    }
-
     /**
      * Pass-through information from NeTEx FlexibleLineType. This information is not used by OTP.
      */
@@ -175,7 +175,7 @@ public final class Route extends TransitEntity {
 
     @Override
     public String toString() {
-        return "<Route " + getId() + " " + shortName + ">";
+        return "<Route " + getId() + " " + getName() + ">";
     }
 
     public String getNetexSubmode() {

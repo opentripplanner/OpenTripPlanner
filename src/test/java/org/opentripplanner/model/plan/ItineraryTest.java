@@ -27,12 +27,12 @@ public class ItineraryTest implements PlanTestConstants {
         assertTrue(result.walkOnly);
 
         // Expected fields on walking leg set
-        assertSameLocation(A, result.firstLeg().from);
-        assertEquals(GregorianCalendar.from(newTime(T11_00)), result.firstLeg().startTime);
-        assertEquals(GregorianCalendar.from(newTime(T11_05)), result.firstLeg().endTime);
-        assertEquals(TraverseMode.WALK, result.firstLeg().mode);
-        assertEquals(420.0d, result.firstLeg().distanceMeters, 1E-3);
-        assertSameLocation(B, result.lastLeg().to);
+        assertSameLocation(A, result.firstLeg().getFrom());
+        assertEquals(GregorianCalendar.from(newTime(T11_00)), result.firstLeg().getStartTime());
+        assertEquals(GregorianCalendar.from(newTime(T11_05)), result.firstLeg().getEndTime());
+        assertEquals(TraverseMode.WALK, result.firstLeg().getMode());
+        assertEquals(420.0d, result.firstLeg().getDistanceMeters(), 1E-3);
+        assertSameLocation(B, result.lastLeg().getTo());
 
         assertEquals("A ~ Walk 5m ~ B [ $600 ]", result.toStr());
     }
@@ -50,13 +50,13 @@ public class ItineraryTest implements PlanTestConstants {
         assertFalse(result.walkOnly);
 
         // Expected fields on bus leg set
-        assertSameLocation(A, result.firstLeg().from);
-        assertSameLocation(B, result.firstLeg().to);
-        assertEquals(GregorianCalendar.from(newTime(T11_00)), result.firstLeg().startTime);
-        assertEquals(GregorianCalendar.from(newTime(T11_10)), result.firstLeg().endTime);
-        assertEquals(TraverseMode.BUS, result.firstLeg().mode);
+        assertSameLocation(A, result.firstLeg().getFrom());
+        assertSameLocation(B, result.firstLeg().getTo());
+        assertEquals(GregorianCalendar.from(newTime(T11_00)), result.firstLeg().getStartTime());
+        assertEquals(GregorianCalendar.from(newTime(T11_10)), result.firstLeg().getEndTime());
+        assertEquals(TraverseMode.BUS, result.firstLeg().getMode());
       assertEquals(new FeedScopedId("F", "55"), result.firstLeg().getTrip().getId());
-        assertEquals(7500, result.firstLeg().distanceMeters, 1E-3);
+        assertEquals(7500, result.firstLeg().getDistanceMeters(), 1E-3);
 
         assertEquals("A ~ BUS 55 11:00 11:10 ~ B [ $720 ]", result.toStr());
     }
@@ -74,13 +74,13 @@ public class ItineraryTest implements PlanTestConstants {
         assertFalse(result.walkOnly);
 
         // Expected fields on bus leg set
-        assertSameLocation(A, result.firstLeg().from);
-        assertSameLocation(B, result.firstLeg().to);
-        assertEquals(GregorianCalendar.from(newTime(T11_05)), result.firstLeg().startTime);
-        assertEquals(GregorianCalendar.from(newTime(T11_15)), result.firstLeg().endTime);
-        assertEquals(TraverseMode.RAIL, result.firstLeg().mode);
+        assertSameLocation(A, result.firstLeg().getFrom());
+        assertSameLocation(B, result.firstLeg().getTo());
+        assertEquals(GregorianCalendar.from(newTime(T11_05)), result.firstLeg().getStartTime());
+        assertEquals(GregorianCalendar.from(newTime(T11_15)), result.firstLeg().getEndTime());
+        assertEquals(TraverseMode.RAIL, result.firstLeg().getMode());
         assertEquals(new FeedScopedId("F", "20"), result.firstLeg().getTrip().getId());
-        assertEquals(15_000, result.firstLeg().distanceMeters, 1E-3);
+        assertEquals(15_000, result.firstLeg().getDistanceMeters(), 1E-3);
 
         assertEquals("A ~ RAIL 20 11:05 11:15 ~ B [ $720 ]", result.toStr());
     }
@@ -147,8 +147,8 @@ public class ItineraryTest implements PlanTestConstants {
         assertEquals(660, result.waitingTimeSeconds);
         assertEquals(720 + 528 + 360 + 2040, result.generalizedCost);
         assertFalse(result.walkOnly);
-        assertSameLocation(A, result.firstLeg().from);
-        assertSameLocation(G, result.lastLeg().to);
+        assertSameLocation(A, result.firstLeg().getFrom());
+        assertSameLocation(G, result.lastLeg().getTo());
 
         assertEquals(
             "A ~ Walk 2m ~ B ~ BUS 55 11:04 11:14 ~ C ~ BUS 21 11:16 11:20 ~ D "

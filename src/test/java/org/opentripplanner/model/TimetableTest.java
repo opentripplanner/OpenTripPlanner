@@ -195,8 +195,8 @@ public class TimetableTest {
         // TODO This will not work since individual stops cannot be cancelled using GTFS updates
         //      yet
         for (int i = 0; i < tripTimes.getNumStops(); i++) {
-            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getPickup(i) );
-            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getDropoff(i) );
+            assertEquals(PickDrop.CANCELLED, pattern.getBoardType(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getAlightType(i));
         }
 
         //---

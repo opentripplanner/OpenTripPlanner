@@ -1,12 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 
 public class TripPatternMapper {
 
@@ -23,8 +22,8 @@ public class TripPatternMapper {
 
         for (TripPattern oldTripPattern : oldTripPatterns) {
             TripPatternWithRaptorStopIndexes newTripPattern = new TripPatternWithRaptorStopIndexes(
-                    stopIndex.listStopIndexesForStops(oldTripPattern.getStopPattern().getStops()),
-                    oldTripPattern
+                    oldTripPattern,
+                    stopIndex.listStopIndexesForStops(oldTripPattern.getStops())
             );
             newTripPatternForOld.put(oldTripPattern, newTripPattern);
         }

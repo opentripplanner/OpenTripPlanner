@@ -68,7 +68,7 @@ public final class DefaultCostCalculator implements CostCalculator {
             RaptorTripSchedule trip,
             RaptorTransferConstraint transferConstraints
     ) {
-        if(transferConstraints == null) {
+        if(transferConstraints.isRegularTransfer()) {
             return boardingCostRegularTransfer(
                     firstBoarding,
                     prevArrivalTime,

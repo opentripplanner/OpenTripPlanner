@@ -1,43 +1,85 @@
 package org.opentripplanner.model.transfer;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.transfer.TransferTestData.ANY_POS;
+import static org.opentripplanner.model.transfer.TransferTestData.ANY_TRIP;
+import static org.opentripplanner.model.transfer.TransferTestData.POS_1;
+import static org.opentripplanner.model.transfer.TransferTestData.POS_3;
+import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1A;
+import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1S;
+import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2B;
+import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2S;
+import static org.opentripplanner.model.transfer.TransferTestData.STATION;
+import static org.opentripplanner.model.transfer.TransferTestData.STATION_POINT;
+import static org.opentripplanner.model.transfer.TransferTestData.STOP_A;
+import static org.opentripplanner.model.transfer.TransferTestData.STOP_B;
+import static org.opentripplanner.model.transfer.TransferTestData.STOP_POINT_A;
+import static org.opentripplanner.model.transfer.TransferTestData.STOP_POINT_B;
+import static org.opentripplanner.model.transfer.TransferTestData.STOP_S;
+import static org.opentripplanner.model.transfer.TransferTestData.TRIP_11;
+import static org.opentripplanner.model.transfer.TransferTestData.TRIP_12;
+import static org.opentripplanner.model.transfer.TransferTestData.TRIP_21;
+import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_11_1;
+import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_21_3;
 
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TransferServiceTest implements TransferTestData {
+public class TransferServiceTest {
 
     private final TransferService subject = new TransferService();
 
+    @BeforeEach
+    public void setup() {
+        STOP_A.setParentStation(STATION);
+    }
 
     @Test
-    public void addOneTransferForEachCombinationOfFromToTypesAndRetriveEachOfThem() {
-        // Given:
-        var A = transfer(STOP_POINT_A, STOP_POINT_B);
-        var B = transfer(STOP_POINT_A, TRIP_POINT_23);
-        var C = transfer(ROUTE_POINT_11, STOP_POINT_B);
-        var D = transfer(TRIP_POINT_11, ROUTE_POINT_22);
-        var E = transfer(TRIP_POINT_11, TRIP_POINT_23);
+    public void findTransfer() {
+        // Given:                                                               // Ranking
+        var A = transfer(TRIP_POINT_11_1, TRIP_POINT_21_3);  // 84
+        var B = transfer(TRIP_POINT_11_1, ROUTE_POINT_2B);   // 74
+        var C = transfer(TRIP_POINT_11_1, ROUTE_POINT_2S);   // 64
+        var D = transfer(STOP_POINT_A, TRIP_POINT_21_3);     // 51
+        var E = transfer(ROUTE_POINT_1A, STOP_POINT_B);      // 43
+        var F = transfer(ROUTE_POINT_1S, STOP_POINT_B);      // 32
+        var G = transfer(STATION_POINT, ROUTE_POINT_2B);     // 30
+        var H = transfer(STATION_POINT, ROUTE_POINT_2S);     // 20
+        var I = transfer(STATION_POINT, STATION_POINT);      // 11
 
         // When: all transfers is added to service
-        subject.addAll(List.of(A, B, C, D, E));
+        subject.addAll(List.of(A, B, C, D, E, F, G, H, I));
 
-        /* THEN */
+        // Then:
 
-        // Find the most specific transfer, Trip and stop position match - stops is ignored
-        assertEquals(D, subject.findTransfer(STOP_A, STOP_B, TRIP_1, TRIP_2, 1, 2));
+        // Find the most specific transfer TRIP to TRIP
+        // Trip and stop position must match, stops are ignored
+        assertEquals(A, subject.findTransfer(TRIP_11, POS_1, STOP_A, TRIP_21, POS_3, STOP_B));
 
-        // Find the another specific transfer with the stop position changed
-        assertEquals(E, subject.findTransfer(STOP_A, STOP_B, TRIP_1, TRIP_2, 1, 3));
+        // Find the TRIP to ROUTE+STOP transfer when TO stop position does not match
+        assertEquals(B, subject.findTransfer(TRIP_11, POS_1, STOP_A, TRIP_21, ANY_POS, STOP_B));
 
-        // Find the specific transfer: TRIP -> STOP when stop position do not match TO point
-        assertEquals(C, subject.findTransfer(STOP_A, STOP_B, TRIP_1, TRIP_2, 1, 7));
+        // Find the TRIP to ROUTE+STATION transfer when TO stop does not match
+        assertEquals(C, subject.findTransfer(TRIP_11, POS_1, STOP_A, TRIP_21, ANY_POS, STOP_S));
 
-        // Find the specific transfer: STOP -> TRIP when stop position do not match FROM point
-        assertEquals(B, subject.findTransfer(STOP_A, STOP_B, TRIP_1, TRIP_2, 7, 3));
+        // Find transfer: STOP to TRIP when FROM trip does not match
+        assertEquals(D, subject.findTransfer(TRIP_12, POS_1, STOP_A, TRIP_21, POS_3, STOP_B));
 
-        // Stop position fall back to STOP -> STOP when stop position do not match
-        assertEquals(A, subject.findTransfer(STOP_A, STOP_B, TRIP_1, TRIP_2, 7, 7));
+        // Find the ROUTE+STOP to STOP transfer when FROM trip and TO stopPos do not match
+        assertEquals(E, subject.findTransfer(TRIP_12, POS_1, STOP_A, TRIP_21, ANY_POS, STOP_B));
+
+        // Find the ROUTE+STATION to STOP transfer when FROM stop position does not match
+        assertEquals(F, subject.findTransfer(TRIP_11, ANY_POS, STOP_S, TRIP_21, POS_3, STOP_B));
+
+        // Find STOP to STOP transfer, when FROM trip and TO stop position do not match
+        assertEquals(G, subject.findTransfer(ANY_TRIP, POS_1, STOP_A, TRIP_21, ANY_POS, STOP_B));
+
+        // Find STATION to ROUTE+STATION when FROM trip and route and TO Stop do not match
+        assertEquals(H, subject.findTransfer(ANY_TRIP, ANY_POS, STOP_S, TRIP_21, POS_3, STOP_S));
+
+        // Find STATION to STATION when there are no match for FROM/TO trips and patterns
+        assertEquals(I, subject.findTransfer(ANY_TRIP, POS_1, STOP_S, ANY_TRIP, ANY_POS, STOP_S));
     }
 
     @Test
@@ -45,12 +87,26 @@ public class TransferServiceTest implements TransferTestData {
         var A = transfer(STOP_POINT_A, STOP_POINT_B);
         var A_EQ = transfer(STOP_POINT_A, STOP_POINT_B);
 
-        // Adding two transfers between the same stops, will result in only the first being kept
+        // Adding two transfers between the same stops
+        // should result in only the first being added
         subject.addAll(List.of(A, A_EQ));
 
-        assertEquals(A, subject.findTransfer(STOP_A, STOP_B, TRIP_1, TRIP_2, 1, 2));
+        assertEquals(List.of(A), subject.listAll());
     }
 
+    @Test
+    public void listAll() {
+        // Given:
+        var A = transfer(STATION_POINT, ROUTE_POINT_1A);
+        var B = transfer(STOP_POINT_A, STOP_POINT_B);
+        var C = transfer(STOP_POINT_A, TRIP_POINT_21_3);
+
+        // When: all transfers is added to service
+        subject.addAll(List.of(A, B, C));
+
+        // Then
+        assertEquals(List.of(A, B, C), subject.listAll());
+    }
 
     ConstrainedTransfer transfer(TransferPoint from, TransferPoint to) {
         var c = TransferConstraint.create().build();

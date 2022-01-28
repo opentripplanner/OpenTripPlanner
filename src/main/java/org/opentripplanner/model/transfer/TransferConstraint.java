@@ -20,6 +20,12 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
     private static final long serialVersionUID = 1L;
 
+
+    /**
+     * A regular transfer is a transfer with no constraints.
+     */
+    public static final TransferConstraint REGULAR_TRANSFER = create().build();
+
     /**
      * STAY_SEATED is not a priority, but we assign a cost to it to be able to compare it with other
      * transfers with a priority and the {@link #GUARANTIED_TRANSFER_COST}.
@@ -91,6 +97,9 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         return priority;
     }
 
+    /**
+     * Also known as interlining of GTFS trips with the same block id.
+     */
     public boolean isStaySeated() {
         return staySeated;
     }
@@ -104,15 +113,40 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
      * if the alight-slack or board-slack is too tight. We ignore slack for facilitated transfers.
      * <p>
      * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer
-     * is either stay-seated or guaranteed. High priority transfers are not.
+     * is either stay-seated or guaranteed. High priority transfers are not facilitated.
      */
     public boolean isFacilitated() {
         return staySeated || guaranteed;
     }
 
+
+    /**
+     * This switch enables transfers in Raptor, ignoring transfer constraints with for example
+     * only priority set.
+     */
+    public boolean useInRaptorRouting() {
+        return isStaySeated() || isGuaranteed() || isNotAllowed();
+    }
+
+    @Override
+    public boolean isNotAllowed() {
+        return priority == NOT_ALLOWED;
+    }
+
+    @Override
+    public boolean isRegularTransfer() {
+        // Note! The 'maxWaitTime' is only valid with the guaranteed flag set, so we
+        // do not need to check it here
+        return !(staySeated || guaranteed || priority.isConstrained());
+    }
+
     /**
      * Maximum time after scheduled departure time the connecting transport is guarantied to wait
      * for the delayed trip.
+     * <p>
+     * THIS IS NOT CONSIDERED IN RAPTOR. OTP relies on real-time data for this, so if the "from"
+     * vehicle is delayed, then the real time system is also responsible for propagating the delay
+     * onto the "to" trip.
      */
     public int getMaxWaitTime() {
         return maxWaitTime;
@@ -135,7 +169,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     }
 
     public String toString() {
-        if(noConstraints()) { return "{no constraints}"; }
+        if(isRegularTransfer()) { return "{no constraints}"; }
 
         return ToStringBuilder.of()
                 .addEnum("priority", priority, ALLOWED)
@@ -143,12 +177,6 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
                 .addBoolIfTrue("guaranteed", guaranteed)
                 .addDurationSec("maxWaitTime", maxWaitTime, MAX_WAIT_TIME_NOT_SET)
                 .toString();
-    }
-
-    public boolean noConstraints() {
-        // Note! The 'maxWaitTime' is only valid with the guaranteed flag set, so we
-        // do not need to check it here
-        return !(staySeated || guaranteed || priority.isConstrained());
     }
 
     /**
@@ -183,13 +211,12 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         return NONE_FACILITATED_COST;
     }
 
-
-
-    public static Builder create() { return new Builder(); }
-
     private boolean isMaxWaitTimeSet() {
         return maxWaitTime != MAX_WAIT_TIME_NOT_SET;
     }
+
+
+    public static Builder create() { return new Builder(); }
 
     public static class Builder {
         private TransferPriority priority = ALLOWED;

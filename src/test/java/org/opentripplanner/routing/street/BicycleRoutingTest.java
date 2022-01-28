@@ -70,7 +70,7 @@ public class BicycleRoutingTest {
 
         var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
         // make sure that we only get BICYLE legs
-        itineraries.forEach(i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.BICYCLE)));
-        return itineraries.get(0).legs.get(0).legGeometry.getPoints();
+        itineraries.forEach(i -> i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.BICYCLE)));
+        return itineraries.get(0).legs.get(0).getLegGeometry().getPoints();
     }
 }
