@@ -302,12 +302,6 @@ public class EnumTypes {
         .value("to", InputField.TO_PLACE)
         .build();
 
-    public static Object enumToString(GraphQLEnumType type, Enum<?> value) {
-        return type.serialize(value);
-    }
-
-
-
     private static <T extends Enum> GraphQLEnumType createEnum(String name, T[] values, Function<T, String> mapping) {
         GraphQLEnumType.Builder enumBuilder = GraphQLEnumType.newEnum().name(name);
         Arrays.stream(values).forEach(type -> enumBuilder.value(mapping.apply(type), type));

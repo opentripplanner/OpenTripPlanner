@@ -6,6 +6,11 @@ import java.util.List;
 
 
 public final class PagingSearchWindowAdjuster {
+
+    private final Duration minSearchWindow;
+
+    private final Duration maxSearchWindow;
+
     /**
      * Extra time is added to the search-window for the next request if the current
      * result has few itineraries.
@@ -14,7 +19,13 @@ public final class PagingSearchWindowAdjuster {
      */
     private final int[] pagingSearchWindowAdjustments;
 
-    public PagingSearchWindowAdjuster(List<Duration> pagingSearchWindowAdjustments) {
+    public PagingSearchWindowAdjuster(
+            int minSearchWindowMinutes,
+            int maxSearchWindowMinutes,
+            List<Duration> pagingSearchWindowAdjustments
+    ) {
+        this.minSearchWindow = Duration.ofMinutes(minSearchWindowMinutes);
+        this.maxSearchWindow = Duration.ofMinutes(maxSearchWindowMinutes);
         this.pagingSearchWindowAdjustments = pagingSearchWindowAdjustments.stream()
                 .mapToInt(d -> (int)d.toMinutes())
                 .toArray();
@@ -44,11 +55,12 @@ public final class PagingSearchWindowAdjuster {
             int newSearchWindow = (int) (usedSearchWindow.toSeconds() - 7 * diffSW / 8);
 
             // Round down to minutes
-            return normalizeSearchWindow(newSearchWindow / 60);
+            return normalizeSearchWindow(newSearchWindow);
         }
         if (nItinerariesInSearchWindow < pagingSearchWindowAdjustments.length) {
             return normalizeSearchWindow(
-                    sw + pagingSearchWindowAdjustments[nItinerariesInSearchWindow]
+                    // Multiply minutes with 60 to get seconds
+                    60 * (sw + pagingSearchWindowAdjustments[nItinerariesInSearchWindow])
             );
         }
         // No change
@@ -59,31 +71,31 @@ public final class PagingSearchWindowAdjuster {
     /**
      * Round search-window({@code sw}) up:
      * <ul>
-     *     <li>if {@code sw < 10m } then search-window is set to 10 minutes
+     *     <li>if {@code sw < minSearchWindow } then search-window is set to `minSearchWindow`
+     *     <li>if {@code sw > maxSearchWindow} then return `maxSearchWindow`
      *     <li>if {@code sw <= 4h} then round search-window up to closest 10 minutes
      *     <li>if {@code sw > 4h} then round search-window up to closest 30 minutes
-     *     <li>if {@code sw > 24h} then return 24 hours(max search window allowed is 24 hours)
      * </ul>
      */
-    static Duration normalizeSearchWindow(int minutes) {
-        if (minutes < 10) {
-            return Duration.ofMinutes(10);
+    Duration normalizeSearchWindow(int seconds) {
+        if (seconds < minSearchWindow.getSeconds()) {
+            return minSearchWindow;
         }
-        else if (minutes <= 240) {
+        if(seconds > maxSearchWindow.getSeconds()) {
+            return maxSearchWindow;
+        }
+        // Round down to the closest minute
+        int minutes = seconds / 60;
+
+        if (minutes <= 240) {
             return Duration.ofMinutes(ceiling(minutes, 10));
         }
-        else if (minutes <= 24 * 60) {
-            return Duration.ofMinutes(ceiling(minutes, 30));
-        }
-        else {
-            // Max search window is one day
-            return Duration.ofDays(1);
-        }
+        return Duration.ofMinutes(ceiling(minutes, 30));
     }
 
     /**
-     * Round value to the closest increment of given {@code step}. This is used to round of a time
-     * or duration to the closest "step" of like 10 minutes.
+     * Round value to the closest increment of given {@code step}. This is used
+     * to round of a time or duration to the closest "step" of like 10 minutes.
      */
     static int ceiling(int value, int step) {
         if (value < 0) {

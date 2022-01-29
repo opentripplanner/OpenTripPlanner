@@ -4,9 +4,12 @@ import static java.util.Locale.ROOT;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.val;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 
@@ -87,7 +90,27 @@ public class DurationUtils {
    * {@code int} seconds.
    */
   public static Duration duration(String duration) {
-    return Duration.parse(duration.startsWith("P") ? duration : "PT" + duration);
+    var d = duration.toUpperCase();
+    if(!(d.startsWith("P") || d.startsWith("-P"))) {
+      int pos = d.indexOf('D') + 1;
+      if (pos > 0) {
+        var days = d.substring(0, pos);
+        d = pos == d.length() ? "P" + days : "P" + days + "T" + d.substring(pos) ;
+      }
+      else {
+        d = "PT" + d;
+      }
+    }
+    try {
+      return Duration.parse(d);
+    }
+    catch (DateTimeParseException e) {
+      throw new DateTimeParseException(
+              e.getMessage() + ": " + e.getParsedString(),
+              e.getParsedString(),
+              e.getErrorIndex()
+      );
+    }
   }
 
   /**

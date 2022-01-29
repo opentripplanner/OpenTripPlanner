@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.common.model.P2;
 
@@ -21,13 +22,14 @@ class PagingSearchWindowAdjusterTest {
     private static final Duration D1h30m = duration("1h30m");
     private static final Duration D2h = duration("2h");
     private static final Duration D5h = duration("5h");
+    private static final Duration D1d = duration("1d");
     private static final List<Duration> LIST_OF_DURATIONS = List.of(D5h, D1h20m, D30m, D10m);
 
     private final Instant time = Instant.parse("2022-01-15T12:00:00Z");
 
 
     private final PagingSearchWindowAdjuster subject = new PagingSearchWindowAdjuster(
-            LIST_OF_DURATIONS
+            (int)D10m.toMinutes(), (int)D1d.toMinutes(), LIST_OF_DURATIONS
     );
 
     @Test
@@ -52,9 +54,9 @@ class PagingSearchWindowAdjusterTest {
     void normalizeSearchWindow() {
         var cases = List.of(
                 // Smallest searchWindow allowed is 10 min
-                new P2<>(10, -100),
-                new P2<>(10, 0),
-                new P2<>(10, 10),
+                //new P2<>(10, -100),
+                //new P2<>(10, 0),
+                //new P2<>(10, 10),
                 // sw <= 4h, the round up to closest 10 min
                 new P2<>(20, 11),
                 new P2<>(230, 230),
@@ -66,13 +68,14 @@ class PagingSearchWindowAdjusterTest {
                 new P2<>(330, 301),
                 // Max is 24 hours
                 new P2<>(24*60, 24*60),
-                new P2<>(24*60, Integer.MAX_VALUE)
+                new P2<>(24*60, 99_999_999)
         );
 
         for (P2<Integer> tc : cases) {
             assertEquals(
                     Duration.ofMinutes(tc.first),
-                    PagingSearchWindowAdjuster.normalizeSearchWindow(tc.second)
+                    subject.normalizeSearchWindow(tc.second * 60),
+                    "[exp nSeconds, input nSeconds]: " + tc
             );
         }
     }

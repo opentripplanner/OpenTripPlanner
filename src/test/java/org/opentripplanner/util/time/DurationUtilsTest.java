@@ -1,8 +1,10 @@
 package org.opentripplanner.util.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.Duration;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
@@ -10,26 +12,28 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 
 public class DurationUtilsTest {
+  private final Duration D3d = Duration.ofDays(3);
   private final Duration D2h = Duration.ofHours(2);
   private final Duration D5m = Duration.ofMinutes(5);
   private final Duration D9s = Duration.ofSeconds(9);
-  private final int D9h31m = durationSec(9, 31, 0);
-  private final int D9h36m55s = durationSec(9, 36, 55);
-  private final int D13h33m57s = durationSec(13, 33, 57);
-  private final int D14h0m47s = durationSec(14, 0, 47);
-  private final int D15h37m = durationSec(15, 37, 0);
+  private final Duration D3d5m9s = D3d.plus(D5m).plus(D9s);
+  private final int I9h31m = durationSec(9, 31, 0);
+  private final int I9h36m55s = durationSec(9, 36, 55);
+  private final int I13h33m57s = durationSec(13, 33, 57);
+  private final int I14h0m47s = durationSec(14, 0, 47);
+  private final int I15h37m = durationSec(15, 37, 0);
 
   @Test
   public void durationToStr() {
-    assertEquals("9h36m55s", DurationUtils.durationToStr(D9h36m55s));
-    assertEquals("13h33m57s", DurationUtils.durationToStr(D13h33m57s));
-    assertEquals("9h31m", DurationUtils.durationToStr(D9h31m));
+    assertEquals("9h36m55s", DurationUtils.durationToStr(I9h36m55s));
+    assertEquals("13h33m57s", DurationUtils.durationToStr(I13h33m57s));
+    assertEquals("9h31m", DurationUtils.durationToStr(I9h31m));
     assertEquals("9s", DurationUtils.durationToStr(D9s));
-    assertEquals("14h47s", DurationUtils.durationToStr(D14h0m47s));
-    assertEquals("15h37m", DurationUtils.durationToStr(D15h37m));
-    int timeSeconds2 = -D13h33m57s;
+    assertEquals("14h47s", DurationUtils.durationToStr(I14h0m47s));
+    assertEquals("15h37m", DurationUtils.durationToStr(I15h37m));
+    int timeSeconds2 = -I13h33m57s;
     assertEquals("-13h33m57s", DurationUtils.durationToStr(timeSeconds2));
-    int timeSeconds1 = -D9h31m;
+    int timeSeconds1 = -I9h31m;
     assertEquals("-9h31m", DurationUtils.durationToStr(timeSeconds1));
     int timeSeconds = -(int)D9s.toSeconds();
     assertEquals("-9s", DurationUtils.durationToStr(timeSeconds));
@@ -40,8 +44,8 @@ public class DurationUtilsTest {
 
   @Test
   public void testDurationToStr() {
-    assertEquals("9h36m55s", DurationUtils.durationToStr(Duration.ofSeconds(D9h36m55s)));
-    assertEquals("9h31m", DurationUtils.durationToStr(Duration.ofSeconds(D9h31m)));
+    assertEquals("9h36m55s", DurationUtils.durationToStr(Duration.ofSeconds(I9h36m55s)));
+    assertEquals("9h31m", DurationUtils.durationToStr(Duration.ofSeconds(I9h31m)));
     assertEquals("9s", DurationUtils.durationToStr(D9s));
   }
 
@@ -57,8 +61,15 @@ public class DurationUtilsTest {
 
   @Test
   public void duration() {
-    assertEquals(Duration.ofSeconds(1), DurationUtils.duration("1s"));
-    assertEquals(Duration.ofHours(2).plus(Duration.ofMinutes(3)), DurationUtils.duration("2h3m"));
+    assertEquals(D9s, DurationUtils.duration("9s"));
+    assertEquals(D2h, DurationUtils.duration("2h"));
+    assertEquals(D3d, DurationUtils.duration("3D"));
+    assertEquals(D3d5m9s, DurationUtils.duration("3d5m9s"));
+
+    // With the PT prefix/divider
+    assertEquals(D9s, DurationUtils.duration("PT9s"));
+    assertEquals(D3d, DurationUtils.duration("P3d"));
+    assertEquals(D3d5m9s, DurationUtils.duration("P3dT5m9s"));
   }
 
   @Test

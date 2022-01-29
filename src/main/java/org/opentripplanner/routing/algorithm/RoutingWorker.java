@@ -25,6 +25,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.util.OTPFeature;
@@ -63,9 +64,7 @@ public class RoutingWorker {
         this.request = request;
         this.router = router;
         this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
-        this.pagingSearchWindowAdjuster = new PagingSearchWindowAdjuster(
-                router.routerConfig.transitTuningParameters().pagingSearchWindowAdjustments()
-        );
+        this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
     }
 
     public RoutingResponse route() {
@@ -230,5 +229,14 @@ public class RoutingWorker {
 
     private Instant searchStartTime() {
         return transitSearchTimeZero.toInstant();
+    }
+
+    private PagingSearchWindowAdjuster createPagingSearchWindowAdjuster(RouterConfig routerConfig) {
+        var c = routerConfig.raptorTuningParameters().dynamicSearchWindowCoefficients();
+        return new PagingSearchWindowAdjuster(
+                c.minWinTimeMinutes(),
+                c.maxWinTimeMinutes(),
+                routerConfig.transitTuningParameters().pagingSearchWindowAdjustments()
+        );
     }
 }

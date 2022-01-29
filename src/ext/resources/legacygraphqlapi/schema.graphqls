@@ -1670,7 +1670,10 @@ type Plan {
 
     """
     This is the time window used by the raptor search. The input searchWindow is an optional
-    parameter and is dynamically assign if not set. The unit is seconds.
+    parameter and is dynamically assign if not set. OTP might override the value if it is too
+    small or too large. When pageing OTP adjust it to the appropriate size, depending on the
+    number of itineraries found in the current search window. The scaling of the search window
+    ensure faster paging and limits resource usage. The unit is seconds.
     """
     searchWindowUsed: Long
 
@@ -2156,10 +2159,8 @@ type QueryType {
         The length of the search-window in seconds. This is normally dynamically
         calculated by the server, but you may override this by setting it. The
         search-window used in a request is returned in the response metadata.
-        To get the \"next page\" of trips use the metadata(searchWindowUsed and
-        nextWindowDateTime) to create a new request. If not provided the value
-        is resolved depending on the other input parameters, available transit
-        options and realtime changes.
+        If not provided the value is resolved depending on the other input
+        parameters, available transit options and realtime changes.
         """
         searchWindow: Long,
 

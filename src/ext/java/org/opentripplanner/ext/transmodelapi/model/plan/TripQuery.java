@@ -44,13 +44,11 @@ public class TripQuery {
         .argument(GraphQLArgument.newArgument()
             .name("searchWindow")
             .description(
-                "The length of the search-window in minutes. This is normally dynamically "
-                + "calculated by the server, but you may override this by setting it. The "
-                + "search-window used in a request is returned in the response metadata. To get "
-                + "the \"next page\" of trips use the metadata(searchWindowUsed and "
-                + "nextWindowDateTime) to create a new request. If not provided the value is "
-                + "resolved depending on the other input parameters, available transit options and "
-                + "realtime changes."
+                    "The length of the search-window in seconds. This is normally dynamically "
+                    + "calculated by the server, but you may override this by setting it. The "
+                    + "search-window used in a request is returned in the response metadata. If "
+                    + "not provided the value is resolved depending on the other input parameters, "
+                    + "available transit options and realtime changes."
             )
             .type(Scalars.GraphQLInt)
             .build()

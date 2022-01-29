@@ -16,7 +16,6 @@ public final class TransitRoutingConfig
         RaptorTuningParameters,
         TransitTuningParameters
 {
-
     private final int maxNumberOfTransfers;
     private final int scheduledTripBinarySearchThreshold;
     private final int iterationDepartureStepInSeconds;
