@@ -1,11 +1,10 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import java.time.Duration;
-import java.time.Period;
-import java.time.ZonedDateTime;
-import java.util.Optional;
+import java.io.Serializable;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
@@ -16,10 +15,6 @@ import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-
-import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
 
 /**
  * This class is an object representation of the 'router-config.json'.
@@ -32,8 +27,6 @@ public class RouterConfig implements Serializable {
     public static final RouterConfig DEFAULT = new RouterConfig(
             MissingNode.getInstance(), "DEFAULT", false
     );
-    // TODO: this should be retrieved from the heuristic
-    public static final Duration MAX_TRIP_SEARCH_PERIOD = Duration.ofHours(6);
 
     /**
      * The raw JsonNode three kept for reference and (de)serialization.
@@ -122,45 +115,6 @@ public class RouterConfig implements Serializable {
         return flexConfig.toFlexParameters(request);
     }
 
-    /**
-     * How many days that are prior to the search date time should be searched for transit.
-     */
-    public int additionalSearchDaysInPast(RoutingRequest req) {
-        if(req.arriveBy) {
-            var sw = getMaximumSearchWindow(req);
-            var requestTime = req.getZonedDateTime();
-            var earliestStart= requestTime.minus(MAX_TRIP_SEARCH_PERIOD.plus(sw));
-
-            return daysInBetween(requestTime, earliestStart);
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * How many days that are after to the search date time should be searched for transit.
-     */
-    public int additionalSearchDaysInFuture(RoutingRequest req) {
-        if(req.arriveBy) {
-            return 0;
-        } else {
-            var sw = getMaximumSearchWindow(req);
-            var requestTime = req.getZonedDateTime();
-            var lastArrival = requestTime.plus(MAX_TRIP_SEARCH_PERIOD.plus(sw));
-
-            return daysInBetween(requestTime, lastArrival);
-        }
-    }
-
-    private Duration getMaximumSearchWindow(RoutingRequest req) {
-        return Optional.ofNullable(req.searchWindow)
-                .orElse(Duration.ofMinutes(
-                        transitConfig.dynamicSearchWindowCoefficients().maxWinTimeMinutes()));
-    }
-
-    private int daysInBetween(ZonedDateTime requestTime, ZonedDateTime earliestStart) {
-        return Math.abs(Period.between(requestTime.toLocalDate(), earliestStart.toLocalDate()).getDays());
-    }
 
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.

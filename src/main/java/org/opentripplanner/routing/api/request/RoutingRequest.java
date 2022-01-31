@@ -790,11 +790,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return dateTime;
     }
 
-    public ZonedDateTime getZonedDateTime() {
-        var zoneId = rctx.graph.getTimeZone().toZoneId();
-        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(dateTime), zoneId);
-    }
-
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
     }
