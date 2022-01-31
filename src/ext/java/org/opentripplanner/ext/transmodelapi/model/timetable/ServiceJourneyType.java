@@ -1,30 +1,35 @@
 package org.opentripplanner.ext.transmodelapi.model.timetable;
 
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
+
+import com.google.common.collect.Lists;
+import graphql.AssertException;
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.Route;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.util.PolylineEncoder;
-
-import java.util.stream.Collectors;
-
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
 
 public class ServiceJourneyType {
   private static final String NAME = "ServiceJourney";
@@ -139,9 +144,40 @@ public class ServiceJourneyType {
                     .name("quays")
                     .description("Quays visited by service journey")
                     .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
-                    .dataFetcher(environment ->
-                        GqlUtil.getRoutingService(environment).getPatternForTrip().get(trip(environment)).getStops()
-                    )
+                    .argument(GraphQLArgument.newArgument()
+                            .name("first")
+                            .description("Only fetch the first n quays on the service journey")
+                            .type(Scalars.GraphQLInt)
+                            .build())
+                    .argument(GraphQLArgument.newArgument()
+                            .name("last")
+                            .description("Only fetch the last n quays on the service journey")
+                            .type(Scalars.GraphQLInt)
+                            .build())
+                    .dataFetcher(environment -> {
+                        Integer first = environment.getArgument("first");
+                        Integer last = environment.getArgument("last");
+
+                        List<StopLocation> stops = GqlUtil.getRoutingService(environment)
+                                .getPatternForTrip()
+                                .get(trip(environment))
+                                .getStops();
+
+                        if (first != null && last != null) {
+                            throw new AssertException("Both first and last can't be defined simultaneously.");
+                        } else if (first != null) {
+                            stops = stops.stream()
+                                    .limit(Long.valueOf(first))
+                                    .collect(Collectors.toList());
+                        } else if (last != null) {
+                            List<StopLocation> reversedStops = Lists.reverse(stops).stream()
+                                    .limit(Long.valueOf(last))
+                                    .collect(Collectors.toList());
+                            stops = Lists.reverse(reversedStops);
+                        }
+
+                        return stops;
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("passingTimes")
