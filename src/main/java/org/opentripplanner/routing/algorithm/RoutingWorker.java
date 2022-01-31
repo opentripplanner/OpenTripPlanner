@@ -57,12 +57,16 @@ public class RoutingWorker {
         this.router = router;
         this.searchStartTime = DateMapper.asStartOfService(request.getDateTimeCurrentPage(), zoneId);
 
+        var searchDateTime =
+                ZonedDateTime.ofInstant(request.getDateTimeOriginalSearch(), zoneId);
+
         var maxWindow = Duration.ofMinutes(router.routerConfig.raptorTuningParameters()
                 .dynamicSearchWindowCoefficients()
                 .maxWinTimeMinutes());
+
         additionalSearchDays = new AdditionalSearchDays(
                 request.arriveBy,
-                searchStartTime,
+                searchDateTime,
                 request.searchWindow,
                 maxWindow,
                 request.maxJourneyDuration
