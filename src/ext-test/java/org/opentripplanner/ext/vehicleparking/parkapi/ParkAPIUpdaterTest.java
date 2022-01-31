@@ -11,8 +11,6 @@ public class ParkAPIUpdaterTest {
 
     @Test
     void parseCars() {
-
-        var cwd = System.getProperty("user.dir");
         var url = "file:src/ext-test/resources/vehicleparking/parkapi/parkapi-reutlingen.json";
 
         var parameters =
