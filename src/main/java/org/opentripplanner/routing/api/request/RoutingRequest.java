@@ -194,6 +194,19 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public Duration searchWindow;
 
     /**
+     * The expected maximum time a journey can last across all possible journeys for the current deployment.
+     * Normally you would just do an estimate and add enough slack, so you are sure that there is no journeys that
+     * falls outside this window. The parameter is used find all possible dates for the journey and then search only
+     * the services which run on those dates. The duration must include access, egress, wait-time and transit time
+     * for the whole journey. It should also take low frequency days/periods like holidays into account. In other words,
+     * pick the two points within your area that has the worst connection and then try to travel on the worst possible
+     * day, and find the maximum journey duration. Using a value that is too high has the effect of including more
+     * patterns in the search, hence, making it a bit slower. Recommended values would be from 12 hours(small
+     * town/city), 1 day (region) to 2 days (country like Norway).
+     */
+    public Duration maxJourneyDuration = Duration.ofHours(24);
+
+    /**
      * Use the cursor to go to the next or previous "page" of trips.
      * You should pass in the original request as is.
      * <p>
@@ -781,10 +794,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     /* ACCESSOR/SETTER METHODS */
-
-    public boolean transitAllowed() {
-        return streetSubRequestModes.isTransit();
-    }
 
     public long getSecondsSinceEpoch() {
         return dateTime;

@@ -11,20 +11,20 @@ public class AdditionalSearchDays {
     private final ZonedDateTime searchDateTime;
     private final Optional<Duration> searchWindow;
     private final Duration maxSearchWindow;
-    private final Duration maxJourneyTime;
+    private final Duration maxJourneyDuration;
 
     public AdditionalSearchDays(
             boolean arriveBy,
             ZonedDateTime searchDateTime,
             Duration searchWindow,
             Duration maxSearchWindow,
-            Duration maxJourneyTime
+            Duration maxJourneyDuration
     ) {
         this.arriveBy = arriveBy;
         this.searchDateTime = searchDateTime;
         this.searchWindow = Optional.ofNullable(searchWindow);
         this.maxSearchWindow = maxSearchWindow;
-        this.maxJourneyTime = maxJourneyTime;
+        this.maxJourneyDuration = maxJourneyDuration;
     }
 
 
@@ -34,7 +34,7 @@ public class AdditionalSearchDays {
     public int additionalSearchDaysInPast() {
         if(arriveBy) {
             var sw = getMaximumSearchWindow();
-            var earliestStart= searchDateTime.minus(maxJourneyTime.plus(sw));
+            var earliestStart= searchDateTime.minus(maxJourneyDuration.plus(sw));
             return daysInBetween(searchDateTime, earliestStart);
         } else {
             return 0;
@@ -50,7 +50,7 @@ public class AdditionalSearchDays {
         } else {
             var sw = getMaximumSearchWindow();
             var requestTime = searchDateTime;
-            var lastArrival = requestTime.plus(maxJourneyTime.plus(sw));
+            var lastArrival = requestTime.plus(maxJourneyDuration.plus(sw));
             return daysInBetween(requestTime, lastArrival);
         }
     }

@@ -56,8 +56,6 @@ public class RoutingWorker {
         this.request = request;
         this.router = router;
         this.searchStartTime = DateMapper.asStartOfService(request.getDateTimeCurrentPage(), zoneId);
-        // TODO: this should be retrieved from the config
-        final Duration MAX_TRIP_SEARCH_PERIOD = Duration.ofHours(6);
 
         var maxWindow = Duration.ofMinutes(router.routerConfig.raptorTuningParameters()
                 .dynamicSearchWindowCoefficients()
@@ -67,10 +65,8 @@ public class RoutingWorker {
                 searchStartTime,
                 request.searchWindow,
                 maxWindow,
-                MAX_TRIP_SEARCH_PERIOD
+                request.maxJourneyDuration
         );
-
-
     }
 
     public RoutingResponse route() {
