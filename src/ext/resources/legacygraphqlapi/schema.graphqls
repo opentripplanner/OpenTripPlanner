@@ -1635,8 +1635,8 @@ type Plan {
 
     """
     Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
-    to the pageCursor query parameter and keep the original request otherwise as is.
-    This will enable you to search for itineraries in the next time-window.
+    to the pageCursor query parameter and keep the original request as is. This will enable you to
+    search for itineraries in the next search-window.
     The cursor based paging only support stepping to the next page, as it does not support jumping.
     This is only usable when public transportation mode(s) are included in the query.
     """
@@ -1645,7 +1645,7 @@ type Plan {
     """
     Use the cursor to go to the previous "page" of itineraries. Copy the cursor from the last
     response to the pageCursor query parameter and keep the original request otherwise as is.
-    This will enable you to search for itineraries in the previous time-window.
+    This will enable you to search for itineraries in the previous search-window.
     The cursor based paging only support stepping to the previous page, as it does not support
     jumping.
     This is only usable when public transportation mode(s) are included in the query.
@@ -1655,7 +1655,7 @@ type Plan {
     """
     This is the suggested search time for the "previous page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips preceding in the
-    time-window BEFORE the current search. No duplicate trips should be returned, unless a trip
+    search-window BEFORE the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
     prevDateTime: Long @deprecated(reason: "Use previousPageCursor instead")
@@ -1663,17 +1663,16 @@ type Plan {
     """
     This is the suggested search time for the "next page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips following in the
-    time-window AFTER the current search. No duplicate trips should be returned, unless a trip
+    search-window AFTER the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
     nextDateTime: Long @deprecated(reason: "Use nextPageCursor instead")
 
     """
-    This is the time window used by the raptor search. The input searchWindow is an optional
-    parameter and is dynamically assign if not set. OTP might override the value if it is too
-    small or too large. When pageing OTP adjust it to the appropriate size, depending on the
-    number of itineraries found in the current search window. The scaling of the search window
-    ensure faster paging and limits resource usage. The unit is seconds.
+    This is the `searchWindow` used by the raptor search. It is provided here for debugging
+    purpousess.
+
+    The unit is seconds.
     """
     searchWindowUsed: Long
 
@@ -2156,11 +2155,30 @@ type QueryType {
         numItineraries: Int = 3
 
         """
-        The length of the search-window in seconds. This is normally dynamically
-        calculated by the server, but you may override this by setting it. The
-        search-window used in a request is returned in the response metadata.
-        If not provided the value is resolved depending on the other input
-        parameters, available transit options and realtime changes.
+        The length of the search-window in seconds. This parameter is optional.
+
+        The search-window is defined as the duration between the earliest-departure-time(EDT) and
+        the latest-departure-time(LDT). OTP will search for all itineraries in this departure
+        window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP
+        will dynamically calculate the EDT. Using a short search-window is faster than using a
+        longer one, but the search duration is not linear. Using a \"too\" short search-window will
+        waist resources server side, while using a search-window that is too long will be slow.
+
+        OTP will dynamically calculate a reasonable value for the search-window if not provided.
+        The calculation comes with a significant overhead (10-20% extra). If you should use the
+        dynamic calculated value or pass in a value depend on your use-case. For a travel planner
+        in a small geographical area with a dense network of public transportation a fix value
+        between 40 minutes and 2 hours make sense. To find the appropriate search-window, adjust it
+        so the number of itineraries on average is around the wanted `numItineraries`. Make sure
+        you set the `numItineraries` to a high number while testing. For a country wide area like
+        Norway, using the dynamic search-window is the best.
+
+        When paginating, the search-window is calculated using the `numItineraries` in the original
+        search together with statistics from the search for the last page. This behaviour is
+        configured server side, and can not be overridden from the client.
+
+        The search-window used is returned in the response metadata as `searchWindowUsed` for
+        debugging purposes.
         """
         searchWindow: Long,
 

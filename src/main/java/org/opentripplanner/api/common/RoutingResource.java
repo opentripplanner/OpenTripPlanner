@@ -74,19 +74,30 @@ public abstract class RoutingResource {
     protected String time;
 
     /**
-     * This is the time/duration in seconds from the earliest-departure-time(EDT) to
-     * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest
-     * to latest arrival time (LAT minus EAT).
+     * The length of the search-window in seconds. This parameter is optional.
      * <p>
-     * All optimal travels that depart within the search window is guarantied to be found.
+     * The search-window is defined as the duration between the earliest-departure-time(EDT) and
+     * the latest-departure-time(LDT). OTP will search for all itineraries in this departure
+     * window. If {@code arriveBy=true} the {@code dateTime} parameter is the latest-arrival-time, so OTP
+     * will dynamically calculate the EDT. Using a short search-window is faster than using a
+     * longer one, but the search duration is not linear. Using a \"too\" short search-window will
+     * waist resources server side, while using a search-window that is too long will be slow.
      * <p>
-     * This is sometimes referred to as the Range Raptor Search Window - but should apply to all
-     * scheduled/time dependent travels.
+     * OTP will dynamically calculate a reasonable value for the search-window if not provided.
+     * The calculation comes with a significant overhead (10-20% extra). If you should use the
+     * dynamic calculated value or pass in a value depend on your use-case. For a travel planner
+     * in a small geographical area with a dense network of public transportation a fix value
+     * between 40 minutes and 2 hours make sense. To find the appropriate search-window, adjust it
+     * so the number of itineraries on average is around the wanted {@code numItineraries}. Make sure
+     * you set the {@code numItineraries} to a high number while testing. For a country wide area like
+     * Norway, using the dynamic search-window is the best.
      * <p>
-     * Optional - The value is dynamically assigned a suitable value, if not set. In a small to
-     * medium size operation you may use a fixed value, like 60 minutes. If you have a mixture of
-     * high frequency cities routes and infrequent long distant journeys, the best option is
-     * normally to use the dynamic auto assignment.
+     * When paginating, the search-window is calculated using the {@code numItineraries} in the original
+     * search together with statistics from the search for the last page. This behaviour is
+     * configured server side, and can not be overridden from the client.
+     * <p>
+     * The search-window used is returned in the response metadata as {@code searchWindowUsed} for
+     * debugging purposes.
      */
     @QueryParam("searchWindow")
     protected Integer searchWindow;
@@ -608,7 +619,7 @@ public abstract class RoutingResource {
 
     /**
      * The number of seconds to add before boarding a transit leg. It is recommended to use the
-     * `boardTimes` in the `router-config.json` to set this for each mode.
+     * {@code boardTimes} in the {@code router-config.json} to set this for each mode.
      * <p>
      * Unit is seconds. Default value is 0.
      */
@@ -617,7 +628,7 @@ public abstract class RoutingResource {
 
     /**
      * The number of seconds to add after alighting a transit leg. It is recommended to use the
-     * `alightTimes` in the `router-config.json` to set this for each mode.
+     * {@code alightTimes} in the {@code router-config.json} to set this for each mode.
      * <p>
      * Unit is seconds. Default value is 0.
      */
