@@ -31,6 +31,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.AllowedTransitMode.FilterType;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -245,6 +246,11 @@ public class TransmodelGraphQLPlanner {
             }
             else {
                 for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
+                    AllowedTransitMode.FilterType filterType = FilterType.LINE;
+                    if (modeWithSubmodes.containsKey("forServiceJourney") && (boolean) modeWithSubmodes.get("forServiceJourney")) {
+                        filterType = FilterType.SERVICE_JOURNEY;
+                    }
+
                     if (modeWithSubmodes.containsKey("transportMode")) {
                         TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
                         if (modeWithSubmodes.containsKey("transportSubModes")) {
@@ -253,7 +259,8 @@ public class TransmodelGraphQLPlanner {
                             for (TransmodelTransportSubmode transitMode : transportSubModes) {
                                 transitModes.add(new AllowedTransitMode(
                                         mainMode,
-                                        transitMode.getValue()
+                                        transitMode.getValue(),
+                                        filterType
                                 ));
                             }
                         }

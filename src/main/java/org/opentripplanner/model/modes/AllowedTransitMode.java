@@ -13,21 +13,33 @@ import org.opentripplanner.model.TransitMode;
  */
 public class AllowedTransitMode {
 
+  public static enum FilterType {
+    LINE,
+    SERVICE_JOURNEY;
+  }
+
+  private final FilterType filterType;
+
   private final TransitMode mainMode;
 
   private final String subMode;
 
   public static AllowedTransitMode fromMainModeEnum(TransitMode mainMode) {
-    return new AllowedTransitMode(mainMode, null);
+    return new AllowedTransitMode(mainMode, null, FilterType.LINE);
   }
 
-  public AllowedTransitMode(TransitMode mainMode, String subMode) {
+  public static AllowedTransitMode fromMainModeEnum(TransitMode mainMode, FilterType filterType) {
+    return new AllowedTransitMode(mainMode, null, filterType);
+  }
+
+  public AllowedTransitMode(TransitMode mainMode, String subMode, FilterType filterType) {
     this.mainMode = mainMode;
     this.subMode = subMode;
+    this.filterType = filterType;
   }
 
   /**
-   * Check if this filter allows the provided TransitMode
+   * Check if this filter allows the provided TransitMode and NeTEx submode
    */
   public boolean allows(TransitMode transitMode, String netexSubMode) {
     return mainMode == transitMode && (
@@ -36,12 +48,19 @@ public class AllowedTransitMode {
   }
 
   /**
+   * Check if this filter allows the provided TransitMode
+   */
+  public boolean allowsMode(TransitMode transitMode) {
+    return mainMode == transitMode;
+  }
+
+  /**
    * Returns a set of AllowedModes that will cover all available TransitModes.
    */
   public static Set<AllowedTransitMode> getAllTransitModes() {
     return Arrays
         .stream(TransitMode.values())
-        .map(m -> new AllowedTransitMode(m, null))
+        .map(m -> new AllowedTransitMode(m, null, FilterType.LINE))
         .collect(Collectors.toSet());
   }
 
@@ -50,7 +69,11 @@ public class AllowedTransitMode {
    */
   public static Set<AllowedTransitMode> getAllTransitModesExceptAirplane() {
     return TransitMode.transitModesExceptAirplane().stream()
-        .map(m -> new AllowedTransitMode(m, null))
+        .map(m -> new AllowedTransitMode(m, null, FilterType.LINE))
         .collect(Collectors.toSet());
+  }
+
+  public FilterType getFilterType() {
+    return filterType;
   }
 }

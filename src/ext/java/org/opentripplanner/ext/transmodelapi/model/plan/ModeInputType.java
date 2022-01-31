@@ -1,9 +1,11 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
+import graphql.Scalars;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 
+import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STREET_MODE;
@@ -54,6 +56,12 @@ class ModeInputType {
     return GraphQLInputObjectType
       .newInputObject()
       .name("TransportModes")
+      .field(GraphQLInputObjectField
+           .newInputObjectField()
+           .name("forServiceJourney")
+           .description("whatever this filter should be applied at line or at service journey level")
+           .type(Scalars.GraphQLBoolean)
+           .build())
       .field(GraphQLInputObjectField
           .newInputObjectField()
           .name("transportMode")
