@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.routing.algorithm.raptor.router;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.algorithm.raptor.router.AdditionalSearchDays;
 
 class AdditionalSearchDaysTest {
 
