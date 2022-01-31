@@ -10,6 +10,13 @@ import org.junit.jupiter.api.Test;
 class AdditionalSearchDaysTest {
 
     @Test
+    void morning() {
+        var req = getDays("2022-01-25T05:05:20+01:00", true);
+        assertEquals(0, req.additionalSearchDaysInFuture());
+        assertEquals(1, req.additionalSearchDaysInPast());
+    }
+
+    @Test
     void middleOfDay() {
         var req = getDays("2022-01-25T13:14:20+01:00", false);
         assertEquals(0, req.additionalSearchDaysInFuture());
@@ -21,11 +28,21 @@ class AdditionalSearchDaysTest {
     }
 
     @Test
+    void evening() {
+        var req = getDays("2022-01-25T20:14:20+01:00", false);
+        assertEquals(1, req.additionalSearchDaysInFuture());
+        assertEquals(0, req.additionalSearchDaysInPast());
+
+        var req2 = getDays("2022-01-25T20:14:20+01:00", true);
+        assertEquals(0, req2.additionalSearchDaysInFuture());
+        assertEquals(0, req2.additionalSearchDaysInPast());
+    }
+
+    @Test
     void closeToMidnight() {
         var req = getDays("2022-01-25T23:14:20+01:00", false);
-
-        assertEquals(0, req.additionalSearchDaysInPast());
         assertEquals(1, req.additionalSearchDaysInFuture());
+        assertEquals(0, req.additionalSearchDaysInPast());
 
         var req2 = getDays("2022-01-25T23:14:20+01:00", true);
         assertEquals(0, req2.additionalSearchDaysInPast());
@@ -42,6 +59,34 @@ class AdditionalSearchDaysTest {
         var req2 = getDays("2022-01-25T00:15:25+01:00", true);
         assertEquals(1, req2.additionalSearchDaysInPast());
         assertEquals(0, req2.additionalSearchDaysInFuture());
+    }
+
+    @Test
+    void veryShortWindows() {
+        var time =
+                OffsetDateTime.parse("2022-01-25T00:23:25+01:00")
+                        .atZoneSameInstant(ZoneId.of("Europe/Berlin"));
+
+        var days = new AdditionalSearchDays(
+                false,
+                time,
+                null,
+                Duration.ofMinutes(20),
+                Duration.ofMinutes(1)
+        );
+        assertEquals(0, days.additionalSearchDaysInPast());
+        assertEquals(0, days.additionalSearchDaysInFuture());
+
+        var days2 = new AdditionalSearchDays(
+                true,
+                time,
+                null,
+                Duration.ofMinutes(20),
+                Duration.ofMinutes(1)
+        );
+
+        assertEquals(0, days2.additionalSearchDaysInPast());
+        assertEquals(0, days2.additionalSearchDaysInFuture());
     }
 
     private AdditionalSearchDays getDays(String time, boolean arriveBy) {
