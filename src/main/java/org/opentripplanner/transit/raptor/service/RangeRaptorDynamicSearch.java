@@ -264,7 +264,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     }
 
     @Nullable
-    private Heuristics getDestinationHeuristics() {
+    public Heuristics getDestinationHeuristics() {
         if (!originalRequest.useDestinationPruning()) { return null; }
         LOG.debug("RangeRaptor - Destination pruning enabled.");
         return revHeuristics.result();
