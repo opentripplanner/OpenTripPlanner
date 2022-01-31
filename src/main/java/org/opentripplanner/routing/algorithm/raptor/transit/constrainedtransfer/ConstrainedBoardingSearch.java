@@ -161,15 +161,17 @@ public final class ConstrainedBoardingSearch
                                 sourceTransitArrivalTime,
                                 onTripTxConstraint.getMinTransferTime()
                         );
-                        // If the feature flag is switched on, then the minimum transfer time is
+                        // If this feature flag is switched on, then the minimum transfer time is
                         // not the minimum transfer time, but the definitive transfer time. Use
                         // this to override what we think the transfer will take according to OSM
-                        // data.
+                        // data, for example if you want to set a very low transfer time like
+                        // 1 minute.
                         if (OTPFeature.MinimumTransferTimeIsDefinitive.isOn()) {
                             onTripEarliestBoardTime = minTransferBoardTime;
                         }
                         // Here we take the max(minTransferTime, osmWalkTransferTime) as the
-                        // transfer time
+                        // transfer time. If the minimum transfer time is 5 minutes, but according
+                        // to OSM data it will take 7 minutes to walk then 7 minutes is chosen.
                         else {
                             onTripEarliestBoardTime = fwdRvsStrategy.maxTime(
                                     earliestBoardTime,

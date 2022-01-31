@@ -103,8 +103,8 @@ The project information variables available are:
 All three configuration files have an optional `configVersion` property. The property can be used
 to version the configuration in a deployment pipeline. The `configVersion` is not used by OTP in 
 any way, but is logged at startup and is available as part of the _server-info_ data in the REST 
-API. The intended usage is to be able to check witch version of the configuration the graph was 
-build with and witch version the router uses. In an deployment with many OTP instances it can be 
+API. The intended usage is to be able to check which version of the configuration the graph was 
+build with and which version the router uses. In an deployment with many OTP instances it can be 
 useful to ask an instance about the version, instead of tracking the deployment pipline backwards 
 to find the version used. How you inject a version into the configuration file is up to you, but
 you can do it in your build-pipline, at deployment time or use system environment variable 
@@ -120,7 +120,7 @@ the graph. The header info is available to configuration substitution:
   - `${graph.file.header}` Will expand to: `OpenTripPlannerGraph;0000007;`
   - `${otp.serialization.version.id}` Will expand to: `7`
  
-The intended usage is to be able to have a graph build pipeline which "knows" witch graph 
+The intended usage is to be able to have a graph build pipeline which "knows" which graph 
 that matches OTP planner instances. For example, you may build new graphs for every OTP 
 serialization version id in use by the planning OPT instances you have deploied and plan to deploy.
 This way you can roll forward and backward new OTP instances without worring about building new 
@@ -196,7 +196,7 @@ example:
 ```
 
 ## OTP Features
-Here is a list of all features witch can be toggled on/off.
+Here is a list of all features which can be toggled on/off.
 
 Feature | Description | Enabled by default | Sandbox
 --------|-------------|--------------------|-------- 
@@ -204,7 +204,8 @@ Feature | Description | Enabled by default | Sandbox
 `APIServerInfo` | Enable the server info endpoint |  yes | no
 `APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no
 `APIUpdaterStatus` | Enable endpoint for graph updaters status | yes | no
-`OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (witch stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
+`OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
+`MinimumTransferTimeIsDefinitive` | If the minimum transfer time is a lower bound (default) or the definitive time for the transfer. Set this to true if you want to set a transfer time lower than what OTP derives from OSM data. | no | no
 `ParallelRouting` | Enable performing parts of the trip planning in parallel | yes | no
 `TransferConstraints` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
 `ActuatorAPI` | Enpoint for actuators (service health status) | no | yes
