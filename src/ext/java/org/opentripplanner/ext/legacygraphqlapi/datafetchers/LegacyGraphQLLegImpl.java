@@ -22,27 +22,27 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Long> startTime() {
-    return environment -> getSource(environment).startTime.getTime().getTime();
+    return environment -> getSource(environment).getStartTime().getTime().getTime();
   }
 
   @Override
   public DataFetcher<Long> endTime() {
-    return environment -> getSource(environment).endTime.getTime().getTime();
+    return environment -> getSource(environment).getEndTime().getTime().getTime();
   }
 
   @Override
   public DataFetcher<Integer> departureDelay() {
-    return environment -> getSource(environment).departureDelay;
+    return environment -> getSource(environment).getDepartureDelay();
   }
 
   @Override
   public DataFetcher<Integer> arrivalDelay() {
-    return environment -> getSource(environment).arrivalDelay;
+    return environment -> getSource(environment).getArrivalDelay();
   }
 
   @Override
   public DataFetcher<String> mode() {
-    return environment -> getSource(environment).mode.name();
+    return environment -> getSource(environment).getMode().name();
   }
 
   @Override
@@ -52,12 +52,12 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Integer> generalizedCost() {
-    return environment -> getSource(environment).generalizedCost;
+    return environment -> getSource(environment).getGeneralizedCost();
   }
 
   @Override
   public DataFetcher<EncodedPolylineBean> legGeometry() {
-    return environment -> getSource(environment).legGeometry;
+    return environment -> getSource(environment).getLegGeometry();
   }
 
   @Override
@@ -67,7 +67,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Boolean> realTime() {
-    return environment -> getSource(environment).realTime;
+    return environment -> getSource(environment).getRealTime();
   }
 
   // TODO
@@ -78,7 +78,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Double> distance() {
-    return environment -> getSource(environment).distanceMeters;
+    return environment -> getSource(environment).getDistanceMeters();
   }
 
   @Override
@@ -88,19 +88,25 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Boolean> walkingBike() {
-    return environment -> getSource(environment).walkingBike;
+    return environment -> getSource(environment).getWalkingBike();
   }
 
   @Override
   public DataFetcher<Boolean> rentedBike() {
-    return environment -> getSource(environment).rentedVehicle;
+    return environment -> getSource(environment).getRentedVehicle();
   }
 
   @Override
   public DataFetcher<StopArrival> from() {
     return environment -> {
       Leg source = getSource(environment);
-      return new StopArrival(source.from, source.startTime, source.startTime);
+      return new StopArrival(
+              source.getFrom(),
+              source.getStartTime(),
+              source.getStartTime(),
+              source.getBoardStopPosInPattern(),
+              source.getBoardingGtfsStopSequence()
+      );
     };
   }
 
@@ -108,7 +114,13 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   public DataFetcher<StopArrival> to() {
     return environment -> {
       Leg source = getSource(environment);
-      return new StopArrival(source.to, source.endTime, source.endTime);
+      return new StopArrival(
+              source.getTo(),
+              source.getEndTime(),
+              source.getEndTime(),
+              source.getAlightStopPosInPattern(),
+              source.getAlightGtfsStopSequence()
+      );
     };
   }
 
@@ -124,13 +136,13 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<String> serviceDate() {
-    return environment -> ServiceDateMapper.mapToApi(getSource(environment).serviceDate);
+    return environment -> ServiceDateMapper.mapToApi(getSource(environment).getServiceDate());
   }
 
   @Override
   public DataFetcher<Iterable<Object>> intermediateStops() {
     return environment -> {
-      List<StopArrival> intermediateStops = getSource(environment).intermediateStops;
+      List<StopArrival> intermediateStops = getSource(environment).getIntermediateStops();
       if (intermediateStops == null) { return null; }
       return intermediateStops.stream()
           .map(intermediateStop -> intermediateStop.place.stop)
@@ -141,7 +153,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Iterable<StopArrival>> intermediatePlaces() {
-    return environment -> getSource(environment).intermediateStops;
+    return environment -> getSource(environment).getIntermediateStops();
   }
 
   // TODO
@@ -152,14 +164,14 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Iterable<WalkStep>> steps() {
-    return environment -> getSource(environment).walkSteps;
+    return environment -> getSource(environment).getWalkSteps();
   }
 
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
-      if (getSource(environment).boardRule == null) { return "SCHEDULED"; }
-      switch (getSource(environment).boardRule) {
+      if (getSource(environment).getBoardRule() == null) { return "SCHEDULED"; }
+      switch (getSource(environment).getBoardRule()) {
         case "impossible": return "NONE";
         case "mustPhone": return "CALL_AGENCY";
         case "coordinateWithDriver": return "COORDINATE_WITH_DRIVER";
@@ -171,8 +183,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<String> dropoffType() {
     return environment -> {
-      if (getSource(environment).alightRule == null) { return "SCHEDULED"; }
-      switch (getSource(environment).alightRule) {
+      if (getSource(environment).getAlightRule() == null) { return "SCHEDULED"; }
+      switch (getSource(environment).getAlightRule()) {
         case "impossible": return "NONE";
         case "mustPhone": return "CALL_AGENCY";
         case "coordinateWithDriver": return "COORDINATE_WITH_DRIVER";
@@ -188,12 +200,12 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<BookingInfo> dropOffBookingInfo() {
-    return environment -> getSource(environment).dropOffBookingInfo;
+    return environment -> getSource(environment).getDropOffBookingInfo();
   }
 
   @Override
   public DataFetcher<BookingInfo> pickupBookingInfo() {
-    return environment -> getSource(environment).pickupBookingInfo;
+    return environment -> getSource(environment).getPickupBookingInfo();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

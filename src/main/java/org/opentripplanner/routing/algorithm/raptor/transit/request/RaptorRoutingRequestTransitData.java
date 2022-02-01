@@ -135,12 +135,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
               TripSchedule fromTrip, int fromStopPosition, TripSchedule toTrip, int toStopPosition
       ) {
         return transferService.findTransfer(
-                transitLayer.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
-                transitLayer.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition)),
                 fromTrip.getOriginalTripTimes().getTrip(),
-                toTrip.getOriginalTripTimes().getTrip(),
                 fromStopPosition,
-                toStopPosition
+                transitLayer.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
+                toTrip.getOriginalTripTimes().getTrip(),
+                toStopPosition,
+                transitLayer.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition))
         );
       }
     };

@@ -338,19 +338,24 @@ public class OtpTransitServiceBuilder {
     /** Remove all transfers which reference none existing trips */
     private void removeTransfersForNoneExistingTrips() {
         int orgSize = transfers.size();
-        transfers.removeIf(this::transferTripsDoesNotExist);
+        transfers.removeIf(this::transferTripReferencesDoNotExist);
         logRemove("Trip", orgSize, transfers.size(), "Transfer to/from trip does not exist.");
     }
 
     /** Return {@code true} if the from/to trip reference is none null, but do not exist. */
-    private boolean transferTripsDoesNotExist(ConstrainedTransfer t) {
-        return transferTripPointDoesNotExist(t.getFrom())
-            || transferTripPointDoesNotExist(t.getTo());
+    private boolean transferTripReferencesDoNotExist(ConstrainedTransfer t) {
+        return transferPointTripReferenceDoesNotExist(t.getFrom())
+            || transferPointTripReferenceDoesNotExist(t.getTo());
     }
 
-    /** Return true if the trip is a valid reference; {@code null} or exist. */
-    private boolean transferTripPointDoesNotExist(TransferPoint p) {
-        return p.getTrip() != null && !tripsById.containsKey(p.getTrip().getId());
+    /**
+     * Return {@code true} if the the point is a trip-transfer-point and the trip reference
+     * is missing.
+     */
+    private boolean transferPointTripReferenceDoesNotExist(TransferPoint point) {
+        if(!point.isTripTransferPoint()) { return false; }
+        var trip = point.asTripTransferPoint().getTrip();
+        return !tripsById.containsKey(trip.getId());
     }
 
     private static void logRemove(String type, int orgSize, int newSize, String reason) {

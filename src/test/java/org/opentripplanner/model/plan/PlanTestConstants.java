@@ -84,8 +84,6 @@ public interface PlanTestConstants {
             null,
             null
     );
-    return Place.forStop(
-            stop, null, null
-    );
+    return Place.forStop(stop);
   }
 }

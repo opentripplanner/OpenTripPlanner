@@ -1,12 +1,12 @@
 package org.opentripplanner.ext.siri;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
@@ -234,7 +234,7 @@ public class SiriFuzzyTripMatcher {
                         }
                     }
                 }
-                String lastStopId = tripPattern.getStops().get(tripPattern.getStops().size()-1).getId().getId();
+                String lastStopId = tripPattern.lastStop().getId().getId();
 
                 TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
                 if (tripTimes != null) {
@@ -385,7 +385,7 @@ public class SiriFuzzyTripMatcher {
      * Returns a match of tripIds that match the provided values.
      */
     public List<FeedScopedId> getTripIdForInternalPlanningCodeServiceDateAndMode(
-            String internalPlanningCode, 
+            String internalPlanningCode,
             ServiceDate serviceDate,
             TransitMode mode,
             String transportSubmode

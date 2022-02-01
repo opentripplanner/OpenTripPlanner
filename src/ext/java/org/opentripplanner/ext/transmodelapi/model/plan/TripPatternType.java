@@ -42,7 +42,7 @@ public class TripPatternType {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("aimedStartTime")
                         .description("The aimed date and time the trip starts.")
-                        .type(gqlUtil.dateTimeScalar)
+                        .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
                         .dataFetcher(
                                 // startTime is already adjusted for realtime - need to subtract delay to get aimed time
                                 env -> itinerary(env).startTime().getTime().getTime()
@@ -52,23 +52,23 @@ public class TripPatternType {
                         .name("expectedStartTime")
                         .description(
                                 "The expected, realtime adjusted date and time the trip starts.")
-                        .type(gqlUtil.dateTimeScalar)
+                        .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
                         .dataFetcher(env -> itinerary(env).startTime().getTime().getTime())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("aimedEndTime")
                         .description("The aimed date and time the trip ends.")
-                        .type(gqlUtil.dateTimeScalar)
+                        .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
                         .dataFetcher(
                                 // endTime is already adjusted for realtime - need to subtract delay to get aimed time
-                                env -> itinerary(env).endTime().getTime().getTime() 
+                                env -> itinerary(env).endTime().getTime().getTime()
                                         - 1000L * itinerary(env).arrivalDelay()
                         )
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("expectedEndTime")
                         .description("The expected, realtime adjusted date and time the trip ends.")
-                        .type(gqlUtil.dateTimeScalar)
+                        .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
                         .dataFetcher(env -> itinerary(env).endTime().getTime().getTime())
                         .build())
                 .field(GraphQLFieldDefinition
@@ -119,9 +119,9 @@ public class TripPatternType {
                         .newFieldDefinition()
                         .name("legs")
                         .description(
-                                "A list of legs. Each leg is either a walking (cycling, car) " 
-                                + "portion of the trip, or a ride leg on a particular vehicle. So " 
-                                + "a trip where the use walks to the Q train, transfers to the 6, " 
+                                "A list of legs. Each leg is either a walking (cycling, car) "
+                                + "portion of the trip, or a ride leg on a particular vehicle. So "
+                                + "a trip where the use walks to the Q train, transfers to the 6, "
                                 + "then walks to their destination, has four legs."
                         )
                         .type(new GraphQLNonNull(new GraphQLList(legType)))
@@ -131,7 +131,7 @@ public class TripPatternType {
                         .newFieldDefinition()
                         .name("systemNotices")
                         .description("Get all system notices.")
-                        .type(new GraphQLNonNull(new GraphQLList(systemNoticeType)))
+                        .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(systemNoticeType))))
                         .dataFetcher(env -> itinerary(env).systemNotices)
                         .build())
                 .field(GraphQLFieldDefinition

@@ -123,6 +123,10 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     final int stop = from.stop();
     var tx = transferServiceAdaptor.findTransfer(from, toTrip, stop);
 
+    if(tx != null && tx.getTransferConstraint().isNotAllowed()) {
+      return List.of();
+    }
+
     final int earliestDepartureTime = earliestDepartureTime(
             from.time(), SAME_STOP_TRANSFER_TIME, tx
     );
@@ -154,6 +158,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       int toStop = it.stop();
 
       ConstrainedTransfer tx = transferServiceAdaptor.findTransfer(from, toTrip, toStop);
+      if(tx != null && tx.getTransferConstraint().isNotAllowed()) {
+        continue;
+      }
 
       int earliestDepartureTime = earliestDepartureTime(from.time(), it.durationInSeconds(), tx);
       int toTripStopPos = toTrip.findDepartureStopPosition(earliestDepartureTime, toStop);

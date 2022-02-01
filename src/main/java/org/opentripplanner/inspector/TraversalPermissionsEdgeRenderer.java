@@ -7,6 +7,7 @@ import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.*;
@@ -19,6 +20,8 @@ import org.opentripplanner.routing.vertextype.*;
 public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
 
     private static final Color LINK_COLOR_EDGE = Color.ORANGE;
+
+    private static final Color ELEVATOR_COLOR_EDGE = Color.YELLOW;
 
     private static final Color STAIRS_COLOR_EDGE = Color.PINK;
 
@@ -52,6 +55,19 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
             }
             if (pse.isWalkNoThruTraffic()) {
                 attrs.label += " walk NTT";
+            }
+        } else if (e instanceof ElevatorHopEdge) {
+            ElevatorHopEdge ehe = (ElevatorHopEdge) e;
+            attrs.color = ELEVATOR_COLOR_EDGE;
+            attrs.label = "elevator";
+            if (ehe.wheelchairAccessible) {
+                attrs.label += " wheelchair";
+            }
+            if(ehe.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
+                attrs.label += " bike";
+            }
+            if(ehe.getPermission().allows(StreetTraversalPermission.CAR)) {
+                attrs.label += " car";
             }
         } else {
             attrs.color = LINK_COLOR_EDGE;

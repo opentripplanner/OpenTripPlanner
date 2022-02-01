@@ -41,7 +41,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -115,10 +114,11 @@ public abstract class SnapshotTestBase {
 
             for (int j = 0; j < itinerary.legs.size(); j++) {
                 Leg leg = itinerary.legs.get(j);
-                String mode = leg.mode.name().substring(0, 1);
-                System.out.printf(" - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n", j, leg.from.toStringShort(),
-                        dtf.format(leg.startTime.toInstant().atZone(zoneId)), mode,
-                        dtf.format(leg.endTime.toInstant().atZone(zoneId)), leg.to.toStringShort());
+                String mode = leg.getMode().name().substring(0, 1);
+                System.out.printf(" - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n", j, leg.getFrom()
+                                .toStringShort(),
+                        dtf.format(leg.getStartTime().toInstant().atZone(zoneId)), mode,
+                        dtf.format(leg.getEndTime().toInstant().atZone(zoneId)), leg.getTo().toStringShort());
             }
 
             System.out.println();
@@ -175,7 +175,7 @@ public abstract class SnapshotTestBase {
 
         RoutingRequest arriveBy = request.clone();
         arriveBy.setArriveBy(true);
-        arriveBy.setDateTime(departByItineraries.get(0).lastLeg().endTime.toInstant());
+        arriveBy.setDateTime(departByItineraries.get(0).lastLeg().getEndTime().toInstant());
 
         List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy, router);
 
@@ -364,10 +364,10 @@ public abstract class SnapshotTestBase {
      */
     public static void handleGeneralizedCost(Itinerary departAt, Itinerary arriveBy) {
         departAt.legs.stream()
-                .filter(l -> !l.mode.isTransit())
-                .forEach(l -> l.generalizedCost = 0);
+                .filter(l -> !l.getMode().isTransit())
+                .forEach(l -> l.setGeneralizedCost(0));
         arriveBy.legs.stream()
-                .filter(l -> !l.mode.isTransit())
-                .forEach(l -> l.generalizedCost = 0);
+                .filter(l -> !l.getMode().isTransit())
+                .forEach(l -> l.setGeneralizedCost(0));
     }
 }

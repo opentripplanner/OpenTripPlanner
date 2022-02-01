@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor._data.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_DURATION;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_START;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING;
@@ -46,7 +47,12 @@ public class TestPathBuilderTest implements RaptorTestConstants {
 
     var transitLeg = path.accessLeg().nextLeg().asTransitLeg();
     int boardCost = COST_CALCULATOR.boardingCost(
-        true, path.accessLeg().toTime(), STOP_A, transitLeg.fromTime(), transitLeg.trip(), null
+            true,
+            path.accessLeg().toTime(),
+            STOP_A,
+            transitLeg.fromTime(),
+            transitLeg.trip(),
+            REGULAR_TRANSFER
     );
 
     int transitCost = COST_CALCULATOR.transitArrivalCost(

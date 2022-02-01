@@ -56,8 +56,8 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
         Leg l2 = i.legs.get(1);
         Leg l3 = i.legs.get(2);
 
-        Double d1 = l1.distanceMeters;
-        Double d3 = l3.distanceMeters;
+        Double d1 = l1.getDistanceMeters();
+        Double d3 = l3.getDistanceMeters();
 
         // These test relay on the internal sort by distance, which make the implementation
         // a bit simpler, but strictly is not something the method grantees

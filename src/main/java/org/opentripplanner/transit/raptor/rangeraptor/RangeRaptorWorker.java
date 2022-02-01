@@ -45,7 +45,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleE
  *     <li>Multi-criteria pareto optimal Range Raptor (McRR)
  *     <li>Reverse search in combination with R and RR
  * </ul>
- * This version do NOT support the following features:
+ * This version does NOT support the following features:
  * <ul>
  *     <li>Frequency routes, supported by the original code using Monte Carlo methods
  *     (generating randomized schedules)
@@ -214,7 +214,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 var route = routeIterator.next();
                 var pattern = route.pattern();
                 var tripSearch = createTripSearch(route.timetable());
-                var txService = enableTransferConstraints
+                var txSearch = enableTransferConstraints
                         ? calculator.transferConstraintsSearch(route) : null;
 
                 int alightSlack = slackProvider.alightSlack(pattern);
@@ -238,12 +238,12 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                         // MC Raptor have many, while RR have one boarding
                         transitWorker.forEachBoarding(stopIndex, (int prevArrivalTime) -> {
 
-                            boolean ok = boardWithConstrainedTransfer(
-                                    txService, route.timetable(), stopIndex, stopPos
+                            boolean handled = boardWithConstrainedTransfer(
+                                    txSearch, route.timetable(), stopIndex, stopPos
                             );
 
                             // Find the best trip and board [no guaranteed transfer exist]
-                            if(!ok) {
+                            if(!handled) {
                                 boardWithRegularTransfer(
                                         tripSearch, stopPos, stopIndex, prevArrivalTime, boardSlack
                                 );
@@ -280,15 +280,19 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         }
     }
 
+    /**
+     * @return {@code true} if a constrained transfer exist to prevent the normal
+     * trip search from execution.
+     */
     private boolean boardWithConstrainedTransfer(
-            RaptorConstrainedTripScheduleBoardingSearch<T> txService,
+            RaptorConstrainedTripScheduleBoardingSearch<T> txSearch,
             RaptorTimeTable<T> targetTimetable,
             int targetStopIndex,
             int targetStopPos
     ) {
         if(!enableTransferConstraints) { return false; }
 
-        if(!txService.transferExist(targetStopPos)) { return false; }
+        if(!txSearch.transferExist(targetStopPos)) { return false; }
 
         // Get the previous transit stop arrival (transfer source)
         TransitArrival<T> sourceStopArrival = transitWorker.previousTransit(targetStopIndex);
@@ -301,15 +305,19 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 slackProvider.alightSlack(sourceStopArrival.trip().pattern())
         );
 
-        var result = txService.find(
+        var result = txSearch.find(
                 targetTimetable,
                 sourceStopArrival.trip(),
                 sourceStopArrival.stop(),
                 earliestBoardTime
         );
 
-        if (result == null) {
-            return false;
+        if (result == null) { return false; }
+
+        if (result.getTransferConstraint().isNotAllowed()) {
+            // We are blocking a normal trip search here by returning
+            // true without boarding the trip
+            return true;
         }
 
         this.earliestBoardTime = earliestBoardTime;

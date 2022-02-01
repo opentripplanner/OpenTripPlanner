@@ -1,12 +1,11 @@
 package org.opentripplanner.model;
 
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.trippattern.RealTimeState;
-import org.opentripplanner.routing.trippattern.TripTimes;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
  * Represents a Trip at a specific stop index and on a specific service day. This is a read-only
@@ -58,7 +57,7 @@ public class TripTimeOnDate {
     }
 
     public FeedScopedId getStopId() {
-        return tripPattern.getStopPattern().getStop(stopIndex).getId();
+        return tripPattern.getStop(stopIndex).getId();
     }
 
     public int getStopIndex() {
@@ -119,8 +118,7 @@ public class TripTimeOnDate {
 
     public boolean isCancelledStop() {
         return tripTimes.isCancelledStop(stopIndex) ||
-            tripPattern.getStopPattern().getPickup(stopIndex) == PickDrop.CANCELLED
-            && tripPattern.getStopPattern().getDropoff(stopIndex) == PickDrop.CANCELLED;
+            tripPattern.isBoardAndAlightAt(stopIndex, PickDrop.CANCELLED);
     }
 
     /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
@@ -153,13 +151,13 @@ public class TripTimeOnDate {
     public PickDrop getPickupType() {
         return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
             ? PickDrop.CANCELLED
-            : tripPattern.getStopPattern().getPickup(stopIndex);
+            : tripPattern.getBoardType(stopIndex);
     }
 
     public PickDrop getDropoffType() {
         return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
             ? PickDrop.CANCELLED
-            : tripPattern.getStopPattern().getDropoff(stopIndex);
+            : tripPattern.getAlightType(stopIndex);
     }
 
     public StopTimeKey getStopTimeKey() {

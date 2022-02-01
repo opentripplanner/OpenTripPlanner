@@ -1,6 +1,19 @@
 package org.opentripplanner.routing.stoptimes;
 
+import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
+import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
+import static org.opentripplanner.util.time.DateConstants.ONE_DAY_SECONDS;
+
 import com.google.common.collect.MinMaxPriorityQueue;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Queue;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -13,20 +26,6 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Queue;
-
-import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
-import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
-import static org.opentripplanner.util.time.DateConstants.ONE_DAY_SECONDS;
 
 public class StopTimesHelper {
   /**
@@ -72,7 +71,7 @@ public class StopTimesHelper {
       dates.add(new ServiceDate(date).shift(i));
     }
 
-    ServiceDate[] serviceDates = dates.toArray(new ServiceDate[dates.size()]);
+    ServiceDate[] serviceDates = dates.toArray(new ServiceDate[0]);
 
     // Fetch all patterns, including those from realtime sources
     Collection<TripPattern> patterns = routingService.getPatternsForStop(stop, timetableSnapshot);
@@ -141,7 +140,7 @@ public class StopTimesHelper {
           .getRoute()
           .getAgency().getId());
       int sidx = 0;
-      for (var currStop : pattern.getStopPattern().getStops()) {
+      for (var currStop : pattern.getStops()) {
         if (currStop == stop) {
           if(skipByPickUpDropOff(pattern, arrivalDeparture, sidx)) continue;
           for (TripTimes t : tt.getTripTimes()) {
@@ -246,7 +245,7 @@ public class StopTimesHelper {
 
       int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
       int stopIndex = 0;
-      for (var currStop : pattern.getStopPattern().getStops()) {
+      for (var currStop : pattern.getStops()) {
         if (currStop == stop) {
 
           if (skipByPickUpDropOff(pattern, arrivalDeparture, stopIndex)) { continue; }
@@ -256,7 +255,7 @@ public class StopTimesHelper {
             if (!sd.serviceRunning(tripTimes.getServiceCode())) { continue; }
             if (skipByTripCancellation(tripTimes, includeCancellations)) { continue; }
             if (
-                    !includeReplaced && 
+                    !includeReplaced &&
                     isReplacedByAnotherPattern(
                             tripTimes.getTrip(), serviceDate, pattern, timetableSnapshot
                     )
@@ -309,23 +308,20 @@ public class StopTimesHelper {
   private static boolean skipByPickUpDropOff(
       TripPattern pattern, ArrivalDeparture arrivalDeparture, int stopIndex
   ) {
-    boolean pickup = pattern.getStopPattern().getPickup(stopIndex) != PickDrop.NONE;
-    boolean dropoff = pattern.getStopPattern().getDropoff(stopIndex) != PickDrop.NONE;
+    boolean noPickup = pattern.getBoardType(stopIndex).is(PickDrop.NONE);
+    boolean noDropoff = pattern.getAlightType(stopIndex).is(PickDrop.NONE);
 
-    if (!pickup && !dropoff)
-      return true;
-    if (!pickup && arrivalDeparture == DEPARTURES)
-      return true;
-    if (!dropoff && arrivalDeparture == ARRIVALS)
-      return true;
+    if (noPickup && noDropoff) { return true; }
+    if (noPickup && arrivalDeparture == DEPARTURES) { return true; }
+    if (noDropoff && arrivalDeparture == ARRIVALS) { return true; }
     return false;
   }
 
   private static boolean skipByStopCancellation(
       TripPattern pattern, boolean includeCancelledTrips, int stopIndex
   ) {
-    boolean pickupCancelled = pattern.getStopPattern().getPickup(stopIndex) == PickDrop.CANCELLED;
-    boolean dropOffCancelled = pattern.getStopPattern().getDropoff(stopIndex) == PickDrop.CANCELLED;
+    boolean pickupCancelled = pattern.getBoardType(stopIndex).is(PickDrop.CANCELLED);
+    boolean dropOffCancelled = pattern.getAlightType(stopIndex).is(PickDrop.CANCELLED);
 
     return (pickupCancelled || dropOffCancelled) && !includeCancelledTrips;
   }

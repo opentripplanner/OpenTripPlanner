@@ -254,7 +254,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
         );
         // Verify the attached Transfer is exist and is valid
         assertEquals(
-                "ConstrainedTransfer{from: (trip: BUS T1:10:02, stopPos: 2), to: (trip: BUS T2:10:13, stopPos: 1), constraint: {guaranteed}}",
+                "ConstrainedTransfer{from: <Trip BUS T1:10:02, stopPos 2>, to: <Trip BUS T2:10:13, stopPos 1>, constraint: {guaranteed}}",
                 it.accessLeg().nextLeg().asTransitLeg().getConstrainedTransferAfterLeg().toString()
         );
     }

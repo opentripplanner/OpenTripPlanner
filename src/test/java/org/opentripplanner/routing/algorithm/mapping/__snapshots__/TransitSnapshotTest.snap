@@ -338,8 +338,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 16th",
             "stopCode": "5060",
             "stopId": "prt:5060",
-            "stopIndex": 92,
-            "stopSequence": 93,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -600,8 +598,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW King",
             "stopCode": "747",
             "stopId": "prt:747",
-            "stopIndex": 107,
-            "stopSequence": 108,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -762,8 +758,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE Morrison & 16th",
             "stopCode": "4019",
             "stopId": "prt:4019",
-            "stopIndex": 50,
-            "stopSequence": 51,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1128,8 +1122,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW 23rd & Lovejoy",
             "stopCode": "7163",
             "stopId": "prt:7163",
-            "stopIndex": 73,
-            "stopSequence": 74,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1350,8 +1342,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 16th",
             "stopCode": "5060",
             "stopId": "prt:5060",
-            "stopIndex": 92,
-            "stopSequence": 93,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1612,8 +1602,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW King",
             "stopCode": "747",
             "stopId": "prt:747",
-            "stopIndex": 107,
-            "stopSequence": 108,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1774,8 +1762,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE Morrison & 16th",
             "stopCode": "4019",
             "stopId": "prt:4019",
-            "stopIndex": 50,
-            "stopSequence": 51,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -2140,8 +2126,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW 23rd & Lovejoy",
             "stopCode": "7163",
             "stopId": "prt:7163",
-            "stopIndex": 73,
-            "stopSequence": 74,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -2342,8 +2326,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "SE 12th & Morrison",
             "stopCode": "6588",
             "stopId": "prt:6588",
-            "stopIndex": 31,
-            "stopSequence": 32,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -2357,8 +2339,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2347.5602438577907,
-          "endTime": "2009-11-17T18:52:12.000+00:00",
+          "distance": 2035.619484953424,
+          "endTime": "2009-11-17T18:51:01.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:42:54.000+00:00",
             "departure": "2009-11-17T18:42:54.000+00:00",
@@ -2372,7 +2354,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 1158,
+          "generalizedCost": 1087,
           "headsign": "Rose Qtr TC",
           "interlineWithPreviousLeg": false,
           "intermediateStops": [
@@ -2466,37 +2448,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "stopSequence": 39,
               "vertexType": "TRANSIT",
               "zoneId": "0"
-            },
-            {
-              "arrival": "2009-11-17T18:51:01.000+00:00",
-              "departure": "2009-11-17T18:51:01.000+00:00",
-              "lat": 45.531569,
-              "lon": -122.659045,
-              "name": "NE Multnomah & 7th",
-              "stopCode": "4054",
-              "stopId": "prt:4054",
-              "stopIndex": 39,
-              "stopSequence": 40,
-              "vertexType": "TRANSIT",
-              "zoneId": "0"
-            },
-            {
-              "arrival": "2009-11-17T18:51:27.000+00:00",
-              "departure": "2009-11-17T18:51:27.000+00:00",
-              "lat": 45.531586,
-              "lon": -122.660482,
-              "name": "NE Multnomah & Grand",
-              "stopCode": "4043",
-              "stopId": "prt:4043",
-              "stopIndex": 40,
-              "stopSequence": 41,
-              "vertexType": "TRANSIT",
-              "zoneId": "0"
             }
           ],
           "legGeometry": {
-            "length": 62,
-            "points": "s`ytGhxrkV[?mCAmC?wBA??W?mC?{BA??Q?oC?mC?kBAa@?w@???wA?mCAmC?oCA}C?sDC??aBAm@@k@AY?uABU@I@IBQFb@fC}@d@OFO@q@???Q?]?gGA??[??nJ???b@?vK?rA???tBCfD???^?nE?V@Z?PH\\Nb@`@~@Rf@"
+            "length": 49,
+            "points": "s`ytGhxrkV[?mCAmC?wBA??W?mC?{BA??Q?oC?mC?kBAa@?w@???wA?mCAmC?oCA}C?sDC??aBAm@@k@AY?uABU@I@IBQFb@fC}@d@OFO@q@???Q?]?gGA??[??nJ???b@?vK?rA"
           },
           "mode": "BUS",
           "pathway": false,
@@ -2509,15 +2465,15 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "startTime": "2009-11-17T18:42:54.000+00:00",
           "steps": [ ],
           "to": {
-            "arrival": "2009-11-17T18:52:12.000+00:00",
-            "departure": "2009-11-17T18:56:09.000+00:00",
-            "lat": 45.531159,
-            "lon": -122.66293,
-            "name": "NE Multnomah & 3rd",
-            "stopCode": "11492",
-            "stopId": "prt:11492",
-            "stopIndex": 41,
-            "stopSequence": 42,
+            "arrival": "2009-11-17T18:51:01.000+00:00",
+            "departure": "2009-11-17T18:54:29.000+00:00",
+            "lat": 45.531569,
+            "lon": -122.659045,
+            "name": "NE Multnomah & 7th",
+            "stopCode": "4054",
+            "stopId": "prt:4054",
+            "stopIndex": 39,
+            "stopSequence": 40,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -2532,25 +2488,51 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 3248.2996826174576,
+          "distance": 3560.2404415218243,
           "endTime": "2009-11-17T19:07:55.000+00:00",
           "from": {
-            "arrival": "2009-11-17T18:52:12.000+00:00",
-            "departure": "2009-11-17T18:56:09.000+00:00",
-            "lat": 45.531159,
-            "lon": -122.66293,
-            "name": "NE Multnomah & 3rd",
-            "stopCode": "11492",
-            "stopId": "prt:11492",
-            "stopIndex": 83,
-            "stopSequence": 84,
+            "arrival": "2009-11-17T18:51:01.000+00:00",
+            "departure": "2009-11-17T18:54:29.000+00:00",
+            "lat": 45.531569,
+            "lon": -122.659045,
+            "name": "NE Multnomah & 7th",
+            "stopCode": "4054",
+            "stopId": "prt:4054",
+            "stopIndex": 81,
+            "stopSequence": 82,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
-          "generalizedCost": 1543,
+          "generalizedCost": 1614,
           "headsign": "Montgomery Park",
           "interlineWithPreviousLeg": false,
           "intermediateStops": [
+            {
+              "arrival": "2009-11-17T18:55:05.000+00:00",
+              "departure": "2009-11-17T18:55:05.000+00:00",
+              "lat": 45.531586,
+              "lon": -122.660482,
+              "name": "NE Multnomah & Grand",
+              "stopCode": "4043",
+              "stopId": "prt:4043",
+              "stopIndex": 82,
+              "stopSequence": 83,
+              "vertexType": "TRANSIT",
+              "zoneId": "0"
+            },
+            {
+              "arrival": "2009-11-17T18:56:09.000+00:00",
+              "departure": "2009-11-17T18:56:09.000+00:00",
+              "lat": 45.531159,
+              "lon": -122.66293,
+              "name": "NE Multnomah & 3rd",
+              "stopCode": "11492",
+              "stopId": "prt:11492",
+              "stopIndex": 83,
+              "stopSequence": 84,
+              "vertexType": "TRANSIT",
+              "zoneId": "0"
+            },
             {
               "arrival": "2009-11-17T18:58:00.000+00:00",
               "departure": "2009-11-17T18:58:00.000+00:00",
@@ -2657,8 +2639,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "legGeometry": {
-            "length": 91,
-            "points": "kx{tG~qtkV`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ"
+            "length": 104,
+            "points": "yz{tG`zskV?tBCfD???^?nE?V@Z?PH\\Nb@`@~@Rf@??`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ"
           },
           "mode": "BUS",
           "pathway": false,
@@ -2668,7 +2650,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeLongName": "Broadway/Halsey",
           "routeShortName": "77",
           "serviceDate": "2009-11-17",
-          "startTime": "2009-11-17T18:56:09.000+00:00",
+          "startTime": "2009-11-17T18:54:29.000+00:00",
           "steps": [ ],
           "to": {
             "arrival": "2009-11-17T19:07:55.000+00:00",
@@ -2701,8 +2683,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW Northrup & 22nd",
             "stopCode": "10778",
             "stopId": "prt:10778",
-            "stopIndex": 92,
-            "stopSequence": 93,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -2746,8 +2726,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "startTime": "2009-11-17T18:37:30.000+00:00",
       "tooSloped": false,
       "transfers": 1,
-      "transitTime": 1264,
-      "waitingTime": 237,
+      "transitTime": 1293,
+      "waitingTime": 208,
       "walkDistance": 438.42099999999994,
       "walkLimitExceeded": false,
       "walkTime": 348
@@ -3042,8 +3022,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 12th",
             "stopCode": "5055",
             "stopId": "prt:5055",
-            "stopIndex": 94,
-            "stopSequence": 95,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3304,8 +3282,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW 23rd Pl",
             "stopCode": "9555",
             "stopId": "prt:9555",
-            "stopIndex": 109,
-            "stopSequence": 110,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3505,8 +3481,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 12th",
             "stopCode": "5055",
             "stopId": "prt:5055",
-            "stopIndex": 94,
-            "stopSequence": 95,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3767,8 +3741,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW 23rd Pl",
             "stopCode": "9555",
             "stopId": "prt:9555",
-            "stopIndex": 109,
-            "stopSequence": 110,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3968,8 +3940,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 12th",
             "stopCode": "5055",
             "stopId": "prt:5055",
-            "stopIndex": 94,
-            "stopSequence": 95,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4230,8 +4200,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "W Burnside & NW 23rd Pl",
             "stopCode": "9555",
             "stopId": "prt:9555",
-            "stopIndex": 109,
-            "stopSequence": 110,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4423,8 +4391,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE 12th & Sandy",
             "stopCode": "6592",
             "stopId": "prt:6592",
-            "stopIndex": 34,
-            "stopSequence": 35,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4438,8 +4404,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 1667.1475209896525,
-          "endTime": "2009-11-17T18:52:12.000+00:00",
+          "distance": 1355.2067620852858,
+          "endTime": "2009-11-17T18:51:01.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:46:00.000+00:00",
             "departure": "2009-11-17T18:46:00.000+00:00",
@@ -4453,7 +4419,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 972,
+          "generalizedCost": 901,
           "headsign": "Rose Qtr TC",
           "interlineWithPreviousLeg": false,
           "intermediateStops": [
@@ -4508,37 +4474,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "stopSequence": 39,
               "vertexType": "TRANSIT",
               "zoneId": "0"
-            },
-            {
-              "arrival": "2009-11-17T18:51:01.000+00:00",
-              "departure": "2009-11-17T18:51:01.000+00:00",
-              "lat": 45.531569,
-              "lon": -122.659045,
-              "name": "NE Multnomah & 7th",
-              "stopCode": "4054",
-              "stopId": "prt:4054",
-              "stopIndex": 39,
-              "stopSequence": 40,
-              "vertexType": "TRANSIT",
-              "zoneId": "0"
-            },
-            {
-              "arrival": "2009-11-17T18:51:27.000+00:00",
-              "departure": "2009-11-17T18:51:27.000+00:00",
-              "lat": 45.531586,
-              "lon": -122.660482,
-              "name": "NE Multnomah & Grand",
-              "stopCode": "4043",
-              "stopId": "prt:4043",
-              "stopIndex": 40,
-              "stopSequence": 41,
-              "vertexType": "TRANSIT",
-              "zoneId": "0"
             }
           ],
           "legGeometry": {
-            "length": 46,
-            "points": "{fztG`xrkVwA?mCAmC?oCA}C?sDC??aBAm@@k@AY?uABU@I@IBQFb@fC}@d@OFO@q@???Q?]?gGA??[??nJ???b@?vK?rA???tBCfD???^?nE?V@Z?PH\\Nb@`@~@Rf@"
+            "length": 33,
+            "points": "{fztG`xrkVwA?mCAmC?oCA}C?sDC??aBAm@@k@AY?uABU@I@IBQFb@fC}@d@OFO@q@???Q?]?gGA??[??nJ???b@?vK?rA"
           },
           "mode": "BUS",
           "pathway": false,
@@ -4551,15 +4491,15 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "startTime": "2009-11-17T18:46:00.000+00:00",
           "steps": [ ],
           "to": {
-            "arrival": "2009-11-17T18:52:12.000+00:00",
-            "departure": "2009-11-17T18:56:09.000+00:00",
-            "lat": 45.531159,
-            "lon": -122.66293,
-            "name": "NE Multnomah & 3rd",
-            "stopCode": "11492",
-            "stopId": "prt:11492",
-            "stopIndex": 41,
-            "stopSequence": 42,
+            "arrival": "2009-11-17T18:51:01.000+00:00",
+            "departure": "2009-11-17T18:54:29.000+00:00",
+            "lat": 45.531569,
+            "lon": -122.659045,
+            "name": "NE Multnomah & 7th",
+            "stopCode": "4054",
+            "stopId": "prt:4054",
+            "stopIndex": 39,
+            "stopSequence": 40,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -4574,25 +4514,51 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 3526.7741793792093,
+          "distance": 3838.714938283576,
           "endTime": "2009-11-17T19:08:50.000+00:00",
           "from": {
-            "arrival": "2009-11-17T18:52:12.000+00:00",
-            "departure": "2009-11-17T18:56:09.000+00:00",
-            "lat": 45.531159,
-            "lon": -122.66293,
-            "name": "NE Multnomah & 3rd",
-            "stopCode": "11492",
-            "stopId": "prt:11492",
-            "stopIndex": 83,
-            "stopSequence": 84,
+            "arrival": "2009-11-17T18:51:01.000+00:00",
+            "departure": "2009-11-17T18:54:29.000+00:00",
+            "lat": 45.531569,
+            "lon": -122.659045,
+            "name": "NE Multnomah & 7th",
+            "stopCode": "4054",
+            "stopId": "prt:4054",
+            "stopIndex": 81,
+            "stopSequence": 82,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
-          "generalizedCost": 1598,
+          "generalizedCost": 1669,
           "headsign": "Montgomery Park",
           "interlineWithPreviousLeg": false,
           "intermediateStops": [
+            {
+              "arrival": "2009-11-17T18:55:05.000+00:00",
+              "departure": "2009-11-17T18:55:05.000+00:00",
+              "lat": 45.531586,
+              "lon": -122.660482,
+              "name": "NE Multnomah & Grand",
+              "stopCode": "4043",
+              "stopId": "prt:4043",
+              "stopIndex": 82,
+              "stopSequence": 83,
+              "vertexType": "TRANSIT",
+              "zoneId": "0"
+            },
+            {
+              "arrival": "2009-11-17T18:56:09.000+00:00",
+              "departure": "2009-11-17T18:56:09.000+00:00",
+              "lat": 45.531159,
+              "lon": -122.66293,
+              "name": "NE Multnomah & 3rd",
+              "stopCode": "11492",
+              "stopId": "prt:11492",
+              "stopIndex": 83,
+              "stopSequence": 84,
+              "vertexType": "TRANSIT",
+              "zoneId": "0"
+            },
             {
               "arrival": "2009-11-17T18:58:00.000+00:00",
               "departure": "2009-11-17T18:58:00.000+00:00",
@@ -4712,8 +4678,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "legGeometry": {
-            "length": 96,
-            "points": "kx{tG~qtkV`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
+            "length": 109,
+            "points": "yz{tG`zskV?tBCfD???^?nE?V@Z?PH\\Nb@`@~@Rf@??`@bANb@FV@R?P?pE?jA@h@AnAbBl@LFJN\\f@LT??NXJPPVJFf@Vf@Pp@Nd@NRLB@RNXZR\\vAhC@BhAhD`AhClAbDBrDCnG@n@@^@d@HdAP`CBjEDvD???LqCFmCDYBGDEBGJkAzAQR??KNa@b@MJuBBY?OHW@u@~@aD`EcBhBBrD@xC??@l@BlE@lD???XBjEBpD???VBlE?dA@t@?b@?h@BfEBrD???VBhEFtKDvJ??@\\DnJ???d@FtKmCBo@@"
           },
           "mode": "BUS",
           "pathway": false,
@@ -4723,7 +4689,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeLongName": "Broadway/Halsey",
           "routeShortName": "77",
           "serviceDate": "2009-11-17",
-          "startTime": "2009-11-17T18:56:09.000+00:00",
+          "startTime": "2009-11-17T18:54:29.000+00:00",
           "steps": [ ],
           "to": {
             "arrival": "2009-11-17T19:08:50.000+00:00",
@@ -4756,8 +4722,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW 23rd & Overton",
             "stopCode": "8981",
             "stopId": "prt:8981",
-            "stopIndex": 93,
-            "stopSequence": 94,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4813,8 +4777,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "startTime": "2009-11-17T18:45:44.000+00:00",
       "tooSloped": false,
       "transfers": 1,
-      "transitTime": 1133,
-      "waitingTime": 237,
+      "transitTime": 1162,
+      "waitingTime": 208,
       "walkDistance": 252.199,
       "walkLimitExceeded": false,
       "walkTime": 197
@@ -4925,8 +4889,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NE Sandy & 12th",
             "stopCode": "5055",
             "stopId": "prt:5055",
-            "stopIndex": 94,
-            "stopSequence": 95,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -5258,8 +5220,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "name": "NW 23rd & Lovejoy",
             "stopCode": "7163",
             "stopId": "prt:7163",
-            "stopIndex": 73,
-            "stopSequence": 74,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
