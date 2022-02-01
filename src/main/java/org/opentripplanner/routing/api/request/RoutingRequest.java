@@ -1053,6 +1053,20 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return pageCursor.originalSortOrder.isSortedByArrivalTimeAcceding() == previousPage;
     }
 
+    /**
+     * Related to {@link #maxNumberOfItinerariesCropHead()}, but is {@code true} if we should
+     * crop the search-window head(in the beginning) or tail(in the end).
+     * <p>
+     * For the first search we look if the sort is ascending(crop tail) or descending(crop head),
+     * and for paged results we look at the paging type: next(tail) and previous(head).
+     */
+    public boolean doCropSearchWindowAtTail() {
+        if(pageCursor == null) {
+            return getItinerariesSortOrder().isSortedByArrivalTimeAcceding();
+        }
+        return pageCursor.type == PageType.NEXT_PAGE;
+    }
+
     public void setNumItineraries(int numItineraries) {
         this.numItineraries = numItineraries;
     }

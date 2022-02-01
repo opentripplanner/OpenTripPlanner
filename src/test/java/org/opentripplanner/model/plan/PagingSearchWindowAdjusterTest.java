@@ -12,21 +12,18 @@ import org.opentripplanner.common.model.P2;
 
 
 class PagingSearchWindowAdjusterTest {
-    private static final boolean CROP_TAIL = false;
-    private static final boolean CROP_HEAD = true;
+    private static final boolean CROP_TAIL = true;
+    private static final boolean CROP_HEAD = false;
 
     private static final Duration D0s = Duration.ZERO;
     private static final Duration D10m = duration("10m");
     private static final Duration D30m = duration("30m");
-    private static final Duration D40m = duration("40m");
     private static final Duration D50m = duration("50m");
     private static final Duration D1h = duration("1h");
     private static final Duration D1h10m = duration("1h10m");
     private static final Duration D1h20m = duration("1h20m");
-    private static final Duration D1h30m = duration("1h30m");
     private static final Duration D2h = duration("2h");
     private static final Duration D4h = duration("4h");
-    private static final Duration D4h30m = duration("4h30m");
     private static final Duration D5h = duration("5h");
     private static final Duration D6h = duration("6h");
     private static final Duration D1d = duration("1d");
@@ -41,54 +38,31 @@ class PagingSearchWindowAdjusterTest {
 
 
     @Test
-    void adjustSearchWindow() {
-        // ACTUAL AND USED SEARCH-WINDOW IS THE SAME, EXPECT ADJUSTED TO BE THE SAME
+    void decreaseSearchWindow() {
+        assertEquals(D1h10m, subject.decreaseSearchWindow(D2h, time, time.plus(D1h10m), CROP_TAIL));
+        assertEquals(D50m, subject.decreaseSearchWindow(D2h, time, time.plus(D1h10m), CROP_HEAD));
 
-       assertEquals(D30m, subject.adjustSearchWindow(D30m, 3, 3, null, null, CROP_HEAD));
-       assertEquals(D1h, subject.adjustSearchWindow(D1h, 3, 3, null, null, CROP_TAIL));
-
-
-        // ACTUAL < USED SEARCH-WINDOW, EXPECT AN INCREASED SEARCH-WINDOW
-
-        assertEquals(D1h, subject.adjustSearchWindow(D30m, 2, 3, null, null, CROP_HEAD));
-        assertEquals(D6h, subject.adjustSearchWindow(D1h, 0, 4, null, null, CROP_TAIL));
-
-
-        // ACTUAL > USED SEARCH-WINDOW, CROPPED SEARCH-WINDOW, WE EXPECT REDUCED SEARCHWINDOWS
-
-        // No itinerary filter (removed itinerary)
-        assertEquals(D40m, subject.adjustSearchWindow(D1h, 2, 1, null, null, CROP_HEAD));
-        assertEquals(D50m, subject.adjustSearchWindow(D2h, 20,  5, null, null, CROP_TAIL));
-
-        // With itinerary filter (removed itinerary)
-        assertEquals(D1h20m, subject.adjustSearchWindow(D2h, 99, 1, time, time.plus(D1h10m), CROP_TAIL));
-        assertEquals(D1h, subject.adjustSearchWindow(D2h, 99,  1, time, time.plus(D1h10m), CROP_HEAD));
-
-        // Search-window reduced by 20% from 5 to 4 hours give us 30 min reduction in time
-        assertEquals(D4h30m, subject.adjustSearchWindow(D5h, 99, 1, time, time.plus(D4h), CROP_TAIL));
-        assertEquals(D4h30m, subject.adjustSearchWindow(D5h, 99,  1, time, time.plus(D1h), CROP_HEAD));
+        assertEquals(D4h, subject.decreaseSearchWindow(D5h, time, time.plus(D4h), CROP_TAIL));
+        assertEquals(D1h, subject.decreaseSearchWindow(D5h, time, time.plus(D4h), CROP_HEAD));
     }
 
     @Test
-    void increaseOrKeepSearchWindow() {
+    void keepSearchWindow() {
+        assertEquals(D30m, subject.increaseOrKeepSearchWindow(D30m,5, 5));
+        assertEquals(D30m, subject.increaseOrKeepSearchWindow(D30m,1, 1));
+        assertEquals(D30m, subject.increaseOrKeepSearchWindow(D30m,1, 3));
+    }
+
+    @Test
+    void increaseSearchWindow() {
         var expectedList = new ArrayList<>(LIST_OF_DURATIONS);
         expectedList.add(D0s);
 
         for (int n=0; n< expectedList.size(); ++n) {
             var expected = expectedList.get(n);
-            assertEquals(expected, subject.increaseOrKeepSearchWindow(D0s, n), "n="+n);
-            assertEquals(expected.plus(D30m), subject.increaseOrKeepSearchWindow(D30m, n), "n="+n);
+            assertEquals(expected, subject.increaseOrKeepSearchWindow(D0s,20, n), "n="+n);
+            assertEquals(expected.plus(D30m), subject.increaseOrKeepSearchWindow(D30m, 20, n), "n="+n);
         }
-    }
-
-    @Test
-    void reduceSearchWindow() {
-        assertEquals(D30m, subject.reduceSearchWindow(D30m, D30m));
-        assertEquals(D40m, subject.reduceSearchWindow(D30m, D1h20m));
-        assertEquals(D40m, subject.reduceSearchWindow(D30m, D1h30m));
-        assertEquals(D50m, subject.reduceSearchWindow(D30m, D2h));
-        assertEquals(D1h30m, subject.reduceSearchWindow(D1h, D5h));
-        assertEquals(D4h, subject.reduceSearchWindow(D1h, D1d));
     }
 
     @Test

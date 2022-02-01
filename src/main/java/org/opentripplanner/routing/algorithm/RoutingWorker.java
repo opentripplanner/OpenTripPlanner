@@ -218,18 +218,26 @@ public class RoutingWorker {
         if(raptorSearchParamsUsed == null) { return null; }
 
         var sw = Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
-        int n = (int) itineraries.stream()
-                .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())
-                .count();
 
-        boolean swCropHead = request.maxNumberOfItinerariesCropHead();
-        Instant swStartTime = searchStartTime().plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
-        Instant rmItineraryStartTime = firstRemovedItinerary == null ? null
-                : firstRemovedItinerary.startTime().toInstant();
+        // SearchWindow cropped -> decrease search-window
+        if(firstRemovedItinerary != null) {
+            Instant swStartTime = searchStartTime().plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
+            boolean cropSWHead = request.doCropSearchWindowAtTail();
+            Instant rmItineraryStartTime = firstRemovedItinerary.startTime().toInstant();
 
-        return pagingSearchWindowAdjuster.adjustSearchWindow(
-                sw, n, request.numItineraries, swStartTime, rmItineraryStartTime, swCropHead
-        );
+            return pagingSearchWindowAdjuster.decreaseSearchWindow(
+                    sw, swStartTime, rmItineraryStartTime, cropSWHead
+            );
+        }
+        // (num-of-itineraries found <= numItineraries)  ->  increase or keep search-window
+        else {
+            int nRequested = request.numItineraries;
+            int nFound = (int) itineraries.stream()
+                    .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())
+                    .count();
+
+            return pagingSearchWindowAdjuster.increaseOrKeepSearchWindow(sw, nRequested, nFound);
+        }
     }
 
     private Instant searchStartTime() {

@@ -38,76 +38,30 @@ public final class PagingSearchWindowAdjuster {
 
     /**
      * Take the given search-window and adjust it so it better matches the number-of-itineraries
-     * found in the seach - this is likely to be a good estimate for the next/previous page.
+     * found in the search - this is likely to be a good estimate for the next/previous page.
      *
      * @param searchWindowUsed         The search window used by raptor
-     * @param nActual                  The number of itineraries to be returned to the client
-     * @param nRequested               The number of itineraries requested by the client
      * @param searchWindowStartTime    The start time for the search window used
      * @param rmItineraryDepartureTime If the search-window is cropped, this is the departure time
      *                                 of the first removed itinerary. This should be {@code null}
      *                                 if the search-window is not cropped in the itinerary filter.
-     * @param swCropHead               This indicates witch end of the list of itineraries witch
-     *                                 is cropped. If {@code true} the list is cropped in the
-     *                                 beginning, and if {@code false} if is cropped at the end. If
-     *                                 not cropped, then we do not care.
+     * @param cropSearchWindowTail     This indicates witch end of the search-window to crop. If
+     *                                 {@code true} the search-window is cropped at the end, and
+     *                                 if {@code false} it is cropped in the beginning. If no
+     *                                 rmItineraryDepartureTime exist, then we do not care.
      */
-    public Duration adjustSearchWindow(
+    public Duration decreaseSearchWindow(
             Duration searchWindowUsed,
-            int nActual,
-            int nRequested,
             Instant searchWindowStartTime,
-            @Nullable Instant rmItineraryDepartureTime,
-            boolean swCropHead
-            ) {
-        if(nActual == nRequested) { return searchWindowUsed; }
-
-        // n < numItineraries
-        if(nActual < nRequested) {
-            return increaseOrKeepSearchWindow(searchWindowUsed, nActual);
-        }
-
-        // For some reason the search-window is not cropped in the itinerary-filter, so
-        // we use the number-of-itineraries to estimate the actual search-window
-        if(rmItineraryDepartureTime == null) {
-            return reduceSearchWindow(
-                    Duration.ofSeconds(searchWindowUsed.getSeconds() * nRequested / nActual),
-                    searchWindowUsed
-            );
-        }
-
-        // Search-window cropped
-        Duration searchWindowSlice = swCropHead
-                ? Duration.between(rmItineraryDepartureTime, searchWindowStartTime.plus(searchWindowUsed))
-                : Duration.between(searchWindowStartTime, rmItineraryDepartureTime);
-
-        return reduceSearchWindow(searchWindowSlice, searchWindowUsed);
-    }
-
-    /**
-     * We look at the search data after the trip search to see if we should adjust the search-
-     * window. This is done to avoid short search windows in low frequency areas, where the client
-     * would need to do multiple new request to fetch the next trips.
-     *
-     * @param searchWindowSlice The part of the search-window actually used. Estimated based on the
-     *                          number of itineraries returned or the departure time of the first
-     *                          removed itinerary.
-     * @param searchWindowUsed The search-window used by Raptor to perform the search
-     */
-    Duration reduceSearchWindow(
-            Duration searchWindowSlice,
-            Duration searchWindowUsed
+            Instant rmItineraryDepartureTime,
+            boolean cropSearchWindowTail
     ) {
-        // The search result was reduced using the max itineraries limit
-        long diffSW = searchWindowUsed.toSeconds() - searchWindowSlice.toSeconds();
+        // We found more itineraries than requested, decrease the search window
+        Duration searchWindowSlice = cropSearchWindowTail
+                ? Duration.between(searchWindowStartTime, rmItineraryDepartureTime)
+                : Duration.between(rmItineraryDepartureTime, searchWindowStartTime.plus(searchWindowUsed));
 
-        // Remove 7/8 (87.5%) of the unused part of the search-window. We leave a little slack
-        // to be sure we get enough results to fill up the num-of-itineraries in the next
-        // result as well.
-        int newSearchWindow = (int) (searchWindowUsed.toSeconds() - 7 * diffSW / 8);
-
-        // Round down to minutes
-        return normalizeSearchWindow(newSearchWindow);
+        return normalizeSearchWindow((int)searchWindowSlice.getSeconds());
     }
 
     /**
@@ -117,19 +71,24 @@ public final class PagingSearchWindowAdjuster {
      * frequency areas, where the client would need to do multiple new request to fetch the next
      * trips.
      */
-    Duration increaseOrKeepSearchWindow(
-            Duration usedSearchWindow,
-            int nItinerariesInSearchWindow
+    public Duration increaseOrKeepSearchWindow(
+            Duration searchWindowUsed,
+            int nRequestedItineraries,
+            int nActualItinerariesFound
     ) {
-        if (nItinerariesInSearchWindow < pagingSearchWindowAdjustments.length) {
+        if(nActualItinerariesFound >= nRequestedItineraries) {
+            return searchWindowUsed;
+        }
+
+        if (nActualItinerariesFound < pagingSearchWindowAdjustments.length) {
             return normalizeSearchWindow(
                     // Multiply minutes with 60 to get seconds
-                    (int)usedSearchWindow.getSeconds()
-                    + 60 * pagingSearchWindowAdjustments[nItinerariesInSearchWindow]
+                    (int)searchWindowUsed.getSeconds()
+                    + 60 * pagingSearchWindowAdjustments[nActualItinerariesFound]
             );
         }
         // No change
-        return usedSearchWindow;
+        return searchWindowUsed;
     }
 
 

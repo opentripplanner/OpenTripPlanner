@@ -21,8 +21,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     public static final Duration D90M = Duration.ofMinutes(90);
 
     private static final Instant T10_30 = time("10:30");
-    private static final Instant T11_00 = time("11:00");
-    private static final Instant T11_01 = time("11:31");
+    private static final Instant T11_01 = time("11:01");
     private static final Instant T12_00 = time("12:00");
     private static final Instant T12_30 = time("12:30");
     private static final Instant T13_00 = time("13:00");

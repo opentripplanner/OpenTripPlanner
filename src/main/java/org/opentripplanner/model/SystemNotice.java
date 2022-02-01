@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 /**
@@ -31,5 +32,13 @@ public class SystemNotice {
     public SystemNotice(String tag, String text) {
         this.tag = tag;
         this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(SystemNotice.class)
+                .addStr("tag", tag)
+                .addStr("text", text)
+                .toString();
     }
 }
