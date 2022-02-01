@@ -122,6 +122,7 @@
 - Not allowed transfers and support for GTFS transfer points [#3792](https://github.com/opentripplanner/OpenTripPlanner/pull/3792)
 - Simple implementation of horizontally moving elevators (Elevator way) [#3750](https://github.com/opentripplanner/OpenTripPlanner/pull/3750)
 - fix: Avoid mixed path separators on Windows in Park API test [#3845](https://github.com/opentripplanner/OpenTripPlanner/pull/3845)
+- Filter out elevator ways that are also implicit areas [#3850](https://github.com/opentripplanner/OpenTripPlanner/pull/3850)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
