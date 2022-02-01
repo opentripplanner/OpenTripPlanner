@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.Objects;
 
 /**
- * Abstract DataSource witch wraps a {@link File}.
+ * Abstract DataSource which wraps a {@link File}.
  */
 public abstract class AbstractFileDataSource implements DataSource {
 
@@ -17,7 +17,7 @@ public abstract class AbstractFileDataSource implements DataSource {
     /**
      * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files
      * as well as normal files. It does not handle directories({@link DirectoryDataSource}) or
-     * zip-files {@link ZipFileDataSource} witch contain multiple files.
+     * zip-files {@link ZipFileDataSource} which contain multiple files.
      */
     AbstractFileDataSource(File file, FileType type) {
         this.file = file;

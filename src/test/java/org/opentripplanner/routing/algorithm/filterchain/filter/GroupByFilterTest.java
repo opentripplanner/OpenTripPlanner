@@ -59,7 +59,7 @@ public class GroupByFilterTest implements PlanTestConstants {
      */
     @Test
     public void testMerging() {
-        // Given these 3 itineraries witch all should be grouped in the same group
+        // Given these 3 itineraries which all should be grouped in the same group
         Itinerary i1 = newItinerary(A).bus(1, 1, 11, E).build();
         Itinerary i11 = newItinerary(A).bus(11, 5, 16, E).build();
         Itinerary i12 = newItinerary(A).bus(12, 5, 16, E).build();

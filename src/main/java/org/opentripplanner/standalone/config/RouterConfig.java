@@ -65,7 +65,7 @@ public class RouterConfig implements Serializable {
     }
 
     /**
-     * The config-version is a parameter witch each OTP deployment may set to be able to
+     * The config-version is a parameter which each OTP deployment may set to be able to
      * query the OTP server and verify that it uses the correct version of the config. The
      * version must be injected into the config in the operation deployment pipeline. How this
      * is done is up to the deployment.

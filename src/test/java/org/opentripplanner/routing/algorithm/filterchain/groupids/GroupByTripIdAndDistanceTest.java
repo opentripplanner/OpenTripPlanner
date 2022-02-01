@@ -59,7 +59,7 @@ public class GroupByTripIdAndDistanceTest implements PlanTestConstants {
         Double d1 = l1.distanceMeters;
         Double d3 = l3.distanceMeters;
 
-        // These test relay on the internal sort by distance, witch make the implementation
+        // These test relay on the internal sort by distance, which make the implementation
         // a bit simpler, but strictly is not something the method grantees
         assertEquals(
                 List.of(l1),

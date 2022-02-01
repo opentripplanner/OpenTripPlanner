@@ -14,7 +14,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  * The purpose of this class is to implement a routing strategy for finding the best arrival-time.
  * This class optimize the raptor search on a single criteria.
  * <p>
- * Note! Raptor give us number-of-transfer as a second pareto criteria - witch is outside the scope
+ * Note! Raptor give us number-of-transfer as a second pareto criteria - which is outside the scope
  * of this class.
  * <p>
  * Note! This strategy can be used with RangeRaptor - iterating over a time-window to get pareto

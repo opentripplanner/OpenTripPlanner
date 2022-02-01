@@ -64,7 +64,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     }
 
     /**
-     * A dynamic search is a search witch uses heuristics to resolve search parameters
+     * A dynamic search is a search which uses heuristics to resolve search parameters
      * as earliest-departure-time, latest-arrival-time and search-window. This is an aggregated
      * value:
      * <ul>

@@ -56,7 +56,7 @@ OTP finds the best transfers in 2 steps:
     2. Goal 2 is achieved by giving some stops a lower _visiting-cost_ according to the 
        `StopTransferPriority`.
     3. Goal 3 and 6 is achieved by allowing constrained transfers to override regular transfers. An 
-       optional `RaptorTransferConstraintsProvider` is injected into Raptor witch Raptor calls to 
+       optional `RaptorTransferConstraintsProvider` is injected into Raptor which Raptor calls to 
        get guaranteed transfers. This service is also responsible for rejecting a transfer(TODO). 
  2. Optimize transfers: Goal 4, 5, and 7 are achieved by post-processing paths. Paths from the 
     routing search are revised, optimizing the stop at which transfers happen between each pair of
@@ -97,7 +97,7 @@ Package `org.opentripplanner.routing.algorithm.transferoptimization` has the fol
 - `api` classes used outside the transfer-optimization.
 - `configure` creates and wires up the the module.
 - `model` simple internal model classes used by the services.
-- `services` internal transfer-optimization domain services, witch collaborate to do the job.
+- `services` internal transfer-optimization domain services, which collaborate to do the job.
 
 ### Important classes
 
@@ -151,7 +151,7 @@ each transfer in the path.
 We have created a function with two parts:
 - a linear decreasing component with a factor `a`. This should be adjusted to balance with the 
   components of the path `generalized-cost`.
-- an inverse logarithmic function witch have a high cost for short wait-times. 
+- an inverse logarithmic function which have a high cost for short wait-times. 
   This function is relative to the calculated `min-safe-transfer-time`. 
 
 The `f(t)` is constructed so only 2 parameters are needed to tune it. Let:
@@ -186,7 +186,7 @@ f(t) =  -----------------------  -  a * t
 
 where the constant `C = (e - 1.0)/t0`.
 
-Here is a plot with three examples with different values for `n` and `a` witch illustrate how the 
+Here is a plot with three examples with different values for `n` and `a` which illustrate how the 
 function look like when the linear, and the logarithmic part is present or not. The blue line have 
 only the logarithmic part(n=4, a=0), the purple line is a combination (n=2, a=0.5), and the yellow
 line have the linear path only(n=0, a=1). The minimum-safe-transfer-time is set to 600s or 10

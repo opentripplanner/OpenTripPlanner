@@ -489,7 +489,7 @@
         <!--
             Netex XML document - JAXB generated Java model.
             This is generated using the official Netex schema(v1.0) and support the entire model,
-            not just the Nordic/Norwegian profile witch is currently supported by OTP.
+            not just the Nordic/Norwegian profile which is currently supported by OTP.
          -->
         <dependency>
             <groupId>org.entur</groupId>

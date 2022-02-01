@@ -118,7 +118,7 @@ public interface RaptorTransfer {
     /**
      * Is this {@link RaptorTransfer} is connected to the given {@code stop} directly by
      * <b>transit</b>? For access and egress paths we allow plugging in flexible transit and other
-     * means of transport, witch might include one or more legs onboard a vehicle. This method
+     * means of transport, which might include one or more legs onboard a vehicle. This method
      * should return {@code true} if the leg connecting to the given stop arrives `onBoard` a public
      * transport or riding another kind of service like a taxi.
      *

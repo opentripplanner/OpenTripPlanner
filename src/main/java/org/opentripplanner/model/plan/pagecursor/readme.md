@@ -1,7 +1,7 @@
 # Page Cursor Design
-There are a few corner cases witch complicates the paging. Below we have tried to document these 
+There are a few corner cases which complicates the paging. Below we have tried to document these 
 cases and at the same time illustrate how we have solved the different cases. There are also a few 
-cases witch are not handled by the current implementation and we try to document those as well. 
+cases which are not handled by the current implementation and we try to document those as well. 
 
 Each case is given a name and the name is referenced in code and unit tests.
 
@@ -17,7 +17,7 @@ before moving on to the next.
    a request to the next page.  **sw'** is the search window for the new next/previous page. The
    search window may change between requests, so we need to account for it when computing the 
    next/previous page cursors.
- - **earliest-departure-time (edt)**  The search-window start with the earliest-depature-time, witch
+ - **earliest-departure-time (edt)**  The search-window start with the earliest-depature-time, which
    is the first possible time any itinerary may start. **edt'** is the calculated value for the
    new cursor.
  - **latest-arrival-time (lat)**  The latest time an itinerary can arrive to get accepted. The 
@@ -89,7 +89,7 @@ This is the basic `sort-by-departure` (arrive-by search) without removing itiner
     `ItineraryFilterChain` will follow the same logic that the `Original Search`. Note! the 
     `latest-arrival-time` is kept the same as in the `Original Search`.
   - The `Next page >>` is a bit problematic, but a rare use-case. 
-    - Itineraries witch start in the original search-window, but arrive AFTER the
+    - Itineraries which start in the original search-window, but arrive AFTER the
       `latest-arrival-time` are not be found. Hopefully these cases are rare.
     - The sort order and filtering is reversed in the `ItineraryFilterChain` 
       (`crop itineraries at START of list`).

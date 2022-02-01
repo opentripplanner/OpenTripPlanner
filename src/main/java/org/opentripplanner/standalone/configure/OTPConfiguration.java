@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * Configuration is loaded lazy at startup form different configuration JSON files. Comments
  * and unquoted keys are allowed in the these configuration files. The configuration is cashed,
  * and not reloaded even if it is changed on the filesystem. Changing some parameters would
- * require a new graph build - witch is complicated. So, instead we try to keep the system
+ * require a new graph build - which is complicated. So, instead we try to keep the system
  * simple.
  * <p>
  * We do not require any JSON config files to be present because that would get in the way

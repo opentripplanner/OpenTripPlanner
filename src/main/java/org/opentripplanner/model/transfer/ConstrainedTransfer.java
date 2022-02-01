@@ -10,7 +10,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 
 
 /**
- * A constrained transfer is a transfer witch is restricted in one ore more ways by the transit data
+ * A constrained transfer is a transfer which is restricted in one ore more ways by the transit data
  * provider. It can be guaranteed or stay-seated, have a priority (NOT_ALLOWED, ALLOWED,
  * RECOMMENDED, PREFERRED) or some sort of time constraint attached to it. It is applied to a
  * transfer from a transfer-point to another point. A transfer point is a combination of stop and

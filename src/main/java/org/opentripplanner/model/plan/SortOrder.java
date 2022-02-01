@@ -34,7 +34,7 @@ public enum SortOrder {
 
     /**
      * The itineraries are sorted with by arrival time with the earliest arrival time first. When
-     * paging we need to know witch end of the list of itineraries we should crop. This method is
+     * paging we need to know which end of the list of itineraries we should crop. This method is
      * used to decide that together with the current page type (next/previous).
      * <p>
      * This return {@code true} for the default depart-after search, and {@code false} for an

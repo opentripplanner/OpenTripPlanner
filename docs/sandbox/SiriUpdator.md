@@ -1,5 +1,5 @@
 # Siri Updator
-Support for consuming SIRI ET, SX and ET messages. The updator is developed to support the Norwegian SIRI profile witch is a subset of the SIRI specification. 
+Support for consuming SIRI ET, SX and ET messages. The updator is developed to support the Norwegian SIRI profile which is a subset of the SIRI specification. 
 
 ## Contact Info
 - Lasse Tyrihjell, Entur, Norway

@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Responsible for dependency injection and creating main NeTEx module
  * objects. This decouple the main classes in the netex module, and serve
- * as a single entry-point to create a {@link NetexModule} witch simplify
+ * as a single entry-point to create a {@link NetexModule} which simplify
  * the code({@link org.opentripplanner.graph_builder.GraphBuilder}) using it.
  * <p>
  * This class inject the build configuration. This way none of the other

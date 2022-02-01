@@ -28,7 +28,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     }
 
     /**
-     * Setup egress arrivals with a callback witch is notified when a new transit egress arrival happens.
+     * Setup egress arrivals with a callback which is notified when a new transit egress arrival happens.
      */
     public void setupEgressStopStates(
             Iterable<RaptorTransfer> egressPaths,

@@ -20,8 +20,8 @@ import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily
- * create complete/correct itineraries with legs - it is the unit-test witch is responsible to
- * create an itinerary that have correct data witch is consistent with what is produced by OTP. To
+ * create complete/correct itineraries with legs - it is the unit-test which is responsible to
+ * create an itinerary that have correct data which is consistent with what is produced by OTP. To
  * keep maintenance easy, create the minimum amount of data to focus your test - this also help
  * demonstrate which data is needed by the "code-under-test".
  * <p>

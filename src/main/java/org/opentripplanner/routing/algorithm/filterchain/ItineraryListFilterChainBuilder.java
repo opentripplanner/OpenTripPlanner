@@ -58,7 +58,7 @@ public class ItineraryListFilterChainBuilder {
      * The maximum number of itineraries returned. This will remove all itineraries at the
      * end of the list AFTER the final sort of the itineraries.
      * <p>
-     * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change witch
+     * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change which
      * end of the list is cropped.
      *
      * Use {@code -1} to disable.

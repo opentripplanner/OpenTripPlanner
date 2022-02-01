@@ -66,7 +66,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * the state keep track of the result.
      * <p/>
      * This also allow us to try out different strategies for storing the result in memory.
-     * For a long time we had a state witch stored all data as int arrays in addition to the
+     * For a long time we had a state which stored all data as int arrays in addition to the
      * current object-oriented approach. There were no performance differences(=> GC is not
      * the bottle neck), so we dropped the integer array implementation.
      */

@@ -28,7 +28,7 @@ import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
- * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This
+ * A debug logger which can be plugged into Raptor to do debug logging to standard error. This
  * is used by the {@link SpeedTest} and in module tests.
  * <p>
  * See the Raptor design doc for a general description of the logging functionality.

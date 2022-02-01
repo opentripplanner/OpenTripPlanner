@@ -55,14 +55,14 @@ public class NodeAdapter {
     private final String source;
 
     /**
-     * This class wrap a {@link JsonNode} witch might be a child of another node. We
+     * This class wrap a {@link JsonNode} which might be a child of another node. We
      * keep the path string for logging and debugging purposes
      */
     private final String contextPath;
 
     /**
      * This parameter is used internally in this class to be able to produce a
-     * list of parameters witch is NOT requested.
+     * list of parameters which is NOT requested.
      */
     private final List<String> parameterNames = new ArrayList<>();
 

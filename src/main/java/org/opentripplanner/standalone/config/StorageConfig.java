@@ -127,7 +127,7 @@ public class StorageConfig {
      * <p>
      * Example: {@code "osm" : "file:///Users/kelvin/otp/buildReport" }
      * <p>
-     * This parameter is optional. Default is {@code null} in witch case the report is skipped.
+     * This parameter is optional. Default is {@code null} in which case the report is skipped.
      */
     public final URI buildReportDir;
 

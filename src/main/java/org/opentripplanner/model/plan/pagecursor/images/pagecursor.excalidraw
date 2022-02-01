@@ -2552,12 +2552,12 @@
       "updated": 1643044151585,
       "fontSize": 20,
       "fontFamily": 2,
-      "text": "Regular depart after search witch cropped search-window, the Next \nPage is time-shifted FORWARD to start when the first removed \nitinerary START.",
+      "text": "Regular depart after search which cropped search-window, the Next \nPage is time-shifted FORWARD to start when the first removed \nitinerary START.",
       "baseline": 64,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "Regular depart after search witch cropped search-window, the Next \nPage is time-shifted FORWARD to start when the first removed \nitinerary START."
+      "originalText": "Regular depart after search which cropped search-window, the Next \nPage is time-shifted FORWARD to start when the first removed \nitinerary START."
     },
     {
       "type": "line",

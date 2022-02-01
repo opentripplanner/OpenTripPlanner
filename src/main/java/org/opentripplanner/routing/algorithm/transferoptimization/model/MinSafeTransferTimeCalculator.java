@@ -15,7 +15,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * <p>
  * The min-safe-transfer-time is calculated using the <em>minimum transit time</em>
  * across the list of journeys passed in. The transit time is used because we do not
- * want to include waiting time, witch variate more from search to search.
+ * want to include waiting time, which variate more from search to search.
  * <p>
  * Example:
  * <pre>

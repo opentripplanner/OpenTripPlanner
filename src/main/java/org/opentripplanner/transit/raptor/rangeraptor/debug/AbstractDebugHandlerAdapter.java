@@ -78,7 +78,7 @@ abstract class AbstractDebugHandlerAdapter<T> implements DebugHandler<T> {
     }
 
     /**
-     * Check if a stop exist among the trip path stops witch should be debugged.
+     * Check if a stop exist among the trip path stops which should be debugged.
      */
     private boolean isDebugTrip(int stop) {
         return pathStartAtStopIndex <= path.indexOf(stop);

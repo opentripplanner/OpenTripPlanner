@@ -17,7 +17,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
  * <p>
  * The class is used to track time relative to a {@link ServiceDate}.
  * <p>
- * The RelativeTime can also be used relative to some other time, in witch case it is similar
+ * The RelativeTime can also be used relative to some other time, in which case it is similar
  * to the JAva {@link Duration}.
  * <p>
  * The primary usage of this class is to convert "number of seconds" into a string

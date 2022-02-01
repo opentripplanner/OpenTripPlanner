@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class create a group identifier for an itinerary based on the set of the longest
- * transit legs witch together account for more than 'p' part of the total distance(including
+ * transit legs which together account for more than 'p' part of the total distance(including
  * non-transit). We call this set of legs the 'key-set'. Non-transit itineraries all get their own
  * group; Hence are considered different. Only transit legs can be part of the key.
  * <p>
