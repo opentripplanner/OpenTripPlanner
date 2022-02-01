@@ -217,7 +217,7 @@ public class NodeAdapter {
     }
 
     private <T extends Enum<T>> T asEnum(String paramName, String value, Class<T> ofType) {
-        val upperCaseValue = value.toUpperCase();
+        var upperCaseValue = value.toUpperCase();
         return Stream.of(ofType.getEnumConstants())
                 .filter(it -> it.name().toUpperCase().equals(upperCaseValue))
                 .findFirst()

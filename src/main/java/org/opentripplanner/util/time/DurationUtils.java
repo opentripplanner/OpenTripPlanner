@@ -7,9 +7,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import lombok.val;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 
