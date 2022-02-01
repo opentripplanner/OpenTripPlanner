@@ -218,13 +218,18 @@ public class RoutingWorker {
         if(raptorSearchParamsUsed == null) { return null; }
 
         var sw = Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
-        var edt = searchStartTime().plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
-        var ldt = firstRemovedItinerary == null
-                ? null : firstRemovedItinerary.startTime().toInstant();
         int n = (int) itineraries.stream()
                 .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())
                 .count();
-        return pagingSearchWindowAdjuster.calculateNewSearchWindow( sw, edt, ldt, n);
+
+        boolean swCropHead = request.maxNumberOfItinerariesCropHead();
+        Instant swStartTime = searchStartTime().plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
+        Instant rmItineraryStartTime = firstRemovedItinerary == null ? null
+                : firstRemovedItinerary.startTime().toInstant();
+
+        return pagingSearchWindowAdjuster.adjustSearchWindow(
+                sw, n, request.numItineraries, swStartTime, rmItineraryStartTime, swCropHead
+        );
     }
 
     private Instant searchStartTime() {

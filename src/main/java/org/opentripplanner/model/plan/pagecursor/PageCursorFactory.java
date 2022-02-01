@@ -38,17 +38,11 @@ public class PageCursorFactory {
             Instant lat,
             Duration searchWindow
     ) {
-        // For the original/first search we set the page type equals to NEXT, since
-        // the NEXT and first search is equivalent when creating new cursors.
-        this.currentPageType = pageType == null ? pageTypeFromSortOrder(sortOrder) : pageType;
+        this.currentPageType = pageType == null ? resolvePageTypeForTheFirstSearch(sortOrder) : pageType;
 
         this.current = new SearchTime(edt, lat);
         this.currentSearchWindow = searchWindow;
         return this;
-    }
-
-    public static PageType pageTypeFromSortOrder(SortOrder sortOrder) {
-        return sortOrder.isSortedByArrivalTimeAcceding() ? NEXT_PAGE : PREVIOUS_PAGE;
     }
 
     /**
@@ -175,6 +169,15 @@ public class PageCursorFactory {
      */
     private Instant calcStartOfSearchWindow(Instant lastMinuteInSearchWindow) {
         return lastMinuteInSearchWindow.minus(currentSearchWindow).plusSeconds(60);
+    }
+
+    /**
+     * For the original/first search we set the page type equals to NEXT if the
+     * sort order is ascending, and to PREVIOUS if descending. We do this because the
+     * logic for the first search is equivalent when creating new cursors.
+     */
+    private static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
+        return sortOrder.isSortedByArrivalTimeAcceding() ? NEXT_PAGE : PREVIOUS_PAGE;
     }
 
     /** Temporary data class used to hold a pair of edt and lat */
