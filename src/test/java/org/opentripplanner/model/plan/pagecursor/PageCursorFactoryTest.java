@@ -30,7 +30,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
 
     @Test
-    public void sortByArrival() {
+    public void sortArrivalAscending() {
         var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
                 .withOriginalSearch(null, T12_00, null, D1H);
 
@@ -42,7 +42,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     }
 
     @Test
-    public void sortByArrivalCropSearchWindow() {
+    public void sortArrivalAscendingCropSearchWindow() {
         var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
                 .withOriginalSearch(NEXT_PAGE, T12_00, null, D1H)
                 .withRemovedItineraries(T12_30, T13_30);
@@ -55,7 +55,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     }
 
     @Test
-    public void sortByArrivalPreviousPage() {
+    public void sortArrivalAscendingPreviousPage() {
         var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
                 .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H);
 
@@ -63,11 +63,11 @@ class PageCursorFactoryTest implements PlanTestConstants {
         assetPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
 
         var prevPage = factory.previousPageCursor();
-        assetPageCursor(prevPage, T11_00, null, D90M, PREVIOUS_PAGE);
+        assetPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE);
     }
 
     @Test
-    public void sortByArrivalCropSearchWindowPreviousPage() {
+    public void sortArrivalAscendingCropSearchWindowPreviousPage() {
         var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
                 .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H)
                 .withRemovedItineraries(T12_30, T13_30);
@@ -80,7 +80,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     }
 
     @Test
-    public void sortByDeparture() {
+    public void sortDepartureDescending() {
         var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
                 .withOriginalSearch(null, T12_00, T13_30, D1H);
 
@@ -92,7 +92,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     }
 
     @Test
-    public void sortByDepartureCropSearchWindow() {
+    public void sortDepartureDescendingCropSearchWindow() {
         var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
                 .withOriginalSearch(PREVIOUS_PAGE, T12_00, T13_30, D1H)
                 .withRemovedItineraries(T12_30, T13_00);
@@ -105,7 +105,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     }
 
     @Test
-    public void sortByDepartureNextPage() {
+    public void sortDepartureDescendingNextPage() {
         var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
                 .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H);
 
@@ -117,7 +117,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     }
 
     @Test
-    public void sortByDepartureCropSearchWindowNextPage() {
+    public void sortDepartureDescendingCropSearchWindowNextPage() {
         var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
                 .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H)
                 .withRemovedItineraries(T12_30, T13_00);

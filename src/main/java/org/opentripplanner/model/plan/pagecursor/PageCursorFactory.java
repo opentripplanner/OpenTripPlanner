@@ -103,7 +103,7 @@ public class PageCursorFactory {
             // current page type == PREV_PAGE
             else {
                 if (wholeSwUsed) {
-                    prev.edt = current.edt.minus(currentSearchWindow);
+                    prev.edt = current.edt.minus(newSearchWindow);
                 }
                 else {
                     //TODO: The start time for the removed itinerary is not the best thing to use
