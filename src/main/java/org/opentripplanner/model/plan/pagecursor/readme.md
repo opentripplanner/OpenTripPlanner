@@ -1,5 +1,5 @@
 # Page Cursor Design
-There are a few corner cases witch complicates the paging. Bellow we have tried to document these 
+There are a few corner cases witch complicates the paging. Below we have tried to document these 
 cases and at the same time illustrate how we have solved the different cases. There are also a few 
 cases witch are not handled by the current implementation and we try to document those as well. 
 
