@@ -66,12 +66,16 @@ class TransferMapper {
 
   /**
    * Passengers can transfer from one trip to another by staying onboard the same vehicle.
+   *
+   * @see <a href="https://github.com/google/transit/pull/303">GTFS proposal</a>
    */
   private static final int STAY_SEATED = 4;
 
   /**
    * In-seat transfers are not allowed between sequential trips. The passenger must alight from the
    * vehicle and re-board.
+   *
+   * @see <a href="https://github.com/google/transit/pull/303">GTFS proposal</a>
    */
   private static final int NO_STAY_SEATED = 5;
 
