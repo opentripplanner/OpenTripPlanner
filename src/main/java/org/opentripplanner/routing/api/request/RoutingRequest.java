@@ -328,8 +328,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public double carReluctance = 2.0;
 
-    /** Zero means turned off. HACK SØRLANDSBANEN */
-    public double extraSearchCoachReluctance = 0.0;
 
     /**
      * How much more time does it take to walk a flight of stairs compared to walking a similar
