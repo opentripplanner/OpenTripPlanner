@@ -383,7 +383,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                     time = weight = getEffectiveBikeDistance() / speed;
                 } else {
                     // take slopes into account when walking
-                    // FIXME: this causes steep stairs to be avoided. see #1297.
                     time = weight = getEffectiveWalkDistance() / speed;
                 }
                 break;

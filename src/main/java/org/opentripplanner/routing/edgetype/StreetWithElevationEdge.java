@@ -99,7 +99,7 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public double getEffectiveBikeDistance() {
-        return effectiveBikeDistanceFactor * getDistanceMeters();
+        return (isStairs() ? 1 : effectiveWalkDistanceFactor) * getDistanceMeters();
     }
 
     @Override
@@ -109,7 +109,7 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public double getEffectiveWalkDistance() {
-        return effectiveWalkDistanceFactor * getDistanceMeters();
+        return (isStairs() ? 1 : effectiveWalkDistanceFactor) * getDistanceMeters();
     }
 
     @Override
