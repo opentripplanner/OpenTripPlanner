@@ -6,38 +6,17 @@ import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.DestinationDisplayRefStructure;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPatternRefStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.RouteRefStructure;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
+import org.rutebanken.netex.model.*;
 
 class NetexTestDataSample {
     public static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";
+    public static final List<String> DATED_SERVICE_JOURNEY_IDS = List.of("RUT:DatedServiceJourney:1", "RUT:DatedServiceJourney:2");
     private static final DayType EVERYDAY = new DayType()
             .withId("EVERYDAY")
             .withName(new MultilingualString().withValue("everyday"));
@@ -49,6 +28,8 @@ class NetexTestDataSample {
     private final HierarchicalMap<String, String> quayIdByStopPointRef = new HierarchicalMap<>();
     private final List<TimetabledPassingTime> timetabledPassingTimes = new ArrayList<>();
     private final HierarchicalMapById<ServiceJourney> serviceJourneyById = new HierarchicalMapById<>();
+    private final HierarchicalMapById<DatedServiceJourney> datedServiceJourneyById = new HierarchicalMapById<>();
+    private final Map<String, List<DatedServiceJourney>> dsjBySjId = new HashMap();
     private final HierarchicalMapById<Route> routesById = new HierarchicalMapById<>();
 
     private final EntityById<org.opentripplanner.model.Route> otpRouteByid = new EntityById<>();
@@ -133,6 +114,19 @@ class NetexTestDataSample {
                             new TimetabledPassingTimes_RelStructure().withTimetabledPassingTime(timetabledPassingTimes)
                     );
             serviceJourneyById.add(serviceJourney);
+
+            for(String dsjId : DATED_SERVICE_JOURNEY_IDS) {
+                DatedServiceJourney datedServiceJourney = new DatedServiceJourney()
+                        .withId(dsjId);
+
+                datedServiceJourneyById.add(datedServiceJourney);
+
+                if(!dsjBySjId.containsKey(SERVICE_JOURNEY_ID)) {
+                    dsjBySjId.put(SERVICE_JOURNEY_ID, new ArrayList());
+                }
+
+                dsjBySjId.get(SERVICE_JOURNEY_ID).add(datedServiceJourney);
+            }
         }
 
         // Setup stops
@@ -169,6 +163,14 @@ class NetexTestDataSample {
 
     HierarchicalMapById<ServiceJourney> getServiceJourneyById() {
         return serviceJourneyById;
+    }
+
+    HierarchicalMapById<DatedServiceJourney> getDatedServiceJourneyById() {
+        return datedServiceJourneyById;
+    }
+
+    Map<String, List<DatedServiceJourney>> getDsjBySjId() {
+        return dsjBySjId;
     }
 
     HierarchicalMapById<Route> getRouteById() {

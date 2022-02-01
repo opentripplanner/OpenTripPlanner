@@ -9,12 +9,8 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
+
+import org.opentripplanner.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +23,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
+
+    private FeedScopedId id;
 
     /**
      * This allows re-using the same scheduled arrival and departure time arrays for many
@@ -131,6 +129,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      * The non-interpolated stoptimes should already be marked at timepoints by a previous filtering step.
      */
     public TripTimes(final Trip trip, final Collection<StopTime> stopTimes, final Deduplicator deduplicator) {
+        this(trip, stopTimes, deduplicator, null);
+
+    }
+
+    public TripTimes(final Trip trip, final Collection<StopTime> stopTimes, final Deduplicator deduplicator, final String id) {
         this.trip = trip;
         final int nStops = stopTimes.size();
         final int[] departures = new int[nStops];
@@ -165,11 +168,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         this.recordedStops = null;
         this.cancelledStops = null;
         this.timepoints = deduplicator.deduplicateBitSet(timepoints);
+        this.id = FeedScopedId.parseId(id);
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
     /** This copy constructor does not copy the actual times, only the scheduled times. */
     public TripTimes(final TripTimes object) {
+        this.id = object.id;
         this.timeShift = object.timeShift;
         this.trip = object.trip;
         this.serviceCode = object.serviceCode;
@@ -224,6 +229,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         } else {
             return hs;
         }
+    }
+
+    public FeedScopedId getId() {
+        return id;
     }
 
     /**

@@ -28,15 +28,8 @@ import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.calendar.DatedServiceJourneyMapper;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.*;
 import org.rutebanken.netex.model.Branding;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.GroupOfStopPlaces;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.NoticeAssignment;
-import org.rutebanken.netex.model.StopPlace;
 
 
 /**
@@ -64,6 +57,7 @@ public class NetexMapper {
     private final TripCalendarBuilder tripCalendarBuilder;
     private final Set<String> ferryIdsNotAllowedForBicycle;
 
+
     /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
     private GroupNetexMapper groupMapper;
 
@@ -75,7 +69,7 @@ public class NetexMapper {
      * OTPTransitService, so we need to temporally cash this here.
      */
     private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
-
+    private final Map<String, List<DatedServiceJourney>> dsjBySjId = new HashMap();
 
     public NetexMapper(
             OtpTransitServiceBuilder transitBuilder,
@@ -316,11 +310,13 @@ public class NetexMapper {
     }
 
     private void mapDatedServiceJourneys() {
+        dsjBySjId.putAll(DatedServiceJourneyMapper.indexDSJBySJId(
+                currentNetexIndex.getDatedServiceJourneys()
+        ));
+
         tripCalendarBuilder.addDatedServiceJourneys(
             currentNetexIndex.getOperatingDayById(),
-            DatedServiceJourneyMapper.indexDSJBySJId(
-                currentNetexIndex.getDatedServiceJourneys()
-            )
+            dsjBySjId
         );
     }
 
@@ -377,6 +373,7 @@ public class NetexMapper {
                 currentNetexIndex.getDestinationDisplayById(),
                 currentNetexIndex.getServiceJourneyById(),
                 currentNetexIndex.getFlexibleLineById(),
+                dsjBySjId,
                 serviceIds,
                 deduplicator
         );
