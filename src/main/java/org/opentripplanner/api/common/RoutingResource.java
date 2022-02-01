@@ -81,22 +81,22 @@ public abstract class RoutingResource {
      * window. If {@code arriveBy=true} the {@code dateTime} parameter is the latest-arrival-time, so OTP
      * will dynamically calculate the EDT. Using a short search-window is faster than using a
      * longer one, but the search duration is not linear. Using a \"too\" short search-window will
-     * waist resources server side, while using a search-window that is too long will be slow.
+     * waste resources server side, while using a search-window that is too long will be slow.
      * <p>
-     * OTP will dynamically calculate a reasonable value for the search-window if not provided.
-     * The calculation comes with a significant overhead (10-20% extra). If you should use the
-     * dynamic calculated value or pass in a value depend on your use-case. For a travel planner
-     * in a small geographical area with a dense network of public transportation a fix value
-     * between 40 minutes and 2 hours make sense. To find the appropriate search-window, adjust it
-     * so the number of itineraries on average is around the wanted {@code numItineraries}. Make sure
-     * you set the {@code numItineraries} to a high number while testing. For a country wide area like
-     * Norway, using the dynamic search-window is the best.
+     * OTP will dynamically calculate a reasonable value for the search-window, if not provided.
+     * The calculation comes with a significant overhead (10-20% extra). Whether you should use the
+     * dynamic calculated value or pass in a value depends on your use-case. For a travel planner
+     * in a small geographical area, with a dense network of public transportation, a fixed value
+     * between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it
+     * so that the number of itineraries on average is around the wanted {@code numItineraries}.
+     * Make sure you set the {@code numItineraries} to a high number while testing. For a country
+     * wide area like Norway, using the dynamic search-window is the best.
      * <p>
      * When paginating, the search-window is calculated using the {@code numItineraries} in the original
      * search together with statistics from the search for the last page. This behaviour is
      * configured server side, and can not be overridden from the client.
      * <p>
-     * The search-window used is returned in the response metadata as {@code searchWindowUsed} for
+     * The search-window used is returned to the response metadata as {@code searchWindowUsed} for
      * debugging purposes.
      */
     @QueryParam("searchWindow")
