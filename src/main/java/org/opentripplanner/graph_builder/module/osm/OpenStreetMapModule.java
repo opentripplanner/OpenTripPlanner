@@ -966,7 +966,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             if (osmdb.isAreaWay(way.getId())) { return false; }
 
             TLongList nodeRefs = way.getNodeRefs();
-            // A way whose first and last nore are the same is probably an area, skip that.
+            // A way whose first and last node are the same is probably an area, skip that.
+            // https://www.openstreetmap.org/way/503412863
+            // https://www.openstreetmap.org/way/187719215
             return nodeRefs.get(0) != nodeRefs.get(nodeRefs.size() - 1);
         }
 
