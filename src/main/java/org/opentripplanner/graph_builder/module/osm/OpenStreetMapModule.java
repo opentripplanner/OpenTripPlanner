@@ -918,8 +918,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             // Add highway=elevators to graph as elevators
             Iterator<OSMWay> elevators = osmdb.getWays().stream()
-                    .filter(way -> way.hasTag("highway") && "elevator".equals(way.getTag("highway"))
-                            && !osmdb.isAreaWay(way.getId()))
+                    .filter(way -> isElevatorWay(way))
                     .iterator();
 
             for (Iterator<OSMWay> it = elevators; it.hasNext(); ) {
@@ -959,6 +958,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 );
                 LOG.debug("Created elevatorHopEdges for way {}", elevatorWay.getId());
             }
+        }
+
+        private boolean isElevatorWay(OSMWay way) {
+            if (!way.hasTag("highway")) { return false; }
+            if (!"elevator".equals(way.getTag("highway"))) { return false; }
+            if (osmdb.isAreaWay(way.getId())) { return false; }
+
+            TLongList nodeRefs = way.getNodeRefs();
+            // A way whose first and last nore are the same is probably an area, skip that.
+            return nodeRefs.get(0) != nodeRefs.get(nodeRefs.size() - 1);
         }
 
         private void createElevatorVertices(
