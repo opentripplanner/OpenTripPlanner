@@ -242,6 +242,16 @@ public class SearchParams {
         return egressPaths;
     }
 
+    /**
+     * Get the maximum duration of any access or egress path in seconds.
+     */
+    public int getAccessEgressMaxDurationSeconds() {
+        return Math.max(
+            accessPaths.stream().mapToInt(RaptorTransfer::durationInSeconds).max().orElse(0),
+            egressPaths.stream().mapToInt(RaptorTransfer::durationInSeconds).max().orElse(0)
+        );
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.of(SearchParams.class)
