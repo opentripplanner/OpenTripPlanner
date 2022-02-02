@@ -5,6 +5,21 @@ import java.time.Period;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+/**
+ * This class computes the days that should be searched in addition to the search date time.
+ *
+ * For example, if you want to arrive at 0:15 you also need to take the timetable from the previous
+ * day into account as your train could arrive at the destination at 23:59.
+ *
+ * It's similar when you start at 23:59 where you want to take the next day into account, but not
+ * the previous one.
+ *
+ * Another case are trips that take more than 24 hours, where you want to search more than 1 day
+ * into the future.
+ *
+ * Since searching through an entire day's schedule is a little expensive it's best to keep the
+ * number of additional days as low as possible.
+ */
 public class AdditionalSearchDays {
 
     private final boolean arriveBy;
