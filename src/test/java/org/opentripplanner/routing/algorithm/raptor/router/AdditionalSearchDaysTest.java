@@ -11,54 +11,54 @@ class AdditionalSearchDaysTest {
 
     @Test
     void morning() {
-        var req = getDays("2022-01-25T05:05:20+01:00", true);
-        assertEquals(0, req.additionalSearchDaysInFuture());
-        assertEquals(1, req.additionalSearchDaysInPast());
+        var days = getDays("2022-01-25T05:05:20+01:00", true);
+        assertEquals(0, days.additionalSearchDaysInFuture());
+        assertEquals(1, days.additionalSearchDaysInPast());
     }
 
     @Test
     void middleOfDay() {
-        var req = getDays("2022-01-25T13:14:20+01:00", false);
-        assertEquals(0, req.additionalSearchDaysInFuture());
-        assertEquals(0, req.additionalSearchDaysInPast());
+        var days1 = getDays("2022-01-25T13:14:20+01:00", false);
+        assertEquals(0, days1.additionalSearchDaysInFuture());
+        assertEquals(0, days1.additionalSearchDaysInPast());
 
-        var req2 = getDays("2022-01-25T13:14:20+01:00", true);
-        assertEquals(0, req2.additionalSearchDaysInFuture());
-        assertEquals(0, req2.additionalSearchDaysInPast());
+        var days2 = getDays("2022-01-25T13:14:20+01:00", true);
+        assertEquals(0, days2.additionalSearchDaysInFuture());
+        assertEquals(0, days2.additionalSearchDaysInPast());
     }
 
     @Test
     void evening() {
-        var req = getDays("2022-01-25T20:14:20+01:00", false);
-        assertEquals(1, req.additionalSearchDaysInFuture());
-        assertEquals(0, req.additionalSearchDaysInPast());
+        var days = getDays("2022-01-25T20:14:20+01:00", false);
+        assertEquals(1, days.additionalSearchDaysInFuture());
+        assertEquals(0, days.additionalSearchDaysInPast());
 
-        var req2 = getDays("2022-01-25T20:14:20+01:00", true);
-        assertEquals(0, req2.additionalSearchDaysInFuture());
-        assertEquals(0, req2.additionalSearchDaysInPast());
+        var days2 = getDays("2022-01-25T20:14:20+01:00", true);
+        assertEquals(0, days2.additionalSearchDaysInFuture());
+        assertEquals(0, days2.additionalSearchDaysInPast());
     }
 
     @Test
     void closeToMidnight() {
-        var req = getDays("2022-01-25T23:14:20+01:00", false);
-        assertEquals(1, req.additionalSearchDaysInFuture());
-        assertEquals(0, req.additionalSearchDaysInPast());
+        var days = getDays("2022-01-25T23:14:20+01:00", false);
+        assertEquals(1, days.additionalSearchDaysInFuture());
+        assertEquals(0, days.additionalSearchDaysInPast());
 
-        var req2 = getDays("2022-01-25T23:14:20+01:00", true);
-        assertEquals(0, req2.additionalSearchDaysInPast());
-        assertEquals(0, req2.additionalSearchDaysInFuture());
+        var days2 = getDays("2022-01-25T23:14:20+01:00", true);
+        assertEquals(0, days2.additionalSearchDaysInPast());
+        assertEquals(0, days2.additionalSearchDaysInFuture());
     }
 
     @Test
     void shortlyAfterMidnight() {
-        var req = getDays("2022-01-25T00:15:25+01:00", false);
+        var days = getDays("2022-01-25T00:15:25+01:00", false);
 
-        assertEquals(0, req.additionalSearchDaysInPast());
-        assertEquals(0, req.additionalSearchDaysInFuture());
+        assertEquals(0, days.additionalSearchDaysInPast());
+        assertEquals(0, days.additionalSearchDaysInFuture());
 
-        var req2 = getDays("2022-01-25T00:15:25+01:00", true);
-        assertEquals(1, req2.additionalSearchDaysInPast());
-        assertEquals(0, req2.additionalSearchDaysInFuture());
+        var days2 = getDays("2022-01-25T00:15:25+01:00", true);
+        assertEquals(1, days2.additionalSearchDaysInPast());
+        assertEquals(0, days2.additionalSearchDaysInFuture());
     }
 
     @Test
