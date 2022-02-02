@@ -41,13 +41,13 @@ jobs:
         run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report
 
       - name: Send coverage data to codecov.io
-        if: github.repository_owner == 'opentripplanner'
+        if: github.repository_owner == 'opentripplanner' && matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v2
         with:
           files: target/site/jacoco/jacoco.xml
 
       - name: Deploy to Github Package Registry
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x') && matrix.os == 'ubuntu-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY
