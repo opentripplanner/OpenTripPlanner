@@ -1216,12 +1216,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             label = unique(label);
             I18NString name = getNameForWay(way, label);
 
-            // consider the elevation gain of stairs, roughly
-            boolean steps = way.isSteps();
-            if (steps) {
-                length *= 2;
-            }
-
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
             StreetEdge street = edgeFactory.createEdge(startEndpoint, endEndpoint, geometry, name, length,
@@ -1250,6 +1244,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             if (!way.hasTag("name") && !way.hasTag("ref")) {
                 street.setHasBogusName(true);
             }
+
+            boolean steps = way.isSteps();
             street.setStairs(steps);
 
             /* TODO: This should probably generalized somehow? */
