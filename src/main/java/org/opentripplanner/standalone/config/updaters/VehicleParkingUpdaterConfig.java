@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.updaters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
@@ -62,7 +63,7 @@ public class VehicleParkingUpdaterConfig {
                 feedId,
                 c.asInt("frequencySec", 60),
                 c.asMap("headers", NodeAdapter::asText),
-                new ArrayList<>(c.asTextSet("tags", null)),
+                new ArrayList<>(c.asTextSet("tags", Set.of())),
                 sourceType
         );
       default:
