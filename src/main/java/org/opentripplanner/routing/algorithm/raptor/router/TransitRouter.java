@@ -223,7 +223,7 @@ public class TransitRouter {
                 var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
                         accessRequest,
                         additionalSearchDays,
-                        router.routerConfig,
+                        router.routerConfig.flexParameters(request),
                         isEgress
                 );
 
