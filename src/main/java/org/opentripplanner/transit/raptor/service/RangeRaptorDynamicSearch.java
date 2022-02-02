@@ -265,6 +265,9 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
         }
     }
 
+    /**
+     * Only exposed for testing purposes
+     */
     @Nullable
     public Heuristics getDestinationHeuristics() {
         if (!originalRequest.useDestinationPruning()) { return null; }
