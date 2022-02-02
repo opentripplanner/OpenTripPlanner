@@ -242,7 +242,6 @@ public class TransitRouter {
 
         try (RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request)) {
             transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
-            request.setRoutingContext(graph);
 
             return new RaptorRoutingRequestTransitData(
                     graph.getTransferService(),

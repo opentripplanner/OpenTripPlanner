@@ -115,7 +115,6 @@ public class RouterConfig implements Serializable {
         return flexConfig.toFlexParameters(request);
     }
 
-
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
      */
