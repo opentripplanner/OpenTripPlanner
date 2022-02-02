@@ -280,8 +280,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "NW 21st & Irving",
             "stopCode": "7114",
             "stopId": "prt:7114",
-            "stopIndex": 15,
-            "stopSequence": 16,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -438,8 +436,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "NW Everett & Broadway",
             "stopCode": "1606",
             "stopId": "prt:1606",
-            "stopIndex": 22,
-            "stopSequence": 23,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -624,8 +620,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "W Burnside & SW Osage",
             "stopCode": "9354",
             "stopId": "prt:9354",
-            "stopIndex": 36,
-            "stopSequence": 37,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -808,8 +802,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "W Burnside & SW 6th",
             "stopCode": "792",
             "stopId": "prt:792",
-            "stopIndex": 45,
-            "stopSequence": 46,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -994,8 +986,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "2400 Block NW Lovejoy",
             "stopCode": "3589",
             "stopId": "prt:3589",
-            "stopIndex": 6,
-            "stopSequence": 7,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1165,8 +1155,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "NW Everett & 4th",
             "stopCode": "9546",
             "stopId": "prt:9546",
-            "stopIndex": 14,
-            "stopSequence": 15,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -1496,8 +1484,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "NW 21st & Irving",
             "stopCode": "7114",
             "stopId": "prt:7114",
-            "stopIndex": 15,
-            "stopSequence": 16,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -1654,8 +1640,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "NW Everett & Broadway",
             "stopCode": "1606",
             "stopId": "prt:1606",
-            "stopIndex": 22,
-            "stopSequence": 23,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -1985,8 +1969,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "NW 21st & Irving",
             "stopCode": "7114",
             "stopId": "prt:7114",
-            "stopIndex": 50,
-            "stopSequence": 51,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -2143,8 +2125,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "NW Everett & Broadway",
             "stopCode": "1606",
             "stopId": "prt:1606",
-            "stopIndex": 57,
-            "stopSequence": 58,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -2293,8 +2273,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "2400 Block NW Lovejoy",
             "stopCode": "3589",
             "stopId": "prt:3589",
-            "stopIndex": 6,
-            "stopSequence": 7,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -2464,8 +2442,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "NW Everett & 4th",
             "stopCode": "9546",
             "stopId": "prt:9546",
-            "stopIndex": 14,
-            "stopSequence": 15,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -3372,8 +3348,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "NW 6th & Flanders",
             "stopCode": "9300",
             "stopId": "prt:9300",
-            "stopIndex": 66,
-            "stopSequence": 67,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -3556,8 +3530,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "NW 21st & Irving",
             "stopCode": "7113",
             "stopId": "prt:7113",
-            "stopIndex": 75,
-            "stopSequence": 76,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -3911,8 +3883,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "W Burnside & NW 5th",
             "stopCode": "782",
             "stopId": "prt:782",
-            "stopIndex": 99,
-            "stopSequence": 100,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -4108,8 +4078,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "W Burnside & NW 23rd Pl",
             "stopCode": "9555",
             "stopId": "prt:9555",
-            "stopIndex": 109,
-            "stopSequence": 110,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4318,8 +4286,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "NW Glisan & 6th",
             "stopCode": "10803",
             "stopId": "prt:10803",
-            "stopIndex": 85,
-            "stopSequence": 86,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -4489,8 +4455,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "NW 23rd & Overton",
             "stopCode": "8981",
             "stopId": "prt:8981",
-            "stopIndex": 93,
-            "stopSequence": 94,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -4675,8 +4639,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "NW 6th & Flanders",
             "stopCode": "9300",
             "stopId": "prt:9300",
-            "stopIndex": 66,
-            "stopSequence": 67,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -4859,8 +4821,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "NW 21st & Irving",
             "stopCode": "7113",
             "stopId": "prt:7113",
-            "stopIndex": 75,
-            "stopSequence": 76,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -5214,8 +5174,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "W Burnside & NW 5th",
             "stopCode": "782",
             "stopId": "prt:782",
-            "stopIndex": 99,
-            "stopSequence": 100,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -5411,8 +5369,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "W Burnside & NW 23rd Pl",
             "stopCode": "9555",
             "stopId": "prt:9555",
-            "stopIndex": 109,
-            "stopSequence": 110,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
@@ -5621,8 +5577,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "NW Glisan & 6th",
             "stopCode": "10803",
             "stopId": "prt:10803",
-            "stopIndex": 85,
-            "stopSequence": 86,
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
@@ -5792,8 +5746,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "NW 23rd & Overton",
             "stopCode": "8981",
             "stopId": "prt:8981",
-            "stopIndex": 93,
-            "stopSequence": 94,
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },

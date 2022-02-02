@@ -26,7 +26,9 @@
     "bikeBoardCost": 600,
     "otherThanPreferredRoutesPenalty": 300,
     "transferSlack": 120,
-    "transitGeneralizedCostLimit": "3600 + 2.0 x",
+    "itineraryFilters": {
+      "transitGeneralizedCostLimit": "3600 + 2.0 x",
+    },
     // Default slack for any mode is 0 (zero)
     "boardSlackForMode": {
       "FERRY": 60,

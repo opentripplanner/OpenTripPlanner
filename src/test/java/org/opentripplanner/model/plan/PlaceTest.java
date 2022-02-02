@@ -69,8 +69,6 @@ public class PlaceTest {
     }
 
     private static Place place(Stop stop) {
-        return Place.forStop(
-                stop, null, null
-        );
+        return Place.forStop(stop);
     }
 }

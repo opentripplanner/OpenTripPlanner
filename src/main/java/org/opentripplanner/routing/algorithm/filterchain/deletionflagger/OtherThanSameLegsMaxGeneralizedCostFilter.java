@@ -60,7 +60,7 @@ public class OtherThanSameLegsMaxGeneralizedCostFilter implements ItineraryDelet
             itinerary -> itinerary.legs.stream()
                 .filter(Leg::isTransitLeg)
                 .filter(leg -> commonTrips.contains(leg.getTrip()))
-                .mapToInt(leg -> leg.generalizedCost)
+                .mapToInt(leg -> leg.getGeneralizedCost())
                 .sum()
         ).min();
 

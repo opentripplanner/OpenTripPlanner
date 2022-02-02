@@ -18,9 +18,9 @@ public class TripTimeShortHelper {
     @Nullable
     public static TripTimeOnDate getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
-        if (leg.flexibleTrip) { return null; }
+        if (leg.isFlexibleTrip()) { return null; }
 
-        ServiceDate serviceDate = leg.serviceDate;
+        ServiceDate serviceDate = leg.getServiceDate();
         List<TripTimeOnDate> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
 
         /* TODO OTP2 This method is only used for EstimatedCalls for from place. We have to decide
@@ -34,7 +34,7 @@ public class TripTimeShortHelper {
         }
          */
 
-        return tripTimes.get(leg.boardStopPosInPattern);
+        return tripTimes.get(leg.getBoardStopPosInPattern());
     }
 
     /**
@@ -43,9 +43,9 @@ public class TripTimeShortHelper {
     @Nullable
     public static TripTimeOnDate getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return null; }
-        if (leg.flexibleTrip) { return null; }
+        if (leg.isFlexibleTrip()) { return null; }
 
-        ServiceDate serviceDate = leg.serviceDate;
+        ServiceDate serviceDate = leg.getServiceDate();
         List<TripTimeOnDate> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
 
         /* TODO OTP2 This method is only used for EstimatedCalls for to place. We have to decide
@@ -59,7 +59,7 @@ public class TripTimeShortHelper {
         }
         */
 
-        return tripTimes.get(leg.alightStopPosInPattern);
+        return tripTimes.get(leg.getAlightStopPosInPattern());
     }
 
 
@@ -68,9 +68,9 @@ public class TripTimeShortHelper {
      */
     public static List<TripTimeOnDate> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
-        if (leg.flexibleTrip) { return List.of(); }
+        if (leg.isFlexibleTrip()) { return List.of(); }
 
-        ServiceDate serviceDate = leg.serviceDate;
+        ServiceDate serviceDate = leg.getServiceDate();
         return routingService.getTripTimesShort(leg.getTrip(), serviceDate);
     }
 
@@ -79,11 +79,11 @@ public class TripTimeShortHelper {
      */
     public static List<TripTimeOnDate> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
         if (!leg.isTransitLeg()) { return List.of(); }
-        if (leg.flexibleTrip) { return List.of(); }
+        if (leg.isFlexibleTrip()) { return List.of(); }
 
-        ServiceDate serviceDate = leg.serviceDate;
+        ServiceDate serviceDate = leg.getServiceDate();
 
         List<TripTimeOnDate> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
-        return tripTimes.subList(leg.boardStopPosInPattern + 1, leg.alightStopPosInPattern);
+        return tripTimes.subList(leg.getBoardStopPosInPattern() + 1, leg.getAlightStopPosInPattern());
     }
 }

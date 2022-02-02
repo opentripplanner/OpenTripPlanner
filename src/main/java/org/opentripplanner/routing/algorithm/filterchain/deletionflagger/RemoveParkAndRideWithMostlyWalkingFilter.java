@@ -31,11 +31,11 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryDeleti
     public Predicate<Itinerary> predicate() {
         return itinerary -> {
             var containsTransit =
-                    itinerary.legs.stream().anyMatch(l -> l != null && l.mode.isTransit());
+                    itinerary.legs.stream().anyMatch(l -> l != null && l.getMode().isTransit());
 
             double carDuration = itinerary.legs
                     .stream()
-                    .filter(l -> l.mode == TraverseMode.CAR)
+                    .filter(l -> l.getMode() == TraverseMode.CAR)
                     .mapToDouble(Leg::getDuration)
                     .sum();
             double totalDuration = itinerary.durationSeconds;
