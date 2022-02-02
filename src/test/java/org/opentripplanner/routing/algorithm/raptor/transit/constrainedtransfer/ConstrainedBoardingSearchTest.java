@@ -43,6 +43,8 @@ public class ConstrainedBoardingSearchTest {
             TransferConstraint.create().guaranteed().build();
     private static final TransferConstraint NOT_ALLOWED_CONSTRAINT =
             TransferConstraint.create().notAllowed().build();
+    private static final TransferConstraint MIN_TRANSFER_TIME_CONSTRAINT =
+            TransferConstraint.create().minTransferTime(600).build();
     private static final StopTransferPoint STOP_B_TX_POINT = new StopTransferPoint(STOP_B);
     private static final StopTransferPoint STOP_C_TX_POINT = new StopTransferPoint(STOP_C);
 
@@ -254,6 +256,16 @@ public class ConstrainedBoardingSearchTest {
         );
     }
 
+    @Test
+    void findMinimumTimeTransfer() {
+        var txMinTransferTime = new ConstrainedTransfer(
+                ID, STOP_C_TX_POINT, STOP_C_TX_POINT, MIN_TRANSFER_TIME_CONSTRAINT
+        );
+
+        testTransferSearch(
+                STOP_C, List.of(txMinTransferTime), TRIP_2_INDEX, TRIP_1_INDEX, MIN_TRANSFER_TIME_CONSTRAINT
+        );
+    }
 
     /**
      * The most specific transfer passed in should be a guaranteed transfer
