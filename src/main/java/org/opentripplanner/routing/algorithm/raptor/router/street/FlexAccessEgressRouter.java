@@ -5,6 +5,7 @@ import java.util.List;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
+import org.opentripplanner.routing.algorithm.raptor.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -15,6 +16,7 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
       RoutingRequest request,
+      AdditionalSearchDays searchDays,
       FlexParameters params,
       boolean isEgress
   ) {
@@ -36,8 +38,8 @@ public class FlexAccessEgressRouter {
         params,
         request.getDateTimeCurrentPage(),
         request.arriveBy,
-        request.additionalSearchDaysBeforeToday,
-        request.additionalSearchDaysAfterToday,
+        searchDays.additionalSearchDaysInPast(),
+        searchDays.additionalSearchDaysInFuture(),
         accessStops,
         egressStops
     );

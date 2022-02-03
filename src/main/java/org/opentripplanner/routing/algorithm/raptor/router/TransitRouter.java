@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
@@ -48,17 +48,20 @@ public class TransitRouter {
     private final Router router;
     private final DebugTimingAggregator debugTimingAggregator;
     private final ZonedDateTime searchStartTime;
+    private final AdditionalSearchDays additionalSearchDays;
 
     private TransitRouter(
             RoutingRequest request,
             Router router,
             ZonedDateTime searchStartTime,
+            AdditionalSearchDays additionalSearchDays,
             DebugTimingAggregator debugTimingAggregator
     ) {
         this.request = request;
         this.router = router;
         this.debugTimingAggregator = debugTimingAggregator;
         this.searchStartTime = searchStartTime;
+        this.additionalSearchDays = additionalSearchDays;
     }
 
     private TransitRouterResult route() {
@@ -219,6 +222,7 @@ public class TransitRouter {
             if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
                 var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
                         accessRequest,
+                        additionalSearchDays,
                         router.routerConfig.flexParameters(request),
                         isEgress
                 );
@@ -235,6 +239,7 @@ public class TransitRouter {
     ) {
         var graph = router.graph;
 
+
         try (RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request)) {
             transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
 
@@ -242,8 +247,8 @@ public class TransitRouter {
                     graph.getTransferService(),
                     transitLayer,
                     searchStartTime,
-                    request.arriveBy ? request.additionalSearchDaysBeforeToday : 0,
-                    request.arriveBy ? 0 : request.additionalSearchDaysAfterToday,
+                    additionalSearchDays.additionalSearchDaysInPast(),
+                    additionalSearchDays.additionalSearchDaysInFuture(),
                     createRequestTransitDataProviderFilter(graph.index),
                     transferRoutingRequest
             );
@@ -292,8 +297,9 @@ public class TransitRouter {
             RoutingRequest request,
             Router router,
             ZonedDateTime searchStartTime,
-            DebugTimingAggregator debugTimingAggregator
+            DebugTimingAggregator debugTimingAggregator,
+            AdditionalSearchDays additionalSearchDays
     ) {
-        return new TransitRouter(request, router, searchStartTime, debugTimingAggregator).route();
+        return new TransitRouter(request, router, searchStartTime, additionalSearchDays, debugTimingAggregator).route();
     }
 }

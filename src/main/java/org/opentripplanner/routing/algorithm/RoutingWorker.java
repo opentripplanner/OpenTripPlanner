@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -13,6 +14,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
+import org.opentripplanner.routing.algorithm.raptor.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptor.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectFlexRouter;
@@ -48,11 +50,27 @@ public class RoutingWorker {
     private SearchParams raptorSearchParamsUsed = null;
     private Itinerary firstRemovedItinerary = null;
     private boolean reverseFilteringDirection = false;
+    private final AdditionalSearchDays additionalSearchDays;
 
     public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
         this.request = request;
         this.router = router;
         this.searchStartTime = DateMapper.asStartOfService(request.getDateTimeCurrentPage(), zoneId);
+
+        var searchDateTime =
+                ZonedDateTime.ofInstant(request.getDateTimeOriginalSearch(), zoneId);
+
+        var maxWindow = Duration.ofMinutes(router.routerConfig.raptorTuningParameters()
+                .dynamicSearchWindowCoefficients()
+                .maxWinTimeMinutes());
+
+        additionalSearchDays = new AdditionalSearchDays(
+                request.arriveBy,
+                searchDateTime,
+                request.searchWindow,
+                maxWindow,
+                request.maxJourneyDuration
+        );
     }
 
     public RoutingResponse route() {
@@ -177,7 +195,7 @@ public class RoutingWorker {
 
         debugTimingAggregator.startedDirectFlexRouter();
         try {
-            itineraries.addAll(DirectFlexRouter.route(router, request));
+            itineraries.addAll(DirectFlexRouter.route(router, request, additionalSearchDays));
         } catch (RoutingValidationException e) {
             routingErrors.addAll(e.getRoutingErrors());
         } finally {
@@ -195,7 +213,8 @@ public class RoutingWorker {
                     request,
                     router,
                     searchStartTime,
-                    debugTimingAggregator
+                    debugTimingAggregator,
+                    additionalSearchDays
             );
             raptorSearchParamsUsed = transitResults.getSearchParams();
             itineraries.addAll(transitResults.getItineraries());

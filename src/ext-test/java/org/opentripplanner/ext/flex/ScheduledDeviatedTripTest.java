@@ -22,6 +22,7 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.raptor.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -171,7 +172,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
         var itineraries = getItineraries(from, to, router);
 
-        assertEquals(1, itineraries.size());
+        assertEquals(2, itineraries.size());
 
         var itin = itineraries.get(0);
         var leg = itin.legs.get(0);
@@ -226,16 +227,20 @@ public class ScheduledDeviatedTripTest extends FlexTest {
             Router router
     ) {
         RoutingRequest request = new RoutingRequest();
-        Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 25, 12, 0, 0);
+        Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
         request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
 
+        var time = dateTime.atZone(ZoneId.of("America/New_York"));
+        var additionalSearchDays = AdditionalSearchDays.defaults(time);
+
         var result = TransitRouter.route(
                 request,
                 router,
-                dateTime.atZone(ZoneId.of("America/New_York")),
-                new DebugTimingAggregator()
+                time,
+                new DebugTimingAggregator(),
+                additionalSearchDays
         );
 
         return result.getItineraries();

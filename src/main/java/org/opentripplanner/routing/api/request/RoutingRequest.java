@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -190,6 +192,19 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * There is no need to set this when going to the next/previous page any more.
      */
     public Duration searchWindow;
+
+    /**
+     * The expected maximum time a journey can last across all possible journeys for the current deployment.
+     * Normally you would just do an estimate and add enough slack, so you are sure that there is no journeys that
+     * falls outside this window. The parameter is used find all possible dates for the journey and then search only
+     * the services which run on those dates. The duration must include access, egress, wait-time and transit time
+     * for the whole journey. It should also take low frequency days/periods like holidays into account. In other words,
+     * pick the two points within your area that has the worst connection and then try to travel on the worst possible
+     * day, and find the maximum journey duration. Using a value that is too high has the effect of including more
+     * patterns in the search, hence, making it a bit slower. Recommended values would be from 12 hours(small
+     * town/city), 1 day (region) to 2 days (country like Norway).
+     */
+    public Duration maxJourneyDuration = Duration.ofHours(24);
 
     /**
      * Use the cursor to go to the next or previous "page" of trips.
@@ -731,23 +746,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public ItineraryFilterParameters itineraryFilters = ItineraryFilterParameters.createDefault();
 
     /**
-     * The numbers of days before the search date to consider when filtering trips for this search.
-     * This is set to 1 to account for trips starting yesterday and crossing midnight so that they
-     * can be boarded today. If there are trips that last multiple days, this will need to be
-     * increased.
-     */
-    public int additionalSearchDaysBeforeToday = 1;
-
-    /**
-     * The number of days after the search date to consider when filtering trips for this search.
-     * This is set to 1 to account for searches today having a search window that crosses midnight
-     * and would also need to board trips starting tomorrow. If a search window that lasts more than
-     * a day is used, this will need to be increased.
-     */
-    public int additionalSearchDaysAfterToday = 2;
-
-
-    /**
      * The filled request parameters for penalties and thresholds values
      */
     public DataOverlayParameters dataOverlay = null;
@@ -796,10 +794,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     /* ACCESSOR/SETTER METHODS */
-
-    public boolean transitAllowed() {
-        return streetSubRequestModes.isTransit();
-    }
 
     public long getSecondsSinceEpoch() {
         return dateTime;
