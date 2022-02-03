@@ -32,7 +32,7 @@ public final class ConstrainedBoardingSearch
     private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY = new ConstrainedBoardingSearchReverse();
 
     /** Handle forward and reverse specific tasks */
-    private final ConstrainedBoardingSearchStrategy fwdRvsStrategy;
+    private final ConstrainedBoardingSearchStrategy searchStrategy;
 
     /**
      * List of transfers for each stop position in pattern
@@ -52,7 +52,7 @@ public final class ConstrainedBoardingSearch
             TransferForPatternByStopPos transfers
     ) {
         this.transfers = transfers;
-        this.fwdRvsStrategy = forwardSearch ? FORWARD_STRATEGY : REVERSE_STRATEGY;
+        this.searchStrategy = forwardSearch ? FORWARD_STRATEGY : REVERSE_STRATEGY;
     }
 
     @Override
@@ -88,7 +88,7 @@ public final class ConstrainedBoardingSearch
         if(!found) { return null; }
 
         var trip = timetable.getTripSchedule(onTripIndex);
-        int departureTime = fwdRvsStrategy.time(trip, currentTargetStopPos);
+        int departureTime = searchStrategy.time(trip, currentTargetStopPos);
 
         return new ConstrainedTransferBoarding<>(
                 onTripTxConstraint,
@@ -132,16 +132,16 @@ public final class ConstrainedBoardingSearch
         int nAllowedBoardings = 0;
         boolean useNextNormalTrip = false;
 
-        var index = fwdRvsStrategy.scheduleIndexIterator(timetable);
+        var index = searchStrategy.scheduleIndexIterator(timetable);
         outer:
         while (index.hasNext()) {
             onTripIndex = index.next();
             var it = timetable.getTripSchedule(onTripIndex);
 
             // Forward: boardTime, Reverse: alightTime
-            int time = fwdRvsStrategy.time(it, stopPos);
+            int time = searchStrategy.time(it, stopPos);
 
-            if (fwdRvsStrategy.timeIsBefore(time, sourceTransitArrivalTime)) { continue; }
+            if (searchStrategy.timeIsBefore(time, sourceTransitArrivalTime)) { continue; }
 
             ++nAllowedBoardings;
 
@@ -157,7 +157,7 @@ public final class ConstrainedBoardingSearch
                 // enough time to do the transfer
                 else {
                     if(onTripTxConstraint.isMinTransferTimeSet()) {
-                        int minTransferBoardTime = fwdRvsStrategy.plus(
+                        int minTransferBoardTime = searchStrategy.plus(
                                 sourceTransitArrivalTime,
                                 onTripTxConstraint.getMinTransferTime()
                         );
@@ -173,7 +173,7 @@ public final class ConstrainedBoardingSearch
                         // transfer time. If the minimum transfer time is 5 minutes, but according
                         // to OSM data it will take 7 minutes to walk then 7 minutes is chosen.
                         else {
-                            onTripEarliestBoardTime = fwdRvsStrategy.maxTime(
+                            onTripEarliestBoardTime = searchStrategy.maxTime(
                                     earliestBoardTime,
                                     minTransferBoardTime
                             );
@@ -183,7 +183,7 @@ public final class ConstrainedBoardingSearch
                         onTripEarliestBoardTime = earliestBoardTime;
                     }
 
-                    if (fwdRvsStrategy.timeIsBefore(time, onTripEarliestBoardTime)) { continue; }
+                    if (searchStrategy.timeIsBefore(time, onTripEarliestBoardTime)) { continue; }
                 }
 
 
