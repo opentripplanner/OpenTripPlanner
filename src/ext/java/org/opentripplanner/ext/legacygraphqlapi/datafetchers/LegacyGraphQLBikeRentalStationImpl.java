@@ -47,7 +47,7 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
         return environment -> {
             var rentalPlace = getSource(environment);
 
-            if(rentalPlace.isFloatingVehicle()) {
+            if(rentalPlace.isFloatingVehicle() && rentalPlace.isAllowPickup()) {
                 return STATE_ON;
             }
             else if(rentalPlace.isAllowDropoff() && rentalPlace.isAllowPickup()) {
