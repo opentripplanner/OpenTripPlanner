@@ -753,6 +753,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public DataOverlayParameters dataOverlay = null;
 
 
+    /**
+     * Raptor can print all events when arriving at stops to system error. For developers only.
+     */
+    public DebugRaptor raptorDebuging = null;
+
+
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */

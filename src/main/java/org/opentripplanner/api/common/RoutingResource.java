@@ -1,7 +1,6 @@
 package org.opentripplanner.api.common;
 
 import java.time.Duration;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +18,7 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.routing.api.request.BannedStopSet;
+import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -689,6 +689,12 @@ public abstract class RoutingResource {
     @QueryParam("useVehicleParkingAvailabilityInformation")
     private Boolean useVehicleParkingAvailabilityInformation;
 
+    @QueryParam("debugRaptorStops")
+    private String debugRaptorStops;
+
+    @QueryParam("debugRaptorPath")
+    private String debugRaptorPath;
+
     /**
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -944,6 +950,12 @@ public abstract class RoutingResource {
 
         if(debugItineraryFilter != null ) {
             request.itineraryFilters.debug = debugItineraryFilter;
+        }
+
+        if(debugRaptorPath != null || debugRaptorStops != null) {
+            request.raptorDebuging = new DebugRaptor()
+                    .withStops(debugRaptorStops)
+                    .withPath(debugRaptorPath);
         }
 
         if (useVehicleParkingAvailabilityInformation != null) {
