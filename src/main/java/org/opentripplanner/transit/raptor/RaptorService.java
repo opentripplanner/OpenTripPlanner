@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor;
 
+import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
@@ -30,10 +31,21 @@ public class RaptorService<T extends RaptorTripSchedule> {
 
     public RaptorResponse<T> route(RaptorRequest<T> request, RaptorTransitDataProvider<T> transitData) {
         LOG.debug("Original request: {}", request);
+        RaptorResponse<T> response;
+
         if(request.isDynamicSearch()) {
-            return new RangeRaptorDynamicSearch<>(config, transitData, request).route();
+            response = new RangeRaptorDynamicSearch<>(config, transitData, request).route();
         }
-        return routeUsingStdWorker(transitData, request);
+        else {
+            response = routeUsingStdWorker(transitData, request);
+        }
+        if(LOG.isDebugEnabled()) {
+            var pathsAsText = response.paths().stream()
+                    .map(p -> "\t\n" + p.toString(transitData.stopNameResolver()))
+                    .collect(Collectors.joining());
+            LOG.debug("Result: {}", pathsAsText);
+        }
+        return response;
     }
 
     public void compareHeuristics(
@@ -59,7 +71,6 @@ public class RaptorService<T extends RaptorTripSchedule> {
     private RaptorResponse<T> routeUsingStdWorker(RaptorTransitDataProvider<T> transitData, RaptorRequest<T> request) {
         LOG.debug("Run query: {}", request);
         Collection<Path<T>> paths = config.createStdWorker(transitData, request).route();
-        LOG.debug("Result: {}", paths);
         return new RaptorResponse<>(paths, request, request);
     }
 }
