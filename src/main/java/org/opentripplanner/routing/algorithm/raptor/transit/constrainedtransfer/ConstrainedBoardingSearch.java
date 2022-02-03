@@ -113,7 +113,7 @@ public final class ConstrainedBoardingSearch
     /**
      * Find the trip to board (trip index) and the transfer constraint.
      * <p>
-     * This method set the following parameter if successful:
+     * This method sets the following parameters if successful:
      * <ul>
      *     <li>{@code onTripIndex}
      *     <li>{@code onTripTxConstraint}
