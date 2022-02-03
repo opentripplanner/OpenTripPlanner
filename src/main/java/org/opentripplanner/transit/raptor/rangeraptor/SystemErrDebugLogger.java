@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor._data.debug;
+package org.opentripplanner.transit.raptor.rangeraptor;
 
 
 import static org.opentripplanner.util.TableFormatter.Align.Center;
@@ -19,7 +19,6 @@ import org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
-import org.opentripplanner.transit.raptor.speed_test.SpeedTest;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.util.TableFormatter;
@@ -28,12 +27,12 @@ import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
- * A debug logger which can be plugged into Raptor to do debug logging to standard error. This
- * is used by the {@link SpeedTest} and in module tests.
+ * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This
+ * is used by the REST API, SpeedTest and in module tests.
  * <p>
  * See the Raptor design doc for a general description of the logging functionality.
  */
-public class TestDebugLogger implements DebugLogger {
+public class SystemErrDebugLogger implements DebugLogger {
     private static final int NOT_SET = Integer.MIN_VALUE;
 
     private final boolean enableDebugLogging;
@@ -56,7 +55,7 @@ public class TestDebugLogger implements DebugLogger {
         9, 2, 5, 5, 8, 8, 8, 6, 0
     );
 
-    public TestDebugLogger(boolean enableDebugLogging) {
+    public SystemErrDebugLogger(boolean enableDebugLogging) {
         this.enableDebugLogging = enableDebugLogging;
     }
 

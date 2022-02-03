@@ -11,6 +11,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
@@ -93,6 +94,19 @@ public class RaptorRequestMapper {
                 .constrainedTransfersEnabled(OTPFeature.TransferConstraints.isOn())
                 .addAccessPaths(accessPaths)
                 .addEgressPaths(egressPaths);
+
+        if(request.raptorDebuging != null) {
+            var debug = builder.debug();
+            var debugLogger = new SystemErrDebugLogger(true);
+
+            debug.addStops(request.raptorDebuging.stops())
+                    .setPath(request.raptorDebuging.path())
+                    .debugPathFromStopIndex(request.raptorDebuging.debugPathFromStopIndex())
+                    .stopArrivalListener(debugLogger::stopArrivalLister)
+                    .patternRideDebugListener(debugLogger::patternRideLister)
+                    .pathFilteringListener(debugLogger::pathFilteringListener)
+                    .logger(debugLogger);
+        }
 
         if(!request.timetableView && request.arriveBy) {
             builder.searchParams().preferLateArrival(true);

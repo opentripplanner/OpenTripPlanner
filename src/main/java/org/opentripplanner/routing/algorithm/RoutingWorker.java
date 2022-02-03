@@ -15,6 +15,7 @@ import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
+import org.opentripplanner.routing.algorithm.raptor.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptor.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectFlexRouter;
@@ -27,6 +28,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -47,7 +49,7 @@ public class RoutingWorker {
     private final RoutingRequest request;
     private final Router router;
     /**
-     * The transit service time-zero normalized for the current search. All transit times are 
+     * The transit service time-zero normalized for the current search. All transit times are
      * relative to a "time-zero". This enables us to use an integer(small memory footprint). The
      * times are number for seconds past the {@code transitSearchTimeZero}. In the internal model
      * all times are stored relative to the {@link org.opentripplanner.model.calendar.ServiceDate},
@@ -58,6 +60,7 @@ public class RoutingWorker {
     private final ZonedDateTime transitSearchTimeZero;
     private SearchParams raptorSearchParamsUsed = null;
     private Itinerary firstRemovedItinerary = null;
+    private final AdditionalSearchDays additionalSearchDays;
 
     public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
         request.applyPageCursor();
@@ -65,6 +68,9 @@ public class RoutingWorker {
         this.router = router;
         this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
         this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
+        this.additionalSearchDays = createAdditionalSearchDays(
+                router.routerConfig.raptorTuningParameters(), zoneId, request
+        );
     }
 
     public RoutingResponse route() {
@@ -184,7 +190,7 @@ public class RoutingWorker {
 
         debugTimingAggregator.startedDirectFlexRouter();
         try {
-            itineraries.addAll(DirectFlexRouter.route(router, request));
+            itineraries.addAll(DirectFlexRouter.route(router, request, additionalSearchDays));
         } catch (RoutingValidationException e) {
             routingErrors.addAll(e.getRoutingErrors());
         } finally {
@@ -202,6 +208,7 @@ public class RoutingWorker {
                     request,
                     router,
                     transitSearchTimeZero,
+                    additionalSearchDays,
                     debugTimingAggregator
             );
             raptorSearchParamsUsed = transitResults.getSearchParams();
@@ -211,6 +218,25 @@ public class RoutingWorker {
         } finally {
             debugTimingAggregator.finishedTransitRouter();
         }
+    }
+
+    private static AdditionalSearchDays createAdditionalSearchDays(
+            RaptorTuningParameters raptorTuningParameters, ZoneId zoneId, RoutingRequest request
+    ) {
+        var searchDateTime = ZonedDateTime.ofInstant(request.getDateTime(), zoneId);
+        var maxWindow = Duration.ofMinutes(
+                raptorTuningParameters
+                        .dynamicSearchWindowCoefficients()
+                        .maxWinTimeMinutes()
+        );
+
+        return new AdditionalSearchDays(
+                request.arriveBy,
+                searchDateTime,
+                request.searchWindow,
+                maxWindow,
+                request.maxJourneyDuration
+        );
     }
 
     private Duration calculateSearchWindowNextSearch(List<Itinerary> itineraries) {

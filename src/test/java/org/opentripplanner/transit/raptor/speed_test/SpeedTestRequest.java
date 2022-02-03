@@ -17,7 +17,7 @@ import java.util.Set;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
+import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
@@ -179,7 +179,7 @@ public class SpeedTestRequest {
             return;
         }
 
-        TestDebugLogger logger = new TestDebugLogger(debugLoggerEnabled);
+        SystemErrDebugLogger logger = new SystemErrDebugLogger(debugLoggerEnabled);
         builder.debug()
                 .stopArrivalListener(logger::stopArrivalLister)
                 .pathFilteringListener(logger::pathFilteringListener)

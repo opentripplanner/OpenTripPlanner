@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,17 +48,21 @@ public class TransitRouter {
     private final Router router;
     private final DebugTimingAggregator debugTimingAggregator;
     private final ZonedDateTime transitSearchTimeZero;
+    private final AdditionalSearchDays additionalSearchDays;
+
 
     private TransitRouter(
             RoutingRequest request,
             Router router,
             ZonedDateTime transitSearchTimeZero,
+            AdditionalSearchDays additionalSearchDays,
             DebugTimingAggregator debugTimingAggregator
     ) {
         this.request = request;
         this.router = router;
-        this.debugTimingAggregator = debugTimingAggregator;
         this.transitSearchTimeZero = transitSearchTimeZero;
+        this.additionalSearchDays = additionalSearchDays;
+        this.debugTimingAggregator = debugTimingAggregator;
     }
 
     private TransitRouterResult route() {
@@ -218,6 +223,7 @@ public class TransitRouter {
             if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
                 var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
                         accessRequest,
+                        additionalSearchDays,
                         router.routerConfig.flexParameters(request),
                         isEgress
                 );
@@ -234,6 +240,7 @@ public class TransitRouter {
     ) {
         var graph = router.graph;
 
+
         try (RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request)) {
             transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
 
@@ -241,8 +248,8 @@ public class TransitRouter {
                     graph.getTransferService(),
                     transitLayer,
                     transitSearchTimeZero,
-                    request.arriveBy ? request.additionalSearchDaysBeforeToday : 0,
-                    request.arriveBy ? 0 : request.additionalSearchDaysAfterToday,
+                    additionalSearchDays.additionalSearchDaysInPast(),
+                    additionalSearchDays.additionalSearchDaysInFuture(),
                     createRequestTransitDataProviderFilter(graph.index),
                     transferRoutingRequest
             );
@@ -291,8 +298,9 @@ public class TransitRouter {
             RoutingRequest request,
             Router router,
             ZonedDateTime transitSearchTimeZero,
+            AdditionalSearchDays additionalSearchDays,
             DebugTimingAggregator debugTimingAggregator
     ) {
-        return new TransitRouter(request, router, transitSearchTimeZero, debugTimingAggregator).route();
+        return new TransitRouter(request, router, transitSearchTimeZero, additionalSearchDays, debugTimingAggregator).route();
     }
 }

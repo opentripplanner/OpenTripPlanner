@@ -74,8 +74,12 @@ public class DebugRequestBuilder {
         return debugPathFromStopIndex;
     }
 
-    public DebugRequestBuilder debugPathFromStopIndex(Integer debugPathStartAtStopIndex) {
-        this.debugPathFromStopIndex = debugPathStartAtStopIndex;
+    /**
+     * Select the stop index where the debugging should start. It is the index of the stops in the
+     * path list.
+     * */
+    public DebugRequestBuilder debugPathFromStopIndex(int stopIndex) {
+        this.debugPathFromStopIndex = stopIndex;
         return this;
     }
 

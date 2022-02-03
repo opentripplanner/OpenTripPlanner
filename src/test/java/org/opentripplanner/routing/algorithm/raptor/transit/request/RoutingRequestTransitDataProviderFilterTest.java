@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -67,19 +68,30 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   @Test
   public void transitModeFilteringTest() {
-    TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
+    TripTimes tripTimes = createTestTripTimes();
+    final var BUS = TransitMode.BUS;
+    final var RAIL = TransitMode.RAIL;
+    final var LOCAL_BUS = TransmodelTransportSubmode.LOCAL_BUS.getValue();
+    final var REGIONAL_BUS = TransmodelTransportSubmode.REGIONAL_BUS.getValue();
 
+    assertFalse(validateModesOnTripTimes(Set.of(), tripTimes));
+    assertFalse(validateModesOnTripTimes(Set.of(new AllowedTransitMode(BUS, REGIONAL_BUS)), tripTimes));
+    assertFalse(validateModesOnTripTimes(Set.of(new AllowedTransitMode(RAIL, LOCAL_BUS)), tripTimes));
+
+    assertTrue(validateModesOnTripTimes(Set.of(new AllowedTransitMode(BUS, null)), tripTimes));
+    assertTrue(validateModesOnTripTimes(Set.of(new AllowedTransitMode(BUS, LOCAL_BUS)), tripTimes));
+  }
+
+  private boolean validateModesOnTripTimes(Set<AllowedTransitMode> allowedModes, TripTimes tripTimes) {
     var filter = new RoutingRequestTransitDataProviderFilter(
-        false,
-        false,
-        false,
-        Set.of(),
-        Set.of()
+            false,
+            false,
+            false,
+            allowedModes,
+            Set.of()
     );
 
-    boolean valid = filter.tripPatternPredicate(tripPatternForDate);
-
-    assertFalse(valid);
+    return filter.tripTimesPredicate(tripTimes);
   }
 
   @Test
@@ -90,7 +102,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         false,
-        Set.of(),
+        Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
         Set.of()
     );
 
@@ -154,6 +166,9 @@ public class RoutingRequestTransitDataProviderFilterTest {
   private TripTimes createTestTripTimes() {
     Trip trip = new Trip(new FeedScopedId("TEST", "TRIP"));
     trip.setBikesAllowed(BikeAccess.NOT_ALLOWED);
+    trip.setRoute(new Route(new FeedScopedId("TEST", "ROUTE")));
+    trip.setMode(TransitMode.BUS);
+    trip.setNetexSubmode(TransmodelTransportSubmode.LOCAL_BUS.getValue());
 
     StopTime stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
@@ -175,7 +190,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         true,
-        Set.of(),
+        Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
         Set.of()
     );
 

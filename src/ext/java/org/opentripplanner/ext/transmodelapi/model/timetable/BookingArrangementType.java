@@ -83,6 +83,34 @@ public class BookingArrangementType {
                 })
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name("bookWhen")
+            .description("Time constraints for booking")
+            .type(EnumTypes.PURCHASE_WHEN)
+            .dataFetcher(environment -> {
+                BookingInfo bookingInfo = bookingInfo(environment);
+                if (bookingInfo.getMinimumBookingNotice() != null) { return null; }
+                BookingTime latestBookingTime = bookingInfo.getLatestBookingTime();
+                BookingTime earliestBookingTime = bookingInfo.getEarliestBookingTime();
+
+                // Try to deduce the original enum from stored values
+                if (earliestBookingTime == null) {
+                    if (latestBookingTime == null) {
+                        return "timeOfTravelOnly";
+                    } else if (latestBookingTime.getDaysPrior() == 1) {
+                        return "untilPreviousDay";
+                    } else if (latestBookingTime.getDaysPrior() == 0) {
+                        return "advanceAndDayOfTravel";
+                    } else {
+                        return "other";
+                    }
+                } else if (earliestBookingTime.getDaysPrior() == 0 && latestBookingTime.getDaysPrior() == 0) {
+                    return "dayOfTravelOnly";
+                } else {
+                    return "other";
+                }
+            })
+            .build())
+        .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("minimumBookingPeriod")
             .description("Minimum period in advance service can be booked as a ISO 8601 duration")
             .type(Scalars.GraphQLString)

@@ -341,6 +341,10 @@ public class NodeAdapter {
         }
     }
 
+    public Duration asDuration(String paramName, Duration defaultValue) {
+        return exist(paramName) ? DurationUtils.duration(param(paramName).asText()) : defaultValue;
+    }
+
     public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {
         JsonNode array = param(paramName);
 
