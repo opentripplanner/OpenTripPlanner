@@ -889,6 +889,421 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
+      "duration": 1296,
+      "elevationGained": 0.0,
+      "elevationLost": 0.0,
+      "endTime": "2009-10-21T23:38:09.000+00:00",
+      "fare": {
+        "details": {
+          "regular": [
+            {
+              "fareId": {
+                "feedId": "prt",
+                "id": "8"
+              },
+              "price": {
+                "cents": 200,
+                "currency": {
+                  "value": "USD"
+                }
+              },
+              "routes": [
+                {
+                  "feedId": "prt",
+                  "id": "20"
+                }
+              ]
+            }
+          ]
+        },
+        "fare": {
+          "regular": {
+            "cents": 200,
+            "currency": {
+              "value": "USD"
+            }
+          }
+        }
+      },
+      "generalizedCost": 2539,
+      "legs": [
+        {
+          "agencyTimeZoneOffset": -25200000,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 565.958,
+          "endTime": "2009-10-21T23:23:59.000+00:00",
+          "from": {
+            "departure": "2009-10-21T23:16:33.000+00:00",
+            "lat": 45.52832,
+            "lon": -122.70059,
+            "name": "SW Johnson St. & NW 24th Ave. (P1)",
+            "vertexType": "NORMAL"
+          },
+          "generalizedCost": 865,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 34,
+            "points": "}f{tGv}{kVjCAjCEnCCFCFErACj@CLMHGFJLNNNDBDBDBF@FBLBH@FBDBNHNJLDPLb@Z^XPNNTBQT{ARJEP"
+          },
+          "mode": "WALK",
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "route": "",
+          "startTime": "2009-10-21T23:16:33.000+00:00",
+          "steps": [
+            {
+              "absoluteDirection": "SOUTH",
+              "area": false,
+              "bogusName": false,
+              "distance": 317.401,
+              "elevation": "",
+              "lat": 45.52831993266165,
+              "lon": -122.70059632295107,
+              "relativeDirection": "DEPART",
+              "stayOn": false,
+              "streetName": "Northwest 24th Avenue"
+            },
+            {
+              "absoluteDirection": "SOUTHEAST",
+              "area": false,
+              "bogusName": false,
+              "distance": 15.262,
+              "elevation": "",
+              "lat": 45.525472400000005,
+              "lon": -122.7004445,
+              "relativeDirection": "SLIGHTLY_LEFT",
+              "stayOn": false,
+              "streetName": "Northwest Westover Road"
+            },
+            {
+              "absoluteDirection": "SOUTHWEST",
+              "area": false,
+              "bogusName": false,
+              "distance": 176.41,
+              "elevation": "",
+              "lat": 45.5253583,
+              "lon": -122.70033570000001,
+              "relativeDirection": "RIGHT",
+              "stayOn": false,
+              "streetName": "Northwest 24th Place"
+            },
+            {
+              "absoluteDirection": "EAST",
+              "area": false,
+              "bogusName": false,
+              "distance": 45.172,
+              "elevation": "",
+              "lat": 45.5239733,
+              "lon": -122.701384,
+              "relativeDirection": "LEFT",
+              "stayOn": false,
+              "streetName": "West Burnside Street"
+            },
+            {
+              "absoluteDirection": "SOUTHWEST",
+              "area": false,
+              "bogusName": true,
+              "distance": 11.713,
+              "elevation": "",
+              "lat": 45.5238426,
+              "lon": -122.70083500000001,
+              "relativeDirection": "RIGHT",
+              "stayOn": false,
+              "streetName": "way 113897002 from 7"
+            }
+          ],
+          "to": {
+            "arrival": "2009-10-21T23:23:59.000+00:00",
+            "departure": "2009-10-21T23:23:59.000+00:00",
+            "lat": 45.523773,
+            "lon": -122.700988,
+            "name": "W Burnside & SW Osage",
+            "stopCode": "9354",
+            "stopId": "prt:9354",
+            "vertexType": "TRANSIT",
+            "zoneId": "1"
+          },
+          "transitLeg": false,
+          "walkingBike": false
+        },
+        {
+          "agencyId": "prt:prt",
+          "agencyName": "TriMet",
+          "agencyTimeZoneOffset": 0,
+          "agencyUrl": "http://trimet.org",
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 2044.4088086831664,
+          "endTime": "2009-10-21T23:34:00.000+00:00",
+          "from": {
+            "arrival": "2009-10-21T23:23:59.000+00:00",
+            "departure": "2009-10-21T23:23:59.000+00:00",
+            "lat": 45.523773,
+            "lon": -122.700988,
+            "name": "W Burnside & SW Osage",
+            "stopCode": "9354",
+            "stopId": "prt:9354",
+            "stopIndex": 36,
+            "stopSequence": 37,
+            "vertexType": "TRANSIT",
+            "zoneId": "1"
+          },
+          "generalizedCost": 1201,
+          "headsign": "Gresham TC",
+          "interlineWithPreviousLeg": false,
+          "intermediateStops": [
+            {
+              "arrival": "2009-10-21T23:24:42.000+00:00",
+              "departure": "2009-10-21T23:24:42.000+00:00",
+              "lat": 45.523287,
+              "lon": -122.696995,
+              "name": "W Burnside & SW St Clair",
+              "stopCode": "718",
+              "stopId": "prt:718",
+              "stopIndex": 37,
+              "stopSequence": 38,
+              "vertexType": "TRANSIT",
+              "zoneId": "1"
+            },
+            {
+              "arrival": "2009-10-21T23:25:10.000+00:00",
+              "departure": "2009-10-21T23:25:10.000+00:00",
+              "lat": 45.523106,
+              "lon": -122.69445,
+              "name": "W Burnside & SW 21st",
+              "stopCode": "749",
+              "stopId": "prt:749",
+              "stopIndex": 38,
+              "stopSequence": 39,
+              "vertexType": "TRANSIT",
+              "zoneId": "1"
+            },
+            {
+              "arrival": "2009-10-21T23:25:30.000+00:00",
+              "departure": "2009-10-21T23:25:30.000+00:00",
+              "lat": 45.523089,
+              "lon": -122.692567,
+              "name": "W Burnside & SW 20th",
+              "stopCode": "8511",
+              "stopId": "prt:8511",
+              "stopIndex": 39,
+              "stopSequence": 40,
+              "vertexType": "TRANSIT",
+              "zoneId": "1"
+            },
+            {
+              "arrival": "2009-10-21T23:26:00.000+00:00",
+              "departure": "2009-10-21T23:26:00.000+00:00",
+              "lat": 45.522942,
+              "lon": -122.689797,
+              "name": "W Burnside & SW 18th",
+              "stopCode": "9860",
+              "stopId": "prt:9860",
+              "stopIndex": 40,
+              "stopSequence": 41,
+              "vertexType": "TRANSIT",
+              "zoneId": "1"
+            },
+            {
+              "arrival": "2009-10-21T23:27:40.000+00:00",
+              "departure": "2009-10-21T23:27:40.000+00:00",
+              "lat": 45.522786,
+              "lon": -122.686682,
+              "name": "W Burnside & SW 15th",
+              "stopCode": "725",
+              "stopId": "prt:725",
+              "stopIndex": 41,
+              "stopSequence": 42,
+              "vertexType": "TRANSIT",
+              "zoneId": "1"
+            },
+            {
+              "arrival": "2009-10-21T23:28:53.000+00:00",
+              "departure": "2009-10-21T23:28:53.000+00:00",
+              "lat": 45.522829,
+              "lon": -122.68439,
+              "name": "W Burnside & SW 13th",
+              "stopCode": "723",
+              "stopId": "prt:723",
+              "stopIndex": 42,
+              "stopSequence": 43,
+              "vertexType": "TRANSIT",
+              "zoneId": "0"
+            },
+            {
+              "arrival": "2009-10-21T23:30:31.000+00:00",
+              "departure": "2009-10-21T23:30:31.000+00:00",
+              "lat": 45.522919,
+              "lon": -122.681327,
+              "name": "W Burnside & SW 10th",
+              "stopCode": "10792",
+              "stopId": "prt:10792",
+              "stopIndex": 43,
+              "stopSequence": 44,
+              "vertexType": "TRANSIT",
+              "zoneId": "0"
+            },
+            {
+              "arrival": "2009-10-21T23:32:01.000+00:00",
+              "departure": "2009-10-21T23:32:01.000+00:00",
+              "lat": 45.522977,
+              "lon": -122.678526,
+              "name": "W Burnside & SW 8th",
+              "stopCode": "715",
+              "stopId": "prt:715",
+              "stopIndex": 44,
+              "stopSequence": 45,
+              "vertexType": "TRANSIT",
+              "zoneId": "0"
+            },
+            {
+              "arrival": "2009-10-21T23:32:52.000+00:00",
+              "departure": "2009-10-21T23:32:52.000+00:00",
+              "lat": 45.522961,
+              "lon": -122.676924,
+              "name": "W Burnside & SW 6th",
+              "stopCode": "792",
+              "stopId": "prt:792",
+              "stopIndex": 45,
+              "stopSequence": 46,
+              "vertexType": "TRANSIT",
+              "zoneId": "0"
+            }
+          ],
+          "legGeometry": {
+            "length": 57,
+            "points": "gkztGz_|kVTmALiBt@mJJ_DBoA??@e@D}AFyDBgADwB??@]BaADgCDmC??By@FiEJoEBuA??DsBD}BBiADmC@y@AiB???Y?g@As@?_@?YAeB@uD???{@G{D?mECeBAu@??Ai@CoEASAuDAmB???MCqEA_B??A{ACsEAwB"
+          },
+          "mode": "BUS",
+          "pathway": false,
+          "realTime": false,
+          "route": "Burnside/Stark",
+          "routeId": "prt:20",
+          "routeLongName": "Burnside/Stark",
+          "routeShortName": "20",
+          "serviceDate": "2009-10-21",
+          "startTime": "2009-10-21T23:23:59.000+00:00",
+          "steps": [ ],
+          "to": {
+            "arrival": "2009-10-21T23:34:00.000+00:00",
+            "departure": "2009-10-21T23:34:00.000+00:00",
+            "lat": 45.522974,
+            "lon": -122.674799,
+            "name": "W Burnside & SW 4th",
+            "stopCode": "772",
+            "stopId": "prt:772",
+            "stopIndex": 46,
+            "stopSequence": 47,
+            "vertexType": "TRANSIT",
+            "zoneId": "0"
+          },
+          "transitLeg": true,
+          "tripBlockId": "1237",
+          "tripId": "prt:201W1450"
+        },
+        {
+          "agencyTimeZoneOffset": -25200000,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 308.24,
+          "endTime": "2009-10-21T23:38:09.000+00:00",
+          "from": {
+            "arrival": "2009-10-21T23:34:00.000+00:00",
+            "departure": "2009-10-21T23:34:00.000+00:00",
+            "lat": 45.522974,
+            "lon": -122.674799,
+            "name": "W Burnside & SW 4th",
+            "stopCode": "772",
+            "stopId": "prt:772",
+            "vertexType": "TRANSIT",
+            "zoneId": "0"
+          },
+          "generalizedCost": 472,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 18,
+            "points": "qeztGn|vkVK@?v@@f@?RWBK@kBBI?K?wBBI?K?I?mBBK@?M?a@"
+          },
+          "mode": "WALK",
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "route": "",
+          "startTime": "2009-10-21T23:34:00.000+00:00",
+          "steps": [
+            {
+              "absoluteDirection": "WEST",
+              "area": false,
+              "bogusName": false,
+              "distance": 45.562,
+              "elevation": "",
+              "lat": 45.52303774853131,
+              "lon": -122.6748017088418,
+              "relativeDirection": "DEPART",
+              "stayOn": false,
+              "streetName": "West Burnside Street"
+            },
+            {
+              "absoluteDirection": "NORTH",
+              "area": false,
+              "bogusName": false,
+              "distance": 12.942,
+              "elevation": "",
+              "lat": 45.5230254,
+              "lon": -122.67538630000001,
+              "relativeDirection": "RIGHT",
+              "stayOn": false,
+              "streetName": "Southwest 5th Avenue"
+            },
+            {
+              "absoluteDirection": "NORTH",
+              "area": false,
+              "bogusName": false,
+              "distance": 231.76099999999997,
+              "elevation": "",
+              "lat": 45.523141200000005,
+              "lon": -122.67540310000001,
+              "relativeDirection": "CONTINUE",
+              "stayOn": false,
+              "streetName": "Northwest 5th Avenue"
+            },
+            {
+              "absoluteDirection": "EAST",
+              "area": false,
+              "bogusName": false,
+              "distance": 17.975,
+              "elevation": "",
+              "lat": 45.525224200000004,
+              "lon": -122.67548060000001,
+              "relativeDirection": "RIGHT",
+              "stayOn": false,
+              "streetName": "Northwest Everett Street"
+            }
+          ],
+          "to": {
+            "arrival": "2009-10-21T23:38:09.000+00:00",
+            "lat": 45.52523,
+            "lon": -122.67525,
+            "name": "NW Everett St. & NW 5th Ave. (P3)",
+            "vertexType": "NORMAL"
+          },
+          "transitLeg": false,
+          "walkingBike": false
+        }
+      ],
+      "startTime": "2009-10-21T23:16:33.000+00:00",
+      "tooSloped": false,
+      "transfers": 0,
+      "transitTime": 601,
+      "waitingTime": 0,
+      "walkDistance": 874.198,
+      "walkLimitExceeded": false,
+      "walkTime": 695
+    },
+    {
+      "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1001,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
@@ -2173,323 +2588,6 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
       "walkDistance": 817.8299999999999,
       "walkLimitExceeded": false,
       "walkTime": 474
-    },
-    {
-      "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1001,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
-      "endTime": "2009-10-21T23:56:10.000+00:00",
-      "fare": {
-        "details": {
-          "regular": [
-            {
-              "fareId": {
-                "feedId": "prt",
-                "id": "8"
-              },
-              "price": {
-                "cents": 200,
-                "currency": {
-                  "value": "USD"
-                }
-              },
-              "routes": [
-                {
-                  "feedId": "prt",
-                  "id": "77"
-                }
-              ]
-            }
-          ]
-        },
-        "fare": {
-          "regular": {
-            "cents": 200,
-            "currency": {
-              "value": "USD"
-            }
-          }
-        }
-      },
-      "generalizedCost": 1805,
-      "legs": [
-        {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 220.14600000000002,
-          "endTime": "2009-10-21T23:42:21.000+00:00",
-          "from": {
-            "departure": "2009-10-21T23:39:29.000+00:00",
-            "lat": 45.52832,
-            "lon": -122.70059,
-            "name": "SW Johnson St. & NW 24th Ave. (P1)",
-            "vertexType": "NORMAL"
-          },
-          "generalizedCost": 336,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 6,
-            "points": "}f{tGv}{kVC?mCBmCD@zCN?"
-          },
-          "mode": "WALK",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:39:29.000+00:00",
-          "steps": [
-            {
-              "absoluteDirection": "NORTH",
-              "area": false,
-              "bogusName": false,
-              "distance": 159.625,
-              "elevation": "",
-              "lat": 45.52831993266165,
-              "lon": -122.70059632295107,
-              "relativeDirection": "DEPART",
-              "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
-            },
-            {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 60.521,
-              "elevation": "",
-              "lat": 45.529755,
-              "lon": -122.70064880000001,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Northwest Lovejoy Street"
-            }
-          ],
-          "to": {
-            "arrival": "2009-10-21T23:42:21.000+00:00",
-            "departure": "2009-10-21T23:42:21.000+00:00",
-            "lat": 45.529662,
-            "lon": -122.701423,
-            "name": "2400 Block NW Lovejoy",
-            "stopCode": "3589",
-            "stopId": "prt:3589",
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
-          },
-          "transitLeg": false,
-          "walkingBike": false
-        },
-        {
-          "agencyId": "prt:prt",
-          "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
-          "agencyUrl": "http://trimet.org",
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 2804.1297859664874,
-          "endTime": "2009-10-21T23:55:32.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:42:21.000+00:00",
-            "departure": "2009-10-21T23:42:21.000+00:00",
-            "lat": 45.529662,
-            "lon": -122.701423,
-            "name": "2400 Block NW Lovejoy",
-            "stopCode": "3589",
-            "stopId": "prt:3589",
-            "stopIndex": 6,
-            "stopSequence": 7,
-            "vertexType": "TRANSIT",
-            "zoneId": "1"
-          },
-          "generalizedCost": 1391,
-          "headsign": "Troutdale",
-          "interlineWithPreviousLeg": false,
-          "intermediateStops": [
-            {
-              "arrival": "2009-10-21T23:43:54.000+00:00",
-              "departure": "2009-10-21T23:43:54.000+00:00",
-              "lat": 45.529746,
-              "lon": -122.69688,
-              "name": "NW Lovejoy & 22nd",
-              "stopCode": "3596",
-              "stopId": "prt:3596",
-              "stopIndex": 7,
-              "stopSequence": 8,
-              "vertexType": "TRANSIT",
-              "zoneId": "1"
-            },
-            {
-              "arrival": "2009-10-21T23:44:39.000+00:00",
-              "departure": "2009-10-21T23:44:39.000+00:00",
-              "lat": 45.529833,
-              "lon": -122.694676,
-              "name": "NW Lovejoy & 21st",
-              "stopCode": "3595",
-              "stopId": "prt:3595",
-              "stopIndex": 8,
-              "stopSequence": 9,
-              "vertexType": "TRANSIT",
-              "zoneId": "1"
-            },
-            {
-              "arrival": "2009-10-21T23:46:23.000+00:00",
-              "departure": "2009-10-21T23:46:23.000+00:00",
-              "lat": 45.529925,
-              "lon": -122.689587,
-              "name": "NW Lovejoy & 18th",
-              "stopCode": "10751",
-              "stopId": "prt:10751",
-              "stopIndex": 9,
-              "stopSequence": 10,
-              "vertexType": "TRANSIT",
-              "zoneId": "1"
-            },
-            {
-              "arrival": "2009-10-21T23:48:05.000+00:00",
-              "departure": "2009-10-21T23:48:05.000+00:00",
-              "lat": 45.529997,
-              "lon": -122.684611,
-              "name": "NW Lovejoy & 13th",
-              "stopCode": "10752",
-              "stopId": "prt:10752",
-              "stopIndex": 10,
-              "stopSequence": 11,
-              "vertexType": "TRANSIT",
-              "zoneId": "1"
-            },
-            {
-              "arrival": "2009-10-21T23:49:07.000+00:00",
-              "departure": "2009-10-21T23:49:07.000+00:00",
-              "lat": 45.530034,
-              "lon": -122.68155,
-              "name": "NW Lovejoy & 10th",
-              "stopCode": "11000",
-              "stopId": "prt:11000",
-              "stopIndex": 11,
-              "stopSequence": 12,
-              "vertexType": "TRANSIT",
-              "zoneId": "1"
-            },
-            {
-              "arrival": "2009-10-21T23:50:00.000+00:00",
-              "departure": "2009-10-21T23:50:00.000+00:00",
-              "lat": 45.531086,
-              "lon": -122.680302,
-              "name": "NW 9th & Marshall",
-              "stopCode": "12803",
-              "stopId": "prt:12803",
-              "stopIndex": 12,
-              "stopSequence": 13,
-              "vertexType": "TRANSIT",
-              "zoneId": "1"
-            },
-            {
-              "arrival": "2009-10-21T23:52:50.000+00:00",
-              "departure": "2009-10-21T23:52:50.000+00:00",
-              "lat": 45.528405,
-              "lon": -122.676979,
-              "name": "NW Station Way & Union Station",
-              "stopCode": "12804",
-              "stopId": "prt:12804",
-              "stopIndex": 13,
-              "stopSequence": 14,
-              "vertexType": "TRANSIT",
-              "zoneId": "0"
-            }
-          ],
-          "legGeometry": {
-            "length": 60,
-            "points": "yo{tG|b|kVC}CEuKGwI???}@G{J???YGsKEuKCuD???UCiECeEAgA?{@AkA?WAwDE{C???i@CiECkECcD??Ae@?mE{BDQ@q@@??{ADCsDbBiB`DaEt@_AVANIX?tBCLK`@c@\\c@l@w@??\\c@FKDCFEXCCgEvBEVAlCClCEnCECoD"
-          },
-          "mode": "BUS",
-          "pathway": false,
-          "realTime": false,
-          "route": "Broadway/Halsey",
-          "routeId": "prt:77",
-          "routeLongName": "Broadway/Halsey",
-          "routeShortName": "77",
-          "serviceDate": "2009-10-21",
-          "startTime": "2009-10-21T23:42:21.000+00:00",
-          "steps": [ ],
-          "to": {
-            "arrival": "2009-10-21T23:55:32.000+00:00",
-            "departure": "2009-10-21T23:55:32.000+00:00",
-            "lat": 45.525183,
-            "lon": -122.674607,
-            "name": "NW Everett & 4th",
-            "stopCode": "9546",
-            "stopId": "prt:9546",
-            "stopIndex": 14,
-            "stopSequence": 15,
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
-          },
-          "transitLeg": true,
-          "tripBlockId": "7703",
-          "tripId": "prt:770W1400"
-        },
-        {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 49.938,
-          "endTime": "2009-10-21T23:56:10.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:55:32.000+00:00",
-            "departure": "2009-10-21T23:55:32.000+00:00",
-            "lat": 45.525183,
-            "lon": -122.674607,
-            "name": "NW Everett & 4th",
-            "stopCode": "9546",
-            "stopId": "prt:9546",
-            "vertexType": "TRANSIT",
-            "zoneId": "0"
-          },
-          "generalizedCost": 77,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 3,
-            "points": "ksztGh{vkVI?@~B"
-          },
-          "mode": "WALK",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": false,
-          "route": "",
-          "startTime": "2009-10-21T23:55:32.000+00:00",
-          "steps": [
-            {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 49.938,
-              "elevation": "",
-              "lat": 45.525239650875925,
-              "lon": -122.67460910872424,
-              "relativeDirection": "DEPART",
-              "stayOn": false,
-              "streetName": "Northwest Everett Street"
-            }
-          ],
-          "to": {
-            "arrival": "2009-10-21T23:56:10.000+00:00",
-            "lat": 45.52523,
-            "lon": -122.67525,
-            "name": "NW Everett St. & NW 5th Ave. (P3)",
-            "vertexType": "NORMAL"
-          },
-          "transitLeg": false,
-          "walkingBike": false
-        }
-      ],
-      "startTime": "2009-10-21T23:39:29.000+00:00",
-      "tooSloped": false,
-      "transfers": 0,
-      "transitTime": 791,
-      "waitingTime": 0,
-      "walkDistance": 270.084,
-      "walkLimitExceeded": false,
-      "walkTime": 210
     }
   ]
 ]

@@ -232,8 +232,10 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
             return originalRequest;
         }
         return originalRequest.mutate().searchParams()
-                .latestArrivalTime(transitData.getValidTransitDataEndTime())
-                .build();
+                .latestArrivalTime(
+                        transitData.getValidTransitDataEndTime() +
+                        originalRequest.searchParams().getAccessEgressMaxDurationSeconds()
+                ).build();
     }
 
     private RaptorRequest<T> requestWithDynamicSearchParams(RaptorRequest<T> request) {
@@ -263,8 +265,11 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
         }
     }
 
+    /**
+     * Only exposed for testing purposes
+     */
     @Nullable
-    private Heuristics getDestinationHeuristics() {
+    public Heuristics getDestinationHeuristics() {
         if (!originalRequest.useDestinationPruning()) { return null; }
         LOG.debug("RangeRaptor - Destination pruning enabled.");
         return revHeuristics.result();
