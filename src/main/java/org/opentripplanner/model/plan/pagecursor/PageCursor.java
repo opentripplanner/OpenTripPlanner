@@ -7,7 +7,7 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.plan.SortOrder;
 
 /**
- * This class hold all the information needed to page to the next/previous page. It is
+ * This class holds all the information needed to page to the next/previous page. It is
  * serialized as base64 when passed on to the client. The base64 encoding is done to prevent the
  * client from using the information inside the cursor.
  * <p>

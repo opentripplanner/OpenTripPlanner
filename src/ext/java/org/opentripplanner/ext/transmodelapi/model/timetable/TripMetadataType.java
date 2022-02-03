@@ -21,10 +21,10 @@ public class TripMetadataType {
             .name("searchWindowUsed")
             .description(
                     "This is the time window used by the raptor search. The input searchWindow "
-                    + "is an optional parameter and is dynamically assign if not set. OTP might "
-                    + "override the value if it is too small or too large. When paging OTP adjust "
+                    + "is an optional parameter and is dynamically assigned if not set. OTP might "
+                    + "override the value if it is too small or too large. When paging OTP adjusts "
                     + "it to the appropriate size, depending on the number of itineraries found in "
-                    + "the current search window. The scaling of the search window ensure faster "
+                    + "the current search window. The scaling of the search window ensures faster "
                     + "paging and limits resource usage. The unit is seconds."
             )
             .type(new GraphQLNonNull(Scalars.GraphQLInt))
