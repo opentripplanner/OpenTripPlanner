@@ -330,7 +330,7 @@ public class StatesToWalkStepsMapper {
         if (edge instanceof StreetEdge) {
             // the next edges will be PlainStreetEdges, we hope
             double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
-            for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
+            for (StreetEdge alternative : backState.getVertex().getOutgoingStreetEdges()) {
                 if (isTurnToOtherStreet(streetName, angleDiff, alternative)) {
                     return true;
                 }
@@ -341,8 +341,8 @@ public class StatesToWalkStepsMapper {
             // FIXME: this code might be wrong with the removal of the edge-based graph
             State twoStatesBack = backState.getBackState();
             Vertex backVertex = twoStatesBack.getVertex();
-            for (Edge alternative : backVertex.getOutgoingStreetEdges()) {
-                for (Edge innerAlternative : alternative.getToVertex().getOutgoingStreetEdges()) {
+            for (StreetEdge alternative : backVertex.getOutgoingStreetEdges()) {
+                for (StreetEdge innerAlternative : alternative.getToVertex().getOutgoingStreetEdges()) {
                     if (isTurnToOtherStreet(streetName, angleDiff, innerAlternative)) {
                         return true;
                     }

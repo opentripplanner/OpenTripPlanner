@@ -204,6 +204,7 @@ public class GraphBuilder implements Runnable {
                     config.writeCachedElevations,
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples,
+                    config.maxElevationPropagationMeters,
                     config.includeEllipsoidToGeoidDifference,
                     config.multiThreadElevationCalculations
                 )

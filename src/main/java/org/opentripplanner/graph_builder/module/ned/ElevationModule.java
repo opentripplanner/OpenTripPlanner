@@ -13,9 +13,9 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.geotools.geometry.DirectPosition2D;
@@ -27,11 +27,9 @@ import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;
 import org.opentripplanner.graph_builder.issues.ElevationProfileFailure;
-import org.opentripplanner.graph_builder.issues.ElevationPropagationLimit;
 import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -70,6 +68,7 @@ public class ElevationModule implements GraphBuilderModule {
     private final boolean writeCachedElevations;
     /* The file of cached elevations */
     private final File cachedElevationsFile;
+    private final double maxElevationPropagationMeters;
     /* Whether or not to include geoid difference values in individual elevation calculations */
     private final boolean includeEllipsoidToGeoidDifference;
     /*
@@ -125,6 +124,7 @@ public class ElevationModule implements GraphBuilderModule {
             false,
             1,
             10,
+            2000,
             true,
             false
         );
@@ -137,6 +137,7 @@ public class ElevationModule implements GraphBuilderModule {
         boolean writeCachedElevations,
         double elevationUnitMultiplier,
         double distanceBetweenSamplesM,
+        double maxElevationPropagationMeters,
         boolean includeEllipsoidToGeoidDifference,
         boolean multiThreadElevationCalculations
     ) {
@@ -145,6 +146,7 @@ public class ElevationModule implements GraphBuilderModule {
         this.readCachedElevations = readCachedElevations;
         this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
+        this.maxElevationPropagationMeters = maxElevationPropagationMeters;
         this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
         this.multiThreadElevationCalculations = multiThreadElevationCalculations;
         this.distanceBetweenSamplesM = distanceBetweenSamplesM;
@@ -250,13 +252,18 @@ public class ElevationModule implements GraphBuilderModule {
                 out.writeObject(newCachedElevations);
                 out.close();
             } catch (IOException e) {
-                LOG.error(e.getMessage());
-                issueStore.add(new Graphwide("Failed to write cached elevation file!"));
+                issueStore.add(new Graphwide("Failed to write cached elevation file: " + e.getMessage()));
             }
         }
+
         @SuppressWarnings("unchecked")
-        HashMap<Vertex, Double> extraElevation = (HashMap<Vertex, Double>) extra.get(ElevationPoint.class);
-        assignMissingElevations(graph, edgesWithCalculatedElevations, extraElevation);
+        Map<Vertex, Double> extraElevation = (Map<Vertex, Double>) extra.get(ElevationPoint.class);
+        var elevationsForVertices = collectKnownElevationsForVertices(extraElevation, edgesWithCalculatedElevations);
+
+        new MissingElevationHandler(
+                issueStore, elevationsForVertices, maxElevationPropagationMeters
+        )
+                .run();
 
         updateElevationMetadata(graph);
 
@@ -271,244 +278,50 @@ public class ElevationModule implements GraphBuilderModule {
         }
     }
 
-    static class ElevationRepairState {
-        /* This uses an intuitionist approach to elevation inspection */
-        public StreetEdge backEdge;
-
-        public ElevationRepairState backState;
-
-        public Vertex vertex;
-
-        public double distance;
-
-        public double initialElevation;
-
-        public ElevationRepairState(StreetEdge backEdge, ElevationRepairState backState,
-                Vertex vertex, double distance, double initialElevation) {
-            this.backEdge = backEdge;
-            this.backState = backState;
-            this.vertex = vertex;
-            this.distance = distance;
-            this.initialElevation = initialElevation;
-        }
-    }
-
-    /**
-     * Assign missing elevations by interpolating from nearby points with known
-     * elevation; also handle osm ele tags
-     */
-    private void assignMissingElevations(Graph graph, List<StreetEdge> edgesWithElevation, HashMap<Vertex, Double> knownElevations) {
-
-        LOG.debug("Assigning missing elevations");
-
-        BinHeap<ElevationRepairState> pq = new BinHeap<>();
-
-        // elevation for each vertex (known or interpolated)
+    private Map<Vertex, Double> collectKnownElevationsForVertices(
+            Map<Vertex, Double> knownElevations,
+            List<StreetEdge> edgesWithElevation
+    ) {
         // knownElevations will be null if there are no ElevationPoints in the data
         // for instance, with the Shapefile loader.)
-        HashMap<Vertex, Double> elevations; 
-        if (knownElevations != null)
-            elevations = (HashMap<Vertex, Double>) knownElevations.clone();
-        else
-            elevations = new HashMap<>();
+        var elevations = knownElevations != null
+                ? new HashMap<>(knownElevations)
+                : new HashMap<Vertex, Double>();
 
-        // If including the EllipsoidToGeoidDifference, subtract these from the known elevations found in OpenStreetMap
-        // data.
+        // If including the EllipsoidToGeoidDifference, subtract these from the known elevations
+        // found in OpenStreetMap data.
         if (includeEllipsoidToGeoidDifference) {
             elevations.forEach((vertex, elevation) -> {
                 try {
                     elevations.put(
-                        vertex, elevation - getApproximateEllipsoidToGeoidDifference(vertex.getY(), vertex.getX())
+                            vertex, elevation - getApproximateEllipsoidToGeoidDifference(vertex.getY(), vertex.getX())
                     );
                 } catch (TransformException e) {
                     LOG.error(
-                        "Error processing elevation for known elevation at vertex: {} due to error: {}",
-                        vertex,
-                        e
+                            "Error processing elevation for known elevation at vertex: {} due to error: {}",
+                            vertex,
+                            e
                     );
                 }
             });
         }
 
-        HashSet<Vertex> closed = new HashSet<>();
-
-        // initialize queue with all vertices which already have known elevation
+        // add all vertices which known elevation
         for (StreetEdge e : edgesWithElevation) {
             PackedCoordinateSequence profile = e.getElevationProfile();
 
             if (!elevations.containsKey(e.getFromVertex())) {
                 double firstElevation = profile.getOrdinate(0, 1);
-                ElevationRepairState state = new ElevationRepairState(
-                    null,
-                    null,
-                    e.getFromVertex(),
-                    0,
-                    firstElevation
-                );
-                pq.insert(state, 0);
                 elevations.put(e.getFromVertex(), firstElevation);
             }
 
             if (!elevations.containsKey(e.getToVertex())) {
                 double lastElevation = profile.getOrdinate(profile.size() - 1, 1);
-                ElevationRepairState state = new ElevationRepairState(
-                    null,
-                    null,
-                    e.getToVertex(),
-                    0,
-                    lastElevation
-                );
-                pq.insert(state, 0);
                 elevations.put(e.getToVertex(), lastElevation);
             }
         }
 
-        // Grow an SPT outward from vertices with known elevations into regions where the
-        // elevation is not known. when a branch hits a region with known elevation, follow the
-        // back pointers through the region of unknown elevation, setting elevations via interpolation.
-        while (!pq.empty()) {
-            ElevationRepairState state = pq.extract_min();
-
-            if (closed.contains(state.vertex)) continue;
-            closed.add(state.vertex);
-
-            ElevationRepairState curState = state;
-            Vertex initialVertex = null;
-            while (curState != null) {
-                initialVertex = curState.vertex;
-                curState = curState.backState;
-            }
-
-            double bestDistance = Double.MAX_VALUE;
-            double bestElevation = 0;
-            for (Edge e : state.vertex.getOutgoing()) {
-                if (!(e instanceof StreetEdge)) {
-                    continue;
-                }
-                StreetEdge edge = (StreetEdge) e;
-                Vertex tov = e.getToVertex();
-                if (tov == initialVertex)
-                    continue;
-
-                Double elevation = elevations.get(tov);
-                if (elevation != null) {
-                    double distance = e.getDistanceMeters();
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestElevation = elevation;
-                    }
-                } else {
-                    // continue
-                    ElevationRepairState newState = new ElevationRepairState(
-                        edge,
-                        state,
-                        tov,
-                        e.getDistanceMeters() + state.distance,
-                        state.initialElevation
-                    );
-                    pq.insert(newState, e.getDistanceMeters() + state.distance);
-                }
-            } // end loop over outgoing edges
-
-            for (Edge e : state.vertex.getIncoming()) {
-                if (!(e instanceof StreetEdge)) {
-                    continue;
-                }
-                StreetEdge edge = (StreetEdge) e;
-                Vertex fromv = e.getFromVertex();
-                if (fromv == initialVertex)
-                    continue;
-                Double elevation = elevations.get(fromv);
-                if (elevation != null) {
-                    double distance = e.getDistanceMeters();
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestElevation = elevation;
-                    }
-                } else {
-                    // continue
-                    ElevationRepairState newState = new ElevationRepairState(
-                        edge,
-                        state,
-                        fromv,
-                        e.getDistanceMeters() + state.distance,
-                        state.initialElevation
-                    );
-                    pq.insert(newState, e.getDistanceMeters() + state.distance);
-                }
-            } // end loop over incoming edges
-
-            //limit elevation propagation to at max 2km; this prevents an infinite loop
-            //in the case of islands missing elevation (and some other cases)
-            if (bestDistance == Double.MAX_VALUE && state.distance > 2000) {
-                issueStore.add(new ElevationPropagationLimit(state.vertex));
-                bestDistance = state.distance;
-                bestElevation = state.initialElevation;
-            }
-            if (bestDistance != Double.MAX_VALUE) {
-                // we have found a second vertex with elevation, so we can interpolate the elevation
-                // for this point
-                double totalDistance = bestDistance + state.distance;
-                // trace backwards, setting states as we go
-                while (true) {
-                    // watch out for division by 0 here, which will propagate NaNs 
-                    // all the way out to edge lengths 
-                    if (totalDistance == 0)
-                        elevations.put(state.vertex, bestElevation);
-                    else {
-                        double elevation = (bestElevation * state.distance + 
-                               state.initialElevation * bestDistance) / totalDistance;
-                        elevations.put(state.vertex, elevation);
-                    }
-                    if (state.backState == null)
-                        break;
-                    bestDistance += state.backEdge.getDistanceMeters();
-                    state = state.backState;
-                    if (elevations.containsKey(state.vertex))
-                        break;
-                }
-
-            }
-        } // end loop over states
-
-        // do actual assignments
-        for (Vertex v : graph.getVertices()) {
-            Double fromElevation = elevations.get(v);
-            for (Edge e : v.getOutgoing()) {
-                if (e instanceof StreetEdge) {
-                    StreetEdge edge = ((StreetEdge) e);
-
-                    Double toElevation = elevations.get(edge.getToVertex());
-
-                    if (fromElevation == null || toElevation == null) {
-                        if (!edge.isElevationFlattened() && !edge.isSlopeOverride()) {
-                            issueStore.add(new ElevationProfileFailure(edge, "Failed to propagate elevation data"));
-                        }
-                        continue;
-                    }
-
-                    if (edge.getElevationProfile() != null && edge.getElevationProfile().size() > 2) {
-                        continue;
-                    }
-
-                    Coordinate[] coords = new Coordinate[2];
-                    coords[0] = new Coordinate(0, fromElevation);
-                    coords[1] = new Coordinate(edge.getDistanceMeters(), toElevation);
-
-                    PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
-
-                    try {
-                        StreetElevationExtension.addToEdge(edge, profile, true);
-
-                        if (edge.isElevationFlattened()) {
-                            issueStore.add(new ElevationFlattened(edge));
-                        }
-                    } catch (Exception ex) {
-                        issueStore.add(new ElevationProfileFailure(edge, ex.getMessage()));
-                    }
-                }
-            }
-        }
+        return elevations;
     }
 
     /**
