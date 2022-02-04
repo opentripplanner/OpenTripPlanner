@@ -108,6 +108,7 @@ public class OtpTransitServiceImplTest {
 
         assertEquals(
                 "ConstrainedTransfer{from: <Route 2, stop D>, to: <Route 5, stop I>, constraint: {guaranteed}}\n"
+                + "ConstrainedTransfer{from: <Stop F>, to: <Stop E>, constraint: {minTransferTime: 20m}}\n"
                 + "ConstrainedTransfer{from: <Stop K>, to: <Stop L>, constraint: {priority: RECOMMENDED}}\n"
                 + "ConstrainedTransfer{from: <Stop K>, to: <Stop M>, constraint: {priority: NOT_ALLOWED}}\n"
                 + "ConstrainedTransfer{from: <Stop L>, to: <Stop K>, constraint: {priority: RECOMMENDED}}\n"

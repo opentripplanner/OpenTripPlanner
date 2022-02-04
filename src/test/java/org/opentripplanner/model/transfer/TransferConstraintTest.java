@@ -21,6 +21,8 @@ public class TransferConstraintTest {
           .guaranteed().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
   private final TransferConstraint EVERYTHING = TransferConstraint.create()
           .staySeated().guaranteed().preferred().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
+  private final TransferConstraint MIN_TRANSFER_TIME = TransferConstraint.create()
+          .minTransferTime(600).build();
 
   @Test
   public void getPriority() {
@@ -46,14 +48,16 @@ public class TransferConstraintTest {
     assertTrue(STAY_SEATED.isFacilitated());
     assertFalse(NO_CONSTRAINS.isFacilitated());
     assertFalse(NOT_ALLOWED.isFacilitated());
+    assertFalse(MIN_TRANSFER_TIME.isFacilitated());
   }
 
   @Test
   public void useInRaptorRouting() {
-    assertTrue(GUARANTIED.useInRaptorRouting());
-    assertTrue(STAY_SEATED.useInRaptorRouting());
-    assertFalse(NO_CONSTRAINS.useInRaptorRouting());
-    assertTrue(NOT_ALLOWED.useInRaptorRouting());
+    assertTrue(GUARANTIED.includeInRaptorRouting());
+    assertTrue(STAY_SEATED.includeInRaptorRouting());
+    assertFalse(NO_CONSTRAINS.includeInRaptorRouting());
+    assertTrue(NOT_ALLOWED.includeInRaptorRouting());
+    assertTrue(MIN_TRANSFER_TIME.includeInRaptorRouting());
   }
 
   @Test
@@ -61,6 +65,7 @@ public class TransferConstraintTest {
     assertTrue(NOT_ALLOWED.isNotAllowed());
     assertFalse(GUARANTIED.isNotAllowed());
     assertFalse(NO_CONSTRAINS.isNotAllowed());
+    assertFalse(MIN_TRANSFER_TIME.isNotAllowed());
   }
 
   @Test
@@ -69,8 +74,15 @@ public class TransferConstraintTest {
   }
 
   @Test
+  public void getMinTransferTime() {
+    assertTrue(MIN_TRANSFER_TIME.isMinTransferTimeSet());
+    assertEquals(600, MIN_TRANSFER_TIME.getMinTransferTime());
+  }
+
+  @Test
   public void cost() {
     assertEquals(33_00, NO_CONSTRAINS.cost());
+    assertEquals(33_00, MIN_TRANSFER_TIME.cost());
     assertEquals(32_00, RECOMMENDED.cost());
     assertEquals(23_00, GUARANTIED.cost());
     assertEquals(13_00, STAY_SEATED.cost());

@@ -59,9 +59,10 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
 
     /**
-     * Regular street transfers should be given this cost.
+     * Used with {@link #getMaxWaitTime()} and {@link #getMinTransferTime()} to indicate
+     * the parameter is not available.
      */
-    public static final int MAX_WAIT_TIME_NOT_SET = -1;
+    public static final int NOT_SET = -1;
 
 
     private final TransferPriority priority;
@@ -72,12 +73,26 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
     private final int maxWaitTime;
 
+    private final int minTransferTime;
+
+    private final boolean includeInRaptorRouting;
+
+
 
     private TransferConstraint(Builder builder) {
         this.priority = builder.priority;
         this.staySeated = builder.staySeated;
         this.guaranteed = builder.guaranteed;
         this.maxWaitTime = builder.maxWaitTime;
+        this.minTransferTime = builder.minTransferTime;
+
+        // Decide if the transfer needs to be taken into account in the Raptor routing process
+        // or can be dealt with outside raptor, e.g in path transfer optimization.
+        this.includeInRaptorRouting =
+                staySeated ||
+                guaranteed ||
+                priority == NOT_ALLOWED ||
+                minTransferTime != NOT_SET;
 
         if(isMaxWaitTimeSet() && !guaranteed) {
             throw new IllegalArgumentException(
@@ -124,8 +139,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
      * This switch enables transfers in Raptor, ignoring transfer constraints with for example
      * only priority set.
      */
-    public boolean useInRaptorRouting() {
-        return isStaySeated() || isGuaranteed() || isNotAllowed();
+    public boolean includeInRaptorRouting() {
+        return includeInRaptorRouting;
     }
 
     @Override
@@ -137,8 +152,10 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     public boolean isRegularTransfer() {
         // Note! The 'maxWaitTime' is only valid with the guaranteed flag set, so we
         // do not need to check it here
-        return !(staySeated || guaranteed || priority.isConstrained());
+        return !(isFacilitated() || isMinTransferTimeSet() || priority.isConstrained());
     }
+
+
 
     /**
      * Maximum time after scheduled departure time the connecting transport is guarantied to wait
@@ -150,6 +167,22 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
      */
     public int getMaxWaitTime() {
         return maxWaitTime;
+    }
+
+    /**
+     * The min-transfer-time specify lower bound for the transfer time.
+     * {@link org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.ConstrainedBoardingSearch}
+     * uses this to make sure at least the amount of seconds specified is available to do the
+     * transfer. If the path transfer takes more time than specified by the
+     * {@code min-transfer-time} then the path transfer is used. Normal slack parameters are added
+     * to the path transfer, but not to the {@code min-transfer-time}.
+     */
+    public int getMinTransferTime() {
+        return minTransferTime;
+    }
+
+    public boolean isMinTransferTimeSet() {
+        return minTransferTime != NOT_SET;
     }
 
     @Override
@@ -175,7 +208,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
                 .addEnum("priority", priority, ALLOWED)
                 .addBoolIfTrue("staySeated", staySeated)
                 .addBoolIfTrue("guaranteed", guaranteed)
-                .addDurationSec("maxWaitTime", maxWaitTime, MAX_WAIT_TIME_NOT_SET)
+                .addDurationSec("minTransferTime", minTransferTime, NOT_SET)
+                .addDurationSec("maxWaitTime", maxWaitTime, NOT_SET)
                 .toString();
     }
 
@@ -212,7 +246,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     }
 
     private boolean isMaxWaitTimeSet() {
-        return maxWaitTime != MAX_WAIT_TIME_NOT_SET;
+        return maxWaitTime != NOT_SET;
     }
 
 
@@ -222,7 +256,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
         private TransferPriority priority = ALLOWED;
         private boolean staySeated = false;
         private boolean guaranteed = false;
-        private int maxWaitTime = MAX_WAIT_TIME_NOT_SET;
+        private int maxWaitTime = NOT_SET;
+        private int minTransferTime = NOT_SET;
 
         public Builder priority(TransferPriority priority) {
             this.priority = priority;
@@ -261,6 +296,11 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
         public Builder maxWaitTime(int maxWaitTime) {
             this.maxWaitTime = maxWaitTime;
+            return this;
+        }
+
+        public Builder minTransferTime(int minTransferTime) {
+            this.minTransferTime = minTransferTime;
             return this;
         }
 

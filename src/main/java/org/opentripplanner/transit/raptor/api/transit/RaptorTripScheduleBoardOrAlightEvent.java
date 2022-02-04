@@ -44,10 +44,18 @@ public interface RaptorTripScheduleBoardOrAlightEvent<T extends RaptorTripSchedu
 
     /**
      * Get the board/alight time for the trip found.
-     * In the case of a normal search the boarding time should be returned,
-     * and in the case of a reverse search the alight time should be returned.
+     * For a forward search the boarding time should be returned,
+     * and for the reverse search the alight time should be returned.
      */
     int getTime();
+
+    /**
+     * For constrained transfer the trip search must calculate an earliest-board-time,
+     * because it depends on the constraints. For the regular trip search this method is not used.
+     */
+    default int getEarliestBoardTimeForConstrainedTransfer() {
+        throw new IllegalStateException("The getEarliestBoardTime() method is not implemented!");
+    }
 
     /**
      * Return the transfer constrains for the transfer before this boarding.

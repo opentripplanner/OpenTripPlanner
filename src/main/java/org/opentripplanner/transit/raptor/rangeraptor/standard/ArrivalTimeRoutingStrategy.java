@@ -82,11 +82,11 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule> impl
     public void board(
             int stopIndex,
             final int earliestBoardTime,
-            RaptorTripScheduleBoardOrAlightEvent<T> result
+            RaptorTripScheduleBoardOrAlightEvent<T> boarding
     ) {
-        onTripIndex = result.getTripIndex();
-        onTrip = result.getTrip();
-        onTripBoardTime = result.getTime();
+        onTripIndex = boarding.getTripIndex();
+        onTrip = boarding.getTrip();
+        onTripBoardTime = boarding.getTime();
         onTripBoardStop = stopIndex;
     }
 
