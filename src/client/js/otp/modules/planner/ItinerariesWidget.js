@@ -91,7 +91,7 @@ otp.widgets.ItinerariesWidget =
             // create an alert if we moved to another day
             var alerts = null;
             if(newItin.differentServiceDayFrom(oldItin)) {
-                alerts = [ "This itinerary departs on a different day from the previous one"];
+                alerts = [ _tr("This itinerary departs on a different day from the previous one") ];
             }
 
             // refresh all itinerary headers
@@ -419,7 +419,7 @@ otp.widgets.ItinerariesWidget =
         var queryTime = otp.util.Time.constructQueryTime(itin.tripPlan.queryParams);
         if(itin.differentServiceDayFromQuery(itin.tripPlan.queryParams.originalQueryTime || queryTime)) {
             //TRANSLATORS: Shown as alert text before showing itinerary.
-            alerts = [ "This itinerary departs on a different day than the one searched for"];
+            alerts = [ _tr("This itinerary departs on a different day than the one searched for") ];
         }
 
         for(var i = 0; i < alerts.length; i++) {
