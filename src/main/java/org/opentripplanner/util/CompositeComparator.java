@@ -8,6 +8,8 @@ import java.util.Comparator;
  * iterating over the vector passes in at construction time.
  * <p>
  * This class implement the composite design pattern.
+ * <p>
+ * THIS CLASS IS THREAD-SAFE
  */
 public class CompositeComparator<T> implements Comparator<T> {
   private final Comparator<T>[] compareVector;
@@ -19,7 +21,7 @@ public class CompositeComparator<T> implements Comparator<T> {
 
   @Override
   public int compare(T o1, T o2) {
-    int v = 0;
+    int v;
     for (Comparator<T> c : compareVector) {
       v = c.compare(o1, o2);
       if(v != 0) { return v; }

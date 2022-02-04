@@ -4,6 +4,10 @@ import static java.util.Locale.ROOT;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 
@@ -13,7 +17,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
  * <p>
  * The class is used to track time relative to a {@link ServiceDate}.
  * <p>
- * The RelativeTime can also be used relative to some other time, in witch case it is similar
+ * The RelativeTime can also be used relative to some other time, in which case it is similar
  * to the JAva {@link Duration}.
  * <p>
  * The primary usage of this class is to convert "number of seconds" into a string
@@ -68,13 +72,59 @@ public class DurationUtils {
   }
 
   /**
-   * Parse a sting on format {@code nHnMn.nS}.
-   * Same as @see Duration#parse(CharSequence) with argument: {@code "PT" + duration}
+   * Parse a sting on format {@code nHnMn.nS} or {@link Duration#parse(CharSequence)}.
+   * The prefix "PT" is added if not present before handed of the
+   * {@link Duration#parse(CharSequence)} method.
+   *
+   * @return the duration in seconds
    */
-  public static int duration(String duration) {
-    Duration d = Duration.parse("PT" + duration);
+  public static int durationInSeconds(String duration) {
+    Duration d = duration(duration);
     return (int)d.toSeconds();
   }
+
+  /**
+   * Same as {@link #durationInSeconds(String)}, but returns the {@link Duration}, not the
+   * {@code int} seconds.
+   */
+  public static Duration duration(String duration) {
+    var d = duration.toUpperCase();
+    if(!(d.startsWith("P") || d.startsWith("-P"))) {
+      int pos = d.indexOf('D') + 1;
+      if (pos > 0) {
+        var days = d.substring(0, pos);
+        d = pos == d.length() ? "P" + days : "P" + days + "T" + d.substring(pos) ;
+      }
+      else {
+        d = "PT" + d;
+      }
+    }
+    try {
+      return Duration.parse(d);
+    }
+    catch (DateTimeParseException e) {
+      throw new DateTimeParseException(
+              e.getMessage() + ": " + e.getParsedString(),
+              e.getParsedString(),
+              e.getErrorIndex()
+      );
+    }
+  }
+
+  /**
+   * Parse a list of durations using white-space, comma or semicolon as a separator.
+   * <p>
+   * Example: {@code "2h 3m;5s"} will result in a list with 3 durations.
+   */
+  public static List<Duration> durations(String durations) {
+    if(durations == null || durations.isBlank()) {
+      return List.of();
+    }
+    return Arrays.stream(durations.split("[,;\\s]+"))
+            .map(DurationUtils::duration)
+            .collect(Collectors.toList());
+  }
+
 
   public static String msToSecondsStr(long timeMs) {
     if(timeMs == 0) { return "0 seconds"; }

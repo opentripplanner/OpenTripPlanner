@@ -72,6 +72,7 @@ public class RoutingRequestMapper {
         request.locale = c.asLocale("locale", dft.locale);
         // 'maxTransfers' is configured in the Raptor tuning parameters, not here
         request.maxDirectStreetDurationSeconds = c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
+        request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
         request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
         request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes);
         request.nonpreferredTransferCost = c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);

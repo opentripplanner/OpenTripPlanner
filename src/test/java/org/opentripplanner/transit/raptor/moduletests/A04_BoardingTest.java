@@ -24,16 +24,16 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  *
  * This test focus on boarding a trip after a transfer at different pattern stop positions.
  * The routing strategies do not board at the same stop, they should board at the optimal stop
- * for the criterion witch they optimize on.
+ * for the criterion which they optimize on.
  * <ul>
- *    <li>The `MinTravelDurationRoutingStrategy` should board at the stop witch give the shortest
+ *    <li>The `MinTravelDurationRoutingStrategy` should board at the stop which give the shortest
  *    travel duration. Hence; picking the path with the shortest travel duration at the point of
  *    boarding.
  *    <li>The `ArrivalTimeRoutingStrategy` should board at the first possible stop and drop all
  *    other paths boarding the same trip. We only care about the arrival-time with this strategy so
  *    any boarding of the same trip will lead to the same arrival-time at the destination. Picking
  *    the first possible path gives us deterministic behavior and the best performance.
- *    <li>The `McTransitWorker` should board at the all stops witch give us pareto optimal results.
+ *    <li>The `McTransitWorker` should board at the all stops which give us pareto optimal results.
  *    The test is set up, so that the cost and time is aligned. We expect the same result as with
  *    the `MinTravelDurationRoutingStrategy`. There are other tests that focus on testing the
  *    multi-criteria routing strategy.

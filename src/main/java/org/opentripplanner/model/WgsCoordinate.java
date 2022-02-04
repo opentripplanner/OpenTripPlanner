@@ -16,7 +16,7 @@ public final class WgsCoordinate implements Serializable {
 
     /**
      * A epsilon of 1E-7 gives a precision for coordinates at equator at 1.1 cm,
-     * witch is good enough for compering most coordinates in OTP.
+     * which is good enough for compering most coordinates in OTP.
      */
     private static final double EPSILON = 1E-7;
 

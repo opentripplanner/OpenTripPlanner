@@ -302,10 +302,14 @@ public class EnumTypes {
         .value("to", InputField.TO_PLACE)
         .build();
 
-    public static Object enumToString(GraphQLEnumType type, Enum<?> value) {
-        return type.serialize(value);
-    }
-
+    public static GraphQLEnumType PURCHASE_WHEN = GraphQLEnumType.newEnum()
+        .name("PurchaseWhen")
+        .value("timeOfTravelOnly", "timeOfTravelOnly")
+        .value("dayOfTravelOnly", "dayOfTravelOnly")
+        .value("untilPreviousDay", "untilPreviousDay")
+        .value("advanceAndDayOfTravel", "advanceAndDayOfTravel")
+        .value("other", "other")
+        .build();
 
 
     private static <T extends Enum> GraphQLEnumType createEnum(String name, T[] values, Function<T, String> mapping) {

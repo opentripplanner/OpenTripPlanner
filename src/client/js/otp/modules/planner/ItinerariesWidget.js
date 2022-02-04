@@ -190,8 +190,7 @@ otp.widgets.ItinerariesWidget =
         var buttonRow = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.footer);
         //TRANSLATORS: button to next page of itineraries
         $('<button>'+_tr("Previous Page")+'</button>').button().appendTo(buttonRow).click(function() {
-            var itin = this_.itineraries[this_.activeIndex];
-            var params = itin.tripPlan.queryParams;
+            var params = this_.module.lastQueryParams;
             _.extend(params, {
                 pageCursor :  this_.previousPageCursor,
             });
@@ -199,10 +198,10 @@ otp.widgets.ItinerariesWidget =
             this_.module.updateActiveOnly = false;
             this_.module.planTripFunction.call(this_.module, params);
         });
+
         //TRANSLATORS: button to next page of itineraries
         $('<button>'+_tr("Next Page")+'</button>').button().appendTo(buttonRow).click(function() {
-            var itin = this_.itineraries[this_.activeIndex];
-            var params = itin.tripPlan.queryParams;
+            var params = this_.module.lastQueryParams;
             _.extend(params, {
                 pageCursor :  this_.nextPageCursor,
             });

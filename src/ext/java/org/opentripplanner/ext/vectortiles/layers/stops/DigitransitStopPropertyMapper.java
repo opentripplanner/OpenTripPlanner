@@ -43,11 +43,11 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
       int stopPos = tripPattern.findStopPosition(stop);
       var headsign  = stopPos < 0 ? "Not Available" :
               tripPattern.getScheduledTimetable().getTripTimes().get(0).getHeadsign(stopPos);
-      return new JSONObject(Map.of(
-              "headsign", headsign,
-              "type", tripPattern.getRoute().getMode().name(),
-              "shortName", tripPattern.getRoute().getShortName()
-      ));
+      JSONObject pattern = new JSONObject();
+      pattern.put("headsign", headsign);
+      pattern.put("type", tripPattern.getRoute().getMode().name());
+      pattern.put("shortName", tripPattern.getRoute().getShortName());
+      return pattern;
     }).collect(Collectors.toList()));
 
     return List.of(

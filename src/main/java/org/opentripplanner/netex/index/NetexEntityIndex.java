@@ -60,7 +60,7 @@ import org.rutebanken.netex.model.TariffZone;
  * {@link HierarchicalElement} classes.
  * <p/>
  * The mapping code should not insert entities, so an instance of this class implements the
- * {@link NetexEntityIndexReadOnlyView} witch is passed to the mapping code for translation into
+ * {@link NetexEntityIndexReadOnlyView} which is passed to the mapping code for translation into
  * OTP domain model objects.
  */
 public class NetexEntityIndex {

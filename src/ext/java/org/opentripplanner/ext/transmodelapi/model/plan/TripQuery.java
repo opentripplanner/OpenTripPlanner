@@ -44,13 +44,30 @@ public class TripQuery {
         .argument(GraphQLArgument.newArgument()
             .name("searchWindow")
             .description(
-                "The length of the search-window in minutes. This is normally dynamically "
-                + "calculated by the server, but you may override this by setting it. The "
-                + "search-window used in a request is returned in the response metadata. To get "
-                + "the \"next page\" of trips use the metadata(searchWindowUsed and "
-                + "nextWindowDateTime) to create a new request. If not provided the value is "
-                + "resolved depending on the other input parameters, available transit options and "
-                + "realtime changes."
+                    "The length of the search-window in minutes. This parameter is optional."
+                    + "\n\n"
+                    + "The search-window is defined as the duration between the earliest-departure-time(EDT) and "
+                    + "the latest-departure-time(LDT). OTP will search for all itineraries in this departure "
+                    + "window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP "
+                    + "will dynamically calculate the EDT. Using a short search-window is faster than using a "
+                    + "longer one, but the search duration is not linear. Using a \"too\" short search-window will "
+                    + "waste resources server side, while using a search-window that is too long will be slow."
+                    + "\n\n"
+                    + "OTP will dynamically calculate a reasonable value for the search-window, if not provided. The "
+                    + "calculation comes with a significant overhead (10-20% extra). Whether you should use the "
+                    + "dynamic calculated value or pass in a value depends on your use-case. For a travel planner "
+                    + "in a small geographical area, with a dense network of public transportation, a fixed value "
+                    + "between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it "
+                    + "so that the number of itineraries on average is around the wanted `numItineraries`. Make "
+                    + "sure you set the `numItineraries` to a high number while testing. For a country wide area like "
+                    + "Norway, using the dynamic search-window is the best."
+                    + "\n\n"
+                    + "When paginating, the search-window is calculated using the `numItineraries` in the original "
+                    + "search together with statistics from the search for the last page. This behaviour is "
+                    + "configured server side, and can not be overridden from the client."
+                    + "\n\n"
+                    + "The search-window used is returned to the response metadata as `searchWindowUsed` for "
+                    + "debugging purposes."
             )
             .type(Scalars.GraphQLInt)
             .build()

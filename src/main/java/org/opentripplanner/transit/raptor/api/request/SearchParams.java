@@ -23,7 +23,7 @@ public class SearchParams {
      * cases/system happens when DST is adjusted.
      * <p>
      * We do not use {@link Integer#MIN_VALUE} because this could potentially lead to overflow
-     * situations witch would be very hard to debug. Add -1 to MIN_VALUE and you get a positive
+     * situations which would be very hard to debug. Add -1 to MIN_VALUE and you get a positive
      * number - not an exception.
      */
     public static final int TIME_NOT_SET = -9_999_999;
@@ -240,6 +240,16 @@ public class SearchParams {
      */
     public Collection<RaptorTransfer> egressPaths() {
         return egressPaths;
+    }
+
+    /**
+     * Get the maximum duration of any access or egress path in seconds.
+     */
+    public int getAccessEgressMaxDurationSeconds() {
+        return Math.max(
+            accessPaths.stream().mapToInt(RaptorTransfer::durationInSeconds).max().orElse(0),
+            egressPaths.stream().mapToInt(RaptorTransfer::durationInSeconds).max().orElse(0)
+        );
     }
 
     @Override

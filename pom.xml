@@ -489,7 +489,7 @@
         <!--
             Netex XML document - JAXB generated Java model.
             This is generated using the official Netex schema(v1.0) and support the entire model,
-            not just the Nordic/Norwegian profile witch is currently supported by OTP.
+            not just the Nordic/Norwegian profile which is currently supported by OTP.
          -->
         <dependency>
             <groupId>org.entur</groupId>
@@ -728,13 +728,6 @@
             <groupId>net.sourceforge.javacsv</groupId>
             <artifactId>javacsv</artifactId>
             <version>2.0</version>
-        </dependency>
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.paho</groupId>

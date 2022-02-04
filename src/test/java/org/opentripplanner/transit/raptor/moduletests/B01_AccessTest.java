@@ -45,8 +45,8 @@ public class B01_AccessTest implements RaptorTestConstants {
         .addAccessPaths(
             walk(STOP_B, D1s),    // Lowest cost
             walk(STOP_C, D4m),    // Best compromise of cost and time
-            walk(STOP_D, DurationUtils.duration("7m")),    // Latest departure time
-            walk(STOP_E, DurationUtils.duration("13m"))     // Not optimal
+            walk(STOP_D, DurationUtils.durationInSeconds("7m")),    // Latest departure time
+            walk(STOP_E, DurationUtils.durationInSeconds("13m"))     // Not optimal
         )
         .addEgressPaths(
             walk(STOP_F, D1s)

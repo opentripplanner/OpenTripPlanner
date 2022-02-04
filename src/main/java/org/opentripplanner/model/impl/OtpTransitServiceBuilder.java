@@ -291,7 +291,7 @@ public class OtpTransitServiceBuilder {
     }
 
     /**
-     * Check all relations and remove entities witch reference none existing entries. This
+     * Check all relations and remove entities which reference none existing entries. This
      * may happen as a result of inconsistent data or by deliberate removal of elements in the
      * builder.
      */
@@ -302,7 +302,7 @@ public class OtpTransitServiceBuilder {
         removeTransfersForNoneExistingTrips();
     }
 
-    /** Remove all trips witch reference none existing service ids */
+    /** Remove all trips which reference none existing service ids */
     private void removeTripsWithNoneExistingServiceIds() {
         Set<FeedScopedId> serviceIds = findAllServiceIds();
         int orgSize = tripsById.size();
@@ -310,7 +310,7 @@ public class OtpTransitServiceBuilder {
         logRemove("Trip", orgSize, tripsById.size(), "Trip service id does not exist.");
     }
 
-    /** Remove all stopTimes witch reference none existing trips */
+    /** Remove all stopTimes which reference none existing trips */
     private void removeStopTimesForNoneExistingTrips() {
         int orgSize = stopTimesByTrip.size();
         stopTimesByTrip.removeIf(t -> !tripsById.containsKey(t.getId()));
@@ -335,7 +335,7 @@ public class OtpTransitServiceBuilder {
         logRemove("TripPattern", orgSize, tripPatterns.size(), "No trips for pattern exist.");
     }
 
-    /** Remove all transfers witch reference none existing trips */
+    /** Remove all transfers which reference none existing trips */
     private void removeTransfersForNoneExistingTrips() {
         int orgSize = transfers.size();
         transfers.removeIf(this::transferTripReferencesDoNotExist);

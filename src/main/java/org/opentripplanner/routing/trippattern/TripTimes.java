@@ -251,7 +251,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
 
     /**
-     * Return an integer witch can be used to sort TripTimes in order of departure/arrivals.
+     * Return an integer which can be used to sort TripTimes in order of departure/arrivals.
      * <p>
      * This sorted trip times is used to search for trips. OTP assume one trip do NOT pass another
      * trip down the line.

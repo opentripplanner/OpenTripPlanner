@@ -8,7 +8,7 @@ import java.util.OptionalDouble;
 import java.util.function.DoubleFunction;
 
 /**
- * This filter remove all transit results witch have a generalized-cost higher than
+ * This filter remove all transit results which have a generalized-cost higher than
  * the max-limit computed by the {@link #costLimitFunction}.
  * <p>
  * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#transitGeneralizedCostLimit

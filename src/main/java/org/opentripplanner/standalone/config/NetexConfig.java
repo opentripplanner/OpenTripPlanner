@@ -30,7 +30,7 @@ public class NetexConfig {
      * This field is used to exclude matching <em>files</em> in the module file(zip file entries).
      * The <em>ignored</em> files are <em>not</em> loaded.
      * <p>
-     * Default value is <code>'$^'</code> witch matches empty stings (not a valid file name).
+     * Default value is <code>'$^'</code> which matches empty stings (not a valid file name).
      * @see #sharedFilePattern
      */
     public final Pattern ignoreFilePattern;

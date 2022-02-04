@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.generalizedCostComparator;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,8 +10,8 @@ import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
+import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
@@ -32,11 +34,12 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdA
 public class ItineraryListFilterChainBuilder {
     private static final int NOT_SET = -1;
 
-    private final boolean arriveBy;
+    private final SortOrder sortOrder;
     private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
 
     private boolean debug = false;
     private int maxNumberOfItineraries = NOT_SET;
+    private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
     private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
     private boolean removeWalkAllTheWayResults;
     private DoubleFunction<Double> transitGeneralizedCostLimit;
@@ -45,25 +48,36 @@ public class ItineraryListFilterChainBuilder {
     private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
-    private boolean reverseFilteringDirection;
 
 
-    /**
-     * @param arriveBy Used to set the correct sort order. This si the same flag as the
-     *        {@link org.opentripplanner.routing.api.request.RoutingRequest#arriveBy}.
-     */
-    public ItineraryListFilterChainBuilder(boolean arriveBy) {
-        this.arriveBy = arriveBy;
+    public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
     }
 
     /**
      * The maximum number of itineraries returned. This will remove all itineraries at the
      * end of the list AFTER the final sort of the itineraries.
      * <p>
+     * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change which
+     * end of the list is cropped.
+     *
      * Use {@code -1} to disable.
      */
     public ItineraryListFilterChainBuilder withMaxNumberOfItineraries(int value) {
         this.maxNumberOfItineraries = value;
+        return this;
+    }
+
+    /**
+     * Remove itineraries from the tail or head of the list in the final filtering. The
+     * {@link #maxNumberOfItineraries} is used together with this parameter to reduce the
+     * number of itineraries down to the requested size.
+     * <p>
+     * The default is to crop the tail. But, we need to crop the head to be able to paginate
+     * in the opposite direction of the main sort-order of the original search.
+     */
+    public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCrop(ListSection section) {
+        this.maxNumberOfItinerariesCrop = section;
         return this;
     }
 
@@ -170,9 +184,10 @@ public class ItineraryListFilterChainBuilder {
     /**
      * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
      * To get notified about this a subscriber can be added. The first itinerary removed by the
-     * {@code maxLimit} is retuned. The 'maxLimit' check is last thing happening in the
-     * filter-chain after the final sort. So, if another filter remove an itinerary, the
-     * itinerary is not considered with the respect to this feature.
+     * {@code maxLimit} is returned. The 'maxLimit' check is the last thing happening in the
+     * filter-chain after the final sort. So, if another filter remove an itinerary, the itinerary
+     * is not considered with the respect to this the {@link #withMaxNumberOfItineraries(int)}
+     * limit.
      *
      * @param maxLimitReachedSubscriber the subscriber to notify in case any elements are removed.
      *                                  Only the first element removed is passed to the subscriber.
@@ -192,15 +207,7 @@ public class ItineraryListFilterChainBuilder {
         return this;
     }
 
-    /**
-     * Should the direction of the final filtering for max number of itineraries be swapped.
-     * This is used to be able to paginate to the opposite direction of the main search.
-     */
-    public ItineraryListFilterChainBuilder withReverseFilteringDirection(boolean enable) {
-        this.reverseFilteringDirection = enable;
-        return this;
-    }
-
+    @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
     public ItineraryListFilterChain build() {
         List<ItineraryListFilter> filters = new ArrayList<>();
 
@@ -249,21 +256,21 @@ public class ItineraryListFilterChainBuilder {
 
         // Remove itineraries if max limit is set
         if (maxNumberOfItineraries > 0) {
-            filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
+            filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
             filters.add(
-                new DeletionFlaggingFilter(
-                    new MaxLimitFilter(
-                        "number-of-itineraries-filter",
-                        maxNumberOfItineraries,
-                        reverseFilteringDirection,
-                        maxLimitReachedSubscriber
+                    new DeletionFlaggingFilter(
+                            new MaxLimitFilter(
+                                    "number-of-itineraries-filter",
+                                    maxNumberOfItineraries,
+                                    maxNumberOfItinerariesCrop,
+                                    maxLimitReachedSubscriber
+                            )
                     )
-                )
             );
         }
 
         // Do the final itineraries sort
-        filters.add(new SortingFilter(new OtpDefaultSortOrder(arriveBy)));
+        filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
 
         return new ItineraryListFilterChain(filters, debug);
     }
@@ -297,7 +304,7 @@ public class ItineraryListFilterChainBuilder {
                 nested.add(new GroupByFilter<>(
                     GroupByAllSameStations::new,
                     List.of(
-                        new SortingFilter(new SortOnGeneralizedCost()),
+                        new SortingFilter(generalizedCostComparator()),
                         new DeletionFlaggingFilter( new MaxLimitFilter(innerGroupName, 1))
                     )
                 ));
@@ -309,7 +316,7 @@ public class ItineraryListFilterChainBuilder {
                 )));
             }
 
-            nested.add(new SortingFilter(new SortOnGeneralizedCost()));
+            nested.add(new SortingFilter(generalizedCostComparator()));
             nested.add(new DeletionFlaggingFilter(new MaxLimitFilter(
                 name,
                 it.maxNumOfItinerariesPerGroup

@@ -119,7 +119,7 @@ millions of paths and at each stop each path is ACCEPTED, REJECTED and/or eventu
 Logging these events make it possible to find out why a path is not making it into the final result.
 Use the Raptor request to specify a set-of-stops or a path to enable the debugger. You also need to
 pass in listeners to the debugger. In the test code there is an implementation of the Logger/Event 
-listener witch logs to the console standard error, `TestDebugLogger`. The `SpeedTest` or the module
+listener which logs to the console standard error, `TestDebugLogger`. The `SpeedTest` or the module
 tests are the easiest way to debug a search. The debugger design support using it from the OTP 
 APIs, but there is no implementation for this. 
 

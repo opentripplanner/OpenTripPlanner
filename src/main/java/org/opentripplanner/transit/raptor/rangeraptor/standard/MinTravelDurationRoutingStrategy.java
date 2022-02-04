@@ -15,7 +15,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  * duration ignoring wait time(except board-/alight-slack). This class optimize on a single
  * criteria: MINIMUM TRAVEL DURATION.
  * <p>
- * Note! Raptor give us number-of-transfer as a second pareto criteria - witch is outside the scope
+ * Note! Raptor give us number-of-transfer as a second pareto criteria - which is outside the scope
  * of this class.
  * <p>
  * Note! This strategy should only be used with one Range Raptor iteration (no searchWindow).

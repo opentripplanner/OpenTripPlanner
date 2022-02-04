@@ -93,7 +93,7 @@ public class TransitLayer {
   }
 
   /**
-   * This is the time zone witch is used for interpreting all local "service" times
+   * This is the time zone which is used for interpreting all local "service" times
    * (in transfers, trip schedules and so on). This is the time zone of the internal OTP
    * time - which is used in logging and debugging. This is independent of the time zone
    * of imported data and of the time zone used on any API - it can be the same, but it does
