@@ -16,7 +16,7 @@ public class FileDataSource extends AbstractFileDataSource {
     /**
      * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files
      * as well as normal files. It does not handle directories({@link DirectoryDataSource}) or
-     * zip-files {@link ZipFileDataSource} witch contain multiple files.
+     * zip-files {@link ZipFileDataSource} which contain multiple files.
      */
     public FileDataSource(File file, FileType type) {
         super(file, type);

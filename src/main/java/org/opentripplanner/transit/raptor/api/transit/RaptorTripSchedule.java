@@ -13,7 +13,7 @@ package org.opentripplanner.transit.raptor.api.transit;
 public interface RaptorTripSchedule {
 
     /**
-     * An id/index for the trip witch can be used to sort trips so they follow each other
+     * An id/index for the trip which can be used to sort trips so they follow each other
      * in time. The id/index must increase with the departure time.
      */
     int tripSortIndex();

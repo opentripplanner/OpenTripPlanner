@@ -270,8 +270,8 @@ public class FaresTest {
                 request,
                 router,
                 zonedDateTime,
-                new DebugTimingAggregator(),
-                additionalSearchDays
+                additionalSearchDays,
+                new DebugTimingAggregator()
         );
         return result.getItineraries();
     }

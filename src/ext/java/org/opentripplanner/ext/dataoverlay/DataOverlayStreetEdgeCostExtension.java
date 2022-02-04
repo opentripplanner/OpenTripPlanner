@@ -66,7 +66,7 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
     private double calculateDataOverlayPenalties(RoutingRequest requestOptions) {
         if(variableValues == null) { return 0d; }
         double totalPenalty = 0d;
-        Instant requestInstant = requestOptions.getDateTimeOriginalSearch();
+        Instant requestInstant = requestOptions.getDateTime();
         var context = requestOptions.getRoutingContext().dataOverlayContext;
 
         for (Parameter parameter : context.getParameters()) {

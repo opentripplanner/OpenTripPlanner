@@ -239,8 +239,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
                 request,
                 router,
                 time,
-                new DebugTimingAggregator(),
-                additionalSearchDays
+                additionalSearchDays,
+                new DebugTimingAggregator()
         );
 
         return result.getItineraries();

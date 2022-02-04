@@ -26,7 +26,7 @@ import java.net.URI;
 public interface DataSourceRepository {
 
     /**
-     * @return a description that identify the datasource witch is helpful to the user in case an
+     * @return a description that identify the datasource which is helpful to the user in case an
      * error occurs when using the repository.
      */
     String description();

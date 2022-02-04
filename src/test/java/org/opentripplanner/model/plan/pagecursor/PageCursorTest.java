@@ -1,6 +1,10 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.pagecursor;
 
 import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
+import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
+import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
+import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -28,8 +32,8 @@ public class PageCursorTest {
         originalTimeZone = TimeZone.getDefault();
         TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
 
-        subjectDepartAfter = PageCursor.departAfterCursor(EDT, SEARCH_WINDOW, false);
-        subjectArriveBy = PageCursor.arriveByCursor(EDT, LAT, SEARCH_WINDOW, false);
+        subjectDepartAfter = new PageCursor(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, EDT, null, SEARCH_WINDOW);
+        subjectArriveBy = new PageCursor(PREVIOUS_PAGE, STREET_AND_DEPARTURE_TIME, EDT, LAT, SEARCH_WINDOW);
     }
 
     @After
@@ -40,11 +44,13 @@ public class PageCursorTest {
     @Test
     public void testToString() {
         assertEquals(
-                "PageCursor{edt: " + EDT_STR + ", searchWindow: 2h}",
+                "PageCursor{type: NEXT_PAGE, sortOrder: STREET_AND_ARRIVAL_TIME, "
+                        + "edt: " + EDT_STR + ", searchWindow: 2h}",
                 subjectDepartAfter.toString()
         );
         assertEquals(
-                "PageCursor{edt: " + EDT_STR + ", lat: " + LAT_STR + ", searchWindow: 2h}",
+                "PageCursor{type: PREVIOUS_PAGE, sortOrder: STREET_AND_DEPARTURE_TIME, "
+                        + "edt: " + EDT_STR + ", lat: " + LAT_STR + ", searchWindow: 2h}",
                 subjectArriveBy.toString()
         );
     }
@@ -61,6 +67,5 @@ public class PageCursorTest {
         buf = subjectArriveBy.encode();
         before = PageCursor.decode(buf);
         assertEquals(subjectArriveBy.toString(), before.toString());
-
     }
 }

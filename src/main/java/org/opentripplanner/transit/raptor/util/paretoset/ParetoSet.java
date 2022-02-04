@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * This {@link java.util.Collection} store all pareto-optimal elements. The
  * {@link #add(Object)} method returns {@code true} if and only if the element
- * was added successfully. When an element is added other elements witch are no
+ * was added successfully. When an element is added other elements which are no
  * longer pareto-optimal are dropped.
  * <p/>
  * Like the {@link java.util.ArrayList} the elements are stored internally in
@@ -194,7 +194,7 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     }
 
     /**
-     * A special toSting method witch allows the caller to provide a to-string-mapper for the
+     * A special toSting method which allows the caller to provide a to-string-mapper for the
      * elements in the set.
      */
     public String toString(Function<? super T, String> toStringMapper) {

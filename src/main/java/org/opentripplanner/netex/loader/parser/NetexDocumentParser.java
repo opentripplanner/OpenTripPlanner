@@ -71,7 +71,7 @@ public class NetexDocumentParser {
             parse((SiteFrame) value, new SiteFrameParser());
         } else if (value instanceof CompositeFrame) {
             // We recursively parse composite frames and content until there
-            // is no more nested frames - this is accepting documents witch
+            // is no more nested frames - this is accepting documents which
             // are not withing the specification, but we leave this for the
             // document schema validation - not a OTP responsibility
             parseCompositeFrame((CompositeFrame) value);

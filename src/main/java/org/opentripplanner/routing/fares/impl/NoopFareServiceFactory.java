@@ -9,7 +9,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 
 
 /**
- * Create a FareServiceFactory witch create a noop fare service. That is a fare service
+ * Create a FareServiceFactory which create a noop fare service. That is a fare service
  * that does nothing.
  */
 class NoopFareServiceFactory implements FareServiceFactory {

@@ -1,18 +1,19 @@
 package org.opentripplanner.routing.algorithm.filterchain.comparator;
 
-import org.junit.Test;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.PlanTestConstants;
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.defaultComparatorArriveBy;
+import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.defaultComparatorDepartAfter;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.Test;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-
-public class OtpDefaultSortOrderTest implements PlanTestConstants {
+public class SortOrderComparatorTest implements PlanTestConstants {
 
     private List<Itinerary> result;
 
@@ -29,14 +30,14 @@ public class OtpDefaultSortOrderTest implements PlanTestConstants {
 
         // Depart-after-sort
         result = Stream.of(walk, bicycle, bus, rail)
-                .sorted(departAfterSort())
+                .sorted(defaultComparatorDepartAfter())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(walk, bicycle, bus, rail), toStr(result));
 
         // Arrive-by-sort
         result = Stream.of(walk, bicycle, bus, rail)
-                .sorted(arriveBySort())
+                .sorted(defaultComparatorArriveBy())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(bicycle, walk, rail, bus), toStr(result));
@@ -54,14 +55,14 @@ public class OtpDefaultSortOrderTest implements PlanTestConstants {
 
         // Depart-after-sort
         result = Stream.of(iD, iB, iA, iC)
-                .sorted(departAfterSort())
+                .sorted(defaultComparatorDepartAfter())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(iA, iB, iC, iD), toStr(result));
 
         // Arrive-by-sort
         result = Stream.of(iB, iD, iC, iA)
-                .sorted(arriveBySort())
+                .sorted(defaultComparatorArriveBy())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(iA, iC, iB, iD), toStr(result));
@@ -82,14 +83,14 @@ public class OtpDefaultSortOrderTest implements PlanTestConstants {
 
         // Verify depart-after sort on arrival-time, then cost
         result = Stream.of(iB, iA, iC)
-                .sorted(departAfterSort())
+                .sorted(defaultComparatorDepartAfter())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(iB, iA, iC), toStr(result));
 
         // Verify arrive-by sort on departure-time, then cost
         result = Stream.of(iB, iA, iC)
-                .sorted(arriveBySort())
+                .sorted(defaultComparatorArriveBy())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(iC, iA, iB), toStr(result));
@@ -118,14 +119,14 @@ public class OtpDefaultSortOrderTest implements PlanTestConstants {
 
         // Verify depart-after sort on generalized-cost, then transfers
         result = Stream.of(iB, iA, iC)
-                .sorted(departAfterSort())
+                .sorted(defaultComparatorDepartAfter())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(iA, iB, iC), toStr(result));
 
         // Verify arrive-by sort on generalized-cost, then transfers
         result = Stream.of(iB, iA, iC)
-                .sorted(arriveBySort())
+                .sorted(defaultComparatorArriveBy())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(iA, iB, iC), toStr(result));
@@ -149,14 +150,14 @@ public class OtpDefaultSortOrderTest implements PlanTestConstants {
 
         // Verify depart-after sort on arrival-time, then cost
         result = Stream.of(iB, iA, iC)
-                .sorted(departAfterSort())
+                .sorted(defaultComparatorDepartAfter())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(iB, iA, iC), toStr(result));
 
         // Verify arrive-by sort on departure-time, then cost
         result = Stream.of(iB, iA, iC)
-                .sorted(arriveBySort())
+                .sorted(defaultComparatorArriveBy())
                 .collect(Collectors.toList());
 
         assertEquals(toStr(iC, iA, iB), toStr(result));
@@ -170,11 +171,4 @@ public class OtpDefaultSortOrderTest implements PlanTestConstants {
         return Itinerary.toStr(list);
     }
 
-    private OtpDefaultSortOrder arriveBySort() {
-        return new OtpDefaultSortOrder(true);
-    }
-
-    private OtpDefaultSortOrder departAfterSort() {
-        return new OtpDefaultSortOrder(false);
-    }
 }

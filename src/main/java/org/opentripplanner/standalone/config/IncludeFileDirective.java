@@ -79,7 +79,7 @@ class IncludeFileDirective {
 
             // If the insert text is a legal JSON object "[white-space]{ ... }[white-space]", then
             // ignore the optional quotes matched by the directive pattern
-            val json = fileText.trim();
+            var json = fileText.trim();
             if(json.startsWith("{") && json.endsWith("}")) {
                 text = text.replace(entry.getKey(), fileText);
             }

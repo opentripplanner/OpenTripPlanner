@@ -7,7 +7,7 @@ package org.opentripplanner.transit.raptor.api.transit;
 public interface RaptorSlackProvider {
 
     /**
-     * Return a default implementation witch can be used in unit-tests.
+     * Return a default implementation which can be used in unit-tests.
      * Unit: seconds.
      */
     static RaptorSlackProvider defaultSlackProvider(int transferSlack, int boardSlack, int alightSlack) {

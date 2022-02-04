@@ -18,7 +18,7 @@ class GsOutFileDataSource extends AbstractGsDataSource implements DataSource {
     /**
      * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files
      * as well as normal files. It does not handle directories({@link DirectoryDataSource}) or
-     * zip-files {@link ZipFileDataSource} witch contain multiple files.
+     * zip-files {@link ZipFileDataSource} which contain multiple files.
      */
     GsOutFileDataSource(Storage storage, BlobId blobId, FileType type) {
         super(blobId, type);

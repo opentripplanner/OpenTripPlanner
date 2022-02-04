@@ -27,10 +27,10 @@ import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -47,21 +47,22 @@ public class TransitRouter {
     private final RoutingRequest request;
     private final Router router;
     private final DebugTimingAggregator debugTimingAggregator;
-    private final ZonedDateTime searchStartTime;
+    private final ZonedDateTime transitSearchTimeZero;
     private final AdditionalSearchDays additionalSearchDays;
+
 
     private TransitRouter(
             RoutingRequest request,
             Router router,
-            ZonedDateTime searchStartTime,
+            ZonedDateTime transitSearchTimeZero,
             AdditionalSearchDays additionalSearchDays,
             DebugTimingAggregator debugTimingAggregator
     ) {
         this.request = request;
         this.router = router;
-        this.debugTimingAggregator = debugTimingAggregator;
-        this.searchStartTime = searchStartTime;
+        this.transitSearchTimeZero = transitSearchTimeZero;
         this.additionalSearchDays = additionalSearchDays;
+        this.debugTimingAggregator = debugTimingAggregator;
     }
 
     private TransitRouterResult route() {
@@ -69,7 +70,7 @@ public class TransitRouter {
             return new TransitRouterResult(List.of(), null);
         }
 
-        if (!router.graph.transitFeedCovers(request.getDateTimeOriginalSearch())) {
+        if (!router.graph.transitFeedCovers(request.getDateTime())) {
             throw new RoutingValidationException(List.of(
                     new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME)
             ));
@@ -97,7 +98,7 @@ public class TransitRouter {
         // Prepare transit search
         var raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
-                searchStartTime,
+                transitSearchTimeZero,
                 accessEgresses.getAccesses(),
                 accessEgresses.getEgresses()
         );
@@ -129,7 +130,7 @@ public class TransitRouter {
         RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
                 router.graph,
                 transitLayer,
-                searchStartTime,
+                transitSearchTimeZero,
                 request
         );
         FareService fareService = router.graph.getService(FareService.class);
@@ -246,7 +247,7 @@ public class TransitRouter {
             return new RaptorRoutingRequestTransitData(
                     graph.getTransferService(),
                     transitLayer,
-                    searchStartTime,
+                    transitSearchTimeZero,
                     additionalSearchDays.additionalSearchDaysInPast(),
                     additionalSearchDays.additionalSearchDaysInFuture(),
                     createRequestTransitDataProviderFilter(graph.index),
@@ -296,10 +297,10 @@ public class TransitRouter {
     public static TransitRouterResult route(
             RoutingRequest request,
             Router router,
-            ZonedDateTime searchStartTime,
-            DebugTimingAggregator debugTimingAggregator,
-            AdditionalSearchDays additionalSearchDays
+            ZonedDateTime transitSearchTimeZero,
+            AdditionalSearchDays additionalSearchDays,
+            DebugTimingAggregator debugTimingAggregator
     ) {
-        return new TransitRouter(request, router, searchStartTime, additionalSearchDays, debugTimingAggregator).route();
+        return new TransitRouter(request, router, transitSearchTimeZero, additionalSearchDays, debugTimingAggregator).route();
     }
 }

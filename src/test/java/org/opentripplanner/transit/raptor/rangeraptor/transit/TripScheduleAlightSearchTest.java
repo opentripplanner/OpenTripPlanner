@@ -185,7 +185,7 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
 
     /**
      * If there is a large number of trips not in service, the binary search may return
-     * a best guess index witch is above the correct trip index. This test make sure
+     * a best guess index which is above the correct trip index. This test make sure
      * such trips are found.
      */
     @Test

@@ -116,7 +116,7 @@ public class GraphPathFinder {
      *  Try to find N paths through the Graph
      */
     public List<GraphPath> graphPathFinderEntryPoint (RoutingRequest request) {
-        long reqTime = request.getDateTimeCurrentPage().getEpochSecond();
+        long reqTime = request.getDateTime().getEpochSecond();
 
         // We used to perform a protective clone of the RoutingRequest here.
         // There is no reason to do this if we don't modify the request.
