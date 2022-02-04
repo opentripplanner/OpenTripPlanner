@@ -393,11 +393,11 @@ otp.widgets.tripoptions.TimeSelector =
         //var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
         //$('#'+this.id+'-picker').datepicker("setDate", new Date(m));
         if(data.queryParams.date) {
-            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, otp.config.locale.time.date_format)));
+            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, otp.config.apiDateFormat)));
             this.tripWidget.module.date = data.queryParams.date;
         }
         if(data.queryParams.time) {
-            $('#'+this.id+'-time').val(moment(data.queryParams.time, otp.config.locale.time.time_format).format(otp.config.locale.time.time_format));
+            $('#'+this.id+'-time').val(moment(data.queryParams.time, otp.config.apiTimeFormat).format(otp.config.locale.time.time_format));
             this.tripWidget.module.time = data.queryParams.time;
         }
         if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {

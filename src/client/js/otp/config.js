@@ -205,8 +205,9 @@ otp.config = {
      */    
      
     timeFormat  : "h:mma",
-    dateFormat  : "MMM Do YYYY"
-
+    dateFormat  : "MMM Do YYYY",
+    apiTimeFormat : "h:mma",
+    apiDateFormat  : "MM-DD-YYYY"
 };
 var options = {
 	resGetPath: 'js/otp/locale/__lng__.json',
