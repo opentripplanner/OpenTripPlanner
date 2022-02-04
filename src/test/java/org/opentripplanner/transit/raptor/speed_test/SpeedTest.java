@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.graph.Graph;
@@ -33,12 +32,10 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 import org.opentripplanner.util.OtpAppException;
 
 /**
@@ -292,8 +289,9 @@ public class SpeedTest {
         routingRequest.setDateTime(routingRequest.getDateTime());
         routingRequest.setFromString(request.tc().fromPlace.coordinate.toString());
         routingRequest.setToString(request.tc().toPlace.coordinate.toString());
+        routingRequest.walkSpeed = request.getWalkSpeedMeterPrSecond();
 
-        var worker = new RoutingWorker(this.router, routingRequest, graph.getTimeZone().toZoneId());
+        var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
         return worker.route();
     }
 
@@ -319,30 +317,6 @@ public class SpeedTest {
 
     private ZoneId getTimeZoneId() {
         return graph.getTimeZone().toZoneId();
-    }
-
-    private RaptorRequest<TripSchedule> heuristicRequest(
-            SpeedTestProfile profile,
-            SpeedTestRequest request,
-            EgressAccessRouter streetRouter
-    ) {
-        return request.createRangeRaptorRequest(
-                profile,
-                nAdditionalTransfers,
-                true,
-                streetRouter
-        );
-    }
-
-
-    private RaptorRequest<TripSchedule> rangeRaptorRequest(
-            SpeedTestProfile profile,
-            SpeedTestRequest request,
-            EgressAccessRouter streetRouter
-    ) {
-        return request.createRangeRaptorRequest(
-                profile, nAdditionalTransfers, false, streetRouter
-        );
     }
 
     private void forceGCToAvoidGCLater() {

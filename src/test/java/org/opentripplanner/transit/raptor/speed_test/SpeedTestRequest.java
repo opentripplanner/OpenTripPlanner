@@ -1,31 +1,19 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
-
-import gnu.trove.iterator.TIntIntIterator;
-import gnu.trove.map.TIntIntMap;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.modes.AllowedTransitMode;
-import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
-import org.opentripplanner.transit.raptor.api.request.Optimization;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 
 
 public class SpeedTestRequest {
@@ -84,85 +72,6 @@ public class SpeedTestRequest {
         return config.maxWalkDurationSeconds;
     }
 
-
-    RaptorRequest<TripSchedule> createRangeRaptorRequest(
-            SpeedTestProfile profile,
-            int numOfExtraTransfers,
-            boolean oneIterationOnly,
-            EgressAccessRouter streetRouter
-    ) {
-        // Add half of the extra time to departure and half to the arrival
-        int expandSearchSec = EXPAND_SEARCH_WINDOW_HOURS * 3600/2;
-
-
-        RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
-        builder.searchParams()
-                .timetableEnabled(true)
-                .numberOfAdditionalTransfers(numOfExtraTransfers);
-
-        if(testCase.departureTime != TestCase.NOT_SET) {
-            builder.searchParams().earliestDepartureTime(testCase.departureTime - expandSearchSec);
-        }
-
-        if(testCase.arrivalTime != TestCase.NOT_SET) {
-            builder.searchParams().latestArrivalTime(testCase.arrivalTime + expandSearchSec);
-        }
-
-        if(testCase.window != TestCase.NOT_SET) {
-            builder.searchParams().searchWindowInSeconds(testCase.window + 2 * expandSearchSec);
-        }
-
-        if(oneIterationOnly) {
-            builder.searchParams().searchOneIterationOnly();
-        }
-
-        builder.enableOptimization(Optimization.PARALLEL);
-
-        builder.profile(profile.raptorProfile);
-        for (Optimization it : profile.optimizations) {
-            builder.enableOptimization(it);
-        }
-        if(profile.raptorProfile.isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
-            builder.searchParams().searchOneIterationOnly();
-        }
-
-        builder.slackProvider(new SlackProvider(
-                config.request.transferSlack,
-                config.request.boardSlack,
-                config.request.boardSlackForMode,
-                config.request.alightSlack,
-                config.request.alightSlackForMode
-        ));
-
-        builder.searchDirection(profile.direction);
-
-        builder.searchParams().addAccessPaths(
-            mapToAccessEgress(streetRouter.getAccessTimesInSecondsByStopIndex())
-        );
-        builder.searchParams().addEgressPaths(
-            mapToAccessEgress(streetRouter.getEgressTimesInSecondsByStopIndex())
-        );
-
-        addDebugOptions(builder, opts);
-
-        RaptorRequest<TripSchedule> req = builder.build();
-
-        if (opts.debugRequest()) {
-            System.err.println("-> Request: " + req);
-        }
-
-        return req;
-    }
-
-    private static List<RaptorTransfer> mapToAccessEgress(TIntIntMap timesToStopsInSeconds) {
-        List<RaptorTransfer> paths = new ArrayList<>();
-        TIntIntIterator it = timesToStopsInSeconds.iterator();
-        while (it.hasNext()) {
-            it.advance();
-            paths.add(walk(it.key(), it.value()));
-        }
-        return paths;
-    }
 
     private static void addDebugOptions(
             RaptorRequestBuilder<TripSchedule> builder,

@@ -1,12 +1,11 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
+import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
-
-import java.util.Collection;
-import java.util.List;
 
 
 /**
