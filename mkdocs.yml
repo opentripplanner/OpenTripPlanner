@@ -26,7 +26,10 @@ pages:
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
     - Getting OTP: 'Getting-OTP.md'
-    - Configuration: 'Configuration.md'
+    - Configuration:
+        - Introduction: 'Configuration.md'
+        - Build: 'BuildConfiguration.md'
+        - Router: 'RouterConfiguration.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
