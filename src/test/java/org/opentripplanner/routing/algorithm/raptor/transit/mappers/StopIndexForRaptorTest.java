@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
@@ -39,7 +38,7 @@ public class StopIndexForRaptorTest {
 
     @Test public void listStopIndexesForEmptyTripPattern() {
         StopIndexForRaptor stopIndex = new StopIndexForRaptor(STOPS, TransitTuningParameters.FOR_TEST);
-        val p = new TripPattern(ANY_ID, null, new StopPattern(List.of()));
+        var p = new TripPattern(ANY_ID, null, new StopPattern(List.of()));
 
         int[] result = stopIndex.listStopIndexesForPattern(p);
 
@@ -85,7 +84,7 @@ public class StopIndexForRaptorTest {
     }
 
     private static StopTime stopTime(Stop stop) {
-        val st = new StopTime();
+        var st = new StopTime();
         st.setStop(stop);
         return st;
     }

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import javax.xml.datatype.Duration;
-import lombok.val;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
@@ -368,7 +367,7 @@ public class TimetableHelper {
         }
 
         //Get all scheduled stops
-        val pattern = timetable.getPattern();
+        var pattern = timetable.getPattern();
 
         // Keeping track of visited stop-objects to allow multiple visits to a stop.
         List<Object> alreadyVisited = new ArrayList<>();
@@ -610,7 +609,7 @@ public class TimetableHelper {
 
                 int arrivalDelay = 0;
                 int departureDelay = 0;
-                val pattern = timetable.getPattern();
+                var pattern = timetable.getPattern();
 
                 for (int index = 0; index < newTimes.getNumStops(); ++index) {
                     if (!matchFound) {
