@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary
@@ -75,8 +76,8 @@ class ItineraryResultMapper {
                 itinerary.durationSeconds,
                 itinerary.generalizedCost,
                 itinerary.generalizedCost, // TODO add walking distance
-                (int) itinerary.startTime().toInstant().getEpochSecond(),
-                (int) itinerary.endTime().toInstant().getEpochSecond(),
+                TimeUtils.localTime(itinerary.startTime()),
+                TimeUtils.localTime(itinerary.endTime()),
                 details(itinerary)
         );
 
@@ -100,7 +101,10 @@ class ItineraryResultMapper {
                 buf.walk((int) leg.getDuration());
             }
             else if(leg.isTransitLeg()) {
-                buf.transit(leg.getMode().name() + " " + leg.getRoute().getShortName(), (int) leg.getStartTime().toInstant().getEpochSecond(), (int) leg.getEndTime().toInstant().getEpochSecond());
+                buf.transit(
+                        leg.getMode().name() + " " + leg.getRoute().getShortName(),
+                        TimeUtils.localTime(leg.getStartTime()).toSecondOfDay(),
+                        TimeUtils.localTime(leg.getEndTime()).toSecondOfDay());
             }
         }
         return buf.toString();

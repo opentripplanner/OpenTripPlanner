@@ -1,10 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.util.CompositeComparator;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
-
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -13,6 +9,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.CompositeComparator;
+import org.opentripplanner.util.time.DurationUtils;
 
 
 /**
@@ -29,15 +28,15 @@ class Result {
     final Integer duration;
     final Integer cost;
     final Integer walkDistance;
-    final Integer startTime;
-    final Integer endTime;
+    final LocalTime startTime;
+    final LocalTime endTime;
     final Set<String> agencies = new TreeSet<>();
     final Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
     final List<String> routes = new ArrayList<>();
     final List<Integer> stops = new ArrayList<>();
     final String details;
 
-    Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, Integer startTime, Integer endTime, String details) {
+    Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, LocalTime startTime, LocalTime endTime, String details) {
         this.testCaseId = testCaseId;
         this.transfers = transfers;
         this.duration = duration;
@@ -51,8 +50,8 @@ class Result {
 
     public static Comparator<Result> comparator(boolean skipCost) {
         return new CompositeComparator<>(
-            Comparator.comparing(r -> r.endTime),
-            Comparator.comparing(r -> -r.startTime),
+            Comparator.comparing(r -> r.endTime.toSecondOfDay()),
+            Comparator.comparing(r -> -r.startTime.toSecondOfDay()),
             compareCost(skipCost),
             (r1, r2) -> compare(r1.routes, r2.routes, String::compareTo),
             (r1, r2) -> compare(r1.stops, r2.stops, Integer::compareTo)
@@ -77,8 +76,8 @@ class Result {
                 durationAsStr(),
                 cost,
                 walkDistance,
-                TimeUtils.timeToStrCompact(startTime),
-                TimeUtils.timeToStrCompact(endTime),
+                startTime.toSecondOfDay(),
+                endTime.toSecondOfDay(),
                 details
         );
     }

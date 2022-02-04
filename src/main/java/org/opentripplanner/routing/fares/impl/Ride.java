@@ -1,12 +1,9 @@
 package org.opentripplanner.routing.fares.impl;
 
-import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-
 import java.util.HashSet;
 import java.util.Set;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 
 /**

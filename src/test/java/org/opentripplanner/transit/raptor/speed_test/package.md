@@ -11,12 +11,12 @@ documentation on this tool, hopefully with time, we will add more doc and maybe 
 this test.
 
 Example input files and setup is included in the resource test folder:
- - {@code /raptor/speedtest/norway}.
+ - {@code test/ci-performance-test/}.
 
 ## Running 
 
 ```
-mvn compiler:testCompile exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.arguments="--dir=src/test/resources/raptor/speedtest/norway"
+mvn compiler:testCompile exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/ci-performance-test/ -p md -n 4"
 ```
 
 ## CI

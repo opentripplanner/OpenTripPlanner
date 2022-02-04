@@ -141,6 +141,10 @@ public class TimeUtils {
         return RelativeTime.from(time).toLongStr();
     }
 
+    public static String timeToStrLong(LocalTime time) {
+        return time.toString();
+    }
+
     public static Calendar midnightOf(Calendar time) {
         final Calendar midnight = (Calendar) time.clone();
         midnight.set(Calendar.HOUR, 0);
@@ -166,5 +170,13 @@ public class TimeUtils {
      */
     public static ZonedDateTime zonedDateTime(LocalDate date, int seconds, ZoneId zoneId) {
         return RelativeTime.ofSeconds(seconds).toZonedDateTime(date, zoneId);
+    }
+
+    public static ZonedDateTime zonedDateTime(Calendar time) {
+        return time.toInstant().atZone(time.getTimeZone().toZoneId());
+    }
+
+    public static LocalTime localTime(Calendar time) {
+        return zonedDateTime(time).toLocalDateTime().toLocalTime();
     }
 }
