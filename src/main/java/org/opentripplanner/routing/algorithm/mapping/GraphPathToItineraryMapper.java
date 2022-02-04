@@ -47,6 +47,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
@@ -490,13 +491,13 @@ public abstract class GraphPathToItineraryMapper {
      */
     private static Place makePlace(State state, Locale requestedLocale) {
         Vertex vertex = state.getVertex();
-        String name = vertex.getName(requestedLocale);
+        String name = vertex.getName().toString(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
         //Names are generated from all the streets in a corner, same as names in origin and destination
         //We use name in TemporaryStreetLocation since this name generation already happened when temporary location was generated
         if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
-            name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
+            name = ((StreetVertex) vertex).getIntersectionName().toString(requestedLocale);
         }
 
         if (vertex instanceof TransitStopVertex) {
@@ -563,7 +564,7 @@ public abstract class GraphPathToItineraryMapper {
                 // exit != null and uses to <exit>
                 // the floor name is the AlightEdge name
                 // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-                step.streetName = ((ElevatorAlightEdge) edge).getName(requestedLocale);
+                step.streetName = edge.getName().toString(requestedLocale);
 
                 step.relativeDirection = RelativeDirection.ELEVATOR;
 
@@ -571,7 +572,7 @@ public abstract class GraphPathToItineraryMapper {
                 continue;
             }
 
-            String streetName = edge.getName(requestedLocale);
+            String streetName = edge.getName().toString(requestedLocale);
             int idx = streetName.indexOf('(');
             String streetNameNoParens;
             if (idx > 0)
@@ -617,7 +618,7 @@ public abstract class GraphPathToItineraryMapper {
                     // indicate that we are now on a roundabout
                     // and use one-based exit numbering
                     roundaboutExit = 1;
-                    roundaboutPreviousStreet = backState.getBackEdge().getName(requestedLocale);
+                    roundaboutPreviousStreet = backState.getBackEdge().getName().toString(requestedLocale);
                     idx = roundaboutPreviousStreet.indexOf('(');
                     if (idx > 0)
                         roundaboutPreviousStreet = roundaboutPreviousStreet.substring(0, idx - 1);
@@ -654,7 +655,7 @@ public abstract class GraphPathToItineraryMapper {
                         // the next edges will be PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
-                            if (alternative.getName(requestedLocale).equals(streetName)) {
+                            if (alternative.getName().toString(requestedLocale).equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -679,7 +680,7 @@ public abstract class GraphPathToItineraryMapper {
                                 continue; // this is not an alternative
                             }
                             alternative = alternatives.get(0);
-                            if (alternative.getName(requestedLocale).equals(streetName)) {
+                            if (alternative.getName().equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -841,7 +842,7 @@ public abstract class GraphPathToItineraryMapper {
         Edge en = forwardState.getBackEdge();
         WalkStep step;
         step = new WalkStep();
-        step.streetName = en.getName(wantedLocale);
+        step.streetName = en.getName().toString(wantedLocale);
         step.startLocation = new WgsCoordinate(
                 backState.getVertex().getLat(),
                 backState.getVertex().getLon()

@@ -67,7 +67,7 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
             if(((TransitStopVertex) v).getStop().getWheelchairBoarding()
                     == WheelChairBoarding.NOT_POSSIBLE)
                 attrs.color = NO_WHEELCHAIR_COLOR;
-            attrs.label = v.getName();
+            attrs.label = v.getDefaultName();
         } else  {
             return false;
         }

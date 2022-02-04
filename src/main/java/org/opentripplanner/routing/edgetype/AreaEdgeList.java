@@ -106,10 +106,10 @@ public class AreaEdgeList implements Serializable {
 
             double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
 
-            AreaEdge forward = new AreaEdge(from, to, line, area.getRawName(), length,
+            AreaEdge forward = new AreaEdge(from, to, line, area.getName(), length,
                     area.getPermission(), false, this);
             forward.setStreetClass(area.getStreetClass());
-            AreaEdge backward = new AreaEdge(to, from, (LineString) line.reverse(), area.getRawName(),
+            AreaEdge backward = new AreaEdge(to, from, (LineString) line.reverse(), area.getName(),
                     length, area.getPermission(), true, this);
             backward.setStreetClass(area.getStreetClass());
         }

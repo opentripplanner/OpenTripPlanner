@@ -187,7 +187,7 @@ public class CarPickupTest extends GraphRoutingTest {
                 "%s - %s - %s",
                 s.getBackMode(),
                 s.getCarPickupState(),
-                s.getBackEdge() != null ? s.getBackEdge().getName() : null
+                s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null
         )).collect(Collectors.joining(", ")) : "path not found";
     }
 }

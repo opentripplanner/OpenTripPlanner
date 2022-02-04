@@ -96,7 +96,7 @@ public class ParkAndRideResource {
         public Double x, y;
 
         public ParkAndRideInfo(VehicleParkingEntranceVertex vertex) {
-            this.name = vertex.getName();
+            this.name = vertex.getDefaultName();
             this.x = vertex.getX();
             this.y = vertex.getY();
         }

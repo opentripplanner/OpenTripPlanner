@@ -173,7 +173,7 @@ public class GraphStats {
                     gc.setStartingGeographicPoint(c.x, c.y);
                     gc.setDirection(azimuth, distance);
                     Point2D dest = gc.getDestinationGeographicPoint();
-                    String name = v.getName();
+                    String name = v.getDefaultName();
                     String[] entries = new String[]{
                             Integer.toString(i),
                             name,

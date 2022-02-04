@@ -91,8 +91,8 @@ public class RoutingContextDestroyTest {
 
     private void originAndDestinationInsertedCorrect() {
         // Then - the origin and destination is
-        assertEquals("Origin", subject.fromVertices.iterator().next().getName());
-        assertEquals("Destination", subject.toVertices.iterator().next().getName());
+        assertEquals("Origin", subject.fromVertices.iterator().next().getDefaultName());
+        assertEquals("Destination", subject.toVertices.iterator().next().getDefaultName());
 
         // And - from the origin
         Collection<String> vertexesReachableFromOrigin = findAllReachableVertexes(
@@ -128,11 +128,11 @@ public class RoutingContextDestroyTest {
 
     private static <T extends Collection<String>> T findAllReachableVertexes(Vertex vertex,
             boolean forward, T list) {
-        if (list.contains(vertex.getName())) {
+        if (list.contains(vertex.getDefaultName())) {
             return list;
         }
 
-        list.add(vertex.getName());
+        list.add(vertex.getDefaultName());
         if (forward) {
             vertex.getOutgoing()
                     .forEach(it -> findAllReachableVertexes(it.getToVertex(), forward, list));
@@ -144,8 +144,8 @@ public class RoutingContextDestroyTest {
     }
 
     private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {
-        String sourceName = src.getName();
-        assertFalse(sourceName + " -> " + e.getName(), e instanceof TemporaryEdge);
-        assertFalse(sourceName + " -> " + v.getName(), v instanceof TemporaryVertex);
+        String sourceName = src.getDefaultName();
+        assertFalse(sourceName + " -> " + e.getDefaultName(), e instanceof TemporaryEdge);
+        assertFalse(sourceName + " -> " + v.getDefaultName(), v instanceof TemporaryVertex);
     }
 }

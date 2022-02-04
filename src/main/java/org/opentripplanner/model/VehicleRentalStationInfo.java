@@ -14,7 +14,7 @@ public class VehicleRentalStationInfo {
     
     public VehicleRentalStationInfo(VehicleRentalStationVertex vertex) {
         id = vertex.getStation().getStationId();
-        name = vertex.getName();
+        name = vertex.getDefaultName();
         lat = vertex.getLat();
         lon = vertex.getLon();
     }

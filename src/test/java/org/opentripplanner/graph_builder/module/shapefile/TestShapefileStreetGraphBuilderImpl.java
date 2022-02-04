@@ -106,10 +106,10 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                 int numParks = 0;
                 int numCarltons = 0;
                 for (Edge e: v.getOutgoing()) {
-                    if (e.getToVertex().getName().contains("PARK")) {
+                    if (e.getToVertex().getDefaultName().contains("PARK")) {
                         numParks ++;
                     }
-                    if (e.getToVertex().getName().contains("CARLTON")) {
+                    if (e.getToVertex().getDefaultName().contains("CARLTON")) {
                         numCarltons ++;
                     }
                 }
@@ -127,10 +127,10 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                 int numParks = 0;
 
                 for (Edge e: v.getOutgoing()) {
-                    if (e.getToVertex().getName().contains("FLATBUSH")) {
+                    if (e.getToVertex().getDefaultName().contains("FLATBUSH")) {
                         numFlatbushes ++;
                     }
-                    if (e.getToVertex().getName().contains("PARK")) {
+                    if (e.getToVertex().getDefaultName().contains("PARK")) {
                         numParks ++;
                     }
                 }

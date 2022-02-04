@@ -114,7 +114,7 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public String toString() {
-        return "StreetWithElevationEdge(" + getName() + ", " + fromv + " -> "
+        return "StreetWithElevationEdge(" + getDefaultName() + ", " + fromv + " -> "
                 + tov + " length=" + this.getDistanceMeters() + " carSpeed=" + this.getCarSpeed()
                 + " permission=" + this.getPermission() + ")";
     }

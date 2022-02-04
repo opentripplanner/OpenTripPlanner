@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Locale;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -10,6 +9,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.util.I18NString;
 
 /**
  * This represents the connection between a street vertex and a vehicle parking vertex.
@@ -40,12 +40,8 @@ public class StreetVehicleParkingLink extends Edge {
         return null;
     }
 
-    public String getName() {
+    public I18NString getName() {
         return vehicleParkingEntranceVertex.getName();
-    }
-
-    public String getName(Locale locale) {
-        return vehicleParkingEntranceVertex.getName(locale);
     }
 
     public State traverse(State s0) {
