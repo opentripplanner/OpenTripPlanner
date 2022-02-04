@@ -168,7 +168,7 @@ The Raptor implementation support instrumentation of ACCEPT, REJECT, and DROP ev
 
 ### GTFS Transfers.txt and NeTEx Interchange import
 
-Transfers may have effects on the routing witch may be difficult to predict. OTP can dump all 
+Transfers may have effects on the routing which may be difficult to predict. OTP can dump all 
 imported transfers to file - _transfers-debug.csv_. This may help verify the result of the import
 or find special test cases. To turn on the export enable the slf4j logger:
 

@@ -58,6 +58,7 @@ enum-set | List of enum string values | `[ "RAIL", "TRAM" ]`
 locale | _`Language[\_country[\_variant]]`_. A Locale object represents a specific geographical, political, or cultural region. For more information see the [Java 11 Locale](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html). | `en_US`, `nn_NO`
 date | Local date. The format is _YYYY-MM-DD_ (ISO-8601). | `2020-09-21`
 date or period | A _local date_, or a _period_ relative to today. The local date has the format `YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer number. | `P1Y` is one year from now, `-P3M2D` means 3 months and 2 days ago, and `P1D` means tomorrow.
+duration | A _duration_ is a amount of time. The format is `PnDTnHnMnS` or `nDnHnMnS` where `n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not case sensitive. | `3h` is 3 hours, `2m` means 2 minutes, and `1d5h2m3s` is 1 day, 5 hours, 2 minutes and 3 seconds. Use the "PT" form with negative values like `-P2dT-1s` and `P-2dT1s` (both is minus 2 days plus one second). 
 regexp pattern | A regular expression pattern used to match a sting. | `"$^"` matches an empty string. `"gtfs"` matches `"A-*gtfs*-file.zip"`. `"$\w{3})-.*\.xml^"` matches a filename with 3 alpha-numeric characters in the beginning of the filename and _.xml_ as file extension.   
 uri | An URI path to a resource like a file or a URL. Relative URIs are resolved relative to the OTP base path. | `"gs://bucket/path/a.obj"` `"http://foo.bar/"` `"file:///Users/x/local/file"` `"myGraph.obj"` `"../street/streetGraph-${otp.serialization.version.id}.obj"`
 linear function | A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x` | `"600 + 2.0 x"`
@@ -103,8 +104,8 @@ The project information variables available are:
 All three configuration files have an optional `configVersion` property. The property can be used
 to version the configuration in a deployment pipeline. The `configVersion` is not used by OTP in 
 any way, but is logged at startup and is available as part of the _server-info_ data in the REST 
-API. The intended usage is to be able to check witch version of the configuration the graph was 
-build with and witch version the router uses. In an deployment with many OTP instances it can be 
+API. The intended usage is to be able to check which version of the configuration the graph was 
+build with and which version the router uses. In an deployment with many OTP instances it can be 
 useful to ask an instance about the version, instead of tracking the deployment pipline backwards 
 to find the version used. How you inject a version into the configuration file is up to you, but
 you can do it in your build-pipline, at deployment time or use system environment variable 
@@ -120,7 +121,7 @@ the graph. The header info is available to configuration substitution:
   - `${graph.file.header}` Will expand to: `OpenTripPlannerGraph;0000007;`
   - `${otp.serialization.version.id}` Will expand to: `7`
  
-The intended usage is to be able to have a graph build pipeline which "knows" witch graph 
+The intended usage is to be able to have a graph build pipeline which "knows" which graph 
 that matches OTP planner instances. For example, you may build new graphs for every OTP 
 serialization version id in use by the planning OPT instances you have deploied and plan to deploy.
 This way you can roll forward and backward new OTP instances without worring about building new 
@@ -196,7 +197,7 @@ example:
 ```
 
 ## OTP Features
-Here is a list of all features witch can be toggled on/off.
+Here is a list of all features which can be toggled on/off.
 
 Feature | Description | Enabled by default | Sandbox
 --------|-------------|--------------------|-------- 
@@ -204,7 +205,7 @@ Feature | Description | Enabled by default | Sandbox
 `APIServerInfo` | Enable the server info endpoint |  yes | no
 `APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no
 `APIUpdaterStatus` | Enable endpoint for graph updaters status | yes | no
-`OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (witch stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
+`OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
 `ParallelRouting` | Enable performing parts of the trip planning in parallel | yes | no
 `TransferConstraints` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
 `ActuatorAPI` | Enpoint for actuators (service health status) | no | yes
@@ -907,6 +908,7 @@ config key | description | value type | value default
 `dynamicSearchWindow` | The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics. | object | `null`
 `stopTransferCost` | Use this to set a stop transfer cost for the given [TransferPriority](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/model/TransferPriority.java). The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | enum map | `null`
 `transferCacheMaxSize` | The maximum number of distinct transfers parameters (`RoutingRequest`s) to cache pre-calculated transfers for. If too low, requests may be slower. If too high, more memory may be used then required. | int | `25`
+`pagingSearchWindowAdjustments` | The provided array of durations is used to increase the search-window for the next/previous page when the current page return few options. If ZERO results is returned the first duration in the list is used, if ONE result is returned then the second duration is used and so on. The duration is added to the existing search-window and inserted into the next and previous page cursor. See JavaDoc for [TransitTuningParameters#pagingSearchWindowAdjustments](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/routing/algorithm/raptor/transit/TransitTuningParameters.java) for more info.  | duration[] | `["4h", "2h", "1h", "30m", "20m", "10m"]`
 
 ### Tuning transit routing - Dynamic search window
 Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.json`.

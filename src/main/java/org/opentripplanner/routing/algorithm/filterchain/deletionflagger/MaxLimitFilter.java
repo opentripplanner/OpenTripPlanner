@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import com.google.common.collect.Lists;
-import java.util.stream.Collectors;
-import org.opentripplanner.model.plan.Itinerary;
-
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
 
 /**
@@ -20,22 +20,23 @@ public class MaxLimitFilter implements ItineraryDeletionFlagger {
 
     private final String name;
     private final int maxLimit;
-    private final boolean reverseFilteringDirection;
+    private final ListSection cropSection;
     private final Consumer<Itinerary> changedSubscriber;
 
+    /** Create filter with default crop(TAIL) and without any callback. */
     public MaxLimitFilter(String name, int maxLimit) {
-        this(name, maxLimit, false, null);
+        this(name, maxLimit, ListSection.TAIL, IGNORE_SUBSCRIBER);
     }
 
     public MaxLimitFilter(
             String name,
             int maxLimit,
-            boolean reverseFilteringDirection,
+            ListSection cropSection,
             Consumer<Itinerary> changedSubscriber
     ) {
         this.name = name;
         this.maxLimit = maxLimit;
-        this.reverseFilteringDirection = reverseFilteringDirection;
+        this.cropSection = cropSection;
         this.changedSubscriber = changedSubscriber == null ? IGNORE_SUBSCRIBER : changedSubscriber;
     }
 
@@ -47,10 +48,10 @@ public class MaxLimitFilter implements ItineraryDeletionFlagger {
     @Override
     public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
         if(itineraries.size() <= maxLimit) { return List.of(); }
-        List<Itinerary> possiblyReversedItineraries = reverseFilteringDirection
-                ? Lists.reverse(itineraries)
-                : itineraries;
-        changedSubscriber.accept(possiblyReversedItineraries.get(maxLimit));
-        return possiblyReversedItineraries.stream().skip(maxLimit).collect(Collectors.toList());
+
+        if(cropSection == ListSection.HEAD) { itineraries = Lists.reverse(itineraries); }
+
+        changedSubscriber.accept(itineraries.get(maxLimit));
+        return itineraries.stream().skip(maxLimit).collect(Collectors.toList());
     }
 }

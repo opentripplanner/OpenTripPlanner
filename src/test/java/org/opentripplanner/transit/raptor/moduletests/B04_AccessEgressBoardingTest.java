@@ -27,7 +27,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  * bit simpler since we only need one Route with three access and egress paths.
  * <p>
  * The routing strategies do not board at the same stop, they should board at the optimal stop
- * for the criterion witch they optimize on. Read the doc for {@link A04_BoardingTest} witch
+ * for the criterion which they optimize on. Read the doc for {@link A04_BoardingTest} which
  * describe the expected behavior with respect to boarding.
  * <p>
  * Note! This test run one iteration. It does not run RangeRaptor over a time window.

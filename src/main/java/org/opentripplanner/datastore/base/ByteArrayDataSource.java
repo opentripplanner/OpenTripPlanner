@@ -84,7 +84,7 @@ public class ByteArrayDataSource implements DataSource {
     }
 
     /**
-     * Clean any existing data, and return a new {@link OutputStream} witch can be used to insert
+     * Clean any existing data, and return a new {@link OutputStream} which can be used to insert
      * data into the byte array.
      * <p>
      * If the source is created with {@code writable = false} then the {@link #asOutputStream()}

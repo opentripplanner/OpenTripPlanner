@@ -28,7 +28,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     }
 
     /**
-     * Setup egress arrivals with a callback witch is notified when a new transit egress arrival happens.
+     * Setup egress arrivals with a callback which is notified when a new transit egress arrival happens.
      */
     public void setupEgressStopStates(
             Iterable<RaptorTransfer> egressPaths,
@@ -71,7 +71,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     public int calculateMinNumberOfTransfers(int stop) {
         for (int i = 0; i < stops.length; i++) {
             if(stops[i][stop] != null) {
-                return i;
+                return i - 1;
             }
         }
         return unreachedMinNumberOfTransfers();

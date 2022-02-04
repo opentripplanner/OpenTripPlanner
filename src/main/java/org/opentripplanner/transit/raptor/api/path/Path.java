@@ -136,7 +136,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     }
 
     /**
-     * The first leg/path of this journey - witch is linked to the next and so on. The leg
+     * The first leg/path of this journey - which is linked to the next and so on. The leg
      * can contain sub-legs, for example: walk-flex-walk.
      *
      */

@@ -195,13 +195,13 @@ public class ParetoSetTest {
         // Assert all vectors is there
         assertEquals("{V0[5, 1], V1[3, 3], V2[0, 7], V3[1, 5]}", set.toString());
 
-        // Add a vector witch dominates all vectors in set, except [0, 7]
+        // Add a vector which dominates all vectors in set, except [0, 7]
         set.add(new Vector("V", 1, 1));
 
         // Expect just 2 vectors
         assertEquals("{V2[0, 7], V[1, 1]}", set.toString());
 
-        // Add a vector witch dominates all vectors in set
+        // Add a vector which dominates all vectors in set
         set.add(new Vector("X", 0, 1));
 
         // Expect just 1 vector - the last
@@ -282,7 +282,7 @@ public class ParetoSetTest {
             assertEquals(i, set.size());
         }
 
-        // When adding a vector witch dominates all existing vectors
+        // When adding a vector which dominates all existing vectors
         set.add(vector(0, 0));
         // Then the set should shrink to size 1
         assertEquals("{Test[0, 0]}", set.toString());

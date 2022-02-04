@@ -31,7 +31,7 @@ import org.opentripplanner.util.time.DurationUtils;
  */
 public class B11_FlexEgressTest implements RaptorTestConstants {
 
-  private static final int D1m59s = DurationUtils.duration("1m59s");
+  private static final int D1m59s = DurationUtils.durationInSeconds("1m59s");
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =

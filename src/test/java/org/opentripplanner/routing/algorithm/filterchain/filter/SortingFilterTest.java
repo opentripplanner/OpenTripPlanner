@@ -1,21 +1,20 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
-import org.junit.Test;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOnGeneralizedCost;
-
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.generalizedCostComparator;
+
+import java.util.List;
+import org.junit.Test;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 
 public class SortingFilterTest implements PlanTestConstants {
 
     @Test
     public void sortWorksWithOneOrEmptyList() {
-        SortingFilter filter = new SortingFilter(new SortOnGeneralizedCost());
+        SortingFilter filter = new SortingFilter(generalizedCostComparator());
 
         // Expect sort to no fail on an empty list
         assertEquals(List.of(), filter.filter(List.of()));

@@ -54,11 +54,15 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   @Override
   public boolean tripPatternPredicate(TripPatternForDate tripPatternForDate) {
-    return routeIsNotBanned(tripPatternForDate) && transitModeIsAllowed(tripPatternForDate);
+    return routeIsNotBanned(tripPatternForDate);
   }
 
   @Override
   public boolean tripTimesPredicate(TripTimes tripTimes) {
+    if (!transitModeIsAllowed(tripTimes)) {
+      return false;
+    }
+
     if (requireBikesAllowed) {
       return bikeAccessForTrip(tripTimes.getTrip()) == BikeAccess.ALLOWED;
     }
@@ -79,9 +83,12 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     return !bannedRoutes.contains(routeId);
   }
 
-  private boolean transitModeIsAllowed(TripPatternForDate tripPatternForDate) {
-    TransitMode transitMode = tripPatternForDate.getTripPattern().getTransitMode();
-    String netexSubmode = tripPatternForDate.getTripPattern().getNetexSubmode();
+  private boolean transitModeIsAllowed(TripTimes tripTimes) {
+
+    Trip trip = tripTimes.getTrip();
+    TransitMode transitMode = trip.getMode();
+    String netexSubmode = trip.getNetexSubmode();
+
     return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, netexSubmode));
   }
 

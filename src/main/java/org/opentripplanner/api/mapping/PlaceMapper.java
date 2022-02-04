@@ -66,7 +66,6 @@ public class PlaceMapper {
 
         api.arrival = arrival;
         api.departure = departure;
-        api.orig = domain.orig;
         api.stopIndex = stopIndex;
         api.stopSequence = gtfsStopSequence;
         api.vertexType = VertexTypeMapper.mapVertexType(domain.vertexType);

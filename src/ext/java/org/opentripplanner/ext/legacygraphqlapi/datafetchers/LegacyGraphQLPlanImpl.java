@@ -7,8 +7,8 @@ import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 

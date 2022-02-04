@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.val;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.util.OtpAppException;
 
@@ -79,7 +78,7 @@ class IncludeFileDirective {
 
             // If the insert text is a legal JSON object "[white-space]{ ... }[white-space]", then
             // ignore the optional quotes matched by the directive pattern
-            val json = fileText.trim();
+            var json = fileText.trim();
             if(json.startsWith("{") && json.endsWith("}")) {
                 text = text.replace(entry.getKey(), fileText);
             }

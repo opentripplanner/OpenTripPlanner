@@ -13,7 +13,7 @@ import java.util.List;
  * Override one of the default methods in this interface to make a filter:
  * <ul>
  *  <li>{@link #predicate()} - If filtering is done based on looking at one itinerary at the time.</li>
- *  <li>{@link getFlaggedItineraries(List)}}) - If you need more than one itinerary to decide witch to delete.</li>
+ *  <li>{@link getFlaggedItineraries(List)}}) - If you need more than one itinerary to decide which to delete.</li>
  * </ul>
  */
 public interface ItineraryDeletionFlagger {

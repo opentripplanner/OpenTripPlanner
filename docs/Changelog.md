@@ -18,7 +18,7 @@
 - Remove request parameter `driveOnRight` and derive information from way property set [#3359](https://github.com/opentripplanner/OpenTripPlanner/pull/3405)
 - Add basic support for routing using floating bikes [#3370](https://github.com/opentripplanner/OpenTripPlanner/pull/3370)
 - Add no thru traffic debug layer [#3443](https://github.com/opentripplanner/OpenTripPlanner/issues/3443)
-- Optimize witch stops are used for transfers, using generalized-cost, wait-time and transfer priority. Partially implements [#2788](https://github.com/opentripplanner/OpenTripPlanner/issues/2788)
+- Optimize which stops are used for transfers, using generalized-cost, wait-time and transfer priority. Partially implements [#2788](https://github.com/opentripplanner/OpenTripPlanner/issues/2788)
 - Support for stay-seated and guaranteed transfers [#3193](https://github.com/opentripplanner/OpenTripPlanner/issues/3193)
 - Fix reading of cached elevation files [#3455](https://github.com/opentripplanner/OpenTripPlanner/pull/3455)
 - Added BikeRentalWithMostlyWalking filter [#3446](https://github.com/opentripplanner/OpenTripPlanner/pull/3446)
@@ -124,6 +124,11 @@
 - fix: Avoid mixed path separators on Windows in Park API test [#3845](https://github.com/opentripplanner/OpenTripPlanner/pull/3845)
 - Filter out elevator ways that are also implicit areas [#3850](https://github.com/opentripplanner/OpenTripPlanner/pull/3850)
 - Narrow down non-null types to improve schema and docs [#3837](https://github.com/opentripplanner/OpenTripPlanner/pull/3837)
+- Dynamically compute additional search days [#3824](https://github.com/opentripplanner/OpenTripPlanner/pull/3824)
+- Mode & submode filter for NeTEx Service Journeys [#3844](https://github.com/opentripplanner/OpenTripPlanner/pull/3844)
+- ci: Add Windows to GitHub Action builds [#3851](https://github.com/opentripplanner/OpenTripPlanner/pull/3851)
+- Return correct heuristic values, when constrained transfers is turned on [#3841](https://github.com/opentripplanner/OpenTripPlanner/pull/3841)
+- Adjust search window dynamically to fit the number of itineraries [#3828](https://github.com/opentripplanner/OpenTripPlanner/pull/3828)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
