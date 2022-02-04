@@ -9,14 +9,13 @@ The current members of this committee are (in alphabetical order):
 | Sean Barbeau      | [University of South Florida](https://www.cutr.usf.edu/) |
 | Sheldon Brown     | [Cambridge Systematics](https://camsys.com/) |
 | Andrew Byrd       | [Conveyal](http://conveyal.com) |
-| Thomas Craig      | [Trillium Transit](https://trilliumtransit.com/) |
+| Thomas Craig      | [CALACT ITS4US](https://calact.org/programs/its4us/) |
 | Drew Dara-Abrams  | [Interline](http://www.interline.io) |
-| David Emory       | [MARTA](https://www.itsmarta.com/) (Atlanta, Georgia USA) |
+| David Emory       | [IBI Group](https://www.ibigroup.com/) |
 | Thomas Gran       | [Ruter](https://ruter.no/en/) & [Entur](https://entur.no/) (Norway) |
-| Tuukka Hastrup    | [Maanteeamet](https://www.mnt.ee/et) (Estonia) |
+| Tuukka Hastrup    | [Transpordiamet](https://www.transpordiamet.ee/en) (Estonia) |
 | Joel Lappalainan  | [Digitransit](https://digitransit.fi/) (Finland) |
 | Frank Purcell     | [TriMet](https:/trimet.org/) (Portland, Oregon) |
-| Evan Siroky       | [IBI Group](https://www.ibigroup.com/) |
 | David Turner      | ex-[OpenPlans](https://www.openplans.org/) |
 
 The PLC holds a quarterly video conference on the first Tuesday of June, September, December, and March. 
