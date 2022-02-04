@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -12,6 +13,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -270,6 +272,14 @@ public class PlainStreetEdgeTest {
         assertNotNull(e0.traverse(e1.traverse(state)));
     }
 
+    @Test
+    public void testElevationProfile() {
+        var elevationProfile = new PackedCoordinateSequence.Double(new double[]{0, 10, 50, 12}, 2);
+        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL, elevationProfile);
+
+        assertArrayEquals(elevationProfile.toCoordinateArray(), e0.getElevationProfile().toCoordinateArray());
+    }
+
     /****
      * Private Methods
      ****/
@@ -299,4 +309,23 @@ public class PlainStreetEdgeTest {
         return new StreetEdge(vA, vB, geom, name, length, perm, false);
     }
 
+    private StreetWithElevationEdge edge(
+            StreetVertex vA,
+            StreetVertex vB,
+            double length,
+            StreetTraversalPermission perm,
+            PackedCoordinateSequence elevationProfile
+    ) {
+        String labelA = vA.getLabel();
+        String labelB = vB.getLabel();
+        String name = String.format("%s_%s", labelA, labelB);
+        Coordinate[] coords = new Coordinate[2];
+        coords[0] = vA.getCoordinate();
+        coords[1] = vB.getCoordinate();
+        LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+
+        var edge = new StreetWithElevationEdge(vA, vB, geom, name, length, perm, false);
+        edge.setElevationProfile(elevationProfile, false);
+        return edge;
+    }
 }

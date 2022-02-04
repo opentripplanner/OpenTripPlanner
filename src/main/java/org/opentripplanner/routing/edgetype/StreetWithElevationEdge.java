@@ -81,7 +81,7 @@ public class StreetWithElevationEdge extends StreetEdge {
     public PackedCoordinateSequence getElevationProfile() {
         return CompactElevationProfile.uncompactElevationProfileWithRegularSamples(
                 packedElevationProfile,
-                getEffectiveWalkDistance()
+                getDistanceMeters()
         );
     }
 
