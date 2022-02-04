@@ -70,8 +70,8 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
     }
 
     @Override
-    public int waitTimeOptimizedCost() {
-        return waitTimeOptimizedCost;
+    public int generalizedCostWaitTimeOptimized() {
+        return generalizedCost() + waitTimeOptimizedCost;
     }
 
     @Override
@@ -95,8 +95,8 @@ public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T>
     }
 
     private void appendSummary(PathStringBuilder buf) {
-        buf.costCentiSec(transferPriorityCost, "pri");
-        buf.costCentiSec(waitTimeOptimizedCost, "wtc");
+        buf.costCentiSec(transferPriorityCost, TransferConstraint.ZERO_COST, "pri");
+        buf.costCentiSec(generalizedCostWaitTimeOptimized(), generalizedCost(), "wtc");
     }
 
     private static int priorityCost(Path<?> path) {

@@ -125,7 +125,7 @@ public class RaptorPathToItineraryMapper {
         itinerary.arrivedAtDestinationWithRentedVehicle = mapped != null && mapped.arrivedAtDestinationWithRentedVehicle;
 
         if(optimizedPath != null) {
-            itinerary.waitTimeOptimizedCost = toOtpDomainCost(optimizedPath.waitTimeOptimizedCost());
+            itinerary.waitTimeOptimizedCost = toOtpDomainCost(optimizedPath.generalizedCostWaitTimeOptimized());
             itinerary.transferPriorityCost = toOtpDomainCost(optimizedPath.transferPriorityCost());
         }
 

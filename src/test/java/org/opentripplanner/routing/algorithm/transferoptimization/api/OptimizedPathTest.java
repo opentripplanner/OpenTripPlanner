@@ -17,7 +17,7 @@ class OptimizedPathTest implements RaptorTestConstants {
         // Verify all costs
         assertEquals(BasicPathTestCase.TOTAL_COST, path.generalizedCost());
         assertEquals(0, path.breakTieCost());
-        assertEquals(0, path.waitTimeOptimizedCost());
+        assertEquals(BasicPathTestCase.TOTAL_COST, path.generalizedCostWaitTimeOptimized());
         assertEquals(66_00, path.transferPriorityCost());
 
         // And toString is the same (transfer priority cost added)
@@ -46,6 +46,7 @@ class OptimizedPathTest implements RaptorTestConstants {
         final int generalizedCost = 881100;
         final int transferPriorityCost = 120100;
         final int waitTimeOptimizedCost = 130200;
+        final int generalizedCostWaitTimeOptimized = generalizedCost + waitTimeOptimizedCost;
         final int breakTieCost = 140300;
 
         var path = new OptimizedPath<>(
@@ -59,12 +60,14 @@ class OptimizedPathTest implements RaptorTestConstants {
 
         assertEquals(generalizedCost, path.generalizedCost());
         assertEquals(breakTieCost, path.breakTieCost());
-        assertEquals(waitTimeOptimizedCost, path.waitTimeOptimizedCost());
+        assertEquals(generalizedCostWaitTimeOptimized, path.generalizedCostWaitTimeOptimized());
         assertEquals(transferPriorityCost, path.transferPriorityCost());
 
         var exp = BasicPathTestCase.BASIC_PATH_AS_STRING
-                .replace("$8184]", "$8811 $1201pri $1302wtc]");
+                .replace("$8184]", "$8811 $1201pri "
+                        + "$" + (generalizedCostWaitTimeOptimized/100) + "wtc]");
 
         assertEquals(exp, path.toString(this::stopIndexToName));
     }
 }
+// 881 100 + 130 200 = 1 011 300

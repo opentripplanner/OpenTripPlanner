@@ -75,7 +75,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
                 + "~ BUS L21 11:00 11:23 ~ D "
                 + "~ BUS L31 11:40 11:52 ~ E "
                 + "~ Walk 7m45s "
-                + "[$8019 $46pri $-101126wtc]";
+                + "[$8019 $46pri $-93107wtc]";
 
         assertEquals(exp, subject.toString());
     }
@@ -88,7 +88,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
         var exp = "Walk 3m15s ~ A "
                 + "~ BUS L11 10:04 10:35 ~ B "
                 + "~ Walk 7m45s "
-                + "[$3318 $0pri $60wtc]";
+                + "[$3318 $0pri $3378wtc]";
 
         assertEquals(exp, subject.toString());
     }
@@ -136,7 +136,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
                 + "~ BUS L21 11:00 11:23 23m $2724 ~ D 17m {staySeated} "
                 + "~ BUS L31 11:40 11:52 12m $1737 ~ E 15s "
                 + "~ Walk 7m45s 11:52:15 12:00 $930 "
-                + "[10:00 12:00 2h $8019 $46pri $-101126wtc]";
+                + "[10:00 12:00 2h $8019 $46pri $-93107wtc]";
 
         assertEquals(expPath, path.toStringDetailed(this::stopIndexToName));
     }

@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
-import static org.opentripplanner.transit.raptor.api.transit.CostCalculator.ZERO_COST;
-
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
@@ -35,6 +33,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
     private int transferPriorityCost = TransferConstraint.ZERO_COST;
     private int waitTimeOptimizedCost = TransferWaitTimeCostCalculator.ZERO_COST;
+    private int generalizedCost = CostCalculator.ZERO_COST;
 
     public OptimizedPathTail(
             RaptorSlackProvider slackProvider,
@@ -60,6 +59,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         this.waitTimeOptimizedCost = other.waitTimeOptimizedCost;
         this.transferPriorityCost = other.transferPriorityCost;
         this.stopPriorityCostCalculator = other.stopPriorityCostCalculator;
+        this.generalizedCost = other.generalizedCost;
     }
 
     @Override
@@ -69,6 +69,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         newLeg.timeShiftThisAndNextLeg(slackProvider);
         addTransferPriorityCost(newLeg);
         addOptimizedWaitTimeCost(newLeg);
+        updateGeneralizedCost();
     }
 
     @Override
@@ -138,7 +139,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
         return new OptimizedPath<>(
                 createPathLegs(costCalculator, slackProvider),
                 iterationDepartureTime,
-                generalizedCost(),
+                generalizedCost,
                 transferPriorityCost,
                 waitTimeOptimizedCost,
                 breakTieCost()
@@ -149,8 +150,12 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
      * Return the generalized cost for the current set of paths.
      */
     public int generalizedCost() {
-        if(skipCostCalc()) { return ZERO_COST; }
-        return legsAsStream()
+        return generalizedCost;
+    }
+
+    private void updateGeneralizedCost() {
+        if(skipCostCalc()) { return; }
+        this.generalizedCost = legsAsStream()
                 .mapToInt(it -> it.generalizedCost(costCalculator, slackProvider))
                 .sum();
     }
@@ -164,8 +169,8 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     }
 
     @Override
-    public int waitTimeOptimizedCost() {
-        return waitTimeOptimizedCost;
+    public int generalizedCostWaitTimeOptimized() {
+        return generalizedCost + waitTimeOptimizedCost;
     }
 
     @Override
@@ -192,7 +197,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
                 .addText(" [")
                 .addCost(generalizedCost())
                 .addCost(transferPriorityCost, "pri")
-                .addCost(waitTimeOptimizedCost, "wtc")
+                .addCost(generalizedCostWaitTimeOptimized(), "wtc")
                 .addText("]")
                 .toString();
     }
@@ -250,9 +255,9 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     }
 
     private int extraStopPriorityCost(PathBuilderLeg<?> leg) {
-        if(stopPriorityCostCalculator == null) { return ZERO_COST; }
+        if(stopPriorityCostCalculator == null) { return CostCalculator.ZERO_COST; }
 
-        int extraCost = ZERO_COST;
+        int extraCost = CostCalculator.ZERO_COST;
         // Ideally we would like to add the board- & alight-stop-cost when a new transit-leg
         // is added to the path. But, the board stop is unknown until the leg before it is
         // added. So, instead of adding the board-stop-cost when it is added, we wait and add it
