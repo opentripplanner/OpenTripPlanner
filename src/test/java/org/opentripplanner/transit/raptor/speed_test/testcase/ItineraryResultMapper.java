@@ -1,12 +1,14 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
-import org.opentripplanner.transit.raptor.speed_test.model.Leg;
+import java.util.Optional;
+import org.opentripplanner.model.plan.Itinerary;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary
@@ -61,7 +63,7 @@ class ItineraryResultMapper {
         this.testCaseId = testCaseId;
     }
 
-    static Collection<Result> map(final String testCaseId, Collection<Itinerary> itineraries, boolean skipCost) {
+    static Collection<Result> map(final String testCaseId, Collection<org.opentripplanner.model.plan.Itinerary> itineraries, boolean skipCost) {
         var mapper = new ItineraryResultMapper(skipCost, testCaseId);
         return itineraries.stream().map(mapper::map).collect(Collectors.toList());
     }
@@ -69,22 +71,38 @@ class ItineraryResultMapper {
     private Result map(Itinerary itinerary) {
         Result result = new Result(
                 testCaseId,
-                itinerary.transfers,
-                itinerary.duration,
-                (int)itinerary.weight,
-                itinerary.walkDistance.intValue(),
-                itinerary.startTime,
-                itinerary.endTime,
-                itinerary.details()
+                itinerary.nTransfers,
+                itinerary.durationSeconds,
+                itinerary.generalizedCost,
+                itinerary.generalizedCost, // TODO add walking distance
+                (int) itinerary.startTime().toInstant().getEpochSecond(),
+                (int) itinerary.endTime().toInstant().getEpochSecond(),
+                details(itinerary)
         );
 
         for (Leg it : itinerary.legs) {
             if (it.isTransitLeg()) {
-                result.agencies.add(AGENCY_NAMES_SHORT.getOrDefault(it.agencyName, it.agencyName));
-                result.modes.add(it.mode);
-                result.routes.add(it.routeShortName);
+                result.agencies.add(AGENCY_NAMES_SHORT.getOrDefault(it.getAgency().getName(), it.getAgency().getName()));
+                result.modes.add(it.getMode());
+                result.routes.add(it.getRoute().getShortName());
             }
         }
         return result;
+    }
+    public static String details(Itinerary itin) {
+        PathStringBuilder buf = new PathStringBuilder(Integer::toString, true);
+
+        for (Leg leg : itin.legs) {
+
+            Optional.ofNullable(leg.getFrom().stop).map(s -> s.getId().getId()).map(id -> buf.sep().stop(id).sep());
+
+            if(leg.isWalkingLeg()) {
+                buf.walk((int) leg.getDuration());
+            }
+            else if(leg.isTransitLeg()) {
+                buf.transit(leg.getMode().name() + " " + leg.getRoute().getShortName(), (int) leg.getStartTime().toInstant().getEpochSecond(), (int) leg.getEndTime().toInstant().getEpochSecond());
+            }
+        }
+        return buf.toString();
     }
 }

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;

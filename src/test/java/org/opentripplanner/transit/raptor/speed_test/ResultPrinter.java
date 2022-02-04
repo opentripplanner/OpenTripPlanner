@@ -11,8 +11,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseFailedException;
 
@@ -58,11 +57,11 @@ class ResultPrinter {
 
     private ResultPrinter() { }
 
-    static void printResultOk(TestCase testCase, RaptorRequest<?> request, long lapTime, boolean printItineraries) {
+    static void printResultOk(TestCase testCase, RoutingRequest request, long lapTime, boolean printItineraries) {
         printResult("SUCCESS", request, testCase, lapTime, printItineraries, "");
     }
 
-    static void printResultFailed(TestCase testCase, RaptorRequest<?> request, long lapTime, Exception e) {
+    static void printResultFailed(TestCase testCase, RoutingRequest request, long lapTime, Exception e) {
         boolean testError = e instanceof TestCaseFailedException;
         String errorDetails = " - " + e.getMessage() + (testError ? "" : "  (" + e.getClass().getSimpleName() + ")");
 
@@ -113,7 +112,7 @@ class ResultPrinter {
 
     private static void printResult(
             String status,
-            RaptorRequest<?> request,
+            RoutingRequest request,
             TestCase tc,
             long lapTime,
             boolean printItineraries,
@@ -131,10 +130,10 @@ class ResultPrinter {
         }
     }
 
-    private static String toString(TestCase tc, RaptorRequest<?> request) {
+    private static String toString(TestCase tc, RoutingRequest request) {
         if(request == null) { return tc.toString(); }
-        SearchParams r = request.searchParams();
-        return tc.toString(r.earliestDepartureTime(), r.latestArrivalTime(), r.searchWindowInSeconds());
+        //SearchParams r = request.searchParams();
+        return tc.toString(0,0,0);
     }
 
     private static List<String> listResults(MeterRegistry registry) {

@@ -20,37 +20,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.model.plan.TripPlan;
+import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.RoutingRequestTransitDataProviderFilter;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.TransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.standalone.OtpStartupInfo;
-import org.opentripplanner.transit.raptor.RaptorService;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
-import org.opentripplanner.transit.raptor.speed_test.model.TripPlan;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
-import org.opentripplanner.transit.raptor.speed_test.testcase.NoResultFound;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
-import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
 import org.opentripplanner.util.OtpAppException;
 
 /**
@@ -70,7 +58,6 @@ public class SpeedTest {
     private static final long nanosToMillis = 1000000;
 
     private final Graph graph;
-    private final TransitLayer transitLayer;
 
     private final Clock clock = Clock.SYSTEM;
     private final MeterRegistry loggerRegistry = new SimpleMeterRegistry();
@@ -81,26 +68,19 @@ public class SpeedTest {
     private final SpeedTestConfig config;
     private int nAdditionalTransfers;
     private SpeedTestProfile routeProfile;
-    private SpeedTestProfile heuristicProfile;
-    private final EgressAccessRouter streetRouter;
+    private final Router router;
     private final List<Integer> numOfPathsFound = new ArrayList<>();
     private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
     private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
-
-    /**
-     * Init profile used by the HttpServer
-     */
-    private final RaptorService<TripSchedule> service;
-
 
     private SpeedTest(SpeedTestCmdLineOpts opts) {
         this.opts = opts;
         this.config = SpeedTestConfig.config(opts.rootDir());
         this.graph = loadGraph(opts.rootDir(), config.graph);
-        this.transitLayer = TransitLayerMapper.map(config.transitRoutingParams, graph);
-        this.streetRouter = new EgressAccessRouter(graph, transitLayer, registry);
         this.nAdditionalTransfers = opts.numOfExtraTransfers();
-        this.service = new RaptorService<>(new RaptorConfig<>(config.transitRoutingParams, registry));
+
+        this.router = new Router(graph, RouterConfig.DEFAULT);
+        this.router.startup();
 
         var measurementEnv = Optional.ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT")).orElse("local");
         registry.config().commonTags(List.of(
@@ -171,10 +151,11 @@ public class SpeedTest {
         }
         printProfileStatistics();
 
-        // close() sends the results to influxdb
-        uploadRegistry.close();
+        if(uploadRegistry != null) {
+            // close() sends the results to influxdb
+            uploadRegistry.close();
+        }
 
-        service.shutdown();
         System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
     }
 
@@ -255,7 +236,7 @@ public class SpeedTest {
     }
 
     private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, boolean ignoreResults) {
-        RaptorRequest<?> rReqUsed = null;
+        RoutingRequest rr = new RoutingRequest();
         int nPathsFound = 0;
         long lapTime = 0;
         Timer.Sample sample = null;
@@ -268,27 +249,22 @@ public class SpeedTest {
 
             if (opts.compareHeuristics()) {
                 sample = Timer.start(clock);
-                SpeedTestRequest heurReq = new SpeedTestRequest(
-                        testCase, opts, config, getTimeZoneId()
-                );
-                compareHeuristics(heurReq, request);
                 sample.stop(timer);
             } else {
                 // Perform routing
                 sample = Timer.start(clock);
-                TripPlan route = route(request);
-                rReqUsed = route.response.requestUsed();
-                nPathsFound = route.response.paths().size();
+                var routingResponse = route(request);
+
                 lapTime = sample.stop(timer) / nanosToMillis;
 
                 if (!ignoreResults) {
-                    tripPlans.add(route);
+                    tripPlans.add(routingResponse.getTripPlan());
 
                     // assert throws Exception on failure
-                    testCase.assertResult(route.getItineraries());
+                    testCase.assertResult(routingResponse.getTripPlan().itineraries);
 
                     // Report success
-                    ResultPrinter.printResultOk(testCase, route.response.requestUsed(), lapTime, opts.verbose());
+                    ResultPrinter.printResultOk(testCase, rr, lapTime, opts.verbose());
                     numOfPathsFound.add(nPathsFound);
                 }
             }
@@ -303,7 +279,7 @@ public class SpeedTest {
             }
             if (!ignoreResults) {
                 // Report failure
-                ResultPrinter.printResultFailed(testCase, rReqUsed, lapTime, e);
+                ResultPrinter.printResultFailed(testCase, rr, lapTime, e);
                 numOfPathsFound.add(nPathsFound);
             }
             return false;
@@ -311,69 +287,14 @@ public class SpeedTest {
     }
 
 
-    public TripPlan route(SpeedTestRequest request) {
-        RaptorTransitDataProvider<TripSchedule> transitData;
-        RaptorRequest<TripSchedule> rRequest;
-        RaptorResponse<TripSchedule> response;
+    public RoutingResponse route(SpeedTestRequest request) {
+        var routingRequest = new RoutingRequest();
+        routingRequest.setDateTime(routingRequest.getDateTime());
+        routingRequest.setFromString(request.tc().fromPlace.coordinate.toString());
+        routingRequest.setToString(request.tc().toPlace.coordinate.toString());
 
-        Timer.Sample streetTimer = null;
-        Timer.Sample transitDataTimer = null;
-        Timer.Sample workerTimer = null;
-        Timer.Sample collectResultsTimer = null;
-
-        try {
-            streetTimer = Timer.start(clock);
-            streetRouter.route(request);
-            streetTimer.stop(Timer.builder(STREET_ROUTE).register(registry));
-            streetTimer = null;
-
-            transitDataTimer = Timer.start(clock);
-            transitData = transitData(request);
-            transitDataTimer.stop(Timer.builder(TRANSIT_DATA).register(registry));
-            transitDataTimer = null;
-
-            workerTimer = Timer.start(clock);
-            rRequest = rangeRaptorRequest(routeProfile, request, streetRouter);
-            response = service.route(rRequest, transitData);
-            workerTimer.stop(Timer.builder(ROUTE_WORKER).register(registry));
-            workerTimer = null;
-
-            collectResultsTimer = Timer.start(clock);
-            if (response.paths().isEmpty()) {
-                throw new NoResultFound();
-            }
-            TripPlan tripPlan = mapToTripPlan(request, response, streetRouter);
-            collectResultsTimer.stop(Timer.builder(COLLECT_RESULTS).register(registry));
-            collectResultsTimer = null;
-
-            return tripPlan;
-        } finally {
-            if (streetTimer != null) {
-                streetTimer.stop(Timer.builder(STREET_ROUTE).tag("success", "false").register(registry));
-            } else if (transitDataTimer != null) {
-                transitDataTimer.stop(Timer.builder(TRANSIT_DATA).tag("success", "false").register(registry));
-            } else if (workerTimer != null) {
-                workerTimer.stop(Timer.builder(ROUTE_WORKER).tag("success", "false").register(registry));
-            } else if (collectResultsTimer != null) {
-                collectResultsTimer.stop(Timer.builder(COLLECT_RESULTS).tag("success", "false").register(registry));
-            }
-        }
-    }
-
-    private void compareHeuristics(SpeedTestRequest heurReq, SpeedTestRequest routeReq) {
-        streetRouter.route(heurReq);
-        RaptorTransitDataProvider<TripSchedule> transitData = transitData(heurReq);
-
-        RaptorRequest<TripSchedule> req1 = heuristicRequest(
-                heuristicProfile, heurReq, streetRouter
-        );
-        RaptorRequest<TripSchedule> req2 = heuristicRequest(
-                routeProfile, routeReq, streetRouter
-        );
-
-        var timer = Timer.start(clock);
-        service.compareHeuristics(req1, req2, transitData);
-        timer.stop(Timer.builder(ROUTE_WORKER).register(registry));
+        var worker = new RoutingWorker(this.router, routingRequest, graph.getTimeZone().toZoneId());
+        return worker.route();
     }
 
     private void setupSingleTest(
@@ -383,10 +304,8 @@ public class SpeedTest {
     ) {
         System.err.println("Set up test");
         if (opts.compareHeuristics()) {
-            heuristicProfile = profilesToRun[0];
             routeProfile = profilesToRun[1 + sample % (profilesToRun.length - 1)];
         } else {
-            heuristicProfile = null;
             routeProfile = profilesToRun[sample % profilesToRun.length];
         }
 
@@ -423,52 +342,6 @@ public class SpeedTest {
     ) {
         return request.createRangeRaptorRequest(
                 profile, nAdditionalTransfers, false, streetRouter
-        );
-    }
-
-    private TripPlan mapToTripPlan(
-            SpeedTestRequest request,
-            RaptorResponse<TripSchedule> response,
-            EgressAccessRouter streetRouter
-    ) {
-        List<Itinerary> itineraries = ItineraryMapper.mapItineraries(
-                request, response.paths(), streetRouter, transitLayer
-        );
-
-        // Filter away similar itineraries for easier reading
-        // itineraries.filter();
-
-        return new TripPlan(
-                request.getDepartureTimestamp(),
-                request.tc().fromPlace,
-                request.tc().toPlace,
-                response,
-                itineraries
-        );
-    }
-
-    private RaptorTransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
-        TransitDataProviderFilter transitDataProviderFilter = new RoutingRequestTransitDataProviderFilter(
-                false,
-                false,
-                false,
-                request.getTransitModes(),
-                Set.of()
-        );
-
-        RoutingRequest routingRequest = new RoutingRequest();
-        routingRequest.walkSpeed = config.walkSpeedMeterPrSecond;
-        RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
-        transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
-
-        return new RaptorRoutingRequestTransitData(
-                null,
-                transitLayer,
-                DateMapper.asStartOfService(request.getDepartureDateWithZone()),
-                0,
-                1,
-                transitDataProviderFilter,
-                transferRoutingRequest
         );
     }
 

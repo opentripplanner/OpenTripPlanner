@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.util.DiffTool;
-import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
 
 import java.util.ArrayList;
 import java.util.Collection;
