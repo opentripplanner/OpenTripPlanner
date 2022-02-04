@@ -22,6 +22,6 @@ public class OpeningHoursCalendarService {
     }
 
     public OHCalendarBuilder newBuilder(ZoneId zoneId) {
-        return new OHCalendarBuilder(deduplicator);
+        return new OHCalendarBuilder(deduplicator, startOfPeriod, daysInPeriod);
     }
 }
