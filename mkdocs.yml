@@ -42,6 +42,7 @@ pages:
     - Codestyle: 'Codestyle.md'
     - Sandbox development: 'SandboxExtension.md'
 - Sandbox:
+    - About: 'SandboxExtension.md'
     - Actuator API: 'sandbox/ActuatorAPI.md'
     - Direct transfer analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
