@@ -177,6 +177,6 @@ public class TimeUtils {
     }
 
     public static LocalTime localTime(Calendar time) {
-        return zonedDateTime(time).toLocalDateTime().toLocalTime();
+        return zonedDateTime(time).toLocalTime();
     }
 }
