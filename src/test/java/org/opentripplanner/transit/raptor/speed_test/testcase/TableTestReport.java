@@ -53,7 +53,7 @@ public class TableTestReport {
             toStr(result.modes),
             toStr(result.agencies),
             toStr(result.routes),
-            intsToStr(result.stops),
+            toStr(result.stops),
             result.details
         );
     }

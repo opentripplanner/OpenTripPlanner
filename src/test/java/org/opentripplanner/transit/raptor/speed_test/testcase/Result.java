@@ -19,7 +19,7 @@ import org.opentripplanner.util.time.DurationUtils;
  * itinerary. The result can be expected or actual, both represented by this class.
  */
 class Result {
-    private static final Pattern STOPS_PATTERN = Pattern.compile(" ~ (\\d+) ~ ");
+    private static final Pattern STOPS_PATTERN = Pattern.compile(" ~ (\\S+) ~ ");
     /**
      * The status is not final; This allows to update the status when matching expected and actual results.
      */
@@ -33,7 +33,7 @@ class Result {
     final Set<String> agencies = new TreeSet<>();
     final Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
     final List<String> routes = new ArrayList<>();
-    final List<Integer> stops = new ArrayList<>();
+    final List<String> stops = new ArrayList<>();
     final String details;
 
     Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, LocalTime startTime, LocalTime endTime, String details) {
@@ -54,7 +54,7 @@ class Result {
             Comparator.comparing(r -> -r.startTime.toSecondOfDay()),
             compareCost(skipCost),
             (r1, r2) -> compare(r1.routes, r2.routes, String::compareTo),
-            (r1, r2) -> compare(r1.stops, r2.stops, Integer::compareTo)
+            (r1, r2) -> compare(r1.stops, r2.stops, String::compareTo)
         );
     }
 
@@ -82,13 +82,13 @@ class Result {
         );
     }
 
-    private static List<Integer> parseStops(String details) {
-        List<Integer> stops = new ArrayList<>();
+    private static List<String> parseStops(String details) {
+        List<String> stops = new ArrayList<>();
         // WALK 0:44 ~ 87540 ~ BUS NX1 06:25 08:50 ~ 87244  WALK 0:20
         Matcher m = STOPS_PATTERN.matcher(details);
 
         while (m.find()) {
-            stops.add(Integer.parseInt(m.group(1)));
+            stops.add(m.group(1));
         }
         return stops;
     }
