@@ -3,15 +3,14 @@ package org.opentripplanner.transit.raptor._data.transit;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.ConstrainedTransferBoarding;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
-class TestConstrainedTransferBoarding
-        implements RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule>, RaptorConstrainedTransfer
-{
+class TestConstrainedTransfer implements RaptorConstrainedTransfer {
 
-    private final RaptorTransferConstraint transferConstraints;
+    private final TransferConstraint transferConstraints;
     private final TestTripSchedule sourceTrip;
     private final int sourceStopPos;
     private final TestTripSchedule targetTrip;
@@ -19,7 +18,7 @@ class TestConstrainedTransferBoarding
     private final int targetStopPos;
     private final int targetTime;
 
-    TestConstrainedTransferBoarding(
+    TestConstrainedTransfer(
             TransferConstraint transferConstraints,
             TestTripSchedule sourceTrip,
             int sourceStopPos,
@@ -37,10 +36,6 @@ class TestConstrainedTransferBoarding
         this.targetTime = targetTime;
     }
 
-    public int getTripIndex() {
-        return targetTripIndex;
-    }
-
     public TestTripSchedule getTrip() {
         return targetTrip;
     }
@@ -53,6 +48,10 @@ class TestConstrainedTransferBoarding
         return targetTime;
     }
 
+    public boolean isFacilitated() {
+        return transferConstraints.isFacilitated();
+    }
+
     @Nullable
     @Override
     public RaptorTransferConstraint getTransferConstraint() {
@@ -61,7 +60,7 @@ class TestConstrainedTransferBoarding
 
     @Override
     public String toString() {
-        return ToStringBuilder.of(TestConstrainedTransferBoarding.class)
+        return ToStringBuilder.of(TestConstrainedTransfer.class)
                 .addObj("sourceTrip", sourceTrip)
                 .addNum("sourceStopPos", sourceStopPos)
                 .addObj("targetTrip", targetTrip)
@@ -77,5 +76,17 @@ class TestConstrainedTransferBoarding
 
     int getSourceStopPos() {
         return sourceStopPos;
+    }
+
+
+    RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> boardingEvent(int earliestBoardingTime) {
+        return new ConstrainedTransferBoarding<>(
+                transferConstraints,
+                targetTripIndex,
+                targetTrip,
+                targetStopPos,
+                targetTime,
+                earliestBoardingTime
+        );
     }
 }

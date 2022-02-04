@@ -16,19 +16,22 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
     private final T trip;
     private final int stopPositionInPattern;
     private final int time;
+    private final int earliestBoardTime;
 
-    ConstrainedTransferBoarding(
+    public ConstrainedTransferBoarding(
             @NotNull RaptorTransferConstraint constraint,
             int tripIndex,
             @NotNull T trip,
             int stopPositionInPattern,
-            int time
+            int time,
+            int earliestBoardTime
     ) {
         this.constraint = constraint;
         this.tripIndex = tripIndex;
         this.trip = trip;
         this.stopPositionInPattern = stopPositionInPattern;
         this.time = time;
+        this.earliestBoardTime = earliestBoardTime;
     }
 
     @Override
@@ -47,4 +50,9 @@ public class ConstrainedTransferBoarding<T extends RaptorTripSchedule>
     @Override
     @NotNull
     public RaptorTransferConstraint getTransferConstraint() { return constraint; }
+
+    @Override
+    public int getEarliestBoardTimeForConstrainedTransfer() {
+        return earliestBoardTime;
+    }
 }

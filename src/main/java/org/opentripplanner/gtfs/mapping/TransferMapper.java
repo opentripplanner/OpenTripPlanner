@@ -119,17 +119,9 @@ class TransferMapper {
 
     TransferConstraint constraint = mapConstraint(rhs, fromTrip, toTrip);
 
-    // TODO TGR - Create a transfer for this se issue #3369
-    int transferTime = rhs.getMinTransferTime();
-
     // If this transfer do not give any advantages in the routing, then drop it
     if(constraint.isRegularTransfer()) {
-      if(transferTime > 0) {
-        LOG.info("Transfer skipped, issue #3369: " + rhs);
-      }
-      else {
-        LOG.warn("Transfer skipped - no effect on routing: " + rhs);
-      }
+      LOG.warn("Transfer skipped - no effect on routing: " + rhs);
       return null;
     }
 
@@ -153,6 +145,10 @@ class TransferMapper {
     builder.guaranteed(rhs.getTransferType() == GUARANTEED);
     builder.staySeated(sameBlockId(fromTrip, toTrip));
     builder.priority(mapTypeToPriority(rhs.getTransferType()));
+
+    if(rhs.isMinTransferTimeSet()) {
+      builder.minTransferTime(rhs.getMinTransferTime());
+    }
 
     return builder.build();
   }

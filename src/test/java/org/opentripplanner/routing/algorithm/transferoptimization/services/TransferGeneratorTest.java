@@ -10,6 +10,7 @@ import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
@@ -331,6 +332,16 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     @Test
     void findTransferWithNotAllowedConstrainedTransfer() {
+        testThatThereIsNoTransferAtStopB(TestTransitData.TX_NOT_ALLOWED);
+    }
+
+    @Test
+    void findTransferWithLongMinTimeTransfer() {
+        // a very long minimum time is effectively the same thing as a not-allowed transfer
+        testThatThereIsNoTransferAtStopB(TestTransitData.TX_LONG_MIN_TIME);
+    }
+
+    private void testThatThereIsNoTransferAtStopB(TransferConstraint transfer) {
         // given 3 possible expected transfers
         var expBxB = "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}";
         var expCxD = "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: On-Street 1m ~ 4}";
@@ -357,14 +368,14 @@ public class TransferGeneratorTest implements RaptorTestConstants {
         var tripA = l1.getTripSchedule(0);
         var tripB = l2.getTripSchedule(0);
 
-        data.withConstrainedTransfer(tripA, STOP_B, tripB, STOP_B, TestTransitData.TX_NOT_ALLOWED);
+        data.withConstrainedTransfer(tripA, STOP_B, tripB, STOP_B, transfer);
         var result = subject.findAllPossibleTransfers(transitLegs);
 
         // The same stop transfer is no longer an option
         assertEquals("[[" + expCxD + ", " + expExE + "]]", result.toString());
 
         data.clearConstrainedTransfers();
-        data.withConstrainedTransfer(tripA, STOP_C, tripB, STOP_D, TestTransitData.TX_NOT_ALLOWED);
+        data.withConstrainedTransfer(tripA, STOP_C, tripB, STOP_D, transfer);
         result = subject.findAllPossibleTransfers(transitLegs);
 
         // The same stop transfer is no longer an option

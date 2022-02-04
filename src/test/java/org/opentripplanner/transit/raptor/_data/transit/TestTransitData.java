@@ -35,6 +35,8 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
           .build();
   public static final TransferConstraint TX_NOT_ALLOWED = TransferConstraint.create().notAllowed()
           .build();
+  public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint.create().minTransferTime(3600)
+          .build();
 
   private final List<List<RaptorTransfer>> transfersFromStop = new ArrayList<>();
   private final List<List<RaptorTransfer>> transfersToStop = new ArrayList<>();
