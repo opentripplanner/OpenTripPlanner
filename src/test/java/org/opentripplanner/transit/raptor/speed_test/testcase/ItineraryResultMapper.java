@@ -83,9 +83,10 @@ class ItineraryResultMapper {
 
         for (Leg it : itinerary.legs) {
             if (it.isTransitLeg()) {
+                var route = Optional.ofNullable(it.getRoute().getShortName()).orElse(it.getRoute().getLongName());
                 result.agencies.add(AGENCY_NAMES_SHORT.getOrDefault(it.getAgency().getName(), it.getAgency().getName()));
                 result.modes.add(it.getMode());
-                result.routes.add(it.getRoute().getShortName());
+                result.routes.add(route);
             }
         }
         return result;

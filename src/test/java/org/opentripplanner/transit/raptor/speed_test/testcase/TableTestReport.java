@@ -66,6 +66,11 @@ public class TableTestReport {
         return list.isEmpty()
                 ? "-"
                 : list.stream()
+                        .peek(s -> {
+                            if(s == null) {
+                                throw new IllegalArgumentException("null value in list " + list);
+                            }
+                        })
                         .map(Object::toString)
                         .collect(Collectors.joining(" "));
     }
