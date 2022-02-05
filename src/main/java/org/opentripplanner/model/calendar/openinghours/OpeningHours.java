@@ -5,12 +5,19 @@ import java.util.BitSet;
 import java.util.Objects;
 import org.opentripplanner.util.time.TimeUtils;
 
-public class OpeningHours {
+/**
+ */
+public class OpeningHours implements Comparable<OpeningHours> {
+    private final String periodDescription;
     private final int startTime;
     private final int endTime;
     private final BitSet days;
 
-    OpeningHours(LocalTime startTime, LocalTime endTime, BitSet days) {
+    /**
+     * @param periodDescription Describe the days this opening hours is defined
+     */
+    OpeningHours(String periodDescription, LocalTime startTime, LocalTime endTime, BitSet days) {
+        this.periodDescription = periodDescription;
         this.startTime = startTime.toSecondOfDay();
         this.endTime = endTime.toSecondOfDay();
         this.days = days;
@@ -21,6 +28,8 @@ public class OpeningHours {
         if (this == o) {return true;}
         if (!(o instanceof OpeningHours)) {return false;}
         final OpeningHours that = (OpeningHours) o;
+        // periodDescription is not part of the equals and hashCode, so when deduplicated
+        // only the first instance is kept
         return startTime == that.startTime && endTime == that.endTime && days.equals(that.days);
     }
 
@@ -33,6 +42,18 @@ public class OpeningHours {
     public String toString() {
         return "[" + TimeUtils.timeToStrCompact(startTime) +
                 " - " + TimeUtils.timeToStrCompact(endTime) +
-                "] on " + days.cardinality() + " days";
+                "] " + periodDescription;
+    }
+
+    @Override
+    public int compareTo(OpeningHours other) {
+        return this.startTime == other.startTime
+            ? endTime - other.endTime
+            : startTime - other.startTime;
+    }
+
+    /** return {@code true} if given opening hours is inside this. */
+    public boolean contains(OpeningHours other) {
+        return this.startTime <= other.startTime  && other.endTime <= endTime;
     }
 }
