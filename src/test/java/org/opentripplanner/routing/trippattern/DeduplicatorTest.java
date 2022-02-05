@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import org.junit.Before;
@@ -42,6 +43,8 @@ public class DeduplicatorTest {
   private static final List<LocalDate> DATE_LIST_2 = List.of(DATE_2);
   private static final List<LocalTime> TIME_LIST = List.of(TIME);
   private static final List<LocalTime> TIME_LIST_2 = List.of(TIME_2);
+  private static final List<LocalTime> TIME_LIST_W_NULL = Arrays.asList(TIME, null);
+  private static final List<LocalTime> TIME_LIST_2_W_NULL = Arrays.asList(TIME_2, null);
 
   private final Deduplicator subject = new Deduplicator();
 
@@ -179,11 +182,14 @@ public class DeduplicatorTest {
     var timeList = subject.deduplicateImmutableList(TIME_CL, TIME_LIST);
     assertSame(timeList, subject.deduplicateImmutableList(TIME_CL, TIME_LIST_2));
 
+    var timeListWNull = subject.deduplicateImmutableList(TIME_CL, TIME_LIST_W_NULL);
+    assertSame(timeListWNull, subject.deduplicateImmutableList(TIME_CL, TIME_LIST_2_W_NULL));
+
     // The order which each generic type occur in the toString is undefined; hence the *contains*
     var value = subject.toString();
-    assertTrue(value, value.contains("LocalTime: 1(1)"));
+    assertTrue(value, value.contains("LocalTime: 1(2)"));
     assertTrue(value, value.contains("LocalDate: 1(1)"));
-    assertTrue(value, value.contains("List<LocalTime>: 1(2)"));
+    assertTrue(value, value.contains("List<LocalTime>: 2(4)"));
     assertTrue(value, value.contains("List<LocalDate>: 1(2)"));
 
     subject.reset();
