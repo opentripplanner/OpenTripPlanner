@@ -29,7 +29,7 @@ public class FlexLegMapper {
               flexTripEdge.getFlexTrip().getPickupBookingInfo(leg.getAlightStopPosInPattern()));
   }
 
-    public static void addFlexPlaces(Leg leg, FlexTripEdge flexEdge, Locale requestedLocale) {
+    public static void addFlexPlaces(Leg leg, FlexTripEdge flexEdge) {
         leg.setFrom(Place.forFlexStop(flexEdge.s1, flexEdge.getFromVertex()));
         leg.setTo(Place.forFlexStop(flexEdge.s2, flexEdge.getToVertex()));
     }

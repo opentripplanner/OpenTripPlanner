@@ -68,7 +68,7 @@ public class BicycleRoutingTest {
         var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT));
         var paths = gpf.graphPathFinderEntryPoint(request);
 
-        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
+        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
         // make sure that we only get BICYLE legs
         itineraries.forEach(i -> i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.BICYCLE)));
         return itineraries.get(0).legs.get(0).getLegGeometry().getPoints();
