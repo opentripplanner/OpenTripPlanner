@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.trippattern;
 
 import com.google.common.collect.Maps;
+import java.util.Objects;
+import java.util.stream.Stream;
 import org.opentripplanner.model.base.ToStringBuilder;
 
 import javax.annotation.Nullable;
@@ -108,18 +110,16 @@ public class Deduplicator implements Serializable {
 
         @SuppressWarnings("unchecked")
         List<T> canonical = (List<T>) canonicalLists.get(original);
+
         if(canonical == null) {
+            boolean containsNull = original.stream().anyMatch(Objects::isNull);
+            Stream<T> stream = original.stream().map(it -> deduplicateObject(clazz, it));
             // The list may contain nulls, hence the use of the old unmodifiable wrapper
-            //noinspection FuseStreamOperations
-            canonical = Collections.unmodifiableList(
-                original
-                    .stream()
-                    .map(it -> deduplicateObject(clazz, it))
-                    .collect(Collectors.toList())
-            );
+            canonical = containsNull
+                    ? Collections.unmodifiableList(stream.collect(Collectors.toList()))
+                    : stream.collect(Collectors.toUnmodifiableList());
             canonicalLists.put(canonical, canonical);
         }
-
         incrementEffectCounter(listKey(clazz));
         return canonical;
     }
