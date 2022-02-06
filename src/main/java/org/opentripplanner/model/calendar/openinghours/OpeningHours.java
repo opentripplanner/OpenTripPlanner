@@ -40,9 +40,9 @@ public class OpeningHours implements Comparable<OpeningHours> {
 
     @Override
     public String toString() {
-        return "[" + TimeUtils.timeToStrCompact(startTime) +
-                " - " + TimeUtils.timeToStrCompact(endTime) +
-                "] " + periodDescription;
+        return periodDescription + " " +
+                TimeUtils.timeToStrShort(startTime) + "-" +
+                TimeUtils.timeToStrShort(endTime);
     }
 
     @Override
