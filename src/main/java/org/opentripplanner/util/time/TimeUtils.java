@@ -125,20 +125,29 @@ public class TimeUtils {
         return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toCompactStr();
     }
 
+    /** Format string on format H:MM[:SS] */
     public static String timeToStrCompact(Calendar time) {
         return time == null ? "" : RelativeTime.from(time).toCompactStr();
     }
 
+    /** Format string on format HH:MM:SS */
     public static String timeToStrLong(int time) {
         return RelativeTime.ofSeconds(time).toLongStr();
     }
 
+    /** Format string on format HH:MM:SS */
     public static String timeToStrLong(int time, int notSetValue) {
         return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toLongStr();
     }
 
+    /** Format string on format HH:MM:SS */
     public static String timeToStrLong(Calendar time) {
         return RelativeTime.from(time).toLongStr();
+    }
+
+    /** Format string on format HH:MM */
+    public static String timeToStrShort(int time) {
+        return RelativeTime.ofSeconds(time).toShortStr();
     }
 
     public static Calendar midnightOf(Calendar time) {
