@@ -1,11 +1,14 @@
 package org.opentripplanner.model.calendar.openinghours;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.ZoneId;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
@@ -43,6 +46,9 @@ class OHCalendarTest {
         calBuilder.openingHours("17th May", time(22,0), time(23,59))
                 .on(date(Month.MAY, 17))
                 .add();
+        calBuilder.openingHours("18th May", time(0,0), time(2,0))
+                .on(date(Month.MAY, 17))
+                .add();
 
         //  Possibilities for the adding date methods:
         //  - on(LocalDate)
@@ -57,11 +63,19 @@ class OHCalendarTest {
         // be assigned to entity
         var c = calBuilder.build();
 
+        assertEquals(
+                "OHCalendar{"
+                        + "zoneId: Europe/Paris, "
+                        + "openingHours: [18th May 00:00-02:00, OCT-25 01:00-03:00, "
+                        + "1-3. April 08:00-16:30, 17th May 22:00-23:59]"
+                        + "}",
+                c.toString()
+        );
 
         ///////// ROUTING SEARCH  /////////
 
         // The start of the search, this is used to optimize the calculation
-        Instant dateTime = Instant.parse("2022-10-25T03:30:00Z");
+        Instant dateTime = Instant.parse("2022-10-25T01:30:00Z");
         long time = dateTime.getEpochSecond();
 
         // The context is used to cache calculations for a search, use negative
