@@ -63,6 +63,17 @@ public class TimeUtilsTest {
   }
 
   @Test
+  public void timeToStrShort() {
+    assertEquals("00:00", TimeUtils.timeToStrShort(T00_00_01));
+    assertEquals("00:01", TimeUtils.timeToStrShort(T00_01_00));
+    assertEquals("01:00", TimeUtils.timeToStrShort(T01_00_00));
+    assertEquals("23:59-1d", TimeUtils.timeToStrShort(-T00_00_01));
+    assertEquals("23:59-1d", TimeUtils.timeToStrShort(-T00_01_00));
+    assertEquals("23:00-1d", TimeUtils.timeToStrShort(-T01_00_00));
+    assertEquals("10:26-1d", TimeUtils.timeToStrShort(-T13_33_57));
+  }
+
+  @Test
   public void time() {
     // Midnight
     assertEquals(0, TimeUtils.time("0"));

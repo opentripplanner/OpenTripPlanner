@@ -110,28 +110,39 @@ public class TimeUtils {
     return Arrays.stream(input.split("[ ,;]+")).mapToInt(TimeUtils::time).toArray();
   }
 
+  /** Format string on format HH:MM:SS */
   public static String timeToStrCompact(int time) {
     return RelativeTime.ofSeconds(time).toCompactStr();
   }
 
+  /** Format string on format HH:MM:SS */
   public static String timeToStrCompact(int time, int notSetValue) {
     return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toCompactStr();
   }
 
+  /** Format string on format HH:MM:SS */
   public static String timeToStrCompact(ZonedDateTime time) {
     return time == null ? "" : RelativeTime.from(time).toCompactStr();
   }
 
+  /** Format string on format HH:MM:SS */
   public static String timeToStrLong(int time) {
     return RelativeTime.ofSeconds(time).toLongStr();
   }
 
+  /** Format string on format HH:MM:SS */
   public static String timeToStrLong(int time, int notSetValue) {
     return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toLongStr();
   }
 
+  /** Format string on format HH:MM:SS */
   public static String timeToStrLong(ZonedDateTime time) {
     return RelativeTime.from(time).toLongStr();
+  }
+
+  /** Format string on format HH:MM */
+  public static String timeToStrShort(int time) {
+    return RelativeTime.ofSeconds(time).toShortStr();
   }
 
   public static String timeToStrLong(LocalTime time) {
