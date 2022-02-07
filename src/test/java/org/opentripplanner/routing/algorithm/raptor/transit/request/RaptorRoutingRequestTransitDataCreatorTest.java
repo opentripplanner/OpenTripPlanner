@@ -59,17 +59,17 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     List<TripPatternForDate> tripPatternsForDates = new ArrayList<>();
 
     // TripPatterns valid for 1st day in search range
-    tripPatternsForDates.add(new TripPatternForDate(tripPattern1, tripTimes, first));
-    tripPatternsForDates.add(new TripPatternForDate(tripPattern2, tripTimes, first));
-    tripPatternsForDates.add(new TripPatternForDate(tripPattern3, tripTimes, first));
+    tripPatternsForDates.add(new TripPatternForDate(tripPattern1, tripTimes, List.of(), first));
+    tripPatternsForDates.add(new TripPatternForDate(tripPattern2, tripTimes, List.of(), first));
+    tripPatternsForDates.add(new TripPatternForDate(tripPattern3, tripTimes, List.of(), first));
 
     // TripPatterns valid for 2nd day in search range
-    tripPatternsForDates.add(new TripPatternForDate(tripPattern2, tripTimes, second));
-    tripPatternsForDates.add(new TripPatternForDate(tripPattern3, tripTimes, second));
+    tripPatternsForDates.add(new TripPatternForDate(tripPattern2, tripTimes, List.of(), second));
+    tripPatternsForDates.add(new TripPatternForDate(tripPattern3, tripTimes, List.of(), second));
 
     // TripPatterns valid for 3rd day in search range
-    tripPatternsForDates.add(new TripPatternForDate(tripPattern1, tripTimes, third));
-    tripPatternsForDates.add(new TripPatternForDate(tripPattern3, tripTimes, third));
+    tripPatternsForDates.add(new TripPatternForDate(tripPattern1, tripTimes, List.of(), third));
+    tripPatternsForDates.add(new TripPatternForDate(tripPattern3, tripTimes, List.of(), third));
 
     // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset in time when requested.
     List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(

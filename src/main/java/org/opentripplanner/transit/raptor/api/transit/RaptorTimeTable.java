@@ -24,4 +24,8 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
      * Number of trips in time-table.
      */
     int numberOfTripSchedules();
+
+    default boolean isFrequencyBased() {
+        return false;
+    };
 }

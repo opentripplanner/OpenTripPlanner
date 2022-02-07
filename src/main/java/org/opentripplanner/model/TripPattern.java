@@ -337,6 +337,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * since it is redundant.
      */
     public void add(FrequencyEntry freq) {
+        // TODO: This does nothing, as it is a temporary list, which is discarded
         getTrips().add(freq.tripTimes.getTrip());
         scheduledTimetable.addFrequencyEntry(freq);
         if (this.getRoute() != freq.tripTimes.getTrip().getRoute()) {
@@ -373,7 +374,13 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * The direction for all the trips in this pattern.
      */
     public Direction getDirection() {
-        return getTrips().get(0).getDirection();
+        if (!getTrips().isEmpty()) {
+            return getTrips().get(0).getDirection();
+        } else if (!scheduledTimetable.getFrequencyEntries().isEmpty()) {
+            return scheduledTimetable.getFrequencyEntries().get(0).tripTimes.getTrip().getDirection();
+        } else {
+            return Direction.UNKNOWN;
+        }
     }
 
     /**
@@ -550,7 +557,17 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
                     sb.append(" express");
                 } else {
                     // The final fallback: reference a specific trip ID.
-                    sb.append(" like trip " + pattern.getTrips().get(0).getId());
+                    Trip trip = null;
+                    if (!pattern.getTrips().isEmpty()) {
+                        trip = pattern.getTrips().get(0);
+                    } else if (!pattern.scheduledTimetable.getFrequencyEntries().isEmpty()) {
+                        trip = pattern.scheduledTimetable.getFrequencyEntries().get(0).tripTimes.getTrip();
+                    }
+
+                    if (trip != null) {
+                        sb.append(" like trip ").append(trip.getId());
+                    }
+
                 }
                 pattern.setName((sb.toString()));
             } // END foreach PATTERN

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import javax.annotation.Nullable;
@@ -31,6 +32,13 @@ public class TripPatternForDate {
      */
     private final List<TripTimes> tripTimes;
 
+    /**
+     * The filtered FrequencyEntries for only those entries in the TripPattern that are active on
+     * the given day. Invariant: this array should contain a subset of the TripSchedules in
+     * tripPattern.frequencyEntries.
+     */
+    private final List<FrequencyEntry> frequencies;
+
     /** The date for which the filtering was performed. */
     private final LocalDate localDate;
 
@@ -47,25 +55,50 @@ public class TripPatternForDate {
     public TripPatternForDate(
         TripPatternWithRaptorStopIndexes tripPattern,
         List<TripTimes> tripTimes,
+        List<FrequencyEntry> frequencies,
         LocalDate localDate
     ) {
         this.tripPattern = tripPattern;
         this.tripTimes = new ArrayList<>(tripTimes);
+        this.frequencies = frequencies;
         this.localDate = localDate;
 
-        // These depend on the tripTimes array being sorted
-        this.startOfRunningPeriod = DateMapper.asDateTime(
-            localDate,
-            tripTimes.get(0).getDepartureTime(0)
-        );
-        var last = tripTimes.get(tripTimes.size()-1);
-        this.endOfRunningPeriod = DateMapper.asDateTime(
-            localDate, last.getArrivalTime(last.getNumStops() - 1)
-        );
+        // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge
+        if (hasFrequencies()) {
+            this.startOfRunningPeriod = DateMapper.asDateTime(
+                localDate,
+                frequencies.stream()
+                    .mapToInt(frequencyEntry -> frequencyEntry.startTime)
+                    .min()
+                    .orElseThrow()
+            );
+
+            this.endOfRunningPeriod = DateMapper.asDateTime(
+                localDate,
+                frequencies.stream()
+                    .mapToInt(frequencyEntry -> frequencyEntry.endTime)
+                    .max()
+                    .orElseThrow()
+            );
+        } else {
+            // These depend on the tripTimes array being sorted
+            this.startOfRunningPeriod = DateMapper.asDateTime(
+                    localDate,
+                    tripTimes.get(0).getDepartureTime(0)
+            );
+            var last = tripTimes.get(tripTimes.size() - 1);
+            this.endOfRunningPeriod = DateMapper.asDateTime(
+                    localDate, last.getArrivalTime(last.getNumStops() - 1)
+            );
+        }
     }
 
     public List<TripTimes> tripTimes() {
         return tripTimes;
+    }
+
+    public List<FrequencyEntry> getFrequencies() {
+        return frequencies;
     }
 
     public TripPatternWithRaptorStopIndexes getTripPattern() {
@@ -100,6 +133,10 @@ public class TripPatternForDate {
             .collect(Collectors.toList());
     }
 
+    public boolean hasFrequencies() {
+        return !frequencies.isEmpty();
+    }
+
     public int hashCode() {
         return Objects.hash(tripPattern, tripTimes, localDate);
     }
@@ -125,13 +162,19 @@ public class TripPatternForDate {
             .filter(filter)
             .collect(Collectors.toList());
 
-        if (filteredTripTimes.isEmpty()) { return null; }
+        List<FrequencyEntry> filteredFrequencies = frequencies
+            .stream()
+            .filter(frequencyEntry -> filter.test(frequencyEntry.tripTimes))
+            .collect(Collectors.toList());
+
+        if (filteredTripTimes.isEmpty() && !hasFrequencies()) { return null; }
 
         if (tripTimes.size() == filteredTripTimes.size()) { return this; }
 
         return new TripPatternForDate(
             tripPattern,
             filteredTripTimes,
+            filteredFrequencies,
             localDate
         );
     }

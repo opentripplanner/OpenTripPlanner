@@ -1,11 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import gnu.trove.set.TIntSet;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -88,7 +91,13 @@ public class TripPatternForDateMapper {
             times.add(tripTimes);
         }
 
-        if (times.isEmpty()) {
+        List<FrequencyEntry> frequencies = timetable.getFrequencyEntries()
+                .stream()
+                .filter(frequency -> serviceCodesRunning.contains(frequency.tripTimes.getServiceCode()))
+                .sorted(Comparator.comparing(frequencyEntry -> frequencyEntry.startTime))
+                .collect(Collectors.toList());
+
+        if (times.isEmpty() && frequencies.isEmpty()) {
             if (timetable.getServiceDate() == serviceDate) {
                 LOG.debug(
                         "Tried to update TripPattern {}, but no service codes are valid for date {}",
@@ -102,6 +111,7 @@ public class TripPatternForDateMapper {
         return new TripPatternForDate(
             newTripPatternForOld.get(oldTripPattern),
             times,
+            frequencies,
             ServiceCalendarMapper.localDateFromServiceDate(serviceDate)
         );
     }

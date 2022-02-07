@@ -148,6 +148,10 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
 
     @Override
     public TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+        if (timeTable.isFrequencyBased()) {
+            return new TripFrequencyBoardSearch<>(timeTable);
+        }
+
         return new TripScheduleBoardSearch<>(tripSearchBinarySearchThreshold, timeTable);
     }
 

@@ -24,9 +24,9 @@ public class TripPatternForDates
 
     private final TripPatternWithRaptorStopIndexes tripPattern;
 
-    private final TripPatternForDate[] tripPatternForDates;
+    public final TripPatternForDate[] tripPatternForDates;
 
-    private final int[] offsets;
+    public final int[] offsets;
 
     private final int numberOfTripSchedules;
 
@@ -109,6 +109,11 @@ public class TripPatternForDates
 
     @Override public int numberOfTripSchedules() {
         return numberOfTripSchedules;
+    }
+
+    @Override
+    public boolean isFrequencyBased() {
+        return Arrays.stream(tripPatternForDates).anyMatch(TripPatternForDate::hasFrequencies);
     }
 
     @Override

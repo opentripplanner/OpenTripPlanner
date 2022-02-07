@@ -60,7 +60,7 @@ public class TestRouteData {
         tripTimes.forEach(t -> raptorTripPattern.getPattern().add(t));
 
         var listOfTripPatternForDates = List.of(
-                new TripPatternForDate(raptorTripPattern, tripTimes, DATE)
+                new TripPatternForDate(raptorTripPattern, tripTimes, List.of(), DATE)
         );
 
         var patternForDates = new TripPatternForDates(
