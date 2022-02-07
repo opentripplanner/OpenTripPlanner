@@ -24,7 +24,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +65,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
      */
     private int pruningThresholdIslandWithStops;
 
-    private final StreetLinkerModule streetLinkerModule;
-
-    public PruneNoThruIslands(StreetLinkerModule streetLinkerModule) {
-        this.streetLinkerModule = streetLinkerModule;
+    public PruneNoThruIslands() {
     }
 
     public List<String> provides() {
@@ -105,19 +101,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 pruningThresholdIslandWithStops,
                 issueStore, TraverseMode.CAR
         );
-        // reconnect stops that got disconnected
-        if (streetLinkerModule != null) {
-            LOG.info("Reconnecting stops");
-            streetLinkerModule.linkTransitStops(graph);
-            int isolated = 0;
-            for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
-                if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {
-                    issueStore.add(new IsolatedStop(tStop));
-                    isolated++;
-                }
-            }
-            LOG.info("{} stops remain isolated", isolated);
-        }
 
         // clean up pruned street vertices
         int removed = 0;

@@ -129,6 +129,17 @@ public class GraphBuilder implements Runnable {
             osmModule.maxAreaNodes = config.maxAreaNodes;
             graphBuilder.addModule(osmModule);
         }
+
+        // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
+        // existence of stops in islands. If an island has a stop, it actually may be a real island and should
+        // not be removed quite as easily
+        if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
+            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(/*streetLinkerModule*/);
+            pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+            pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+            graphBuilder.addModule(pruneNoThruIslands);
+        }
+
         if ( hasGtfs ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
             for (DataSource gtfsData : dataSources.get(GTFS)) {
@@ -165,15 +176,7 @@ public class GraphBuilder implements Runnable {
         streetLinkerModule.setAddExtraEdgesToAreas(config.areaVisibility);
         graphBuilder.addModule(streetLinkerModule);
 
-        // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
-        // existence of stops in islands. If an island has a stop, it actually may be a real island and should
-        // not be removed quite as easily
-        if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
-            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
-            pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-            pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-            graphBuilder.addModule(pruneNoThruIslands);
-        }
+
 
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
