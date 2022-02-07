@@ -767,7 +767,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <test.included.groups>*</test.included.groups>
+                <test.included.groups></test.included.groups>
                 <test.excluded.groups>org.opentripplanner.smoketest.SmokeTest</test.excluded.groups>
             </properties>
         </profile>
