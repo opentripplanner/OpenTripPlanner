@@ -101,4 +101,8 @@ public abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
     public LocalDate getServiceDate() {
         return serviceDate;
     }
+
+    public int getHeadway() {
+        return headway;
+    }
 }
