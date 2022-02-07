@@ -14,6 +14,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.URI;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class SpeedTest {
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
     private static final String SPEED_TEST_ROUTE = "speedTest.route";
     private static final String STREET_ROUTE = "speedTest.street.route";
+    private static final String DIRECT_STREET_ROUTE = "speedTest.direct.street.route";
     private static final String TRANSIT_DATA = "speedTest.transit.data";
     private static final String ROUTE_WORKER = "speedTest.route.worker";
     private static final String COLLECT_RESULTS = "speedTest.collect.results";
@@ -296,7 +298,18 @@ public class SpeedTest {
         routingRequest.walkSpeed = request.getWalkSpeedMeterPrSecond();
         var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
 
-        return worker.route();
+        var response = worker.route();
+        var data = response.getDebugTimingAggregator().getDebugOutput();
+
+        record(STREET_ROUTE, data.accesssEgressTime);
+        record(DIRECT_STREET_ROUTE, data.directStreetRouterTime);
+        record(TRANSIT_DATA, data.precalculationTime);
+
+        return response;
+    }
+
+    private void record(String name, long nanos) {
+        Timer.builder(name).register(registry).record(Duration.ofNanos(nanos));
     }
 
     private void setupSingleTest(

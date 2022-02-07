@@ -234,11 +234,12 @@ public class DebugTimingAggregator {
   }
 
   /** Summarize and calculate elapsed times. */
-  private DebugOutput getDebugOutput() {
+  public DebugOutput getDebugOutput() {
 
     return new DebugOutput(
         precalculationTime,
         directStreetRouterTime,
+        accessEgressTime,
         transitRouterTime,
         filteringTime,
         renderingTime,
