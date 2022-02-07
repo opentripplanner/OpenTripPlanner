@@ -55,7 +55,6 @@ public class SpeedTestRequest {
         return config.maxWalkDurationSeconds;
     }
 
-
     private static void addDebugOptions(
             RaptorRequestBuilder<TripSchedule> builder,
             SpeedTestCmdLineOpts opts

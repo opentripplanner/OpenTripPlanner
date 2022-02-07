@@ -296,6 +296,7 @@ public class SpeedTest {
         routingRequest.walkSpeed = request.getWalkSpeedMeterPrSecond();
 
         var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
+
         return worker.route();
     }
 
