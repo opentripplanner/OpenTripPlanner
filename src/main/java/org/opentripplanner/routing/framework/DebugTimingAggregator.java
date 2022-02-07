@@ -239,7 +239,6 @@ public class DebugTimingAggregator {
     return new DebugOutput(
         precalculationTime,
         directStreetRouterTime,
-        accessEgressTime,
         transitRouterTime,
         filteringTime,
         renderingTime,

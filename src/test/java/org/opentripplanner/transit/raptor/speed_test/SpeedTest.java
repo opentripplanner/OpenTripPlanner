@@ -24,9 +24,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
+import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.graph.Graph;
@@ -295,15 +297,18 @@ public class SpeedTest {
         routingRequest.setDateTime(request.getDepartureTime().toInstant());
         routingRequest.from = request.tc().fromPlace.toGenericLocation();
         routingRequest.to = request.tc().toPlace.toGenericLocation();
-        routingRequest.walkSpeed = request.getWalkSpeedMeterPrSecond();
+        routingRequest.walkSpeed = request.walkSpeed();
+        routingRequest.numItineraries = request.numIineraries();
+        routingRequest.searchWindow = Duration.ofSeconds(request.tc().window);
         var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
 
         var response = worker.route();
+
         var data = response.getDebugTimingAggregator().getDebugOutput();
 
-        record(STREET_ROUTE, data.accesssEgressTime);
+        record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime);
+        record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime);
         record(DIRECT_STREET_ROUTE, data.directStreetRouterTime);
-        record(TRANSIT_DATA, data.precalculationTime);
 
         return response;
     }

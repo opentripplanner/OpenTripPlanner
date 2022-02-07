@@ -24,6 +24,7 @@ public class SpeedTestRequest {
     private final TestCase testCase;
     private final SpeedTestConfig config;
     private final ZonedDateTime departureTime;
+    private final SpeedTestCmdLineOpts opts;
 
     SpeedTestRequest(
             TestCase testCase,
@@ -33,6 +34,7 @@ public class SpeedTestRequest {
     ) {
         this.testCase = testCase;
         this.config = config;
+        this.opts = opts;
         this.departureTime = departureTime;
     }
 
@@ -46,13 +48,13 @@ public class SpeedTestRequest {
         return AllowedTransitMode.getAllTransitModesExceptAirplane();
     }
 
-    double getWalkSpeedMeterPrSecond() {
+    double walkSpeed() {
         // 1.4 m/s = ~ 5.0 km/t
         return config.walkSpeedMeterPrSecond;
     }
 
-    public double getAccessEgressMaxWalkDurationSeconds() {
-        return config.maxWalkDurationSeconds;
+    int numIineraries() {
+        return opts.numOfItineraries();
     }
 
     private static void addDebugOptions(

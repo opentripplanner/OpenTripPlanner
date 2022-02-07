@@ -16,11 +16,6 @@ public class DebugOutput {
     public final long directStreetRouterTime;
 
     /**
-     * Time taken in the access/agress router in nanoseconds.
-     */
-    public final long accesssEgressTime;
-
-    /**
      * Time taken in the transit router (including access/egress street router) in nanoseconds.
      * Detailed timing information within the transit router is sored in transitRouterTimes.
      *
@@ -52,14 +47,12 @@ public class DebugOutput {
     public DebugOutput(
         long precalculationTime,
         long directStreetRouterTime,
-        long accessEgressTime,
         long transitRouterTime,
         long filteringTime, long renderingTime, long totalTime,
         TransitTimingOutput transitRouterTimes
     ) {
         this.precalculationTime = precalculationTime;
         this.directStreetRouterTime = directStreetRouterTime;
-        this.accesssEgressTime = accessEgressTime;
         this.transitRouterTime = transitRouterTime;
         this.filteringTime = filteringTime;
         this.renderingTime = renderingTime;

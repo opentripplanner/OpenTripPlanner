@@ -21,12 +21,6 @@ public class SpeedTestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SpeedTestConfig.class);
     public static final String FILE_NAME = "speed-test-config.json";
 
-    /**
-     * Set the default max walk duration for access/egress to the OTP default value of 45 minutes.
-     * Unit: seconds
-     */
-    private static final int ACCESS_MAX_WALK = 45 * 60;
-
     private final JsonNode rawNode;
 
     /**
@@ -37,7 +31,6 @@ public class SpeedTestConfig {
     /** The speed test run all its test on an existing pre-build graph. */
     public final URI graph;
 
-    public final int maxWalkDurationSeconds;
     public final double walkSpeedMeterPrSecond;
     public final TransitRoutingConfig transitRoutingParams;
     public final RoutingRequest request;
@@ -47,7 +40,6 @@ public class SpeedTestConfig {
         this.rawNode = node;
         testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
         graph = adapter.asUri("graph", null);
-        maxWalkDurationSeconds = adapter.asInt("maxWalkDurationSeconds", ACCESS_MAX_WALK);
         walkSpeedMeterPrSecond = adapter.asDouble("walkSpeedMeterPrSecond", 1.4);
         transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
         request = mapRoutingRequest(adapter.path("routingDefaults"));
