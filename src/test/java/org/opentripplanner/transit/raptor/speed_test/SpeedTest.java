@@ -24,11 +24,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
-import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.graph.Graph;
@@ -55,7 +53,6 @@ public class SpeedTest {
     private static final String DIRECT_STREET_ROUTE = "speedTest.direct.street.route";
     private static final String TRANSIT_DATA = "speedTest.transit.data";
     private static final String ROUTE_WORKER = "speedTest.route.worker";
-    private static final String COLLECT_RESULTS = "speedTest.collect.results";
 
     private static final long nanosToMillis = 1000000;
 
