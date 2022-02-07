@@ -10,10 +10,7 @@ jobs:
   build:
     env:
       MAVEN_OPTS: -Xmx2g
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, windows-latest ]
+    runs-on: ubuntu-latest
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
       - uses: actions/checkout@v2.3.2
