@@ -291,10 +291,9 @@ public class SpeedTest {
     public RoutingResponse route(SpeedTestRequest request) {
         var routingRequest = new RoutingRequest();
         routingRequest.setDateTime(request.getDepartureTime().toInstant());
-        routingRequest.setFromString(request.tc().fromPlace.coordinate.toString());
-        routingRequest.setToString(request.tc().toPlace.coordinate.toString());
+        routingRequest.from = request.tc().fromPlace.toGenericLocation();
+        routingRequest.to = request.tc().toPlace.toGenericLocation();
         routingRequest.walkSpeed = request.getWalkSpeedMeterPrSecond();
-
         var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
 
         return worker.route();

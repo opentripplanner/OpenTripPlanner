@@ -76,7 +76,7 @@ class ItineraryResultMapper {
                 itinerary.nTransfers,
                 itinerary.durationSeconds,
                 itinerary.generalizedCost,
-                itinerary.generalizedCost, // TODO add walking distance
+                itinerary.legs.stream().filter(Leg::isWalkingLeg).mapToInt(l -> l.getDistanceMeters().intValue()).sum(),
                 TimeUtils.localTime(itinerary.startTime()).toSecondOfDay(),
                 TimeUtils.localTime(itinerary.endTime()).toSecondOfDay(),
                 details(itinerary)
