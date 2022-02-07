@@ -286,7 +286,8 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Properly set wheelchairAccessible on area edges
 - Fixed file URL in test [#2339](https://github.com/opentripplanner/OpenTripPlanner/issues/2339)
 - Add details field to fares, listing which legs each fare applies to [#1699](https://github.com/opentripplanner/OpenTripPlanner/issues/1699)
-
+- Hack on prune islands to make it happen before stops are added (WhereIsMyTransport)
+- Temporarily override pathway duration if not specified to 20 seconds (WhereIsMyTransport)
 
 ## 1.0 (2016-09-09)
 
