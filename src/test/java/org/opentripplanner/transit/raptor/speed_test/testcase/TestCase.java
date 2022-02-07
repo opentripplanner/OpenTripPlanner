@@ -14,7 +14,7 @@ import org.opentripplanner.util.time.TimeUtils;
 public class TestCase {
     public static final int NOT_SET = -1;
 
-    private static final String FEED_ID = "RB";
+    private static final String FEED_ID = "EN";
     public final String id;
     public final String description;
     public final int departureTime;
