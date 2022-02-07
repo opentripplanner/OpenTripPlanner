@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  * itinerary. The result can be expected or actual, both represented by this class.
  */
 class Result {
-    private static final Pattern STOPS_PATTERN = Pattern.compile(" ~ (\\S+) ~ ");
+    private static final Pattern STOPS_PATTERN = Pattern.compile(" ~ (\\.+) ~ ");
     /**
      * The status is not final; This allows to update the status when matching expected and actual results.
      */

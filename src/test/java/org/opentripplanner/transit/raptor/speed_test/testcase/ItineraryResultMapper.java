@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import java.time.Duration;
 import java.util.Optional;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Itinerary;
 
 import java.util.Collection;
@@ -98,7 +98,7 @@ class ItineraryResultMapper {
 
         for (Leg leg : itin.legs) {
 
-            Optional.ofNullable(leg.getFrom().stop).map(s -> s.getId().getId()).map(id -> buf.sep().stop(id).sep());
+            Optional.ofNullable(leg.getFrom().stop).map(ItineraryResultMapper::formatStop).map(id -> buf.sep().stop(id).sep());
 
             if(leg.isWalkingLeg()) {
                 buf.walk((int) leg.getDuration());
@@ -111,5 +111,9 @@ class ItineraryResultMapper {
             }
         }
         return buf.toString();
+    }
+
+    private static String formatStop(StopLocation s) {
+        return s.getName() + "(" + s.getId().getId() + ")";
     }
 }
