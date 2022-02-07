@@ -26,6 +26,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.Issue;
 import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
@@ -290,16 +291,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         private OptionalInt parseCapacity(OSMWithTags element, String capacityTag) {
-            if (element.hasTag(capacityTag)) {
-                String capacity = element.getTag(capacityTag);
-                try {
-                    int parsedValue = Integer.parseInt(capacity);
-                    return OptionalInt.of(parsedValue);
-                } catch (NumberFormatException e) {
-                    issueStore.add(new InvalidVehicleParkingCapacity(element.getId(), capacity));
-                }
-            }
-            return OptionalInt.empty();
+            return element.getTagAsInt(
+                    capacityTag,
+                    v -> issueStore.add(new InvalidVehicleParkingCapacity(element.getId(), v))
+            );
+        }
+
+        private OptionalInt parseDuration(OSMWithTags element) {
+            return element.getTagAsInt(
+                    "duration", v -> issueStore.add(invalidDuration(element, v))
+            );
         }
 
         private void processParkAndRideNodes(Collection<OSMNode> nodes, boolean isCarParkAndRide) {
@@ -886,13 +887,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             levelName
                     );
                 }
-                int travelTime = node.hasTag("duration") ?
-                        Integer.parseInt(node.getTag("duration")) :
-                        -1;
-                boolean wheelchairAccessible = true;
-                if (node.isTagFalse("wheelchair")) {
-                    wheelchairAccessible = false;
-                }
+                int travelTime = parseDuration(node).orElse(-1);
+
+                boolean wheelchairAccessible = !node.isTagFalse("wheelchair");
 
                 createElevatorHopEdges(
                         onboardVertices, wheelchairAccessible, node.isTagTrue("bicycle"),
@@ -925,9 +922,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     );
                 }
 
-                int travelTime = elevatorWay.hasTag("duration") ?
-                        Integer.parseInt(elevatorWay.getTag("duration")) :
-                        -1;
+                int travelTime = parseDuration(elevatorWay).orElse(-1);
                 int levels = nodes.size();
                 boolean wheelchairAccessible = !elevatorWay.isTagFalse("wheelchair");
 
@@ -1442,6 +1437,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             return iv;
         }
+    }
+
+    private Issue invalidDuration(OSMWithTags element, String v) {
+        return Issue.issue("InvalidDuration",
+                "Duration for osm node %d is not a number: '%s'; it's replaced with '-1' (unknown).",
+                element.getId(),
+                v
+        );
     }
 
     @Override
