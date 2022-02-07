@@ -1,6 +1,10 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import java.time.LocalTime;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.CompositeComparator;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -9,9 +13,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.util.CompositeComparator;
-import org.opentripplanner.util.time.DurationUtils;
 
 
 /**
@@ -19,7 +20,7 @@ import org.opentripplanner.util.time.DurationUtils;
  * itinerary. The result can be expected or actual, both represented by this class.
  */
 class Result {
-    private static final Pattern STOPS_PATTERN = Pattern.compile(" ~ (\\S+) ~ ");
+    private static final Pattern STOPS_PATTERN = Pattern.compile(" ~ (\\d+) ~ ");
     /**
      * The status is not final; This allows to update the status when matching expected and actual results.
      */
@@ -28,15 +29,15 @@ class Result {
     final Integer duration;
     final Integer cost;
     final Integer walkDistance;
-    final LocalTime startTime;
-    final LocalTime endTime;
+    final Integer startTime;
+    final Integer endTime;
     final Set<String> agencies = new TreeSet<>();
     final Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
     final List<String> routes = new ArrayList<>();
-    final List<String> stops = new ArrayList<>();
+    final List<Integer> stops = new ArrayList<>();
     final String details;
 
-    Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, LocalTime startTime, LocalTime endTime, String details) {
+    Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, Integer startTime, Integer endTime, String details) {
         this.testCaseId = testCaseId;
         this.transfers = transfers;
         this.duration = duration;
@@ -50,11 +51,11 @@ class Result {
 
     public static Comparator<Result> comparator(boolean skipCost) {
         return new CompositeComparator<>(
-            Comparator.comparing(r -> r.endTime.toSecondOfDay()),
-            Comparator.comparing(r -> -r.startTime.toSecondOfDay()),
-            compareCost(skipCost),
-            (r1, r2) -> compare(r1.routes, r2.routes, String::compareTo),
-            (r1, r2) -> compare(r1.stops, r2.stops, String::compareTo)
+                Comparator.comparing(r -> r.endTime),
+                Comparator.comparing(r -> -r.startTime),
+                compareCost(skipCost),
+                (r1, r2) -> compare(r1.routes, r2.routes, String::compareTo),
+                (r1, r2) -> compare(r1.stops, r2.stops, Integer::compareTo)
         );
     }
 
@@ -76,25 +77,25 @@ class Result {
                 durationAsStr(),
                 cost,
                 walkDistance,
-                startTime.toSecondOfDay(),
-                endTime.toSecondOfDay(),
+                TimeUtils.timeToStrCompact(startTime),
+                TimeUtils.timeToStrCompact(endTime),
                 details
         );
     }
 
-    private static List<String> parseStops(String details) {
-        List<String> stops = new ArrayList<>();
+    private static List<Integer> parseStops(String details) {
+        List<Integer> stops = new ArrayList<>();
         // WALK 0:44 ~ 87540 ~ BUS NX1 06:25 08:50 ~ 87244  WALK 0:20
         Matcher m = STOPS_PATTERN.matcher(details);
 
         while (m.find()) {
-            stops.add(m.group(1));
+            stops.add(Integer.parseInt(m.group(1)));
         }
         return stops;
     }
 
     public String durationAsStr() {
-      return DurationUtils.durationToStr(duration);
+        return DurationUtils.durationToStr(duration);
     }
 
     static <T> int compare(List<T> a, List<T> b, Comparator<T> comparator) {

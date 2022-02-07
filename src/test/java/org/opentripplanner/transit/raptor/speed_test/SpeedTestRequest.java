@@ -1,10 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.modes.AllowedTransitMode;
@@ -26,37 +22,24 @@ public class SpeedTestRequest {
     private static final int EXPAND_SEARCH_WINDOW_HOURS = 0;
 
     private final TestCase testCase;
-    private final SpeedTestCmdLineOpts opts;
     private final SpeedTestConfig config;
-    private final ZoneId inputZoneId;
-    private final LocalDate date;
+    private final ZonedDateTime departureTime;
 
     SpeedTestRequest(
             TestCase testCase,
             SpeedTestCmdLineOpts opts,
             SpeedTestConfig config,
-            ZoneId inputZoneId
+            ZonedDateTime departureTime
     ) {
         this.testCase = testCase;
-        this.opts = opts;
         this.config = config;
-        this.date = config.testDate;
-        this.inputZoneId = inputZoneId;
+        this.departureTime = departureTime;
     }
 
     public TestCase tc() { return testCase; }
-    public LocalDate getDepartureDate() {
-        return date;
-    }
-    public Date getDepartureTimestamp() {
-        return new Date(
-                date.atStartOfDay(inputZoneId).toInstant().toEpochMilli()
-                        + testCase.departureTime * 1000L
-        );
-    }
 
-    ZonedDateTime getDepartureDateWithZone() {
-        return ZonedDateTime.of(date, LocalTime.MIDNIGHT, inputZoneId);
+    ZonedDateTime getDepartureTime() {
+        return departureTime;
     }
 
     Set<AllowedTransitMode> getTransitModes() {

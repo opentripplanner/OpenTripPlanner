@@ -1,12 +1,14 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import com.csvreader.CsvReader;
+import java.nio.charset.StandardCharsets;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.time.TimeUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
@@ -159,8 +159,8 @@ public class CsvFileIO {
                     parseTime(csvReader.get("duration")),
                     Integer.parseInt(csvReader.get("cost")),
                     Integer.parseInt(csvReader.get("walkDistance")),
-                    LocalTime.ofSecondOfDay(parseTime(csvReader.get("startTime"))),
-                    LocalTime.ofSecondOfDay(parseTime(csvReader.get("endTime"))),
+                    parseTime(csvReader.get("startTime")),
+                    parseTime(csvReader.get("endTime")),
                     csvReader.get("details")
             );
             r.modes.addAll(str2Col(csvReader.get("modes"), TraverseMode::valueOf));
@@ -179,10 +179,6 @@ public class CsvFileIO {
 
     static String time2str(Integer timeOrDuration) {
         return TimeUtils.timeToStrLong(timeOrDuration);
-    }
-
-    static String time2str(LocalTime time) {
-        return time.toString();
     }
 
     static Integer parseTime(String timeOrDuration) {

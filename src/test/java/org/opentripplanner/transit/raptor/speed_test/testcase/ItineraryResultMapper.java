@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
+import java.time.Duration;
 import java.util.Optional;
 import org.opentripplanner.model.plan.Itinerary;
 
@@ -76,8 +77,8 @@ class ItineraryResultMapper {
                 itinerary.durationSeconds,
                 itinerary.generalizedCost,
                 itinerary.generalizedCost, // TODO add walking distance
-                TimeUtils.localTime(itinerary.startTime()),
-                TimeUtils.localTime(itinerary.endTime()),
+                TimeUtils.localTime(itinerary.startTime()).toSecondOfDay(),
+                TimeUtils.localTime(itinerary.endTime()).toSecondOfDay(),
                 details(itinerary)
         );
 
@@ -91,6 +92,7 @@ class ItineraryResultMapper {
         }
         return result;
     }
+
     public static String details(Itinerary itin) {
         PathStringBuilder buf = new PathStringBuilder(Integer::toString, true);
 

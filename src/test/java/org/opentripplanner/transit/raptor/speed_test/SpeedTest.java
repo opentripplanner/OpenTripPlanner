@@ -14,6 +14,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.URI;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -239,7 +240,10 @@ public class SpeedTest {
         Timer.Sample sample = null;
         try {
             final SpeedTestRequest request = new SpeedTestRequest(
-                    testCase, opts, config, getTimeZoneId()
+                    testCase,
+                    opts,
+                    config,
+                    LocalTime.ofSecondOfDay(testCase.departureTime).atDate(config.testDate).atZone(getTimeZoneId())
             );
 
             final Timer timer = Timer.builder(SPEED_TEST_ROUTE).register(registry);
@@ -286,7 +290,7 @@ public class SpeedTest {
 
     public RoutingResponse route(SpeedTestRequest request) {
         var routingRequest = new RoutingRequest();
-        routingRequest.setDateTime(routingRequest.getDateTime());
+        routingRequest.setDateTime(request.getDepartureTime().toInstant());
         routingRequest.setFromString(request.tc().fromPlace.coordinate.toString());
         routingRequest.setToString(request.tc().toPlace.coordinate.toString());
         routingRequest.walkSpeed = request.getWalkSpeedMeterPrSecond();
