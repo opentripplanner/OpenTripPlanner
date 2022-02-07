@@ -70,7 +70,8 @@ public class RoutingServiceTest extends GtfsTest {
         }
         for (var stop : graph.index.getAllStops()) {
             for (TripPattern pattern : graph.index.getPatternsForStop(stop)) {
-                assertTrue(pattern.getStopPattern().containsStop(stop.getId().toString()));
+                int stopPos = pattern.findStopPosition(stop);
+                assertTrue("Stop position exist", stopPos >= 0);
             }
         }
     }

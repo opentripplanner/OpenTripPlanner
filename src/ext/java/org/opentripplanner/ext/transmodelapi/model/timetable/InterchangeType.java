@@ -5,9 +5,13 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import java.util.function.Function;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.model.transfer.TransferPoint;
 
 public class InterchangeType {
 
@@ -52,42 +56,63 @@ public class InterchangeType {
                         .deprecate(
                                 "This is the same as using the `fromServiceJourney { line }` field.")
                         .type(lineType)
-                        .dataFetcher(env -> transfer(env).getFrom().getTrip().getRoute())
+                        .dataFetcher(env -> transferRoute(env, ConstrainedTransfer::getFrom))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("ToLine")
                         .deprecate(
                                 "This is the same as using the `toServiceJourney { line }` field.")
                         .type(lineType)
-                        .dataFetcher(env -> transfer(env).getTo().getTrip().getRoute())
+                        .dataFetcher(env -> transferRoute(env, ConstrainedTransfer::getTo))
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("fromServiceJourney")
+                        .type(serviceJourneyType)
+                        .dataFetcher(env -> transferTrip(env, ConstrainedTransfer::getFrom))
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("toServiceJourney")
+                        .type(serviceJourneyType)
+                        .dataFetcher(env -> transferTrip(env, ConstrainedTransfer::getTo))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("FromServiceJourney")
                         .type(serviceJourneyType)
                         .deprecate("Use fromServiceJourney instead")
-                        .dataFetcher(env -> transfer(env).getFrom().getTrip())
+                        .dataFetcher(env -> transferTrip(env, ConstrainedTransfer::getFrom))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("ToServiceJourney")
                         .type(serviceJourneyType)
                         .deprecate("Use toServiceJourney instead")
-                        .dataFetcher(env -> transfer(env).getTo().getTrip())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("fromServiceJourney")
-                        .type(serviceJourneyType)
-                        .dataFetcher(env -> transfer(env).getFrom().getTrip())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("toServiceJourney")
-                        .type(serviceJourneyType)
-                        .dataFetcher(env -> transfer(env).getTo().getTrip())
+                        .dataFetcher(env -> transferTrip(env, ConstrainedTransfer::getTo))
                         .build())
                 .build();
     }
 
     private static ConstrainedTransfer transfer(DataFetchingEnvironment environment) {
         return environment.getSource();
+    }
+
+    private static TransferPoint transferPoint(
+            DataFetchingEnvironment environment,
+            Function<ConstrainedTransfer, TransferPoint> fromTo
+    ) {
+        return fromTo.apply(transfer(environment));
+    }
+
+    private static Trip transferTrip(
+            DataFetchingEnvironment environment,
+            Function<ConstrainedTransfer, TransferPoint> fromTo
+    ) {
+        return TransferPoint.getTrip(transferPoint(environment, fromTo));
+    }
+
+    private static Route transferRoute(
+            DataFetchingEnvironment environment,
+            Function<ConstrainedTransfer, TransferPoint> fromTo
+    ) {
+        return TransferPoint.getRoute(transferPoint(environment, fromTo));
     }
 
     private static TransferConstraint constraint(DataFetchingEnvironment environment) {

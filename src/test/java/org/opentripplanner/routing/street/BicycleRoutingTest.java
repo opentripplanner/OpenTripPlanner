@@ -20,7 +20,7 @@ import org.opentripplanner.standalone.server.Router;
 
 public class BicycleRoutingTest {
 
-    static long dateTime = Instant.now().toEpochMilli();
+    static final Instant dateTime = Instant.now();
     Graph herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
 
     /**
@@ -57,7 +57,7 @@ public class BicycleRoutingTest {
 
     private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
         RoutingRequest request = new RoutingRequest();
-        request.dateTime = dateTime;
+        request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
         request.bicycleOptimizeType = BicycleOptimizeType.QUICK;
@@ -70,7 +70,7 @@ public class BicycleRoutingTest {
 
         var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
         // make sure that we only get BICYLE legs
-        itineraries.forEach(i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.BICYCLE)));
-        return itineraries.get(0).legs.get(0).legGeometry.getPoints();
+        itineraries.forEach(i -> i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.BICYCLE)));
+        return itineraries.get(0).legs.get(0).getLegGeometry().getPoints();
     }
 }

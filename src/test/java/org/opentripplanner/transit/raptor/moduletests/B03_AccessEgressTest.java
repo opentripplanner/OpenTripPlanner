@@ -115,7 +115,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
   /**
    * This test turn timetable "off", this is the same as {@code arriveBy=false}. There is no
-   * support for {@code arriveBy=true}, witch would prioritize the latest arrival if cost is
+   * support for {@code arriveBy=true}, which would prioritize the latest arrival if cost is
    * the same.
    */
   @Test

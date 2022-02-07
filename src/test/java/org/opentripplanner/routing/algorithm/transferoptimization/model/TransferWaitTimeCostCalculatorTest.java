@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.util.time.DurationUtils.duration;
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 import org.junit.jupiter.api.Test;
 
@@ -10,16 +10,16 @@ public class TransferWaitTimeCostCalculatorTest {
   private static final double EPSILON = 0.005;
   private static final double ANY = Double.NaN;
 
-  final int d12s = duration("12s");
-  final int d24s = duration("24s");
-  final int d1m = duration("1m");
-  final int d2m = duration("2m");
-  final int d4m = duration("4m");
-  final int d5m = duration("5m");
-  final int d10m = duration("10m");
-  final int d20m = duration("20m");
-  final int d50m = duration("50m");
-  final int d5d = 5 * duration("24h");
+  final int d12s = durationInSeconds("12s");
+  final int d24s = durationInSeconds("24s");
+  final int d1m = durationInSeconds("1m");
+  final int d2m = durationInSeconds("2m");
+  final int d4m = durationInSeconds("4m");
+  final int d5m = durationInSeconds("5m");
+  final int d10m = durationInSeconds("10m");
+  final int d20m = durationInSeconds("20m");
+  final int d50m = durationInSeconds("50m");
+  final int d5d = 5 * durationInSeconds("24h");
 
   private TransferWaitTimeCostCalculator subject;
 

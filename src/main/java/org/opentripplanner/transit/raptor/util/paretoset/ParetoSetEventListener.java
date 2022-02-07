@@ -33,7 +33,7 @@ public interface ParetoSetEventListener<T> {
      * This is the callback called when an element is dropped.
      *
      * @param element           The new element that is rejected.
-     * @param rejectedByElement One of the existing elements in the set witch dominates the new rejected element.
+     * @param rejectedByElement One of the existing elements in the set which dominates the new rejected element.
      */
     default void notifyElementRejected(T element, T rejectedByElement) { }
 }

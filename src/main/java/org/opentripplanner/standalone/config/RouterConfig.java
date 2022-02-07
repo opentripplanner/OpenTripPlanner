@@ -1,7 +1,10 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import java.io.Serializable;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
@@ -12,10 +15,6 @@ import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-
-import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
 
 /**
  * This class is an object representation of the 'router-config.json'.
@@ -64,7 +63,7 @@ public class RouterConfig implements Serializable {
     }
 
     /**
-     * The config-version is a parameter witch each OTP deployment may set to be able to
+     * The config-version is a parameter which each OTP deployment may set to be able to
      * query the OTP server and verify that it uses the correct version of the config. The
      * version must be injected into the config in the operation deployment pipeline. How this
      * is done is up to the deployment.

@@ -262,7 +262,7 @@ public abstract class GraphPathToItineraryMapper {
                 .orElse(null);
             if (flexEdge != null) {
                 leg = new Leg(flexEdge.getTrip());
-                leg.flexibleTrip = true;
+                leg.setFlexibleTrip(true);
             }
         }
 
@@ -272,18 +272,18 @@ public abstract class GraphPathToItineraryMapper {
 
         Edge[] edges = new Edge[states.length - 1];
 
-        leg.startTime = makeCalendar(states[0]);
-        leg.endTime = makeCalendar(states[states.length - 1]);
+        leg.setStartTime(makeCalendar(states[0]));
+        leg.setEndTime(makeCalendar(states[states.length - 1]));
 
         // Calculate leg distance and fill array of edges
-        leg.distanceMeters = 0.0;
+        leg.setDistanceMeters(0.0);
         for (int i = 0; i < edges.length; i++) {
             edges[i] = states[i + 1].getBackEdge();
-            leg.distanceMeters += edges[i].getDistanceMeters();
+            leg.setDistanceMeters(leg.getDistanceMeters() + edges[i].getDistanceMeters());
         }
 
-        TimeZone timeZone = leg.startTime.getTimeZone();
-        leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
+        TimeZone timeZone = leg.getStartTime().getTimeZone();
+        leg.setAgencyTimeZoneOffset(timeZone.getOffset(leg.getStartTime().getTimeInMillis()));
 
         if (flexEdge != null) {
             FlexLegMapper.addFlexPlaces(leg, flexEdge, requestedLocale);
@@ -294,15 +294,16 @@ public abstract class GraphPathToItineraryMapper {
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
 
-        leg.legGeometry = PolylineEncoder.createEncodings(geometry);
+        leg.setLegGeometry(PolylineEncoder.createEncodings(geometry));
 
-        leg.generalizedCost = (int) (states[states.length - 1].getWeight() - states[0].getWeight());
+        leg.setGeneralizedCost(
+                (int) (states[states.length - 1].getWeight() - states[0].getWeight()));
 
-        leg.walkingBike = states[states.length - 1].isBackWalkingBike();
+        leg.setWalkingBike(states[states.length - 1].isBackWalkingBike());
 
-        leg.rentedVehicle = states[0].isRentingVehicle();
+        leg.setRentedVehicle(states[0].isRentingVehicle());
 
-        if (leg.rentedVehicle) {
+        if (leg.getRentedVehicle()) {
             String vehicleRentalNetwork = states[0].getVehicleRentalNetwork();
             if (vehicleRentalNetwork != null) {
                 leg.setVehicleRentalNetwork(vehicleRentalNetwork);
@@ -323,7 +324,7 @@ public abstract class GraphPathToItineraryMapper {
         var previousStateIsVehicleParking = states[0].getBackState() != null
                 && states[0].getBackEdge() instanceof VehicleParkingEdge;
         if (previousStateIsVehicleParking) {
-            leg.startTime = makeCalendar(states[0].getBackState());
+            leg.setStartTime(makeCalendar(states[0].getBackState()));
         }
 
         return leg;
@@ -343,12 +344,12 @@ public abstract class GraphPathToItineraryMapper {
 
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
-            TraverseMode legMode = legs.get(i).mode;
+            TraverseMode legMode = legs.get(i).getMode();
             if(legMode != lastMode && !walkSteps.isEmpty()) {
                 lastMode = legMode;
             }
 
-            legs.get(i).walkSteps = walkSteps;
+            legs.get(i).setWalkSteps(walkSteps);
 
             if (walkSteps.size() > 0) {
                 previousStep = walkSteps.get(walkSteps.size() - 1);
@@ -381,8 +382,8 @@ public abstract class GraphPathToItineraryMapper {
             for (int j = 1; j < legsStates[i].length; j++) {
                 if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
                     PathwayEdge pe = (PathwayEdge) legsStates[i][j].getBackEdge();
-                    legs.get(i).pathwayId = pe.getId();
-                    legs.get(i).pathway = true;
+                    legs.get(i).setPathwayId(pe.getId());
+                    legs.get(i).setPathway(true);
                     break OUTER;
                 }
             }
@@ -476,21 +477,19 @@ public abstract class GraphPathToItineraryMapper {
      * @param states The states that go with the leg
      */
     private static void addPlaces(Leg leg, State[] states, Locale requestedLocale) {
-        Vertex firstVertex = states[0].getVertex();
-        Vertex lastVertex = states[states.length - 1].getVertex();
-
-        leg.from = makePlace(firstVertex, requestedLocale);
-        leg.to = makePlace(lastVertex, requestedLocale);
+        leg.setFrom(makePlace(states[0], requestedLocale));
+        leg.setTo(makePlace(states[states.length - 1], requestedLocale));
     }
 
     /**
      * Make a {@link Place} to add to a {@link Leg}.
      *
-     * @param vertex The {@link Vertex} at the {@link State}.
+     * @param state The {@link State}.
      * @param requestedLocale The locale to use for all text attributes.
      * @return The resulting {@link Place} object.
      */
-    private static Place makePlace(Vertex vertex, Locale requestedLocale) {
+    private static Place makePlace(State state, Locale requestedLocale) {
+        Vertex vertex = state.getVertex();
         String name = vertex.getName(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
@@ -501,11 +500,11 @@ public abstract class GraphPathToItineraryMapper {
         }
 
         if (vertex instanceof TransitStopVertex) {
-            return Place.forStop((TransitStopVertex) vertex, name);
+            return Place.forStop(((TransitStopVertex) vertex).getStop());
         } else if(vertex instanceof VehicleRentalStationVertex) {
             return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex, name);
         } else if (vertex instanceof VehicleParkingEntranceVertex) {
-            return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, name);
+            return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, name, state.getOptions());
         } else {
             return Place.normal(vertex, name);
         }

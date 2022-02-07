@@ -34,12 +34,21 @@ public class ReverseTransitCalculatorTest {
     }
 
     @Test
-    public void isBest() {
+    public void isBefore() {
         var subject = create();
 
-        assertTrue(subject.isBest(11, 10));
-        assertFalse(subject.isBest(10, 11));
-        assertFalse(subject.isBest(10, 10));
+        assertTrue(subject.isBefore(11, 10));
+        assertFalse(subject.isBefore(10, 11));
+        assertFalse(subject.isBefore(10, 10));
+    }
+
+    @Test
+    public void isAfter() {
+        var subject = create();
+
+        assertTrue(subject.isAfter(10, 11));
+        assertFalse(subject.isAfter(11, 10));
+        assertFalse(subject.isAfter(10, 10));
     }
 
     @Test

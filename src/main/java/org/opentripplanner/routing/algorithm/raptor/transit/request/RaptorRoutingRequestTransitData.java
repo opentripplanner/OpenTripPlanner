@@ -1,15 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
-import java.util.function.IntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
@@ -48,7 +46,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
    */
   private final RaptorTransferIndex transfers;
 
-  private final ZonedDateTime startOfTime;
+  private final ZonedDateTime transitSearchTimeZero;
 
   private final CostCalculator generalizedCostCalculator;
 
@@ -59,7 +57,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   public RaptorRoutingRequestTransitData(
       TransferService transferService,
       TransitLayer transitLayer,
-      Instant departureTime,
+      ZonedDateTime transitSearchTimeZero,
       int additionalPastSearchDays,
       int additionalFutureSearchDays,
       TransitDataProviderFilter filter,
@@ -68,14 +66,14 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
     this.transferService = transferService;
     this.transitLayer = transitLayer;
+    this.transitSearchTimeZero = transitSearchTimeZero;
 
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolate this code to only be available at
     // the time of construction
     var transitDataCreator = new RaptorRoutingRequestTransitDataCreator(
-            transitLayer, departureTime
+            transitLayer, transitSearchTimeZero
     );
-    this.startOfTime = transitDataCreator.getSearchStartTime();
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(
         additionalPastSearchDays,
         additionalFutureSearchDays,
@@ -87,13 +85,13 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
             transitLayer.getStopIndex().stopBoardAlightCosts
     );
     this.validTransitDataStartTime = DateMapper.secondsSinceStartOfTime(
-        startOfTime,
-        startOfTime.minusDays(additionalPastSearchDays).toInstant()
+            this.transitSearchTimeZero,
+        this.transitSearchTimeZero.minusDays(additionalPastSearchDays).toInstant()
     );
     // The +1 is due to the validity being to the end of the day
     this.validTransitDataEndTime = DateMapper.secondsSinceStartOfTime(
-        startOfTime,
-        startOfTime.plusDays(additionalFutureSearchDays + 1).toInstant()
+            this.transitSearchTimeZero,
+        this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
     );
   }
 
@@ -137,12 +135,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
               TripSchedule fromTrip, int fromStopPosition, TripSchedule toTrip, int toStopPosition
       ) {
         return transferService.findTransfer(
-                transitLayer.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
-                transitLayer.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition)),
                 fromTrip.getOriginalTripTimes().getTrip(),
-                toTrip.getOriginalTripTimes().getTrip(),
                 fromStopPosition,
-                toStopPosition
+                transitLayer.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
+                toTrip.getOriginalTripTimes().getTrip(),
+                toStopPosition,
+                transitLayer.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition))
         );
       }
     };
@@ -166,7 +164,4 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     return validTransitDataEndTime;
   }
 
-  public ZonedDateTime getStartOfTime() {
-    return startOfTime;
-  }
 }

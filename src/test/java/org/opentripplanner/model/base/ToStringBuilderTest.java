@@ -176,7 +176,7 @@ public class ToStringBuilderTest {
             ZoneId.systemDefault()
         )
     );
-    assertEquals("ToStringBuilderTest{c: 23:45:12}", subject().addCalTime("c", c).toString());
+    assertEquals("ToStringBuilderTest{c: 23:45:12}", subject().addTimeCal("c", c).toString());
   }
 
   @Test

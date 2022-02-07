@@ -8,7 +8,7 @@ import static org.opentripplanner.model.calendar.ServiceDate.MIN_DATE;
 
 
 /**
- * Value object witch represent an service date interval from a starting date
+ * Value object which represent an service date interval from a starting date
  * until an end date. Both start and end is inclusive.
  *
  * The {@code start} must be equals or before the {@code end} to form a valid

@@ -54,7 +54,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
     public void add(EgressStopArrivalState<T> egressStopArrival) {
         // TODO: Check earliestDepartureTime?
         int time = destinationArrivalTime(egressStopArrival);
-        if (calculator.isBest(time, bestDestinationTime)) {
+        if (calculator.isBefore(time, bestDestinationTime)) {
             newElementSet = true;
             bestDestinationTime = time;
             bestEgressStopArrival = egressStopArrival;

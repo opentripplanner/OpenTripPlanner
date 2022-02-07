@@ -56,7 +56,7 @@ public class TransportModeSlack {
                 .field(
                         newInputObjectField()
                                 .name("modes")
-                                .description("List of modes for witch the given slack apply.")
+                                .description("List of modes for which the given slack apply.")
                                 .type(MODE_LIST_TYPE)
                                 .build()
                 )

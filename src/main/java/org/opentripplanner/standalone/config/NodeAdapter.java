@@ -3,11 +3,11 @@ package org.opentripplanner.standalone.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -16,17 +16,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 
 
@@ -51,14 +54,14 @@ public class NodeAdapter {
     private final String source;
 
     /**
-     * This class wrap a {@link JsonNode} witch might be a child of another node. We
+     * This class wrap a {@link JsonNode} which might be a child of another node. We
      * keep the path string for logging and debugging purposes
      */
     private final String contextPath;
 
     /**
      * This parameter is used internally in this class to be able to produce a
-     * list of parameters witch is NOT requested.
+     * list of parameters which is NOT requested.
      */
     private final List<String> parameterNames = new ArrayList<>();
 
@@ -94,6 +97,10 @@ public class NodeAdapter {
             ++i;
         }
         return result;
+    }
+
+    public boolean isNonEmptyArray() {
+        return json.isArray() && json.size() > 0;
     }
 
     public String getSource() {
@@ -149,6 +156,12 @@ public class NodeAdapter {
         return param(paramName).asDouble();
     }
 
+    public Optional<Double> asDoubleOptional(String paramName) {
+        JsonNode node = param(paramName);
+        if(node.isMissingNode()) { return Optional.empty(); }
+        return Optional.of(node.asDouble());
+    }
+
     public List<Double> asDoubles(String paramName, List<Double> defaultValue) {
         if(!exist(paramName)) return defaultValue;
         return arrayAsList(paramName, JsonNode::asDouble);
@@ -190,20 +203,31 @@ public class NodeAdapter {
         return param(paramName).asText();
     }
 
+    /** Get required enum value. Parser is not case sensitive. */
+    public <T extends Enum<T>> T asEnum(String paramName, Class<T> ofType) {
+        return asEnum(paramName, asText(paramName), ofType);
+    }
+
+    /** Get optional enum value. Parser is not case sensitive. */
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T asEnum(String paramName, T defaultValue) {
-        String valueAsString = asText(paramName, defaultValue.name());
-        try {
-            return Enum.valueOf((Class<T>) defaultValue.getClass(), valueAsString);
-        }
-        catch (IllegalArgumentException ignore) {
-            List<T> legalValues = (List<T>) Arrays.asList(defaultValue.getClass().getEnumConstants());
-            throw new OtpAppException(
-                    "The parameter '" + fullPath(paramName)
-                    + "': '" + valueAsString + "' is not in legal. Expected one of " + legalValues
-                    + ". Source: " + source + "."
-            );
-        }
+        var value = asText(paramName, defaultValue.name());
+        return asEnum(paramName, value, (Class<T>) defaultValue.getClass());
+    }
+
+    private <T extends Enum<T>> T asEnum(String paramName, String value, Class<T> ofType) {
+        var upperCaseValue = value.toUpperCase();
+        return Stream.of(ofType.getEnumConstants())
+                .filter(it -> it.name().toUpperCase().equals(upperCaseValue))
+                .findFirst()
+                .orElseThrow(() -> {
+                    List<T> legalValues =  List.of(ofType.getEnumConstants());
+                    throw new OtpAppException(
+                            "The parameter '" + fullPath(paramName)
+                            + "': '" + value + "' is not in legal. Expected one of "
+                            + legalValues + ". Source: " + source + "."
+                    );
+                });
     }
 
     /**
@@ -314,6 +338,25 @@ public class NodeAdapter {
                     + "Source: " + source + ". Details: " + e.getLocalizedMessage()
             );
         }
+    }
+
+    public Duration asDuration(String paramName, Duration defaultValue) {
+        return exist(paramName) ? DurationUtils.duration(param(paramName).asText()) : defaultValue;
+    }
+
+    public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {
+        JsonNode array = param(paramName);
+
+        if(array.isMissingNode()) {
+            return defaultValues;
+        }
+        assertIsArray(paramName, array);
+
+        List<Duration> durations = new ArrayList<>();
+        for (JsonNode it : array) {
+            durations.add(DurationUtils.duration(it.asText()));
+        }
+        return durations;
     }
 
     public Pattern asPattern(String paramName, String defaultValue) {

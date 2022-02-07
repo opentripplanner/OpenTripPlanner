@@ -63,7 +63,7 @@ public class LegTest implements PlanTestConstants {
 
     assertTrue("t0 is same trip as it self", t0.isPartiallySameTransitLeg(t0));
 
-    // Create a new trip with the same trip Id witch ride only between the two first stops of trip 0.
+    // Create a new trip with the same trip Id which ride only between the two first stops of trip 0.
     t1 = createLegIgnoreTime(tripId0, fromStopIndex, fromStopIndex+1, day1);
     assertTrue("t1 overlap t0", t1.isPartiallySameTransitLeg(t0));
     assertTrue("t0 overlap t1", t0.isPartiallySameTransitLeg(t1));
@@ -74,12 +74,12 @@ public class LegTest implements PlanTestConstants {
     assertFalse("t0 diffrent serviceDate from t1", t0.isPartiallySameTransitLeg(t1));
 
 
-    // Create a new trip with the same trip Id witch ride only between the two last stops of trip 0.
+    // Create a new trip with the same trip Id which ride only between the two last stops of trip 0.
     t1 = createLegIgnoreTime(tripId0, toStopIndex-1, toStopIndex, day1);
     assertTrue("t1 overlap t0", t1.isPartiallySameTransitLeg(t0));
     assertTrue("t0 overlap t1", t0.isPartiallySameTransitLeg(t1));
 
-    // Create a new trip witch alight at the board stop of t0 - should not overlap
+    // Create a new trip which alight at the board stop of t0 - should not overlap
     t1 = createLegIgnoreTime(tripId0, fromStopIndex-1, fromStopIndex, day1);
     assertFalse("t1 do not overlap t0", t1.isPartiallySameTransitLeg(t0));
     assertFalse("t0 do not overlap t1", t0.isPartiallySameTransitLeg(t1));
@@ -92,7 +92,7 @@ public class LegTest implements PlanTestConstants {
 
   private static Leg createLegIgnoreTime(int tripId, int fromStopIndex, int toStopIndex, ServiceDate service) {
     Leg leg = TestItineraryBuilder.newItinerary(A, 99).bus(tripId, 99, 99, fromStopIndex, toStopIndex, B).build().firstLeg();
-    leg.serviceDate = service;
+    leg.setServiceDate(service);
     return leg;
   }
 }

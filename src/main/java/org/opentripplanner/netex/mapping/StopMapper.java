@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
@@ -34,7 +35,7 @@ class StopMapper {
           Quay quay,
           Station parentStation,
           Collection<FareZone> fareZones,
-          TransitMode transitMode
+          T2<TransitMode, String> transitMode
   ) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
@@ -55,7 +56,8 @@ class StopMapper {
         fareZones,
         null,
         null,
-        transitMode
+        transitMode.first,
+        transitMode.second
     );
     stop.setParentStation(parentStation);
 

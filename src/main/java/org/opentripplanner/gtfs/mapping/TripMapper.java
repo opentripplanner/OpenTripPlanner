@@ -3,7 +3,6 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.util.MapUtils;
@@ -31,6 +30,11 @@ class TripMapper {
         return orginal == null ? null : mappedTrips.computeIfAbsent(orginal, this::doMap);
     }
 
+    Collection<Trip> getMappedTrips() {
+        return mappedTrips.values();
+    }
+
+
     private Trip doMap(org.onebusaway.gtfs.model.Trip rhs) {
         Trip lhs = new Trip(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
@@ -49,7 +53,6 @@ class TripMapper {
         return lhs;
     }
 
-    @Nullable
     private static int mapDirectionId(org.onebusaway.gtfs.model.Trip trip) {
         try {
             String directionId = trip.getDirectionId();

@@ -76,12 +76,12 @@ public class TransitLayer {
   }
 
   public int getIndexByStop(Stop stop) {
-    return stopIndex.indexByStop.get(stop);
+    return stopIndex.indexOf(stop);
   }
 
   @Nullable
   public StopLocation getStopByIndex(int stop) {
-    return stop != -1 ? this.stopIndex.stopsByIndex.get(stop) : null;
+    return stop == -1 ? null : this.stopIndex.stopByIndex(stop);
   }
 
   public StopIndexForRaptor getStopIndex() {
@@ -93,7 +93,7 @@ public class TransitLayer {
   }
 
   /**
-   * This is the time zone witch is used for interpreting all local "service" times
+   * This is the time zone which is used for interpreting all local "service" times
    * (in transfers, trip schedules and so on). This is the time zone of the internal OTP
    * time - which is used in logging and debugging. This is independent of the time zone
    * of imported data and of the time zone used on any API - it can be the same, but it does
@@ -104,7 +104,7 @@ public class TransitLayer {
   }
 
   public int getStopCount() {
-    return stopIndex.stopsByIndex.size();
+    return stopIndex.size();
   }
 
   @Nullable

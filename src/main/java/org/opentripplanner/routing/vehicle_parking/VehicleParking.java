@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -188,6 +189,51 @@ public class VehicleParking implements Serializable {
 
   public boolean hasRealTimeData() {
     return availability != null;
+  }
+
+  public boolean hasSpacesAvailable(TraverseMode traverseMode, boolean wheelchairAccessible, boolean useAvailability) {
+    switch (traverseMode) {
+      case BICYCLE:
+        if (useAvailability && hasRealTimeDataForMode(TraverseMode.BICYCLE, false)) {
+          return availability.getBicycleSpaces() > 0;
+        } else {
+          return bicyclePlaces;
+        }
+      case CAR:
+        if (wheelchairAccessible) {
+          if (useAvailability && hasRealTimeDataForMode(TraverseMode.CAR, true)) {
+            return availability.getWheelchairAccessibleCarSpaces() > 0;
+          } else {
+            return wheelchairAccessibleCarPlaces;
+          }
+        } else {
+          if (useAvailability && hasRealTimeDataForMode(TraverseMode.CAR, false)) {
+            return availability.getCarSpaces() > 0;
+          } else {
+            return carPlaces;
+          }
+        }
+      default:
+        return false;
+    }
+  }
+
+  public boolean hasRealTimeDataForMode(TraverseMode traverseMode, boolean wheelchairAccessibleCarPlaces) {
+    if (availability == null) {
+      return false;
+    }
+
+    switch (traverseMode) {
+      case BICYCLE:
+        return availability.getBicycleSpaces() != null;
+      case CAR:
+        var places = wheelchairAccessibleCarPlaces
+                ? availability.getWheelchairAccessibleCarSpaces()
+                : availability.getCarSpaces();
+        return places != null;
+      default:
+        return false;
+    }
   }
 
   public void updateAvailability(VehicleParkingSpaces vehicleParkingSpaces) {

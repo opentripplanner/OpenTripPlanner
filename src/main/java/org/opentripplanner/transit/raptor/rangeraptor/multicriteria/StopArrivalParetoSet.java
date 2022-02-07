@@ -38,7 +38,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule> extends ParetoSetWithMa
 
     /**
      * Create a new StopArrivalParetoSet and attach a debugger if it exist. Also
-     * attach a {@link CalculateTransferToDestination} listener witch will create
+     * attach a {@link CalculateTransferToDestination} listener which will create
      * new destination arrivals for each accepted egress stop arrival.
      */
     static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(

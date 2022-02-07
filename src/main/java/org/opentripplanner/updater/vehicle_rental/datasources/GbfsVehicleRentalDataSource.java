@@ -1,5 +1,11 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.entur.gbfs.v2_2.free_bike_status.GBFSFreeBikeStatus;
 import org.entur.gbfs.v2_2.station_information.GBFSStationInformation;
 import org.entur.gbfs.v2_2.station_status.GBFSStation;
@@ -10,18 +16,11 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
-import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
+import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Created by demory on 2017-03-14.
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
  * router-config.json from being used, but more importantly, floating bikes added by a
  * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be used.
  */
-class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
+class GbfsVehicleRentalDataSource implements DataSource<VehicleRentalPlace> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
 
@@ -66,7 +65,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
     }
 
     @Override
-    public List<VehicleRentalPlace> getStations() {
+    public List<VehicleRentalPlace> getUpdates() {
 
         // Get system information
         GBFSSystemInformation systemInformation = loader.getFeed(GBFSSystemInformation.class);

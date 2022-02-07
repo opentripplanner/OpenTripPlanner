@@ -68,7 +68,7 @@ class RelativeTime {
 
   /**
    * Convert to ZonedDateTime. Follow the GTFS spec for resolving the absolute time from a relative
-   * time(11:00), date(2020-03-12) and time-zone. The time is relative to "noon - 12 hours", witch
+   * time(11:00), date(2020-03-12) and time-zone. The time is relative to "noon - 12 hours", which
    * for most days are midnight, but in when time is adjusted for day-light-saving it is not.
    */
   public ZonedDateTime toZonedDateTime(LocalDate date, ZoneId zoneId) {

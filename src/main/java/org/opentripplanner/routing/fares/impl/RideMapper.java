@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.fares.impl;
 
-import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.List;
@@ -26,20 +25,20 @@ public class RideMapper {
      */
     public static List<Ride> ridesForItinerary(Itinerary itinerary) {
         return itinerary.legs.stream()
-                .filter(leg -> leg.isTransitLeg() || leg.flexibleTrip)
+                .filter(leg -> leg.isTransitLeg() || leg.isFlexibleTrip())
                 .map(RideMapper::rideForTransitPathLeg)
                 .collect(Collectors.toList());
     }
 
     public static Ride rideForTransitPathLeg(Leg leg) {
         Ride ride = new Ride();
-        ride.firstStop = leg.from.stop;
-        ride.lastStop = leg.to.stop;
+        ride.firstStop = leg.getFrom().stop;
+        ride.lastStop = leg.getTo().stop;
 
         ride.startZone = ride.firstStop.getFirstZoneAsString();
         ride.endZone = ride.lastStop.getFirstZoneAsString();
 
-        var zones = leg.intermediateStops.stream()
+        var zones = leg.getIntermediateStops().stream()
                 .map(stopArrival -> stopArrival.place.stop.getFirstZoneAsString())
                 .collect(Collectors.toSet());
 
@@ -52,11 +51,11 @@ public class RideMapper {
         ride.route = leg.getRoute().getId();
         ride.trip = leg.getTrip().getId();
 
-        ride.startTime = toZonedDateTime(leg.startTime);
-        ride.endTime = toZonedDateTime(leg.endTime);
+        ride.startTime = toZonedDateTime(leg.getStartTime());
+        ride.endTime = toZonedDateTime(leg.getEndTime());
 
         // In the default fare service, we classify rides by mode.
-        ride.classifier = leg.mode;
+        ride.classifier = leg.getMode();
         return ride;
     }
 

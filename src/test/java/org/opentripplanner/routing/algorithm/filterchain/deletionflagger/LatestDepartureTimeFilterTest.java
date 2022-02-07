@@ -17,7 +17,7 @@ public class LatestDepartureTimeFilterTest implements PlanTestConstants {
     public void filterOnLatestDepartureTime() {
         // Given:
         Itinerary it = newItinerary(A).bus(32, 0, 60, E).build();
-        Instant time = it.firstLeg().startTime.toInstant();
+        Instant time = it.firstLeg().getStartTime().toInstant();
 
         // When:
         assertTrue(DeletionFlaggerTestHelper.process(List.of(it), new LatestDepartureTimeFilter(time.minusSeconds(1))).isEmpty());

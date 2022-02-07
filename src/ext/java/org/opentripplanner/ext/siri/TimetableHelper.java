@@ -1,15 +1,26 @@
 package org.opentripplanner.ext.siri;
 
+import static java.util.Collections.EMPTY_LIST;
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.SCHEDULED;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
+import javax.xml.datatype.Duration;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -24,19 +35,6 @@ import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityStructure;
-
-import javax.xml.datatype.Duration;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-
-import static java.util.Collections.EMPTY_LIST;
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
 public class TimetableHelper {
 
@@ -95,8 +93,6 @@ public class TimetableHelper {
 
         boolean stopPatternChanged = false;
 
-        var modifiedStops = timetable.getPattern().getStopPattern().getStops();
-
         Trip trip = getTrip(tripId, timetable);
 
         List<StopTime> modifiedStopTimes = createModifiedStopTimes(timetable, oldTimes, journey, trip, new RoutingService(graph));
@@ -119,7 +115,7 @@ public class TimetableHelper {
         int departureFromPreviousStop = 0;
         int lastArrivalDelay = 0;
         int lastDepartureDelay = 0;
-        for (var stop : modifiedStops) {
+        for (var stop : timetable.getPattern().getStops()) {
             boolean foundMatch = false;
 
             for (RecordedCall recordedCall : recordedCalls) {
@@ -286,8 +282,7 @@ public class TimetableHelper {
             }
             if (!foundMatch) {
 
-                if (timetable.getPattern().getStopPattern().getPickup(callCounter) == NONE &&
-                        timetable.getPattern().getStopPattern().getDropoff(callCounter) == NONE) {
+                if (timetable.getPattern().isBoardAndAlightAt(callCounter, NONE)) {
                     // When newTimes contains stops without pickup/dropoff - set both arrival/departure to previous stop's departure
                     // This necessary to accommodate the case when delay is reduced/eliminated between to stops with pickup/dropoff, and
                     // multiple non-pickup/dropoff stops are in between.
@@ -331,7 +326,7 @@ public class TimetableHelper {
             return null;
         }
 
-        if (newTimes.getNumStops() != timetable.getPattern().getStopPattern().getStops().length) {
+        if (newTimes.getNumStops() != timetable.getPattern().numberOfStops()) {
             return null;
         }
 
@@ -372,15 +367,15 @@ public class TimetableHelper {
         }
 
         //Get all scheduled stops
-        var stops = timetable.getPattern().getStopPattern().getStops();
+        var pattern = timetable.getPattern();
 
         // Keeping track of visited stop-objects to allow multiple visits to a stop.
         List<Object> alreadyVisited = new ArrayList<>();
 
         List<StopLocation> modifiedStops = new ArrayList<>();
 
-        for (int i = 0; i < stops.length; i++) {
-            StopLocation stop = stops[i];
+        for (int i = 0; i < pattern.numberOfStops(); i++) {
+            StopLocation stop = pattern.getStop(i);
 
             boolean foundMatch = false;
             if (i < recordedCalls.size()) {
@@ -481,8 +476,8 @@ public class TimetableHelper {
             stopTime.setStop(stop);
             stopTime.setTrip(trip);
             stopTime.setStopSequence(i);
-            stopTime.setDropOffType(timetable.getPattern().getStopPattern().getDropoff(i));
-            stopTime.setPickupType(timetable.getPattern().getStopPattern().getPickup(i));
+            stopTime.setDropOffType(timetable.getPattern().getAlightType(i));
+            stopTime.setPickupType(timetable.getPattern().getBoardType(i));
             stopTime.setArrivalTime(oldTimes.getScheduledArrivalTime(i));
             stopTime.setDepartureTime(oldTimes.getScheduledDepartureTime(i));
             stopTime.setStopHeadsign(oldTimes.getHeadsign(i));
@@ -597,7 +592,6 @@ public class TimetableHelper {
         if (update == null) {
             return null;
         }
-        final List<StopLocation> stops = timetable.getPattern().getStops();
 
         VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
 
@@ -615,11 +609,12 @@ public class TimetableHelper {
 
                 int arrivalDelay = 0;
                 int departureDelay = 0;
+                var pattern = timetable.getPattern();
 
                 for (int index = 0; index < newTimes.getNumStops(); ++index) {
                     if (!matchFound) {
                         // Delay is set on a single stop at a time. When match is found - propagate delay on all following stops
-                        final var stop = stops.get(index);
+                        final var stop =  pattern.getStop(index);
 
                         matchFound = stop.getId().getId().equals(monitoredCall.getStopPointRef().getValue());
 

@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
@@ -86,7 +87,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
     private static final int[] STOP_COSTS = {0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0};
 
-    // Some times witch should not have eny effect on tests
+    // Some times which should not have eny effect on tests
     private static final int VERY_EARLY = time("00:00");
     private static final int VERY_LATE = time("23:59");
 
@@ -329,7 +330,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     ) {
         boolean firstTransit = TRIP_1 == trip;
         int boardCost = COST_CALCULATOR.boardingCost(
-                firstTransit, prevArrivalTime, boardStop, boardTime, trip, null
+                firstTransit, prevArrivalTime, boardStop, boardTime, trip, REGULAR_TRANSFER
         );
 
         return COST_CALCULATOR.transitArrivalCost(

@@ -17,6 +17,9 @@
 - Create RentalVehicle, VehicleRentalStation and VehicleRentalUris types. Deprecate BikeRentalStation and BikeRentalStationUris types (October 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3632)
 - Create VehicleParking type. Deprecate BikePark and CarPark types (November 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3480)
 - Update and implement Alert type and alerts query. Add ACCESSIBILITY_ISSUE to AlertEffectType enum (November 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3747)
+- Add geometries for stops (December 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3757)
+- Add RouteType and Unknown entities and implement alerts fields (add add alerts field to Feed) (December 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3780)
+- Take free-floating vehicles into account when computing state (Februay 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3857)
 
 ## Documentation
 

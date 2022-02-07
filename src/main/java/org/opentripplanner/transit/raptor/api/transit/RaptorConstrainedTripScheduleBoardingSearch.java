@@ -34,6 +34,7 @@ public interface RaptorConstrainedTripScheduleBoardingSearch<T extends RaptorTri
             RaptorTimeTable<T> targetTimetable,
             T sourceTrip,
             int sourceStopIndex,
-            int sourceArrivalTime
+            int prevTransitArrivalTime,
+            int earliestBoardTime
     );
 }

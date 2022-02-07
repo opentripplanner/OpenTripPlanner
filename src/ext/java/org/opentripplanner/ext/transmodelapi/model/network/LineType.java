@@ -37,7 +37,8 @@ public class LineType {
       GraphQLObjectType presentationType,
       GraphQLOutputType journeyPatternType,
       GraphQLOutputType serviceJourneyType,
-      GraphQLOutputType ptSituationElementType
+      GraphQLOutputType ptSituationElementType,
+      GraphQLOutputType brandingType
   ) {
     return GraphQLObjectType.newObject()
             .name(NAME)
@@ -58,6 +59,10 @@ public class LineType {
                     .dataFetcher(environment -> (((Route) environment.getSource()).getOperator()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("branding")
+                    .type(brandingType)
+                    .dataFetcher(environment -> ((Route) environment.getSource()).getBranding()))
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("publicCode")
                     .type(Scalars.GraphQLString)
                     .description("Publicly announced code for line, differentiating it from other lines for the same operator.")
@@ -76,8 +81,10 @@ public class LineType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("transportSubmode")
                     .type(EnumTypes.TRANSPORT_SUBMODE)
-                    .description("NOT IMPLEMENTED")
-                    .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
+                    .dataFetcher(environment -> {
+                        final String netexSubMode = ((Route) environment.getSource()).getNetexSubmode();
+                        return netexSubMode != null ? TransmodelTransportSubmode.fromValue(netexSubMode): null;
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("description")
@@ -156,10 +163,9 @@ public class LineType {
                     .name("situations")
                     .description("Get all situations active for the line.")
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                .dataFetcher(environment -> {
-                  return GqlUtil.getRoutingService(environment).getTransitAlertService().getRouteAlerts(
-                      environment.getSource());
-                })
+                .dataFetcher(environment -> GqlUtil.getRoutingService(environment)
+                        .getTransitAlertService()
+                        .getRouteAlerts(((Route) environment.getSource()).getId()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("flexibleLineType")

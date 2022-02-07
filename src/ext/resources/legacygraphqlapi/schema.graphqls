@@ -33,9 +33,31 @@ type Agency implements Node {
     routes: [Route]
 
     """
-    List of alerts which have an effect on all operations of the agency (e.g. a strike)
+    By default, list of alerts which have an effect on all operations of the agency (e.g. a strike).
+    It's also possible to return other relevant alerts through defining types.
     """
-    alerts: [Alert]
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the agency.
+        By default only returns alerts that have an effect on all operations of the agency (e.g. a strike).
+        """
+        types: [AgencyAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for an agency and can contain alerts"""
+enum AgencyAlertType {
+    """Alerts affecting the agency."""
+    AGENCY
+
+    """Alerts affecting agency's routes"""
+    ROUTES
+
+    """
+    Alerts affecting the different route types of the agency.
+    Alerts that affect route types on all agencies can be fetched through Feed.
+    """
+    ROUTE_TYPES
 }
 
 """Alert of a current or upcoming disruption in public transportation"""
@@ -213,7 +235,7 @@ enum AlertEffectType {
 
 
 """Entity related to an alert"""
-union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip
+union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip | RouteType | Unknown
 
 """Severity level of a alert"""
 enum AlertSeverityLevelType {
@@ -267,6 +289,22 @@ type BikePark implements Node & PlaceInterface {
 
     """Latitude of the bike park (WGS 84)"""
     lat: Float
+
+    """
+    Source specific tags of the bike park, which describe the available features.
+    """
+    tags: [String]
+
+    """
+    Opening hours for the selected dates using the local time of the park.
+    Each date can have multiple time spans.
+    """
+    openingHours(
+        """
+        Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
+        """
+        dates: [String!]!
+    ): [LocalTimeSpanDate]
 }
 
 """Vehicle parking represents a location where bicycles or cars can be parked."""
@@ -667,6 +705,22 @@ type CarPark implements Node & PlaceInterface {
 
     """Latitude of the car park (WGS 84)"""
     lat: Float
+
+    """
+    Source specific tags of the car park, which describe the available features.
+    """
+    tags: [String]
+
+    """
+    Opening hours for the selected dates using the local time of the park.
+    Each date can have multiple time spans.
+    """
+    openingHours(
+        """
+        Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
+        """
+        dates: [String!]!
+    ): [LocalTimeSpanDate]
 }
 
 """Cluster is a list of stops grouped by name and proximity"""
@@ -807,6 +861,29 @@ type Feed {
 
     """List of agencies which provide data to this feed"""
     agencies: [Agency]
+
+    """
+    Alerts relevant for the feed.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the feed.
+        """
+        types: [FeedAlertType!]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a feed and can contain alerts"""
+enum FeedAlertType {
+    """Alerts affecting the feed's agencies"""
+    AGENCIES
+
+    """
+    Alerts affecting the route types across the feed.
+    There might be alerts that only affect route types within an agency of the feed,
+    and those can be fetched through the Agency.
+    """
+    ROUTE_TYPES
 }
 
 enum FilterPlaceType {
@@ -1188,6 +1265,24 @@ type Leg {
     pickupBookingInfo: BookingInfo
 }
 
+"""A span of time."""
+type LocalTimeSpan {
+    """The start of the time timespan as seconds from midnight."""
+    from: Int!
+
+    """The end of the timespan as seconds from midnight."""
+    to: Int!
+}
+
+"""A date using the local timezone of the object that can contain timespans."""
+type LocalTimeSpanDate {
+    """The time spans for this date."""
+    timeSpans: [LocalTimeSpan]
+
+    """The date of this time span. Format: YYYYMMDD."""
+    date: String!
+}
+
 """Identifies whether this stop represents a stop or station."""
 enum LocationType {
     """A location where passengers board or disembark from a transit vehicle."""
@@ -1357,8 +1452,41 @@ type Pattern implements Node {
     """
     semanticHash: String
 
-    """List of alerts which have an effect on trips of the pattern"""
-    alerts: [Alert]
+    """
+    By default, list of alerts which have directly an effect on just the pattern.
+    It's also possible to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the pattern.
+        By default, list of alerts which have directly an effect on just the pattern.
+        """
+        types: [PatternAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a pattern and can contain alerts"""
+enum PatternAlertType {
+    """Alerts affecting the pattern"""
+    PATTERN
+
+    """Alerts affecting the pattern's route's agency"""
+    AGENCY
+
+    """Alerts affecting the route that the pattern runs on"""
+    ROUTE
+
+    """Alerts affecting the route type of the route that the pattern runs on"""
+    ROUTE_TYPE
+
+    """Alerts affecting the trips which run on this pattern"""
+    TRIPS
+
+    """Alerts affecting the stops which are on this pattern"""
+    STOPS_ON_PATTERN
+
+    """Alerts affecting the stops of the trips which run on this pattern"""
+    STOPS_ON_TRIPS
 }
 
 enum PickupDropoffType {
@@ -1506,24 +1634,45 @@ type Plan {
     messageStrings: [String]!
 
     """
+    Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
+    to the pageCursor query parameter and keep the original request as is. This will enable you to
+    search for itineraries in the next search-window.
+    The cursor based paging only support stepping to the next page, as it does not support jumping.
+    This is only usable when public transportation mode(s) are included in the query.
+    """
+    nextPageCursor: String
+
+    """
+    Use the cursor to go to the previous "page" of itineraries. Copy the cursor from the last
+    response to the pageCursor query parameter and keep the original request otherwise as is.
+    This will enable you to search for itineraries in the previous search-window.
+    The cursor based paging only support stepping to the previous page, as it does not support
+    jumping.
+    This is only usable when public transportation mode(s) are included in the query.
+    """
+    previousPageCursor: String
+
+    """
     This is the suggested search time for the "previous page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips preceding in the
-    time-window BEFORE the current search. No duplicate trips should be returned, unless a trip
+    search-window BEFORE the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    prevDateTime: Long
+    prevDateTime: Long @deprecated(reason: "Use previousPageCursor instead")
 
     """
     This is the suggested search time for the "next page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips following in the
-    time-window AFTER the current search. No duplicate trips should be returned, unless a trip
+    search-window AFTER the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    nextDateTime: Long
+    nextDateTime: Long @deprecated(reason: "Use nextPageCursor instead")
 
     """
-    This is the time window used by the raptor search. The window is an optional parameter and
-    OTP might override it/dynamically assign a new value. The unit is seconds.
+    This is the `searchWindow` used by the raptor search. It is provided here for debugging
+    purpousess.
+
+    The unit is seconds.
     """
     searchWindowUsed: Long
 
@@ -2006,15 +2155,40 @@ type QueryType {
         numItineraries: Int = 3
 
         """
-        The length of the search-window in seconds. This is normally dynamically
-        calculated by the server, but you may override this by setting it. The
-        search-window used in a request is returned in the response metadata.
-        To get the \"next page\" of trips use the metadata(searchWindowUsed and
-        nextWindowDateTime) to create a new request. If not provided the value
-        is resolved depending on the other input parameters, available transit
-        options and realtime changes.
+        The length of the search-window in seconds. This parameter is optional.
+
+        The search-window is defined as the duration between the earliest-departure-time(EDT) and
+        the latest-departure-time(LDT). OTP will search for all itineraries in this departure
+        window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP
+        will dynamically calculate the EDT. Using a short search-window is faster than using a
+        longer one, but the search duration is not linear. Using a \"too\" short search-window will
+        waste resources server side, while using a search-window that is too long will be slow.
+
+        OTP will dynamically calculate a reasonable value for the search-window, if not provided.
+        The calculation comes with a significant overhead (10-20% extra). Whether you should use the
+        dynamic calculated value or pass in a value depends on your use-case. For a travel planner
+        in a small geographical area, with a dense network of public transportation, a fixed value
+        between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust
+        it so that the number of itineraries on average is around the wanted `numItineraries`. Make
+        sure you set the `numItineraries` to a high number while testing. For a country wide area
+        like Norway, using the dynamic search-window is the best.
+
+        When paginating, the search-window is calculated using the `numItineraries` in the original
+        search together with statistics from the search for the last page. This behaviour is
+        configured server side, and can not be overridden from the client.
+
+        The search-window used is returned to the response metadata as `searchWindowUsed` for
+        debugging purposes.
         """
         searchWindow: Long,
+
+        """
+        Use the cursor to get the next or previous page of results.
+        The next page is a set of itineraries departing after the last itinerary in this result and
+        the previous page is a set of itineraries departing before the first itinerary.
+        This is only usable when public transportation mode(s) are included in the query.
+        """
+        pageCursor: String
 
         """
         The maximum distance (in meters) the user is willing to walk per walking
@@ -2415,8 +2589,67 @@ type Route implements Node {
     """List of trips which operate on this route"""
     trips: [Trip]
 
-    """List of alerts which have an effect on the route"""
-    alerts: [Alert]
+    """
+    List of alerts which have an effect on the route directly or indirectly.
+    By default only alerts directly affecting this route are returned. It's also possible
+    to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the route.
+        By default only returns alerts that directly affect this route.
+        """
+        types: [RouteAlertType]
+    ): [Alert]
+}
+
+"""Entities that are relevant for routes that can contain alerts"""
+enum RouteAlertType {
+    """Alerts affecting the route's agency."""
+    AGENCY
+
+    """Alerts directly affecting the route."""
+    ROUTE
+
+    """Alerts affecting the route type of the route."""
+    ROUTE_TYPE
+
+    """Alerts affecting the stops that are on the route."""
+    STOPS_ON_ROUTE
+
+    """Alerts affecting the route's trips."""
+    TRIPS
+
+    """Alerts affecting the stops on some trips of the route."""
+    STOPS_ON_TRIPS
+
+    """
+    Alerts affecting route's patterns.
+    """
+    PATTERNS
+}
+
+"""
+Route type entity which covers all agencies if agency is null,
+otherwise only relevant for one agency.
+"""
+type RouteType {
+    """
+    GTFS Route type.
+    For the list of possible values, see:
+        https://developers.google.com/transit/gtfs/reference/#routestxt and
+        https://developers.google.com/transit/gtfs/reference/extended-route-types
+    """
+    routeType: Int!
+
+    """A public transport agency"""
+    agency: Agency
+
+    """
+    The routes which have the defined routeType and belong to the agency, if defined.
+    Otherwise all routes of the feed that have the defined routeType.
+    """
+    routes: [Route]
 }
 
 """Time range for which the API has data available"""
@@ -2632,8 +2865,41 @@ type Stop implements Node & PlaceInterface {
         omitCanceled: Boolean = true
     ): [Stoptime]
 
-    """List of alerts which have an effect on this stop"""
-    alerts: [Alert]
+    """
+    By default, list of alerts which have directly an effect on just the stop.
+    It's also possible to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the stop.
+        By default, list of alerts which have directly an effect on just the stop.
+        """
+        types: [StopAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a stop and can contain alerts"""
+enum StopAlertType {
+    """Alerts affecting the stop"""
+    STOP
+
+    """Alerts affecting the stop's patterns"""
+    PATTERNS
+
+    """Alerts affecting the agencies of the routes going through the stop"""
+    AGENCIES_OF_ROUTES
+
+    """Alerts affecting the routes that go through the stop"""
+    ROUTES
+
+    """Alerts affecting the trips that go through this stop"""
+    TRIPS
+
+    """Alerts affecting the stop on specific routes"""
+    STOP_ON_ROUTES
+
+    """Alerts affecting the stop on specific trips"""
+    STOP_ON_TRIPS
 }
 
 type stopAtDistance implements Node {
@@ -2665,14 +2931,11 @@ Stop that should (but not guaranteed) to exist on a route.
 """
 type StopOnRoute {
     """
-    Stop at the route. It's also possible that the stop is no longer on the route
-    or that the stop is null when it can no longer be found.
+    Stop at the route. It's also possible that the stop is no longer on the route.
     """
-    stop: Stop
-    """
-    Route which contains the stop. Route is null if it can't be found anymore.
-    """
-    route: Route
+    stop: Stop!
+    """Route which contains the stop."""
+    route: Route!
 }
 
 """
@@ -2680,14 +2943,13 @@ Stop that should (but not guaranteed) to exist on a trip.
 """
 type StopOnTrip {
     """
-    Stop at the trip. It's also possible that the stop is no longer on the trip
-    or that the stop is null when it can no longer be found.
+    Stop at the trip. It's also possible that the stop is no longer on the trip.
     """
-    stop: Stop
+    stop: Stop!
     """
-    Trip which contains the stop. Route is null if it can't be found anymore.
+    Trip which contains the stop.
     """
-    trip: Trip
+    trip: Trip!
 }
 
 """
@@ -2903,8 +3165,41 @@ type Trip implements Node {
     """
     tripGeometry: Geometry
 
-    """List of alerts which have an effect on this trip"""
-    alerts: [Alert]
+    """
+    By default, list of alerts which have directly an effect on just the trip.
+    It's also possible to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the trip.
+        By default, list of alerts which have directly an effect on just the trip.
+        """
+        types: [TripAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a trip and can contain alerts"""
+enum TripAlertType {
+    """Alerts affecting the trip"""
+    TRIP
+
+    """Alerts affecting the trip's pattern"""
+    PATTERN
+
+    """Alerts affecting the trip's agency"""
+    AGENCY
+
+    """Alerts affecting the trip's route"""
+    ROUTE
+
+    """Alerts affecting the route type of the trip's route"""
+    ROUTE_TYPE
+
+    """
+    Alerts affecting the stops visited on the trip.
+    Some of the alerts can only affect the trip or its route on the stop.
+    """
+    STOPS_ON_TRIP
 }
 
 """
@@ -2920,6 +3215,14 @@ type SystemNotice {
     tag: String
     """Notice's description"""
     text: String
+}
+
+"""
+This is used for alert entities that we don't explicitly handle or they are missing.
+"""
+type Unknown {
+    """Entity's description"""
+    description: String
 }
 
 enum VertexType {

@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTransferPriority;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 
 /**
@@ -26,36 +26,60 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConve
  * The scope of instances of this class is limited to the mapping process, the final state is
  * stored in the {@link TransitLayer}.
  */
-public class StopIndexForRaptor {
-    public final List<StopLocation> stopsByIndex;
-    public final Map<StopLocation, Integer> indexByStop = new HashMap<>();
+public final class StopIndexForRaptor {
+    private final List<StopLocation> stopsByIndex;
+    private final Map<StopLocation, Integer> indexByStop = new HashMap<>();
     public final int[] stopBoardAlightCosts;
 
     public StopIndexForRaptor(Collection<StopLocation> stops, TransitTuningParameters tuningParameters) {
-        this.stopsByIndex = new ArrayList<>(stops);
+        this.stopsByIndex = List.copyOf(stops);
         initializeIndexByStop();
         this.stopBoardAlightCosts = createStopBoardAlightCosts(stopsByIndex, tuningParameters);
     }
 
-    /**
-     * Create map between stop and index used by Raptor to stop objects in original graph
-     */
-    void initializeIndexByStop() {
-        for(int i = 0; i< stopsByIndex.size(); ++i) {
-            indexByStop.put(stopsByIndex.get(i), i);
-        }
+    public StopLocation stopByIndex(int index) {
+        return stopsByIndex.get(index);
+    }
+
+    public int indexOf(StopLocation stop) {
+        return indexByStop.get(stop);
+    }
+
+    public int size() {
+        return stopsByIndex.size();
     }
 
     /**
      * Create a list of stop indexes for a given list of stops.
      */
-    public int[] listStopIndexesForStops(StopLocation[] stops) {
-        int[] stopIndex = new int[stops.length];
+    public int[] listStopIndexesForStops(List<StopLocation> stops) {
+        int[] stopIndex = new int[stops.size()];
 
-        for (int i = 0; i < stops.length; i++) {
-            stopIndex[i] = indexByStop.get(stops[i]);
+        for (int i = 0; i < stops.size(); i++) {
+            stopIndex[i] = indexByStop.get(stops.get(i));
         }
         return stopIndex;
+    }
+
+    /**
+     * Create a list of stop indexes for a given list of stops.
+     */
+    public int[] listStopIndexesForPattern(TripPattern pattern) {
+        int[] stopIndex = new int[pattern.numberOfStops()];
+
+        for (int i = 0; i < pattern.numberOfStops(); i++) {
+            stopIndex[i] = indexByStop.get(pattern.getStop(i));
+        }
+        return stopIndex;
+    }
+
+    /**
+     * Create map between stop and index used by Raptor to stop objects in original graph
+     */
+    private void initializeIndexByStop() {
+        for(int i = 0; i< stopsByIndex.size(); ++i) {
+            indexByStop.put(stopsByIndex.get(i), i);
+        }
     }
 
     /**

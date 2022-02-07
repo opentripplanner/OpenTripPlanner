@@ -1,28 +1,27 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 
 public enum SpeedTestProfile {
-    std_range_raptor(
+    standard(
             "rr",
             "Standard Range Raptor, super fast [ transfers, arrival time, travel time ].",
             RaptorProfile.STANDARD,
             SearchDirection.FORWARD
     ),
-    std_range_raptor_reverse(
+    std_reverse(
             "rrr",
             "Reverse Standard Range Raptor",
             RaptorProfile.STANDARD,
             SearchDirection.REVERSE
     ),
-    std_best_time(
+    best_time(
             "bt",
             "Best Time Range Raptor, super fast. Arrival time only, no path.",
             RaptorProfile.BEST_TIME,
@@ -34,28 +33,28 @@ public enum SpeedTestProfile {
             RaptorProfile.BEST_TIME,
             SearchDirection.REVERSE
     ),
-    no_wait_std(
-            "ws",
+    min_travel_duration_std(
+            "td",
             "Standard Range Raptor without waiting time.",
-            RaptorProfile.NO_WAIT_STD,
+            RaptorProfile.MIN_TRAVEL_DURATION,
             SearchDirection.FORWARD
     ),
-    no_wait_std_reverse(
-            "wsr",
+    min_travel_duration_std_reverse(
+            "tdr",
             "Reverse Standard Range Raptor without waiting time.",
-            RaptorProfile.NO_WAIT_STD,
+            RaptorProfile.MIN_TRAVEL_DURATION,
             SearchDirection.REVERSE
     ),
-    no_wait_best_time(
-            "wt",
+    min_travel_duration_best_time(
+            "tb",
             "Best Time Range Raptor without waiting time.",
-            RaptorProfile.NO_WAIT_BEST_TIME,
+            RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
             SearchDirection.FORWARD
     ),
-    no_wait_best_time_reverse(
-            "wtr",
+    min_travel_duration_best_time_reverse(
+            "tbr",
             "Reverse Best Time Range Raptor without waiting time.",
-            RaptorProfile.NO_WAIT_BEST_TIME,
+            RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME,
             SearchDirection.REVERSE
     ),
     mc_range_raptor(
@@ -66,7 +65,7 @@ public enum SpeedTestProfile {
     ),
     mc_destination(
             "md",
-            "Multi-Criteria Range Raptor with check on destination arrival.",
+            "Multi-Criteria Range Raptor with destination pruning.",
             RaptorProfile.MULTI_CRITERIA,
             SearchDirection.FORWARD,
             Optimization.PARETO_CHECK_AGAINST_DESTINATION

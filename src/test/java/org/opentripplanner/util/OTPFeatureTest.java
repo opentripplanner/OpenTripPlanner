@@ -10,7 +10,9 @@ import org.opentripplanner.standalone.configure.OTPConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class OTPFeatureTest {
@@ -48,6 +50,16 @@ public class OTPFeatureTest {
         // then expect
         assertFalse(subject.isOn());
         assertTrue(subject.isOff());
+    }
+
+    @Test public void isOnElseNull() {
+        subject.set(true);
+        // then expect value to be passed through
+        assertEquals("OK", subject.isOnElseNull(() -> "OK"));
+
+        subject.set(false);
+        // then expect supplier to be ignored
+        assertNull(subject.isOnElseNull(() -> Integer.parseInt("THROW EXCEPTION")));
     }
 
     @Test public void allowOTPFeaturesToBeConfigurableFromJSON() {

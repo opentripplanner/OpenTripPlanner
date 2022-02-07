@@ -8,7 +8,7 @@ import java.io.Serializable;
  * <ol>
  *   <li>
  *     {@code id} - All entities should have an id. The id should be unique within the
- *     context the entity live. For aggregates witch live in a global space the id must be unique.
+ *     context the entity live. For aggregates which live in a global space the id must be unique.
  *     This apply to all entities listed in the index service.
  *   </li>
  *   <li>

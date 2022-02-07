@@ -24,7 +24,7 @@ import static org.opentripplanner.datastore.FileType.OSM;
 
 /**
  * This is a wrapper around an {@link OtpDataStore} adding the ability to filter
- * witch data source input files should be used and validate the available input files
+ * which data source input files should be used and validate the available input files
  * against the command line parameters set.
  * <p/>
  * After this class is validated the {@link #has(FileType)} method can be used to
@@ -56,7 +56,7 @@ public class GraphBuilderDataSources {
         this.cacheDirectory = cli.cacheDirectory;
         this.outputGraph = getOutputGraph(cli);
 
-        // Select witch files to import
+        // Select which files to import
         include(cli.doBuildStreet() && bc.streets, OSM);
         include(cli.doBuildStreet() && bc.streets, DEM);
         include(cli.doBuildTransit() && bc.transit, GTFS);
@@ -73,7 +73,7 @@ public class GraphBuilderDataSources {
     }
 
     /**
-     * Create a wrapper around the data-store and resolve witch files to
+     * Create a wrapper around the data-store and resolve which files to
      * import and export. Validate these files against the given command line
      * arguments and the graph build parameters.
      */

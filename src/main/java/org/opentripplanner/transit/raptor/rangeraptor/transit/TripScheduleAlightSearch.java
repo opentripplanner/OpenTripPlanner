@@ -65,9 +65,10 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
         return stopPositionInPattern;
     }
 
-    @Nullable
     @Override
-    public RaptorTransferConstraint getTransferConstraint() { return null; }
+    public RaptorTransferConstraint getTransferConstraint() {
+        return RaptorTransferConstraint.REGULAR_TRANSFER;
+    }
 
 
     /* TripScheduleSearch implementation */

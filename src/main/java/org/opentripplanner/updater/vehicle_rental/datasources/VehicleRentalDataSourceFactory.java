@@ -2,13 +2,14 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSource;
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
-import org.opentripplanner.updater.vehicle_rental.VehicleRentalDataSource;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 public class VehicleRentalDataSourceFactory {
 
-    public static VehicleRentalDataSource create(VehicleRentalDataSourceParameters source) {
+    public static DataSource<VehicleRentalPlace> create(VehicleRentalDataSourceParameters source) {
         switch (source.getSourceType()) {
             // There used to be a lot more updaters and corresponding config variables here, but since
             // the industry has largely moved towards GBFS, they were removed.

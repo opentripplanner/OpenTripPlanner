@@ -1,29 +1,33 @@
 package org.opentripplanner.api.common;
 
+import java.time.Duration;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.BannedStopSet;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.util.ResourceBundleSingleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.TimeZone;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.time.Duration;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.plan.pagecursor.PageCursor;
+import org.opentripplanner.routing.api.request.BannedStopSet;
+import org.opentripplanner.routing.api.request.DebugRaptor;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.ResourceBundleSingleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -71,24 +75,43 @@ public abstract class RoutingResource {
     protected String time;
 
     /**
-     * This is the time/duration in seconds from the earliest-departure-time(EDT) to
-     * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest
-     * to latest arrival time (LAT minus EAT).
+     * The length of the search-window in seconds. This parameter is optional.
      * <p>
-     * All optimal travels that depart within the search window is guarantied to be found.
+     * The search-window is defined as the duration between the earliest-departure-time(EDT) and
+     * the latest-departure-time(LDT). OTP will search for all itineraries in this departure
+     * window. If {@code arriveBy=true} the {@code dateTime} parameter is the latest-arrival-time, so OTP
+     * will dynamically calculate the EDT. Using a short search-window is faster than using a
+     * longer one, but the search duration is not linear. Using a \"too\" short search-window will
+     * waste resources server side, while using a search-window that is too long will be slow.
      * <p>
-     * This is sometimes referred to as the Range Raptor Search Window - but should apply to all
-     * scheduled/time dependent travels.
+     * OTP will dynamically calculate a reasonable value for the search-window, if not provided.
+     * The calculation comes with a significant overhead (10-20% extra). Whether you should use the
+     * dynamic calculated value or pass in a value depends on your use-case. For a travel planner
+     * in a small geographical area, with a dense network of public transportation, a fixed value
+     * between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it
+     * so that the number of itineraries on average is around the wanted {@code numItineraries}.
+     * Make sure you set the {@code numItineraries} to a high number while testing. For a country
+     * wide area like Norway, using the dynamic search-window is the best.
      * <p>
-     * Optional - it is NOT recommended to set this value, unless you use the value returned by the
-     * previous search. Then it can be used to get the next/previous "page". The value is
-     * dynamically assigned a suitable value, if not set. In a small to medium size operation
-     * you may use a fixed value, like 60 minutes. If you have a mixture of high frequency cities
-     * routes and infrequent long distant journeys, the best option is normally to use the dynamic
-     * auto assignment.
+     * When paginating, the search-window is calculated using the {@code numItineraries} in the original
+     * search together with statistics from the search for the last page. This behaviour is
+     * configured server side, and can not be overridden from the client.
+     * <p>
+     * The search-window used is returned to the response metadata as {@code searchWindowUsed} for
+     * debugging purposes.
      */
     @QueryParam("searchWindow")
     protected Integer searchWindow;
+
+    /**
+     * Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last
+     * response and keep the original request as is. This will enable you to search for itineraries
+     * in the next or previous time-window.
+     * <p>
+     * This is an optional parameter.
+     */
+    @QueryParam("pageCursor")
+    public String pageCursor;
 
     /**
      * Search for the best trip options within a time window. If {@code true} two itineraries are
@@ -596,16 +619,20 @@ public abstract class RoutingResource {
     protected Boolean reverseOptimizeOnTheFly;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add before boarding a transit leg. It is recommended to use the
+     * {@code boardTimes} in the {@code router-config.json} to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("boardSlack")
     private Integer boardSlack;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add after alighting a transit leg. It is recommended to use the
+     * {@code alightTimes} in the {@code router-config.json} to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("alightSlack")
     private Integer alightSlack;
 
@@ -668,6 +695,15 @@ public abstract class RoutingResource {
     @QueryParam("pathComparator")
     private String pathComparator;
 
+    @QueryParam("useVehicleParkingAvailabilityInformation")
+    private Boolean useVehicleParkingAvailabilityInformation;
+
+    @QueryParam("debugRaptorStops")
+    private String debugRaptorStops;
+
+    @QueryParam("debugRaptorPath")
+    private String debugRaptorPath;
+
     /**
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -683,8 +719,9 @@ public abstract class RoutingResource {
      * Range/sanity check the query parameter fields and build a Request object from them.
      *
      * @throws ParameterException when there is a problem interpreting a query parameter
+     * @param queryParameters incoming request parameters
      */
-    protected RoutingRequest buildRequest() throws ParameterException {
+    protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) throws ParameterException {
         Router router = otpServer.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
 
@@ -710,8 +747,7 @@ public abstract class RoutingResource {
                     if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
                         gregCal.setTimeZone(tz);
                     }
-                    Date d2 = gregCal.getTime();
-                    request.setDateTime(d2);
+                    request.setDateTime(gregCal.toInstant());
                 } catch (DatatypeConfigurationException e) {
                     request.setDateTime(date, time, tz);
                 }
@@ -722,6 +758,9 @@ public abstract class RoutingResource {
 
         if(searchWindow != null) {
             request.searchWindow = Duration.ofSeconds(searchWindow);
+        }
+        if(pageCursor != null) {
+            request.pageCursor = PageCursor.decode(pageCursor);
         }
         if(timetableView != null) {
             request.timetableView = timetableView;
@@ -895,9 +934,7 @@ public abstract class RoutingResource {
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;
 
-        final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
-        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useVehicleRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
+        request.useVehicleRentalAvailabilityInformation = request.isTripPlannedForNow();
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
             request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);
@@ -924,8 +961,26 @@ public abstract class RoutingResource {
             request.itineraryFilters.debug = debugItineraryFilter;
         }
 
+        if(debugRaptorPath != null || debugRaptorStops != null) {
+            request.raptorDebuging = new DebugRaptor()
+                    .withStops(debugRaptorStops)
+                    .withPath(debugRaptorPath);
+        }
+
+        if (useVehicleParkingAvailabilityInformation != null) {
+            request.useVehicleParkingAvailabilityInformation = useVehicleParkingAvailabilityInformation;
+        }
+
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
+
+        if (OTPFeature.DataOverlay.isOn()) {
+            var queryDataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
+            if (!queryDataOverlayParameters.isEmpty()) {
+                request.dataOverlay = queryDataOverlayParameters;
+            }
+        }
+
         return request;
     }
 

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class create a group identifier for an itinerary based on the set of the longest
- * transit legs witch together account for more than 'p' part of the total distance(including
+ * transit legs which together account for more than 'p' part of the total distance(including
  * non-transit). We call this set of legs the 'key-set'. Non-transit itineraries all get their own
  * group; Hence are considered different. Only transit legs can be part of the key.
  * <p>
@@ -61,21 +61,21 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
 
     /** package local to be unit-testable */
     static double calculateTotalDistance(List<Leg> transitLegs) {
-        return transitLegs.stream().mapToDouble(it -> it.distanceMeters).sum();
+        return transitLegs.stream().mapToDouble(it -> it.getDistanceMeters()).sum();
     }
 
     /** package local to be unit-testable */
     static List<Leg> getKeySetOfLegsByLimit(List<Leg> legs, double distanceLimitMeters) {
         // Sort legs descending on distance
         legs = legs.stream()
-                .sorted((l,r) -> r.distanceMeters.compareTo(l.distanceMeters))
+                .sorted((l,r) -> r.getDistanceMeters().compareTo(l.getDistanceMeters()))
                 .collect(Collectors.toList());
         double sum = 0.0;
         int i=0;
         while (sum < distanceLimitMeters) {
             // If the transit legs is not long enough, threat the itinerary as non-transit
             if(i == legs.size()) { return List.of(); }
-            sum += legs.get(i).distanceMeters;
+            sum += legs.get(i).getDistanceMeters();
             ++i;
         }
         return legs.stream()

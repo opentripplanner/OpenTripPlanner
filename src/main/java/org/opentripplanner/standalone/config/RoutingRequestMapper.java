@@ -5,6 +5,7 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
+import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,7 @@ public class RoutingRequestMapper {
         request.locale = c.asLocale("locale", dft.locale);
         // 'maxTransfers' is configured in the Raptor tuning parameters, not here
         request.maxDirectStreetDurationSeconds = c.asDouble("maxDirectStreetDurationSeconds", dft.maxDirectStreetDurationSeconds);
+        request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
         request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
         request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes);
         request.nonpreferredTransferCost = c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
@@ -89,6 +91,7 @@ public class RoutingRequestMapper {
         request.setTransitReluctanceForMode(c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble));
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useVehicleRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useVehicleRentalAvailabilityInformation);
+        request.useVehicleParkingAvailabilityInformation = c.asBoolean("useVehicleParkingAvailabilityInformation", dft.useVehicleParkingAvailabilityInformation);
         request.useUnpreferredRoutesPenalty = c.asInt("useUnpreferredRoutesPenalty", dft.useUnpreferredRoutesPenalty);
         request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
         request.waitAtBeginningFactor = c.asDouble("waitAtBeginningFactor", dft.waitAtBeginningFactor);
@@ -102,6 +105,8 @@ public class RoutingRequestMapper {
             (TransferOptimizationRequest)request.transferOptimization,
             c.path("transferOptimization")
         );
+
+        request.dataOverlay = DataOverlayParametersMapper.map(c.path("dataOverlay"));
 
         return request;
     }

@@ -102,8 +102,13 @@ public class JourneyPatternType {
             .description("Get all situations active for the journey pattern.")
             .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
             .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment).getTransitAlertService().getTripPatternAlerts(
-                  environment.getSource());
+                TripPattern tripPattern = environment.getSource();
+                return GqlUtil.getRoutingService(environment)
+                        .getTransitAlertService()
+                        .getDirectionAndRouteAlerts(
+                                tripPattern.getDirection().gtfsCode,
+                                tripPattern.getRoute().getId()
+                        );
             })
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()

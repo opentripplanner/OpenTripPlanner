@@ -3,6 +3,13 @@ package org.opentripplanner;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import junit.framework.TestCase;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -17,20 +24,13 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest extends TestCase {
@@ -66,7 +66,6 @@ public abstract class GtfsTest extends TestCase {
         graph = new Graph();
         router = new Router(graph, RouterConfig.DEFAULT);
 
-        gtfsBundle.setTransfersTxtDefinesStationPaths(true);
         gtfsGraphBuilderImpl.buildGraph(graph, null);
         // Set the agency ID to be used for tests to the first one in the feed.
         agencyId = graph.getAgencies().iterator().next().getId().getId();
@@ -108,7 +107,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setNumItineraries(1);
         
         routingRequest.setArriveBy(dateTime < 0);
-        routingRequest.dateTime = Math.abs(dateTime);
+        routingRequest.setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
         if (fromVertex != null && !fromVertex.isEmpty()) {
             routingRequest.from = LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex);
         }
@@ -157,22 +156,22 @@ public abstract class GtfsTest extends TestCase {
             String fromStopId,
             String alert
     ) {
-        assertEquals(startTime, leg.startTime.getTimeInMillis());
-        assertEquals(endTime, leg.endTime.getTimeInMillis());
-        assertEquals(toStopId, leg.to.stop.getId().getId());
-        assertEquals(feedId.getId(), leg.to.stop.getId().getFeedId());
+        assertEquals(startTime, leg.getStartTime().getTimeInMillis());
+        assertEquals(endTime, leg.getEndTime().getTimeInMillis());
+        assertEquals(toStopId, leg.getTo().stop.getId().getId());
+        assertEquals(feedId.getId(), leg.getTo().stop.getId().getFeedId());
         if (fromStopId != null) {
-            assertEquals(feedId.getId(), leg.from.stop.getId().getFeedId());
-            assertEquals(fromStopId, leg.from.stop.getId().getId());
+            assertEquals(feedId.getId(), leg.getFrom().stop.getId().getFeedId());
+            assertEquals(fromStopId, leg.getFrom().stop.getId().getId());
         } else {
-            assertNull(leg.from.stop.getId());
+            assertNull(leg.getFrom().stop.getId());
         }
         if (alert != null) {
-            assertNotNull(leg.streetNotes);
-            assertEquals(1, leg.streetNotes.size());
-            assertEquals(alert, leg.streetNotes.iterator().next().note.toString());
+            assertNotNull(leg.getStreetNotes());
+            assertEquals(1, leg.getStreetNotes().size());
+            assertEquals(alert, leg.getStreetNotes().iterator().next().note.toString());
         } else {
-            assertNull(leg.streetNotes);
+            assertNull(leg.getStreetNotes());
         }
     }
 }

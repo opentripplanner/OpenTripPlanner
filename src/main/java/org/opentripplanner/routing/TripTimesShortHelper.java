@@ -29,6 +29,12 @@ public class TripTimesShortHelper {
         pattern = routingService.getPatternForTrip().get(trip);
       }
       timetable = timetableSnapshot.resolve(pattern, serviceDate);
+
+      // If realtime moved pattern back to original trip, fetch it instead
+      if (timetable.getTripIndex(trip.getId()) == -1) {
+        pattern = routingService.getPatternForTrip().get(trip);
+        timetable = timetableSnapshot.resolve(pattern, serviceDate);
+      }
     }
     if (timetable == null) {
       timetable = routingService.getPatternForTrip().get(trip).getScheduledTimetable();

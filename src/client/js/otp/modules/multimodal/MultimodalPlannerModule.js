@@ -110,17 +110,31 @@ otp.modules.multimodal.MultimodalPlannerModule =
         }
         if(restoring && this.restoredItinIndex) {
             this.itinWidget.show();
-            this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams, this.restoredItinIndex);
+            this.itinWidget.updateItineraries(
+                tripPlan.itineraries,
+                tripPlan.queryParams,
+                this.restoredItinIndex,
+                tripPlan.planData.previousPageCursor,
+                tripPlan.planData.nextPageCursor
+            );
             this.restoredItinIndex = null;
         } else  {
             this.itinWidget.show();
-            this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams);
+            this.itinWidget.updateItineraries(
+                tripPlan.itineraries,
+                tripPlan.queryParams,
+                undefined,
+                tripPlan.planData.previousPageCursor,
+                tripPlan.planData.nextPageCursor
+            );
         }
 
         /*if(restoring) {
             this.optionsWidget.restorePlan(tripPlan);
         }*/
-        this.drawItinerary(tripPlan.itineraries[0]);
+        if (tripPlan.itineraries.length > 0) {
+            this.drawItinerary(tripPlan.itineraries[0]);
+        }
     },
 
     restoreTrip : function(queryParams) {

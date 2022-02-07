@@ -73,7 +73,7 @@ class NoticeAssignmentMapper {
 
     Multimap<TransitEntity, Notice> map(NoticeAssignment noticeAssignment) {
         // TODO OTP2 - Idealy this should en up as one key,value pair.
-        //             The `StopPointInJourneyPattern` witch result in more than one key/valye pair,
+        //             The `StopPointInJourneyPattern` which result in more than one key/valye pair,
         //             can be replaced with a new compound key type.
         Multimap<TransitEntity, Notice> noticiesByEntity = ArrayListMultimap.create();
 

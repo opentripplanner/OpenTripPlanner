@@ -66,7 +66,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
                 .latestArrivalTime(T00_30)
                 .timetableEnabled(true);
 
-        // Make sure the slack have values witch prevent the normal from happening transfer.
+        // Make sure the slack have values which prevent the normal from happening transfer.
         // The test scenario have zero seconds to transfer, so any slack will do.
         requestBuilder.slackProvider(
                 RaptorSlackProvider.defaultSlackProvider(30, 20, 10)

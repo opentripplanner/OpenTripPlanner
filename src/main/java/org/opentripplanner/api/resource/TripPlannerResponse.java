@@ -1,13 +1,12 @@
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.api.model.ApiTripPlan;
-import org.opentripplanner.api.model.ApiTripSearchMetadata;
-import org.opentripplanner.api.model.error.PlannerError;
-
-import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import javax.ws.rs.core.UriInfo;
+import org.opentripplanner.api.model.ApiTripPlan;
+import org.opentripplanner.api.model.ApiTripSearchMetadata;
+import org.opentripplanner.api.model.error.PlannerError;
 
 /** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
 public class TripPlannerResponse {
@@ -16,6 +15,9 @@ public class TripPlannerResponse {
     public HashMap<String, String> requestParameters;
     private ApiTripPlan plan;
     private ApiTripSearchMetadata metadata;
+    private String previousPageCursor;
+    private String nextPageCursor;
+
     private PlannerError error = null;
 
     /** Debugging and profiling information */
@@ -53,12 +55,39 @@ public class TripPlannerResponse {
         this.plan = plan;
     }
 
-    public ApiTripSearchMetadata getMetadata() {
-        return metadata;
+    /**
+     * Use the cursor to get the previous page of results. Insert the cursor into the request and
+     * post it to get the previous page.
+     * <p>
+     * The previous page is a set of itineraries departing BEFORE the first itinerary in the result for a 
+     * depart after search. When using the default sort order the previous set of itineraries
+     * is inserted before the current result.
+     * <p>
+     * Note! The behavior is undefined if timetableView is off. This is possible to support,
+     * but require more information to be included in the cursor.
+     */
+    public String getPreviousPageCursor() {
+        return previousPageCursor;
     }
 
-    public void setMetadata(ApiTripSearchMetadata metadata) {
-        this.metadata = metadata;
+    public void setPreviousPageCursor(String pageCursor) {
+        this.previousPageCursor = pageCursor;
+    }
+    /**
+     * Use the cursor to get the next page of results. Insert the cursor into the request and post
+     * it to get the next page.
+     * <p>
+     * The next page is a set of itineraries departing AFTER the last itinerary in this result.
+     * <p>
+     * Note! The behavior is undefined if timetableView is off. This is possible to support,
+     * but require more information to be included in the cursor.
+     */
+    public String getNextPageCursor() {
+        return nextPageCursor;
+    }
+
+    public void setNextPageCursor(String pageCursor) {
+        this.nextPageCursor = pageCursor;
     }
 
     /** The error (if any) that this response raised. */
@@ -69,5 +98,14 @@ public class TripPlannerResponse {
     public void setError(PlannerError error) {
         this.error = error;
     }
-    
+
+    public ApiTripSearchMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(ApiTripSearchMetadata metadata) {
+        this.metadata = metadata;
+    }
+
+
 }
