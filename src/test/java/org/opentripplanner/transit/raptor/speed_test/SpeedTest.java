@@ -257,6 +257,7 @@ public class SpeedTest {
                 // Perform routing
                 sample = Timer.start(clock);
                 var routingResponse = route(request);
+                nPathsFound = routingResponse.getTripPlan().itineraries.size();
 
                 lapTime = sample.stop(timer) / nanosToMillis;
 
