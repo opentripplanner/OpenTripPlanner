@@ -77,7 +77,7 @@ class TransferMapper {
    *
    * @see <a href="https://github.com/google/transit/pull/303">GTFS proposal</a>
    */
-  private static final int NO_STAY_SEATED = 5;
+  private static final int STAY_SEATED_NOT_ALLOWED = 5;
 
 
   private final RouteMapper routeMapper;
@@ -113,12 +113,11 @@ class TransferMapper {
         return TransferPriority.NOT_ALLOWED;
       case GUARANTEED:
       case MIN_TIME:
-      case NO_STAY_SEATED:
+      case STAY_SEATED:
+      case STAY_SEATED_NOT_ALLOWED:
         return TransferPriority.ALLOWED;
       case RECOMMENDED:
         return TransferPriority.RECOMMENDED;
-      case STAY_SEATED:
-        return TransferPriority.PREFERRED;
     }
     throw new IllegalArgumentException("Mapping missing for type: " + type);
   }
@@ -171,7 +170,7 @@ class TransferMapper {
     // and not explicitly disallowed.
     builder.staySeated(
             rhs.getTransferType() == STAY_SEATED ||
-            (rhs.getTransferType() != NO_STAY_SEATED && sameBlockId(fromTrip, toTrip))
+            (rhs.getTransferType() != STAY_SEATED_NOT_ALLOWED && sameBlockId(fromTrip, toTrip))
 
     );
 
