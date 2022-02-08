@@ -94,7 +94,7 @@ public class Model implements Serializable {
             var path = dir.getAbsolutePath();
             if(path.length() <= length) {
                 LOG.warn(
-                        "The rood directory contains a config file, choose " +
+                        "The root directory contains a config file, choose " +
                         "the parent directory or delete the config file."
                 );
                 continue;
