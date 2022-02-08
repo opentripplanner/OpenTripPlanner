@@ -1,27 +1,13 @@
 package org.opentripplanner.graph_builder;
 
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
-
 import com.google.common.collect.Lists;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
-import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
+import org.opentripplanner.graph_builder.module.*;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -39,6 +25,14 @@ import org.opentripplanner.standalone.config.S3BucketConfig;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.opentripplanner.datastore.FileType.*;
+import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
 
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.
@@ -130,15 +124,6 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(osmModule);
         }
 
-        // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
-        // existence of stops in islands. If an island has a stop, it actually may be a real island and should
-        // not be removed quite as easily
-        if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
-            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(/*streetLinkerModule*/);
-            pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
-            pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
-            graphBuilder.addModule(pruneNoThruIslands);
-        }
 
         if ( hasGtfs ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
@@ -177,6 +162,15 @@ public class GraphBuilder implements Runnable {
         graphBuilder.addModule(streetLinkerModule);
 
 
+        // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
+        // existence of stops in islands. If an island has a stop, it actually may be a real island and should
+        // not be removed quite as easily
+        if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
+            PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(streetLinkerModule);
+            pruneNoThruIslands.setPruningThresholdIslandWithoutStops(config.pruningThresholdIslandWithoutStops);
+            pruneNoThruIslands.setPruningThresholdIslandWithStops(config.pruningThresholdIslandWithStops);
+            graphBuilder.addModule(pruneNoThruIslands);
+        }
 
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
