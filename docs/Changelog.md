@@ -130,6 +130,7 @@
 - Return correct heuristic values, when constrained transfers is turned on [#3841](https://github.com/opentripplanner/OpenTripPlanner/pull/3841)
 - Adjust search window dynamically to fit the number of itineraries [#3828](https://github.com/opentripplanner/OpenTripPlanner/pull/3828)
 - Implement minimum transfer time from GTFS transfers.txt [#3830](https://github.com/opentripplanner/OpenTripPlanner/pull/3830)
+- Fix number format exception for elevator duration parsing OSM data [#3871](https://github.com/opentripplanner/OpenTripPlanner/pull/3871)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
