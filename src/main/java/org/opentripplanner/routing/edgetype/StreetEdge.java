@@ -852,6 +852,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             e1.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
             e1.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e1.setStreetClass(this.getStreetClass());
+            e1.setStairs(this.isStairs());
             tempEdges.addEdge(e1);
         }
         if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
@@ -860,6 +861,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             e2.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
             e2.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e2.setStreetClass(this.getStreetClass());
+            e2.setStairs(this.isStairs());
             tempEdges.addEdge(e2);
         }
 
