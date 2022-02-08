@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.Timer.Builder;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
@@ -240,15 +241,18 @@ public class SpeedTest {
         int nPathsFound = 0;
         long lapTime = 0;
         Timer.Sample sample = null;
-        try {
-            final SpeedTestRequest request = new SpeedTestRequest(
-                    testCase,
-                    opts,
-                    config,
-                    LocalTime.ofSecondOfDay(testCase.departureTime).atDate(config.testDate).atZone(getTimeZoneId())
-            );
+        final SpeedTestRequest request = new SpeedTestRequest(
+                testCase,
+                opts,
+                config,
+                LocalTime.ofSecondOfDay(testCase.departureTime).atDate(config.testDate).atZone(getTimeZoneId())
+        );
 
-            final Timer timer = Timer.builder(SPEED_TEST_ROUTE).register(registry);
+        try {
+
+            var builder = Timer.builder(SPEED_TEST_ROUTE);
+            addTagsToTimer(request.tags(), builder);
+            var timer = builder.register(registry);
 
             if (opts.compareHeuristics()) {
                 sample = Timer.start(clock);
@@ -275,10 +279,10 @@ public class SpeedTest {
             return true;
         } catch (Exception e) {
             if (sample != null) {
-                final Timer timer = Timer
-                    .builder(SPEED_TEST_ROUTE)
-                    .tag("success", "false")
-                    .register(registry);
+                var builder = Timer.builder(SPEED_TEST_ROUTE);
+                addTagsToTimer(request.tags(), builder);
+                var timer = builder.tag("success", "false").register(registry);
+
                 lapTime = sample.stop(timer) / nanosToMillis;
             }
             if (!ignoreResults) {
@@ -290,7 +294,6 @@ public class SpeedTest {
         }
     }
 
-
     public RoutingResponse route(SpeedTestRequest request) {
         var routingRequest = request.toRoutingRequest();
         RoutingResponse response = null;
@@ -299,25 +302,35 @@ public class SpeedTest {
             response = worker.route();
             var data = response.getDebugTimingAggregator().getDebugOutput();
 
-            record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime);
-            record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime);
-            record(DIRECT_STREET_ROUTE, data.directStreetRouterTime);
-            record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime);
+            var tags = request.tags();
+            record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime, tags);
+            record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime, tags);
+            record(DIRECT_STREET_ROUTE, data.directStreetRouterTime, tags);
+            record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime, tags);
         }
         catch (Exception e){
-            List.of(STREET_ROUTE, TRANSIT_DATA, DIRECT_STREET_ROUTE, COLLECT_RESULTS).forEach(
-                    this::fail);
+            List.of(STREET_ROUTE, TRANSIT_DATA, DIRECT_STREET_ROUTE, COLLECT_RESULTS).forEach(n -> fail(n, request.tags()));
         }
 
         return response;
     }
 
-    private void record(String name, long nanos) {
-        Timer.builder(name).register(registry).record(Duration.ofNanos(nanos));
+    private void record(String name, long nanos, List<String> tags) {
+        var timer = Timer.builder(name);
+        addTagsToTimer(tags, timer);
+        timer.register(registry).record(Duration.ofNanos(nanos));
     }
 
-    private void fail(String name) {
-        Timer.builder(name).tag("success", "false").register(registry);
+    private void addTagsToTimer(List<String> tags, Builder timer) {
+        if (!tags.isEmpty()) {
+            timer.tag("tags", String.join(" ", tags));
+        }
+    }
+
+    private void fail(String name, List<String> tags) {
+        var timer = Timer.builder(name).tag("success", "false");
+        addTagsToTimer(tags, timer);
+        timer.register(registry);
     }
 
     private void setupSingleTest(

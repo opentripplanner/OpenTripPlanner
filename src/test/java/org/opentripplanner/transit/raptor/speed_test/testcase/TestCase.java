@@ -22,12 +22,13 @@ public class TestCase {
     public final int window;
     public final Place fromPlace;
     public final Place toPlace;
+    public final List<String> tags;
     final TestCaseResults results;
 
     TestCase(
             String id, int departureTime, int arrivalTime, int window, String description,
             String origin, String fromPlace, double fromLat, double fromLon,
-            String destination, String toPlace, double toLat, double toLon,
+            String destination, String toPlace, double toLat, double toLon, List<String> tags,
             TestCaseResults testCaseResults
     ) {
         this.id = id;
@@ -38,6 +39,7 @@ public class TestCase {
         this.fromPlace = new Place(origin, FEED_ID, fromPlace, fromLat, fromLon);
         this.toPlace = new Place(destination, FEED_ID, toPlace, toLat, toLon);
         this.results = testCaseResults;
+        this.tags = tags;
     }
 
     @Override

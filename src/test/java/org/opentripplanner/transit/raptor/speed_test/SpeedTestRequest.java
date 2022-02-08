@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.modes.AllowedTransitMode;
@@ -65,6 +66,18 @@ public class SpeedTestRequest {
         routingRequest.searchWindow = Duration.ofSeconds(this.tc().window);
 
         return routingRequest;
+    }
+
+    List<String> tags() {
+        var tags = new ArrayList<String>();
+        if(tc().fromPlace.stopId != null && tc().toPlace.stopId != null) {
+            tags.add("stop-to-stop");
+        }
+        else if(tc().fromPlace.coordinate != null && tc().toPlace.coordinate != null) {
+            tags.add("coordinate-to-coordinate");
+        }
+        tags.addAll(testCase.tags);
+        return tags;
     }
 
     private static void addDebugOptions(

@@ -77,6 +77,7 @@ public class CsvFileIO {
                     csvReader.get("toPlace"),
                     Double.parseDouble(csvReader.get("toLat")),
                     Double.parseDouble(csvReader.get("toLon")),
+                    Arrays.stream(csvReader.get("tags").split(" ")).collect(Collectors.toList()),
                     testCaseResults
             );
             testCases.add(tc);
