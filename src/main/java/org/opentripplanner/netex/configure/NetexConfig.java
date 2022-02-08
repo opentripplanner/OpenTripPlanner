@@ -57,6 +57,7 @@ public class NetexConfig {
                 buildParams.netex.netexFeedId,
                 buildParams.getSubwayAccessTimeSeconds(),
                 buildParams.maxInterlineDistance,
+                buildParams.maxStopToShapeSnapDistance,
                 buildParams.getTransitServicePeriod(),
                 netexBundles
         );
