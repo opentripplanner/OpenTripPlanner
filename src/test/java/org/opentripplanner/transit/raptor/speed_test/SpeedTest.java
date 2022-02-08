@@ -53,6 +53,7 @@ public class SpeedTest {
     private static final String DIRECT_STREET_ROUTE = "speedTest.direct.street.route";
     private static final String TRANSIT_DATA = "speedTest.transit.data";
     private static final String ROUTE_WORKER = "speedTest.route.worker";
+    private static final String COLLECT_RESULTS = "speedTest.collect.results";
 
     private static final long nanosToMillis = 1000000;
 
@@ -297,21 +298,32 @@ public class SpeedTest {
         routingRequest.walkSpeed = request.walkSpeed();
         routingRequest.numItineraries = request.numIineraries();
         routingRequest.searchWindow = Duration.ofSeconds(request.tc().window);
-        var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
 
-        var response = worker.route();
+        RoutingResponse response = null;
+        try {
+            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
+            response = worker.route();
+            var data = response.getDebugTimingAggregator().getDebugOutput();
 
-        var data = response.getDebugTimingAggregator().getDebugOutput();
-
-        record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime);
-        record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime);
-        record(DIRECT_STREET_ROUTE, data.directStreetRouterTime);
+            record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime);
+            record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime);
+            record(DIRECT_STREET_ROUTE, data.directStreetRouterTime);
+            record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime);
+        }
+        catch (Exception e){
+            List.of(STREET_ROUTE, TRANSIT_DATA, DIRECT_STREET_ROUTE, COLLECT_RESULTS).forEach(
+                    this::fail);
+        }
 
         return response;
     }
 
     private void record(String name, long nanos) {
         Timer.builder(name).register(registry).record(Duration.ofNanos(nanos));
+    }
+
+    private void fail(String name) {
+        Timer.builder(name).tag("success", "false").register(registry);
     }
 
     private void setupSingleTest(
