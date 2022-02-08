@@ -1,8 +1,5 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideEntranceRemoved;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
@@ -23,6 +20,10 @@ import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links various
@@ -112,7 +113,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
 
       // check if entrance is already linked, to allow multiple linking cycles
-      if (tEntrance.getDegreeOut() + tEntrance.getDegreeIn() > 0) {
+      // we do this by checking if there is an outgoing edge that connects to a street vertex that allows egress.
+      if (tEntrance
+              .getOutgoingStreetTransitEntranceEdges().stream().anyMatch(
+                      x -> x.getToVertex().getOutgoingStreetEdges().stream().count() > 0)) {
         continue;
       }
       graph.getLinker().linkVertexPermanently(

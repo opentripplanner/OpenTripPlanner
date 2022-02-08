@@ -4,6 +4,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -263,6 +264,18 @@ public abstract class Vertex implements Serializable, Cloneable {
                 continue;
             }
             result.add((StreetEdge) out);
+        }
+        return result;
+    }
+
+
+    public List<Edge> getOutgoingStreetTransitEntranceEdges() {
+        List<Edge> result = new ArrayList<Edge>();
+        for (Edge out : this.getOutgoing()) {
+            if (!(out instanceof StreetTransitEntranceLink)) {
+                continue;
+            }
+            result.add((StreetTransitEntranceLink) out);
         }
         return result;
     }
