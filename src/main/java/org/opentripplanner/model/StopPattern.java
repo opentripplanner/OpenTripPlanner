@@ -79,19 +79,19 @@ public final class StopPattern implements Serializable {
     }
 
     int findBoardingPosition(StopLocation stop) {
-        return findStopPosition(0, stops.length-1, (s) -> s == stop, stop);
+        return findStopPosition(0, stops.length - 1, (s) -> s == stop);
     }
 
     int findAlightPosition(StopLocation stop) {
-        return findStopPosition(1, stops.length, (s) -> s == stop, stop);
+        return findStopPosition(1, stops.length, (s) -> s == stop);
     }
 
     int findBoardingPosition(Station station) {
-        return findStopPosition(0, stops.length-1, station::includes, station);
+        return findStopPosition(0, stops.length - 1, station::includes);
     }
 
     int findAlightPosition(Station station) {
-        return findStopPosition(1, stops.length, station::includes, station);
+        return findStopPosition(1, stops.length, station::includes);
     }
 
     public boolean equals(Object other) {
@@ -198,15 +198,18 @@ public final class StopPattern implements Serializable {
         else { return pickDrop; }
     }
 
+    /**
+     * Find the given stop position in the sequence according to match Predicate, return -1 if not
+     * found.
+     */
     private int findStopPosition(
             final int start,
             final int end,
-            final Predicate<StopLocation> match,
-            final Object entity
+            final Predicate<StopLocation> match
     ) {
-        for (int i=start; i<end; ++i) {
-            if(match.test(stops[i])) { return i; }
+        for (int i = start; i < end; ++i) {
+            if (match.test(stops[i])) { return i; }
         }
-        throw new IllegalArgumentException("Stop/Station not found: " + entity);
+        return -1;
     }
 }
