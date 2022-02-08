@@ -67,7 +67,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.calculateConvexHull();
   }
 
-
   public void linkTransitStops(Graph graph) {
     List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
@@ -108,9 +107,14 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
   }
 
-  private void linkTransitEntrances(Graph graph) {
+  public void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
+
+      // check if entrance is already linked, to allow multiple linking cycles
+      if (tEntrance.getDegreeOut() + tEntrance.getDegreeIn() > 0) {
+        continue;
+      }
       graph.getLinker().linkVertexPermanently(
           tEntrance,
           new TraverseModeSet(TraverseMode.WALK),

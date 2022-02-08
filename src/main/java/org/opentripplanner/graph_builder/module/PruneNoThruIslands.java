@@ -109,6 +109,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         if (streetLinkerModule != null) {
             LOG.info("Reconnecting stops");
             streetLinkerModule.linkTransitStops(graph);
+            streetLinkerModule.linkTransitEntrances(graph);
             int isolated = 0;
             for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
                 if (tStop.getDegreeOut() + tStop.getDegreeIn() == 0) {
