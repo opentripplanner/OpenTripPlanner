@@ -91,7 +91,7 @@ public class SpeedTest {
         ));
 
         // record the lowest percentile of times
-        loggerRegistry.config().meterFilter(
+        registry.config().meterFilter(
                 new MeterFilter() {
                     @Override
                     public DistributionStatisticConfig configure(
