@@ -11,8 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Model implements Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Model.class);
 
     private static final File MODEL_FILE = new File("interactive_otp_main.json");
 
@@ -83,11 +87,19 @@ public class Model implements Serializable {
         List<String> dataSourceOptions = new ArrayList<>();
         File rootDir = new File(getRootDirectory());
         List<File> dirs = SearchForOtpConfig.search(rootDir);
-        // Add 1 char for the path separator character
+        // Add 1 char for the path-separator-character
         int length = rootDir.getAbsolutePath().length() + 1;
 
         for (File dir : dirs) {
-            dataSourceOptions.add(dir.getAbsolutePath().substring(length));
+            var path = dir.getAbsolutePath();
+            if(path.length() <= length) {
+                LOG.warn(
+                        "The rood directory contains a config file, choose " +
+                        "the parent directory or delete the config file."
+                );
+                continue;
+            }
+            dataSourceOptions.add(path.substring(length));
         }
         return dataSourceOptions;
     }
