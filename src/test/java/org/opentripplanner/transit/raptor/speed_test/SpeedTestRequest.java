@@ -1,10 +1,12 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
@@ -53,8 +55,16 @@ public class SpeedTestRequest {
         return config.walkSpeedMeterPrSecond;
     }
 
-    int numIineraries() {
-        return opts.numOfItineraries();
+    RoutingRequest toRoutingRequest() {
+        var routingRequest = new RoutingRequest();
+        routingRequest.setDateTime(this.getDepartureTime().toInstant());
+        routingRequest.from = this.tc().fromPlace.toGenericLocation();
+        routingRequest.to = this.tc().toPlace.toGenericLocation();
+        routingRequest.walkSpeed = this.walkSpeed();
+        routingRequest.numItineraries = opts.numOfItineraries();
+        routingRequest.searchWindow = Duration.ofSeconds(this.tc().window);
+
+        return routingRequest;
     }
 
     private static void addDebugOptions(
