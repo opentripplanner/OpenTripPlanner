@@ -601,7 +601,7 @@ public class TransmodelGraphQLSchema {
           .argument(GraphQLArgument.newArgument()
               .name("maximumDistance")
               .description("Maximum distance (in meters) to search for from the specified location. Default is 2000m.")
-              .defaultValue(2000)
+              .defaultValueProgrammatic(2000)
               .type(new GraphQLNonNull(Scalars.GraphQLFloat))
               .build())
           .argument(GraphQLArgument.newArgument()

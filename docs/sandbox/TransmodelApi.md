@@ -23,6 +23,9 @@
 - Fix issue with fetching parent StopPlaces in nearest query in Transmodel API [#3807](https://github.com/opentripplanner/OpenTripPlanner/pull/3807)
 - Fix invalid cast in situations resolver for line type [#3810](https://github.com/opentripplanner/OpenTripPlanner/pull/3810)
 - Deduce enum for bookWhen in Transmodel API [#3854](https://github.com/opentripplanner/OpenTripPlanner/pull/3854)
+- Fix coercion of default parameter for maximumDistance in nearest [#3846](https://github.com/opentripplanner/OpenTripPlanner/pull/3846)
+- Expose stopPositionInPattern on EstimatedCall [#3846](https://github.com/opentripplanner/OpenTripPlanner/pull/3846)
+- Allow selecting first or last quays in a ServiceJourney [#3846](https://github.com/opentripplanner/OpenTripPlanner/pull/3846)
 
 ## Documentation
 
