@@ -1,26 +1,6 @@
 package org.opentripplanner.visualizer;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.index.strtree.STRtree;
-import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import processing.core.PApplet;
-import processing.core.PFont;
-
-import java.awt.*;
+import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
@@ -38,6 +18,44 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.index.strtree.STRtree;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitEntityLink;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
+import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
+import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
+import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
+import org.opentripplanner.routing.vertextype.ExitVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.SplitterVertex;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
+import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import processing.core.PApplet;
+import processing.core.PFont;
 
 /**
  * Processing applet to show a map of the graph. The user can: - Use mouse wheel to zoom (or right drag, or ctrl-drag) - Left drag to pan around the
@@ -120,6 +138,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     boolean drawStreetVertices = true;
 
     boolean drawTransitStopVertices = true;
+
+    boolean drawExtraVertices = true;
 
     private static double lastLabelY;
 
@@ -466,12 +486,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             env = new Envelope(c);
             vertexIndex.insert(env, v);
             for (Edge e : v.getOutgoing()) {
-                if (e.getGeometry() == null)
-                    continue;
-                if (e instanceof StreetTransitStopLink
-                        || e instanceof StreetEdge || e instanceof PathwayEdge) {
-                    env = e.getGeometry().getEnvelopeInternal();
-                    edgeIndex.insert(env, e);
+                var edgeGeometry = e.getGeometry();
+                if (edgeGeometry == null) {
+                    edgeIndex.insert(new Envelope(e.getFromVertex().getCoordinate(), e.getToVertex().getCoordinate()), e);
+                } else {
+                    edgeIndex.insert(edgeGeometry.getEnvelopeInternal(), e);
                 }
             }
         }
@@ -486,19 +505,21 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         visibleLinkEdges.clear();
         visibleTransitEdges.clear();
         for (Edge de : (Iterable<Edge>) edgeIndex.query(modelBounds)) {
-            if (de instanceof PathwayEdge || de instanceof StreetTransitStopLink) {
+            if (de instanceof PathwayEdge || de instanceof VehicleParkingEdge || de instanceof StreetTransitEntityLink
+                    || de instanceof FreeEdge || de instanceof StreetVehicleParkingLink
+                    || de instanceof StreetVehicleRentalLink) {
                 visibleLinkEdges.add(de);
             }
-            else if (de instanceof StreetEdge) {
+            else if (de instanceof StreetEdge || de instanceof ElevatorAlightEdge
+                    || de instanceof ElevatorBoardEdge) {
                 visibleStreetEdges.add(de);
             }
         }
     }
 
     private int drawEdge(Edge e) {
-        if (e.getGeometry() == null)
-            return 0; // do not attempt to draw geometry-less edges
-        Coordinate[] coords = e.getGeometry().getCoordinates();
+        var geometry = getOrCreateGeometry(e);
+        Coordinate[] coords = geometry.getCoordinates();
         beginShape();
         for (int i = 0; i < coords.length; i++) {
             vertex((float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
@@ -509,7 +530,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     /* use endpoints instead of geometry for quick updating */
     private void drawEdgeFast(Edge e) {
-        Coordinate[] coords = e.getGeometry().getCoordinates();
+        Coordinate[] coords = getOrCreateGeometry(e).getCoordinates();
         Coordinate c0 = coords[0];
         Coordinate c1 = coords[coords.length - 1];
         line((float) toScreenX(c0.x), (float) toScreenY(c0.y), (float) toScreenX(c1.x),
@@ -721,13 +742,22 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		boolean closeEnough = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 5);
 		/* Draw selected visible vertices */
 		for (Vertex v : visibleVertices) {
-            if (drawTransitStopVertices && closeEnough && v instanceof TransitStopVertex) {
+            if (drawTransitStopVertices && closeEnough && (v instanceof TransitStopVertex || v instanceof TransitPathwayNodeVertex
+                    || v instanceof TransitEntranceVertex || v instanceof TransitBoardingAreaVertex)) {
                 fill(60, 60, 200); // Make transit stops blue dots
 		        drawVertex(v, 7);
 			}
-			if (drawStreetVertices && v instanceof IntersectionVertex) {
-		        IntersectionVertex iv = (IntersectionVertex) v;
-		        if (iv.trafficLight) {
+            if (drawExtraVertices && closeEnough && (
+                    v instanceof VehicleParkingEntranceVertex || v instanceof VehicleRentalPlace
+            )) {
+                fill(255, 70, 255); // Make B+R/P+R pink
+                drawVertex(v, 7);
+            }
+			if (drawStreetVertices && ((v instanceof IntersectionVertex && ((IntersectionVertex) v).trafficLight)
+                    || (v instanceof ElevatorOnboardVertex || v instanceof ElevatorOffboardVertex || v instanceof ExitVertex
+                    || v instanceof TemporaryVertex || v instanceof SplitterVertex || v instanceof StreetLocation)))
+			{
+                if (v instanceof IntersectionVertex && ((IntersectionVertex) v).trafficLight) {
                     fill(120, 60, 60); // Make traffic lights red dots
                     drawVertex(v, 5);
                 }
@@ -761,7 +791,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		    drawGraphPath(highlightedGraphPath);
 		}
 		/* Draw (single) highlighted edge in highlight color */
-		if (highlightedEdge != null && highlightedEdge.getGeometry() != null) {
+		if (highlightedEdge != null) {
 			stroke(10, 200, 10, 128);
 			strokeWeight(12);
 		    drawEdge(highlightedEdge);
@@ -1143,4 +1173,17 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	public void setSPT(ShortestPathTree spt) {
 		this.spt = spt;
 	}
+
+    private static LineString getOrCreateGeometry(Edge edge) {
+        var edgeGeometry = edge.getGeometry();
+        if (edgeGeometry != null) {
+            return edgeGeometry;
+        }
+
+        Coordinate[] coordinates = new Coordinate[] {
+                edge.getFromVertex().getCoordinate(),
+                edge.getToVertex().getCoordinate()
+        };
+        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
+    }
 }
