@@ -141,13 +141,15 @@ class ResultPrinter {
                 RESULT_TABLE_TITLE.length(),
                 registry.getMeters()
                         .stream()
-                        .mapToInt(it -> it.getId().getConventionName(NAMING_CONVENTION).length())
+                        .mapToInt(it -> getFullName(it).length())
                         .max()
                         .orElse(0)
         );
         final List<String> result = new ArrayList<>();
         result.add(header1(width));
         result.add(header2(width));
+
+        var metricsResults = new ArrayList<String>();
         for (Meter meter : registry.getMeters()) {
             if(meter instanceof Timer
                 && ((Timer) meter).count() > 0
@@ -157,9 +159,12 @@ class ResultPrinter {
                         meter.getId().getName(),
                         Tags.of("success", "false")
                 );
-                result.add(timerToString((Timer) meter, failureTimer, width));
+                metricsResults.add(timerToString((Timer) meter, failureTimer, width));
             }
         }
+
+
+        result.addAll(metricsResults.stream().sorted().collect(Collectors.toList()));
         return result;
     }
 
@@ -181,11 +186,16 @@ class ResultPrinter {
     }
 
     private static String timerToString(Timer successTimer, Timer failureTimer, int width) {
-        return formatLine(successTimer.getId().getConventionName(NAMING_CONVENTION),
+        return formatLine(
+                getFullName(successTimer),
                 width,
                 formatResultAvg(successTimer),
                 formatResult(failureTimer)
         );
+    }
+
+    private static String getFullName(Meter successTimer) {
+        return successTimer.getId().getConventionName(NAMING_CONVENTION) + " [" + successTimer.getId().getTag("tags") + "]";
     }
 
     private static String formatResultAvg(Timer timer) {
