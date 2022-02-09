@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
@@ -50,9 +51,11 @@ public class SpeedTest {
     private static final boolean TEST_NUM_OF_ADDITIONAL_TRANSFERS = false;
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
 
+    // only useful for the console
     private static final String SPEED_TEST_ROUTE = "speedTest.route";
-    private static final String ROUTE_WORKER = "speedTest.route.worker";
 
+    // router
+    private static final String ROUTE_WORKER = "speedTest.route.worker";
     private static final String STREET_ROUTE = "speedTest.street.route";
     private static final String DIRECT_STREET_ROUTE = "speedTest.direct.street.route";
     private static final String TRANSIT_DATA = "speedTest.transit.data";
@@ -277,6 +280,8 @@ public class SpeedTest {
                     // Report success
                     ResultPrinter.printResultOk(testCase, rr, lapTime, opts.verbose());
                     numOfPathsFound.add(nPathsFound);
+
+                    recordSuccesses(routingResponse.getDebugTimingAggregator().getDebugOutput(), request.tags());
                 }
             }
             return true;
@@ -285,10 +290,8 @@ public class SpeedTest {
                 var builder = Timer.builder(SPEED_TEST_ROUTE);
                 addTagsToTimer(request.tags(), builder);
                 var timer = builder.tag("success", "false").register(registry);
-
                 lapTime = sample.stop(timer) / nanosToMillis;
             }
-            List.of(STREET_ROUTE, TRANSIT_DATA, DIRECT_STREET_ROUTE, COLLECT_RESULTS, RAPTOR_SEARCH).forEach(n -> fail(n, request.tags()));
             if (!ignoreResults) {
                 // Report failure
                 ResultPrinter.printResultFailed(testCase, rr, lapTime, e);
@@ -303,21 +306,31 @@ public class SpeedTest {
         RoutingResponse response = null;
         var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
         response = worker.route();
-        var data = response.getDebugTimingAggregator().getDebugOutput();
-
-        var tags = request.tags();
-        record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime, tags);
-        record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime, tags);
-        record(DIRECT_STREET_ROUTE, data.directStreetRouterTime, tags);
-        record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime, tags);
-        record(RAPTOR_SEARCH, data.transitRouterTimes.raptorSearchTime, tags);
-
         return response;
     }
 
-    private void record(String name, long nanos, List<String> tags) {
+    private void recordSuccesses(DebugOutput data, List<String> tags) {
+        recordResults(data, tags, false);
+    }
+
+    private void recordFailures(DebugOutput data, List<String> tags) {
+        recordResults(data, tags, true);
+    }
+
+    private void recordResults(DebugOutput data, List<String> tags, boolean isFailure) {
+        record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime, tags, isFailure);
+        record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime, tags, isFailure);
+        record(DIRECT_STREET_ROUTE, data.directStreetRouterTime, tags, isFailure);
+        record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime, tags, isFailure);
+        record(RAPTOR_SEARCH, data.transitRouterTimes.raptorSearchTime, tags, isFailure);
+    }
+
+    private void record(String name, long nanos, List<String> tags, boolean isFailure) {
         var timer = Timer.builder(name);
         addTagsToTimer(tags, timer);
+        if(isFailure) {
+            timer.tag("success", "false");
+        }
         timer.register(registry).record(Duration.ofNanos(nanos));
     }
 
@@ -325,12 +338,6 @@ public class SpeedTest {
         if (!tags.isEmpty()) {
             timer.tag("tags", String.join(" ", tags));
         }
-    }
-
-    private void fail(String name, List<String> tags) {
-        var timer = Timer.builder(name).tag("success", "false");
-        addTagsToTimer(tags, timer);
-        timer.register(registry);
     }
 
     private void setupSingleTest(
