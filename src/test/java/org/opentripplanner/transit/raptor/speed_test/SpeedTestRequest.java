@@ -47,10 +47,6 @@ public class SpeedTestRequest {
         return departureTime;
     }
 
-    Set<AllowedTransitMode> getTransitModes() {
-        return AllowedTransitMode.getAllTransitModesExceptAirplane();
-    }
-
     double walkSpeed() {
         // 1.4 m/s = ~ 5.0 km/t
         return config.walkSpeedMeterPrSecond;
@@ -64,6 +60,7 @@ public class SpeedTestRequest {
         routingRequest.walkSpeed = this.walkSpeed();
         routingRequest.numItineraries = opts.numOfItineraries();
         routingRequest.searchWindow = Duration.ofSeconds(this.tc().window);
+        routingRequest.modes = tc().getModes();
 
         return routingRequest;
     }

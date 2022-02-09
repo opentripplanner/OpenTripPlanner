@@ -181,8 +181,7 @@ class ResultPrinter {
     }
 
     private static String timerToString(Timer successTimer, Timer failureTimer, int width) {
-        return formatLine(
-                successTimer.getId().getConventionName(NAMING_CONVENTION),
+        return formatLine(successTimer.getId().getConventionName(NAMING_CONVENTION),
                 width,
                 formatResultAvg(successTimer),
                 formatResult(failureTimer)

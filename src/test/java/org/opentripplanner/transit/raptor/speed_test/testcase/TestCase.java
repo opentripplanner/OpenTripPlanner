@@ -2,7 +2,9 @@ package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -24,12 +26,13 @@ public class TestCase {
     public final Place toPlace;
     public final List<String> tags;
     final TestCaseResults results;
+    private final RequestModes modes;
 
     TestCase(
             String id, int departureTime, int arrivalTime, int window, String description,
             String origin, String fromPlace, double fromLat, double fromLon,
             String destination, String toPlace, double toLat, double toLon, List<String> tags,
-            TestCaseResults testCaseResults
+            String modes, TestCaseResults testCaseResults
     ) {
         this.id = id;
         this.departureTime = departureTime;
@@ -40,6 +43,7 @@ public class TestCase {
         this.toPlace = new Place(destination, FEED_ID, toPlace, toLat, toLon);
         this.results = testCaseResults;
         this.tags = tags;
+        this.modes = (new QualifiedModeSet(modes)).getRequestModes();
     }
 
     @Override
@@ -107,5 +111,9 @@ public class TestCase {
      */
     List<Result> actualResults() {
         return results.actualResults();
+    }
+
+    public RequestModes getModes() {
+        return modes;
     }
 }
