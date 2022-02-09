@@ -58,7 +58,8 @@ public class SpeedTest {
     private static final String ROUTE_WORKER = "speedTest.route.worker";
     private static final String STREET_ROUTE = "speedTest.street.route";
     private static final String DIRECT_STREET_ROUTE = "speedTest.direct.street.route";
-    private static final String TRANSIT_DATA = "speedTest.transit.data";
+    private static final String TRANSIT_PATTERN_FILTERING = "speedTest.transit.data";
+    private static final String TRANSIT_ROUTING = "speedTest.transit.routing";
     private static final String RAPTOR_SEARCH = "speedTest.transit.raptor";
     private static final String COLLECT_RESULTS = "speedTest.collect.results";
 
@@ -319,10 +320,11 @@ public class SpeedTest {
 
     private void recordResults(DebugOutput data, List<String> tags, boolean isFailure) {
         record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime, tags, isFailure);
-        record(TRANSIT_DATA, data.transitRouterTimes.tripPatternFilterTime, tags, isFailure);
+        record(TRANSIT_PATTERN_FILTERING, data.transitRouterTimes.tripPatternFilterTime, tags, isFailure);
         record(DIRECT_STREET_ROUTE, data.directStreetRouterTime, tags, isFailure);
         record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime, tags, isFailure);
         record(RAPTOR_SEARCH, data.transitRouterTimes.raptorSearchTime, tags, isFailure);
+        record(TRANSIT_ROUTING, data.transitRouterTime, tags, isFailure);
     }
 
     private void record(String name, long nanos, List<String> tags, boolean isFailure) {
