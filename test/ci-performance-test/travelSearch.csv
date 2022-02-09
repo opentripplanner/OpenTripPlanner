@@ -21,3 +21,4 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 102,Crossing Oslo 2,09:00,"",2:00,Lillestrøm,,59.9559,11.0509,Hokksund,,59.7705,9.9088,transit,"TRANSIT,WALK"
 201,P+R into Oslo,10:00,,3:00,Slemmestad,,59.779213,10.495719,Oslo,,59.9299041,10.74874,p-and-r,"CAR_PARK,TRANSIT,WALK"
 202,P+R into Bergen,14:00,,3:00,Norvik,,60.234250,5.3580665,Bergen,,60.3920207,5.329484,p-and-r,"CAR_PARK,TRANSIT,WALK"
+203,P+R into Trondheim,14:00,,3:00,Venn,,63.251093811782034,%2C10.0528335,Trondheim,,63.4291709,10.40096,p-and-r,"CAR_PARK,TRANSIT,WALK"
