@@ -49,11 +49,14 @@ public class SpeedTest {
 
     private static final boolean TEST_NUM_OF_ADDITIONAL_TRANSFERS = false;
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
+
     private static final String SPEED_TEST_ROUTE = "speedTest.route";
+    private static final String ROUTE_WORKER = "speedTest.route.worker";
+
     private static final String STREET_ROUTE = "speedTest.street.route";
     private static final String DIRECT_STREET_ROUTE = "speedTest.direct.street.route";
     private static final String TRANSIT_DATA = "speedTest.transit.data";
-    private static final String ROUTE_WORKER = "speedTest.route.worker";
+    private static final String RAPTOR_SEARCH = "speedTest.transit.raptor";
     private static final String COLLECT_RESULTS = "speedTest.collect.results";
 
     private static final long nanosToMillis = 1000000;
@@ -285,7 +288,7 @@ public class SpeedTest {
 
                 lapTime = sample.stop(timer) / nanosToMillis;
             }
-            List.of(STREET_ROUTE, TRANSIT_DATA, DIRECT_STREET_ROUTE, COLLECT_RESULTS).forEach(n -> fail(n, request.tags()));
+            List.of(STREET_ROUTE, TRANSIT_DATA, DIRECT_STREET_ROUTE, COLLECT_RESULTS, RAPTOR_SEARCH).forEach(n -> fail(n, request.tags()));
             if (!ignoreResults) {
                 // Report failure
                 ResultPrinter.printResultFailed(testCase, rr, lapTime, e);
@@ -307,6 +310,7 @@ public class SpeedTest {
         record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime, tags);
         record(DIRECT_STREET_ROUTE, data.directStreetRouterTime, tags);
         record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime, tags);
+        record(RAPTOR_SEARCH, data.transitRouterTimes.raptorSearchTime, tags);
 
         return response;
     }
