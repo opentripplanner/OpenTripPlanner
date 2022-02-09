@@ -64,6 +64,21 @@ class TransferMapper {
    */
   private static final int FORBIDDEN = 3;
 
+  /**
+   * Passengers can transfer from one trip to another by staying onboard the same vehicle.
+   *
+   * @see <a href="https://github.com/google/transit/pull/303">GTFS proposal</a>
+   */
+  private static final int STAY_SEATED = 4;
+
+  /**
+   * In-seat transfers are not allowed between sequential trips. The passenger must alight from the
+   * vehicle and re-board.
+   *
+   * @see <a href="https://github.com/google/transit/pull/303">GTFS proposal</a>
+   */
+  private static final int STAY_SEATED_NOT_ALLOWED = 5;
+
 
   private final RouteMapper routeMapper;
 
@@ -98,6 +113,8 @@ class TransferMapper {
         return TransferPriority.NOT_ALLOWED;
       case GUARANTEED:
       case MIN_TIME:
+      case STAY_SEATED:
+      case STAY_SEATED_NOT_ALLOWED:
         return TransferPriority.ALLOWED;
       case RECOMMENDED:
         return TransferPriority.RECOMMENDED;
@@ -125,6 +142,11 @@ class TransferMapper {
       return null;
     }
 
+    if (constraint.isStaySeated() && (fromTrip == null || toTrip == null)) {
+      LOG.warn("Transfer skipped - from_trip_id and to_trip_id must exist for in-seat transfer");
+      return null;
+    }
+
     TransferPoint fromPoint = mapTransferPoint(rhs.getFromStop(), rhs.getFromRoute(), fromTrip, false);
     TransferPoint toPoint = mapTransferPoint(rhs.getToStop(), rhs.getToRoute(), toTrip, true);
 
@@ -143,7 +165,15 @@ class TransferMapper {
     var builder = TransferConstraint.create();
 
     builder.guaranteed(rhs.getTransferType() == GUARANTEED);
-    builder.staySeated(sameBlockId(fromTrip, toTrip));
+
+    // A transfer is stay seated, if it is either explicitly mapped as such, or in the same block
+    // and not explicitly disallowed.
+    builder.staySeated(
+            rhs.getTransferType() == STAY_SEATED ||
+            (rhs.getTransferType() != STAY_SEATED_NOT_ALLOWED && sameBlockId(fromTrip, toTrip))
+
+    );
+
     builder.priority(mapTypeToPriority(rhs.getTransferType()));
 
     if(rhs.isMinTransferTimeSet()) {
