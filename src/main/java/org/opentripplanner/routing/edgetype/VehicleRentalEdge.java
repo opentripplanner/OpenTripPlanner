@@ -1,15 +1,14 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Locale;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Renting or dropping off a rented vehicle edge.
@@ -154,13 +153,8 @@ public class VehicleRentalEdge extends Edge {
     }
 
     @Override
-    public String getName() {
+    public I18NString getName() {
         return getToVertex().getName();
-    }
-
-    @Override
-    public String getName(Locale locale) {
-        return getToVertex().getName(locale);
     }
 
     @Override

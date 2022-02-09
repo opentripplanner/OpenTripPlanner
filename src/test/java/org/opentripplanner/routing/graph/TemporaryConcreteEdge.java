@@ -6,9 +6,9 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import org.locationtech.jts.geom.LineString;
-import java.util.Locale;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.util.I18NString;
 
 public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
 
@@ -40,12 +40,7 @@ public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
     }
 
     @Override
-    public String getName() {
-        return null;
-    }
-
-    @Override
-    public String getName(Locale locale) {
+    public I18NString getName() {
         return null;
     }
 

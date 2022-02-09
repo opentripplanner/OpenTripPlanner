@@ -5,7 +5,6 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -612,21 +611,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         return true;
     }
 
-	@Override
-	public String getName() {
-		return this.name.toString();
-	}
-
 	/**
 	* Gets non-localized I18NString (Used when splitting edges)
 	* @return non-localized Name
 	*/
-	public I18NString getRawName() {
+	public I18NString getName() {
 		return this.name;
-	}
-
-	public String getName(Locale locale) {
-		return this.name.toString(locale);
 	}
 
 	public void setName(I18NString name) {

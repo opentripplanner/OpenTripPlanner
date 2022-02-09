@@ -3,7 +3,10 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
+import java.util.Locale;
+import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.WalkStep;
 
 public class PathGuidanceType {
@@ -32,7 +35,10 @@ public class PathGuidanceType {
             .name("streetName")
             .description("The name of the street.")
             .type(Scalars.GraphQLString)
-            .dataFetcher(environment -> ((WalkStep) environment.getSource()).streetName)
+            .dataFetcher(environment -> {
+                Locale locale = TransmodelGraphQLUtils.getLocale(environment);
+                return ((WalkStep) environment.getSource()).streetName.toString(locale);
+            })
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()

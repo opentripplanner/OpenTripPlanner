@@ -85,13 +85,13 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
             }
         } else if (v instanceof TransitStopVertex || v instanceof TransitEntranceVertex || v instanceof TransitPathwayNodeVertex || v instanceof TransitBoardingAreaVertex) {
             attrs.color = TRANSIT_STOP_COLOR_VERTEX;
-            attrs.label = v.getName();
+            attrs.label = v.getDefaultName();
         } else if (v instanceof VehicleRentalStationVertex) {
             attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
-            attrs.label = v.getName();
+            attrs.label = v.getDefaultName();
         } else if (v instanceof VehicleParkingEntranceVertex) {
             attrs.color = PARK_AND_RIDE_COLOR_VERTEX;
-            attrs.label = v.getName();
+            attrs.label = v.getDefaultName();
         } else {
             return false;
         }

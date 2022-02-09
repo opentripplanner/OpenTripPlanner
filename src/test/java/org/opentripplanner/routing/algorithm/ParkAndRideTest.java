@@ -24,7 +24,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
                 .map(s -> String.format("%s%s - %s (%,.2f, %d)",
                         s.getBackMode(),
                         s.isVehicleParked() ? " (parked)" : "",
-                        s.getBackEdge() != null ? s.getBackEdge().getName() : null,
+                        s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
                         s.getWeight(),
                         s.getElapsedTimeSeconds()
                 ))
@@ -129,7 +129,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
                         "%s%s - %s (%,.2f, %d)",
                         s.getBackMode(),
                         s.isVehicleParked() ? " (parked)" : "",
-                        s.getBackEdge() != null ? s.getBackEdge().getName() : null,
+                        s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
                         s.getWeight(),
                         s.getElapsedTimeSeconds()
                 ))

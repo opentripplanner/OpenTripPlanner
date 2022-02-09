@@ -560,7 +560,7 @@ public class BikeRentalTest extends GraphRoutingTest {
                         s.getBackMode(),
                         s.getVehicleRentalState(),
                         s.mayKeepRentedVehicleAtDestination() ? " (may keep)" : "",
-                        s.getBackEdge() != null ? s.getBackEdge().getName() : null,
+                        s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
                         s.getWeight(),
                         s.getElapsedTimeSeconds()
                 ))

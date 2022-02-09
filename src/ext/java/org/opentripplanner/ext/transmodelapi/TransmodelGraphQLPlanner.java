@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi;
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 
 import graphql.GraphQLException;
+import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
@@ -47,14 +48,15 @@ public class TransmodelGraphQLPlanner {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraphQLPlanner.class);
 
-    public PlanResponse plan(DataFetchingEnvironment environment) {
+    public DataFetcherResult<PlanResponse> plan(DataFetchingEnvironment environment) {
         PlanResponse response = new PlanResponse();
+        TransmodelRequestContext ctx = environment.getContext();
+        Router router = ctx.getRouter();
+        Locale locale = router.defaultRoutingRequest.locale;
         RoutingRequest request = null;
         try {
-            TransmodelRequestContext ctx = environment.getContext();
-            Router router = ctx.getRouter();
-
             request = createRequest(environment);
+            locale = request.locale;
 
             RoutingResponse res = ctx.getRoutingService().route(request, router);
 
@@ -74,7 +76,10 @@ public class TransmodelGraphQLPlanner {
             response.plan = TripPlanMapper.mapTripPlan(request, List.of());
             response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
         }
-        return response;
+        return DataFetcherResult.<PlanResponse>newResult()
+                .data(response)
+                .localContext(Map.of("locale", locale))
+                .build();
     }
 
     private GenericLocation toGenericLocation(Map<String, Object> m) {

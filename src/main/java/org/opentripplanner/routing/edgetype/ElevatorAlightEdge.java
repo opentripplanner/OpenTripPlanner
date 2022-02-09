@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -9,6 +8,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
+import org.opentripplanner.util.I18NString;
 
 /**
  * A relatively low cost edge for alighting from an elevator.
@@ -24,7 +24,7 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
     /**
      * This is the level of this elevator exit, used in narrative generation.
      */
-    private String level;
+    private I18NString level;
 
     /**
      * The polyline geometry of this edge.
@@ -36,7 +36,7 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
     /**
      * @param level It's a float for future expansion.
      */
-    public ElevatorAlightEdge(ElevatorOnboardVertex from, ElevatorOffboardVertex to, String level) {
+    public ElevatorAlightEdge(ElevatorOnboardVertex from, ElevatorOffboardVertex to, I18NString level) {
         super(from, to);
         this.level = level;
 
@@ -64,11 +64,11 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
         return the_geom;
     }
 
-    /** 
+    /**
      * The level from OSM is the name
      */
     @Override
-    public String getName() {
+    public I18NString getName() {
         return level;
     }
 
@@ -85,9 +85,4 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
         return "ElevatorAlightEdge(" + fromv + " -> " + tov + ")";
     }
 
-    @Override
-    public String getName(Locale locale) {
-        //FIXME: no localization currently
-        return level;
-    }
 }

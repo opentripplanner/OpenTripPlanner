@@ -320,7 +320,7 @@ public class Itinerary {
     public String toStr() {
         // No translater needed, stop indexes are never passed to the builder
         PathStringBuilder buf = new PathStringBuilder(null);
-        buf.stop(firstLeg().getFrom().name);
+        buf.stop(firstLeg().getFrom().name.toString());
 
         for (Leg leg : legs) {
             buf.sep();
@@ -336,7 +336,7 @@ public class Itinerary {
             }
 
             buf.sep();
-            buf.stop(leg.getTo().name);
+            buf.stop(leg.getTo().name.toString());
         }
 
         buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));

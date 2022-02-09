@@ -50,7 +50,7 @@ public class PlaceMapper {
 
         ApiPlace api = new ApiPlace();
 
-        api.name = domain.name;
+        api.name = domain.name.toString(locale);
 
         if (domain.stop != null) {
             api.stopId = FeedScopedIdMapper.mapToApi(domain.stop.getId());

@@ -122,7 +122,7 @@ public class CarRoutingTest {
         var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT));
         var paths = gpf.graphPathFinderEntryPoint(request);
 
-        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
+        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
         // make sure that we only get CAR legs
         itineraries.forEach(
                 i -> i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.CAR)));

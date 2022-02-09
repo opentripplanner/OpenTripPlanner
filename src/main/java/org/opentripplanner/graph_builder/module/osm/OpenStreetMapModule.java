@@ -957,7 +957,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         ) {
             ElevatorOffboardVertex offboardVertex = new ElevatorOffboardVertex(graph,
                     sourceVertexLabel + "_offboard", sourceVertex.getX(),
-                    sourceVertex.getY(), levelName
+                    sourceVertex.getY(), new NonLocalizedString(levelName)
             );
 
             new FreeEdge(sourceVertex, offboardVertex);
@@ -965,11 +965,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             ElevatorOnboardVertex onboardVertex = new ElevatorOnboardVertex(graph,
                     sourceVertexLabel + "_onboard", sourceVertex.getX(),
-                    sourceVertex.getY(), levelName
+                    sourceVertex.getY(), new NonLocalizedString(levelName)
             );
 
             new ElevatorBoardEdge(offboardVertex, onboardVertex);
-            new ElevatorAlightEdge(onboardVertex, offboardVertex, levelName);
+            new ElevatorAlightEdge(onboardVertex, offboardVertex, new NonLocalizedString(levelName));
 
             // accumulate onboard vertices to so they can be connected by hop edges later
             onboardVertices.add(onboardVertex);

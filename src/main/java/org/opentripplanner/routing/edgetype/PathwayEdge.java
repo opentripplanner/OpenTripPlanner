@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Objects;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.State;
@@ -10,7 +11,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.TraverseMode;
-import java.util.Locale;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A walking pathway as described in GTFS
@@ -18,44 +20,40 @@ import java.util.Locale;
 public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
     private static final long serialVersionUID = -3311099256178798982L;
+    public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
 
+    private final I18NString name;
     private int traversalTime;
     private double distance;
     private int steps;
     private double angle;
-    private String name = "pathway";
 
     private boolean wheelchairAccessible = true;
     private FeedScopedId id;
 
-    public PathwayEdge(Vertex fromv, Vertex tov, String name) {
+    public PathwayEdge(Vertex fromv, Vertex tov, I18NString name) {
         super(fromv, tov);
-        if (name != null) this.name = name;
+        this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
     }
 
     public PathwayEdge(
         Vertex fromv,
         Vertex tov,
         FeedScopedId id,
-        String name,
+        I18NString name,
         int traversalTime,
         double distance,
         int steps,
         double angle,
         boolean wheelchairAccessible
     ) {
-        super(fromv, tov);
+        this(fromv, tov, name != null ? name : tov.getName());
         this.id = id;
         this.traversalTime = traversalTime;
         this.distance = distance;
         this.steps = steps;
         this.angle = angle;
         this.wheelchairAccessible = wheelchairAccessible;
-        if (name != null) {
-            this.name = name;
-        } else if (tov.getName() != null) {
-            this.name = tov.getName();
-        }
     }
 
     public String getDirection() {
@@ -86,14 +84,9 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
-    public String getName(Locale locale) {
-        //TODO: localize
-        return this.getName();
+    public I18NString getName() {
+        return name;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
