@@ -22,3 +22,4 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 201,P+R into Oslo,10:00,,3:00,Slemmestad,,59.779213,10.495719,Oslo,,59.9299041,10.74874,p-and-r,"CAR_PARK,TRANSIT,WALK"
 202,P+R into Bergen,14:00,,3:00,Norvik,,60.234250,5.3580665,Bergen,,60.3920207,5.329484,p-and-r,"CAR_PARK,TRANSIT,WALK"
 203,P+R into Trondheim,14:00,,3:00,Venn,,63.251093811782034,10.0528335,Trondheim,,63.4291709,10.40096,p-and-r,"CAR_PARK,TRANSIT,WALK"
+204,P+R into Stavanger,10:00,,3:00,Verdalen,,58.785018355267404,5.6150436401,Stavanger,,58.96983560365735,5.72782516,p-and-r,"CAR_PARK,TRANSIT,WALK"
