@@ -71,21 +71,25 @@ class ServiceLinkMapper {
             .getServiceLinkRef()
             .getRef();
         ServiceLink serviceLink = serviceLinkById.lookup(serviceLinkRef);
+        
         if(serviceLink !=null) {
-          shapePoints.addAll(mapServiceLink(
-                  serviceLink,
-                  journeyPattern,
-                  sequenceCounter,
-                  distance,
-                  quayIdByStopPointRef,
-                  quayById
-          ));
+          shapePoints.addAll(
+                  mapServiceLink(
+                          serviceLink,
+                          journeyPattern,
+                          sequenceCounter,
+                          distance,
+                          quayIdByStopPointRef,
+                          quayById
+                  )
+          );
         }
         else {
           issueStore.add(
                   "MissingServiceLink",
                   "ServiceLink not found in journey pattern %s",
-                  journeyPattern.getId());
+                  journeyPattern.getId()
+          );
         }
       }
     }
