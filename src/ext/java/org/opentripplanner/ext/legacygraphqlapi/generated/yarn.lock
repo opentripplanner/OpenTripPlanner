@@ -527,18 +527,6 @@
     "@graphql-tools/utils" "^8.1.1"
     tslib "~2.3.0"
 
-"@graphql-codegen/java-common@2.1.11-alpha-bbecef04a.0":
-  version "2.1.11-alpha-bbecef04a.0"
-  resolved "https://registry.yarnpkg.com/@graphql-codegen/java-common/-/java-common-2.1.11-alpha-bbecef04a.0.tgz#c88fe1f074ba6488c1350d1fa67133584492b974"
-  integrity sha512-ezMzFVLaX5HJ9uw//mJ+S3hnD3sUuYxd2WO8n0PhMuRJmmFxNpDWnx1oXv4pbqFvVdBwJWzZMpCX9C+RFU5LNw==
-  dependencies:
-    "@graphql-codegen/plugin-helpers" "2.4.1-alpha-bbecef04a.0"
-    "@graphql-codegen/visitor-plugin-common" "2.6.1-alpha-bbecef04a.0"
-    auto-bind "~4.0.0"
-    min-indent "1.0.1"
-    tslib "~2.3.0"
-    unixify "^1.0.0"
-
 "@graphql-codegen/java-common@^2.1.10":
   version "2.1.10"
   resolved "https://registry.yarnpkg.com/@graphql-codegen/java-common/-/java-common-2.1.10.tgz#8d4af092086bf58c1bcfe302a6a9fea5d11bc4c6"
@@ -561,26 +549,14 @@
     "@graphql-codegen/visitor-plugin-common" "2.6.0"
     tslib "~2.3.0"
 
-"@graphql-codegen/java@3.2.4-alpha-bbecef04a.0":
-  version "3.2.4-alpha-bbecef04a.0"
-  resolved "https://registry.yarnpkg.com/@graphql-codegen/java/-/java-3.2.4-alpha-bbecef04a.0.tgz#c2b21836cdefe7f076d88a9c1c84936d8d23658a"
-  integrity sha512-aCZKJqhvbWpgbruX3nwQS6Ug5BdD0Hbi1Vv4SPMilqybpUXRRG5buKdLsacsJzx29B7qH7g9j8OVTMlGUjOuEQ==
+"@graphql-codegen/java@3.2.4":
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/java/-/java-3.2.4.tgz#1de413e66fc3d061254930c32ea6e8d83f849376"
+  integrity sha512-2pxSCCe4ODuQ1zjwM2AvwStzx4NuS44qtd2Vc0ct17zljRYNrUygtjOr2Rp2Ow8861LHMqtE+/ibWF8dPPONMA==
   dependencies:
-    "@graphql-codegen/java-common" "2.1.11-alpha-bbecef04a.0"
-    "@graphql-codegen/plugin-helpers" "2.4.1-alpha-bbecef04a.0"
-    "@graphql-codegen/visitor-plugin-common" "2.6.1-alpha-bbecef04a.0"
-    tslib "~2.3.0"
-
-"@graphql-codegen/plugin-helpers@2.4.1-alpha-bbecef04a.0":
-  version "2.4.1-alpha-bbecef04a.0"
-  resolved "https://registry.yarnpkg.com/@graphql-codegen/plugin-helpers/-/plugin-helpers-2.4.1-alpha-bbecef04a.0.tgz#1e481f162ea89fa4041311707e2118a1615e6438"
-  integrity sha512-Tl7DkbEpFsmaKUkQUNRbY+VNtIH7o+9yJsh0FLjuk8LKw2Vf++DS2BTbQjtjMRTe1WEXtw3bRLUl/iYwOprCXg==
-  dependencies:
-    "@graphql-tools/utils" "^8.5.2"
-    change-case-all "1.0.14"
-    common-tags "1.8.2"
-    import-from "4.0.0"
-    lodash "~4.17.0"
+    "@graphql-codegen/java-common" "^2.1.10"
+    "@graphql-codegen/plugin-helpers" "^2.4.0"
+    "@graphql-codegen/visitor-plugin-common" "2.6.0"
     tslib "~2.3.0"
 
 "@graphql-codegen/plugin-helpers@^2.3.2", "@graphql-codegen/plugin-helpers@^2.4.0":
@@ -601,22 +577,6 @@
   integrity sha512-MysdJ8L/dIn62D+BFbiu6HSVaZfkAt0EI1g5twkpKzLmG7qDJ8P7KemFVFU/sCW3SVuhs7XabkSjnFK9uBquwg==
   dependencies:
     "@graphql-codegen/plugin-helpers" "^2.4.0"
-    "@graphql-tools/optimize" "^1.0.1"
-    "@graphql-tools/relay-operation-optimizer" "^6.3.7"
-    "@graphql-tools/utils" "^8.3.0"
-    auto-bind "~4.0.0"
-    change-case-all "1.0.14"
-    dependency-graph "^0.11.0"
-    graphql-tag "^2.11.0"
-    parse-filepath "^1.0.2"
-    tslib "~2.3.0"
-
-"@graphql-codegen/visitor-plugin-common@2.6.1-alpha-bbecef04a.0":
-  version "2.6.1-alpha-bbecef04a.0"
-  resolved "https://registry.yarnpkg.com/@graphql-codegen/visitor-plugin-common/-/visitor-plugin-common-2.6.1-alpha-bbecef04a.0.tgz#cd5db7dbfbea0a9d768e50f5013d35a7a0c0ebde"
-  integrity sha512-Jl9Z9H72Waxk1P+Qmc6ODxL5iWuWXGjy01hgeG7MIJrNUHtkb4kguwkKBzR+ptvgVFdQdYbfYhP9pQFFkpH+6g==
-  dependencies:
-    "@graphql-codegen/plugin-helpers" "2.4.1-alpha-bbecef04a.0"
     "@graphql-tools/optimize" "^1.0.1"
     "@graphql-tools/relay-operation-optimizer" "^6.3.7"
     "@graphql-tools/utils" "^8.3.0"
