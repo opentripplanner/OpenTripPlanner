@@ -319,7 +319,7 @@ public class SpeedTest {
 
     private void recordResults(DebugOutput data, List<String> tags, boolean isFailure) {
         record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime, tags, isFailure);
-        record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime, tags, isFailure);
+        record(TRANSIT_DATA, data.transitRouterTimes.tripPatternFilterTime, tags, isFailure);
         record(DIRECT_STREET_ROUTE, data.directStreetRouterTime, tags, isFailure);
         record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime, tags, isFailure);
         record(RAPTOR_SEARCH, data.transitRouterTimes.raptorSearchTime, tags, isFailure);
