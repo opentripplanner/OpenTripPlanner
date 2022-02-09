@@ -64,6 +64,21 @@ class TransferMapper {
    */
   private static final int FORBIDDEN = 3;
 
+  /**
+   * Passengers can transfer from one trip to another by staying onboard the same vehicle.
+   *
+   * @see <a href="https://github.com/google/transit/pull/303">GTFS proposal</a>
+   */
+  private static final int STAY_SEATED = 4;
+
+  /**
+   * In-seat transfers are not allowed between sequential trips. The passenger must alight from the
+   * vehicle and re-board.
+   *
+   * @see <a href="https://github.com/google/transit/pull/303">GTFS proposal</a>
+   */
+  private static final int STAY_SEATED_NOT_ALLOWED = 5;
+
 
   private final RouteMapper routeMapper;
 
@@ -98,6 +113,8 @@ class TransferMapper {
         return TransferPriority.NOT_ALLOWED;
       case GUARANTEED:
       case MIN_TIME:
+      case STAY_SEATED:
+      case STAY_SEATED_NOT_ALLOWED:
         return TransferPriority.ALLOWED;
       case RECOMMENDED:
         return TransferPriority.RECOMMENDED;
@@ -119,17 +136,14 @@ class TransferMapper {
 
     TransferConstraint constraint = mapConstraint(rhs, fromTrip, toTrip);
 
-    // TODO TGR - Create a transfer for this se issue #3369
-    int transferTime = rhs.getMinTransferTime();
-
     // If this transfer do not give any advantages in the routing, then drop it
     if(constraint.isRegularTransfer()) {
-      if(transferTime > 0) {
-        LOG.info("Transfer skipped, issue #3369: " + rhs);
-      }
-      else {
-        LOG.warn("Transfer skipped - no effect on routing: " + rhs);
-      }
+      LOG.warn("Transfer skipped - no effect on routing: " + rhs);
+      return null;
+    }
+
+    if (constraint.isStaySeated() && (fromTrip == null || toTrip == null)) {
+      LOG.warn("Transfer skipped - from_trip_id and to_trip_id must exist for in-seat transfer");
       return null;
     }
 
@@ -151,8 +165,20 @@ class TransferMapper {
     var builder = TransferConstraint.create();
 
     builder.guaranteed(rhs.getTransferType() == GUARANTEED);
-    builder.staySeated(sameBlockId(fromTrip, toTrip));
+
+    // A transfer is stay seated, if it is either explicitly mapped as such, or in the same block
+    // and not explicitly disallowed.
+    builder.staySeated(
+            rhs.getTransferType() == STAY_SEATED ||
+            (rhs.getTransferType() != STAY_SEATED_NOT_ALLOWED && sameBlockId(fromTrip, toTrip))
+
+    );
+
     builder.priority(mapTypeToPriority(rhs.getTransferType()));
+
+    if(rhs.isMinTransferTimeSet()) {
+      builder.minTransferTime(rhs.getMinTransferTime());
+    }
 
     return builder.build();
   }

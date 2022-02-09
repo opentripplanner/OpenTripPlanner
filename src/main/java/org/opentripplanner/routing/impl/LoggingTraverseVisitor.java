@@ -11,7 +11,7 @@ public class LoggingTraverseVisitor implements TraverseVisitor {
 
     @Override
     public void visitEdge(Edge edge, State state) {
-        String nextName = edge.getName();
+        String nextName = edge.getDefaultName();
         LOG.info("Traversing edge {}", nextName);
     }
 

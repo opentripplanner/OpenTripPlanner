@@ -93,15 +93,15 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     public void board(
             final int stopIndex,
             final int earliestBoardTime,
-            final RaptorTripScheduleBoardOrAlightEvent<T> result
+            final RaptorTripScheduleBoardOrAlightEvent<T> boarding
     ) {
-        onTripIndex = result.getTripIndex();
-        onTrip = result.getTrip();
+        onTripIndex = boarding.getTripIndex();
+        onTrip = boarding.getTrip();
         onTripBoardTime = earliestBoardTime;
         onTripBoardStop = stopIndex;
         // Calculate the time-shift, the time-shift will be a positive duration in a
         // forward-search, and a negative value in case of a reverse-search.
-        onTripTimeShift = result.getTime() - onTripBoardTime;
+        onTripTimeShift = boarding.getTime() - onTripBoardTime;
     }
 
     @Override

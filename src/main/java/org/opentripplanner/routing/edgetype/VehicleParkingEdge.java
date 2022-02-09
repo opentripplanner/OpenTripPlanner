@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Locale;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -9,6 +8,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Parking a vehicle edge.
@@ -122,13 +122,8 @@ public class VehicleParkingEdge extends Edge {
     }
 
     @Override
-    public String getName() {
+    public I18NString getName() {
         return getToVertex().getName();
-    }
-
-    @Override
-    public String getName(Locale locale) {
-        return getToVertex().getName(locale);
     }
 
     @Override

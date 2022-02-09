@@ -52,10 +52,14 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
      */
     TransitArrival<T> previousTransit(int boardStopIndex);
 
+    /**
+     * Board the given trip(event) at the given stop index.
+     * @param earliestBoardTime used to calculate wait-time (if needed)
+     */
     void board(
             final int stopIndex,
             final int earliestBoardTime,
-            RaptorTripScheduleBoardOrAlightEvent<T> result
+            RaptorTripScheduleBoardOrAlightEvent<T> boarding
     );
 
     /**

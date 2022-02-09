@@ -9,6 +9,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,13 @@ public class TransitStopVertex extends Vertex {
      * @param modes Set of modes for all Routes using this stop. If {@code null} an empty set is used.
      */
     public TransitStopVertex (Graph graph, Stop stop, Set<TransitMode> modes) {
-        super(graph, stop.getId().toString(), stop.getLon(), stop.getLat());
+        super(
+                graph,
+                stop.getId().toString(),
+                stop.getLon(),
+                stop.getLat(),
+                new NonLocalizedString(stop.getName())
+        );
         this.stop = stop;
         this.modes = modes != null ? modes : new HashSet<>();
         this.wheelchairEntrance = stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
@@ -89,16 +96,6 @@ public class TransitStopVertex extends Vertex {
 
     public Stop getStop() {
             return this.stop;
-    }
-
-    @Override
-    public String getName() {
-        return stop.getName();
-    }
-
-    @Override
-    public String getName(Locale locale) {
-        return stop.getName();
     }
 
     @Override

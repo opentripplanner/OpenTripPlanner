@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Stream;
@@ -26,7 +25,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -47,6 +45,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
@@ -69,11 +68,11 @@ public abstract class GraphPathToItineraryMapper {
     /**
      * Generates a TripPlan from a set of paths
      */
-    public static List<Itinerary> mapItineraries(List<GraphPath> paths, RoutingRequest request) {
+    public static List<Itinerary> mapItineraries(List<GraphPath> paths) {
 
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.locale);
+            Itinerary itinerary = generateItinerary(path);
             if (itinerary.legs.isEmpty()) { continue; }
             itineraries.add(itinerary);
         }
@@ -89,7 +88,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param path The graph path to base the itinerary on
      * @return The generated itinerary
      */
-    public static Itinerary generateItinerary(GraphPath path, Locale requestedLocale) {
+    public static Itinerary generateItinerary(GraphPath path) {
 
         State[] states = new State[path.states.size()];
         State lastState = path.states.getLast();
@@ -104,15 +103,15 @@ public abstract class GraphPathToItineraryMapper {
 
         List<Leg> legs = new ArrayList<>();
         for (State[] legStates : legsStates) {
-            legs.add(generateLeg(graph, legStates, requestedLocale));
+            legs.add(generateLeg(graph, legStates));
         }
 
-        addWalkSteps(graph, legs, legsStates, requestedLocale);
+        addWalkSteps(graph, legs, legsStates);
 
 
         boolean first = true;
         for (Leg leg : legs) {
-            AlertToLegMapper.addTransitAlertPatchesToLeg(graph, leg, first, requestedLocale);
+            AlertToLegMapper.addTransitAlertPatchesToLeg(graph, leg, first);
             first = false;
         }
 
@@ -248,7 +247,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param states The array of states to base the leg on
      * @return The generated leg
      */
-    private static Leg generateLeg(Graph graph, State[] states, Locale requestedLocale) {
+    private static Leg generateLeg(Graph graph, State[] states) {
         Leg leg = null;
         FlexTripEdge flexEdge = null;
 
@@ -286,9 +285,9 @@ public abstract class GraphPathToItineraryMapper {
         leg.setAgencyTimeZoneOffset(timeZone.getOffset(leg.getStartTime().getTimeInMillis()));
 
         if (flexEdge != null) {
-            FlexLegMapper.addFlexPlaces(leg, flexEdge, requestedLocale);
+            FlexLegMapper.addFlexPlaces(leg, flexEdge);
         } else {
-            addPlaces(leg, states, requestedLocale);
+            addPlaces(leg, states);
         }
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
@@ -337,13 +336,13 @@ public abstract class GraphPathToItineraryMapper {
      * @param legs The legs of the itinerary
      * @param legsStates The states that go with the legs
      */
-    private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates, Locale requestedLocale) {
+    private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates) {
         WalkStep previousStep = null;
 
         TraverseMode lastMode = null;
 
         for (int i = 0; i < legsStates.length; i++) {
-            List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
+            List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep);
             TraverseMode legMode = legs.get(i).getMode();
             if(legMode != lastMode && !walkSteps.isEmpty()) {
                 lastMode = legMode;
@@ -476,35 +475,34 @@ public abstract class GraphPathToItineraryMapper {
      * @param leg The leg to add the places to
      * @param states The states that go with the leg
      */
-    private static void addPlaces(Leg leg, State[] states, Locale requestedLocale) {
-        leg.setFrom(makePlace(states[0], requestedLocale));
-        leg.setTo(makePlace(states[states.length - 1], requestedLocale));
+    private static void addPlaces(Leg leg, State[] states) {
+        leg.setFrom(makePlace(states[0]));
+        leg.setTo(makePlace(states[states.length - 1]));
     }
 
     /**
      * Make a {@link Place} to add to a {@link Leg}.
      *
      * @param state The {@link State}.
-     * @param requestedLocale The locale to use for all text attributes.
      * @return The resulting {@link Place} object.
      */
-    private static Place makePlace(State state, Locale requestedLocale) {
+    private static Place makePlace(State state) {
         Vertex vertex = state.getVertex();
-        String name = vertex.getName(requestedLocale);
+        I18NString name = vertex.getName();
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
         //Names are generated from all the streets in a corner, same as names in origin and destination
         //We use name in TemporaryStreetLocation since this name generation already happened when temporary location was generated
         if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
-            name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
+            name = ((StreetVertex) vertex).getIntersectionName();
         }
 
         if (vertex instanceof TransitStopVertex) {
             return Place.forStop(((TransitStopVertex) vertex).getStop());
         } else if(vertex instanceof VehicleRentalStationVertex) {
-            return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex, name);
+            return Place.forVehicleRentalPlace((VehicleRentalStationVertex) vertex);
         } else if (vertex instanceof VehicleParkingEntranceVertex) {
-            return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, name, state.getOptions());
+            return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, state.getOptions());
         } else {
             return Place.normal(vertex, name);
         }
@@ -515,7 +513,7 @@ public abstract class GraphPathToItineraryMapper {
      * 
      * @param previous a non-transit leg that immediately precedes this one (bike-walking, say), or null
      */
-    public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale requestedLocale) {
+    public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous) {
         List<WalkStep> steps = new ArrayList<>();
         WalkStep step = null;
         double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
@@ -553,7 +551,7 @@ public abstract class GraphPathToItineraryMapper {
             // before or will come after
             if (edge instanceof ElevatorAlightEdge) {
                 // don't care what came before or comes after
-                step = createWalkStep(graph, forwardState, backState, requestedLocale);
+                step = createWalkStep(graph, forwardState, backState);
                 createdNewStep = true;
                 disableZagRemovalForThisStep = true;
 
@@ -563,7 +561,7 @@ public abstract class GraphPathToItineraryMapper {
                 // exit != null and uses to <exit>
                 // the floor name is the AlightEdge name
                 // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-                step.streetName = ((ElevatorAlightEdge) edge).getName(requestedLocale);
+                step.streetName = edge.getName();
 
                 step.relativeDirection = RelativeDirection.ELEVATOR;
 
@@ -571,7 +569,7 @@ public abstract class GraphPathToItineraryMapper {
                 continue;
             }
 
-            String streetName = edge.getName(requestedLocale);
+            String streetName = edge.getName().toString();
             int idx = streetName.indexOf('(');
             String streetNameNoParens;
             if (idx > 0)
@@ -581,7 +579,7 @@ public abstract class GraphPathToItineraryMapper {
 
             if (step == null) {
                 // first step
-                step = createWalkStep(graph, forwardState, backState, requestedLocale);
+                step = createWalkStep(graph, forwardState, backState);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -609,7 +607,7 @@ public abstract class GraphPathToItineraryMapper {
                     roundaboutExit = 0;
                 }
                 /* start a new step */
-                step = createWalkStep(graph, forwardState, backState, requestedLocale);
+                step = createWalkStep(graph, forwardState, backState);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -617,7 +615,7 @@ public abstract class GraphPathToItineraryMapper {
                     // indicate that we are now on a roundabout
                     // and use one-based exit numbering
                     roundaboutExit = 1;
-                    roundaboutPreviousStreet = backState.getBackEdge().getName(requestedLocale);
+                    roundaboutPreviousStreet = backState.getBackEdge().getName().toString();
                     idx = roundaboutPreviousStreet.indexOf('(');
                     if (idx > 0)
                         roundaboutPreviousStreet = roundaboutPreviousStreet.substring(0, idx - 1);
@@ -654,7 +652,7 @@ public abstract class GraphPathToItineraryMapper {
                         // the next edges will be PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
-                            if (alternative.getName(requestedLocale).equals(streetName)) {
+                            if (alternative.getName().toString().equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -679,7 +677,7 @@ public abstract class GraphPathToItineraryMapper {
                                 continue; // this is not an alternative
                             }
                             alternative = alternatives.get(0);
-                            if (alternative.getName(requestedLocale).equals(streetName)) {
+                            if (alternative.getName().toString().equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -696,7 +694,7 @@ public abstract class GraphPathToItineraryMapper {
 
                     if (shouldGenerateContinue) {
                         // turn to stay on same-named street
-                        step = createWalkStep(graph, forwardState, backState, requestedLocale);
+                        step = createWalkStep(graph, forwardState, backState);
                         createdNewStep = true;
                         steps.add(step);
                         step.setDirections(lastAngle, thisAngle, false);
@@ -837,11 +835,11 @@ public abstract class GraphPathToItineraryMapper {
         return angleDiff;
     }
 
-    private static WalkStep createWalkStep(Graph graph, State forwardState, State backState, Locale wantedLocale) {
+    private static WalkStep createWalkStep(Graph graph, State forwardState, State backState) {
         Edge en = forwardState.getBackEdge();
         WalkStep step;
         step = new WalkStep();
-        step.streetName = en.getName(wantedLocale);
+        step.streetName = en.getName();
         step.startLocation = new WgsCoordinate(
                 backState.getVertex().getLat(),
                 backState.getVertex().getLon()

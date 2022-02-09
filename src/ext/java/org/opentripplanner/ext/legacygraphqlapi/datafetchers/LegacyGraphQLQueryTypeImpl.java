@@ -7,6 +7,7 @@ import static org.opentripplanner.ext.legacygraphqlapi.mapping.LegacyGraphQLSeve
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimaps;
+import graphql.execution.DataFetcherResult;
 import graphql.relay.Connection;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
@@ -844,7 +845,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<RoutingResponse> plan() {
+  public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
       RoutingRequest request = context.getRouter().defaultRoutingRequest.clone();
@@ -983,7 +984,8 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("disableRemainingWeightHeuristic", (Boolean v) -> request.disableRemainingWeightHeuristic = v);
 
       callWith.argument("locale", (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v));
-      return context.getRoutingService().route(request, context.getRouter());
+      RoutingResponse res = context.getRoutingService().route(request, context.getRouter());
+      return DataFetcherResult.<RoutingResponse>newResult().data(res).localContext(Map.of("locale", request.locale)).build();
     };
   }
 

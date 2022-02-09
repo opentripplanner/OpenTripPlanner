@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Locale;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -8,6 +7,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.util.I18NString;
 
 /**
  * This represents the connection between a street vertex and a bike rental station vertex.
@@ -41,13 +41,9 @@ public class StreetVehicleRentalLink extends Edge {
         return null;
     }
 
-    public String getName() {
-        return vehicleRentalStationVertex.getName();
-    }
-
     @Override
-    public String getName(Locale locale) {
-        return vehicleRentalStationVertex.getName(locale);
+    public I18NString getName() {
+        return vehicleRentalStationVertex.getName();
     }
 
     public State traverse(State s0) {

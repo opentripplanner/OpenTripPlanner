@@ -227,7 +227,7 @@ public class IndexAPI {
         return routingService
                 .getPatternsForStop(stop)
                 .stream()
-                .map(it -> it.getRoute())
+                .map(TripPattern::getRoute)
                 .map(RouteMapper::mapToApiShort)
                 .collect(Collectors.toList());
     }

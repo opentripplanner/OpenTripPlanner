@@ -369,7 +369,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
                                 ? ((double) Math.round(s.getWeightDelta() * 10)) / 10
                                 : 0.0,
                         s.getBackEdge() != null
-                                ? s.getBackEdge().getName()
+                                ? s.getBackEdge().getDefaultName()
                                 : null
                 ))
                 .collect(Collectors.toList());

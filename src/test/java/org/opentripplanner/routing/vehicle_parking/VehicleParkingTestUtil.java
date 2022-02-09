@@ -46,7 +46,7 @@ public class VehicleParkingTestUtil {
         new StreetEdge(from, to,
                 GeometryUtils.makeLineString(
                         from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-                String.format("%s%s street", from.getName(), to.getName()),
+                String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                 1,
                 permissions,
                 false

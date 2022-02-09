@@ -310,6 +310,13 @@ public class BuildConfig {
     public final DataOverlayConfig dataOverlay;
 
     /**
+     * This field is used for mapping routes geometry shapes.
+     * It determines max distance between shape points and their stop sequence.
+     * If mapper can not find any stops within this radius it will default to simple stop-to-stop geometry instead.
+     */
+    public final double maxStopToShapeSnapDistance;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -339,6 +346,7 @@ public class BuildConfig {
         maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
         maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
         maxTransferDurationSeconds = c.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
+        maxStopToShapeSnapDistance = c.asDouble("maxStopToShapeSnapDistance", 150);
         multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
         osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
         osmWayPropertySet = WayPropertySetSource.fromConfig(c.asText("osmWayPropertySet", "default"));

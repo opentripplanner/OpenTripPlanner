@@ -131,7 +131,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
 
     @Override
     public String toString() {
-        return "TemporaryPartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
+        return "TemporaryPartialStreetEdge(" + this.getDefaultName() + ", " + this.getFromVertex() + " -> "
                 + this.getToVertex() + " length=" + this.getDistanceMeters() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
     }

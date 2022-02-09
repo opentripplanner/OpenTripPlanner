@@ -35,4 +35,22 @@ interface ConstrainedBoardingSearchStrategy {
      * </ol>
      */
     IntIterator scheduleIndexIterator(RaptorTimeTable<TripSchedule> timetable);
+
+    /**
+     * <ol>
+     * <li>In a forward search add {@code u} and {@code v} together. Example: {@code plus(5, 2) => 7}
+     * <li>In a reverse search subtract {@code v} from {@code u}. Example: {@code plus(5, 2) => 3}
+     * </ol>
+     */
+    int plus(int v, int u);
+
+    /**
+     * <ol>
+     * <li>In a forward search return the highest time.
+     * <li>In a reverse search return the lowest time.
+     * </ol>
+     */
+    default int maxTime(int v, int u) {
+        return timeIsBefore(v, u) ? u : v;
+    }
 }

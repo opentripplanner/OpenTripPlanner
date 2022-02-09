@@ -18,7 +18,7 @@ public class TestConstrainedBoardingSearch
         implements RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> {
 
     /** Index of guaranteed transfers by fromStopPos */
-    private final TIntObjectMap<List<TestConstrainedTransferBoarding>> transfersByFromStopPos = new TIntObjectHashMap<>();
+    private final TIntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos = new TIntObjectHashMap<>();
 
     private int currentTargetStopPos;
 
@@ -34,22 +34,25 @@ public class TestConstrainedBoardingSearch
         return transfersByFromStopPos.containsKey(targetStopPos);
     }
 
-    @Override
     @Nullable
+    @Override
     public RaptorTripScheduleBoardOrAlightEvent<TestTripSchedule> find(
-            RaptorTimeTable<TestTripSchedule> timeTable,
+            RaptorTimeTable<TestTripSchedule> targetTimetable,
             TestTripSchedule sourceTrip,
             int sourceStopIndex,
-            int sourceArrivalTime
+            int prevTransitArrivalTime,
+            int earliestBoardTime
     ) {
         var list = transfersByFromStopPos.get(currentTargetStopPos);
-        for (TestConstrainedTransferBoarding tx : list) {
+        for (TestConstrainedTransfer tx : list) {
             var trip = tx.getSourceTrip();
             if(trip == sourceTrip) {
-                int stopPos = trip.findDepartureStopPosition(sourceArrivalTime, sourceStopIndex);
-                boolean boardAlightPossible = timeAfterOrEqual.test(tx.getTime(), sourceArrivalTime);
+                int stopPos = trip.findDepartureStopPosition(prevTransitArrivalTime, sourceStopIndex);
+                boolean boardAlightPossible = timeAfterOrEqual.test(tx.getTime(), prevTransitArrivalTime);
                 if(tx.getSourceStopPos() == stopPos && boardAlightPossible) {
-                    return tx;
+                    return tx.boardingEvent(
+                            tx.isFacilitated() ? prevTransitArrivalTime : earliestBoardTime
+                    );
                 }
             }
         }
@@ -59,7 +62,7 @@ public class TestConstrainedBoardingSearch
     /**
      * Return boardings as a result for constrained transfers like a guaranteed transfer.
      */
-    public List<TestConstrainedTransferBoarding> constrainedBoardings() {
+    public List<TestConstrainedTransfer> constrainedBoardings() {
         return transfersByFromStopPos.valueCollection()
                 .stream()
                 .flatMap(Collection::stream)
@@ -79,12 +82,12 @@ public class TestConstrainedBoardingSearch
             int targetTime,
             TransferConstraint constraint
     ) {
-        List<TestConstrainedTransferBoarding> list = transfersByFromStopPos.get(targetStopPos);
+        List<TestConstrainedTransfer> list = transfersByFromStopPos.get(targetStopPos);
         if(list == null) {
             list = new ArrayList<>();
             transfersByFromStopPos.put(targetStopPos, list);
         }
-        list.add(new TestConstrainedTransferBoarding(
+        list.add(new TestConstrainedTransfer(
                 constraint,
                 sourceTrip, sourceStopPos,
                 targetTrip, targetTripIndex, targetStopPos, targetTime

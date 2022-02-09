@@ -129,6 +129,12 @@
 - ci: Add Windows to GitHub Action builds [#3851](https://github.com/opentripplanner/OpenTripPlanner/pull/3851)
 - Return correct heuristic values, when constrained transfers is turned on [#3841](https://github.com/opentripplanner/OpenTripPlanner/pull/3841)
 - Adjust search window dynamically to fit the number of itineraries [#3828](https://github.com/opentripplanner/OpenTripPlanner/pull/3828)
+- Implement minimum transfer time from GTFS transfers.txt [#3830](https://github.com/opentripplanner/OpenTripPlanner/pull/3830)
+- Fix number format exception for elevator duration parsing OSM data [#3871](https://github.com/opentripplanner/OpenTripPlanner/pull/3871)
+- Include generalizedCost in the optimized transfers wait-time cost [#3864](https://github.com/opentripplanner/OpenTripPlanner/pull/3864)
+- Expose maxStopToShapeSnapDistance as build-config.json parameter [#3874](https://github.com/opentripplanner/OpenTripPlanner/pull/3874)
+- Implement in-seat transfers per GTFS draft [#3831](https://github.com/opentripplanner/OpenTripPlanner/pull/3831)
+- Add stairsTimeFactor to StreetEdge [#3832](https://github.com/opentripplanner/OpenTripPlanner/pull/3832)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

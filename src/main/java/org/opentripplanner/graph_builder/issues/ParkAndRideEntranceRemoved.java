@@ -12,7 +12,7 @@ public class ParkAndRideEntranceRemoved implements DataImportIssue {
 
   public ParkAndRideEntranceRemoved(VehicleParkingEntrance vehicleParkingEntrance){
     this.entranceId = vehicleParkingEntrance.getEntranceId().toString();
-    this.streetVertexName = vehicleParkingEntrance.getVertex().getName();
+    this.streetVertexName = vehicleParkingEntrance.getVertex().getDefaultName();
   }
 
   @Override

@@ -63,7 +63,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
         return transferConstraintsReverseSearch;
     }
 
-    public List<TestConstrainedTransferBoarding> listTransferConstraintsForwardSearch() {
+    public List<TestConstrainedTransfer> listTransferConstraintsForwardSearch() {
         return transferConstraintsForwardSearch.constrainedBoardings();
     }
 

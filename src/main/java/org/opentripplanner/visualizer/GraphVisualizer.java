@@ -96,7 +96,7 @@ class DisplayVertex {
     public String toString() {
         String label = vertex.getLabel();
         if (label.contains("osm node")) {
-            label = vertex.getName();
+            label = vertex.getDefaultName();
         }
         return label;
     }
@@ -931,7 +931,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                         JOptionPane.PLAIN_MESSAGE);
                 for (Vertex gv : getGraph().getVertices()) {
                     for (Edge edge : gv.getOutgoing()) {
-                        if (edge.getName() != null && edge.getName().contains(edgeName)) {
+                        if (edge.getDefaultName() != null && edge.getDefaultName().contains(edgeName)) {
                             showGraph.highlightVertex(gv);
                             ArrayList<Vertex> l = new ArrayList<Vertex>();
                             l.add(gv);

@@ -88,10 +88,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
       timeShift = secondsFromStartOfTime + earliestDepartureTime - preFlexTime;
     }
 
-    Itinerary itinerary = GraphPathToItineraryMapper.generateItinerary(
-        new GraphPath(state),
-        Locale.ENGLISH
-    );
+    Itinerary itinerary = GraphPathToItineraryMapper.generateItinerary(new GraphPath(state));
 
     ZonedDateTime zdt = startOfTime.plusSeconds(timeShift);
     Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));

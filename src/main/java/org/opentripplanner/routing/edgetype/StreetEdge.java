@@ -5,7 +5,6 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -383,7 +382,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                     time = weight = getEffectiveBikeDistance() / speed;
                 } else {
                     // take slopes into account when walking
-                    // FIXME: this causes steep stairs to be avoided. see #1297.
                     time = weight = getEffectiveWalkDistance() / speed;
                 }
                 break;
@@ -539,7 +537,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             // NOTE: Automobiles have variable speeds depending on the edge type
             return calculateCarSpeed(options);
         }
-        return options.getSpeed(traverseMode, walkingBike);
+        final double speed = options.getSpeed(traverseMode, walkingBike);
+        return isStairs() ? (speed / options.stairsTimeFactor) : speed;
     }
 
     /**
@@ -612,21 +611,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         return true;
     }
 
-	@Override
-	public String getName() {
-		return this.name.toString();
-	}
-
 	/**
 	* Gets non-localized I18NString (Used when splitting edges)
 	* @return non-localized Name
 	*/
-	public I18NString getRawName() {
+	public I18NString getName() {
 		return this.name;
-	}
-
-	public String getName(Locale locale) {
-		return this.name.toString(locale);
 	}
 
 	public void setName(I18NString name) {
@@ -852,6 +842,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             e1.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
             e1.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e1.setStreetClass(this.getStreetClass());
+            e1.setStairs(this.isStairs());
             tempEdges.addEdge(e1);
         }
         if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
@@ -860,6 +851,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             e2.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
             e2.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e2.setStreetClass(this.getStreetClass());
+            e2.setStairs(this.isStairs());
             tempEdges.addEdge(e2);
         }
 

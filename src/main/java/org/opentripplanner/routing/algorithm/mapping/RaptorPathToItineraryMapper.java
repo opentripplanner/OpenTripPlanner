@@ -95,9 +95,7 @@ public class RaptorPathToItineraryMapper {
         while (!pathLeg.isEgressLeg()) {
             // Map transit leg
             if (pathLeg.isTransitLeg()) {
-                transitLeg = mapTransitLeg(
-                        request, transitLeg, pathLeg.asTransitLeg(), firstLeg
-                );
+                transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg(), firstLeg);
                 firstLeg = false;
                 legs.add(transitLeg);
             }
@@ -125,7 +123,7 @@ public class RaptorPathToItineraryMapper {
         itinerary.arrivedAtDestinationWithRentedVehicle = mapped != null && mapped.arrivedAtDestinationWithRentedVehicle;
 
         if(optimizedPath != null) {
-            itinerary.waitTimeOptimizedCost = toOtpDomainCost(optimizedPath.waitTimeOptimizedCost());
+            itinerary.waitTimeOptimizedCost = toOtpDomainCost(optimizedPath.generalizedCostWaitTimeOptimized());
             itinerary.transferPriorityCost = toOtpDomainCost(optimizedPath.transferPriorityCost());
         }
 
@@ -139,8 +137,7 @@ public class RaptorPathToItineraryMapper {
 
         GraphPath graphPath = new GraphPath(accessPath.getLastState());
 
-        Itinerary subItinerary = GraphPathToItineraryMapper
-            .generateItinerary(graphPath, request.locale);
+        Itinerary subItinerary = GraphPathToItineraryMapper.generateItinerary(graphPath);
 
         if (subItinerary.legs.isEmpty()) { return List.of(); }
 
@@ -150,7 +147,6 @@ public class RaptorPathToItineraryMapper {
     }
 
     private Leg mapTransitLeg(
-            RoutingRequest request,
             Leg prevTransitLeg,
             TransitPathLeg<TripSchedule> pathLeg,
             boolean firstLeg
@@ -227,8 +223,7 @@ public class RaptorPathToItineraryMapper {
         AlertToLegMapper.addTransitAlertPatchesToLeg(
             graph,
             leg,
-            firstLeg,
-            request.locale
+            firstLeg
         );
 
         return leg;
@@ -251,8 +246,7 @@ public class RaptorPathToItineraryMapper {
 
         GraphPath graphPath = new GraphPath(egressPath.getLastState());
 
-        Itinerary subItinerary = GraphPathToItineraryMapper
-            .generateItinerary(graphPath, request.locale);
+        Itinerary subItinerary = GraphPathToItineraryMapper.generateItinerary(graphPath);
 
         if (subItinerary.legs.isEmpty()) { return null; }
 
@@ -302,8 +296,7 @@ public class RaptorPathToItineraryMapper {
                 State[] states = transferStates.toArray(new State[0]);
                 GraphPath graphPath = new GraphPath(states[states.length - 1]);
 
-                Itinerary subItinerary = GraphPathToItineraryMapper
-                        .generateItinerary(graphPath, request.locale);
+                Itinerary subItinerary = GraphPathToItineraryMapper.generateItinerary(graphPath);
 
                 if (subItinerary.legs.isEmpty()) {
                     return List.of();

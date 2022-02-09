@@ -146,7 +146,7 @@ public class BarrierRoutingTest {
         var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT));
         var paths = gpf.graphPathFinderEntryPoint(request);
 
-        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
+        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
 
         assertAll(assertions.apply(itineraries));
 

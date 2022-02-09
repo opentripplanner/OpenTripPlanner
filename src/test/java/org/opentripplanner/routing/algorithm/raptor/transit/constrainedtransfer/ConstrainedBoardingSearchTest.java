@@ -16,6 +16,7 @@ import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestT
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
@@ -34,6 +35,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRapto
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TestRouteData;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.util.OTPFeature;
 
 
 public class ConstrainedBoardingSearchTest {
@@ -43,6 +45,10 @@ public class ConstrainedBoardingSearchTest {
             TransferConstraint.create().guaranteed().build();
     private static final TransferConstraint NOT_ALLOWED_CONSTRAINT =
             TransferConstraint.create().notAllowed().build();
+    private static final TransferConstraint MIN_TRANSFER_TIME_10_MIN_CONSTRAINT =
+            TransferConstraint.create().minTransferTime(600).build();
+    private static final TransferConstraint MIN_TRANSFER_TIME_0MIN_CONSTRAINT =
+            TransferConstraint.create().minTransferTime(0).build();
     private static final StopTransferPoint STOP_B_TX_POINT = new StopTransferPoint(STOP_B);
     private static final StopTransferPoint STOP_C_TX_POINT = new StopTransferPoint(STOP_C);
 
@@ -50,6 +56,12 @@ public class ConstrainedBoardingSearchTest {
     private static final int TRIP_2_INDEX = 1;
     public static final StationTransferPoint STATION_B_TX_POINT =
             new StationTransferPoint(STATION_B);
+
+    /**
+     * 2 minutes alight slack is used in this test, no slack provider is involved - but
+     * the test pass in times to the search with slack added.
+     */
+    private static final int ALIGHT_SLACK = 120;
 
     private TestRouteData route1;
     private TestRouteData route2;
@@ -248,6 +260,33 @@ public class ConstrainedBoardingSearchTest {
         );
     }
 
+    @Test
+    void findMinimumTimeTransfer() {
+        var txMinTransferTime = new ConstrainedTransfer(
+                ID, STOP_C_TX_POINT, STOP_C_TX_POINT, MIN_TRANSFER_TIME_10_MIN_CONSTRAINT
+        );
+
+        testTransferSearch(
+                STOP_C, List.of(txMinTransferTime), TRIP_2_INDEX, TRIP_1_INDEX,
+                MIN_TRANSFER_TIME_10_MIN_CONSTRAINT
+        );
+    }
+
+    @Test
+    void findDefinitiveMinTimeTransfer() {
+        // we set a very low minimum transfer time of 0 seconds. we expect this to work similar
+        // to a guaranteed transfer and hence it has the same expectation.
+        OTPFeature.enableFeatures(Map.of(OTPFeature.MinimumTransferTimeIsDefinitive, true));
+        var txMinTransferTime = new ConstrainedTransfer(
+                ID, STOP_B_TX_POINT, STOP_B_TX_POINT, MIN_TRANSFER_TIME_0MIN_CONSTRAINT
+        );
+
+        testTransferSearch(
+                STOP_B, List.of(txMinTransferTime), TRIP_1_INDEX, TRIP_2_INDEX,
+                MIN_TRANSFER_TIME_0MIN_CONSTRAINT
+        );
+        OTPFeature.enableFeatures(Map.of(OTPFeature.MinimumTransferTimeIsDefinitive, false));
+    }
 
     /**
      * The most specific transfer passed in should be a guaranteed transfer
@@ -292,7 +331,8 @@ public class ConstrainedBoardingSearchTest {
                 route2.getTimetable(),
                 route1.lastTrip().getTripSchedule(),
                 stopIndex,
-                sourceArrivalTime
+                sourceArrivalTime,
+                sourceArrivalTime + ALIGHT_SLACK
         );
         assertBoarding(stopIndex, targetStopPos, expectedTripIndex, expectedConstraint, boarding);
     }
@@ -317,7 +357,8 @@ public class ConstrainedBoardingSearchTest {
                 route1.getTimetable(),
                 route2.firstTrip().getTripSchedule(),
                 stopIndex,
-                sourceArrivalTime
+                sourceArrivalTime,
+                sourceArrivalTime + ALIGHT_SLACK
         );
 
         assertBoarding(stopIndex, targetStopPos, expectedTripIndex, expectedConstraint, boarding);

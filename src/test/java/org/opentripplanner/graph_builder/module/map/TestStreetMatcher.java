@@ -173,17 +173,7 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public String getName() {
-            return null;
-        }
-
-        @Override
-        public I18NString getRawName() {
-            return null;
-        }
-
-        @Override
-        public String getName(Locale locale) {
+        public I18NString getName() {
             return null;
         }
 

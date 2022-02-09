@@ -161,7 +161,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "departure": "2009-10-21T23:17:37.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "transitLeg": false,
@@ -178,7 +178,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "departure": "2009-10-21T23:17:37.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 236,
@@ -1780,7 +1780,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "departure": "2009-10-21T23:30:37.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "transitLeg": false,
@@ -1797,7 +1797,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "departure": "2009-10-21T23:30:37.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 236,
@@ -2265,7 +2265,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "departure": "2009-10-21T23:39:37.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "transitLeg": false,
@@ -2282,7 +2282,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "departure": "2009-10-21T23:39:37.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 236,
@@ -2728,7 +2728,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "departure": "2009-10-21T23:12:42.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "transitLeg": false,
@@ -2745,7 +2745,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "departure": "2009-10-21T23:12:42.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 236,
@@ -3010,7 +3010,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "departure": "2009-10-21T23:07:18.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "transitLeg": false,
@@ -3027,7 +3027,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "departure": "2009-10-21T23:07:18.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 298,
@@ -3239,7 +3239,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "departure": "2009-10-21T23:12:42.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "transitLeg": false,
@@ -3256,7 +3256,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "departure": "2009-10-21T23:12:42.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 312,
@@ -3727,7 +3727,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "departure": "2009-10-21T23:26:39.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "transitLeg": false,
@@ -3744,7 +3744,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "departure": "2009-10-21T23:26:39.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 81,
@@ -5018,7 +5018,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "departure": "2009-10-21T23:41:39.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "transitLeg": false,
@@ -5035,7 +5035,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "departure": "2009-10-21T23:41:39.000+00:00",
             "lat": 45.5276173,
             "lon": -122.7003923,
-            "name": "corner of way -102328 from 0 and Northwest Irving Street",
+            "name": "corner of Northwest Irving Street and way -102328 from 0",
             "vertexType": "NORMAL"
           },
           "generalizedCost": 81,
