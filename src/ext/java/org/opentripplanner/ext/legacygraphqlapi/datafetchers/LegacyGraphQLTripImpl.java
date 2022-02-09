@@ -280,13 +280,13 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case Trip:
+            case TRIP:
               alerts.addAll(alertService.getTripAlerts(getSource(environment).getId(), null));
               break;
-            case Agency:
+            case AGENCY:
               alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
               break;
-            case RouteType:
+            case ROUTE_TYPE:
               int routeType = getRoute(environment).getGtfsType();
               alerts.addAll(alertService.getRouteTypeAlerts(
                       routeType,
@@ -297,16 +297,16 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
                       getAgency(environment).getId()
               ));
               break;
-            case Route:
+            case ROUTE:
               alerts.addAll(alertService.getRouteAlerts(getRoute(environment).getId()));
               break;
-            case Pattern:
+            case PATTERN:
               alerts.addAll(alertService.getDirectionAndRouteAlerts(
                       getSource(environment).getDirection().gtfsCode,
                       getRoute(environment).getId()
               ));
               break;
-            case StopsOnTrip:
+            case STOPS_ON_TRIP:
               alerts.addAll(alertService.getAllAlerts()
                       .stream()
                       .filter(alert -> alert.getEntities()

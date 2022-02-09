@@ -294,7 +294,7 @@ public class LegacyGraphQLQueryTypeImpl
       List<TransitMode> filterByModes = args.getLegacyGraphQLFilterByModes() != null ? StreamSupport
           .stream(args.getLegacyGraphQLFilterByModes().spliterator(), false)
           .map(mode -> {
-            try { return TransitMode.valueOf(mode.label); }
+            try { return TransitMode.valueOf(mode.name()); }
             catch (IllegalArgumentException ignored) { return null; }
           })
           .filter(Objects::nonNull)
@@ -302,7 +302,7 @@ public class LegacyGraphQLQueryTypeImpl
       List<PlaceType> filterByPlaceTypes =
           args.getLegacyGraphQLFilterByPlaceTypes() != null ? StreamSupport
               .stream(args.getLegacyGraphQLFilterByPlaceTypes().spliterator(), false)
-              .map(placeType -> placeType.label)
+              .map(placeType -> placeType.name())
               .map(placeType -> placeType.equals("DEPARTURE_ROW") ? "PATTERN_AT_STOP" : placeType)
               .map(PlaceType::valueOf)
               .collect(Collectors.toList()) : null;
@@ -410,7 +410,7 @@ public class LegacyGraphQLQueryTypeImpl
       if (args.getLegacyGraphQLTransportModes() != null) {
         List<TransitMode> modes = StreamSupport
                 .stream(args.getLegacyGraphQLTransportModes().spliterator(), false)
-                .map(mode -> TransitMode.valueOf(mode.label))
+                .map(mode -> TransitMode.valueOf(mode.name()))
                 .collect(Collectors.toList());
         routeStream = routeStream.filter(route -> modes.contains(route.getMode()));
       }
@@ -516,17 +516,17 @@ public class LegacyGraphQLQueryTypeImpl
       List<String> severities = args.getLegacyGraphQLSeverityLevel() == null
               ? null
               : ((List<LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType>) args.getLegacyGraphQLSeverityLevel()).stream()
-                      .map(severity -> severity.label)
+                      .map(severity -> severity.name())
                       .collect(Collectors.toList());
       List<String> effects = args.getLegacyGraphQLEffect() == null
               ? null
               : ((List<LegacyGraphQLTypes.LegacyGraphQLAlertEffectType>) args.getLegacyGraphQLEffect()).stream()
-                      .map(effect -> effect.label)
+                      .map(effect -> effect.name())
                       .collect(Collectors.toList());
       List<String> causes = args.getLegacyGraphQLCause() == null
               ? null
               : ((List<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType>) args.getLegacyGraphQLCause()).stream()
-                      .map(cause -> cause.label)
+                      .map(cause -> cause.name())
                       .collect(Collectors.toList());
       return alerts.stream()
               .filter(alert -> args.getLegacyGraphQLFeeds() == null
