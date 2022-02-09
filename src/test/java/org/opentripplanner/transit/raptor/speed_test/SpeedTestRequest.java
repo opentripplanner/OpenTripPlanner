@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -66,15 +67,7 @@ public class SpeedTestRequest {
     }
 
     List<String> tags() {
-        var tags = new ArrayList<String>();
-        if(tc().fromPlace.stopId != null && tc().toPlace.stopId != null) {
-            tags.add("stop-to-stop");
-        }
-        else if(tc().fromPlace.coordinate != null && tc().toPlace.coordinate != null) {
-            tags.add("coordinate-to-coordinate");
-        }
-        tags.addAll(testCase.tags);
-        return tags;
+        return testCase.tags.stream().distinct().sorted().collect(Collectors.toList());
     }
 
     private static void addDebugOptions(
