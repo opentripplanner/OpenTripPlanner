@@ -285,6 +285,7 @@ public class SpeedTest {
 
                 lapTime = sample.stop(timer) / nanosToMillis;
             }
+            List.of(STREET_ROUTE, TRANSIT_DATA, DIRECT_STREET_ROUTE, COLLECT_RESULTS).forEach(n -> fail(n, request.tags()));
             if (!ignoreResults) {
                 // Report failure
                 ResultPrinter.printResultFailed(testCase, rr, lapTime, e);
@@ -297,20 +298,15 @@ public class SpeedTest {
     public RoutingResponse route(SpeedTestRequest request) {
         var routingRequest = request.toRoutingRequest();
         RoutingResponse response = null;
-        try {
-            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
-            response = worker.route();
-            var data = response.getDebugTimingAggregator().getDebugOutput();
+        var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
+        response = worker.route();
+        var data = response.getDebugTimingAggregator().getDebugOutput();
 
-            var tags = request.tags();
-            record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime, tags);
-            record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime, tags);
-            record(DIRECT_STREET_ROUTE, data.directStreetRouterTime, tags);
-            record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime, tags);
-        }
-        catch (Exception e){
-            List.of(STREET_ROUTE, TRANSIT_DATA, DIRECT_STREET_ROUTE, COLLECT_RESULTS).forEach(n -> fail(n, request.tags()));
-        }
+        var tags = request.tags();
+        record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime, tags);
+        record(TRANSIT_DATA, data.transitRouterTimes.raptorSearchTime, tags);
+        record(DIRECT_STREET_ROUTE, data.directStreetRouterTime, tags);
+        record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime, tags);
 
         return response;
     }
