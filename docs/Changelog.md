@@ -133,6 +133,7 @@
 - Fix number format exception for elevator duration parsing OSM data [#3871](https://github.com/opentripplanner/OpenTripPlanner/pull/3871)
 - Include generalizedCost in the optimized transfers wait-time cost [#3864](https://github.com/opentripplanner/OpenTripPlanner/pull/3864)
 - Expose maxStopToShapeSnapDistance as build-config.json parameter [#3874](https://github.com/opentripplanner/OpenTripPlanner/pull/3874)
+- Implement in-seat transfers per GTFS draft [#3831](https://github.com/opentripplanner/OpenTripPlanner/pull/3831)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
