@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransfersMapper.mapTransfers;
-import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TripPatternMapper.mapOldTripPatternToRaptorTripPattern;
 
 import com.google.common.collect.ArrayListMultimap;
 import java.time.LocalDate;
@@ -67,7 +66,8 @@ public class TransitLayerMapper {
         stopIndex = new StopIndexForRaptor(graph.index.getAllStops(), tuningParameters);
 
         Collection<TripPattern> allTripPatterns = graph.tripPatternForId.values();
-        newTripPatternForOld = mapOldTripPatternToRaptorTripPattern(
+        TripPatternMapper tripPatternMapper = new TripPatternMapper();
+        newTripPatternForOld = tripPatternMapper.mapOldTripPatternToRaptorTripPattern(
                 stopIndex,
                 allTripPatterns
         );
@@ -76,12 +76,14 @@ public class TransitLayerMapper {
 
         transferByStopIndex = mapTransfers(stopIndex, graph.transfersByStop);
 
+        TransferIndexGenerator transferIndexGenerator = null;
         if(OTPFeature.TransferConstraints.isOn()) {
-            new TransferIndexGenerator(
+            transferIndexGenerator = new TransferIndexGenerator(
                     graph.getTransferService().listAll(),
                     newTripPatternForOld.values(),
                     stopIndex
-            ).generateTransfers();
+            );
+            transferIndexGenerator.generateTransfers();
         }
 
         var transferCache = new RaptorRequestTransferCache(tuningParameters.transferCacheMaxSize());
@@ -94,7 +96,9 @@ public class TransitLayerMapper {
             graph.getTransferService(),
             stopIndex,
             graph.getTimeZone().toZoneId(),
-            transferCache
+            transferCache,
+            tripPatternMapper,
+            transferIndexGenerator
         );
     }
 

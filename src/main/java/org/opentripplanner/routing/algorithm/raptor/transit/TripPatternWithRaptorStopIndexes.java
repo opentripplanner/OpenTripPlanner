@@ -29,6 +29,8 @@ public class TripPatternWithRaptorStopIndexes {
     private final TransferForPatternByStopPos
             constrainedTransfersReverseSearch = new TransferForPatternByStopPos();
 
+    private boolean sealedConstrainedTransfers = false;
+
 
     public TripPatternWithRaptorStopIndexes(
             TripPattern pattern,
@@ -99,6 +101,8 @@ public class TripPatternWithRaptorStopIndexes {
             int targetStopPosition,
             TransferForPattern transferForPattern
     ) {
+        if (sealedConstrainedTransfers) {return;}
+
         constrainedTransfersForwardSearch.add(targetStopPosition, transferForPattern);
     }
 
@@ -109,6 +113,8 @@ public class TripPatternWithRaptorStopIndexes {
             int targetStopPosition,
             TransferForPattern transferForPattern
     ) {
+        if (sealedConstrainedTransfers) {return;}
+
         constrainedTransfersReverseSearch.add(targetStopPosition, transferForPattern);
     }
 
@@ -116,8 +122,11 @@ public class TripPatternWithRaptorStopIndexes {
      * This method should be called AFTER all transfers are added, and before the
      * pattern is used in a Raptor search.
      */
-    public void sortConstrainedTransfers() {
+    public void sealConstrainedTransfers() {
+        if (sealedConstrainedTransfers) {return;}
+
         constrainedTransfersForwardSearch.sortOnSpecificityRanking();
         constrainedTransfersReverseSearch.sortOnSpecificityRanking();
+        sealedConstrainedTransfers = true;
     }
 }
