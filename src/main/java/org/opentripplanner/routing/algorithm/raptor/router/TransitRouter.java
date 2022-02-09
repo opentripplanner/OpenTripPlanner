@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -178,13 +177,7 @@ public class TransitRouter {
                         CompletableFuture.runAsync(egressCalculator)
                 ).join();
             } catch (CompletionException e) {
-                if (e.getCause() instanceof RoutingValidationException) {
-                    throw (RoutingValidationException) e.getCause();
-                } else if (e.getCause() instanceof RuntimeException) {
-                    LOG.warn("Unknown exception from access/egress calculation", e.getCause());
-                    throw (RuntimeException) e.getCause();
-                }
-                throw e;
+                RoutingValidationException.unwrapAndRethrowCompletionException(e);
             }
         } else {
             accessCalculator.run();
