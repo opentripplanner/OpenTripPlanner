@@ -19,4 +19,5 @@ testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon
 100,Oslo høyfrekvens,16:05,18:05,2:00,Marienlyst,,59.932322,10.724663,Kjøbenhavngata,,59.928979,10.769432,transit,"TRANSIT,WALK"
 101,Crossing Oslo 1,09:00,"",2:00,Lillestrøm,,59.9559,11.0509,Asker,,59.8367,10.4249,transit,"TRANSIT,WALK"
 102,Crossing Oslo 2,09:00,"",2:00,Lillestrøm,,59.9559,11.0509,Hokksund,,59.7705,9.9088,transit,"TRANSIT,WALK"
-201,P+R into Oslo,10:00,,3:00,Slemmestad,,59.779213,10.495719,Oslo,,59.929904118284846,10.748748779296873,p+r,"CAR_PARK,TRANSIT,WALK"
+201,P+R into Oslo,10:00,,3:00,Slemmestad,,59.779213,10.495719,Oslo,,59.9299041,10.74874,p+r,"CAR_PARK,TRANSIT,WALK"
+202,P+R into Bergen,14:00,,3:00,Norvike,,60.234250,C5.3580665,Bergen,,60.3920207,5.329484,p+r,"CAR_PARK,TRANSIT,WALK"
