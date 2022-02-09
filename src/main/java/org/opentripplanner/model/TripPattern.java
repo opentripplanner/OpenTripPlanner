@@ -215,22 +215,46 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         return stopPattern.getStops();
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code stop}. The search start at
+     * position {@code 0}. Return a negative number if not found. Use {@link
+     * #findAlightStopPositionInPattern(StopLocation)} or {@link #findBoardingStopPositionInPattern(StopLocation)}
+     * if possible.
+     */
     public int findStopPosition(StopLocation stop) {
         return stopPattern.findStopPosition(stop);
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code station} where it is
+     * allowed to board. The search start at position {@code 0}. Return a negative number if not
+     * found.
+     */
     public int findBoardingStopPositionInPattern(Station station) {
         return stopPattern.findBoardingPosition(station);
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code station} where it is
+     * allowed to alight. The search start at position {@code 1}. Return a negative number if not
+     * found.
+     */
     public int findAlightStopPositionInPattern(Station station) {
         return stopPattern.findAlightPosition(station);
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code stop} where it is allowed
+     * to board. The search start at position {@code 0}. Return a negative number if not found.
+     */
     public int findBoardingStopPositionInPattern(StopLocation stop) {
         return stopPattern.findBoardingPosition(stop);
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code stop} where it is allowed
+     * to alight. The search start at position {@code 1}. Return a negative number if not found.
+     */
     public int findAlightStopPositionInPattern(StopLocation stop) {
         return stopPattern.findAlightPosition(stop);
     }
