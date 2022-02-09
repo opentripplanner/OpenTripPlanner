@@ -104,6 +104,7 @@ public class Transfer {
 
         transferRoutingRequest.walkReluctance = roundTo(request.walkReluctance, 1);
         transferRoutingRequest.stairsReluctance = roundTo(request.stairsReluctance, 1);
+        transferRoutingRequest.stairsTimeFactor = roundTo(request.stairsTimeFactor, 1);
         transferRoutingRequest.turnReluctance = roundTo(request.turnReluctance, 1);
 
         transferRoutingRequest.elevatorBoardCost = roundTo100(request.elevatorBoardCost);
