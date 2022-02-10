@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
@@ -86,11 +87,16 @@ public class RoutingWorker {
         var routingErrors = Collections.synchronizedSet(new HashSet<RoutingError>());
 
         if (OTPFeature.ParallelRouting.isOn()) {
-            CompletableFuture.allOf(
-                    CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
-                    CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
-                    CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
-            ).join();
+            try {
+                CompletableFuture.allOf(
+                        CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
+                        CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
+                        CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
+                ).join();
+            }
+            catch (CompletionException e) {
+                RoutingValidationException.unwrapAndRethrowCompletionException(e);
+            }
         } else {
             // Direct street routing
             routeDirectStreet(itineraries, routingErrors);
