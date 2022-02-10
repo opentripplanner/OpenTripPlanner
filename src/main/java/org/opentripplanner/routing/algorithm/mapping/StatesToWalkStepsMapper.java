@@ -414,6 +414,7 @@ public class StatesToWalkStepsMapper {
         step.bogusName = en.hasBogusName();
         step.addStreetNotes(graph.streetNotesService.getNotes(forwardState));
         step.angle = DirectionUtils.getFirstAngle(forwardState.getBackEdge().getGeometry());
+        step.walkingBike = forwardState.isBackWalkingBike();
         if (forwardState.getBackEdge() instanceof AreaEdge) {
             step.area = true;
         }

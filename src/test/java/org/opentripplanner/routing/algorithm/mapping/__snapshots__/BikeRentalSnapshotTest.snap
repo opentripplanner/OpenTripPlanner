@@ -76,7 +76,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -88,7 +89,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70058100000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -100,7 +102,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -153,7 +156,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70038790000001,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": true
             }
           ],
           "to": {
@@ -204,7 +208,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -257,7 +262,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.69423177172958,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -269,7 +275,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.69447930000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 21st Avenue"
+              "streetName": "Northwest 21st Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -462,7 +469,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.6776666369647,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -561,7 +569,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHEAST",
@@ -573,7 +582,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7004445,
               "relativeDirection": "SLIGHTLY_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Westover Road"
+              "streetName": "Northwest Westover Road",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHWEST",
@@ -585,7 +595,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70033570000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Place"
+              "streetName": "Northwest 24th Place",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -597,7 +608,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.701384,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHWEST",
@@ -609,7 +621,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70083500000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 113897002 from 7"
+              "streetName": "way 113897002 from 7",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -828,7 +841,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.67692504190299,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -840,7 +854,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.6764861,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Southwest 6th Avenue"
+              "streetName": "Southwest 6th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -852,7 +867,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.67645900000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Northwest 6th Avenue"
+              "streetName": "Northwest 6th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -864,7 +880,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.6765342,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -963,7 +980,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHEAST",
@@ -975,7 +993,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7004445,
               "relativeDirection": "SLIGHTLY_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Westover Road"
+              "streetName": "Northwest Westover Road",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHWEST",
@@ -987,7 +1006,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70033570000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Place"
+              "streetName": "Northwest 24th Place",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -999,7 +1019,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.701384,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHWEST",
@@ -1011,7 +1032,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70083500000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 113897002 from 7"
+              "streetName": "way 113897002 from 7",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1243,7 +1265,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.6748017088418,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -1255,7 +1278,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.67538630000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Southwest 5th Avenue"
+              "streetName": "Southwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -1267,7 +1291,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.67540310000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -1279,7 +1304,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.67548060000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1378,7 +1404,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -1390,7 +1417,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70064880000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Lovejoy Street"
+              "streetName": "Northwest Lovejoy Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1596,7 +1624,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.67460910872424,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1695,7 +1724,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -1707,7 +1737,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70058100000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -1719,7 +1750,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1772,7 +1804,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70038790000001,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": true
             }
           ],
           "to": {
@@ -1823,7 +1856,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1876,7 +1910,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.69423177172958,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -1888,7 +1923,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.69447930000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 21st Avenue"
+              "streetName": "Northwest 21st Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2081,7 +2117,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.6776666369647,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2180,7 +2217,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -2192,7 +2230,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70058100000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -2204,7 +2243,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2257,7 +2297,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.70038790000001,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": true
             }
           ],
           "to": {
@@ -2308,7 +2349,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2361,7 +2403,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.69423177172958,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -2373,7 +2416,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.69447930000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 21st Avenue"
+              "streetName": "Northwest 21st Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2566,7 +2610,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "lon": -122.6776666369647,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2643,7 +2688,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -2655,7 +2701,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.70058100000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -2667,7 +2714,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2720,7 +2768,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.70038790000001,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": true
             }
           ],
           "to": {
@@ -2771,7 +2820,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2824,7 +2874,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.69423177172958,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -2836,7 +2887,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.69245690000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 20th Avenue"
+              "streetName": "Northwest 20th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -2848,7 +2900,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.6924259,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Hoyt Street"
+              "streetName": "Northwest Hoyt Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2925,7 +2978,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -2937,7 +2991,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.70058100000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -2949,7 +3004,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3002,7 +3058,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.70038790000001,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": true
             }
           ],
           "to": {
@@ -3053,7 +3110,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -3065,7 +3123,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.6985374,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue"
+              "streetName": "Northwest 23rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -3077,7 +3136,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.69851030000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Hoyt Street"
+              "streetName": "Northwest Hoyt Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3154,7 +3214,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -3166,7 +3227,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.70058100000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -3178,7 +3240,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3231,7 +3294,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.70038790000001,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": true
             }
           ],
           "to": {
@@ -3282,7 +3346,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -3294,7 +3359,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.69245690000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 20th Avenue"
+              "streetName": "Northwest 20th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -3306,7 +3372,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "lon": -122.6924259,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Hoyt Street"
+              "streetName": "Northwest Hoyt Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3411,7 +3478,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -3423,7 +3491,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67548060000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -3435,7 +3504,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.6755097,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Flanders Street"
+              "streetName": "Northwest Flanders Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3654,7 +3724,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.69447686508221,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 21st Avenue"
+              "streetName": "Northwest 21st Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -3666,7 +3737,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.69447930000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3719,7 +3791,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.69423177172958,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3770,7 +3843,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7003923,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": true
             }
           ],
           "to": {
@@ -3823,7 +3897,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70038790000001,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -3835,7 +3910,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7003923,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -3847,7 +3923,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70058100000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3946,7 +4023,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -3958,7 +4036,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67548060000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -3970,7 +4049,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67540310000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -4202,7 +4282,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70071990797962,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHEAST",
@@ -4214,7 +4295,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.701384,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Place"
+              "streetName": "Northwest 24th Place",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -4226,7 +4308,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70033570000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Westover Road"
+              "streetName": "Northwest Westover Road",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -4238,7 +4321,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7004445,
               "relativeDirection": "SLIGHTLY_RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -4337,7 +4421,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -4349,7 +4434,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67548060000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -4361,7 +4447,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67553910000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Glisan Street"
+              "streetName": "Northwest Glisan Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -4373,7 +4460,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67649170000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 156261070 from 2"
+              "streetName": "way 156261070 from 2",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -4579,7 +4667,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.69870264831422,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue"
+              "streetName": "Northwest 23rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -4591,7 +4680,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.698695,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Overton Street"
+              "streetName": "Northwest Overton Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -4603,7 +4693,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70072830000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -4702,7 +4793,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -4714,7 +4806,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67548060000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -4726,7 +4819,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.6755097,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Flanders Street"
+              "streetName": "Northwest Flanders Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -4945,7 +5039,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.69447686508221,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 21st Avenue"
+              "streetName": "Northwest 21st Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -4957,7 +5052,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.69447930000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5010,7 +5106,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.69423177172958,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5061,7 +5158,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7003923,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": true
             }
           ],
           "to": {
@@ -5114,7 +5212,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70038790000001,
               "relativeDirection": "HARD_LEFT",
               "stayOn": false,
-              "streetName": "way -102328 from 0"
+              "streetName": "way -102328 from 0",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5126,7 +5225,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7003923,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5138,7 +5238,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70058100000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5237,7 +5338,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -5249,7 +5351,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67548060000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5261,7 +5364,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67540310000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5493,7 +5597,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70071990797962,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHEAST",
@@ -5505,7 +5610,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.701384,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Place"
+              "streetName": "Northwest 24th Place",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -5517,7 +5623,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70033570000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Westover Road"
+              "streetName": "Northwest Westover Road",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5529,7 +5636,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.7004445,
               "relativeDirection": "SLIGHTLY_RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5628,7 +5736,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Everett Street"
+              "streetName": "Northwest Everett Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5640,7 +5749,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67548060000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5652,7 +5762,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67553910000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Glisan Street"
+              "streetName": "Northwest Glisan Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5664,7 +5775,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.67649170000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 156261070 from 2"
+              "streetName": "way 156261070 from 2",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5870,7 +5982,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.69870264831422,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue"
+              "streetName": "Northwest 23rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5882,7 +5995,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.698695,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Overton Street"
+              "streetName": "Northwest Overton Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -5894,7 +6008,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "lon": -122.70072830000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
