@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
+import ch.qos.logback.core.encoder.EchoEncoder;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CompletionException;
@@ -16,7 +18,6 @@ import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.error.RoutingValidationException;
 
 @ExtendWith(SnapshotExtension.class)
 @ResourceLock(Resources.LOCALE)
@@ -109,8 +110,11 @@ public class BikeRentalSnapshotTest
 
         try {
             expectArriveByToMatchDepartAtAndSnapshot(request);
-        } catch (CompletionException e) {
-            RoutingValidationException.unwrapAndRethrowCompletionException(e);
+            throw new IllegalArgumentException();
+        } catch (Exception e) {
+            // for some strange reason the stack trace actually is not printed to the console
+            e.printStackTrace();
+            Arrays.stream(e.getSuppressed()).forEach(Throwable::printStackTrace);
         }
     }
 
