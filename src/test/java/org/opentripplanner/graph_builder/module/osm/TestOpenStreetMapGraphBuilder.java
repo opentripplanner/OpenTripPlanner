@@ -16,7 +16,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -88,10 +87,10 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         assertNotNull(e2);
         assertNotNull(e3);
 
-        assertTrue("name of e1 must be like \"Kamiennog\u00F3rska\"; was " + e1.getName(), e1
-                .getName().contains("Kamiennog\u00F3rska"));
-        assertTrue("name of e2 must be like \"Mariana Smoluchowskiego\"; was " + e2.getName(), e2
-                .getName().contains("Mariana Smoluchowskiego"));
+        assertTrue("name of e1 must be like \"Kamiennog\u00F3rska\"; was " + e1.getDefaultName(), e1
+                .getDefaultName().contains("Kamiennog\u00F3rska"));
+        assertTrue("name of e2 must be like \"Mariana Smoluchowskiego\"; was " + e2.getDefaultName(), e2
+                .getDefaultName().contains("Mariana Smoluchowskiego"));
     }
 
     /**

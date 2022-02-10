@@ -148,7 +148,7 @@ public class PortlandCustomNamer implements CustomNamer {
                 e.setName(new NonLocalizedString(name));
                 return name;
             } else {
-                String name = out.getName();
+                String name = out.getDefaultName();
                 e.setName(new NonLocalizedString(name));
                 return name;
             }
@@ -170,7 +170,7 @@ public class PortlandCustomNamer implements CustomNamer {
                 e.setName(new NonLocalizedString(name));
                 return name;
             } else {
-                String name = in.getName();
+                String name = in.getDefaultName();
                 e.setName(new NonLocalizedString(name));
                 return name;
             }

@@ -134,19 +134,19 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case Pattern:
+            case PATTERN:
               alerts.addAll(alertService.getDirectionAndRouteAlerts(
                       getSource(environment).getDirection().gtfsCode,
                       getRoute(environment).getId()
               ));
               break;
-            case Agency:
+            case AGENCY:
               alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
               break;
-            case Route:
+            case ROUTE:
               alerts.addAll(alertService.getRouteAlerts(getRoute(environment).getId()));
               break;
-            case RouteType:
+            case ROUTE_TYPE:
               int routeType = getRoute(environment).getGtfsType();
               alerts.addAll(alertService.getRouteTypeAlerts(
                       routeType,
@@ -157,11 +157,11 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
                       getAgency(environment).getId()
               ));
               break;
-            case Trips:
+            case TRIPS:
               getTrips(environment).forEach(
                       trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
               break;
-            case StopsOnPattern:
+            case STOPS_ON_PATTERN:
               alerts.addAll(alertService.getAllAlerts()
                       .stream()
                       .filter(alert -> alert.getEntities()
@@ -177,7 +177,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
                 alerts.addAll(alertService.getStopAlerts(stopId));
               });
               break;
-            case StopsOnTrips:
+            case STOPS_ON_TRIPS:
               Iterable<Trip> trips = getTrips(environment);
               trips.forEach(trip -> alerts.addAll(alertService.getAllAlerts()
                       .stream()

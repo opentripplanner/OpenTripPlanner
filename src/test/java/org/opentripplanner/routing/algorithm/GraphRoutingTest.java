@@ -103,7 +103,7 @@ public abstract class GraphRoutingTest {
             return new StreetEdge(from, to,
                     GeometryUtils.makeLineString(
                             from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-                    String.format("%s%s street", from.getName(), to.getName()),
+                    String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                     length,
                     permissions,
                     false
@@ -121,7 +121,7 @@ public abstract class GraphRoutingTest {
                     new StreetEdge(from, to,
                             GeometryUtils.makeLineString(
                                     from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-                            String.format("%s%s street", from.getName(), to.getName()),
+                            String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                             length,
                             forwardPermissions,
                             false
@@ -129,7 +129,7 @@ public abstract class GraphRoutingTest {
                     new StreetEdge(to, from,
                             GeometryUtils.makeLineString(
                                     to.getLat(), to.getLon(), from.getLat(), from.getLon()),
-                            String.format("%s%s street", from.getName(), to.getName()),
+                            String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                             length,
                             reversePermissions,
                             true
@@ -170,22 +170,22 @@ public abstract class GraphRoutingTest {
             List<ElevatorOnboardVertex> onboardVertices = new ArrayList<>();
 
             for (Vertex v : vertices) {
-                var level = String.format("L-%s", v.getName());
+                var level = String.format("L-%s", v.getDefaultName());
                 var boardLabel = String.format("%s-onboard", level);
                 var alightLabel = String.format("%s-offboard", level);
 
                 var onboard = new ElevatorOnboardVertex(
-                        graph, boardLabel, v.getX(), v.getY(), boardLabel
+                        graph, boardLabel, v.getX(), v.getY(), new NonLocalizedString(boardLabel)
                 );
                 var offboard = new ElevatorOffboardVertex(
-                        graph, alightLabel, v.getX(), v.getY(), alightLabel
+                        graph, alightLabel, v.getX(), v.getY(), new NonLocalizedString(alightLabel)
                 );
 
                 new FreeEdge(v, offboard);
                 new FreeEdge(offboard, v);
 
                 edges.add(new ElevatorBoardEdge(offboard, onboard));
-                edges.add(new ElevatorAlightEdge(onboard, offboard, level));
+                edges.add(new ElevatorAlightEdge(onboard, offboard, new NonLocalizedString(level)));
 
                 onboardVertices.add(onboard);
             }
@@ -272,7 +272,7 @@ public abstract class GraphRoutingTest {
         public PathwayEdge pathway(Vertex from, Vertex to, int time, int length) {
             return new PathwayEdge(
                     from, to, null,
-                    String.format("%s%s pathway", from.getName(), to.getName()),
+                    new NonLocalizedString(String.format("%s%s pathway", from.getDefaultName(), to.getDefaultName())),
                     time, length, 0, 0, false
             );
         }
@@ -428,8 +428,8 @@ public abstract class GraphRoutingTest {
     public static String graphPathToString(GraphPath graphPath) {
         return graphPath.states.stream()
             .flatMap(s -> Stream.of(
-                s.getBackEdge() != null ? s.getBackEdge().getName() : null,
-                s.getVertex().getName()
+                s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
+                s.getVertex().getDefaultName()
             ))
             .filter(Objects::nonNull)
             .collect(Collectors.joining(" - "));

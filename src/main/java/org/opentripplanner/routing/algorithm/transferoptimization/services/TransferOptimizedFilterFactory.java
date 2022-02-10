@@ -26,7 +26,7 @@ public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule> {
         }
 
         if(optimizeWaitTime) {
-            filters.add(OptimizedPathTail::waitTimeOptimizedCost);
+            filters.add(OptimizedPathTail::generalizedCostWaitTimeOptimized);
         }
         else {
             filters.add(OptimizedPathTail::generalizedCost);

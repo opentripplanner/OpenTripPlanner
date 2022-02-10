@@ -149,6 +149,11 @@ public class EstimatedCallType {
                     .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getRealtimeState())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("stopPositionInPattern")
+                    .type(Scalars.GraphQLInt)
+                    .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStopIndex())
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("forBoarding")
                 .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
                 .description("Whether vehicle may be boarded at quay according to the planned data. "

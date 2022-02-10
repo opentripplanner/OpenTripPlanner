@@ -61,7 +61,7 @@ config:
     placeAtDistance: org.opentripplanner.routing.graphfinder.PlaceAtDistance#PlaceAtDistance
     placeAtDistanceConnection: graphql.relay.Connection#Connection<PlaceAtDistance>
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
-    Plan: org.opentripplanner.routing.api.response.RoutingResponse#RoutingResponse
+    Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     RealtimeState: String
     Route: org.opentripplanner.model.Route#Route
     serviceTimeRange: Object

@@ -142,7 +142,7 @@ public class TestIntermediatePlaces {
         assertNotNull(paths);
         assertFalse(paths.isEmpty());
 
-        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
+        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
         TripPlan plan = TripPlanMapper.mapTripPlan(request, itineraries);
         assertLocationIsVeryCloseToPlace(from, plan.from);
         assertLocationIsVeryCloseToPlace(to, plan.to);

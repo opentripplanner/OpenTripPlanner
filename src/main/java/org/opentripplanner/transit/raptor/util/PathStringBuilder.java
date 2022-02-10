@@ -4,6 +4,7 @@ import java.util.Calendar;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.OtpNumberFormat;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.time.DurationUtils;
@@ -92,9 +93,9 @@ public class PathStringBuilder {
         return space().time(fromTime, toTime).generalizedCostSentiSec(generalizedCost);
     }
 
-    /** Add generalizedCostCentiSec {@link #costCentiSec(int, String)} */
+    /** Add generalizedCostCentiSec {@link #costCentiSec(int, int, String)} */
     public PathStringBuilder generalizedCostSentiSec(int cost) {
-        return costCentiSec(cost, null);
+        return costCentiSec(cost, CostCalculator.ZERO_COST, null);
     }
 
     /**
@@ -106,8 +107,8 @@ public class PathStringBuilder {
      *     <li>{@code "pri"} - Transfer priority cost</li>
      * </ul>
      */
-    public PathStringBuilder costCentiSec(int cost, String unit) {
-        if(cost == 0) { return this; }
+    public PathStringBuilder costCentiSec(int cost, int defaultValue, String unit) {
+        if(cost == defaultValue) { return this; }
         space().append(OtpNumberFormat.formatCost(cost));
         if(unit != null) {
             append(unit);

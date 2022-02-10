@@ -259,6 +259,7 @@ config key | description | value type | value default | notes
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `maxAreaNodes` | Visibility calculations for an area will not be done if there are more nodes than this limit | integer | 500 |
+`maxStopToShapeSnapDistance` | This field is used for mapping route's geometry shapes. It determines max distance between shape points and their stop sequence. If the mapper can not find any stops within this radius it will default to simple stop-to-stop geometry instead. | double | 150 | units: meters
 
 This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
 

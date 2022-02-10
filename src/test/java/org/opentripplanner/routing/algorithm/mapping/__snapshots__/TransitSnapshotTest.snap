@@ -5775,22 +5775,22 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
   [
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 2361,
+      "duration": 2366,
       "elevationGained": 0.0,
       "elevationLost": 0.0,
-      "endTime": "2009-11-17T18:39:21.000+00:00",
+      "endTime": "2009-11-17T18:39:26.000+00:00",
       "fare": {
         "details": { },
         "fare": { }
       },
-      "generalizedCost": 4557,
+      "generalizedCost": 4597,
       "legs": [
         {
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2989.7960000000003,
-          "endTime": "2009-11-17T18:39:21.000+00:00",
+          "distance": 2985.4260000000004,
+          "endTime": "2009-11-17T18:39:26.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
             "lat": 45.530244,
@@ -5801,11 +5801,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType": "TRANSIT",
             "zoneId": "0"
           },
-          "generalizedCost": 4557,
+          "generalizedCost": 4597,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 173,
-            "points": "_s{tGvpukV??c@tADDFDDDHHYx@Wt@{@lBS^MROZ]h@Y`@[`@k@r@kAtASVEDa@f@EDm@l@s@p@JVA@GOCBzEfKxF`M|AfDJRLPVb@DBBBBBDBB@CRE\\C?A@A@ABAB?DAHATC\\AXAVCZATAPAPATG`AATAPAL?J?F?F?D?F@x@AJ@D@B@DAB?RK@I??TBlBCJ?D?BAFAB?DADABEFCDA@CDC?c@@{@@O?K??LCDC??LC?G?E@GBE?KCI?EFC@?N?F?D?BABA@AD?D?B?D@B@BABAB?D?DADABABABC@A@I@IZCFIJ?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
+            "length": 143,
+            "points": "_s{tGvpukV??c@tADDFDDDHHYx@Wt@{@lBS^MROZ]h@Y`@[`@k@r@kAtASVEDa@f@EDm@l@s@p@JVA@GOCBzEfKxF`M|AfDJRLPVb@DBBBBBDBB@CRE\\C?A@A@ABAB?DAHATC\\AXAVCZATAPAPATG`AATAPAL?J?F?F?D?F@x@AJ@D@B@DAB?RK@I??TBlBCJ?D?BAFAB?DADABEFCDA@CDC?c@@{@@O?K?eBBM?M@@P?N@P@nA?j@AX?L@`B@dA?R?RBbD?T?NBbD?R?P@|D@jB?x@@J?N?B?P?LBjD@N@fD?T?LBdD?R?PF`K?RDlJ?R?PFlJ?RDbH@xA?D?P?RDpH"
           },
           "mode": "WALK",
           "pathway": false,
@@ -5854,7 +5854,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection": "SOUTHWEST",
               "area": false,
               "bogusName": true,
-              "distance": 40.36,
+              "distance": 20.18,
               "elevation": "",
               "lat": 45.532912800000005,
               "lon": -122.67197920000001,
@@ -5926,7 +5926,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection": "NORTH",
               "area": false,
               "bogusName": false,
-              "distance": 71.22,
+              "distance": 143.231,
               "elevation": "",
               "lat": 45.5302432,
               "lon": -122.6813836,
@@ -5938,65 +5938,17 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
-              "distance": 5.54,
+              "distance": 1470.2359999999999,
               "elevation": "",
-              "lat": 45.5308835,
-              "lon": -122.68140700000001,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Northwest Marshall Street"
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "area": false,
-              "bogusName": true,
-              "distance": 5.888,
-              "elevation": "",
-              "lat": 45.530882000000005,
-              "lon": -122.6814781,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "way 117751890 from 1"
-            },
-            {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 7.364,
-              "elevation": "",
-              "lat": 45.5309273,
-              "lon": -122.6815085,
-              "relativeDirection": "LEFT",
-              "stayOn": false,
-              "streetName": "Tanner Springs Park"
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "area": false,
-              "bogusName": false,
-              "distance": 116.77899999999998,
-              "elevation": "",
-              "lat": 45.530944000000005,
-              "lon": -122.6815772,
-              "relativeDirection": "RIGHT",
-              "stayOn": false,
-              "streetName": "Tanner Springs Park Trail"
-            },
-            {
-              "absoluteDirection": "WEST",
-              "area": false,
-              "bogusName": false,
-              "distance": 1390.866,
-              "elevation": "",
-              "lat": 45.5315117,
-              "lon": -122.68244770000001,
+              "lat": 45.5315309,
+              "lon": -122.6814307,
               "relativeDirection": "LEFT",
               "stayOn": false,
               "streetName": "Northwest Northrup Street"
             }
           ],
           "to": {
-            "arrival": "2009-11-17T18:39:21.000+00:00",
+            "arrival": "2009-11-17T18:39:26.000+00:00",
             "lat": 45.531,
             "lon": -122.70029,
             "name": "NW Northrup St. & NW 24th Ave. (P3)",
@@ -6011,9 +5963,9 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 2989.7960000000003,
+      "walkDistance": 2985.4260000000004,
       "walkLimitExceeded": false,
-      "walkTime": 2361
+      "walkTime": 2366
     }
   ]
 ]

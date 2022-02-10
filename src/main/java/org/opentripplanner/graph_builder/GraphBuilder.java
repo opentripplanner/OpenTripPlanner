@@ -141,6 +141,7 @@ public class GraphBuilder implements Runnable {
                 gtfsBundle.parentStationTransfers = config.stationTransfers;
                 gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
                 gtfsBundle.maxInterlineDistance = config.maxInterlineDistance;
+                gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsModule gtfsModule = new GtfsModule(gtfsBundles, config.getTransitServicePeriod());

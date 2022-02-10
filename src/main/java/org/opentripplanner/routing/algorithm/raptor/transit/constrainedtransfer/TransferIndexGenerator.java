@@ -184,9 +184,12 @@ public class TransferIndexGenerator {
 
         for (var pattern : patterns) {
             int stopPosInPattern = resolveStopPosInPattern.applyAsInt(pattern.getPattern());
-            int stopIndex = pattern.stopIndex(stopPosInPattern);
-            var sourcePoint = createTransferPointForPattern(route, stopIndex);
-            points.add(new TPoint(pattern, sourcePoint, null, stopPosInPattern));
+            // stopPosInPattern == -1 means stop is not on pattern
+            if (stopPosInPattern >= 0) {
+                int stopIndex = pattern.stopIndex(stopPosInPattern);
+                var sourcePoint = createTransferPointForPattern(route, stopIndex);
+                points.add(new TPoint(pattern, sourcePoint, null, stopPosInPattern));
+            }
         }
         return points;
     }

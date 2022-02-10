@@ -35,7 +35,7 @@ public class DirectStreetRouter {
       List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(directRequest);
 
       // Convert the internal GraphPaths to itineraries
-      List<Itinerary> response = GraphPathToItineraryMapper.mapItineraries(paths, directRequest);
+      List<Itinerary> response = GraphPathToItineraryMapper.mapItineraries(paths);
       ItinerariesHelper.decorateItinerariesWithRequestData(response, directRequest);
       return response;
     }

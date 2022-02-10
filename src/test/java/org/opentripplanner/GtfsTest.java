@@ -137,9 +137,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
-        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(
-                paths, routingRequest
-        );
+        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
         // Stored in instance field for use in individual tests
         itinerary = itineraries.get(0);
 

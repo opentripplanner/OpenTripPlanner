@@ -25,7 +25,6 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import graphql.relay.Connection;
 import graphql.relay.Edge;
-import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -608,7 +607,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Iterable<TripPattern>> patterns();
 
-        public DataFetcher<RoutingResponse> plan();
+        public DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> plan();
 
         public DataFetcher<VehicleRentalVehicle> rentalVehicle();
 
