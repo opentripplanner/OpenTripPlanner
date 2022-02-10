@@ -29,7 +29,7 @@ you want into a single instance of OTP2.
 ## Build Config
 
 New parameters:
-
+ - `maxJourneyDuration (2.1)` This limits the patterns we consider in the transit search. See [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
  - `transitServiceStart` Limit the import of transit services to the given *start* date. Default: `-P1Y`
  - `transitServiceEnd` Limit the import of transit services to the given *end* date. *Inclusive*. Default: `P3Y`
 
