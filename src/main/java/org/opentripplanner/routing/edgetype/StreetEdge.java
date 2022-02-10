@@ -1,10 +1,13 @@
 package org.opentripplanner.routing.edgetype;
 
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -117,6 +120,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
+
+    private CopyOnWriteArrayList<TurnRestriction> turnRestrictions;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -590,7 +595,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
     
     public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
-        for (TurnRestriction turnRestriction : getTurnRestrictions(state.getOptions().rctx.graph)) {
+        for (TurnRestriction turnRestriction : getTurnRestrictions()) {
             /* FIXME: This is wrong for trips that end in the middle of turnRestriction.to
              */
 
@@ -755,10 +760,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 		return (int) Math.round(this.outAngle * 180 / 128.0);
 	}
 
-    protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
-        return graph.getTurnRestrictions(this);
-    }
-
     public void setCostExtension(StreetEdgeCostExtension costExtension) {
         this.costExtension = costExtension;
     }
@@ -866,7 +867,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      */
     private static void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> splitEdges, Graph graph) {
 
-        graph.getTurnRestrictions(edge).forEach(restriction -> {
+        edge.getTurnRestrictions().forEach(restriction -> {
             // figure which one is the "from" edge
             StreetEdge fromEdge = shouldUseFirstSplitEdge(edge, restriction) ? splitEdges.first : splitEdges.second;
 
@@ -878,13 +879,13 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                     "Recreate new restriction {} with split edge as from edge {}", splitTurnRestriction,
                     fromEdge
             );
-            graph.addTurnRestriction(fromEdge, splitTurnRestriction);
+            fromEdge.addTurnRestriction(splitTurnRestriction);
             // Not absolutely necessary, as old edge will not be accessible, but for good housekeeping
-            graph.removeTurnRestriction(edge, restriction);
+            edge.removeTurnRestriction(restriction);
         });
 
-        applyToAdjacentEdges(edge, splitEdges.second, edge.getToVertex().getOutgoing(), graph);
-        applyToAdjacentEdges(edge, splitEdges.first, edge.getFromVertex().getIncoming(), graph);
+        applyToAdjacentEdges(edge, splitEdges.second, edge.getToVertex().getOutgoing());
+        applyToAdjacentEdges(edge, splitEdges.first, edge.getFromVertex().getIncoming());
     }
 
     private static boolean shouldUseFirstSplitEdge(StreetEdge edge, TurnRestriction restriction) {
@@ -894,19 +895,19 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     private static void applyToAdjacentEdges(
             StreetEdge formerEdge,
             StreetEdge newToEdge,
-            Collection<Edge> adjacentEdges,
-            Graph graph
+            Collection<Edge> adjacentEdges
     ) {
         adjacentEdges.stream()
-                .flatMap(originatingEdge -> graph.getTurnRestrictions(originatingEdge).stream())
+                .filter(StreetEdge.class::isInstance)
+                .map(StreetEdge.class::cast)
+                .flatMap(originatingEdge -> originatingEdge.getTurnRestrictions().stream())
                 .filter(restriction -> restriction.to == formerEdge)
-                .forEach(restriction -> applyRestrictionsToNewEdge(newToEdge, restriction, graph));
+                .forEach(restriction -> applyRestrictionsToNewEdge(newToEdge, restriction));
     }
 
     private static void applyRestrictionsToNewEdge(
             StreetEdge newEdge,
-            TurnRestriction restriction,
-            Graph graph
+            TurnRestriction restriction
     ) {
         TurnRestriction splitTurnRestriction = new TurnRestriction(restriction.from,
                 newEdge, restriction.type, restriction.modes
@@ -916,10 +917,47 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                 "Recreate new restriction {} with split edge as to edge {}", splitTurnRestriction,
                 newEdge
         );
-        graph.addTurnRestriction(restriction.from, splitTurnRestriction);
+        restriction.from.addTurnRestriction(splitTurnRestriction);
         // Former turn restriction needs to be removed. Especially no only_turn
         // restriction to a non existent edge must not survive
-        graph.removeTurnRestriction(restriction.from, restriction);
+        restriction.from.removeTurnRestriction(restriction);
+    }
+
+    /**
+     * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} belonging to an
+     * {@link Edge}.
+     */
+    public void addTurnRestriction(TurnRestriction turnRestriction) {
+        if (turnRestriction == null) return;
+        if (turnRestrictions == null) {
+            turnRestrictions = new CopyOnWriteArrayList<>();
+        }
+        turnRestrictions.add(turnRestriction);
+    }
+
+    public void removeTurnRestriction(TurnRestriction turnRestriction) {
+        if (turnRestriction == null) return;
+        if (turnRestrictions != null && turnRestrictions.contains(turnRestriction)) {
+            if (turnRestrictions.size() < 2) {
+                turnRestrictions = null;
+            } else {
+                turnRestrictions.remove(turnRestriction);
+            }
+        }
+    }
+
+    /**
+     * Get the {@link TurnRestriction} {@link List} that belongs to an {@link Edge} and return an
+     * immutable copy. This method is thread-safe when used by itself, but not if addTurnRestriction
+     * or removeTurnRestriction is called concurrently.
+     * @return The {@link TurnRestriction} {@link List} that belongs to the {@link Edge}
+     */
+    public List<TurnRestriction> getTurnRestrictions() {
+        if (turnRestrictions == null) {
+            return Collections.emptyList();
+        } else {
+            return ImmutableList.copyOf(turnRestrictions);
+        }
     }
 
     /**

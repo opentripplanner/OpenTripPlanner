@@ -17,7 +17,6 @@ import java.util.function.Function;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -245,21 +244,6 @@ public class RoutingService {
     /** {@link Graph#getEdgesOfType(Class)} */
     public <T extends Edge> List<T> getEdgesOfType(Class<T> cls) {
         return this.graph.getEdgesOfType(cls);
-    }
-
-    /** {@link Graph#addTurnRestriction(Edge, TurnRestriction)} */
-    public void addTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
-        this.graph.addTurnRestriction(edge, turnRestriction);
-    }
-
-    /** {@link Graph#removeTurnRestriction(Edge, TurnRestriction)} */
-    public void removeTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
-        this.graph.removeTurnRestriction(edge, turnRestriction);
-    }
-
-    /** {@link Graph#getTurnRestrictions(Edge)} */
-    public List<TurnRestriction> getTurnRestrictions(Edge edge) {
-        return this.graph.getTurnRestrictions(edge);
     }
 
     /** {@link Graph#getStreetEdges()} */

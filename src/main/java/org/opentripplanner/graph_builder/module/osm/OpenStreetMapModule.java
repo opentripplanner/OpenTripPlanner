@@ -1082,7 +1082,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             restriction.type = restrictionTag.type;
                             restriction.modes = restrictionTag.modes;
                             restriction.time = restrictionTag.time;
-                            graph.addTurnRestriction(from, restriction);
+                            from.addTurnRestriction(restriction);
                         }
                     }
                 }

@@ -45,7 +45,6 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -112,10 +111,6 @@ public class Graph implements Serializable {
 
     public static final IntersectionTraversalCostModel DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL
         = new SimpleIntersectionTraversalCostModel(DEFAULT_DRIVING_DIRECTION);
-
-    private final OtpProjectInfo projectInfo = projectInfo();
-
-    private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
     public final StreetNotesService streetNotesService = new StreetNotesService();
 
@@ -356,19 +351,22 @@ public class Graph implements Serializable {
      */
     public void removeEdge(Edge e) {
         if (e != null) {
-            turnRestrictions.remove(e);
             streetNotesService.removeStaticNotes(e);
 
             if (e.fromv != null) {
                 e.fromv.removeOutgoing(e);
 
-                for (Edge otherEdge : e.fromv.getIncoming()) {
-                    for (TurnRestriction turnRestriction : getTurnRestrictions(otherEdge)) {
-                        if (turnRestriction.to == e) {
-                            removeTurnRestriction(otherEdge, turnRestriction);
-                        }
-                    }
-                }
+                e.fromv.getIncoming()
+                        .stream()
+                        .filter(StreetEdge.class::isInstance)
+                        .map(StreetEdge.class::cast)
+                        .forEach(otherEdge -> {
+                            for (TurnRestriction turnRestriction : otherEdge.getTurnRestrictions()) {
+                                if (turnRestriction.to == e) {
+                                    otherEdge.removeTurnRestriction(turnRestriction);
+                                }
+                            }
+                        });
 
                 e.fromv = null;
             }
@@ -422,51 +420,7 @@ public class Graph implements Serializable {
             .collect(Collectors.toList());
     }
 
-    /**
-     * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} belonging to an
-     * {@link Edge}. This method is not thread-safe.
-     */
-    public void addTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
-        if (edge == null || turnRestriction == null) return;
-        List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
-        if (turnRestrictions == null) {
-            turnRestrictions = Lists.newArrayList();
-            this.turnRestrictions.put(edge, turnRestrictions);
-        }
-        turnRestrictions.add(turnRestriction);
-    }
 
-    /**
-     * Remove a {@link TurnRestriction} from the {@link TurnRestriction} {@link List} belonging to
-     * an {@link Edge}. This method is not thread-safe.
-     */
-    public void removeTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
-        if (edge == null || turnRestriction == null) return;
-        List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
-        if (turnRestrictions != null && turnRestrictions.contains(turnRestriction)) {
-            if (turnRestrictions.size() < 2) {
-                this.turnRestrictions.remove(edge);
-            } else {
-                turnRestrictions.remove(turnRestriction);
-            }
-        }
-    }
-
-    /**
-     * Get the {@link TurnRestriction} {@link List} that belongs to an {@link Edge} and return an
-     * immutable copy. This method is thread-safe when used by itself, but not if addTurnRestriction
-     * or removeTurnRestriction is called concurrently.
-     * @return The {@link TurnRestriction} {@link List} that belongs to the {@link Edge}
-     */
-    public List<TurnRestriction> getTurnRestrictions(Edge edge) {
-        if (edge != null) {
-            List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
-            if (turnRestrictions != null) {
-                return ImmutableList.copyOf(turnRestrictions);
-            }
-        }
-        return Collections.emptyList();
-    }
 
     /**
      * Return only the StreetEdges in the graph.
