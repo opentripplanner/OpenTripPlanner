@@ -1,10 +1,9 @@
 package org.opentripplanner.model.plan;
 
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.locationtech.jts.geom.Geometry;
+import java.util.TimeZone;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
@@ -14,165 +13,46 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 
 /**
-* One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
-* particular vehicle (or on foot).
-*/
-public class Leg {
-
-    private final TraverseMode mode;
-
-    private final Trip trip;
-
-    private Calendar startTime = null;
-
-    private Calendar endTime = null;
-
-    private int departureDelay = 0;
-
-    private int arrivalDelay = 0;
-
-    private Boolean realTime = false;
-
-    private boolean flexibleTrip = false;
-
-    private Boolean isNonExactFrequency = null;
-
-    private Integer headway = null;
-
-    private Double distanceMeters = null;
-
-    private Boolean pathway = false;
-
-    private FeedScopedId pathwayId;
-
-    private int agencyTimeZoneOffset;
-
-    private Integer routeType = null;
-
-    private String headsign = null;
-
-    private ServiceDate serviceDate = null;
-
-    private String routeBrandingUrl = null;
-
-    private Place from = null;
-
-    private Place to = null;
-
-    private List<StopArrival> intermediateStops;
-
-    private LineString legGeometry;
-
-    private List<WalkStep> walkSteps;
-
-    private Set<StreetNote> streetNotes = new HashSet<>();
-
-    private Set<TransitAlert> transitAlerts = new HashSet<>();
-
-    private PickDrop boardRule;
-
-    private PickDrop alightRule;
-
-    private BookingInfo dropOffBookingInfo = null;
-
-    private BookingInfo pickupBookingInfo = null;
-
-    private ConstrainedTransfer transferFromPrevLeg = null;
-
-    private ConstrainedTransfer transferToNextLeg = null;
-
-    public Integer boardStopPosInPattern = null;
-
-    public Integer alightStopPosInPattern = null;
-
-    private Integer boardingGtfsStopSequence = null;
-
-    private Integer alightGtfsStopSequence = null;
-
-    private Boolean walkingBike;
-
-    private Boolean rentedVehicle;
-
-    private String vehicleRentalNetwork;
-
-    private int generalizedCost = -1;
-
-    public Leg(TraverseMode mode) {
-        if (mode.isTransit()) {
-            throw new IllegalArgumentException(
-                    "To create a transit leg use the other constructor.");
-        }
-        this.mode = mode;
-        this.trip = null;
-    }
-
-    public Leg(Trip trip) {
-        this.mode = TraverseMode.fromTransitMode(trip.getMode());
-        this.trip = trip;
-    }
+ * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
+ * particular vehicle or on the street using mainly a single mode
+ */
+public interface Leg {
 
     /**
      * Whether this leg is a transit leg or not.
      *
      * @return Boolean true if the leg is a transit leg
      */
-    public boolean isTransitLeg() {
-        return mode.isTransit();
-    }
+    boolean isTransitLeg();
 
     /**
      * For transit legs, if the rider should stay on the vehicle as it changes route names. This is
      * the same as a stay-seated transfer.
      */
-    public Boolean isInterlinedWithPreviousLeg() {
-        if (transferFromPrevLeg == null) {return false;}
-        return transferFromPrevLeg.getTransferConstraint().isStaySeated();
+    default Boolean isInterlinedWithPreviousLeg() {
+        return false;
     }
 
-    /**
-     * A scheduled leg is a leg riding a public scheduled transport including frequency based
-     * transport, or flex service. If the ride is not likely to wait for the passenger, even if the
-     * passenger call in and say hen is late, then this method should return {@code true}.
-     * <p>
-     * For example, this method can be used to add extra "cost" if the transfer time is tight.
-     */
-    public boolean isScheduled() {
-        return isTransitLeg() || flexibleTrip;
+    default boolean isWalkingLeg() {
+        return false;
     }
 
-    public boolean isWalkingLeg() {
-        return mode.isWalking();
-    }
-
-    public boolean isOnStreetNonTransit() {
-        return mode.isOnStreetNonTransit();
+    default boolean isOnStreetNonTransit() {
+        return false;
     }
 
     /**
      * The leg's duration in seconds
      */
-    public long getDuration() {
-        // Round to closest second; Hence subtract 500 ms before dividing by 1000
-        return (500 + endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
-    }
-
-    public void addStretNote(StreetNote streetNote) {
-        streetNotes.add(streetNote);
-    }
-
-    public void addAlert(TransitAlert alert) {
-        transitAlerts.add(alert);
-    }
-
-    public void setVehicleRentalNetwork(String network) {
-        vehicleRentalNetwork = network;
+    default long getDuration() {
+        // Round to the closest second; Hence subtract 500 ms before dividing by 1000
+        return (500 + getEndTime().getTimeInMillis() - getStartTime().getTimeInMillis()) / 1000;
     }
 
     /**
@@ -180,26 +60,26 @@ public class Leg {
      * overlap. Two legs overlap is they have at least one segment(from one stop to the next) in
      * common.
      */
-    public boolean isPartiallySameTransitLeg(Leg other) {
+    default boolean isPartiallySameTransitLeg(Leg other) {
         // Assert both legs are transit legs
         if (!isTransitLeg() || !other.isTransitLeg()) {throw new IllegalStateException();}
 
         // Must be on the same service date
-        if (!serviceDate.equals(other.serviceDate)) {return false;}
+        if (!getServiceDate().equals(other.getServiceDate())) {return false;}
 
         // If NOT the same trip, return false
-        if (!trip.getId().equals(other.trip.getId())) {return false;}
+        if (!getTrip().getId().equals(other.getTrip().getId())) {return false;}
 
         // Return true if legs overlap
-        return boardStopPosInPattern < other.alightStopPosInPattern &&
-               alightStopPosInPattern > other.boardStopPosInPattern;
+        return getBoardStopPosInPattern() < other.getAlightStopPosInPattern()
+                && getAlightStopPosInPattern() > other.getBoardStopPosInPattern();
     }
 
     /**
      * For transit legs, the route agency. For non-transit legs {@code null}.
      */
-    public Agency getAgency() {
-        return isTransitLeg() ? getRoute().getAgency() : null;
+    default Agency getAgency() {
+        return null;
     }
 
     /**
@@ -208,126 +88,61 @@ public class Leg {
      *
      * @see Trip#getOperator()
      */
-    public Operator getOperator() {
-        return isTransitLeg() ? trip.getOperator() : null;
+    default Operator getOperator() {
+        return null;
     }
 
     /**
      * For transit legs, the route. For non-transit legs, null.
      */
-    public Route getRoute() {return isTransitLeg() ? trip.getRoute() : null;}
+    default Route getRoute() {
+        return null;
+    }
 
     /**
      * For transit legs, the trip. For non-transit legs, null.
      */
-    public Trip getTrip() {return trip;}
-
-    /**
-     * Should be used for debug logging only
-     */
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(Leg.class)
-                .addObj("from", from)
-                .addObj("to", to)
-                .addTimeCal("startTime", startTime)
-                .addTimeCal("endTime", endTime)
-                .addNum("departureDelay", departureDelay, 0)
-                .addNum("arrivalDelay", arrivalDelay, 0)
-                .addBool("realTime", realTime)
-                .addBool("isNonExactFrequency", isNonExactFrequency)
-                .addNum("headway", headway)
-                .addEnum("mode", mode)
-                .addNum("distance", distanceMeters, "m")
-                .addNum("cost", generalizedCost)
-                .addBool("pathway", pathway)
-                .addObj("gtfsPathwayId", pathwayId)
-                .addNum("agencyTimeZoneOffset", agencyTimeZoneOffset, 0)
-                .addNum("routeType", routeType)
-                .addEntityId("agencyId", getAgency())
-                .addEntityId("routeId", getRoute())
-                .addEntityId("tripId", trip)
-                .addStr("headsign", headsign)
-                .addObj("serviceDate", serviceDate)
-                .addStr("routeBrandingUrl", routeBrandingUrl)
-                .addCol("intermediateStops", intermediateStops)
-                .addObj("legGeometry", legGeometry)
-                .addCol("walkSteps", walkSteps)
-                .addCol("streetNotes", streetNotes)
-                .addCol("transitAlerts", transitAlerts)
-                .addEnum("boardRule", boardRule)
-                .addEnum("alightRule", alightRule)
-                .addBool("walkingBike", walkingBike)
-                .addBool("rentedVehicle", rentedVehicle)
-                .addStr("bikeRentalNetwork", vehicleRentalNetwork)
-                .addObj("transferFromPrevLeg", transferFromPrevLeg)
-                .addObj("transferToNextLeg", transferToNextLeg)
-                .toString();
+    default Trip getTrip() {
+        return null;
     }
 
     /**
      * The mode (e.g., <code>Walk</code>) used when traversing this leg.
      */
-    public TraverseMode getMode() {
-        return mode;
-    }
+    TraverseMode getMode();
 
     /**
      * The date and time this leg begins.
      */
-    public Calendar getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Calendar startTime) {
-        this.startTime = startTime;
-    }
+    Calendar getStartTime();
 
     /**
      * The date and time this leg ends.
      */
-    public Calendar getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Calendar endTime) {
-        this.endTime = endTime;
-    }
+    Calendar getEndTime();
 
     /**
      * For transit leg, the offset from the scheduled departure-time of the boarding stop in this
      * leg. "scheduled time of departure at boarding stop" = startTime - departureDelay Unit:
      * seconds.
      */
-    public int getDepartureDelay() {
-        return departureDelay;
-    }
-
-    public void setDepartureDelay(int departureDelay) {
-        this.departureDelay = departureDelay;
+    default int getDepartureDelay() {
+        return 0;
     }
 
     /**
      * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this
      * leg. "scheduled time of arrival at alighting stop" = endTime - arrivalDelay Unit: seconds.
      */
-    public int getArrivalDelay() {
-        return arrivalDelay;
-    }
-
-    public void setArrivalDelay(int arrivalDelay) {
-        this.arrivalDelay = arrivalDelay;
+    default int getArrivalDelay() {
+        return 0;
     }
 
     /**
      * Whether there is real-time data about this Leg
      */
-    public Boolean getRealTime() {
-        return realTime;
-    }
-
-    public void setRealTime(Boolean realTime) {
-        this.realTime = realTime;
+    default boolean getRealTime() {
+        return false;
     }
 
     /**
@@ -335,23 +150,15 @@ public class Leg {
      * inherit from Trip, so that the information that the Trip is flexible would be lost when
      * creating this object.
      */
-    public boolean isFlexibleTrip() {
-        return flexibleTrip;
-    }
-
-    public void setFlexibleTrip(boolean flexibleTrip) {
-        this.flexibleTrip = flexibleTrip;
+    default boolean isFlexibleTrip() {
+        return false;
     }
 
     /**
      * Is this a frequency-based trip with non-strict departure times?
      */
-    public Boolean getNonExactFrequency() {
-        return isNonExactFrequency;
-    }
-
-    public void setNonExactFrequency(Boolean nonExactFrequency) {
-        isNonExactFrequency = nonExactFrequency;
+    default Boolean getNonExactFrequency() {
+        return null;
     }
 
     /**
@@ -359,53 +166,25 @@ public class Leg {
      * for non-strict frequency trips, but could become important for real-time trips, strict
      * frequency trips, and scheduled trips with empirical headways.
      */
-    public Integer getHeadway() {
-        return headway;
-    }
-
-    public void setHeadway(Integer headway) {
-        this.headway = headway;
+    default Integer getHeadway() {
+        return null;
     }
 
     /**
      * The distance traveled while traversing the leg in meters.
      */
-    public Double getDistanceMeters() {
-        return distanceMeters;
-    }
-
-    public void setDistanceMeters(Double distanceMeters) {
-        this.distanceMeters = distanceMeters;
-    }
-
-    /**
-     * Is this leg a traversing pathways?
-     */
-    public Boolean getPathway() {
-        return pathway;
-    }
-
-    public void setPathway(Boolean pathway) {
-        this.pathway = pathway;
-    }
+    Double getDistanceMeters();
 
     /**
      * The GTFS pathway id
      */
-    public FeedScopedId getPathwayId() {
-        return pathwayId;
+    default FeedScopedId getPathwayId() {
+        return null;
     }
 
-    public void setPathwayId(FeedScopedId pathwayId) {
-        this.pathwayId = pathwayId;
-    }
-
-    public int getAgencyTimeZoneOffset() {
-        return agencyTimeZoneOffset;
-    }
-
-    public void setAgencyTimeZoneOffset(int agencyTimeZoneOffset) {
-        this.agencyTimeZoneOffset = agencyTimeZoneOffset;
+    default int getAgencyTimeZoneOffset() {
+        TimeZone timeZone = getStartTime().getTimeZone();
+        return timeZone.getOffset(getStartTime().getTimeInMillis());
     }
 
     /**
@@ -414,23 +193,15 @@ public class Leg {
      * coded using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard Also
      * see http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
      */
-    public Integer getRouteType() {
-        return routeType;
-    }
-
-    public void setRouteType(Integer routeType) {
-        this.routeType = routeType;
+    default Integer getRouteType() {
+        return null;
     }
 
     /**
      * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
      */
-    public String getHeadsign() {
-        return headsign;
-    }
-
-    public void setHeadsign(String headsign) {
-        this.headsign = headsign;
+    default String getHeadsign() {
+        return null;
     }
 
     /**
@@ -441,215 +212,121 @@ public class Leg {
      * for a given trip may happen at service date March 25th and service time 25:00, which in local
      * time would be Mach 26th 01:00.
      */
-    public ServiceDate getServiceDate() {
-        return serviceDate;
-    }
-
-    public void setServiceDate(ServiceDate serviceDate) {
-        this.serviceDate = serviceDate;
+    default ServiceDate getServiceDate() {
+        return null;
     }
 
     /**
      * For transit leg, the route's branding URL (if one exists). For non-transit legs, null.
      */
-    public String getRouteBrandingUrl() {
-        return routeBrandingUrl;
-    }
-
-    public void setRouteBrandingUrl(String routeBrandingUrl) {
-        this.routeBrandingUrl = routeBrandingUrl;
+    default String getRouteBrandingUrl() {
+        return null;
     }
 
     /**
      * The Place where the leg originates.
      */
-    public Place getFrom() {
-        return from;
-    }
-
-    public void setFrom(Place from) {
-        this.from = from;
-    }
+    Place getFrom();
 
     /**
      * The Place where the leg begins.
      */
-    public Place getTo() {
-        return to;
-    }
-
-    public void setTo(Place to) {
-        this.to = to;
-    }
+    Place getTo();
 
     /**
      * For transit legs, intermediate stops between the Place where the leg originates and the Place
-     * where the leg ends. For non-transit legs, {@code null}. This field is optional i.e. it is
-     * always {@code null} unless {@code showIntermediateStops} parameter is set to "true" in the
-     * planner request.
+     * where the leg ends. For non-transit legs, {@code null}.
      */
-    public List<StopArrival> getIntermediateStops() {
-        return intermediateStops;
-    }
-
-    public void setIntermediateStops(List<StopArrival> intermediateStops) {
-        this.intermediateStops = intermediateStops;
+    default List<StopArrival> getIntermediateStops() {
+        return null;
     }
 
     /**
      * The leg's geometry.
      */
-    public LineString getLegGeometry() {
-        return legGeometry;
-    }
-
-    public void setLegGeometry(LineString legGeometry) {
-        this.legGeometry = legGeometry;
-    }
+    LineString getLegGeometry();
 
     /**
      * A series of turn by turn instructions used for walking, biking and driving.
      */
-    public List<WalkStep> getWalkSteps() {
-        return walkSteps;
+    default List<WalkStep> getWalkSteps() {
+        return List.of();
     }
 
-    public void setWalkSteps(List<WalkStep> walkSteps) {
-        this.walkSteps = walkSteps;
+    default Set<StreetNote> getStreetNotes() {
+        return null;
     }
 
-    public Set<StreetNote> getStreetNotes() {
-        return streetNotes;
+    default Set<TransitAlert> getTransitAlerts() {
+        return null;
     }
 
-    public void setStreetNotes(Set<StreetNote> streetNotes) {
-        this.streetNotes = streetNotes;
+    default PickDrop getBoardRule() {
+        return null;
     }
 
-    public Set<TransitAlert> getTransitAlerts() {
-        return transitAlerts;
+    default PickDrop getAlightRule() {
+        return null;
     }
 
-    public void setTransitAlerts(Set<TransitAlert> transitAlerts) {
-        this.transitAlerts = transitAlerts;
+    default BookingInfo getDropOffBookingInfo() {
+        return null;
     }
 
-    public PickDrop getBoardRule() {
-        return boardRule;
+    default BookingInfo getPickupBookingInfo() {
+        return null;
     }
 
-    public void setBoardRule(PickDrop boardRule) {
-        this.boardRule = boardRule;
+    default ConstrainedTransfer getTransferFromPrevLeg() {
+        return null;
     }
 
-    public PickDrop getAlightRule() {
-        return alightRule;
+    default ConstrainedTransfer getTransferToNextLeg() {
+        return null;
     }
 
-    public void setAlightRule(PickDrop alightRule) {
-        this.alightRule = alightRule;
+    default Integer getBoardStopPosInPattern() {
+        return null;
     }
 
-    public BookingInfo getDropOffBookingInfo() {
-        return dropOffBookingInfo;
+    default Integer getAlightStopPosInPattern() {
+        return null;
     }
 
-    public void setDropOffBookingInfo(BookingInfo dropOffBookingInfo) {
-        this.dropOffBookingInfo = dropOffBookingInfo;
+    default Integer getBoardingGtfsStopSequence() {
+        return null;
     }
 
-    public BookingInfo getPickupBookingInfo() {
-        return pickupBookingInfo;
-    }
-
-    public void setPickupBookingInfo(BookingInfo pickupBookingInfo) {
-        this.pickupBookingInfo = pickupBookingInfo;
-    }
-
-    public ConstrainedTransfer getTransferFromPrevLeg() {
-        return transferFromPrevLeg;
-    }
-
-    public void setTransferFromPrevLeg(ConstrainedTransfer transferFromPrevLeg) {
-        this.transferFromPrevLeg = transferFromPrevLeg;
-    }
-
-    public ConstrainedTransfer getTransferToNextLeg() {
-        return transferToNextLeg;
-    }
-
-    public void setTransferToNextLeg(ConstrainedTransfer transferToNextLeg) {
-        this.transferToNextLeg = transferToNextLeg;
-    }
-
-    public Integer getBoardStopPosInPattern() {
-        return boardStopPosInPattern;
-    }
-
-    public void setBoardStopPosInPattern(Integer boardStopPosInPattern) {
-        this.boardStopPosInPattern = boardStopPosInPattern;
-    }
-
-    public Integer getAlightStopPosInPattern() {
-        return alightStopPosInPattern;
-    }
-
-    public void setAlightStopPosInPattern(Integer alightStopPosInPattern) {
-        this.alightStopPosInPattern = alightStopPosInPattern;
-    }
-
-    public Integer getBoardingGtfsStopSequence() {
-        return boardingGtfsStopSequence;
-    }
-
-    public void setBoardingGtfsStopSequence(Integer boardingGtfsStopSequence) {
-        this.boardingGtfsStopSequence = boardingGtfsStopSequence;
-    }
-
-    public Integer getAlightGtfsStopSequence() {
-        return alightGtfsStopSequence;
-    }
-
-    public void setAlightGtfsStopSequence(Integer alightGtfsStopSequence) {
-        this.alightGtfsStopSequence = alightGtfsStopSequence;
+    default Integer getAlightGtfsStopSequence() {
+        return null;
     }
 
     /**
      * Is this leg walking with a bike?
      */
-    public Boolean getWalkingBike() {
-        return walkingBike;
+    default Boolean getWalkingBike() {
+        return null;
     }
 
-    public void setWalkingBike(Boolean walkingBike) {
-        this.walkingBike = walkingBike;
+    default Boolean getRentedVehicle() {
+        return null;
     }
 
-    public Boolean getRentedVehicle() {
-        return rentedVehicle;
-    }
-
-    public void setRentedVehicle(Boolean rentedVehicle) {
-        this.rentedVehicle = rentedVehicle;
-    }
-
-    public String getVehicleRentalNetwork() {
-        return vehicleRentalNetwork;
+    default String getVehicleRentalNetwork() {
+        return null;
     }
 
     /**
      * If a generalized cost is used in the routing algorithm, this should be the "delta" cost
      * computed by the algorithm for the section this leg account for. This is relevant for anyone
-     * who want to debug an search and tuning the system. The unit should be equivalent to the cost
+     * who want to debug a search and tuning the system. The unit should be equivalent to the cost
      * of "one second of transit".
      * <p>
      * -1 indicate that the cost is not set/computed.
      */
-    public int getGeneralizedCost() {
-        return generalizedCost;
-    }
+    int getGeneralizedCost();
 
-    public void setGeneralizedCost(int generalizedCost) {
-        this.generalizedCost = generalizedCost;
+    default void addAlert(TransitAlert alert) {
+        throw new UnsupportedOperationException();
     }
 }

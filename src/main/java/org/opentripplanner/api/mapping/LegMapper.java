@@ -72,7 +72,7 @@ public class LegMapper {
         api.headway = domain.getHeadway();
         api.distance = domain.getDistanceMeters();
         api.generalizedCost = domain.getGeneralizedCost();
-        api.pathway = domain.getPathway();
+        api.pathway = domain.getPathwayId() != null;
         api.mode = TraverseModeMapper.mapToApi(domain.getMode());
         api.agencyTimeZoneOffset = domain.getAgencyTimeZoneOffset();
         api.transitLeg = domain.isTransitLeg();
@@ -98,7 +98,7 @@ public class LegMapper {
             api.tripShortName = trip.getTripShortName();
             api.tripBlockId = trip.getBlockId();
         }
-        else if (domain.getPathway()) {
+        else if (domain.getPathwayId() != null) {
             api.route = FeedScopedIdMapper.mapToApi(domain.getPathwayId());
         }
         else {
