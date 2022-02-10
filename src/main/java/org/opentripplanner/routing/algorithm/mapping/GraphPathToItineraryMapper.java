@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,26 +12,19 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexLegMapper;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.VehicleRentalStationInfo;
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
-import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
@@ -40,7 +34,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
@@ -63,7 +56,6 @@ import org.slf4j.LoggerFactory;
 public abstract class GraphPathToItineraryMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPathToItineraryMapper.class);
-    private static final double MAX_ZAG_DISTANCE = 30; // TODO add documentation, what is a "zag"?
 
     /**
      * Generates a TripPlan from a set of paths
@@ -102,12 +94,20 @@ public abstract class GraphPathToItineraryMapper {
         State[][] legsStates = sliceStates(states);
 
         List<Leg> legs = new ArrayList<>();
+        WalkStep previousStep = null;
+
         for (State[] legStates : legsStates) {
-            legs.add(generateLeg(graph, legStates));
+            Leg leg = generateLeg(graph, legStates, previousStep);
+            legs.add(leg);
+
+            List<WalkStep> walkSteps = leg.getWalkSteps();
+            if (walkSteps.size() > 0) {
+                previousStep = walkSteps.get(walkSteps.size() - 1);
+            }
+            else {
+                previousStep = null;
+            }
         }
-
-        addWalkSteps(graph, legs, legsStates);
-
 
         boolean first = true;
         for (Leg leg : legs) {
@@ -245,9 +245,11 @@ public abstract class GraphPathToItineraryMapper {
      * Generate one leg of an itinerary from a {@link State} array.
      *
      * @param states The array of states to base the leg on
+     * @param previousStep the previous walk step, so that the first relative turn direction is
+     *                     calculated correctly
      * @return The generated leg
      */
-    private static Leg generateLeg(Graph graph, State[] states) {
+    private static Leg generateLeg(Graph graph, State[] states, WalkStep previousStep) {
         Leg leg = null;
         FlexTripEdge flexEdge = null;
 
@@ -309,6 +311,12 @@ public abstract class GraphPathToItineraryMapper {
             }
         }
 
+        if (!leg.isTransitLeg()) {
+            leg.setWalkSteps(new StatesToWalkStepsMapper(graph, Arrays.asList(states), previousStep)
+                    .generateWalkSteps()
+            );
+        }
+
         addStreetNotes(graph, leg, states);
 
         if (flexEdge != null) {
@@ -327,35 +335,6 @@ public abstract class GraphPathToItineraryMapper {
         }
 
         return leg;
-    }
-
-    /**
-     * Add a {@link WalkStep} {@link List} to a {@link Leg} {@link List}.
-     * It's more convenient to process all legs in one go because the previous step should be kept.
-     *
-     * @param legs The legs of the itinerary
-     * @param legsStates The states that go with the legs
-     */
-    private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates) {
-        WalkStep previousStep = null;
-
-        TraverseMode lastMode = null;
-
-        for (int i = 0; i < legsStates.length; i++) {
-            List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep);
-            TraverseMode legMode = legs.get(i).getMode();
-            if(legMode != lastMode && !walkSteps.isEmpty()) {
-                lastMode = legMode;
-            }
-
-            legs.get(i).setWalkSteps(walkSteps);
-
-            if (walkSteps.size() > 0) {
-                previousStep = walkSteps.get(walkSteps.size() - 1);
-            } else {
-                previousStep = null;
-            }
-        }
     }
 
     /**
@@ -508,351 +487,13 @@ public abstract class GraphPathToItineraryMapper {
         }
     }
 
-    /**
-     * Converts a list of street edges to a list of turn-by-turn directions.
-     * 
-     * @param previous a non-transit leg that immediately precedes this one (bike-walking, say), or null
-     */
-    public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous) {
-        List<WalkStep> steps = new ArrayList<>();
-        WalkStep step = null;
-        double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
-        int roundaboutExit = 0; // track whether we are in a roundabout, and if so the exit number
-        String roundaboutPreviousStreet = null;
-
-        State onVehicleRentalState = null, offVehicleRentalState = null;
-
-        if (isRentalPickUp(states[states.length - 1])) {
-            onVehicleRentalState = states[states.length - 1];
-        }
-        if (isRentalDropOff(states[0])) {
-            offVehicleRentalState = states[0];
-        }
-
-        for (int i = 0; i < states.length - 1; i++) {
-            State backState = states[i];
-            State forwardState = states[i + 1];
-            Edge edge = forwardState.getBackEdge();
-
-            boolean createdNewStep = false, disableZagRemovalForThisStep = false;
-            if (edge instanceof FreeEdge) {
-                continue;
-            }
-            if (forwardState.getBackMode() == null || !forwardState.getBackMode().isOnStreetNonTransit()) {
-                continue; // ignore STLs and the like
-            }
-            Geometry geom = edge.getGeometry();
-            if (geom == null) {
-                continue;
-            }
-
-            // generate a step for getting off an elevator (all
-            // elevator narrative generation occurs when alighting). We don't need to know what came
-            // before or will come after
-            if (edge instanceof ElevatorAlightEdge) {
-                // don't care what came before or comes after
-                step = createWalkStep(graph, forwardState, backState);
-                createdNewStep = true;
-                disableZagRemovalForThisStep = true;
-
-                // tell the user where to get off the elevator using the exit notation, so the
-                // i18n interface will say 'Elevator to <exit>'
-                // what happens is that the webapp sees name == null and ignores that, and it sees
-                // exit != null and uses to <exit>
-                // the floor name is the AlightEdge name
-                // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-                step.streetName = edge.getName();
-
-                step.relativeDirection = RelativeDirection.ELEVATOR;
-
-                steps.add(step);
-                continue;
-            }
-
-            String streetName = edge.getName().toString();
-            int idx = streetName.indexOf('(');
-            String streetNameNoParens;
-            if (idx > 0)
-                streetNameNoParens = streetName.substring(0, idx - 1);
-            else
-                streetNameNoParens = streetName;
-
-            if (step == null) {
-                // first step
-                step = createWalkStep(graph, forwardState, backState);
-                createdNewStep = true;
-
-                steps.add(step);
-                double thisAngle = DirectionUtils.getFirstAngle(geom);
-                if (previous == null) {
-                    step.setAbsoluteDirection(thisAngle);
-                    step.relativeDirection = RelativeDirection.DEPART;
-                } else {
-                    step.setDirections(previous.angle, thisAngle, false);
-                }
-                // new step, set distance to length of first edge
-                distance = edge.getDistanceMeters();
-            } else if (((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
-                    && (!step.bogusName || !edge.hasBogusName())) ||
-                    edge.isRoundabout() != (roundaboutExit > 0) || // went on to or off of a roundabout
-                    isLink(edge) && !isLink(backState.getBackEdge())) {
-                // Street name has changed, or we've gone on to or off of a roundabout.
-                if (roundaboutExit > 0) {
-                    // if we were just on a roundabout,
-                    // make note of which exit was taken in the existing step
-                    step.exit = Integer.toString(roundaboutExit); // ordinal numbers from
-                    if (streetNameNoParens.equals(roundaboutPreviousStreet)) {
-                        step.stayOn = true;
-                    }
-                    roundaboutExit = 0;
-                }
-                /* start a new step */
-                step = createWalkStep(graph, forwardState, backState);
-                createdNewStep = true;
-
-                steps.add(step);
-                if (edge.isRoundabout()) {
-                    // indicate that we are now on a roundabout
-                    // and use one-based exit numbering
-                    roundaboutExit = 1;
-                    roundaboutPreviousStreet = backState.getBackEdge().getName().toString();
-                    idx = roundaboutPreviousStreet.indexOf('(');
-                    if (idx > 0)
-                        roundaboutPreviousStreet = roundaboutPreviousStreet.substring(0, idx - 1);
-                }
-                double thisAngle = DirectionUtils.getFirstAngle(geom);
-                step.setDirections(lastAngle, thisAngle, edge.isRoundabout());
-                // new step, set distance to length of first edge
-                distance = edge.getDistanceMeters();
-            } else {
-                /* street name has not changed */
-                double thisAngle = DirectionUtils.getFirstAngle(geom);
-                RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle,
-                        edge.isRoundabout());
-                boolean optionsBefore = backState.multipleOptionsBefore();
-                if (edge.isRoundabout()) {
-                    // we are on a roundabout, and have already traversed at least one edge of it.
-                    if (optionsBefore) {
-                        // increment exit count if we passed one.
-                        roundaboutExit += 1;
-                    }
-                }
-                if (edge.isRoundabout() || direction == RelativeDirection.CONTINUE) {
-                    // we are continuing almost straight, or continuing along a roundabout.
-                    // just append elevation info onto the existing step.
-
-                } else {
-                    // we are not on a roundabout, and not continuing straight through.
-
-                    // figure out if there were other plausible turn options at the last
-                    // intersection
-                    // to see if we should generate a "left to continue" instruction.
-                    boolean shouldGenerateContinue = false;
-                    if (edge instanceof StreetEdge) {
-                        // the next edges will be PlainStreetEdges, we hope
-                        double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
-                        for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
-                            if (alternative.getName().toString().equals(streetName)) {
-                                // alternatives that have the same name
-                                // are usually caused by street splits
-                                continue;
-                            }
-                            double altAngle = DirectionUtils.getFirstAngle(alternative
-                                    .getGeometry());
-                            double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
-                            if (angleDiff > Math.PI / 4 || altAngleDiff - angleDiff < Math.PI / 16) {
-                                shouldGenerateContinue = true;
-                                break;
-                            }
-                        }
-                    } else {
-                        double angleDiff = getAbsoluteAngleDiff(lastAngle, thisAngle);
-                        // FIXME: this code might be wrong with the removal of the edge-based graph
-                        State twoStatesBack = backState.getBackState();
-                        Vertex backVertex = twoStatesBack.getVertex();
-                        for (Edge alternative : backVertex.getOutgoingStreetEdges()) {
-                            List<Edge> alternatives = alternative.getToVertex()
-                                    .getOutgoingStreetEdges();
-                            if (alternatives.size() == 0) {
-                                continue; // this is not an alternative
-                            }
-                            alternative = alternatives.get(0);
-                            if (alternative.getName().toString().equals(streetName)) {
-                                // alternatives that have the same name
-                                // are usually caused by street splits
-                                continue;
-                            }
-                            double altAngle = DirectionUtils.getFirstAngle(alternative
-                                    .getGeometry());
-                            double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
-                            if (angleDiff > Math.PI / 4 || altAngleDiff - angleDiff < Math.PI / 16) {
-                                shouldGenerateContinue = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (shouldGenerateContinue) {
-                        // turn to stay on same-named street
-                        step = createWalkStep(graph, forwardState, backState);
-                        createdNewStep = true;
-                        steps.add(step);
-                        step.setDirections(lastAngle, thisAngle, false);
-                        step.stayOn = true;
-                        // new step, set distance to length of first edge
-                        distance = edge.getDistanceMeters();
-                    }
-                }
-            }
-
-            State exitState = backState;
-            Edge exitEdge = exitState.getBackEdge();
-            while (exitEdge instanceof FreeEdge) {
-                exitState = exitState.getBackState();
-                exitEdge = exitState.getBackEdge();
-            }
-            if (exitState.getVertex() instanceof ExitVertex) {
-                step.exit = ((ExitVertex) exitState.getVertex()).getExitName();
-            }
-
-            if (createdNewStep && !disableZagRemovalForThisStep && forwardState.getBackMode() == backState.getBackMode()) {
-                //check last three steps for zag
-                int last = steps.size() - 1;
-                if (last >= 2) {
-                    WalkStep threeBack = steps.get(last - 2);
-                    WalkStep twoBack = steps.get(last - 1);
-                    WalkStep lastStep = steps.get(last);
-
-                    if (twoBack.distance < MAX_ZAG_DISTANCE
-                            && lastStep.streetNameNoParens().equals(threeBack.streetNameNoParens())) {
-                        
-                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT ||
-                                lastStep.relativeDirection == RelativeDirection.HARD_RIGHT) &&
-                                (twoBack.relativeDirection == RelativeDirection.RIGHT ||
-                                twoBack.relativeDirection == RelativeDirection.HARD_RIGHT)) ||
-                                ((lastStep.relativeDirection == RelativeDirection.LEFT ||
-                                lastStep.relativeDirection == RelativeDirection.HARD_LEFT) &&
-                                (twoBack.relativeDirection == RelativeDirection.LEFT ||
-                                twoBack.relativeDirection == RelativeDirection.HARD_LEFT))) {
-                            // in this case, we have two left turns or two right turns in quick 
-                            // succession; this is probably a U-turn.
-                            
-                            steps.remove(last - 1);
-                            
-                            lastStep.distance += twoBack.distance;
-                            
-                            // A U-turn to the left, typical in the US. 
-                            if (lastStep.relativeDirection == RelativeDirection.LEFT ||
-                                    lastStep.relativeDirection == RelativeDirection.HARD_LEFT)
-                                lastStep.relativeDirection = RelativeDirection.UTURN_LEFT;
-                            else
-                                lastStep.relativeDirection = RelativeDirection.UTURN_RIGHT;
-                            
-                            // in this case, we're definitely staying on the same street 
-                            // (since it's zag removal, the street names are the same)
-                            lastStep.stayOn = true;
-                        }
-                                
-                        else {
-                            // What is a zag? TODO write meaningful documentation for this.
-                            // It appears to mean simplifying out several rapid turns in succession
-                            // from the description.
-                            // total hack to remove zags.
-                            steps.remove(last);
-                            steps.remove(last - 1);
-                            step = threeBack;
-                            step.distance += twoBack.distance;
-                            distance += step.distance;
-                            if (twoBack.elevation != null) {
-                                if (step.elevation == null) {
-                                    step.elevation = twoBack.elevation;
-                                } else {
-                                    for (P2<Double> d : twoBack.elevation) {
-                                        step.elevation.add(new P2<Double>(d.first + step.distance, d.second));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (!createdNewStep && step.elevation != null) {
-                    List<P2<Double>> s = encodeElevationProfile(edge, distance,
-                            backState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
-                    if (step.elevation != null && step.elevation.size() > 0) {
-                        step.elevation.addAll(s);
-                    } else {
-                        step.elevation = s;
-                    }
-                }
-                distance += edge.getDistanceMeters();
-
-            }
-
-            // increment the total length for this step
-            step.distance += edge.getDistanceMeters();
-            step.addStreetNotes(graph.streetNotesService.getNotes(forwardState));
-            lastAngle = DirectionUtils.getLastAngle(geom);
-
-            step.edges.add(edge);
-        }
-
-        // add vehicle rental information if applicable
-        if(onVehicleRentalState != null && !steps.isEmpty()) {
-            steps.get(steps.size()-1).vehicleRentalOnStation =
-                    new VehicleRentalStationInfo((VehicleRentalStationVertex) onVehicleRentalState.getVertex());
-        }
-        if(offVehicleRentalState != null && !steps.isEmpty()) {
-            steps.get(0).vehicleRentalOffStation =
-                    new VehicleRentalStationInfo((VehicleRentalStationVertex) offVehicleRentalState.getVertex());
-        }
-
-        return steps;
-    }
-
-    private static boolean isRentalPickUp(State state) {
+    public static boolean isRentalPickUp(State state) {
         return state.getBackEdge() instanceof VehicleRentalEdge && (state.getBackState() == null || !state.getBackState()
                 .isRentingVehicle());
     }
 
-    private static boolean isRentalDropOff(State state) {
+    public static boolean isRentalDropOff(State state) {
         return state.getBackEdge() instanceof VehicleRentalEdge && state.getBackState().isRentingVehicle();
-    }
-
-    private static boolean isLink(Edge edge) {
-        return edge instanceof StreetEdge && (((StreetEdge)edge).getStreetClass() & StreetEdge.CLASS_LINK) == StreetEdge.CLASS_LINK;
-    }
-
-    private static double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
-        double angleDiff = thisAngle - lastAngle;
-        if (angleDiff < 0) {
-            angleDiff += Math.PI * 2;
-        }
-        double ccwAngleDiff = Math.PI * 2 - angleDiff;
-        if (ccwAngleDiff < angleDiff) {
-            angleDiff = ccwAngleDiff;
-        }
-        return angleDiff;
-    }
-
-    private static WalkStep createWalkStep(Graph graph, State forwardState, State backState) {
-        Edge en = forwardState.getBackEdge();
-        WalkStep step;
-        step = new WalkStep();
-        step.streetName = en.getName();
-        step.startLocation = new WgsCoordinate(
-                backState.getVertex().getLat(),
-                backState.getVertex().getLon()
-        );
-        step.elevation = encodeElevationProfile(forwardState.getBackEdge(), 0,
-                forwardState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
-        step.bogusName = en.hasBogusName();
-        step.addStreetNotes(graph.streetNotesService.getNotes(forwardState));
-        step.angle = DirectionUtils.getFirstAngle(forwardState.getBackEdge().getGeometry());
-        if (forwardState.getBackEdge() instanceof AreaEdge) {
-            step.area = true;
-        }
-        return step;
     }
 
     private static List<P2<Double>> encodeElevationProfile(Edge edge, double distanceOffset, double heightOffset) {
