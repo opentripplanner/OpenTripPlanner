@@ -99,6 +99,11 @@ public class WalkStep {
     public double angle;
 
     /**
+     * Is this step walking with a bike?
+     */
+    public boolean walkingBike;
+
+    /**
      * The street edges that make up this walkStep.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
