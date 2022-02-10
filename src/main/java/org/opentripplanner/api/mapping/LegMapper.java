@@ -7,6 +7,7 @@ import java.util.Locale;
 import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.util.PolylineEncoder;
 
 public class LegMapper {
     private final WalkStepMapper walkStepMapper;
@@ -111,7 +112,7 @@ public class LegMapper {
         if(addIntermediateStops) {
             api.intermediateStops = placeMapper.mapStopArrivals(domain.getIntermediateStops());
         }
-        api.legGeometry = domain.getLegGeometry();
+        api.legGeometry = PolylineEncoder.createEncodings(domain.getLegGeometry());
         api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
         api.alerts = concatenateAlerts(
             streetNoteMaperMapper.mapToApi(domain.getStreetNotes()),

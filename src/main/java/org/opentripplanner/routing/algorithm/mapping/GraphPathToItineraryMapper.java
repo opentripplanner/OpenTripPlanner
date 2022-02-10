@@ -40,7 +40,6 @@ import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -293,9 +292,9 @@ public abstract class GraphPathToItineraryMapper {
         }
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
-        Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
+        LineString geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
 
-        leg.setLegGeometry(PolylineEncoder.createEncodings(geometry));
+        leg.setLegGeometry(geometry);
 
         leg.setGeneralizedCost(
                 (int) (states[states.length - 1].getWeight() - states[0].getWeight()));

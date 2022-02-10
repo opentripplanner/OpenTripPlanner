@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -16,7 +18,6 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.util.model.EncodedPolylineBean;
 
 /**
 * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -66,7 +67,7 @@ public class Leg {
 
     private List<StopArrival> intermediateStops;
 
-    private EncodedPolylineBean legGeometry;
+    private LineString legGeometry;
 
     private List<WalkStep> walkSteps;
 
@@ -497,11 +498,11 @@ public class Leg {
     /**
      * The leg's geometry.
      */
-    public EncodedPolylineBean getLegGeometry() {
+    public LineString getLegGeometry() {
         return legGeometry;
     }
 
-    public void setLegGeometry(EncodedPolylineBean legGeometry) {
+    public void setLegGeometry(LineString legGeometry) {
         this.legGeometry = legGeometry;
     }
 

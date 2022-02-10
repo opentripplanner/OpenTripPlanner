@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -16,6 +17,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
 
 /*
@@ -156,6 +158,7 @@ public class SplitEdgeTurnRestrictionsTest {
         // make sure that we only get CAR legs
         itineraries.forEach(
                 i -> i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.CAR)));
-        return itineraries.get(0).legs.get(0).getLegGeometry().getPoints();
+        Geometry geometry = itineraries.get(0).legs.get(0).getLegGeometry();
+        return PolylineEncoder.createEncodings(geometry).getPoints();
     }
 }

@@ -5,6 +5,7 @@ import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -16,6 +17,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.PolylineEncoder;
 
 
 public class BicycleRoutingTest {
@@ -71,6 +73,7 @@ public class BicycleRoutingTest {
         var itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
         // make sure that we only get BICYLE legs
         itineraries.forEach(i -> i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.BICYCLE)));
-        return itineraries.get(0).legs.get(0).getLegGeometry().getPoints();
+        Geometry legGeometry = itineraries.get(0).legs.get(0).getLegGeometry();
+        return PolylineEncoder.createEncodings(legGeometry).getPoints();
     }
 }

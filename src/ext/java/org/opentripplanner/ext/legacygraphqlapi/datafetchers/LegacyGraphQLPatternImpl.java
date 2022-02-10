@@ -6,6 +6,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -106,15 +107,8 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   @Override
-  public DataFetcher<EncodedPolylineBean> patternGeometry() {
-    return environment -> {
-      LineString geometry = getSource(environment).getGeometry();
-      if (geometry == null) {
-        return null;
-      }
-
-      return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
-    };
+  public DataFetcher<Geometry> patternGeometry() {
+    return environment -> getSource(environment).getGeometry();
   }
 
   @Override
