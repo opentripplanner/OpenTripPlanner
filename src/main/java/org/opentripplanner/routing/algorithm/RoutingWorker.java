@@ -89,10 +89,8 @@ public class RoutingWorker {
         if (OTPFeature.ParallelRouting.isOn()) {
             try {
                 CompletableFuture.allOf(
-                        CompletableFuture.runAsync(
-                                () -> routeDirectStreet(itineraries, routingErrors)),
-                        CompletableFuture.runAsync(
-                                () -> routeDirectFlex(itineraries, routingErrors)),
+                        CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
+                        CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
                         CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
                 ).join();
             }
