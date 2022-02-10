@@ -69,6 +69,12 @@ public class TransferIndexGenerator {
         sealConstrainedTransfers();
     }
 
+    /**
+     * This sorts and seals the constrained transfers for all patterns in order to protect them from
+     * modification ,while they are used in the routing.
+     *
+     * {@link TripPatternWithRaptorStopIndexes#sealConstrainedTransfers()}
+     */
     private void sealConstrainedTransfers() {
         for (var patterns : patternsByRoute.values()) {
             for (var pattern : patterns) {
@@ -77,6 +83,9 @@ public class TransferIndexGenerator {
         }
     }
 
+    /**
+     * Index scheduled patterns when loading the graph initially.
+     */
     private void setupPatternByTripIndex(Collection<TripPatternWithRaptorStopIndexes> tripPatterns) {
         for (TripPatternWithRaptorStopIndexes pattern : tripPatterns) {
             TripPattern tripPattern = pattern.getPattern();
@@ -99,6 +108,10 @@ public class TransferIndexGenerator {
         }
     }
 
+    /**
+     * Add information about a newly created pattern and timetables in the index, in order to be
+     * able to create constrained transfers for these patterns.
+     */
     public void addRealtimeTrip(TripPatternWithRaptorStopIndexes pattern, List<Trip> trips) {
         TripPattern tripPattern = pattern.getPattern();
 

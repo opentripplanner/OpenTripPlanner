@@ -29,6 +29,11 @@ public class TripPatternWithRaptorStopIndexes {
     private final TransferForPatternByStopPos
             constrainedTransfersReverseSearch = new TransferForPatternByStopPos();
 
+    /**
+     * We only want to add constrained transfers once, in order not to get duplicates, and to avoid
+     * modifying the lists while they are potentially in use in the router. This flag is set to true
+     * after the transfers have been looped through once.
+     */
     private boolean sealedConstrainedTransfers = false;
 
 
@@ -119,8 +124,11 @@ public class TripPatternWithRaptorStopIndexes {
     }
 
     /**
-     * This method should be called AFTER all transfers are added, and before the
-     * pattern is used in a Raptor search.
+     * This method should be called AFTER all transfers are added, and before the pattern is used in
+     * a Raptor search. This is done to protect against modification when processing real-time
+     * updates
+     *
+     * {@link TripPatternWithRaptorStopIndexes#sealedConstrainedTransfers}
      */
     public void sealConstrainedTransfers() {
         if (sealedConstrainedTransfers) {return;}

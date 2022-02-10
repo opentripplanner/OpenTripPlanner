@@ -371,6 +371,9 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         return scheduledTimetable;
     }
 
+    /**
+     * Has the TripPattern been created by a real-time update.
+     */
     public boolean isCreatedByRealtimeUpdater() {
         return createdByRealtimeUpdater;
     }
