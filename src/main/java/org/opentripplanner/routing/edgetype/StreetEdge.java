@@ -964,7 +964,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         if (turnRestriction == null) { return; }
         synchronized (this) {
             if (turnRestrictions.contains(turnRestriction)) {
-                if (turnRestrictions.size() < 2) {
+                if (turnRestrictions.size() == 1) {
                     turnRestrictions = NO_TURN_RESTRICTIONS;
                 }
                 else {
