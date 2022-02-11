@@ -1,18 +1,20 @@
 package org.opentripplanner.updater.stoptime;
 
+import static org.asynchttpclient.Dsl.asyncHttpClient;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.ws.DefaultWebSocketListener;
-import com.ning.http.client.ws.WebSocket;
-import com.ning.http.client.ws.WebSocketListener;
-import com.ning.http.client.ws.WebSocketUpgradeHandler;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.ws.WebSocket;
+import org.asynchttpclient.ws.WebSocketListener;
+import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -80,18 +82,9 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public void run() throws InterruptedException {
-        // The AsyncHttpClient library uses Netty by default (it has a dependency on Netty).
-        // It can also make use of Grizzly for the HTTP layer, but the Jersey-Grizzly integration
-        // forces us to use a version of Grizzly that is too old to be compatible with the current
-        // AsyncHttpClient. This would be done as follows:
-        // AsyncHttpClientConfig config = new AsyncHttpClientConfig.Builder().build();
-        // AsyncHttpClient client = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(config),
-        // config);
-        // Using Netty by default:
-
+    public void run() throws InterruptedException, IOException {
         while (true) {
-            AsyncHttpClient client = new AsyncHttpClient();
+            AsyncHttpClient client = asyncHttpClient();
             WebSocketListener listener = new Listener();
             WebSocketUpgradeHandler handler = new WebSocketUpgradeHandler.Builder()
                     .addWebSocketListener(listener).build();
@@ -137,9 +130,9 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     /**
      * Auxiliary class to handle incoming messages via the websocket connection
      */
-    private class Listener extends DefaultWebSocketListener {
+    private class Listener implements WebSocketListener {
         @Override
-        public void onMessage(byte[] message) {
+        public void onBinaryFrame(byte[] message, boolean finalFragment, int rsv) {
             FeedMessage feedMessage;
             List<FeedEntity> feedEntityList;
             List<TripUpdate> updates = null;
@@ -175,6 +168,18 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
                 );
                 saveResultOnGraph.execute(runnable);
             }
+        }
+
+        @Override
+        public void onOpen(WebSocket websocket) {
+        }
+
+        @Override
+        public void onClose(WebSocket websocket, int code, String reason) {
+        }
+
+        @Override
+        public void onError(Throwable t) {
         }
     }
 
