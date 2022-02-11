@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, CarPickupableEdge {
 
-    private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
     private StreetEdgeCostExtension costExtension;
 
@@ -65,8 +65,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     public static final int CLASS_OTHERPATH = 5;
     public static final int CLASS_OTHER_PLATFORM = 8;
     public static final int CLASS_TRAIN_PLATFORM = 16;
-    public static final int ANY_PLATFORM_MASK = 24;
-    public static final int CROSSING_CLASS_MASK = 7; // ignore platform
     public static final int CLASS_LINK = 32; // on/offramps; OSM calls them "links"
 
     private static final double GREENWAY_SAFETY_FACTOR = 0.1;
