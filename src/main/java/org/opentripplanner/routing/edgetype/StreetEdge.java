@@ -25,7 +25,6 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
@@ -776,7 +775,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     /** Split this street edge and return the resulting street edges. After splitting, the original
      * edge will be removed from the graph. */
-    public P2<StreetEdge> splitDestructively(SplitterVertex v, Graph graph) {
+    public P2<StreetEdge> splitDestructively(SplitterVertex v) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, permission, this.isBack());
@@ -830,7 +829,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         }
 
         var splitEdges = new P2<>(e1, e2);
-        copyRestrictionsToSplitEdges(this, splitEdges, graph);
+        copyRestrictionsToSplitEdges(this, splitEdges);
         return splitEdges;
     }
 
@@ -839,8 +838,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     public P2<StreetEdge> splitNonDestructively(
         SplitterVertex v,
         DisposableEdgeCollection tempEdges,
-        LinkingDirection direction,
-        Graph graph
+        LinkingDirection direction
     ) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
@@ -867,7 +865,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         }
 
         var splitEdges = new P2<>(e1, e2);
-        copyRestrictionsToSplitEdges(this, splitEdges, graph);
+        copyRestrictionsToSplitEdges(this, splitEdges);
         return splitEdges;
     }
 
@@ -875,7 +873,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * Copy restrictions having former edge as from to appropriate split edge, as well as
      * restrictions on incoming edges.
      */
-    private static void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> splitEdges, Graph graph) {
+    private static void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> splitEdges) {
 
         edge.getTurnRestrictions().forEach(restriction -> {
             // figure which one is the "from" edge
