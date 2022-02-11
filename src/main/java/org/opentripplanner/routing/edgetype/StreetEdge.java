@@ -1,13 +1,11 @@
 package org.opentripplanner.routing.edgetype;
 
-import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -936,13 +934,15 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
 
     /**
-     * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} of this edge.
+     * Add a {@link TurnRestriction} to this edge.
      *
-     * This method is thread-safe.
+     * This method is thread-safe as modifying the underlying set is synchronized.
      */
     public void addTurnRestriction(TurnRestriction turnRestriction) {
         if (turnRestriction == null) { return; }
-        synchronized (turnRestrictions) {
+        synchronized (this) {
+            // in order to guarantee fast access without extra allocations
+            // we make the turn restrictions unmodifiable after a copy-on-write modification
             var temp = new HashSet<>(turnRestrictions);
             temp.add(turnRestriction);
             turnRestrictions = Collections.unmodifiableSet(temp);
@@ -950,18 +950,20 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
 
     /**
-     * Remove a {@link TurnRestriction} from the {@link TurnRestriction} {@link List} of this edge.
+     * Remove a {@link TurnRestriction} from this edge.
      *
-     * This method is thread-safe as modifying the underlying list is synchronized.
+     * This method is thread-safe as modifying the underlying set is synchronized.
      */
     public void removeTurnRestriction(TurnRestriction turnRestriction) {
-        if (turnRestriction == null) {return;}
-        synchronized (turnRestrictions) {
+        if (turnRestriction == null) { return; }
+        synchronized (this) {
             if (turnRestrictions.contains(turnRestriction)) {
                 if (turnRestrictions.size() < 2) {
                     turnRestrictions = NO_TURN_RESTRICTIONS;
                 }
                 else {
+                    // in order to guarantee fast access without extra allocations
+                    // we make the turn restrictions unmodifiable after a copy-on-write modification
                     var withRemoved = new HashSet<>(turnRestrictions);
                     withRemoved.remove(turnRestriction);
                     turnRestrictions = Collections.unmodifiableSet(withRemoved);
@@ -978,6 +980,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      *
      */
     public Set<TurnRestriction> getTurnRestrictions() {
+        // this can be safely returned as it's unmodifiable
         return turnRestrictions;
     }
 
