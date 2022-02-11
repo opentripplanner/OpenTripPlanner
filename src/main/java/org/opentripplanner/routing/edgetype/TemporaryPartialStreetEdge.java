@@ -1,16 +1,14 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.I18NString;
-
-import java.util.List;
 
 
 final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge implements TemporaryEdge {
@@ -85,7 +83,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     }
 
     @Override
-    public List<TurnRestriction> getTurnRestrictions() {
+    public Set<TurnRestriction> getTurnRestrictions() {
         return parentEdge.getTurnRestrictions();
     }
 

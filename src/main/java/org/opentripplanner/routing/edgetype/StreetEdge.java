@@ -1,13 +1,14 @@
 package org.opentripplanner.routing.edgetype;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -51,6 +52,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     private StreetEdgeCostExtension costExtension;
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Since the majority of StreetEdge instances don't have any turn restrictions,
+     * we create a global instance of an empty set of turn restrictions.
+     */
+    private static final Set<TurnRestriction> NO_TURN_RESTRICTIONS = Set.of();
 
     /* TODO combine these with OSM highway= flags? */
     public static final int CLASS_STREET = 3;
@@ -121,7 +128,14 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
 
-    private CopyOnWriteArrayList<TurnRestriction> turnRestrictions;
+    /**
+     * The set of turn restrictions of this edge. Since most instances don't have any, we reuse
+     * a global instance in order to conserve memory.
+     *
+     * This field is optimized for low memory consumption and fast access, but modification is
+     * synchronized since it can happen concurrently.
+     */
+    private Set<TurnRestriction> turnRestrictions = NO_TURN_RESTRICTIONS;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -919,45 +933,54 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         );
         restriction.from.addTurnRestriction(splitTurnRestriction);
         // Former turn restriction needs to be removed. Especially no only_turn
-        // restriction to a non existent edge must not survive
+        // restriction to a non-existent edge must not survive
         restriction.from.removeTurnRestriction(restriction);
     }
 
     /**
-     * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} belonging to an
-     * {@link Edge}.
+     * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} of this edge.
+     *
+     * This method is thread-safe.
      */
     public void addTurnRestriction(TurnRestriction turnRestriction) {
-        if (turnRestriction == null) return;
-        if (turnRestrictions == null) {
-            turnRestrictions = new CopyOnWriteArrayList<>();
+        if (turnRestriction == null) { return; }
+        synchronized (turnRestrictions) {
+            var temp = new HashSet<>(turnRestrictions);
+            temp.add(turnRestriction);
+            turnRestrictions = Collections.unmodifiableSet(temp);
         }
-        turnRestrictions.add(turnRestriction);
     }
 
+    /**
+     * Remove a {@link TurnRestriction} from the {@link TurnRestriction} {@link List} of this edge.
+     *
+     * This method is thread-safe as modifying the underlying list is synchronized.
+     */
     public void removeTurnRestriction(TurnRestriction turnRestriction) {
-        if (turnRestriction == null) return;
-        if (turnRestrictions != null && turnRestrictions.contains(turnRestriction)) {
-            if (turnRestrictions.size() < 2) {
-                turnRestrictions = null;
-            } else {
-                turnRestrictions.remove(turnRestriction);
+        if (turnRestriction == null) {return;}
+        synchronized (turnRestrictions) {
+            if (turnRestrictions.contains(turnRestriction)) {
+                if (turnRestrictions.size() < 2) {
+                    turnRestrictions = NO_TURN_RESTRICTIONS;
+                }
+                else {
+                    var withRemoved = new HashSet<>(turnRestrictions);
+                    withRemoved.remove(turnRestriction);
+                    turnRestrictions = Collections.unmodifiableSet(withRemoved);
+                }
             }
         }
     }
 
     /**
-     * Get the {@link TurnRestriction} {@link List} that belongs to an {@link Edge} and return an
-     * immutable copy. This method is thread-safe when used by itself, but not if addTurnRestriction
-     * or removeTurnRestriction is called concurrently.
-     * @return The {@link TurnRestriction} {@link List} that belongs to the {@link Edge}
+     * Get the immutable {@link Set} of {@link TurnRestriction} that belongs to this {@link StreetEdge}.
+     *
+     * This method is thread-safe, even if {@link StreetEdge#addTurnRestriction}
+     * or {@link StreetEdge#removeTurnRestriction} is called concurrently.
+     *
      */
-    public List<TurnRestriction> getTurnRestrictions() {
-        if (turnRestrictions == null) {
-            return Collections.emptyList();
-        } else {
-            return ImmutableList.copyOf(turnRestrictions);
-        }
+    public Set<TurnRestriction> getTurnRestrictions() {
+        return turnRestrictions;
     }
 
     /**

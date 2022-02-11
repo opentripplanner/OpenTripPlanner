@@ -22,7 +22,6 @@ import gnu.trove.map.hash.TIntIntHashMap;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -135,21 +134,6 @@ public class SerializedGraphObject implements Serializable {
             LOG.info("Not saving graph to disk, as requested.");
         }
     }
-
-    /**
-     * This method is an alternative to {@link #save(DataSource)} for tests and other purposes,
-     * but should not be used within the main OTP application.
-     */
-    public void saveToFile(File file) throws IOException {
-        try {
-            save(new FileOutputStream(file), file.getName(), file.length());
-        } catch (Exception e) {
-            // remove half-written file
-            file.deleteOnExit();
-            throw e;
-        }
-    }
-
 
     /**
      * This method allows reproducibly creating Kryo (de)serializer instances with exactly the same configuration.
