@@ -129,6 +129,14 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      *
      * This field is optimized for low memory consumption and fast access, but modification is
      * synchronized since it can happen concurrently.
+     *
+     * Why not use null to represent no turn restrictions?
+     * This would mean that the access would also need to be synchronized but since that is a very
+     * hot code path, it needs to be fast.
+     *
+     * Why not use a concurrent collection?
+     * That would mean that every StreetEdge has its own empty instance which would increase
+     * memory significantly.
      */
     private Set<TurnRestriction> turnRestrictions = NO_TURN_RESTRICTIONS;
 
