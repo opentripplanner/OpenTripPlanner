@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.api.path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -328,20 +329,16 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     private static <S extends RaptorTripSchedule> int countNumberOfTransfers(
         AccessPathLeg<S> accessLeg, EgressPathLeg<S> egressPathLeg
     ) {
-        return accessLeg.access().numberOfRides()
-            + (int) accessLeg
-                .nextLeg()
+        int nAccessRides = accessLeg.access().numberOfRides();
+        int nTransitRides = (int) accessLeg
                 .stream()
                 .filter(PathLeg::isTransitLeg)
-                // Filter out legs, where the user stays onboard to the next leg
-                .filter(leg -> {
-                    var transfer = leg.asTransitLeg().getConstrainedTransferAfterLeg();
-                    return transfer == null || !transfer.getTransferConstraint().isStaySeated();
-                })
-                .count()
-            + egressPathLeg.egress().numberOfRides()
-            // Remove one boarding to get the count of transfers only.
-            // We can't remove the first leg, as it might have info on a stay seated transfer.
-            - 1;
+                .map(PathLeg::asTransitLeg)
+                .filter(Predicate.not(TransitPathLeg::isStaySeatedOntoNextLeg))
+                .count();
+        int nEgressRides = egressPathLeg.egress().numberOfRides();
+
+        // Remove one boarding to get the count of transfers only.
+        return nAccessRides + nTransitRides + nEgressRides - 1;
     }
 }
