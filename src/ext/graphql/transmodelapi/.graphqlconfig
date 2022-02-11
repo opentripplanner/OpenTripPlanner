@@ -5,7 +5,7 @@
   },
   "extensions": {
     "endpoints": {
-      "Localhost GraphQL Endpoint": {
+      "Transmodel - Localhost GraphQL Endpoint": {
         "url": "http://localhost:8080/otp/routers/default/transmodel/index/graphql",
         "headers": {
           "user-agent": "JS GraphQL"

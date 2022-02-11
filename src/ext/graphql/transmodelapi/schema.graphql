@@ -47,16 +47,34 @@ type BikeRentalStation implements PlaceInterface {
 }
 
 type BookingArrangement {
+    "Time constraints for booking"
+    bookWhen: PurchaseWhen
     "Who should ticket be contacted for booking"
     bookingContact: Contact
     "How should service be booked?"
-    bookingMethods: String
+    bookingMethods: [BookingMethod]
     "Textual description of booking arrangement for service"
     bookingNote: String
-    "Latest time service can be booked. ISO 8601 timestamp"
+    "How many days prior to the travel the service needs to be booked"
+    latestBookingDay: Int
+    "Latest time the service can be booked. ISO 8601 timestamp"
     latestBookingTime: LocalTime
     "Minimum period in advance service can be booked as a ISO 8601 duration"
     minimumBookingPeriod: String
+}
+
+type Branding {
+    "Description of branding."
+    description: String
+    id: ID
+    "URL to an image be used for branding"
+    image: String
+    "Full name to be used for branding."
+    name: String
+    "Short name to be used for branding."
+    shortName: String
+    "URL to be used for branding"
+    url: String
 }
 
 type Contact {
@@ -85,49 +103,54 @@ type EstimatedCall {
     "Actual time of departure from quay. Updated with real time information if available. NOT IMPLEMENTED"
     actualDepartureTime: DateTime
     "Scheduled time of arrival at quay. Not affected by read time updated"
-    aimedArrivalTime: DateTime
+    aimedArrivalTime: DateTime!
     "Scheduled time of departure from quay. Not affected by read time updated"
-    aimedDepartureTime: DateTime
-    "Booking arrangements for flexible service. NOT IMPLEMENTED"
+    aimedDepartureTime: DateTime!
+    "Booking arrangements for this EstimatedCall."
     bookingArrangements: BookingArrangement
-    "Whether stop is cancellation. NOT IMPLEMENTED"
-    cancellation: Boolean
+    "Whether stop is cancelled. This means that either the ServiceJourney has a planned cancellation, the ServiceJourney has been cancelled by realtime data, or this particular StopPoint has been cancelled. This also means that both boarding and alighting has been cancelled."
+    cancellation: Boolean!
     "The date the estimated call is valid for."
     date: Date
     destinationDisplay: DestinationDisplay
     "Expected time of arrival at quay. Updated with real time information if available. Will be null if an actualArrivalTime exists"
-    expectedArrivalTime: DateTime
+    expectedArrivalTime: DateTime!
     "Expected time of departure from quay. Updated with real time information if available. Will be null if an actualDepartureTime exists"
-    expectedDepartureTime: DateTime
-    "Whether vehicle may be alighted at quay."
-    forAlighting: Boolean
-    "Whether vehicle may be boarded at quay."
-    forBoarding: Boolean
-    notices: [Notice]!
+    expectedDepartureTime: DateTime!
+    "Whether vehicle may be alighted at quay according to the planned data. If the cancellation flag is set, alighting is not possible, even if this field is set to true."
+    forAlighting: Boolean!
+    "Whether vehicle may be boarded at quay according to the planned data. If the cancellation flag is set, boarding is not possible, even if this field is set to true."
+    forBoarding: Boolean!
+    notices: [Notice!]!
     "Whether the updated estimates are expected to be inaccurate. NOT IMPLEMENTED"
-    predictionInaccurate: Boolean
+    predictionInaccurate: Boolean!
     quay: Quay
     "Whether this call has been updated with real time information."
-    realtime: Boolean
-    realtimeState: RealtimeState
+    realtime: Boolean!
+    realtimeState: RealtimeState!
     "Whether vehicle will only stop on request."
-    requestStop: Boolean
+    requestStop: Boolean!
     serviceJourney: ServiceJourney
     "Get all relevant situations for this EstimatedCall."
-    situations: [PtSituationElement]!
+    situations: [PtSituationElement!]!
+    stopPositionInPattern: Int
     "Whether this is a timing point or not. Boarding and alighting is not allowed at timing points."
-    timingPoint: Boolean
+    timingPoint: Boolean!
 }
 
 type Interchange {
-    FromLine: Line
-    FromServiceJourney: ServiceJourney
-    ToLine: Line
-    ToServiceJourney: ServiceJourney
-    "Time that the trip departs. NOT IMPLEMENTED"
+    FromLine: Line @deprecated(reason : "This is the same as using the `fromServiceJourney { line }` field.")
+    FromServiceJourney: ServiceJourney @deprecated(reason : "Use fromServiceJourney instead")
+    ToLine: Line @deprecated(reason : "This is the same as using the `toServiceJourney { line }` field.")
+    ToServiceJourney: ServiceJourney @deprecated(reason : "Use toServiceJourney instead")
+    fromServiceJourney: ServiceJourney
     guaranteed: Boolean
-    "Time that the trip departs. NOT IMPLEMENTED"
+    "Maximum time after scheduled departure time the connecting transport is guarantied to wait for the delayed trip. [NOT RESPECTED DURING ROUTING, JUST PASSED THROUGH]"
+    maximumWaitTime: Int
+    "The transfer priority is used to decide where a transfer should happen, at the highest prioritized location. If the guarantied flag is set it take precedence priority. A guarantied ALLOWED transfer is preferred over a PREFERRED none-guarantied transfer."
+    priority: InterchangePriority
     staySeated: Boolean
+    toServiceJourney: ServiceJourney
 }
 
 type JourneyPattern {
@@ -149,11 +172,12 @@ type JourneyPattern {
 "Part of a trip pattern. Either a ride on a public transport vehicle or access or path link to/from/between places"
 type Leg {
     "The aimed date and time this leg ends."
-    aimedEndTime: DateTime
+    aimedEndTime: DateTime!
     "The aimed date and time this leg starts."
-    aimedStartTime: DateTime
+    aimedStartTime: DateTime!
     "For ride legs, the service authority used for this legs. For non-ride legs, null."
     authority: Authority
+    bikeRentalNetworks: [String]!
     bookingArrangements: BookingArrangement
     "NOT IMPLEMENTED"
     directDuration: Long
@@ -162,51 +186,51 @@ type Leg {
     "The legs's duration in seconds"
     duration: Long
     "The expected, realtime adjusted date and time this leg ends."
-    expectedEndTime: DateTime
+    expectedEndTime: DateTime!
     "The expected, realtime adjusted date and time this leg starts."
-    expectedStartTime: DateTime
-    "EstimatedCall for the quay where the leg originates. NOT IMPLEMENTED"
+    expectedStartTime: DateTime!
+    "EstimatedCall for the quay where the leg originates."
     fromEstimatedCall: EstimatedCall
     "The Place where the leg originates."
     fromPlace: Place!
-    "NOT IMPLEMENTED"
+    "Generalized cost or weight of the leg. Used for debugging."
+    generalizedCost: Int
     interchangeFrom: Interchange
-    "NOT IMPLEMENTED"
     interchangeTo: Interchange
     "For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list."
     intermediateEstimatedCalls: [EstimatedCall]!
     "For ride legs, intermediate quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list."
-    intermediateQuays: [Quay]!
+    intermediateQuays: [Quay!]!
     "For ride legs, the line. For non-ride legs, null."
     line: Line
     "The mode of transport or access (e.g., foot) used when traversing this leg."
-    mode: Mode
+    mode: Mode!
     "For ride legs, the operator used for this legs. For non-ride legs, null."
     operator: Operator
     "The legs's geometry."
     pointsOnLink: PointsOnLink
     "Whether there is real-time data about this leg"
-    realtime: Boolean
-    "Whether this leg is walking with a bike."
-    walkingBike: Boolean
+    realtime: Boolean!
     "Whether this leg is with a rented bike."
     rentedBike: Boolean
     "Whether this leg is a ride leg or not."
-    ride: Boolean
+    ride: Boolean!
     "For ride legs, the service journey. For non-ride legs, null."
     serviceJourney: ServiceJourney
     "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list."
     serviceJourneyEstimatedCalls: [EstimatedCall]!
     "All relevant situations for this leg"
-    situations: [PtSituationElement]!
+    situations: [PtSituationElement!]!
     "Do we continue from a specified via place"
     steps: [PathGuidance]!
-    "EstimatedCall for the quay where the leg ends. NOT IMPLEMENTED"
+    "EstimatedCall for the quay where the leg ends."
     toEstimatedCall: EstimatedCall
     "The Place where the leg ends."
     toPlace: Place!
     "The transport sub mode (e.g., localBus or expressBus) used when traversing this leg. Null if leg is not a ride"
     transportSubmode: TransportSubmode
+    "Whether this leg is walking with a bike."
+    walkingBike: Boolean
 }
 
 "A group of routes which is generally known to the public by a similar name or number"
@@ -214,7 +238,8 @@ type Line {
     authority: Authority
     bikesAllowed: BikesAllowed
     "Booking arrangements for flexible line."
-    bookingArrangements: BookingArrangement
+    bookingArrangements: BookingArrangement @deprecated(reason : "BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
+    branding: Branding
     description: String
     "Type of flexible line, or null if line is not flexible."
     flexibleLineType: String
@@ -231,7 +256,6 @@ type Line {
     "Get all situations active for the line."
     situations: [PtSituationElement]!
     transportMode: TransportMode
-    "NOT IMPLEMENTED"
     transportSubmode: TransportSubmode
     url: String
 }
@@ -298,6 +322,8 @@ type PathGuidance {
 type Place {
     "The bike rental station related to the place"
     bikeRentalStation: BikeRentalStation
+    "The flexible area related to the place."
+    flexibleArea: Coordinates
     "The latitude of the place."
     latitude: Float!
     "The longitude of the place."
@@ -306,8 +332,16 @@ type Place {
     name: String
     "The quay related to the place."
     quay: Quay
+    "The rental vehicle related to the place"
+    rentalVehicle: RentalVehicle
     "Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit quay) Mostly used for better localization of bike sharing and P+R station names"
     vertexType: VertexType
+}
+
+type PlaceAtDistance {
+    distance: Float
+    id: ID! @deprecated(reason : "Id is not referable or meaningful and will be removed")
+    place: PlaceInterface
 }
 
 "A list of coordinates encoded as a polyline string (see http://code.google.com/apis/maps/documentation/polylinealgorithm.html)"
@@ -336,12 +370,16 @@ type PtSituationElement {
     "Optional links to more information."
     infoLinks: [infoLink]
     lines: [Line]!
+    "Priority of this situation "
+    priority: Int
     quays: [Quay]!
     "Authority that reported this situation"
     reportAuthority: Authority @deprecated(reason : "Not yet officially supported. May be removed or renamed.")
     "ReportType of this situation"
     reportType: ReportType
     serviceJourneys: [ServiceJourney]!
+    "Severity of this situation "
+    severity: Severity
     "Operator's internal id for this situation"
     situationNumber: String
     "Summary of situation in all different translations available"
@@ -355,6 +393,8 @@ type Quay implements PlaceInterface {
     description: String
     "List of visits to this quay as part of vehicle journeys."
     estimatedCalls(
+        "Filters results by either departures, arrivals or both. For departures forBoarding has to be true and the departure time has to be within the specified time range. For arrivals, forAlight has to be true and the arrival time has to be within the specified time range. If both are asked for, either the conditions for arrivals or the conditions for departures will have to be true for an EstimatedCall to show."
+        arrivalDeparture: ArrivalDeparture = departures,
         "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
         includeCancelledTrips: Boolean = false,
         "Limit the total number of departures returned."
@@ -369,9 +409,7 @@ type Quay implements PlaceInterface {
         whiteListed: InputWhiteListed,
         "Only show estimated calls for selected modes."
         whiteListedModes: [TransportMode]
-    ): [EstimatedCall]!
-    "Geometry for flexible area."
-    flexibleArea: Coordinates
+    ): [EstimatedCall!]!
     id: ID!
     "List of journey patterns servicing this quay"
     journeyPatterns: [JourneyPattern]!
@@ -386,13 +424,14 @@ type Quay implements PlaceInterface {
     situations: [PtSituationElement]!
     "The stop place to which this quay belongs to."
     stopPlace: StopPlace
-    timezone: String!
+    tariffZones: [TariffZone]!
     "Whether this quay is suitable for wheelchair boarding."
     wheelchairAccessible: WheelchairBoarding
 }
 
 type QuayAtDistance {
-    distance: Int
+    "The distance in meters to the given quay."
+    distance: Float
     id: ID!
     quay: Quay
 }
@@ -410,7 +449,7 @@ type QueryType {
     bikeRentalStation(id: String!): BikeRentalStation
     "Get all bike rental stations"
     bikeRentalStations(ids: [String]): [BikeRentalStation]!
-    "Get all bike rental stations within the specified bounding box. NOT IMPLEMENTED"
+    "Get all bike rental stations within the specified bounding box."
     bikeRentalStationsByBbox(maximumLatitude: Float, maximumLongitude: Float, minimumLatitude: Float, minimumLongitude: Float): [BikeRentalStation]!
     "Get a single line based on its id"
     line(id: ID!): Line
@@ -418,12 +457,43 @@ type QueryType {
     lines(
         "Set of ids of authorities to fetch lines for."
         authorities: [String],
+        "Filter by lines containing flexible / on demand serviceJourneys only."
+        flexibleOnly: Boolean = false,
         ids: [ID],
         name: String,
         publicCode: String,
         publicCodes: [String],
         transportModes: [TransportMode]
     ): [Line]!
+    "Get all places (quays, stop places, car parks etc. with coordinates) within the specified radius from a location. The returned type has two fields place and distance. The search is done by walking so the distance is according to the network of walkables."
+    nearest(
+        "fetching only nodes after this node (exclusive)"
+        after: String,
+        "fetching only nodes before this node (exclusive)"
+        before: String,
+        "Only include places that match one of the given ids."
+        filterByIds: InputPlaceIds,
+        "Only affects queries for quays and stop places. If true only quays and stop places with at least one visiting line are included."
+        filterByInUse: Boolean = false,
+        "Only include places that include this mode. Only checked for places with mode i.e. quays, departures."
+        filterByModes: [TransportMode],
+        "Only include places of given types if set. Default accepts all types"
+        filterByPlaceTypes: [FilterPlaceType] = [quay, stopPlace, bicycleRent, bikePark, carPark],
+        "fetching only the first certain number of nodes"
+        first: Int,
+        "fetching only the last certain number of nodes"
+        last: Int,
+        "Latitude of the location"
+        latitude: Float!,
+        "Longitude of the location"
+        longitude: Float!,
+        "Maximum distance (in meters) to search for from the specified location. Default is 2000m."
+        maximumDistance: Float! = 2000.0,
+        "Maximum number of results. Search is stopped when this limit is reached. Default is 20."
+        maximumResults: Int = 20,
+        "MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response. Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace"
+        multiModalMode: MultiModalMode = parent
+    ): placeAtDistanceConnection
     "Get a operator by ID"
     operator(id: String!): Operator
     "Get all operators"
@@ -442,7 +512,7 @@ type QueryType {
         minimumLatitude: Float!,
         minimumLongitude: Float!
     ): [Quay]!
-    "Get all quays within the specified radius from a location. The returned type has two fields quay and distance"
+    "Get all quays within the specified walking radius from a location. The returned type has two fields quay and distance"
     quaysByRadius(
         "fetching only nodes after this node (exclusive)"
         after: String,
@@ -457,8 +527,8 @@ type QueryType {
         latitude: Float!,
         "Longitude of the location"
         longitude: Float!,
-        "Radius (in meters) to search for from the specified location"
-        radius: Int!
+        "Radius via streets (in meters) to search for from the specified location"
+        radius: Float!
     ): quayAtDistanceConnection
     "Get default routing parameters."
     routingParameters: RoutingParameters
@@ -477,6 +547,8 @@ type QueryType {
         "Set of ids of private codes to fetch serviceJourneys for."
         privateCodes: [String]
     ): [ServiceJourney]!
+    "Get a single situation based on its situationNumber"
+    situation(situationNumber: String!): PtSituationElement
     "Get all active situations."
     situations(
         "Filter by reporting authorities."
@@ -503,79 +575,122 @@ type QueryType {
     "Input type for executing a travel search for a trip between two locations. Returns trip patterns describing suggested alternatives for the trip."
     trip(
         "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
-        alightSlackDefault: Int = 15,
-        "List of alightSlack for a given set of modes. Defaults: []"
+        alightSlackDefault: Int = 0,
+        "List of alightSlack for a given set of modes. Defaults: [air : 900]"
         alightSlackList: [TransportModeSlack],
-        "Is bike rental allowed?"
-        allowBikeRental: Boolean = false,
-        "Whether the trip should depart at dateTime (false, the default), or arrive at dateTime."
+        "Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. See `timetableView` for use-cases where this parameter is relevant."
         arriveBy: Boolean = false,
         "Parameters for indicating authorities, lines or quays not be used in the trip patterns"
         banned: InputBanned,
+        "The set of characteristics that the user wants to optimise for during bicycle searches -- defaults to safe"
+        bicycleOptimisationMethod: BicycleOptimisationMethod = safe,
         "The maximum bike speed along streets, in meters per second"
         bikeSpeed: Float = 5.0,
         "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also apply to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
-        boardSlackDefault: Int = 30,
-        "List of boardSlack for a given set of modes. Defaults: [rail : 120, water : 300, air : 1800]"
+        boardSlackDefault: Int = 0,
+        "List of boardSlack for a given set of modes. Defaults: [air : 2100]"
         boardSlackList: [TransportModeSlack],
-        "DEPRECATED - NO EFFECT IN OTP2"
-        compactLegsByReversedSearch: Boolean = false,
         "Date and time for the earliest time the user is willing to start the journey (if arriveBy=false/not set) or the latest acceptable time of arriving (arriveBy=true). Defaults to now"
         dateTime: DateTime,
-        "Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, but NOT delete them when this is enabled."
+        "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters."
         debugItineraryFilter: Boolean = false,
+        "FOR TESTING ONLY"
+        extraSearchCoachReluctance: Float,
         "The start location"
         from: Location!,
         "When true, realtime updates are ignored during this search."
         ignoreRealtimeUpdates: Boolean = false,
+        "When true, service journeys cancelled in scheduled route data will be included during this search."
+        includePlannedCancellations: Boolean = false,
+        "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
+        itineraryFilters: ItineraryFilters,
+        "The preferable language to use for text targeted the end user. Note! The data quality is limited, only stop and quay names are translates, and not in all places of the API."
         locale: Locale = no,
-        "Maximum time for the ride part of \"kiss and ride\" and \"ride and kiss\"."
-        maxPreTransitTime: Int = 1800,
-        "Max walk distance for access/egress legs. NOT IMPLEMENTED"
-        maxPreTransitWalkDistance: Float,
-        "The maximum walk distance allowed for transfers."
-        maxTransferWalkDistance: Float = 1.7976931348623157E+308,
-        "Maximum number of transfers"
-        maximumTransfers: Int,
-        "DEPRECATED - Use maxPreTransitWalkDistance/maxTransferWalkDistance instead. The maximum distance (in meters) the user is willing to walk. Note that trip patterns with longer walking distances will be penalized, but not altogether disallowed. Maximum allowed value is 15000 m"
-        maximumWalkDistance: Float = 1.7976931348623157E+308,
-        "DEPRECATED - Use 'transferSlack/boardSlack/alightSlack' instead.  "
-        minimumTransferTime: Int = 60,
-        "The set of access/egress/direct/transit modes to be used for this search."
+        "Maximum number of transfers. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
+        maximumTransfers: Int = 12,
+        "The set of access/egress/direct/transit modes to be used for this search. Note that this only works at the Line level. If individual ServiceJourneys have modes that differ from the Line mode, this will NOT be accounted for."
         modes: Modes,
-        "The maximum number of trip patterns to return."
-        numTripPatterns: Int = 3,
-        "The set of characteristics that the user wants to optimise for -- defaults to quick"
-        optimisationMethod: OptimisationMethod = quick,
-        "Parameters for indicating authorities or lines that preferably should be used in trip patters. A cost is applied to boarding nonpreferred authorities or lines (otherThanPreferredRoutesPenalty)."
-        preferred: InputPreferred,
-        "DEPRECATED - NO EFFECT IN OTP2."
-        reverseOptimizeOnTheFly: Boolean = false,
-        "The length of the search-window in minutes. This is normally dynamically calculated by the server, but you may override this by setting it. The search-window used in a request is returned in the response metadata. To get the \"next page\" of trips use the metadata(searchWindowUsed and nextWindowDateTime) to create a new request. If not provided the value is resolved depending on the other input parameters, available transit options and realtime changes."
+        "The maximum number of trip patterns to return. Note! This reduce the number of trip patterns AFTER the OTP travel search is done in a post-filtering process. There is little performance gain in reducing the number of trip patterns returned. The post-filtering will reduce the number of trip-patterns down to this size. It does not make the search faster, as it did in OTP1. See also the trip meta-data on how to implement paging."
+        numTripPatterns: Int = 12,
+        "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from the last response and keep the original request as is. This will enable you to search for itineraries in the next or previous time-window."
+        pageCursor: String,
+        """
+
+        The length of the search-window in minutes. This parameter is optional.
+
+        The search-window is defined as the duration between the earliest-departure-time(EDT) and the latest-departure-time(LDT). OTP will search for all itineraries in this departure window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP will dynamically calculate the EDT. Using a short search-window is faster than using a longer one, but the search duration is not linear. Using a "too" short search-window will waste resources server side, while using a search-window that is too long will be slow.
+
+        OTP will dynamically calculate a reasonable value for the search-window, if not provided. The calculation comes with a significant overhead (10-20% extra). Whether you should use the dynamic calculated value or pass in a value depends on your use-case. For a travel planner in a small geographical area, with a dense network of public transportation, a fixed value between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it so that the number of itineraries on average is around the wanted `numItineraries`. Make sure you set the `numItineraries` to a high number while testing. For a country wide area like Norway, using the dynamic search-window is the best.
+
+        When paginating, the search-window is calculated using the `numItineraries` in the original search together with statistics from the search for the last page. This behaviour is configured server side, and can not be overridden from the client.
+
+        The search-window used is returned to the response metadata as `searchWindowUsed` for debugging purposes.
+        """
         searchWindow: Int,
+        """
+
+        Search for the best trip options within a time window. If `true` two TripPatterns are considered optimal if one is better on arrival time(earliest wins) and the other is better on departure time(latest wins).In combination with `arriveBy` this parameter cover the following 3 use cases:
+
+
+        - Traveler want to find the best alternative within a time window. Set     `timetableView=true` and `arriveBy=false`. This is the default, and if     the intention of the traveler is unknown it gives the best result,     because it includes the two next use-cases. This option also work well     with paging. Setting the `arriveBy=true`, covers the same use-case, but     the input time is interpreted as latest-arrival-time, and not     earliest-departure-time.
+
+        - Traveler want to find the best alternative with departure after a     specific time. For example: I am at the station now and want to get     home as quickly as possible. Set `timetableView=false` and     `arriveBy=false`. Do not support paging.
+
+        - Traveler want to find the best alternative with arrival before a    specific time. For example going to a meeting. Set `timetableView=false`     and `arriveBy=true`. Do not support paging.
+
+        Default: `true`
+        """
+        timetableView: Boolean,
         "The end location"
         to: Location!,
         "An extra penalty added on transfers (i.e. all boardings except the first one). The transferPenalty is used when a user requests even less transfers. In the latter case, we don't actually optimise for fewest transfers, as this can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers trip pattern is to wait until midnight, when the 4 train runs local the whole way. The actual fastest trip pattern is the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour. Even someone optimise for fewest transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. If this takes less than transferPenalty seconds, then that's what we'll return."
         transferPenalty: Int = 0,
         "An expected transfer time (in seconds) that specifies the amount of time that must pass between exiting one public transport vehicle and boarding another. This time is in addition to time it might take to walk between stops."
-        transferSlack: Int = 60,
-        "Optional set of allowed submodes per transport mode provided in 'modes'. If at least one submode is set for a transport mode all submodes not set will be disregarded. Note that transportMode must also be included in 'modes' for the submodes to be allowed"
-        transportSubmodes: [TransportSubmodeFilter] = [],
-        "Parameters for indicating authorities or lines that preferably should not be used in trip patters. A cost is applied to boarding nonpreferred authorities or lines (otherThanPreferredRoutesPenalty)."
-        unpreferred: InputUnpreferred,
-        "NOT IMPLEMENTED"
-        useFlex: Boolean,
-        "An ordered list of intermediate locations to be visited."
-        vias: [Location],
+        transferSlack: Int = 120,
+        "DEPRECATED. REPLACED BY 'itineraryFilters.transitGeneralizedCostLimit'"
+        transitGeneralizedCostLimit: DoubleFunction,
+        "When setting the BicycleOptimisationMethod to 'triangle', use these values to tell the routing engine how important each of the factors is compared to the others. All values should add up to 1."
+        triangleFactors: TriangleFactors,
+        "Whether or not bike rental availability information will be used to plan bike rental trips."
+        useBikeRentalAvailabilityInformation: Boolean = false,
+        "Wait cost is multiplied by this value. Setting this to a value lower than 1 indicates that waiting is better than staying on a vehicle. This should never be set higher than walkReluctance, since that would lead to walking down a line to avoid waiting."
+        waitReluctance: Float = 1.0,
         "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
-        walkReluctance: Float = 2.0,
-        "The maximum walk speed along streets, in meters per second"
-        walkSpeed: Float = 1.33,
-        "Whether the trip must be wheelchair accessible."
-        wheelchair: Boolean = false,
+        walkReluctance: Float = 4.0,
+        "The maximum walk speed along streets, in meters per second."
+        walkSpeed: Float = 1.3,
+        "Whether the trip must be wheelchair accessible. Supported for the street part to the search, not implemented for the transit jet."
+        wheelchairAccessible: Boolean = false,
         "Parameters for indicating the only authorities, lines or quays to be used in the trip patterns"
         whiteListed: InputWhiteListed
-    ): Trip
+    ): Trip!
+}
+
+type RentalVehicle implements PlaceInterface {
+    currentRangeMeters: Float
+    id: ID!
+    latitude: Float!
+    longitude: Float!
+    network: String!
+    vehicleType: RentalVehicleType!
+}
+
+type RentalVehicleType {
+    formFactor: String!
+    maxRangeMeters: Float
+    name: String
+    propulsionType: String!
+    vehicleTypeId: String!
+}
+
+"Description of the reason, why the planner did not return any results"
+type RoutingError {
+    "An enum describing the reason"
+    code: RoutingErrorCode!
+    "A textual description of why the search failed. The clients are expected to have their own translations based on the code, for user visible error messages."
+    description: String!
+    "An enum describing the field which should be changed, in order for the search to succeed"
+    inputField: InputField
 }
 
 "The default parameters used in travel searches."
@@ -584,7 +699,7 @@ type RoutingParameters {
     alightSlackDefault: Int
     "List of alightSlack for a given set of modes."
     alightSlackList: [TransportModeSlackType]
-    allowBikeRental: Boolean
+    allowBikeRental: Boolean @deprecated(reason : "Rental is specified by modes")
     "Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot."
     bikeBoardCost: Int
     "Cost to park a bike."
@@ -613,8 +728,7 @@ type RoutingParameters {
     carDropOffTime: Int
     "Max car speed along streets, in meters per second"
     carSpeed: Float
-    "DEPRECATED - NOT IN USE IN OTP2."
-    compactLegsByReversedSearch: Boolean
+    compactLegsByReversedSearch: Boolean @deprecated(reason : "NOT IN USE IN OTP2.")
     debugItineraryFilter: Boolean
     "Option to disable the default filtering of GTFS-RT alerts by time."
     disableAlertFiltering: Boolean
@@ -632,17 +746,15 @@ type RoutingParameters {
     geoIdElevation: Boolean
     "When true, realtime updates are ignored during this search."
     ignoreRealTimeUpdates: Boolean
+    "When true, service journeys cancelled in scheduled route data will be included during this search."
+    includedPlannedCancellations: Boolean
     kissAndRide: Boolean
-    "The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride or kiss and ride)."
-    maxPreTransitTime: Float
+    "This is the maximum duration in seconds for a direct street search. This is a performance limit and should therefore be set high. Use filters to limit what is presented to the client."
+    maxDirectStreetDuration: Float
     "The maximum slope of streets for wheelchair trips."
     maxSlope: Float
-    "The maximum distance (in meters) the user is willing to walk for transfer legs."
-    maxTransferWalkDistance: Float
     "Maximum number of transfers returned in a trip plan."
     maxTransfers: Int
-    "The maximum distance (in meters) the user is willing to walk for access/egress legs."
-    maxWalkDistance: Float
     "The maximum number of itineraries to return."
     numItineraries: Int
     "Accept only paths that use transit (no street-only paths)."
@@ -650,8 +762,7 @@ type RoutingParameters {
     "Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing to wait for preferred route."
     otherThanPreferredRoutesPenalty: Int
     parkAndRide: Boolean
-    "DEPRECATED - NOT IN USE IN OTP2."
-    reverseOptimizeOnTheFly: Boolean
+    reverseOptimizeOnTheFly: Boolean @deprecated(reason : "NOT IN USE IN OTP2.")
     "Whether the planner should return intermediate stops lists for transit legs."
     showIntermediateStops: Boolean
     "Used instead of walkReluctance for stairs."
@@ -677,11 +788,19 @@ type RoutingParameters {
 }
 
 type ServerInfo {
+    "The 'configVersion' of the build-config.json file."
+    buildConfigVersion: String
     "OTP Build timestamp"
     buildTime: String
     gitBranch: String
     gitCommit: String
     gitCommitTime: String
+    "The 'configVersion' of the otp-config.json file."
+    otpConfigVersion: String
+    "The otp-serialization-version-id used to check graphs for compatibility with current version of OTP."
+    otpSerializationVersionId: String
+    "The 'configVersion' of the router-config.json file."
+    routerConfigVersion: String
     "Maven version"
     version: String
 }
@@ -692,7 +811,7 @@ type ServiceJourney {
     "Whether bikes are allowed on service journey."
     bikesAllowed: BikesAllowed
     "Booking arrangements for flexible services."
-    bookingArrangements: BookingArrangement
+    bookingArrangements: BookingArrangement @deprecated(reason : "BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
     directionType: DirectionType
     "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with realtime-updates (if available). NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead."
     estimatedCalls(
@@ -706,17 +825,23 @@ type ServiceJourney {
     operator: Operator
     "Returns scheduled passing times only - without realtime-updates, for realtime-data use 'estimatedCalls'"
     passingTimes: [TimetabledPassingTime]!
-    "Detailed path travelled by service journey."
+    "Detailed path travelled by service journey. Not available for flexible trips."
     pointsOnLink: PointsOnLink
     "For internal use by operators."
     privateCode: String
     "Publicly announced code for service journey, differentiating it from other service journeys for the same line."
     publicCode: String
     "Quays visited by service journey"
-    quays: [Quay!]!
+    quays(
+        "Only fetch the first n quays on the service journey"
+        first: Int,
+        "Only fetch the last n quays on the service journey"
+        last: Int
+    ): [Quay!]!
+    serviceAlteration: ServiceAlteration @deprecated(reason : "The service journey alteration will be moved out of SJ and grouped together with the SJ and date. In Netex this new type is called DatedServiceJourney. We will create artificial DSJs for the old SJs.")
     "Get all situations active for the service journey."
     situations: [PtSituationElement]!
-    "The transport submode of the journey, if different from lines transport submode. NOT IMPLEMENTED"
+    transportMode: TransportMode
     transportSubmode: TransportSubmode
     "Whether service journey is accessible with wheelchair."
     wheelchairAccessible: WheelchairBoarding
@@ -727,11 +852,13 @@ type StopPlace implements PlaceInterface {
     description: String
     "List of visits to this stop place as part of vehicle journeys."
     estimatedCalls(
+        arrivalDeparture: ArrivalDeparture = departures,
+        "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
+        includeCancelledTrips: Boolean = false,
         "Limit the total number of departures returned."
         numberOfDepartures: Int = 5,
         "Limit the number of departures per line and destination display returned. The parameter is only applied when the value is between 1 and 'numberOfDepartures'."
         numberOfDeparturesPerLineAndDestinationDisplay: Int,
-        omitNonBoarding: Boolean = false,
         "DateTime for when to fetch estimated calls from. Default value is current time"
         startTime: DateTime,
         timeRange: Int = 86400,
@@ -739,7 +866,7 @@ type StopPlace implements PlaceInterface {
         whiteListed: InputWhiteListed,
         "Only show estimated calls for selected modes."
         whiteListedModes: [TransportMode]
-    ): [EstimatedCall]!
+    ): [EstimatedCall!]!
     id: ID!
     latitude: Float
     longitude: Float
@@ -751,27 +878,23 @@ type StopPlace implements PlaceInterface {
         "If true only quays with at least one visiting line are included."
         filterByInUse: Boolean = false
     ): [Quay]
-    "NOT IMPLEMENTED"
     tariffZones: [TariffZone]!
-    timezone: String!
-    "The transport mode serviced by this stop place.  NOT IMPLEMENTED"
-    transportMode: TransportMode
-    "The transport submode serviced by this stop place. NOT IMPLEMENTED"
-    transportSubmode: TransportSubmode
+    "The transport modes of quays under this stop place."
+    transportMode: [TransportMode]
+    "The transport submode serviced by this stop place."
+    transportSubmode: [TransportSubmode]
     "Relative weighting of this stop with regards to interchanges. NOT IMPLEMENTED"
     weighting: InterchangeWeighting
-    "Whether this stop place is suitable for wheelchair boarding."
-    wheelchairBoarding: WheelchairBoarding
 }
 
-"A system notice is used to tag elements with system information for debugging or other system related purpose. One use-case is to run a routing search with 'debugItineraryFilter: true'. This will then tag itineraries instead of removing them from the result. This make it possible to inspect the itinerary-filter-chain. A SystemNotice only have english text, because the primary user are technical staff, like testers and developers."
+"A system notice is used to tag elements with system information for debugging or other system related purpose. One use-case is to run a routing search with 'itineraryFilters.debug: true'. This will then tag itineraries instead of removing them from the result. This make it possible to inspect the itinerary-filter-chain. A SystemNotice only have english text, because the primary user are technical staff, like testers and developers."
 type SystemNotice {
     tag: String
     text: String
 }
 
 type TariffZone {
-    id: ID
+    id: ID!
     name: String
 }
 
@@ -786,7 +909,7 @@ type TimeAndDayOffset {
 type TimetabledPassingTime {
     "Scheduled time of arrival at quay"
     arrival: TimeAndDayOffset
-    "Booking arrangements for flexible service. NOT IMPLEMENTED"
+    "Booking arrangements for this passing time."
     bookingArrangements: BookingArrangement
     "Scheduled time of departure from quay"
     departure: TimeAndDayOffset
@@ -819,19 +942,37 @@ type Trip {
     "The origin"
     fromPlace: Place!
     "A list of possible error messages as enum"
-    messageEnums: [String]!
+    messageEnums: [String]! @deprecated(reason : "Use routingErrors instead")
     "A list of possible error messages in cleartext"
-    messageStrings: [String]!
+    messageStrings: [String]! @deprecated(reason : "Use routingErrors instead")
     "The trip request metadata."
     metadata: TripSearchData
+    """
+
+    Use the cursor to get the next page of results. Use this cursor for the pageCursor parameter in the trip query in order to get the next page.
+    The next page is a set of itineraries departing AFTER the last itinerary in this result.
+    """
+    nextPageCursor: String
+    """
+
+    Use the cursor to get the previous page of results. Use this cursor for the pageCursor parameter in the trip query in order to get the previous page.
+    The previous page is a set of itineraries departing BEFORE the first itinerary in this result.
+    """
+    previousPageCursor: String
+    "A list of routing errors, and fields which caused them"
+    routingErrors: [RoutingError!]!
     "The destination"
     toPlace: Place!
     "A list of possible trip patterns"
-    tripPatterns: [TripPattern]!
+    tripPatterns: [TripPattern!]!
 }
 
 "List of legs constituting a suggested sequence of rides and links for a specific trip."
 type TripPattern {
+    "The aimed date and time the trip ends."
+    aimedEndTime: DateTime!
+    "The aimed date and time the trip starts."
+    aimedStartTime: DateTime!
     "NOT IMPLEMENTED."
     directDuration: Long
     "Total distance for the trip, in meters. NOT IMPLEMENTED"
@@ -839,35 +980,43 @@ type TripPattern {
     "Duration of the trip, in seconds."
     duration: Long
     "Time that the trip arrives."
-    endTime: DateTime
+    endTime: DateTime @deprecated(reason : "Replaced with expectedEndTime")
+    "The expected, realtime adjusted date and time the trip ends."
+    expectedEndTime: DateTime!
+    "The expected, realtime adjusted date and time the trip starts."
+    expectedStartTime: DateTime!
+    "Generalized cost or weight of the itinerary. Used for debugging."
+    generalizedCost: Int
     "A list of legs. Each leg is either a walking (cycling, car) portion of the trip, or a ride leg on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6, then walks to their destination, has four legs."
     legs: [Leg]!
     "Time that the trip departs."
-    startTime: DateTime
+    startTime: DateTime @deprecated(reason : "Replaced with expectedStartTime")
     "Get all system notices."
-    systemNotices: [SystemNotice]!
+    systemNotices: [SystemNotice!]!
+    "A cost calculated to favor transfer with higher priority. This field is meant for debugging only."
+    transferPriorityCost: Int
+    "A cost calculated to distribute wait-time and avoid very short transfers. This field is meant for debugging only."
+    waitTimeOptimizedCost: Int
     "How much time is spent waiting for transit to arrive, in seconds."
     waitingTime: Long
     "How far the user has to walk, in meters."
     walkDistance: Float
     "How much time is spent walking, in seconds."
     walkTime: Long
-    "Generalized cost or weight of the itinerary. Used for debugging."
-    weight: Float
 }
 
 "Trips search metadata."
 type TripSearchData {
     "This is the suggested search time for the \"next page\" or time window. Insert it together with the 'searchWindowUsed' in the request to get a new set of trips following in the time-window AFTER the current search."
-    nextDateTime: DateTime
+    nextDateTime: DateTime @deprecated(reason : "Use pageCursor instead")
     "This is the suggested search time for the \"previous page\" or time-window. Insert it together with the 'searchWindowUsed' in the request to get a new set of trips preceding in the time-window BEFORE the current search."
-    prevDateTime: DateTime
-    "The search-window used in the current trip request. Use the value in the next request and set the request 'dateTime' to 'nextDateTime' or 'prevDateTime' to get the previous/next \"window\" of results. No duplicate trips should be returned, unless a trip is delayed and new realtime-data is available.Unit: minutes."
+    prevDateTime: DateTime @deprecated(reason : "Use pageCursor instead")
+    "This is the time window used by the raptor search. The input searchWindow is an optional parameter and is dynamically assigned if not set. OTP might override the value if it is too small or too large. When paging OTP adjusts it to the appropriate size, depending on the number of itineraries found in the current search window. The scaling of the search window ensures faster paging and limits resource usage. The unit is seconds."
     searchWindowUsed: Int!
 }
 
 type ValidityPeriod {
-    "End of validity period"
+    "End of validity period. Will return 'null' if validity is open-ended."
     endTime: DateTime
     "Start of validity period"
     startTime: DateTime
@@ -882,6 +1031,22 @@ type infoLink {
     label: String
     "URI"
     uri: String
+}
+
+"A connection to a list of items."
+type placeAtDistanceConnection {
+    "a list of edges"
+    edges: [placeAtDistanceEdge]
+    "details about this specific page"
+    pageInfo: PageInfo!
+}
+
+"An edge in a connection"
+type placeAtDistanceEdge {
+    "cursor marks a unique position or index into the connection"
+    cursor: String!
+    "The item at the end of the edge"
+    node: PlaceAtDistance
 }
 
 "A connection to a list of items."
@@ -911,6 +1076,24 @@ enum AbsoluteDirection {
     west
 }
 
+enum ArrivalDeparture {
+    "Only show arrivals"
+    arrivals
+    "Show both arrivals and departures"
+    both
+    "Only show departures"
+    departures
+}
+
+enum BicycleOptimisationMethod {
+    flat
+    greenways
+    quick
+    safe
+    transfers
+    triangle
+}
+
 enum BikesAllowed {
     "The vehicle being used on this particular trip can accommodate at least one bicycle."
     allowed
@@ -920,12 +1103,46 @@ enum BikesAllowed {
     notAllowed
 }
 
+enum BookingMethod {
+    callDriver
+    callOffice
+    online
+    phoneAtStop
+    text
+}
+
 enum DirectionType {
     anticlockwise
     clockwise
     inbound
     outbound
     unknown
+}
+
+enum FilterPlaceType {
+    "Bicycle rent stations"
+    bicycleRent
+    "Bike parks"
+    bikePark
+    "Car parks"
+    carPark
+    "Quay"
+    quay
+    "StopPlace"
+    stopPlace
+}
+
+enum InputField {
+    dateTime
+    from
+    to
+}
+
+enum InterchangePriority {
+    allowed
+    notAllowed
+    preferred
+    recommended
 }
 
 enum InterchangeWeighting {
@@ -957,6 +1174,7 @@ enum Mode {
     lift
     metro
     rail
+    scooter
     tram
     "Any for of public transportation"
     transit
@@ -972,13 +1190,12 @@ enum MultiModalMode {
     parent
 }
 
-enum OptimisationMethod {
-    flat
-    greenways
-    quick
-    safe
-    transfers
-    triangle
+enum PurchaseWhen {
+    advanceAndDayOfTravel
+    dayOfTravelOnly
+    other
+    timeOfTravelOnly
+    untilPreviousDay
 }
 
 enum RealtimeState {
@@ -1017,6 +1234,32 @@ enum ReportType {
     incident
 }
 
+enum RoutingErrorCode {
+    "The specified location is not close to any streets or transit stops"
+    locationNotFound
+    "No stops are reachable from the location specified. You can try searching using a different access or egress mode"
+    noStopsInRange
+    "No transit connection was found between the origin and destination withing the operating day or the next day"
+    noTransitConnection
+    "Transit connection was found, but it was outside the search window, see metadata for the next search window"
+    noTransitConnectionInSearchWindow
+    "The coordinates are outside the bounds of the data currently loaded into the system"
+    outsideBounds
+    "The date specified is outside the range of data currently loaded into the system"
+    outsideServicePeriod
+    "An unknown error happened during the search. The details have been logged to the server logs"
+    systemError
+    "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
+    walkingBetterThanTransit
+}
+
+enum ServiceAlteration {
+    cancellation
+    extraJourney
+    planned
+    replaced
+}
+
 enum Severity {
     "Situation has no impact on trips."
     noImpact
@@ -1024,8 +1267,16 @@ enum Severity {
     normal
     "Situation has a severe impact on trips."
     severe
-    "Situation has a small impact on trips."
+    "Situation has a slight impact on trips."
     slight
+    "Severity is undefined."
+    undefined
+    "Situation has unknown impact on trips."
+    unknown
+    "Situation has a very severe impact on trips."
+    verySevere
+    "Situation has a very slight impact on trips."
+    verySlight
 }
 
 enum StreetMode {
@@ -1041,11 +1292,14 @@ enum StreetMode {
     car_park
     "Walk to a pickup point along the road, drive to a drop-off point along the road, and walk the rest of the way. This can include various taxi-services or kiss & ride."
     car_pickup
+    "Walk to an eligible pickup area for flexible transportation, ride to an eligible drop-off area and then walk the rest of the way."
+    flexible
     "Walk only"
     foot
+    "Walk to a scooter rental point, ride a scooter to a scooter rental drop-off point, and walk the rest of the way. This can include scooter rental at fixed locations or free-floating services."
+    scooter_rental
 }
 
-"NOT IMPLEMENTED"
 enum TransportMode {
     air
     bus
@@ -1054,8 +1308,10 @@ enum TransportMode {
     funicular
     lift
     metro
+    monorail
     rail
     tram
+    trolleybus
     unknown
     water
 }
@@ -1213,22 +1469,17 @@ input InputCoordinates {
     longitude: Float!
 }
 
-"Preferences for trip search."
-input InputPreferred {
-    "Set of ids of authorities preferred by user."
-    authorities: [ID] = []
-    "Set of ids of lines preferred by user."
-    lines: [ID] = []
-    "Penalty added for using a line that is not preferred if user has set any line as preferred. In number of seconds that user is willing to wait for preferred line."
-    otherThanPreferredLinesPenalty: Int = 300
-}
-
-"Negative preferences for trip search. Unpreferred elements may still be used in suggested trips if alternatives are not desirable, see InputBanned for hard limitations."
-input InputUnpreferred {
-    "Set of ids of authorities user prefers not to use."
-    authorities: [ID] = []
-    "Set of ids of lines user prefers not to use."
-    lines: [ID] = []
+input InputPlaceIds {
+    "Bike parks to include by id."
+    bikeParks: [String]
+    "Bike rentals to include by id."
+    bikeRentalStations: [String]
+    "Car parks to include by id."
+    carParks: [String]
+    "Lines to include by id."
+    lines: [String]
+    "Quays to include by id."
+    quays: [String]
 }
 
 "Filter trips by only allowing lines involving certain elements. If both lines and authorities are specified, only one must be valid for each line to be used. If a line is both banned and whitelisted, it will be counted as banned."
@@ -1237,6 +1488,18 @@ input InputWhiteListed {
     authorities: [ID] = []
     "Set of ids for lines that should be used"
     lines: [ID] = []
+}
+
+"Parameters for the OTP Itinerary Filter Chain. These parameters SHOULD be configured on the server side and should not be used by the client. They are made available here to be able to experiment and tune the server."
+input ItineraryFilters {
+    "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
+    groupSimilarityKeepOne: Float = 0.85
+    "Reduce the number of itineraries in each group to to maximum 3 itineraries. The itineraries are grouped by similar legs (on board same journey). So, if  68% of the distance is traveled by similar legs, then two itineraries are in the same group. Default value is 68%, must be at least 50%."
+    groupSimilarityKeepThree: Float = 0.68
+    "Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped legs be compared to the lowest cost. 2.0 means that they can be double the cost, and any itineraries having a higher cost will be filtered. Default value is 2.0, use a value lower than 1.0 to turn off"
+    groupedOtherThanSameLegsMaxCostMultiplier: Float = 2.0
+    "Set a relative limit for all transit itineraries. The limit is calculated based on the best transit itinerary generalized-cost. Itineraries without transit legs are excluded from this filter. Example: f(x) = 3600 + 2.0 x. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600. Then all itineraries with at least one transit leg and a cost above 26 600 is removed from the result. Default: 3600.0 + 2.5 x"
+    transitGeneralizedCostLimit: DoubleFunction
 }
 
 "Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known."
@@ -1258,7 +1521,7 @@ input Modes {
     "The mode used to get from the egress stops in the transit network tothe destination (last-mile). If the element is not present or null,only transit that can immediately arrive at the origin will be used."
     egressMode: StreetMode
     "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
-    transportMode: [TransportMode]
+    transportModes: [TransportModes]
 }
 
 "Used to specify board and alight slack for a given modes."
@@ -1269,12 +1532,21 @@ input TransportModeSlack {
     slack: Int!
 }
 
-"Filter trips by allowing only certain transport submodes per mode."
-input TransportSubmodeFilter {
-    "Set of ids for lines that should be used"
-    transportMode: TransportMode!
-    "Set of transport submodes allowed for transport mode."
-    transportSubmodes: [TransportSubmode]!
+input TransportModes {
+    "A transportMode that should be allowed for this search. You can furthernarrow it down by specifying a list of transportSubModes"
+    transportMode: TransportMode
+    "The allowed transportSubModes for this search. If this element is notpresent or null, it will default to all transportSubModes for the specifiedTransportMode. Be aware that all transportSubModes have an associated TransportMode, which must match what is specified in the transportMode field."
+    transportSubModes: [TransportSubmode]
+}
+
+"How much the factors safety, slope and distance are weighted relative to each other when routing bicycle legs. In total all three values need to add up to 1."
+input TriangleFactors {
+    "How important is bicycle safety expressed as a fraction of 1."
+    safety: Float!
+    "How important is slope/elevation expressed as a fraction of 1."
+    slope: Float!
+    "How important is time expressed as a fraction of 1. Note that what this really optimises for is distance (even if that means going over terrible surfaces, so I might be slower than the safe route)."
+    time: Float!
 }
 
 
@@ -1287,11 +1559,14 @@ scalar Date
 """
 DateTime format accepting ISO 8601 dates with time zone offset.
 
-Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|Â±01:00)`
+Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|±01:00)`
 
 Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`
 """
 scalar DateTime
+
+"A linear function to calculate a value(y) based on a parameter (x): `y = f(x) = a + bx`. It allows setting both a constant(a) and a coefficient(b) and the use those in the computation. Format: `a + b x`. Example: `1800 + 2.0 x`"
+scalar DoubleFunction
 
 "Time using the format: HH:mm:SS. Example: 18:25:SS"
 scalar LocalTime
