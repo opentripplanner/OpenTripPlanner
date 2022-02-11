@@ -71,7 +71,7 @@ public class TransferIndexGenerator {
 
     /**
      * This sorts and seals the constrained transfers for all patterns in order to protect them from
-     * modification ,while they are used in the routing.
+     * modification, while they are used in the routing.
      *
      * {@link TripPatternWithRaptorStopIndexes#sealConstrainedTransfers()}
      */
