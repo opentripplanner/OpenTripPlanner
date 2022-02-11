@@ -82,7 +82,7 @@ public class UnscheduledTrip extends FlexTrip {
     // Check if trip is possible
     if (fromIndex == -1 ||
         fromIndex > toIndex ||
-        !stopTimes[toIndex].dropOffType.isRoutable()
+        getDropOffType(toIndex).isNotRoutable()
     ) {
       return Stream.empty();
     }
@@ -109,7 +109,7 @@ public class UnscheduledTrip extends FlexTrip {
     // Check if trip is possible
     if (toIndex == -1 ||
         fromIndex > toIndex ||
-        !stopTimes[fromIndex].pickupType.isRoutable()
+        getPickupType(fromIndex).isNotRoutable()
     ) {
       return Stream.empty();
     }
@@ -190,6 +190,14 @@ public class UnscheduledTrip extends FlexTrip {
     return getToIndex(stop) != -1;
   }
 
+  public PickDrop getPickupType(int i) {
+    return stopTimes[i].pickupType;
+  }
+
+  public PickDrop getDropOffType(int i) {
+    return stopTimes[i].dropOffType;
+  }
+
   private Collection<StopLocation> expandStops(StopLocation stop) {
     return stop instanceof FlexLocationGroup
         ? ((FlexLocationGroup) stop).getLocations()
@@ -198,7 +206,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   private int getFromIndex(NearbyStop accessEgress) {
     for (int i = 0; i < stopTimes.length; i++) {
-      if (!stopTimes[i].pickupType.isRoutable()) continue;
+      if (getPickupType(i).isNotRoutable()) continue;
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof FlexLocationGroup) {
         if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
@@ -216,7 +224,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   private int getToIndex(NearbyStop accessEgress) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
-      if (!stopTimes[i].dropOffType.isRoutable()) continue;
+      if (getDropOffType(i).isNotRoutable()) continue;
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof FlexLocationGroup) {
         if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {

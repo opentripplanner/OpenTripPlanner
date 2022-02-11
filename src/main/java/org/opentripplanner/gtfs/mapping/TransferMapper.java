@@ -240,8 +240,8 @@ class TransferMapper {
 
     for (int i = firstStopPos; i < lastStopPos; i++) {
       StopTime stopTime = stopTimes.get(i);
-      if(boardTrip && !stopTime.getPickupType().isRoutable()) { continue; }
-      if(!boardTrip && !stopTime.getDropOffType().isRoutable()) { continue; }
+      if(boardTrip && stopTime.getPickupType().isNotRoutable()) { continue; }
+      if(!boardTrip && stopTime.getDropOffType().isNotRoutable()) { continue; }
 
       if(stopMatches.test(stopTime.getStop())) {
         return i;
