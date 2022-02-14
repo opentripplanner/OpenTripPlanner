@@ -246,6 +246,7 @@
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
+                    <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
             <!-- code coverage report -->
