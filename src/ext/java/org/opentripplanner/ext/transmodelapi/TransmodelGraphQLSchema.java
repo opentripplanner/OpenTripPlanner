@@ -47,6 +47,7 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.ext.transmodelapi.model.framework.AuthorityType;
 import org.opentripplanner.ext.transmodelapi.model.framework.BrandingType;
 import org.opentripplanner.ext.transmodelapi.model.framework.InfoLinkType;
+import org.opentripplanner.ext.transmodelapi.model.framework.KeyValueType;
 import org.opentripplanner.ext.transmodelapi.model.framework.MultilingualStringType;
 import org.opentripplanner.ext.transmodelapi.model.framework.NoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.OperatorType;
@@ -188,7 +189,8 @@ public class TransmodelGraphQLSchema {
           JourneyPatternType.REF,
           ServiceJourneyType.REF,
           PtSituationElementType.REF,
-          brandingType
+          brandingType,
+          KeyValueType.TYPE
       );
       GraphQLOutputType interchangeType = InterchangeType.create(lineType, ServiceJourneyType.REF);
 

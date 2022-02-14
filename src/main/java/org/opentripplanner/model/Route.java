@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.util.List;
+
 public final class Route extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
@@ -30,6 +32,8 @@ public final class Route extends TransitEntity {
     private String color;
 
     private String textColor;
+
+    private List<KeyValue> keyValues;
 
     private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
 
@@ -135,6 +139,14 @@ public final class Route extends TransitEntity {
 
     public void setTextColor(String textColor) {
         this.textColor = textColor;
+    }
+
+    public List<KeyValue> getKeyValues() {
+        return keyValues != null ? keyValues : List.of();
+    }
+
+    public void setKeyValues(List<KeyValue> keyValues) {
+        this.keyValues = keyValues;
     }
 
     public BikeAccess getBikesAllowed() {

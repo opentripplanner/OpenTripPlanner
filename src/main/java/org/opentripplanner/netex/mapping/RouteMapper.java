@@ -36,6 +36,7 @@ class RouteMapper {
     private final EntityById<Branding> brandingsById;
     private final NetexEntityIndexReadOnlyView netexIndex;
     private final AuthorityToAgencyMapper authorityMapper;
+    private final KeyValueMapper keyValueMapper;
     private final Set<String> ferryIdsNotAllowedForBicycle;
 
     RouteMapper(
@@ -55,6 +56,7 @@ class RouteMapper {
         this.brandingsById = brandingsById;
         this.netexIndex = netexIndex;
         this.authorityMapper = new AuthorityToAgencyMapper(idFactory, timeZone);
+        this.keyValueMapper = new KeyValueMapper();
         this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     }
 
@@ -67,6 +69,7 @@ class RouteMapper {
         otpRoute.setBranding(findBranding(line));
         otpRoute.setLongName(line.getName().getValue());
         otpRoute.setShortName(line.getPublicCode());
+        otpRoute.setKeyValues(keyValueMapper.mapKeyValues(line.getKeyList()));
         T2<TransitMode, String> mode = transportModeMapper.map(
                 line.getTransportMode(),
                 line.getTransportSubmode()
