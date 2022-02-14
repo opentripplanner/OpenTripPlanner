@@ -2,11 +2,13 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -985,6 +987,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * or {@link StreetEdge#removeTurnRestriction} is called concurrently.
      *
      */
+    @Nonnull
     public Set<TurnRestriction> getTurnRestrictions() {
         // this can be safely returned as it's unmodifiable
         return turnRestrictions;

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -82,6 +83,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
         return parentEdge.getInAngle();
     }
 
+    @Nonnull
     @Override
     public Set<TurnRestriction> getTurnRestrictions() {
         return parentEdge.getTurnRestrictions();
