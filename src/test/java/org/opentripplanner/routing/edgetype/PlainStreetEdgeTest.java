@@ -267,7 +267,7 @@ public class PlainStreetEdgeTest {
         State state = new State(v2, 0, proto.clone());
 
         state.getOptions().setArriveBy(true);
-        e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes()));
+        e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
 
         assertNotNull(e0.traverse(e1.traverse(state)));
     }

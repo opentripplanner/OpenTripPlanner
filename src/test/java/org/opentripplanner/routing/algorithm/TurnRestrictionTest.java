@@ -200,7 +200,7 @@ public class TurnRestrictionTest {
     private void DisallowTurn(StreetEdge from, StreetEdge to) {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
-        TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
+        TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes, null);
         from.addTurnRestriction(restrict);
     }
 

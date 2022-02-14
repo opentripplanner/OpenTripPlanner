@@ -890,9 +890,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             StreetEdge fromEdge = shouldUseFirstSplitEdge(edge, restriction) ? splitEdges.first : splitEdges.second;
 
             TurnRestriction splitTurnRestriction = new TurnRestriction(fromEdge, restriction.to,
-                    restriction.type, restriction.modes
+                    restriction.type, restriction.modes, restriction.time
             );
-            splitTurnRestriction.time = restriction.time;
             LOG.debug(
                     "Recreate new restriction {} with split edge as from edge {}", splitTurnRestriction,
                     fromEdge
@@ -928,9 +927,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             TurnRestriction restriction
     ) {
         TurnRestriction splitTurnRestriction = new TurnRestriction(restriction.from,
-                newEdge, restriction.type, restriction.modes
+                newEdge, restriction.type, restriction.modes, restriction.time
         );
-        splitTurnRestriction.time = restriction.time;
         LOG.debug(
                 "Recreate new restriction {} with split edge as to edge {}", splitTurnRestriction,
                 newEdge
