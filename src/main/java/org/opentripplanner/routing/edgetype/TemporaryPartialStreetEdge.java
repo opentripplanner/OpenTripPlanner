@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
@@ -85,7 +86,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
 
     @Nonnull
     @Override
-    public Set<TurnRestriction> getTurnRestrictions() {
+    public ImmutableSet<TurnRestriction> getTurnRestrictions() {
         return parentEdge.getTurnRestrictions();
     }
 
