@@ -949,9 +949,9 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         synchronized (this) {
             // in order to guarantee fast access without extra allocations
             // we make the turn restrictions unmodifiable after a copy-on-write modification
-            var temp = new HashSet<>(turnRestrictions);
+            var temp = new ArrayList<>(turnRestrictions);
             temp.add(turnRestriction);
-            turnRestrictions = Collections.unmodifiableSet(temp);
+            turnRestrictions = Set.copyOf(temp);
         }
     }
 
