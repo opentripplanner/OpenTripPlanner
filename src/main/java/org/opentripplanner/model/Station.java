@@ -159,6 +159,7 @@ public class Station extends TransitEntity implements StopCollection {
   }
 
   private static GeometryCollection computeGeometry(WgsCoordinate coordinate, Set<StopLocation> childStops) {
+    if(coordinate == null) { return null; }
     var stationPoint =  getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
     var childGeometries = childStops.stream().map(StopLocation::getGeometry).collect(Collectors.toList());
     childGeometries.add(stationPoint);
