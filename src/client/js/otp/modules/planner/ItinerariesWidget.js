@@ -250,7 +250,7 @@ otp.widgets.ItinerariesWidget =
         var maxSpan = itin.tripPlan.latestEndTime - itin.tripPlan.earliestStartTime;
         var startPct = (itin.itinData.startTime - itin.tripPlan.earliestStartTime) / maxSpan;
         var itinSpan = itin.getEndTime() - itin.getStartTime();
-        var timeWidth = 32;
+        var timeWidth = 40;
         var startPx = 20+timeWidth, endPx = div.width()-timeWidth - (itin.groupSize ? 48 : 0);
         var pxSpan = endPx-startPx;
         var leftPx = startPx + startPct * pxSpan;
@@ -260,7 +260,7 @@ otp.widgets.ItinerariesWidget =
 
         var timeStr = otp.util.Time.formatItinTime(itin.getStartTime(), otp.config.locale.time.time_format);
 	/*timeStr = timeStr.substring(0, timeStr.length - 1);*/
-        div.append('<div class="otp-itinsAccord-header-time" style="left: '+(leftPx-32)+'px;">' + timeStr + '</div>');
+        div.append('<div class="otp-itinsAccord-header-time" style="left: '+(leftPx-timeWidth)+'px;">' + timeStr + '</div>');
 
         var timeStr = otp.util.Time.formatItinTime(itin.getEndTime(), otp.config.locale.time.time_format);
 	/*timeStr = timeStr.substring(0, timeStr.length - 1);*/
