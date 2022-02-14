@@ -2,7 +2,7 @@ package org.opentripplanner.ext.legacygraphqlapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
-import org.opentripplanner.api.json.GraphQLResponseSerializer;
+import org.opentripplanner.api.rest.json.GraphQLResponseSerializer;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-// TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
+// TODO move to org.opentripplanner.api.rest.resource, this is a Jersey resource class
 
 @Path("/routers/{ignoreRouterId}/index/graphql")
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.

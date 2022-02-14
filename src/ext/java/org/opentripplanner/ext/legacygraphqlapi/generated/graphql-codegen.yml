@@ -44,7 +44,7 @@ config:
     ContactInfo: org.opentripplanner.model.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
-    debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
+    debugOutput: org.opentripplanner.api.rest.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.common.model.P2#P2<Double>
     fare: java.util.Map#Map<String, Object>

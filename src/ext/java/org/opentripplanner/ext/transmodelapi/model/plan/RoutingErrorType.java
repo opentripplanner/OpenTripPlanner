@@ -4,7 +4,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.api.mapping.PlannerErrorMapper;
+import org.opentripplanner.api.rest.mapping.PlannerErrorMapper;
 
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.INPUT_FIELD;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.ROUTING_ERROR_CODE;

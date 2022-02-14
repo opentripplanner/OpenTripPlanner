@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.opentripplanner.api.common.ParameterException;
+import org.opentripplanner.api.rest.common.ParameterException;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;

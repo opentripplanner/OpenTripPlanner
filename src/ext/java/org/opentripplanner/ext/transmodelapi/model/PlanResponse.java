@@ -2,7 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.api.resource.DebugOutput;
+import org.opentripplanner.api.rest.resource.DebugOutput;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.routing.api.response.RoutingError;

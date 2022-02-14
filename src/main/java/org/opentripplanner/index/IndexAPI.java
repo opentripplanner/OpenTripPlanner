@@ -1,32 +1,31 @@
 package org.opentripplanner.index;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.mapping.AgencyMapper;
-import org.opentripplanner.api.mapping.AlertMapper;
-import org.opentripplanner.api.mapping.FeedInfoMapper;
-import org.opentripplanner.api.mapping.FeedScopedIdMapper;
-import org.opentripplanner.api.mapping.RouteMapper;
-import org.opentripplanner.api.mapping.StopMapper;
-import org.opentripplanner.api.mapping.StopTimesInPatternMapper;
-import org.opentripplanner.api.mapping.TransferMapper;
-import org.opentripplanner.api.mapping.TripMapper;
-import org.opentripplanner.api.mapping.TripPatternMapper;
-import org.opentripplanner.api.model.ApiAgency;
-import org.opentripplanner.api.model.ApiAlert;
-import org.opentripplanner.api.model.ApiFeedInfo;
-import org.opentripplanner.api.model.ApiPatternShort;
-import org.opentripplanner.api.model.ApiRoute;
-import org.opentripplanner.api.model.ApiRouteShort;
-import org.opentripplanner.api.model.ApiStop;
-import org.opentripplanner.api.model.ApiStopShort;
-import org.opentripplanner.api.model.ApiStopTimesInPattern;
-import org.opentripplanner.api.model.ApiTransfer;
-import org.opentripplanner.api.model.ApiTrip;
-import org.opentripplanner.api.model.ApiTripShort;
+import org.opentripplanner.api.rest.mapping.AgencyMapper;
+import org.opentripplanner.api.rest.mapping.AlertMapper;
+import org.opentripplanner.api.rest.mapping.FeedInfoMapper;
+import org.opentripplanner.api.rest.mapping.FeedScopedIdMapper;
+import org.opentripplanner.api.rest.mapping.RouteMapper;
+import org.opentripplanner.api.rest.mapping.StopMapper;
+import org.opentripplanner.api.rest.mapping.StopTimesInPatternMapper;
+import org.opentripplanner.api.rest.mapping.TransferMapper;
+import org.opentripplanner.api.rest.mapping.TripMapper;
+import org.opentripplanner.api.rest.mapping.TripPatternMapper;
+import org.opentripplanner.api.rest.model.ApiAgency;
+import org.opentripplanner.api.rest.model.ApiAlert;
+import org.opentripplanner.api.rest.model.ApiFeedInfo;
+import org.opentripplanner.api.rest.model.ApiPatternShort;
+import org.opentripplanner.api.rest.model.ApiRoute;
+import org.opentripplanner.api.rest.model.ApiRouteShort;
+import org.opentripplanner.api.rest.model.ApiStop;
+import org.opentripplanner.api.rest.model.ApiStopShort;
+import org.opentripplanner.api.rest.model.ApiStopTimesInPattern;
+import org.opentripplanner.api.rest.model.ApiTransfer;
+import org.opentripplanner.api.rest.model.ApiTrip;
+import org.opentripplanner.api.rest.model.ApiTripShort;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
@@ -62,7 +61,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-// TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
+// TODO move to org.opentripplanner.api.rest.resource, this is a Jersey resource class
 
 @Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.

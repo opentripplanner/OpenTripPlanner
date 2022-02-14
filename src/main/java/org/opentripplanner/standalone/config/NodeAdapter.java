@@ -24,7 +24,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.api.rest.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;

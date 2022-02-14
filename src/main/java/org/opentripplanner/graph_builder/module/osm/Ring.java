@@ -9,7 +9,7 @@ import gnu.trove.list.TLongList;
 import gnu.trove.map.TLongObjectMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.algorithm.Orientation;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.api.rest.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 

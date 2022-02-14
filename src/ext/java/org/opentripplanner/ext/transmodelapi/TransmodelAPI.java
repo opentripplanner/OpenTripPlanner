@@ -7,7 +7,7 @@ import io.micrometer.core.instrument.Tag;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.HttpHeaders;
-import org.opentripplanner.api.json.GraphQLResponseSerializer;
+import org.opentripplanner.api.rest.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-// TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
+// TODO move to org.opentripplanner.api.rest.resource, this is a Jersey resource class
 
 @Path("/routers/{ignoreRouterId}/transmodel/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.

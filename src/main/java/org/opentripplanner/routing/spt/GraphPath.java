@@ -3,7 +3,7 @@ package org.opentripplanner.routing.spt;
 import java.util.LinkedList;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.api.rest.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;

@@ -2,7 +2,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.api.resource.DebugOutput;
+import org.opentripplanner.api.rest.resource.DebugOutput;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
 public class LegacyGraphQLdebugOutputImpl
