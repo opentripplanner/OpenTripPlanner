@@ -85,7 +85,19 @@ otp.util.Itin = {
     },
 
     isTransit : function(mode) {
-        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "RAIL" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "AIRPLANE";
+        return mode === "TRANSIT"
+            || mode === "RAIL"
+            || mode === "COACH"
+            || mode === "SUBWAY"
+            || mode === "BUS"
+            || mode === "TRAM"
+            || mode === "FERRY"
+            || mode === "AIRPLANE"
+            || mode === "CABLE_CAR"
+            || mode === "GONDOLA"
+            || mode === "FUNICULAR"
+            || mode === "TROLLEYBUS"
+            || mode === "MONORAIL";
     },
 
     includesTransit : function(mode) {
@@ -228,6 +240,7 @@ otp.util.Itin = {
         'BIKESHARE_EMPTY': _tr('Bicycle rental station'),
         //TRANSLATORS: WALK/CYCLE distance to [Bicycle rental] {name}
         'BIKESHARE': _tr('Bicycle rental'),
+        'TRANSIT': ""
     },
 
     /**
@@ -341,6 +354,11 @@ otp.util.Itin = {
         if(mode === "FUNICULAR") return '#f0f';
         if(mode === "MONORAIL") return '#f0f';
         return '#aaa';
+    },
+
+    getModeIcon : function (mode) {
+        return otp.config.resourcePath + 'images/mode/' + mode.toLowerCase()
+            + '.png';
     },
 
     getLegTextColor : function (leg) {

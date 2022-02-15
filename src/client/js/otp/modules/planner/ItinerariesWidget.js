@@ -289,7 +289,7 @@ otp.widgets.ItinerariesWidget =
                 background: legBackgroundColor,
             })
             .appendTo(div);
-            segment.append('<div class="mode-icon" style="background: ' + legTextColor + '; mask-image: url('+otp.config.resourcePath+'images/mode/'+leg.mode.toLowerCase()+'.png); -webkit-mask-image: url('+otp.config.resourcePath+'images/mode/'+leg.mode.toLowerCase()+'.png)"></div>');
+            segment.append('<div class="mode-icon" style="background: ' + legTextColor + '; mask-image: url(' + otp.util.Itin.getModeIcon(leg.mode) + '); -webkit-mask-image: url(' + otp.util.Itin.getModeIcon(leg.mode) + ')"></div>');
             if(showRouteLabel) segment.append('<span>'+leg.routeShortName+'</span>');
 
         }
