@@ -122,7 +122,7 @@ public class QualifiedModeSet implements Serializable {
                         accessMode = StreetMode.CAR_TO_PARK;
                         transferMode = StreetMode.WALK;
                         egressMode = StreetMode.WALK;
-                        directMode = StreetMode.CAR_TO_PARK;
+                        directMode = null;
                     } else if (requestMode.qualifiers.contains(Qualifier.PICKUP)) {
                         accessMode = StreetMode.WALK;
                         transferMode = StreetMode.WALK;
