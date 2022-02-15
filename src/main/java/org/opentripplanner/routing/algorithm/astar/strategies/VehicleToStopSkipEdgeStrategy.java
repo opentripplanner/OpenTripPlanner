@@ -12,6 +12,21 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
+/**
+ * This strategy terminates when enough "important" stops are found.
+ * <p>
+ * The definition of important is a stop where many routes of mode RAIL, SUBWAY or FERRY depart.
+ * <p>
+ * This means that the search radius scales with density of "important" stops:
+ * <p>
+ * <li>in a city the radius is quite small
+ * <li>in more rural regions the radius is bigger and stops further away are considered
+ * <p>
+ * The strategy is useful when you want to limit the number of accesses of Park+Ride, Bike+Ride and
+ * Bike+Transit: it improves both performance the quality of results.
+ * <p>
+ * {@see https://github.com/opentripplanner/OpenTripPlanner/pull/3906/files}
+ */
 public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
 
     private final double durationInSeconds;
