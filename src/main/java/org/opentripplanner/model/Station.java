@@ -63,12 +63,35 @@ public class Station extends TransitEntity implements StopCollection {
     this.url = url;
     this.timezone = timezone;
     this.priority = priority == null ? DEFAULT_PRIORITY : priority;
-    this.geometry = computeGeometry(coordinate, childStops);
+    // Initialize the geometry with an empty set of children
+    this.geometry = computeGeometry(coordinate, Set.of());
   }
+
+  /**
+   * Create a minimal Station object for unit-test use, where the test only care about id, name and
+   * coordinate. The feedId is static set to "F"
+   */
+  public static Station stationForTest(String idAndName, double lat, double lon) {
+    return new Station(
+            new FeedScopedId("F", idAndName),
+            idAndName,
+            new WgsCoordinate(lat, lon),
+            idAndName,
+            "Station " + idAndName,
+            null,
+            null,
+            StopTransferPriority.ALLOWED
+    );
+  }
+
 
   public void addChildStop(Stop stop) {
     this.childStops.add(stop);
     this.geometry = computeGeometry(coordinate, childStops);
+  }
+
+  public boolean includes(StopLocation stop) {
+    return childStops.contains(stop);
   }
 
   @Override
@@ -104,7 +127,7 @@ public class Station extends TransitEntity implements StopCollection {
    * adding adjusting the cost for all board-/alight- events in the routing search.
    * <p/>
    * To not interfere with request parameters this must be implemented in a neutral way. This mean
-   * that the {@link StopTransferPriority#ALLOWED} (witch is default) should a nett-effect of
+   * that the {@link StopTransferPriority#ALLOWED} (which is default) should a nett-effect of
    * adding 0 - zero cost.
    */
   public StopTransferPriority getPriority() {

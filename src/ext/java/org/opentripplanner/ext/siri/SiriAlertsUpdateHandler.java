@@ -1,7 +1,17 @@
 package org.opentripplanner.ext.siri;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -40,16 +50,6 @@ import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
 import uk.org.siri.siri20.StopPointRef;
 import uk.org.siri.siri20.VehicleJourneyRef;
 import uk.org.siri.siri20.WorkflowStatusEnumeration;
-
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds.
@@ -104,11 +104,16 @@ public class SiriAlertsUpdateHandler {
                         addedCounter++;
                         if (alert != null) {
                             alert.setId(situationNumber);
+                            if (alert.getEntities().isEmpty()) {
+                                LOG.info(
+                                        "No match found for Alert - setting Unknown entity for situation with situationNumber {}",
+                                        situationNumber
+                                );
+                                alert.addEntity(new EntitySelector.Unknown(
+                                        "Alert had no entities that could be handled"));
+                            }
                             alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
                             alerts.add(alert);
-                            if (alert.getEntities().isEmpty()) {
-                                LOG.info("No match found for Alert - ignoring situation with situationNumber {}", situationNumber);
-                            }
                         }
                     }
                 }
@@ -313,25 +318,23 @@ public class SiriAlertsUpdateHandler {
 
                             FeedScopedId tripIdFromVehicleJourney = siriFuzzyTripMatcher.getTripId(vehicleJourneyRef.getValue());
 
-                            ZonedDateTime originAimedDepartureTime = affectedVehicleJourney.getOriginAimedDepartureTime();
+                            ZonedDateTime originAimedDepartureTime = affectedVehicleJourney.getOriginAimedDepartureTime() != null
+                                ? affectedVehicleJourney.getOriginAimedDepartureTime()
+                                : ZonedDateTime.now();
 
-                            ServiceDate serviceDate = null;
-                            if (originAimedDepartureTime != null) {
-                                serviceDate = new ServiceDate(DateMapper.asStartOfService(originAimedDepartureTime)
-                                    .toLocalDate());
-                            }
+                            ZonedDateTime startOfService = DateMapper.asStartOfService(originAimedDepartureTime);
+
+                            ServiceDate serviceDate = new ServiceDate(startOfService.toLocalDate());
 
                             if (tripIdFromVehicleJourney != null) {
-
                                 tripIds.add(tripIdFromVehicleJourney);
-
                             } else {
-
-//                                Commented out for now
-//
-//                                // TODO - SIRI: Support submode when fuzzy-searching for trips
-//                                tripIds = siriFuzzyTripMatcher.getTripIdForTripShortNameServiceDateAndMode(vehicleJourneyRef.getValue(),
-//                                        serviceDate, TraverseMode.RAIL/*, TransmodelTransportSubmode.RAIL_REPLACEMENT_BUS*/);
+                                tripIds = siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDateAndMode(
+                                    vehicleJourneyRef.getValue(),
+                                    serviceDate,
+                                    TransitMode.RAIL,
+                                    "railReplacementBus"
+                                );
                             }
 
                             for (FeedScopedId tripId : tripIds) {

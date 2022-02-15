@@ -1,5 +1,13 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Calendar;
+import java.util.List;
+import java.util.TimeZone;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -11,23 +19,14 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
-
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for planning with intermediate places
@@ -170,8 +169,8 @@ public class TestIntermediatePlaces {
                     legIndex < itinerary.legs.size());
                 leg = itinerary.legs.get(legIndex);
                 legIndex++;
-            } while (Math.abs(leg.to.coordinate.latitude() - location.lat) > DELTA
-                || Math.abs(leg.to.coordinate.longitude() - location.lng) > DELTA);
+            } while (Math.abs(leg.getTo().coordinate.latitude() - location.lat) > DELTA
+                || Math.abs(leg.getTo().coordinate.longitude() - location.lng) > DELTA);
         }
     }
 
@@ -179,8 +178,8 @@ public class TestIntermediatePlaces {
     private void validateLegsSpatially(TripPlan plan, Itinerary itinerary) {
         Place place = plan.from;
         for (Leg leg : itinerary.legs) {
-            assertEquals(place.coordinate, leg.from.coordinate);
-            place = leg.to;
+            assertEquals(place.coordinate, leg.getFrom().coordinate);
+            place = leg.getTo();
         }
         assertEquals(place.coordinate, plan.to.coordinate);
     }
@@ -190,18 +189,18 @@ public class TestIntermediatePlaces {
         Calendar departTime = Calendar.getInstance(timeZone);
         Calendar arriveTime = Calendar.getInstance(timeZone);
         if (request.arriveBy) {
-            departTime = itinerary.legs.get(0).startTime;
-            arriveTime.setTimeInMillis(request.dateTime * 1000);
+            departTime = itinerary.legs.get(0).getStartTime();
+            arriveTime.setTimeInMillis(request.getDateTime().toEpochMilli());
         } else {
-            departTime.setTimeInMillis(request.dateTime * 1000);
-            arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).endTime;
+            departTime.setTimeInMillis(request.getDateTime().toEpochMilli());
+            arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).getEndTime();
         }
         long sumOfDuration = 0;
         for (Leg leg : itinerary.legs) {
-            assertFalse(departTime.after(leg.startTime));
-            assertFalse(leg.startTime.after(leg.endTime));
+            assertFalse(departTime.after(leg.getStartTime()));
+            assertFalse(leg.getStartTime().after(leg.getEndTime()));
 
-            departTime = leg.endTime;
+            departTime = leg.getEndTime();
             sumOfDuration += leg.getDuration();
         }
         sumOfDuration += itinerary.waitingTimeSeconds;

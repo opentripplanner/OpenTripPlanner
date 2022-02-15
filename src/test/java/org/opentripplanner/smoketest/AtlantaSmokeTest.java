@@ -24,7 +24,7 @@ import org.junit.experimental.categories.Category;
 public class AtlantaSmokeTest {
 
     String nearGeorgiaStateStation = "33.74139944890028,-84.38607215881348";
-    String powderSpringsInsideFlexZone1 = "33.86425088555784,-84.67141628265381";
+    String powderSpringsInsideFlexZone1 = "33.86916840022388,-84.66315507888794";
 
     @Test
     public void regularRouteFromCentralAtlantaToPowderSprings() {

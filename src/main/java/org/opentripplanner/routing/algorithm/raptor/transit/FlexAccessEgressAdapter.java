@@ -12,7 +12,7 @@ public class FlexAccessEgressAdapter extends AccessEgress {
           FlexAccessEgress flexAccessEgress, boolean isEgress, StopIndexForRaptor stopIndex
   ) {
     super(
-        stopIndex.indexByStop.get(flexAccessEgress.stop),
+        stopIndex.indexOf(flexAccessEgress.stop),
         isEgress ? flexAccessEgress.lastState.reverse() : flexAccessEgress.lastState
     );
 

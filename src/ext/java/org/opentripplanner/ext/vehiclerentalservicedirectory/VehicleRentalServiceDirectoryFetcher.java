@@ -9,6 +9,7 @@ import java.util.List;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,9 @@ public class VehicleRentalServiceDirectoryFetcher {
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 
-        GraphUpdater updater = new VehicleRentalUpdater(vehicleRentalParameters);
+        var dataSource =
+                VehicleRentalDataSourceFactory.create(vehicleRentalParameters.sourceParameters());
+        GraphUpdater updater = new VehicleRentalUpdater(vehicleRentalParameters, dataSource);
         updaters.add(updater);
       }
     }

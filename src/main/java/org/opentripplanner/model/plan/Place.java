@@ -3,9 +3,10 @@ package org.opentripplanner.model.plan;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
@@ -18,8 +19,6 @@ public class Place {
      * For transit stops, the name of the stop.  For points of interest, the name of the POI.
      */
     public final String name;
-
-    public final String orig;
 
     /**
      * The coordinate of the place.
@@ -38,16 +37,6 @@ public class Place {
     public final StopLocation stop;
 
     /**
-     * For transit trips, the stop index (numbered from zero from the start of the trip).
-     */
-    public final Integer stopIndex;
-
-    /**
-     * For transit trips, the sequence number of the stop. Per GTFS, these numbers are increasing.
-     */
-    public final Integer stopSequence;
-
-    /**
      * The vehicle rental place if the type is {@link VertexType#VEHICLERENTAL}.
      */
     public final VehicleRentalPlace vehicleRentalPlace;
@@ -59,22 +48,16 @@ public class Place {
 
     private Place(
             String name,
-            String orig,
             WgsCoordinate coordinate,
             VertexType vertexType,
             StopLocation stop,
-            Integer stopIndex,
-            Integer stopSequence,
             VehicleRentalPlace vehicleRentalPlace,
             VehicleParkingWithEntrance vehicleParkingWithEntrance
     ) {
         this.name = name;
-        this.orig = orig;
         this.coordinate = coordinate;
         this.vertexType = vertexType;
         this.stop = stop;
-        this.stopIndex = stopIndex;
-        this.stopSequence = stopSequence;
         this.vehicleRentalPlace = vehicleRentalPlace;
         this.vehicleParkingWithEntrance = vehicleParkingWithEntrance;
     }
@@ -112,9 +95,6 @@ public class Place {
                 .addStr("name", name)
                 .addObj("stop", stop)
                 .addObj("coordinate", coordinate)
-                .addStr("orig", orig)
-                .addNum("stopIndex", stopIndex)
-                .addNum("stopSequence", stopSequence)
                 .addEnum("vertexType", vertexType)
                 .addObj("vehicleRentalPlace", vehicleRentalPlace)
                 .addObj("vehicleParkingEntrance", vehicleParkingWithEntrance)
@@ -124,67 +104,40 @@ public class Place {
     public static Place normal(Double lat, Double lon, String name) {
         return new Place(
                 name,
-                null,
                 WgsCoordinate.creatOptionalCoordinate(lat, lon),
                 VertexType.NORMAL,
-                null, null, null, null, null
+                null, null, null
         );
     }
 
     public static Place normal(Vertex vertex, String name) {
         return new Place(
                 name,
-                null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.NORMAL,
-                null, null, null, null, null
+                null, null, null
         );
     }
 
-    public static Place forStop(StopLocation stop, Integer stopIndex, Integer stopSequence) {
+    public static Place forStop(StopLocation stop) {
         return new Place(
                 stop.getName(),
-                null,
                 stop.getCoordinate(),
                 VertexType.TRANSIT,
                 stop,
-                stopIndex,
-                stopSequence,
                 null,
                 null
         );
     }
 
-    public static Place forFlexStop(
-            StopLocation stop,
-            Vertex vertex,
-            Integer stopIndex,
-            Integer stopSequence
-    ) {
+    public static Place forFlexStop(StopLocation stop, Vertex vertex) {
         // The actual vertex is used because the StopLocation coordinates may not be equal to the vertex's
         // coordinates.
         return new Place(
                 stop.getName(),
-                null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.TRANSIT,
                 stop,
-                stopIndex,
-                stopSequence,
-                null,
-                null
-        );
-    }
-
-    public static Place forStop(TransitStopVertex vertex, String name) {
-        return new Place(
-                name,
-                null,
-                WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
-                VertexType.TRANSIT,
-                vertex.getStop(),
-                null,
-                null,
                 null,
                 null
         );
@@ -193,30 +146,34 @@ public class Place {
     public static Place forVehicleRentalPlace(VehicleRentalStationVertex vertex, String name) {
         return new Place(
                 name,
-                null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.VEHICLERENTAL,
-                null,
-                null,
                 null,
                 vertex.getStation(),
                 null
         );
     }
 
-    public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, String name) {
+    public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, String name, RoutingRequest request) {
+        TraverseMode traverseMode = null;
+        if (request.streetSubRequestModes.getCar()) {
+            traverseMode = TraverseMode.CAR;
+        } else if (request.streetSubRequestModes.getBicycle()) {
+            traverseMode = TraverseMode.BICYCLE;
+        }
+
+        boolean realTime = request.useVehicleParkingAvailabilityInformation
+                && vertex.getVehicleParking().hasRealTimeDataForMode(traverseMode, request.wheelchairAccessible);
         return new Place(
                 name,
-                null,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.VEHICLEPARKING,
-                null,
-                null,
                 null,
                 null,
                 VehicleParkingWithEntrance.builder()
                         .vehicleParking(vertex.getVehicleParking())
                         .entrance(vertex.getParkingEntrance())
+                        .realtime(realTime)
                         .build()
         );
     }

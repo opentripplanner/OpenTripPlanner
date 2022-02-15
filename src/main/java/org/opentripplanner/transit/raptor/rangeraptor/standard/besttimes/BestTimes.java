@@ -189,11 +189,11 @@ public final class BestTimes {
     }
 
     private boolean isBestTime(int stop, int time) {
-        return calculator.isBest(time, times[stop]);
+        return calculator.isBefore(time, times[stop]);
     }
 
     private boolean isBestTransitTime(int stop, int time) {
-        return calculator.isBest(time, transitTimes[stop]);
+        return calculator.isBefore(time, transitTimes[stop]);
     }
 
     private void setTransitTime(int stop, int time) {

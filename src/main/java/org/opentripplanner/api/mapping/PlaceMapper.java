@@ -30,10 +30,22 @@ public class PlaceMapper {
     }
 
     public ApiPlace mapStopArrival(StopArrival domain) {
-        return mapPlace(domain.place, domain.arrival, domain.departure);
+        return mapPlace(
+                domain.place,
+                domain.arrival,
+                domain.departure,
+                domain.stopPosInPattern,
+                domain.gtfsStopSequence
+        );
     }
 
-    public ApiPlace mapPlace(Place domain, Calendar arrival, Calendar departure) {
+    public ApiPlace mapPlace(
+            Place domain,
+            Calendar arrival,
+            Calendar departure,
+            Integer stopIndex,
+            Integer gtfsStopSequence
+    ) {
         if(domain == null) { return null; }
 
         ApiPlace api = new ApiPlace();
@@ -54,9 +66,8 @@ public class PlaceMapper {
 
         api.arrival = arrival;
         api.departure = departure;
-        api.orig = domain.orig;
-        api.stopIndex = domain.stopIndex;
-        api.stopSequence = domain.stopSequence;
+        api.stopIndex = stopIndex;
+        api.stopSequence = gtfsStopSequence;
         api.vertexType = VertexTypeMapper.mapVertexType(domain.vertexType);
         if (domain.vehicleRentalPlace != null) {
             api.bikeShareId = domain.vehicleRentalPlace.getStationId();
@@ -87,6 +98,7 @@ public class PlaceMapper {
                 .hasWheelchairAccessibleCarPlaces(vp.hasWheelchairAccessibleCarPlaces())
                 .availability(mapVehicleParkingSpaces(vp.getAvailability()))
                 .capacity(mapVehicleParkingSpaces(vp.getCapacity()))
+                .realtime(vehicleParkingWithEntrance.isRealtime())
                 .build();
     }
 

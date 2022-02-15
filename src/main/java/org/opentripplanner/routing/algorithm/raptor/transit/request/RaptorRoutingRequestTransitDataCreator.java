@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import static java.util.stream.Collectors.groupingBy;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.stream.Stream;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 
 
 /**
@@ -28,18 +26,14 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 class RaptorRoutingRequestTransitDataCreator {
 
   private final TransitLayer transitLayer;
-  private final ZonedDateTime searchStartTime;
+  private final ZonedDateTime transitSearchTimeZero;
   private final LocalDate departureDate;
 
 
-  RaptorRoutingRequestTransitDataCreator(TransitLayer transitLayer, Instant departureTime) {
+  RaptorRoutingRequestTransitDataCreator(TransitLayer transitLayer, ZonedDateTime transitSearchTimeZero) {
     this.transitLayer = transitLayer;
-    this.departureDate = LocalDate.ofInstant(departureTime, transitLayer.getTransitDataZoneId());
-    this.searchStartTime = DateMapper.asStartOfService(departureDate, transitLayer.getTransitDataZoneId());
-  }
-
-  ZonedDateTime getSearchStartTime() {
-    return searchStartTime;
+    this.departureDate = transitSearchTimeZero.toLocalDate();
+    this.transitSearchTimeZero = transitSearchTimeZero;
   }
 
   List<List<TripPatternForDates>> createTripPatternsPerStop(
@@ -54,7 +48,7 @@ class RaptorRoutingRequestTransitDataCreator {
         filter
     );
 
-    List<TripPatternForDates> tripPatternForDateList = merge(searchStartTime, tripPatternForDates);
+    List<TripPatternForDates> tripPatternForDateList = merge(transitSearchTimeZero, tripPatternForDates);
 
     return createTripPatternsPerStop(tripPatternForDateList, transitLayer.getStopCount());
   }
@@ -87,7 +81,7 @@ class RaptorRoutingRequestTransitDataCreator {
    * performance for searching, as each TripPattern is searched only once per round.
    */
   static List<TripPatternForDates> merge(
-      ZonedDateTime searchStartTime, List<TripPatternForDate> patternForDateList
+      ZonedDateTime transitSearchTimeZero, List<TripPatternForDate> patternForDateList
   ) {
 
     // Group TripPatternForDate objects by TripPattern
@@ -112,7 +106,7 @@ class RaptorRoutingRequestTransitDataCreator {
       // Calculate offsets per date
       List<Integer> offsets = new ArrayList<>();
       for (TripPatternForDate tripPatternForDate : patternsSorted) {
-        offsets.add(secondsSinceStartOfTime(searchStartTime, tripPatternForDate.getLocalDate()));
+        offsets.add(secondsSinceStartOfTime(transitSearchTimeZero, tripPatternForDate.getLocalDate()));
       }
 
       // Combine TripPatternForDate objects

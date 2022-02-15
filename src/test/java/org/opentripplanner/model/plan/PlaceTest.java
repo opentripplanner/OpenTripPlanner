@@ -63,13 +63,12 @@ public class PlaceTest {
                 null,
                 null,
                 null,
+                null,
                 null
         );
     }
 
     private static Place place(Stop stop) {
-        return Place.forStop(
-                stop, null, null
-        );
+        return Place.forStop(stop);
     }
 }

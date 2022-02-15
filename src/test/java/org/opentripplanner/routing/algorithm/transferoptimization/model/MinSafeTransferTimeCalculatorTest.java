@@ -17,7 +17,7 @@ import org.opentripplanner.util.time.DurationUtils;
 
 
 public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
-  private static final int D2m = DurationUtils.duration("2m");
+  private static final int D2m = DurationUtils.durationInSeconds("2m");
   private static final int TRANSIT_TIME = 2000 - (BOARD_SLACK + ALIGHT_SLACK);
 
   private static final TestPathBuilder

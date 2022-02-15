@@ -11,8 +11,8 @@ public class SortOnGeneralizedCost extends CompositeComparator<Itinerary> {
 
     public SortOnGeneralizedCost() {
         super(
-            OtpDefaultSortOrder.GENERALIZED_COST,
-            OtpDefaultSortOrder.NUM_OF_TRANSFERS
+            SortOrderComparator.GENERALIZED_COST_COMP,
+            SortOrderComparator.NUM_OF_TRANSFERS_COMP
         );
     }
 }

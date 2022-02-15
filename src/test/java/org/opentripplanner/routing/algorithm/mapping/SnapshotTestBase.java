@@ -23,6 +23,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -31,14 +33,14 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.api.mapping.ItineraryMapper;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -60,6 +62,7 @@ public abstract class SnapshotTestBase {
     private static final DateTimeFormatter apiDateFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
     private static final DateTimeFormatter apiTimeFormatter = DateTimeFormatter.ofPattern("H:mm%20a");
     private static final SnapshotSerializer snapshotSerializer = new SnapshotItinerarySerializer();
+    private static final ItineraryMapper itineraryMapper = new ItineraryMapper(null, true);
 
     static final boolean verbose = Boolean.getBoolean("otp.test.verbose");
 
@@ -84,7 +87,7 @@ public abstract class SnapshotTestBase {
         Router router = getRouter();
 
         RoutingRequest request = router.defaultRoutingRequest.clone();
-        request.dateTime = TestUtils.dateInSeconds(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second);
+        request.setDateTime(TestUtils.dateInstant(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second));
         request.maxTransfers = 6;
         request.numItineraries = 6;
         request.searchWindow = Duration.ofHours(5);
@@ -111,10 +114,11 @@ public abstract class SnapshotTestBase {
 
             for (int j = 0; j < itinerary.legs.size(); j++) {
                 Leg leg = itinerary.legs.get(j);
-                String mode = leg.mode.name().substring(0, 1);
-                System.out.printf(" - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n", j, leg.from.toStringShort(),
-                        dtf.format(leg.startTime.toInstant().atZone(zoneId)), mode,
-                        dtf.format(leg.endTime.toInstant().atZone(zoneId)), leg.to.toStringShort());
+                String mode = leg.getMode().name().substring(0, 1);
+                System.out.printf(" - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n", j, leg.getFrom()
+                                .toStringShort(),
+                        dtf.format(leg.getStartTime().toInstant().atZone(zoneId)), mode,
+                        dtf.format(leg.getEndTime().toInstant().atZone(zoneId)), leg.getTo().toStringShort());
             }
 
             System.out.println();
@@ -167,26 +171,26 @@ public abstract class SnapshotTestBase {
 
         logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
 
-        sanitizeItinerariesForSnapshot(departByItineraries);
         logDebugInformationOnFailure(departAt, () -> expectItinerariesToMatchSnapshot(departByItineraries));
 
         RoutingRequest arriveBy = request.clone();
         arriveBy.setArriveBy(true);
-        arriveBy.dateTime = departByItineraries.get(0).lastLeg().endTime.toInstant().getEpochSecond();
+        arriveBy.setDateTime(departByItineraries.get(0).lastLeg().getEndTime().toInstant());
 
         List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy, router);
-        sanitizeItinerariesForSnapshot(arriveByItineraries);
 
         var departAtItinerary = departByItineraries.get(0);
         var arriveByItinerary = arriveByItineraries.get(0);
 
         arriveByCorrecter.accept(departAtItinerary, arriveByItinerary);
-        logDebugInformationOnFailure(arriveBy, () -> assertEquals(asJsonString(departAtItinerary), asJsonString(arriveByItinerary)));
+        logDebugInformationOnFailure(arriveBy, () -> assertEquals(
+                asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
+                asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
+        ));
     }
 
     protected void expectItinerariesToMatchSnapshot(List<Itinerary> itineraries) {
-        sanitizeItinerariesForSnapshot(itineraries);
-        expect(itineraries).serializer(snapshotSerializer).toMatchSnapshot();
+        expect(itineraryMapper.mapItineraries(itineraries)).serializer(snapshotSerializer).toMatchSnapshot();
     }
 
     protected void logDebugInformationOnFailure(RoutingRequest request, Runnable task) {
@@ -200,15 +204,30 @@ public abstract class SnapshotTestBase {
         }
     }
 
+    private static List<ApiRequestMode> mapModes(Collection<AllowedTransitMode> reqModes) {
+        List<ApiRequestMode> result = new ArrayList<>();
+
+        if(ApiRequestMode.TRANSIT.getTransitModes().equals(reqModes)) {
+            return List.of(ApiRequestMode.TRANSIT);
+        }
+
+        for (AllowedTransitMode allowedTransitMode : reqModes) {
+            Collection<AllowedTransitMode> allowedTransitModes = Set.of(allowedTransitMode);
+            for (ApiRequestMode apiCandidate : ApiRequestMode.values()) {
+                if(allowedTransitModes.equals(apiCandidate.getTransitModes())) {
+                    result.add(apiCandidate);
+                }
+            }
+        }
+        return result;
+    }
+
     private String createDebugUrlForRequest(RoutingRequest request) {
-        var dateTime = Instant.ofEpochSecond(request.getSecondsSinceEpoch())
+        var dateTime = Instant.ofEpochSecond(request.getDateTime().getEpochSecond())
                 .atZone(getRouter().graph.getTimeZone().toZoneId())
                 .toLocalDateTime();
 
-        var transitModes = Objects.equals(request.modes.transitModes, Set.of(TransitMode.values())) ?
-                Stream.of(ApiRequestMode.TRANSIT) :
-                        request.modes.transitModes.stream()
-                                .map(ApiRequestMode::fromTransitMode);
+        var transitModes = mapModes(request.modes.transitModes);
 
         var modes = Stream.concat(
                 Stream.of(
@@ -218,7 +237,7 @@ public abstract class SnapshotTestBase {
                 )
                         .filter(Objects::nonNull)
                         .map(QualifiedMode::toString),
-                transitModes
+                transitModes.stream()
                         .map(ApiRequestMode::name)
         )
                 .distinct()
@@ -276,16 +295,6 @@ public abstract class SnapshotTestBase {
             default:
                 return null;
         }
-    }
-
-    private void sanitizeItinerariesForSnapshot(List<Itinerary> itineraries) {
-        itineraries.forEach(itinerary -> itinerary.legs.forEach(leg -> sanitizeWalkStepsForSnapshot(leg.walkSteps)));
-    }
-
-    private void sanitizeWalkStepsForSnapshot(List<WalkStep> walkSteps) {
-        walkSteps.forEach(walkStep -> {
-            walkStep.edges.clear();
-        });
     }
 
     private static String asJsonString(Object object) {
@@ -355,10 +364,10 @@ public abstract class SnapshotTestBase {
      */
     public static void handleGeneralizedCost(Itinerary departAt, Itinerary arriveBy) {
         departAt.legs.stream()
-                .filter(l -> !l.mode.isTransit())
-                .forEach(l -> l.generalizedCost = 0);
+                .filter(l -> !l.getMode().isTransit())
+                .forEach(l -> l.setGeneralizedCost(0));
         arriveBy.legs.stream()
-                .filter(l -> !l.mode.isTransit())
-                .forEach(l -> l.generalizedCost = 0);
+                .filter(l -> !l.getMode().isTransit())
+                .forEach(l -> l.setGeneralizedCost(0));
     }
 }

@@ -2,6 +2,8 @@ package org.opentripplanner.util;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,19 +19,21 @@ public enum OTPFeature {
     APIServerInfo(true),
     APIGraphInspectorTile(true),
     APIUpdaterStatus(true),
+    MinimumTransferTimeIsDefinitive(false),
     OptimizeTransfers(true),
     ParallelRouting(true),
     TransferConstraints(true),
 
     // Sandbox extension features - Must be turned OFF by default
     ActuatorAPI(false),
+    DataOverlay(false),
     FlexRouting(false),
     FloatingBike(false),
     GoogleCloudStorage(false),
     ReportApi(false),
-    SandboxAPITransmodelApi(false),
     SandboxAPILegacyGraphQLApi(false),
     SandboxAPIMapboxVectorTilesApi(false),
+    SandboxAPITransmodelApi(false),
     SandboxExampleAPIGraphStatistics(false),
     SandboxAPIParkAndRideApi(false),
     TransferAnalyzer(false);
@@ -72,6 +76,13 @@ public enum OTPFeature {
      */
     void set(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * If feature is turned on, then return supplied object if not return {@code null}.
+     */
+    public <T> T isOnElseNull(Supplier<T> supplier) {
+        return isOn() ? supplier.get() : null;
     }
 
 

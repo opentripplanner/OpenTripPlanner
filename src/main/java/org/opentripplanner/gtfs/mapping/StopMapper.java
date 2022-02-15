@@ -49,7 +49,8 @@ class StopMapper {
         gtfsStop.getPlatformCode(), fareZones,
         gtfsStop.getUrl(),
         gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
-        TransitModeMapper.mapMode(gtfsStop.getVehicleType())
+        TransitModeMapper.mapMode(gtfsStop.getVehicleType()),
+        null
     );
   }
 

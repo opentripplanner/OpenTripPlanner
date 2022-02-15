@@ -21,7 +21,7 @@ import org.opentripplanner.standalone.server.Router;
 
 public class CarRoutingTest {
 
-    static long dateTime = Instant.now().toEpochMilli();
+    static final Instant dateTime = Instant.now();
 
     static private Graph herrenbergGraph;
 
@@ -111,7 +111,7 @@ public class CarRoutingTest {
 
     private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
         RoutingRequest request = new RoutingRequest();
-        request.dateTime = dateTime;
+        request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
 
@@ -125,7 +125,7 @@ public class CarRoutingTest {
         var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
         // make sure that we only get CAR legs
         itineraries.forEach(
-                i -> i.legs.forEach(l -> Assertions.assertEquals(l.mode, TraverseMode.CAR)));
-        return itineraries.get(0).legs.get(0).legGeometry.getPoints();
+                i -> i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.CAR)));
+        return itineraries.get(0).legs.get(0).getLegGeometry().getPoints();
     }
 }

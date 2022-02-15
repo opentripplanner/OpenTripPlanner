@@ -17,6 +17,10 @@ public class TransitIdMapper {
   private static String fixedFeedId = null;
 
   public static String mapEntityIDToApi(TransitEntity entity) {
+    if (entity == null) {
+      return null;
+    }
+
     return mapIDToApi(entity.getId());
   }
 

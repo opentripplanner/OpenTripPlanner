@@ -126,7 +126,7 @@ public class ValueObjectToStringBuilder {
      * Add time in seconds since midnight. Format:  HH:mm:ss.
      */
     public  ValueObjectToStringBuilder addServiceTime(int secondsPastMidnight) {
-        // Use a NOT_SET value witch is unlikely to be used
+        // Use a NOT_SET value which is unlikely to be used
         return addServiceTime(secondsPastMidnight, -87_654_321);
     }
 

@@ -1,35 +1,35 @@
 package org.opentripplanner.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import static org.opentripplanner.util.TestUtils.AUGUST;
+
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.TestUtils;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-import static org.opentripplanner.util.TestUtils.AUGUST;
 
 
 
@@ -137,7 +137,7 @@ public class TimetableTest {
         //---
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 0, 0);
         long endTime;
-        options.dateTime = startTime;
+        options.setDateTime(Instant.ofEpochSecond(startTime));
 
         //---
         options.setRoutingContext(graph, stop_a, stop_c);
@@ -195,8 +195,8 @@ public class TimetableTest {
         // TODO This will not work since individual stops cannot be cancelled using GTFS updates
         //      yet
         for (int i = 0; i < tripTimes.getNumStops(); i++) {
-            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getPickup(i) );
-            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getDropoff(i) );
+            assertEquals(PickDrop.CANCELLED, pattern.getBoardType(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getAlightType(i));
         }
 
         //---

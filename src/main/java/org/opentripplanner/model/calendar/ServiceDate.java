@@ -158,7 +158,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
     /**
      * Create a ZonedDateTime based on the current service date, time zone and seconds-offset.
-     * This method add the offset seconds to the service date start time, witch is defined
+     * This method add the offset seconds to the service date start time, which is defined
      * to be NOON - 12 hours. This is midnight for most days, except days where the time is
      * adjusted for daylight saving time.
      */
@@ -170,7 +170,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
     /**
      * Add a given number of seconds to the service date and convert it to a new service date if it
-     * the new time is on another date. The given time-zone is used to account for days witch
+     * the new time is on another date. The given time-zone is used to account for days which
      * do not have 24 hours (switching between summer and winter time).
      */
     public ServiceDate plusSeconds(ZoneId zoneId, int seconds) {

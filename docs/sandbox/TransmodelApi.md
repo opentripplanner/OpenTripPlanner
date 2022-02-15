@@ -19,6 +19,10 @@
 - Allow filtering by a list of ids [#3738](https://github.com/opentripplanner/OpenTripPlanner/pull/3738)
 - Don't filter out stops who don't have multimodal parents in the nearest query [#3752](https://github.com/opentripplanner/OpenTripPlanner/pull/3752)
 - Restore ability to filter by private code [#3764](https://github.com/opentripplanner/OpenTripPlanner/pull/3764)
+- Narrow down non-null types type [#3803](https://github.com/opentripplanner/OpenTripPlanner/pull/3803)
+- Fix issue with fetching parent StopPlaces in nearest query in Transmodel API [#3807](https://github.com/opentripplanner/OpenTripPlanner/pull/3807)
+- Fix invalid cast in situations resolver for line type [#3810](https://github.com/opentripplanner/OpenTripPlanner/pull/3810)
+- Deduce enum for bookWhen in Transmodel API [#3854](https://github.com/opentripplanner/OpenTripPlanner/pull/3854)
 
 ## Documentation
 

@@ -4,8 +4,10 @@ import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRoute;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -34,11 +36,17 @@ public class LegacyGraphQLAlertEntityTypeResolver implements TypeResolver {
     if (o instanceof TripPattern) {
       return schema.getObjectType("Pattern");
     }
-    if (o instanceof LegacyGraphQLStopOnRoute) {
+    if (o instanceof LegacyGraphQLStopOnRouteModel) {
       return schema.getObjectType("StopOnRoute");
     }
-    if (o instanceof LegacyGraphQLStopOnTrip) {
+    if (o instanceof LegacyGraphQLStopOnTripModel) {
       return schema.getObjectType("StopOnTrip");
+    }
+    if (o instanceof LegacyGraphQLRouteTypeModel) {
+      return schema.getObjectType("RouteType");
+    }
+    if (o instanceof LegacyGraphQLUnknownModel) {
+      return schema.getObjectType("Unknown");
     }
 
     return null;

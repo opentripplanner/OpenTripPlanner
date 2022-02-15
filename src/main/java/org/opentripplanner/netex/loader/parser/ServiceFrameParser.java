@@ -168,7 +168,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
                     // TODO OTP2 - This check belongs to the mapping or as a separate validation
                     //           - step. The problem is that we do not want to relay on the
-                    //           - the order in witch elements are loaded.
+                    //           - the order in which elements are loaded.
                     FlexibleStopPlace flexibleStopPlace = flexibleStopPlaceById.lookup(
                         flexibleStopPlaceRef);
 

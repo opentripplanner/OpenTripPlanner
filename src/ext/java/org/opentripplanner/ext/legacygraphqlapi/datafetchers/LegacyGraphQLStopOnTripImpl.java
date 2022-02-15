@@ -3,7 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip;
+import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
 import org.opentripplanner.model.Trip;
 
 public class LegacyGraphQLStopOnTripImpl
@@ -19,7 +19,7 @@ public class LegacyGraphQLStopOnTripImpl
         return environment -> getSource(environment).getTrip();
     }
 
-    private LegacyGraphQLStopOnTrip getSource(DataFetchingEnvironment environment) {
+    private LegacyGraphQLStopOnTripModel getSource(DataFetchingEnvironment environment) {
         return environment.getSource();
     }
 }

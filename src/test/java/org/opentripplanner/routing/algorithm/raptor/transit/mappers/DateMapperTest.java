@@ -1,17 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.asStartOfService;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.asStartOfService;
+import org.junit.jupiter.api.Test;
 
 public class DateMapperTest {
   private static final ZoneId ZONE_ID = ZoneId.of("Europe/Paris");
@@ -62,6 +60,12 @@ public class DateMapperTest {
     assertEquals("2019-10-26T00:00+02:00[Europe/Paris]", asStartOfService(D2019_10_26, ZONE_ID).toString());
     assertEquals("2019-10-27T01:00+02:00[Europe/Paris]", asStartOfService(D2019_10_27, ZONE_ID).toString());
     assertEquals("2019-10-28T00:00+01:00[Europe/Paris]", asStartOfService(D2019_10_28, ZONE_ID).toString());
+  }
+
+  @Test
+  public void testAsStartOfServiceWithInstance() {
+    var time = Instant.parse("2019-03-30T10:00:00Z");
+    assertEquals("2019-03-30T00:00+01:00[Europe/Paris]", asStartOfService(time, ZONE_ID).toString());
   }
 
   @Test

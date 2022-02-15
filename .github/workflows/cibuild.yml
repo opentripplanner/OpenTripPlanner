@@ -8,10 +8,9 @@ on:
       - ibi-dev-2.x
 jobs:
   build:
-    runs-on: ubuntu-latest
-
     env:
       MAVEN_OPTS: -Xmx2g
+    runs-on: ubuntu-latest
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
       - uses: actions/checkout@v2.3.2
@@ -30,6 +29,22 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
+      - name: Prepare coverage agent, build and test
+        run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report
+
+      - name: Send coverage data to codecov.io
+        if: github.repository_owner == 'opentripplanner' && matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v2
+        with:
+          files: target/site/jacoco/jacoco.xml
+
+      ## IBI start
+      - name: Deploy to Github Package Registry
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x') && matrix.os == 'ubuntu-latest'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY
       # So that the branch name can be reference via $GITHUB_REF_SLUG.
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x

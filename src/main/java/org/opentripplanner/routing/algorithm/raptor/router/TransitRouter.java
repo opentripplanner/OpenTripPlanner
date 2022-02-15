@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
-import java.time.Instant;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,10 +27,10 @@ import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -46,23 +47,30 @@ public class TransitRouter {
     private final RoutingRequest request;
     private final Router router;
     private final DebugTimingAggregator debugTimingAggregator;
+    private final ZonedDateTime transitSearchTimeZero;
+    private final AdditionalSearchDays additionalSearchDays;
+
 
     private TransitRouter(
             RoutingRequest request,
             Router router,
+            ZonedDateTime transitSearchTimeZero,
+            AdditionalSearchDays additionalSearchDays,
             DebugTimingAggregator debugTimingAggregator
     ) {
         this.request = request;
         this.router = router;
+        this.transitSearchTimeZero = transitSearchTimeZero;
+        this.additionalSearchDays = additionalSearchDays;
         this.debugTimingAggregator = debugTimingAggregator;
     }
 
     private TransitRouterResult route() {
         if (request.modes.transitModes.isEmpty()) {
-            return new TransitRouterResult(List.of(), null, NOT_SET);
+            return new TransitRouterResult(List.of(), null);
         }
 
-        if (!router.graph.transitFeedCovers(request.dateTime)) {
+        if (!router.graph.transitFeedCovers(request.getDateTime())) {
             throw new RoutingValidationException(List.of(
                     new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME)
             ));
@@ -90,7 +98,7 @@ public class TransitRouter {
         // Prepare transit search
         var raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
-                requestTransitDataProvider.getStartOfTime(),
+                transitSearchTimeZero,
                 accessEgresses.getAccesses(),
                 accessEgresses.getEgresses()
         );
@@ -122,7 +130,7 @@ public class TransitRouter {
         RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
                 router.graph,
                 transitLayer,
-                requestTransitDataProvider.getStartOfTime(),
+                transitSearchTimeZero,
                 request
         );
         FareService fareService = router.graph.getService(FareService.class);
@@ -139,19 +147,9 @@ public class TransitRouter {
             itineraries.add(itinerary);
         }
 
-        // Filter itineraries away that depart after the latest-departure-time for depart after
-        // search. These itineraries is a result of time-shifting the access leg and is needed for
-        // the raptor to prune the results. These itineraries are often not ideal, but if they
-        // pareto optimal for the "next" window, they will appear when a "next" search is performed.
-        Instant filterOnLatestDepartureTime = null;
-        var searchWindowUsedInSeconds = transitResponse.requestUsed().searchParams().searchWindowInSeconds();
-        if(!request.arriveBy && searchWindowUsedInSeconds > 0) {
-            filterOnLatestDepartureTime = Instant.ofEpochSecond(request.dateTime + searchWindowUsedInSeconds);
-        }
-
         debugTimingAggregator.finishedItineraryCreation();
 
-        return new TransitRouterResult(itineraries, filterOnLatestDepartureTime, searchWindowUsedInSeconds);
+        return new TransitRouterResult(itineraries, transitResponse.requestUsed().searchParams());
     }
 
     private AccessEgresses getAccessEgresses(
@@ -208,6 +206,7 @@ public class TransitRouter {
         // Prepare access/egress lists
         try (RoutingRequest accessRequest = request.getStreetSearchRequest(mode)) {
             accessRequest.setRoutingContext(router.graph);
+
             if (!isEgress) {
                 accessRequest.allowKeepingRentedVehicleAtDestination = false;
             }
@@ -224,6 +223,7 @@ public class TransitRouter {
             if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
                 var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
                         accessRequest,
+                        additionalSearchDays,
                         router.routerConfig.flexParameters(request),
                         isEgress
                 );
@@ -240,15 +240,16 @@ public class TransitRouter {
     ) {
         var graph = router.graph;
 
+
         try (RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request)) {
             transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
 
             return new RaptorRoutingRequestTransitData(
                     graph.getTransferService(),
                     transitLayer,
-                    request.getDateTime().toInstant(),
-                    request.arriveBy ? request.additionalSearchDaysBeforeToday : 0,
-                    request.arriveBy ? 0 : request.additionalSearchDaysAfterToday,
+                    transitSearchTimeZero,
+                    additionalSearchDays.additionalSearchDaysInPast(),
+                    additionalSearchDays.additionalSearchDaysInFuture(),
                     createRequestTransitDataProviderFilter(graph.index),
                     transferRoutingRequest
             );
@@ -296,8 +297,10 @@ public class TransitRouter {
     public static TransitRouterResult route(
             RoutingRequest request,
             Router router,
+            ZonedDateTime transitSearchTimeZero,
+            AdditionalSearchDays additionalSearchDays,
             DebugTimingAggregator debugTimingAggregator
     ) {
-        return new TransitRouter(request, router, debugTimingAggregator).route();
+        return new TransitRouter(request, router, transitSearchTimeZero, additionalSearchDays, debugTimingAggregator).route();
     }
 }

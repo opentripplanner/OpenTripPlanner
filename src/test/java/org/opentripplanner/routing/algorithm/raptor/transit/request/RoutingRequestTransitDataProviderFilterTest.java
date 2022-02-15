@@ -1,20 +1,30 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.opentripplanner.model.*;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
+import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripAlteration;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 public class RoutingRequestTransitDataProviderFilterTest {
 
@@ -30,7 +40,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         false,
-        Set.of(TransitMode.BUS),
+        Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
         Set.of()
     );
 
@@ -47,7 +57,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         false,
-        Set.of(TransitMode.BUS),
+        Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
         Set.of(TEST_ROUTE_ID)
     );
 
@@ -58,19 +68,30 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   @Test
   public void transitModeFilteringTest() {
-    TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
+    TripTimes tripTimes = createTestTripTimes();
+    final var BUS = TransitMode.BUS;
+    final var RAIL = TransitMode.RAIL;
+    final var LOCAL_BUS = TransmodelTransportSubmode.LOCAL_BUS.getValue();
+    final var REGIONAL_BUS = TransmodelTransportSubmode.REGIONAL_BUS.getValue();
 
+    assertFalse(validateModesOnTripTimes(Set.of(), tripTimes));
+    assertFalse(validateModesOnTripTimes(Set.of(new AllowedTransitMode(BUS, REGIONAL_BUS)), tripTimes));
+    assertFalse(validateModesOnTripTimes(Set.of(new AllowedTransitMode(RAIL, LOCAL_BUS)), tripTimes));
+
+    assertTrue(validateModesOnTripTimes(Set.of(new AllowedTransitMode(BUS, null)), tripTimes));
+    assertTrue(validateModesOnTripTimes(Set.of(new AllowedTransitMode(BUS, LOCAL_BUS)), tripTimes));
+  }
+
+  private boolean validateModesOnTripTimes(Set<AllowedTransitMode> allowedModes, TripTimes tripTimes) {
     var filter = new RoutingRequestTransitDataProviderFilter(
-        false,
-        false,
-        false,
-        Set.of(),
-        Set.of()
+            false,
+            false,
+            false,
+            allowedModes,
+            Set.of()
     );
 
-    boolean valid = filter.tripPatternPredicate(tripPatternForDate);
-
-    assertFalse(valid);
+    return filter.tripTimesPredicate(tripTimes);
   }
 
   @Test
@@ -81,7 +102,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         false,
-        Set.of(),
+        Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
         Set.of()
     );
 
@@ -134,7 +155,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     TripPattern pattern = new TripPattern(null, route, stopPattern);
 
     TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
-        new int[0], pattern
+            pattern, new int[0]
     );
 
     TripTimes tripTimes = Mockito.mock(TripTimes.class);
@@ -145,6 +166,9 @@ public class RoutingRequestTransitDataProviderFilterTest {
   private TripTimes createTestTripTimes() {
     Trip trip = new Trip(new FeedScopedId("TEST", "TRIP"));
     trip.setBikesAllowed(BikeAccess.NOT_ALLOWED);
+    trip.setRoute(new Route(new FeedScopedId("TEST", "ROUTE")));
+    trip.setMode(TransitMode.BUS);
+    trip.setNetexSubmode(TransmodelTransportSubmode.LOCAL_BUS.getValue());
 
     StopTime stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
@@ -166,7 +190,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         true,
-        Set.of(),
+        Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
         Set.of()
     );
 

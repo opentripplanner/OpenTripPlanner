@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -44,6 +45,8 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
@@ -286,6 +289,13 @@ public class Graph implements Serializable {
      * going to fail as soon as we load a base OSM graph and build transit on top of it.
      */
     public long nextSplitNumber = 0;
+
+    /**
+     * DataOverlay Sandbox module parameter bindings configured in the build-config, and needed
+     * when creating the data overlay context when routing.
+     */
+    public DataOverlayParameterBindings dataOverlayParameterBindings;
+
 
     public Graph(Graph basedOn) {
         this();
@@ -562,10 +572,12 @@ public class Graph implements Serializable {
                 }
                 // assume feed is unreliable after midnight on last service day
                 long u = t + SEC_IN_DAY;
-                if (t < this.transitServiceStarts)
+                if (t < this.transitServiceStarts) {
                     this.transitServiceStarts = t;
-                if (u > this.transitServiceEnds)
+                }
+                if (u > this.transitServiceEnds) {
                     this.transitServiceEnds = u;
+                }
             }
         }
         for (String agency : agencies) {
@@ -576,7 +588,8 @@ public class Graph implements Serializable {
     }
 
     // Check to see if we have transit information for a given date
-    public boolean transitFeedCovers(long t) {
+    public boolean transitFeedCovers(Instant time) {
+        long t = time.getEpochSecond();
         return t >= this.transitServiceStarts && t < this.transitServiceEnds;
     }
 

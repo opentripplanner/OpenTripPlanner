@@ -4,7 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.raptor.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare;
@@ -39,7 +43,7 @@ public class FaresTest {
         var router = new Router(graph, RouterConfig.DEFAULT);
         router.startup();
 
-        var start = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
+        var start = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
         var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
         var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
@@ -65,7 +69,7 @@ public class FaresTest {
                 portlandId, "8371"
         );
 
-        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
+        Instant startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
 
         Fare fare = getFare(from, to, startTime, router);
 
@@ -73,7 +77,7 @@ public class FaresTest {
 
         // long trip
 
-        startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
+        startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 2, 14, 0, 0);
 
         from = GenericLocation.fromStopId("Origin", portlandId, "8389");
         to = GenericLocation.fromStopId("Destination", portlandId, "1252");
@@ -112,17 +116,17 @@ public class FaresTest {
         var from = GenericLocation.fromStopId("Origin", feedId, "2010");
         var to = GenericLocation.fromStopId("Destination", feedId, "2140");
 
-        var dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
+        var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
 
         var costOffPeak = getFare(from, to, dateTime, router);
 
         assertEquals(new Money(USD, 250), costOffPeak.getFare(FareType.regular));
 
-        long onPeakStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
+        var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
         var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
         var leg = peakItinerary.legs.get(0);
-        assertTrue(toLocalTime(leg.startTime).isAfter(LocalTime.parse("08:00")));
-        assertTrue(toLocalTime(leg.startTime).isBefore(LocalTime.parse("09:00")));
+        assertTrue(toLocalTime(leg.getStartTime()).isAfter(LocalTime.parse("08:00")));
+        assertTrue(toLocalTime(leg.getStartTime()).isBefore(LocalTime.parse("09:00")));
 
         assertEquals(new Money(USD, 275), peakItinerary.fare.getFare(FareType.regular));
 
@@ -138,7 +142,7 @@ public class FaresTest {
 
         Money tenUSD = new Money(USD, 1000);
 
-        var dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 0, 0, 0);
+        var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 0, 0, 0);
 
         // A -> B, base case
 
@@ -241,7 +245,7 @@ public class FaresTest {
     private static Fare getFare(
             GenericLocation from,
             GenericLocation to,
-            long time,
+            Instant time,
             Router router
     ) {
         Itinerary itinerary = getItineraries(from, to, time, router).get(0);
@@ -251,15 +255,24 @@ public class FaresTest {
     private static List<Itinerary> getItineraries(
             GenericLocation from,
             GenericLocation to,
-            long time,
+            Instant time,
             Router router
     ) {
         RoutingRequest request = new RoutingRequest();
-        request.dateTime = time;
+        request.setDateTime(time);
         request.from = from;
         request.to = to;
 
-        var result = TransitRouter.route(request, router, new DebugTimingAggregator());
+        var zonedDateTime = time.atZone(ZoneId.of("America/Los_Angeles"));
+        var additionalSearchDays = AdditionalSearchDays.defaults(zonedDateTime);
+
+        var result = TransitRouter.route(
+                request,
+                router,
+                zonedDateTime,
+                additionalSearchDays,
+                new DebugTimingAggregator()
+        );
         return result.getItineraries();
     }
 

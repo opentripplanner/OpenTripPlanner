@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor._data;
 
-import static org.opentripplanner.util.time.DurationUtils.duration;
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 public interface RaptorTestConstants {
@@ -14,14 +14,14 @@ public interface RaptorTestConstants {
   int D20s = 20;
   int D30s = 30;
   int D40s = 40;
-  int D1m = duration("1m");
-  int D2m = duration("2m");
-  int D3m = duration("3m");
-  int D4m = duration("4m");
-  int D5m = duration("5m");
-  int D7m = duration("7m");
-  int D10m = duration("10m");
-  int D20m = duration("20m");
+  int D1m = durationInSeconds("1m");
+  int D2m = durationInSeconds("2m");
+  int D3m = durationInSeconds("3m");
+  int D4m = durationInSeconds("4m");
+  int D5m = durationInSeconds("5m");
+  int D7m = durationInSeconds("7m");
+  int D10m = durationInSeconds("10m");
+  int D20m = durationInSeconds("20m");
 
   // Time constants, all values are in seconds
   int T00_00 = hm2time(0, 0);

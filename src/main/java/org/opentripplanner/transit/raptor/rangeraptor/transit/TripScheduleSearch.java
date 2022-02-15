@@ -42,7 +42,7 @@ public interface TripScheduleSearch<T extends RaptorTripSchedule> {
      * Find the best trip matching the given {@code timeLimit} and {@code tripIndexLimit}. This
      * method returns {@code null} if no trip is found.
      * <p>
-     * Note! The implementation may use a "fly-weight" pattern to implement this, witch mean no
+     * Note! The implementation may use a "fly-weight" pattern to implement this, which mean no
      * objects are created for the result, but the result object will instead be reused for the
      * next search. So, the caller MUST copy values over and NOT store references to the result
      * object. As soon as a new call the the search is done, the result object is invalid.
@@ -51,7 +51,7 @@ public interface TripScheduleSearch<T extends RaptorTripSchedule> {
      * @param stopPositionInPattern The stop to board
      * @param tripIndexLimit        Upper bound for trip index to search. Inclusive. Use
      *                              {@code -1} for an unbounded search. This is an optimization
-     *                              which allow us to search faster, and it exclude results witch
+     *                              which allow us to search faster, and it exclude results which
      *                              is less favorable than trips already processed.
      */
     @Nullable

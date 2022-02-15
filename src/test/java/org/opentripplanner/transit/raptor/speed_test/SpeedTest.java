@@ -5,7 +5,9 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -24,6 +27,7 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RoutingRequestTransitDataProviderFilter;
@@ -68,8 +72,10 @@ public class SpeedTest {
     private final Graph graph;
     private final TransitLayer transitLayer;
 
-    private final MeterRegistry registry = new SimpleMeterRegistry();
-    private final Clock clock = registry.config().clock();
+    private final Clock clock = Clock.SYSTEM;
+    private final MeterRegistry loggerRegistry = new SimpleMeterRegistry();
+    private final CompositeMeterRegistry registry = new CompositeMeterRegistry(clock, List.of(loggerRegistry));
+    private final MeterRegistry uploadRegistry = RegistrySetup.getRegistry().orElse(null);
 
     private final SpeedTestCmdLineOpts opts;
     private final SpeedTestConfig config;
@@ -96,8 +102,16 @@ public class SpeedTest {
         this.nAdditionalTransfers = opts.numOfExtraTransfers();
         this.service = new RaptorService<>(new RaptorConfig<>(config.transitRoutingParams, registry));
 
+        var measurementEnv = Optional.ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT")).orElse("local");
+        registry.config().commonTags(List.of(
+                Tag.of("measurement.environment", measurementEnv),
+                Tag.of("git.commit", projectInfo().versionControl.commit),
+                Tag.of("git.branch", projectInfo().versionControl.branch),
+                Tag.of("git.buildtime", projectInfo().versionControl.buildTime)
+        ));
+
         // record the lowest percentile of times
-        registry.config().meterFilter(
+        loggerRegistry.config().meterFilter(
                 new MeterFilter() {
                     @Override
                     public DistributionStatisticConfig configure(
@@ -125,10 +139,12 @@ public class SpeedTest {
         }
         catch (OtpAppException ae) {
             System.err.println(ae.getMessage());
+            System.exit(1);
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
             e.printStackTrace(System.err);
+            System.exit(1);
         }
     }
 
@@ -154,6 +170,9 @@ public class SpeedTest {
             runSingleTest(i+1, nSamples);
         }
         printProfileStatistics();
+
+        // close() sends the results to influxdb
+        uploadRegistry.close();
 
         service.shutdown();
         System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
@@ -193,9 +212,14 @@ public class SpeedTest {
         }
 
         ResultPrinter.logSingleTestHeader(routeProfile);
+
+        // Clear registry after first run
         registry.clear();
 
-        //Need to create timer again after clearing registry
+        if (uploadRegistry != null) {
+            registry.add(uploadRegistry);
+        }
+
         Timer totalTimer = Timer.builder(SPEED_TEST_ROUTE).register(registry);
 
         for (TestCase testCase : testCasesToRun) {
@@ -206,8 +230,13 @@ public class SpeedTest {
         workerResults.get(routeProfile).add((int) Timer.builder(ROUTE_WORKER).register(registry).mean(TimeUnit.MILLISECONDS));
         totalResults.get(routeProfile).add((int) totalTimer.mean(TimeUnit.MILLISECONDS));
 
+        if (uploadRegistry != null) {
+            registry.remove(uploadRegistry);
+        }
+
         ResultPrinter.logSingleTestResult(
-                routeProfile, numOfPathsFound, sample, nSamples, nSuccess, tcSize, totalTimer.totalTime(TimeUnit.SECONDS), registry
+                routeProfile, numOfPathsFound, sample, nSamples, nSuccess, tcSize, totalTimer.totalTime(TimeUnit.SECONDS),
+                loggerRegistry
         );
 
         tcIO.writeResultsToFile(testCases);
@@ -435,7 +464,7 @@ public class SpeedTest {
         return new RaptorRoutingRequestTransitData(
                 null,
                 transitLayer,
-                request.getDepartureDateWithZone().toInstant(),
+                DateMapper.asStartOfService(request.getDepartureDateWithZone()),
                 0,
                 1,
                 transitDataProviderFilter,

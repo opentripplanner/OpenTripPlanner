@@ -8,18 +8,21 @@ import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.util.time.DurationUtils;
 
-public class TransferConstraintTest implements TransferTestData {
+public class TransferConstraintTest {
 
-  public static final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.duration("1h");
+  public static final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.durationInSeconds("1h");
 
   private final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
   private final TransferConstraint RECOMMENDED = TransferConstraint.create().recommended().build();
   private final TransferConstraint STAY_SEATED = TransferConstraint.create().staySeated().build();
   private final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
+  private final TransferConstraint NOT_ALLOWED = TransferConstraint.create().notAllowed().build();
   private final TransferConstraint MAX_WAIT_TIME = TransferConstraint.create()
           .guaranteed().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
   private final TransferConstraint EVERYTHING = TransferConstraint.create()
           .staySeated().guaranteed().preferred().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
+  private final TransferConstraint MIN_TRANSFER_TIME = TransferConstraint.create()
+          .minTransferTime(600).build();
 
   @Test
   public void getPriority() {
@@ -44,6 +47,25 @@ public class TransferConstraintTest implements TransferTestData {
     assertTrue(GUARANTIED.isFacilitated());
     assertTrue(STAY_SEATED.isFacilitated());
     assertFalse(NO_CONSTRAINS.isFacilitated());
+    assertFalse(NOT_ALLOWED.isFacilitated());
+    assertFalse(MIN_TRANSFER_TIME.isFacilitated());
+  }
+
+  @Test
+  public void useInRaptorRouting() {
+    assertTrue(GUARANTIED.includeInRaptorRouting());
+    assertTrue(STAY_SEATED.includeInRaptorRouting());
+    assertFalse(NO_CONSTRAINS.includeInRaptorRouting());
+    assertTrue(NOT_ALLOWED.includeInRaptorRouting());
+    assertTrue(MIN_TRANSFER_TIME.includeInRaptorRouting());
+  }
+
+  @Test
+  public void isNotAllowed() {
+    assertTrue(NOT_ALLOWED.isNotAllowed());
+    assertFalse(GUARANTIED.isNotAllowed());
+    assertFalse(NO_CONSTRAINS.isNotAllowed());
+    assertFalse(MIN_TRANSFER_TIME.isNotAllowed());
   }
 
   @Test
@@ -52,8 +74,15 @@ public class TransferConstraintTest implements TransferTestData {
   }
 
   @Test
+  public void getMinTransferTime() {
+    assertTrue(MIN_TRANSFER_TIME.isMinTransferTimeSet());
+    assertEquals(600, MIN_TRANSFER_TIME.getMinTransferTime());
+  }
+
+  @Test
   public void cost() {
     assertEquals(33_00, NO_CONSTRAINS.cost());
+    assertEquals(33_00, MIN_TRANSFER_TIME.cost());
     assertEquals(32_00, RECOMMENDED.cost());
     assertEquals(23_00, GUARANTIED.cost());
     assertEquals(13_00, STAY_SEATED.cost());
@@ -62,12 +91,12 @@ public class TransferConstraintTest implements TransferTestData {
 
   @Test
   public void noConstraints() {
-    assertTrue(NO_CONSTRAINS.noConstraints());
-    assertFalse(STAY_SEATED.noConstraints());
-    assertFalse(GUARANTIED.noConstraints());
-    assertFalse(RECOMMENDED.noConstraints());
-    assertFalse(MAX_WAIT_TIME.noConstraints());
-    assertFalse(EVERYTHING.noConstraints());
+    assertTrue(NO_CONSTRAINS.isRegularTransfer());
+    assertFalse(STAY_SEATED.isRegularTransfer());
+    assertFalse(GUARANTIED.isRegularTransfer());
+    assertFalse(RECOMMENDED.isRegularTransfer());
+    assertFalse(MAX_WAIT_TIME.isRegularTransfer());
+    assertFalse(EVERYTHING.isRegularTransfer());
   }
 
   @Test

@@ -73,6 +73,44 @@ class ResultPrinter {
         }
     }
 
+    static void logSingleTestResult(
+            SpeedTestProfile profile,
+            List<Integer> numOfPathsFound,
+            int sample,
+            int nSamples,
+            int nSuccess,
+            int tcSize,
+            double totalTimeInSeconds,
+            MeterRegistry registry
+    ) {
+        System.err.println(
+                "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ SUMMARY " + profile + " ]" +
+                "\n" + String.join("\n", listResults(registry)) +
+                "\n" +
+                logLine("Paths found", "%d %s", numOfPathsFound.stream().mapToInt((it) -> it).sum(), numOfPathsFound) +
+                logLine("Successful searches", "%d / %d", nSuccess, tcSize) +
+                logLine(nSamples > 1, "Sample", "%d / %d",  sample ,nSamples) +
+                logLine("Time total", "%.2f seconds",  totalTimeInSeconds) +
+                logLine(nSuccess != tcSize, "!!! UNEXPECTED RESULTS", "%d OF %d FAILED. SEE LOG ABOVE FOR ERRORS !!!", tcSize - nSuccess, tcSize)
+        );
+    }
+
+    static void logSingleTestHeader(SpeedTestProfile profile) {
+        System.err.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ START " + profile + " ]");
+    }
+
+    static void printProfileResults(String header, SpeedTestProfile[] profiles, Map<SpeedTestProfile, List<Integer>> result) {
+        System.err.println();
+        System.err.println(header);
+        int labelMaxLen = result.keySet().stream().mapToInt(it -> it.name().length()).max().orElse(20);
+        for (SpeedTestProfile p : profiles) {
+            List<Integer> v = result.get(p);
+            if(v != null) {
+                printProfileResultLine(p.name(), v, labelMaxLen);
+            }
+        }
+    }
+
     private static void printResult(
             String status,
             RaptorRequest<?> request,
@@ -99,29 +137,7 @@ class ResultPrinter {
         return tc.toString(r.earliestDepartureTime(), r.latestArrivalTime(), r.searchWindowInSeconds());
     }
 
-    static void logSingleTestResult(
-            SpeedTestProfile profile,
-            List<Integer> numOfPathsFound,
-            int sample,
-            int nSamples,
-            int nSuccess,
-            int tcSize,
-            double totalTimeInSeconds,
-            MeterRegistry registry
-    ) {
-        System.err.println(
-                "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ SUMMARY " + profile + " ]" +
-                "\n" + String.join("\n", listResults(registry)) +
-                "\n" +
-                logLine("Paths found", "%d %s", numOfPathsFound.stream().mapToInt((it) -> it).sum(), numOfPathsFound) +
-                logLine("Successful searches", "%d / %d", nSuccess, tcSize) +
-                logLine(nSamples > 1, "Sample", "%d / %d",  sample ,nSamples) +
-                logLine("Time total", "%.2f seconds",  totalTimeInSeconds) +
-                logLine(nSuccess != tcSize, "!!! UNEXPECTED RESULTS", "%d OF %d FAILED. SEE LOG ABOVE FOR ERRORS !!!", tcSize - nSuccess, tcSize)
-        );
-    }
-
-    static List<String> listResults(MeterRegistry registry) {
+    private static List<String> listResults(MeterRegistry registry) {
         final int width = Math.max(
                 RESULT_TABLE_TITLE.length(),
                 registry.getMeters()
@@ -212,18 +228,6 @@ class ResultPrinter {
         return "Average  Count   Total";
     }
 
-    static void printProfileResults(String header, SpeedTestProfile[] profiles, Map<SpeedTestProfile, List<Integer>> result) {
-        System.err.println();
-        System.err.println(header);
-        int labelMaxLen = result.keySet().stream().mapToInt(it -> it.name().length()).max().orElse(20);
-        for (SpeedTestProfile p : profiles) {
-            List<Integer> v = result.get(p);
-            if(v != null) {
-                printProfileResultLine(p.name(), v, labelMaxLen);
-            }
-        }
-    }
-
     private static void printProfileResultLine(String label, List<Integer> v, int labelMaxLen) {
         if(!v.isEmpty()) {
             String values = "[ " + v.stream().map(it -> String.format("%4d", it)).reduce((a, b) -> a + ", " + b).orElse("") + " ]";
@@ -238,9 +242,5 @@ class ResultPrinter {
 
     private static String logLine(boolean enable, String label, String formatValues, Object... args) {
         return enable ? (String.format("%n%-20s: ", label) + String.format(formatValues, args)) : "";
-    }
-
-    static void logSingleTestHeader(SpeedTestProfile profile) {
-        System.err.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ START " + profile + " ]");
     }
 }

@@ -16,6 +16,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.util.OTPFeature;
 
 
 /**
@@ -123,6 +124,10 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     final int stop = from.stop();
     var tx = transferServiceAdaptor.findTransfer(from, toTrip, stop);
 
+    if(tx != null && tx.getTransferConstraint().isNotAllowed()) {
+      return List.of();
+    }
+
     final int earliestDepartureTime = earliestDepartureTime(
             from.time(), SAME_STOP_TRANSFER_TIME, tx
     );
@@ -154,6 +159,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       int toStop = it.stop();
 
       ConstrainedTransfer tx = transferServiceAdaptor.findTransfer(from, toTrip, toStop);
+      if(tx != null && tx.getTransferConstraint().isNotAllowed()) {
+        continue;
+      }
 
       int earliestDepartureTime = earliestDepartureTime(from.time(), it.durationInSeconds(), tx);
       int toTripStopPos = toTrip.findDepartureStopPosition(earliestDepartureTime, toStop);
@@ -179,12 +187,25 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
     // Ignore slack and walking-time for guaranteed and stay-seated transfers
     if(tx != null && tx.getTransferConstraint().isFacilitated()) {
       return fromTime;
-    }
-    return fromTime
+    // Ignore board and alight slack for min transfer time, but keep transfer slack
+    } else if (tx != null && tx.getTransferConstraint().isMinTransferTimeSet()) {
+      var minTransferTime = tx.getTransferConstraint().getMinTransferTime();
+      int transferDuration;
+      if(OTPFeature.MinimumTransferTimeIsDefinitive.isOn()) {
+        transferDuration = minTransferTime;
+      } else {
+        transferDuration = Math.max(minTransferTime, transferDurationInSeconds);
+      }
+      return fromTime
+              + transferDuration
+              + slackProvider.transferSlack();
+    } else {
+      return fromTime
             + slackProvider.alightSlack(fromTrip.pattern())
             + transferDurationInSeconds
             + slackProvider.transferSlack()
             + slackProvider.boardSlack(toTrip.pattern());
+    }
   }
 
   @Nonnull

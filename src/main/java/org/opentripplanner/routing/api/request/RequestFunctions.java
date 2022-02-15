@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This is a factory for creating functions witch can be used as parameters in the
+ * This is a factory for creating functions which can be used as parameters in the
  * {@link RoutingRequest}. A function is used in the request to specify limits/thresholds. We
  * support linear function for now, but it should be easy to extend with other type of functions if
  * needed. Use the {@link #parse(String)} method to create new functions from a string.

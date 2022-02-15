@@ -17,7 +17,7 @@ We use the [Entire Norway](https://storage.googleapis.com/marduk-production/outb
 
 In the past the file did not contain the stops, so they needed to be downloaded separably (Entire Norway (Current stops) - Latest valid version of all country stops) and inserted into the Netex-file. Unpack the stops zipfile, rename the stops file to `_stops.xml`. Unpack the netex file and move the `_stops.xml` into the netex directory. Copy the netex directory and config files into the same directory and start OTP with it as the base directory.
  
-We also build with elevation data, witch is not available on the internet without transformation. Send us a request, and we will find a way to share it.  
+We also build with elevation data, which is not available on the internet without transformation. Send us a request, and we will find a way to share it.  
 
 We download the OSM data file [norway-latest.osm.pbf](https://download.geofabrik.de/europe/norway.html) every night and build a street-graph with OSM and elevation data. We also use some custom OSM files for areas outside Norway, but they in most cases insignificant. If requested, we can provide them.
  

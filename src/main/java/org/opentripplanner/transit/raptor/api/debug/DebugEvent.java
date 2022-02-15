@@ -63,7 +63,7 @@ public class DebugEvent<E> {
     }
 
     /**
-     * Witch iteration this event is part of.
+     * which iteration this event is part of.
      */
     public int iterationStartTime() {
         return iterationStartTime;
