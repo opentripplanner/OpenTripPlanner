@@ -25,7 +25,7 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
             Function<Stop, Set<Route>> getRoutesForStop
     ) {
         this.durationInSeconds = durationInSeconds;
-        this.maxScore = 1000 * 2;
+        this.maxScore = 3000;
         this.getRoutesForStop = getRoutesForStop;
     }
 
