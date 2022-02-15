@@ -55,7 +55,13 @@ public class NearbyStopFinder {
     private DirectGraphFinder directGraphFinder;
 
     public final static Set<StreetMode> vehicleToStopModes =
-            Set.of(StreetMode.CAR_TO_PARK, StreetMode.BIKE_TO_PARK, StreetMode.BIKE);
+            Set.of(
+                    StreetMode.BIKE,
+                    StreetMode.BIKE_TO_PARK,
+                    StreetMode.BIKE_RENTAL,
+                    StreetMode.CAR_TO_PARK,
+                    StreetMode.CAR_PICKUP
+            );
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
