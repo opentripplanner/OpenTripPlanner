@@ -168,17 +168,23 @@ class StopTimesMapper {
         stopTime.setStop(stop);
         if (passingTime.getArrivalTime() != null || passingTime.getDepartureTime() != null) {
             stopTime.setArrivalTime(calculateOtpTime(
-                passingTime.getArrivalTime(),                 
-                passingTime.getArrivalDayOffset(),
-                passingTime.getDepartureTime(),
-                passingTime.getDepartureDayOffset()
+                    passingTime.getArrivalTime(),
+                    passingTime.getArrivalDayOffset(),
+                    passingTime.getDepartureTime(),
+                    passingTime.getDepartureDayOffset()
             ));
             stopTime.setDepartureTime(calculateOtpTime(
-                passingTime.getDepartureTime(),
-                passingTime.getDepartureDayOffset(),
-                passingTime.getArrivalTime(),
-                passingTime.getArrivalDayOffset()
+                    passingTime.getDepartureTime(),
+                    passingTime.getDepartureDayOffset(),
+                    passingTime.getArrivalTime(),
+                    passingTime.getArrivalDayOffset()
             ));
+
+            // From NeTEx we define timepoint as a waitpoint with waiting time defined (also 0)
+            if (Boolean.TRUE.equals(stopPoint.isIsWaitPoint())
+                    && passingTime.getWaitingTime() != null) {
+                stopTime.setTimepoint(1);
+            }
         } else if (passingTime.getEarliestDepartureTime() != null && passingTime.getLatestArrivalTime() != null) {
             stopTime.setFlexWindowStart(
                     calculateOtpTime(
