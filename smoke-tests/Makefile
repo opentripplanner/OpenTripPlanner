@@ -12,8 +12,7 @@ atlanta/cobblinc.gtfs.zip:
 	${CURL} https://internal-test-gtfs-testing.s3.amazonaws.com/Cobblinc-static-extended-dates.zip -o $@
 
 atlanta/cobblinc-flex.gtfs.zip:
-	# once a continuously updated file is available we can replace the URL
-	${CURL} https://leonard.io/ibi/cobblinc-flex-with-farezones.zip -o $@
+	${CURL} https://internal-test-gtfs-testing.s3.amazonaws.com/cobblinc-gtfs-flex.zip -o $@
 
 atlanta/gtfs.zip: atlanta/cobblinc.gtfs.zip atlanta/cobblinc-flex.gtfs.zip
 	${CURL} https://itsmarta.com/google_transit_feed/google_transit.zip -o $@
