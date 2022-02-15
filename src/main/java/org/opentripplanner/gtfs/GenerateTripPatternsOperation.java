@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
@@ -14,11 +12,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -164,6 +158,7 @@ public class GenerateTripPatternsOperation {
                 .map(it -> {
                     var st = new StopTime(it);
                     st.setArrivalTime(it.getArrivalTime() + timeShiftArrival);
+                    st.setDepartureTime(it.getDepartureTime() + timeShiftArrival);
                     return st;
                 })
                 .collect(Collectors.toList());
