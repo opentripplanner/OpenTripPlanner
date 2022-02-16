@@ -72,7 +72,7 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
             case RAIL:
             case FERRY:
             case SUBWAY:
-                return 10;
+                return 20;
             case BUS:
                 return 1;
             default:
