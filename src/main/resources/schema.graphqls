@@ -1,0 +1,486 @@
+scalar Coordinate
+scalar Envelope
+scalar DateTime
+scalar LocalDate
+scalar Interval
+scalar Locale
+scalar GeoJson
+scalar EncodedPolyline
+
+schema {
+  query: Query
+}
+
+type Query {
+  nodes(ids: [ID!]!): [Node]!
+  node(id: ID!): Node
+
+  allFeeds(first: Int = 5, after: String): AllFeedsConnection!
+  feedById(id: ID!): Feed
+
+  allAgencies(first: Int = 5, after: String): AllAgenciesConnection!
+  agencyById(id: ID!): Agency
+
+  allOperators(first: Int = 5, after: String): AllOperatorsConnection!
+  operatorById(id: ID!): Operator
+
+  allRoutes(first: Int = 5, after: String): AllRoutesConnection!
+  routeById(id: ID!): Route
+
+  allPatterns(first: Int = 5, after: String): AllPatternsConnection!
+  patternById(id: ID!): Pattern
+
+  allTrips(first: Int = 5, after: String): AllTripsConnection!
+  tripById(id: ID!): Trip
+
+  tripOnDateById(id: ID!): TripOnDate
+
+  cancelledTrips(first: Int = 5, after: String): CancelledTripsConnection!
+
+  allStations(first: Int = 5, after: String): AllStationsConnection!
+  stationsByIds(ids: [ID!]!): [Station]!
+  stationsInsideEnvelope(envelope: Envelope!): [Station!]!
+  stationById(id: ID!): Station
+  
+  allStops(first: Int = 5, after: String): AllStopsConnection!
+  stopsByIds(ids: [ID!]!): [Stop]!
+  stopsInsideEnvelope(envelope: Envelope!): [Stop!]!
+  stopsByDistance(from: Coordinate!, first: Int!, after: String): StopsByDistanceConnection!
+  stopById(id: ID!): Stop
+
+  nearest(from: Coordinate!, first: Int!, after: String): NearestConnection
+
+  allAlerts(filters: [AlertFilter!], first: Int = 5, after: String): AllAlertsConnection!
+  alertById(id: ID!): Alert
+
+  allRentalVehicles(first: Int = 5, after: String): AllRentalVehiclesConnection!
+  rentalVehicleById(id: ID!): RentalVehicle
+
+  allVehicleRentalStations(first: Int = 5, after: String): AllVehicleRentalStationsConnection!
+  vehicleRentalStationById(id: ID!): VehicleRentalStation
+
+  allVehicleParkingLots(first: Int = 5, after: String): AllVehicleParkingLotsConnection!
+  vehicleParkingLotById(id: ID!): VehicleParkingLot
+
+  plan(from: Place!, to: Place!, first: Int, last: Int, after: String, before: String): PlanConnection!
+
+  direct(from: ID!, to: ID!, first: Int, last: Int, after: String, before: String): DirectConnection!
+
+  transitMetadata: TransitMetadata!
+  serverMetadata: ServerMetadata!
+}
+
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  startCursor: String!
+  endCursor: String!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type AllFeedsConnection {
+  edges: [AllFeedsEdge!]!
+  nodes: [Feed!]!
+  pageInfo: PageInfo!
+}
+
+type AllFeedsEdge {
+  node: Feed!
+  cursor: String!
+}
+
+type Feed implements Node {
+  id: ID!
+  agencies(first: Int = 5, after: String): FeedAgenciesConnection!
+}
+
+type FeedAgenciesConnection {
+  edges: [FeedAgenciesEdge!]!
+  nodes: [Agency!]!
+  pageInfo: PageInfo!
+}
+
+type FeedAgenciesEdge {
+  node: Agency!
+  cursor: String!
+}
+
+type AllAgenciesConnection {
+  edges: [AllAgenciesEdge!]!
+  nodes: [Agency!]!
+  pageInfo: PageInfo!
+}
+
+type AllAgenciesEdge {
+  node: Agency!
+  cursor: String!
+}
+
+type Agency implements Node {
+  id: ID!
+  name: String!
+  url: String
+  timezone: String!
+  language: Locale
+  phoneNumber: String
+  fareUrl: String
+
+  routes(first: Int = 5, after: String): AgencyRoutesConnection!
+}
+
+type AgencyRoutesConnection {
+  edges: [AgencyRoutesEdge!]!
+  nodes: [Route!]!
+  pageInfo: PageInfo!
+}
+
+type AgencyRoutesEdge {
+  node: Route!
+  cursor: String!
+}
+
+type AllOperatorsConnection {
+  edges: [AllOperatorsEdge!]!
+  nodes: [Operator!]!
+  pageInfo: PageInfo!
+}
+
+type AllOperatorsEdge {
+  node: Operator!
+  cursor: String!
+}
+
+type Operator implements Node {
+  id: ID!
+  name: String!
+  url: String
+  phoneNumber: String
+}
+
+type AllRoutesConnection {
+  edges: [AllRoutesEdge!]!
+  nodes: [Route!]!
+  pageInfo: PageInfo!
+}
+
+type AllRoutesEdge {
+  node: Route!
+  cursor: String!
+}
+
+type Route implements Node {
+  id: ID!
+  shortName: String
+  longName: String
+  description: String
+  url: String
+
+  mode: TransitMode
+  gtfsType: Int
+  netexSubmode: String
+  bikesAllowed: Boolean
+
+  presentation: Presentation
+  branding: Branding
+  bookingArrangements: BookingArrangements
+
+  responsibleAgency: Agency!
+  operatedBy: Operator
+
+  patterns: (first: Int = 5, after: String): RoutePatternsConnection!
+  stops: (first: Int = 5, after: String): RouteStopsConnection!
+  trips: (first: Int = 5, after: String): RouteTripsConnection!
+}
+
+type AllPatternsConnection {
+  edges: [AllPatternsEdge!]!
+  nodes: [Pattern!]!
+  pageInfo: PageInfo!
+}
+
+type AllPatternsEdge {
+  node: Pattern!
+  cursor: String!
+}
+
+type Pattern implements Node {
+  id: ID!
+  name: String
+  headsign: String
+  direction: Direction!
+  geometry: LineString
+
+  route: Route!
+
+  trips(first: Int = 5, after: String): PatternTripsConnection!
+  tripOnDates(date: LocalDate, first: Int = 5, after: String): PatternTripOnDatesConnection!  trips(first: Int = 5, after: String): PatternTripsConnection!
+  stops(first: Int, last: Int, after: String, before: String): PatternStopsConnection!
+}
+
+type LineString {
+  asGeoJson: GeoJson
+  asEncodedPolyline: EncodedPolyline
+}
+
+enum Direction {
+  UNKNOWN
+  OUTBOUND
+  INBOUND
+}
+
+type AllTripsConnection {
+  edges: [AllTripsEdge!]!
+  nodes: [Trip!]!
+  pageInfo: PageInfo!
+}
+
+type AllTripsEdge {
+  node: Trip!
+  cursor: String!
+}
+
+type CancelledTripsConnection{
+  edges: [CancelledTripsEdge!]!
+  nodes: [Trip!]!
+  pageInfo: PageInfo!
+}
+
+type CancelledTripsEdge {
+  node: Trip!
+  cursor: String!
+  alerts: [Alert!]!
+}
+
+type Trip implements Node {
+  id: ID!
+  shortName: String
+  privateCode: String
+  headsign: String
+  direction: Direction!
+  mode: TransitMode
+  netexSubmode: String
+  wheelchairAccessible: Boolean
+  bikesAllowed: Boolean
+  bookingArrangements: BookingArrangements
+  geometry: LineString
+
+  operatedBy: Opeartor
+  route: Route
+  pattern: Pattern
+
+  //TODO Should this be a list of TimetableStopTimes instead
+  stops(first: Int, last: Int, after: String, before: String): TripStopsConnection!
+  tripOnDates(first: Int, last: Int, after: String, before: String): TripTripOnDatesConnection!
+}
+
+type TripStopsConnection {
+  edges: [TripStopsEdge!]!
+  nodes: [Stop!]!
+  pageInfo: PageInfo!
+}
+
+type TripStopsEdge {
+  node: Stop!
+  timetableStopTime: TimetableStopTime!
+  cursor: String!
+}
+
+type TripTripOnDatesConnection {
+  edges: [TripTripOnDatesEdge!]!
+  nodes: [TripOnDate!]!
+  pageInfo: PageInfo!
+}
+
+type TripTripOnDatesEdge {
+  node: TripOnDate!
+  cursor: String!
+}
+
+type TripOnDate extends Node {
+  id: ID!
+  trip: Trip!
+  replacing: TripOnDate
+  replacedBy: TripOnDate
+  serviceDate: LocalDate!
+  stopTimes(first: Int, last: Int, after: String, before: String): TripOnDateStopTimesConnection!
+}
+
+type TripOnDateStopTimesConnection {
+  edges: [TripOnDateStopTimesEdge!]!
+  nodes: [StopTime!]!
+  pageInfo: PageInfo!
+}
+
+type TripOnDateStopTimesEdge {
+  node: StopTime!
+  cursor: String!
+}
+
+type TimetableStopTime {
+  stop: Stop!
+  trip: Trip!
+
+  scheduledArrivalTime: LocalTime!
+  shceduledArrivalTimeDateDifference: Int!
+  scheduledDepartureTime: LocalTime!
+  shceduledRepartureTimeDateDifference: Int!
+  timepoint: Boolean
+  pickupType: PickDrop
+  dropoffType: PickDrop
+  boardingAllowed: Boolean
+  alightingAllowed: Boolean
+  requestStop: Boolean
+  bookingArrangements: BookingArrangements
+  headsign: DestinationDisplay
+}
+
+type StopTime {
+  stop: Stop!
+  tripOnDate: TripOnDate!
+
+  scheduledArrival: DateTime!
+  realtimeArrival: DateTime!
+  arrivalDelay: Duration!
+  scheduledDeparture: DateTime!
+  realtimeDeparture: DateTime!
+  departureDelay: Duration!
+  realtimeState: RealtimeState
+  departed: Boolean
+  timepoint: Boolean
+  pickupType: PickDrop
+  dropoffType: PickDrop
+  boardingAllowed: Boolean
+  alightingAllowed: Boolean
+  requestStop: Boolean
+  bookingArrangements: BookingArrangements
+  headsign: DestinationDisplay
+}
+
+type AllStationsConnection {
+  edges: [AllStationsEdge!]!
+  nodes: [Station!]!
+  pageInfo: PageInfo!
+}
+
+type AllStationsEdge {
+  node: Station!
+  cursor: String!
+}
+
+type AllStopsConnection {
+  edges: [AllStopsEdge!]!
+  nodes: [Stop!]!
+  pageInfo: PageInfo!
+}
+
+type AllStopsEdge {
+  node: Stop!
+  cursor: String!
+}
+
+type StopsByDistanceConnection {
+  edges: [StopsByDistanceEdge!]!
+  pageInfo: PageInfo!
+}
+
+type AllStationsEdge {
+  node: Stop!
+  distanceMeters: Float!
+  cursor: String!
+}
+
+type NearestConnection {
+  edges: [NearestEdge!]!
+  pageInfo: PageInfo!
+}
+
+type NearestEdge {
+  node: Place!
+  distanceMeters: Float!
+  cursor: String!
+}
+
+type AllAlertsConnection {
+  edges: [AllAlertsEdge!]!
+  nodes: [Alert!]!
+  pageInfo: PageInfo!
+}
+
+type AllAlertsEdge {
+  node: Alert!
+  cursor: String!
+}
+
+type AllRentalVehiclesConnection {
+  edges: [AllRentalVehiclesEdge!]!
+  nodes: [RentalVehicle!]!
+  pageInfo: PageInfo!
+}
+
+type AllRentalVehiclesEdge {
+  node: RentalVehicle!
+  cursor: String!
+}
+
+type AllVehicleRentalStationsConnection {
+  edges: [AllVehicleRentalStationsEdge!]!
+  nodes: [VehicleRentalStation!]!
+  pageInfo: PageInfo!
+}
+
+type AllVehicleRentalStationsEdge {
+  node: VehicleRentalStation!
+  cursor: String!
+}
+
+type AllVehicleParkingLotsConnection {
+  edges: [VehicleParkingLotsEdge!]!
+  nodes: [VehicleParkingLot!]!
+  pageInfo: PageInfo!
+}
+
+type AllVehicleParkingLotsEdge {
+  node: RentalVehicle!
+  cursor: String!
+}
+
+type PlanConnection {
+  edges: [PlanEdge!]!
+  nodes: [Itinerary!]!
+  from: Place!
+  to: Place!
+  routingErrors: [RoutingError!]!
+  searchWindowMinutes: Int!
+  pageInfo: PageInfo!
+}
+
+type PlanEdge {
+  node: Itinerary!
+}
+
+type DirectConnection {
+  edges: [DirectEdge!]!
+  pageInfo: PageInfo!
+}
+
+type DirectEdge {
+  node: ScheduledTransitLeg!
+  cursor: String!
+}
+
+type TransitMetadata {
+  validity: Interval
+  graphBuildTime: DateTime
+  otpSerializationVersionId: String
+}
+
+type ServerMetadata {
+  version: String
+  buildTime: DateTime
+  gitBranch: String
+  gitCommit: String
+  gitCommitTime: DateTime
+}
