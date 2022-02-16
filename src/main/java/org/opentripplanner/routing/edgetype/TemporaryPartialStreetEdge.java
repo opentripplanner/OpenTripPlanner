@@ -5,7 +5,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.I18NString;
 
 
@@ -122,22 +121,6 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
         return "TemporaryPartialStreetEdge(" + this.getDefaultName() + ", " + this.getFromVertex() + " -> "
                 + this.getToVertex() + " length=" + this.getDistanceMeters() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
-    }
-
-    private void assertEdgeIsNotDirectedAwayFromTemporaryEndVertex(StreetVertex v1) {
-        if(v1 instanceof TemporaryVertex) {
-            if (((TemporaryVertex)v1).isEndVertex()) {
-                throw new IllegalStateException("A temporary edge is directed away from an end vertex");
-            }
-        }
-    }
-
-    private void assertEdgeIsDirectedTowardsTemporaryEndVertex(StreetVertex v2) {
-        if(v2 instanceof TemporaryVertex) {
-            if (!((TemporaryVertex)v2).isEndVertex()) {
-                throw new IllegalStateException("A temporary edge is directed towards a start vertex");
-            }
-        }
     }
 
     private void setElevationProfileUsingParents() {
