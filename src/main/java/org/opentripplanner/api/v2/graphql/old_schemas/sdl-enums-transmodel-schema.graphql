@@ -1,0 +1,352 @@
+## [   Legacy-Netex:  AlertSeverityLevelType  -  Severity   ] ##
+enum Severity {
+ noImpact
+ normal
+ severe
+ slight
+ undefined
+ unknown
+ verySevere
+ verySlight
+}
+
+## [   Legacy-Netex:  BikesAllowed  -  BikesAllowed   ] ##
+enum BikesAllowed {
+ allowed
+ noInformation
+ notAllowed
+}
+
+## [   Legacy-Netex:  FilterPlaceType  -  FilterPlaceType   ] ##
+enum FilterPlaceType {
+ bicycleRent
+ bikePark
+ carPark
+ quay
+ stopPlace
+}
+
+## [   Legacy-Netex:  OptimizeType  -  BicycleOptimisationMethod   ] ##
+enum BicycleOptimisationMethod {
+ flat
+ greenways
+ quick
+ safe
+ transfers
+ triangle
+}
+
+## [   Legacy-Netex:  RealtimeState  -  RealtimeState   ] ##
+enum RealtimeState {
+ Added
+ canceled
+ modified
+ scheduled
+ updated
+}
+
+## [   Legacy-Netex:  PickupDropoffType  -  BookingMethod   ] ##
+enum BookingMethod {
+ callDriver
+ callOffice
+ online
+ phoneAtStop
+ text
+}
+
+## [   Legacy-Netex:  VertexType  -  VertexType   ] ##
+enum VertexType {
+ bikePark
+ bikeShare
+ normal
+ transit
+}
+
+## [   Legacy-Netex:  WheelchairBoarding  -  WheelchairBoarding   ] ##
+enum WheelchairBoarding {
+ noInformation
+ notPossible
+ possible
+}
+
+## [   Legacy-Netex:  Mode  -  Mode   ] ##
+enum Mode {
+ air
+ bicycle
+ bus
+ cableway
+ car
+ coach
+ foot
+ funicular
+ lift
+ metro
+ rail
+ scooter
+ tram
+ transit
+ water
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  TransportSubmode   ] ##
+enum TransportSubmode {
+ SchengenAreaFlight
+ airportBoatLink
+ airportLinkBus
+ airportLinkRail
+ airshipService
+ allFunicularServices
+ allHireVehicles
+ allTaxiServices
+ bikeTaxi
+ blackCab
+ cableCar
+ cableFerry
+ canalBarge
+ carTransportRailService
+ chairLift
+ charterTaxi
+ cityTram
+ communalTaxi
+ commuterCoach
+ crossCountryRail
+ dedicatedLaneBus
+ demandAndResponseBus
+ domesticCharterFlight
+ domesticFlight
+ domesticScheduledFlight
+ dragLift
+ expressBus
+ funicular
+ helicopterService
+ highFrequencyBus
+ highSpeedPassengerService
+ highSpeedRail
+ highSpeedVehicleService
+ hireCar
+ hireCycle
+ hireMotorbike
+ hireVan
+ intercontinentalCharterFlight
+ intercontinentalFlight
+ international
+ internationalCarFerry
+ internationalCharterFlight
+ internationalCoach
+ internationalFlight
+ internationalPassengerFerry
+ interregionalRail
+ lift
+ local
+ localBus
+ localCarFerry
+ localPassengerFerry
+ localTram
+ longDistance
+ metro
+ miniCab
+ mobilityBus
+ mobilityBusForRegisteredDisabled
+ nationalCarFerry
+ nationalCoach
+ nationalPassengerFerry
+ nightBus
+ nightRail
+ postBoat
+ postBus
+ rackAndPinionRailway
+ railReplacementBus
+ railShuttle
+ railTaxi
+ regionalBus
+ regionalCarFerry
+ regionalCoach
+ regionalPassengerFerry
+ regionalRail
+ regionalTram
+ replacementRailService
+ riverBus
+ roadFerryLink
+ roundTripCharterFlight
+ scheduledFerry
+ schoolAndPublicServiceBus
+ schoolBoat
+ schoolBus
+ schoolCoach
+ shortHaulInternationalFlight
+ shuttleBus
+ shuttleCoach
+ shuttleFerryService
+ shuttleFlight
+ shuttleTram
+ sightseeingBus
+ sightseeingCoach
+ sightseeingFlight
+ sightseeingService
+ sightseeingTram
+ sleeperRailService
+ specialCoach
+ specialNeedsBus
+ specialTrain
+ streetCableCar
+ suburbanRailway
+ telecabin
+ telecabinLink
+ touristCoach
+ touristRailway
+ trainFerry
+ trainTram
+ tube
+ undefined
+ undefinedFunicular
+ unknown
+ urbanRailway
+ waterTaxi
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  TransportMode   ] ##
+enum TransportMode {
+ air
+ bus
+ cableway
+ coach
+ funicular
+ lift
+ metro
+ monorail
+ rail
+ tram
+ trolleybus
+ unknown
+ water
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  StreetMode   ] ##
+enum StreetMode {
+ bicycle
+ bike_park
+ bike_rental
+ car
+ car_park
+ car_pickup
+ flexible
+ foot
+ scooter_rental
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  AbsoluteDirection   ] ##
+enum AbsoluteDirection {
+ east
+ north
+ northeast
+ northwest
+ south
+ southeast
+ southwest
+ west
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  ArrivalDeparture   ] ##
+enum ArrivalDeparture {
+ arrivals
+ both
+ departures
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  Locale   ] ##
+enum Locale {
+ no
+ us
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  MultiModalMode   ] ##
+enum MultiModalMode {
+ all
+ child
+ parent
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  RelativeDirection   ] ##
+enum RelativeDirection {
+ circleClockwise
+ circleCounterclockwise
+ continue
+ depart
+ elevator
+ hardLeft
+ hardRight
+ left
+ right
+ slightlyLeft
+ slightlyRight
+ uturnLeft
+ uturnRight
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  ReportType   ] ##
+enum ReportType {
+ general
+ incident
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  ServiceAlteration   ] ##
+enum ServiceAlteration {
+ cancellation
+ extraJourney
+ planned
+ replaced
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  DirectionType   ] ##
+enum DirectionType {
+ anticlockwise
+ clockwise
+ inbound
+ outbound
+ unknown
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  InputField   ] ##
+enum InputField {
+ dateTime
+ from
+ to
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  InterchangePriority   ] ##
+enum InterchangePriority {
+ allowed
+ notAllowed
+ preferred
+ recommended
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  InterchangeWeighting   ] ##
+enum InterchangeWeighting {
+ interchangeAllowed
+ noInterchange
+ preferredInterchange
+ recommendedInterchange
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  PurchaseWhen   ] ##
+enum PurchaseWhen {
+ advanceAndDayOfTravel
+ dayOfTravelOnly
+ other
+ timeOfTravelOnly
+ untilPreviousDay
+}
+
+## [   Legacy-Netex:  DOES_NOT_EXIST  -  RoutingErrorCode   ] ##
+enum RoutingErrorCode {
+ locationNotFound
+ noStopsInRange
+ noTransitConnection
+ noTransitConnectionInSearchWindow
+ outsideBounds
+ outsideServicePeriod
+ systemError
+ walkingBetterThanTransit
+}
+

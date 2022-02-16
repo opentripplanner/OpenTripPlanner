@@ -1,0 +1,7 @@
+## [   Legacy-Netex:  PlaceInterface  -  PlaceInterface   ] ##
+interface PlaceInterface {
+  id: ID!
+  latitude: Float
+  longitude: Float
+}
+

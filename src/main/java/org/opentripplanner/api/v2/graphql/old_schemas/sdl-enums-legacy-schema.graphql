@@ -1,0 +1,202 @@
+## [   Legacy-Netex:  LocationType  -  DOES_NOT_EXIST   ] ##
+enum LocationType {
+ ENTRANCE
+ STATION
+ STOP
+}
+
+## [   Legacy-Netex:  VehicleParkingState  -  DOES_NOT_EXIST   ] ##
+enum VehicleParkingState {
+ CLOSED
+ OPERATIONAL
+ TEMPORARILY_CLOSED
+}
+
+## [   Legacy-Netex:  Qualifier  -  DOES_NOT_EXIST   ] ##
+enum Qualifier {
+ ACCESS
+ DIRECT
+ DROPOFF
+ EGRESS
+ HAVE @deprecated(reason: "Currently not used")
+ KEEP @deprecated(reason: "Currently not used")
+ PARK
+ PICKUP
+ RENT
+}
+
+## [   Legacy-Netex:  AgencyAlertType  -  DOES_NOT_EXIST   ] ##
+enum AgencyAlertType {
+ AGENCY
+ ROUTES
+ ROUTE_TYPES
+}
+
+## [   Legacy-Netex:  AlertCauseType  -  DOES_NOT_EXIST   ] ##
+enum AlertCauseType {
+ ACCIDENT
+ CONSTRUCTION
+ DEMONSTRATION
+ HOLIDAY
+ MAINTENANCE
+ MEDICAL_EMERGENCY
+ OTHER_CAUSE
+ POLICE_ACTIVITY
+ STRIKE
+ TECHNICAL_PROBLEM
+ UNKNOWN_CAUSE
+ WEATHER
+}
+
+## [   Legacy-Netex:  AlertEffectType  -  DOES_NOT_EXIST   ] ##
+enum AlertEffectType {
+ ACCESSIBILITY_ISSUE
+ ADDITIONAL_SERVICE
+ DETOUR
+ MODIFIED_SERVICE
+ NO_EFFECT
+ NO_SERVICE
+ OTHER_EFFECT
+ REDUCED_SERVICE
+ SIGNIFICANT_DELAYS
+ STOP_MOVED
+ UNKNOWN_EFFECT
+}
+
+## [   Legacy-Netex:  FeedAlertType  -  DOES_NOT_EXIST   ] ##
+enum FeedAlertType {
+ AGENCIES
+ ROUTE_TYPES
+}
+
+## [   Legacy-Netex:  PatternAlertType  -  DOES_NOT_EXIST   ] ##
+enum PatternAlertType {
+ AGENCY
+ PATTERN
+ ROUTE
+ ROUTE_TYPE
+ STOPS_ON_PATTERN
+ STOPS_ON_TRIPS
+ TRIPS
+}
+
+## [   Legacy-Netex:  RouteAlertType  -  DOES_NOT_EXIST   ] ##
+enum RouteAlertType {
+ AGENCY
+ PATTERNS
+ ROUTE
+ ROUTE_TYPE
+ STOPS_ON_ROUTE
+ STOPS_ON_TRIPS
+ TRIPS
+}
+
+## [   Legacy-Netex:  StopAlertType  -  DOES_NOT_EXIST   ] ##
+enum StopAlertType {
+ AGENCIES_OF_ROUTES
+ PATTERNS
+ ROUTES
+ STOP
+ STOP_ON_ROUTES
+ STOP_ON_TRIPS
+ TRIPS
+}
+
+## [   Legacy-Netex:  TripAlertType  -  DOES_NOT_EXIST   ] ##
+enum TripAlertType {
+ AGENCY
+ PATTERN
+ ROUTE
+ ROUTE_TYPE
+ STOPS_ON_TRIP
+ TRIP
+}
+
+## [   Legacy-Netex:  AlertSeverityLevelType  -  Severity   ] ##
+enum AlertSeverityLevelType {
+ INFO
+ SEVERE
+ UNKNOWN_SEVERITY
+ WARNING
+}
+
+## [   Legacy-Netex:  BikesAllowed  -  BikesAllowed   ] ##
+enum BikesAllowed {
+ ALLOWED
+ NOT_ALLOWED
+ NO_INFORMATION
+}
+
+## [   Legacy-Netex:  FilterPlaceType  -  FilterPlaceType   ] ##
+enum FilterPlaceType {
+ BICYCLE_RENT
+ BIKE_PARK
+ CAR_PARK
+ DEPARTURE_ROW
+ STOP
+}
+
+## [   Legacy-Netex:  OptimizeType  -  BicycleOptimisationMethod   ] ##
+enum OptimizeType {
+ FLAT
+ GREENWAYS
+ QUICK
+ SAFE
+ TRIANGLE
+}
+
+## [   Legacy-Netex:  RealtimeState  -  RealtimeState   ] ##
+enum RealtimeState {
+ ADDED
+ CANCELED
+ MODIFIED
+ SCHEDULED
+ UPDATED
+}
+
+## [   Legacy-Netex:  PickupDropoffType  -  BookingMethod   ] ##
+enum PickupDropoffType {
+ CALL_AGENCY
+ COORDINATE_WITH_DRIVER
+ NONE
+ SCHEDULED
+}
+
+## [   Legacy-Netex:  VertexType  -  VertexType   ] ##
+enum VertexType {
+ BIKEPARK
+ BIKESHARE
+ NORMAL
+ PARKANDRIDE
+ TRANSIT
+}
+
+## [   Legacy-Netex:  WheelchairBoarding  -  WheelchairBoarding   ] ##
+enum WheelchairBoarding {
+ NOT_POSSIBLE
+ NO_INFORMATION
+ POSSIBLE
+}
+
+## [   Legacy-Netex:  Mode  -  Mode   ] ##
+enum Mode {
+ AIRPLANE
+ BICYCLE
+ BUS
+ CABLE_CAR
+ CAR
+ COACH
+ FERRY
+ FLEX
+ FLEXIBLE @deprecated(reason: "Use FLEX instead")
+ FUNICULAR
+ GONDOLA
+ LEG_SWITCH
+ RAIL
+ SCOOTER
+ SUBWAY
+ TRAM
+ TRANSIT
+ WALK
+}
+

@@ -1,0 +1,12 @@
+## [   Legacy-Netex:  PlaceInterface  -  PlaceInterface   ] ##
+interface PlaceInterface {
+  id: ID!
+  lat: Float
+  lon: Float
+}
+
+## [   Legacy-Netex:  Node  -  DOES_NOT_EXIST   ] ##
+interface Node {
+  id: ID!
+}
+
