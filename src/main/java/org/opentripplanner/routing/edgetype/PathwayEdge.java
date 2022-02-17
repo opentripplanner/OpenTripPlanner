@@ -1,16 +1,17 @@
 package org.opentripplanner.routing.edgetype;
 
+import static org.opentripplanner.common.geometry.SphericalDistanceLibrary.distance;
+
 import java.util.Objects;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -23,37 +24,55 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
 
     private final I18NString name;
-    private int traversalTime;
-    private double distance;
-    private int steps;
-    private double angle;
+    private final int traversalTime;
+    private final double distance;
+    private final int steps;
+    private final double angle;
 
-    private boolean wheelchairAccessible = true;
-    private FeedScopedId id;
+    private final boolean wheelchairAccessible;
+    private final FeedScopedId id;
 
-    public PathwayEdge(Vertex fromv, Vertex tov, I18NString name) {
-        super(fromv, tov);
-        this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
+    public static PathwayEdge withComputedDistance(Vertex fromV, Vertex toV, I18NString name) {
+        return new PathwayEdge(
+                fromV,
+                toV,
+                null,
+                name,
+                0,
+                0, // distance is computed in the default constructor
+                0,
+                0,
+                true
+        );
     }
 
     public PathwayEdge(
-        Vertex fromv,
-        Vertex tov,
-        FeedScopedId id,
-        I18NString name,
-        int traversalTime,
-        double distance,
-        int steps,
-        double angle,
-        boolean wheelchairAccessible
+            Vertex fromv,
+            Vertex tov,
+            FeedScopedId id,
+            I18NString name,
+            int traversalTime,
+            double distance,
+            int steps,
+            double angle,
+            boolean wheelchairAccessible
     ) {
-        this(fromv, tov, name != null ? name : tov.getName());
+        super(fromv, tov);
+        this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
         this.id = id;
         this.traversalTime = traversalTime;
-        this.distance = distance;
         this.steps = steps;
         this.angle = angle;
         this.wheelchairAccessible = wheelchairAccessible;
+
+        // the GTFS spec allows you to define a pathway which has neither traversal time, distance
+        // nor steps. if that happens we compute it from the coordinates of the vertices
+        if (traversalTime <= 0 && distance <= 0 && steps <= 0) {
+            this.distance = distance(fromv.getCoordinate(), tov.getCoordinate());
+        }
+        else {
+            this.distance = distance;
+        }
     }
 
     public String getDirection() {
@@ -68,7 +87,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     public double getEffectiveWalkDistance() {
         if (traversalTime > 0) {
             return 0;
-        } else {
+        }
+        else {
             return distance;
         }
     }
@@ -79,8 +99,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     }
 
     public LineString getGeometry() {
-        Coordinate[] coordinates = new Coordinate[] { getFromVertex().getCoordinate(),
-                getToVertex().getCoordinate() };
+        Coordinate[] coordinates = new Coordinate[]{
+                getFromVertex().getCoordinate(),
+                getToVertex().getCoordinate()
+        };
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
@@ -89,11 +111,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
         return name;
     }
 
-    public void setWheelchairAccessible(boolean wheelchairAccessible) {
-        this.wheelchairAccessible = wheelchairAccessible;
-    }
-
-    public FeedScopedId getId( ){ return id; }
+    public FeedScopedId getId() {return id;}
 
     public State traverse(State s0) {
         StateEditor s1 = createEditorForWalking(s0, this);
@@ -122,11 +140,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
             }
         }
 
-        if (time <= 0) {
-            return null;
-        }
-
-        double weight = time * s0.getOptions().getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
+        double weight = time * s0.getOptions()
+                .getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
 
         s1.incrementTimeInSeconds(time);
         s1.incrementWeight(weight);

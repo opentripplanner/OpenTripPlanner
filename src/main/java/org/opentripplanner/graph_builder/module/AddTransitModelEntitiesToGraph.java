@@ -170,13 +170,13 @@ public class AddTransitModelEntitiesToGraph {
             TransitBoardingAreaVertex boardingAreaVertex = new TransitBoardingAreaVertex(graph, boardingArea);
             stationElementNodes.put(boardingArea, boardingAreaVertex);
             if (boardingArea.getParentStop() != null) {
-                new PathwayEdge(
+                PathwayEdge.withComputedDistance(
                     boardingAreaVertex,
                     stationElementNodes.get(boardingArea.getParentStop()),
                     new NonLocalizedString(boardingArea.getName())
                 );
 
-                new PathwayEdge(
+                PathwayEdge.withComputedDistance(
                     stationElementNodes.get(boardingArea.getParentStop()),
                     boardingAreaVertex,
                     new NonLocalizedString(boardingArea.getName())
@@ -277,8 +277,8 @@ public class AddTransitModelEntitiesToGraph {
             toVertexLevelName
         );
 
-        new PathwayEdge(fromVertex, fromOffboardVertex, fromVertex.getName());
-        new PathwayEdge(toOffboardVertex, toVertex, toVertex.getName());
+        PathwayEdge.withComputedDistance(fromVertex, fromOffboardVertex, fromVertex.getName());
+        PathwayEdge.withComputedDistance(toOffboardVertex, toVertex, toVertex.getName());
 
         ElevatorOnboardVertex fromOnboardVertex = new ElevatorOnboardVertex(
             graph,
@@ -308,8 +308,8 @@ public class AddTransitModelEntitiesToGraph {
         );
 
         if (pathway.isBidirectional()) {
-            new PathwayEdge(fromOffboardVertex, fromVertex, fromVertex.getName());
-            new PathwayEdge(toVertex, toOffboardVertex, toVertex.getName());
+            PathwayEdge.withComputedDistance(fromOffboardVertex, fromVertex, fromVertex.getName());
+            PathwayEdge.withComputedDistance(toVertex, toOffboardVertex, toVertex.getName());
             new ElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
             new ElevatorAlightEdge(
                 fromOnboardVertex,
