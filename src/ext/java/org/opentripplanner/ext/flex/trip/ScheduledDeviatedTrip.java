@@ -79,7 +79,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
     for (int toIndex = fromIndex; toIndex < stopTimes.length; toIndex++) {
-      if (getDropOffType(toIndex).isNotRoutable()) continue;
+      if (getDropOffType(toIndex).isNotRoutable()) { continue; }
       for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
         res.add(new FlexAccessTemplate(
                 access,
@@ -110,7 +110,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 
     for (int fromIndex = toIndex; fromIndex >= 0; fromIndex--) {
-      if (getPickupType(fromIndex).isNotRoutable()) continue;
+      if (getPickupType(fromIndex).isNotRoutable()) { continue; }
       for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
         res.add(new FlexEgressTemplate(
                 egress,
@@ -202,7 +202,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   private int getFromIndex(NearbyStop accessEgress) {
     for (int i = 0; i < stopTimes.length; i++) {
-      if (getPickupType(i).isNotRoutable()) continue;
+      if (getPickupType(i).isNotRoutable()) { continue; }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof FlexLocationGroup) {
         if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
@@ -220,7 +220,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   private int getToIndex(NearbyStop accessEgress) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
-      if (getDropOffType(i).isNotRoutable()) continue;
+      if (getDropOffType(i).isNotRoutable()) { continue; }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof FlexLocationGroup) {
         if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
