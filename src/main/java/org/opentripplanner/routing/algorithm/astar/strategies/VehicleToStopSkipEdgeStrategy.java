@@ -25,7 +25,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  * The strategy is useful when you want to limit the number of accesses of Park+Ride, Bike+Ride and
  * Bike+Transit: it improves both performance the quality of results.
  * <p>
- * {@see https://github.com/opentripplanner/OpenTripPlanner/pull/3906/files}
+ * {@see https://github.com/opentripplanner/OpenTripPlanner/pull/3906}
  */
 public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
 
