@@ -227,7 +227,7 @@ public class ElevationModule implements GraphBuilderModule {
             }
         }
 
-        int nPoints = nPointsEvaluated.get();
+        int nPoints = nPointsEvaluated.get() + nPointsOutsideDEM.get();
         if(nPoints > 0) {
             double failurePercentage = (double) nPointsOutsideDEM.get() / nPoints * 100.0;
             if (failurePercentage > 50) {
