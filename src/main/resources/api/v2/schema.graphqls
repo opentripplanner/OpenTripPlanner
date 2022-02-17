@@ -271,7 +271,7 @@ type Trip implements Node {
   route: Route
   pattern: Pattern
 
-  //TODO Should this be a list of TimetableStopTimes instead
+  #TODO Should this be a list of TimetableStopTimes instead
   stops(first: Int, last: Int, after: String, before: String): TripStopsConnection!
   tripOnDates(first: Int, last: Int, after: String, before: String): TripTripOnDatesConnection!
 }
