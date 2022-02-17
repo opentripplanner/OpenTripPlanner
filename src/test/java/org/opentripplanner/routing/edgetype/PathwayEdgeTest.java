@@ -7,10 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.util.NonLocalizedString;
 
 class PathwayEdgeTest {
+
+    Graph graph = new Graph();
+    Vertex from = new SimpleVertex(graph, "A", 10, 10);
+    Vertex to = new SimpleVertex(graph, "B", 10.001, 10.001);
 
     @Test
     void testZeroLengthPathway() {
@@ -18,10 +23,6 @@ class PathwayEdgeTest {
         // GTFS pathways don't need to define traversal_time, distance or steps
         // in such a case we compute the traversal time from the distance of the vertices rather
         // than rendering them unpassable
-
-        var graph = new Graph();
-        var from = new SimpleVertex(graph, "A", 10, 10);
-        var to = new SimpleVertex(graph, "B", 10.001, 10.001);
 
         var edge = new PathwayEdge(
                 from,
@@ -35,8 +36,32 @@ class PathwayEdgeTest {
                 true
         );
 
-        assertTrue(edge.getEffectiveWalkDistance() > 0);
+        assertThatEdgeIsTraversable(edge);
+    }
 
+    @Test
+    void testZeroLengthPathwayWithSteps() {
+
+        // GTFS pathways don't need to define traversal_time, distance or steps
+        // in such a case we compute the traversal time from the distance of the vertices rather
+        // than rendering them unpassable
+
+        var edge = new PathwayEdge(
+                from,
+                to,
+                null,
+                new NonLocalizedString("pathway"),
+                0,
+                0,
+                2,
+                0,
+                true
+        );
+        
+        assertThatEdgeIsTraversable(edge);
+    }
+
+    private void assertThatEdgeIsTraversable(PathwayEdge edge) {
         var req = new RoutingRequest();
         req.setRoutingContext(graph, from, to);
         var state = new State(req);
