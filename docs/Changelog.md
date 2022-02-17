@@ -138,6 +138,7 @@
 - Make sure we keep the itinerary with the least number of transfers when grouping the itineraries [#3833](https://github.com/opentripplanner/OpenTripPlanner/pull/3833)
 - Don't expect every pattern in a route to have the specified stop with constrained transfers [#3868](https://github.com/opentripplanner/OpenTripPlanner/pull/3868)
 - Add support for creating constrained transfers from real-time generated patterns [#3878](https://github.com/opentripplanner/OpenTripPlanner/pull/3878)
+- Account for stay seated transfers when calculating the number of transfers [#3888](https://github.com/opentripplanner/OpenTripPlanner/pull/3888)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
