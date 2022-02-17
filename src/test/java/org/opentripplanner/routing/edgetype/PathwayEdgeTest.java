@@ -57,7 +57,7 @@ class PathwayEdgeTest {
                 0,
                 true
         );
-        
+
         assertThatEdgeIsTraversable(edge);
     }
 
