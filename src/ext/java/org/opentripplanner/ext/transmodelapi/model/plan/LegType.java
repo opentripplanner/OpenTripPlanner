@@ -260,7 +260,7 @@ public class LegType {
             .withDirective(gqlUtil.timingData)
             .description(
                 "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list.")
-            .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
+            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
             .dataFetcher(env ->
                 TripTimeShortHelper.getAllTripTimeShortsForLegsTrip(
                     env.getSource(),
