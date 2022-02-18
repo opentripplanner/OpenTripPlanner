@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TripTimesTest {
     private static final FeedScopedId TRIP_ID = new FeedScopedId("agency", "testTripId");
@@ -89,6 +90,43 @@ public class TripTimesTest {
         updatedTripTimesB.updateArrivalTime(7, 420);
 
         assertFalse(updatedTripTimesB.timesIncreasing());
+    }
+
+
+    @Test
+    public void testNonIncreasingUpdateWithCancellation() {
+        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+
+        updatedTripTimesA.updateArrivalTime(1, 60);
+        updatedTripTimesA.updateDepartureTime(1, 59);
+        updatedTripTimesA.setCancelled(1);
+
+        assertTrue(updatedTripTimesA.timesIncreasing());
+
+        TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
+        updatedTripTimesB.updateDepartureTime(6, 421);
+        updatedTripTimesB.updateArrivalTime(7, 420);
+        updatedTripTimesB.setCancelled(6);
+
+        assertTrue(updatedTripTimesA.timesIncreasing());
+    }
+
+    @Test
+    public void testNonIncreasingUpdateOnFirstAndLastStop() {
+        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+
+        updatedTripTimesA.updateArrivalTime(0, 1);
+        updatedTripTimesA.updateDepartureTime(0, 0);
+
+        assertTrue(updatedTripTimesA.timesIncreasing());
+
+
+        TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
+
+        updatedTripTimesB.updateArrivalTime(7,421);
+        updatedTripTimesB.updateDepartureTime(7, 420);
+
+        assertTrue(updatedTripTimesB.timesIncreasing());
     }
 
     @Test

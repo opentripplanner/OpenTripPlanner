@@ -365,20 +365,29 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      */
     public boolean timesIncreasing() {
         final int nStops = scheduledArrivalTimes.length;
-        int prevDep = -1;
+        int prevDep = Integer.MIN_VALUE;
+        int prevIndex = -1;
         for (int s = 0; s < nStops; s++) {
+            // Do not validate for cancelled stops
+            if (isCancelledStop(s)) {
+                continue;
+            }
+            boolean isFirstStop = s == 0;
+            boolean isLastStop = s + 1 == nStops;
             final int arr = getArrivalTime(s);
             final int dep = getDepartureTime(s);
 
-            if (dep < arr) {
+            // Do not validate for first and last stop
+            if (!isFirstStop && !isLastStop && dep < arr) {
                 LOG.warn("Negative dwell time in TripTimes at stop index {}.", s);
                 return false;
             }
             if (prevDep > arr) {
-                LOG.warn("Negative running time in TripTimes after stop index {}.", s);
+                LOG.warn("Negative running time in TripTimes between stop index {} and index {}.", prevIndex, s);
                 return false;
             }
             prevDep = dep;
+            prevIndex = s;
         }
         return true;
     }
