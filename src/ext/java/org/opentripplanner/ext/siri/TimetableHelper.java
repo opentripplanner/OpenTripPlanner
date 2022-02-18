@@ -181,9 +181,7 @@ public class TimetableHelper {
                     } else if (recordedCall.getAimedDepartureTime() != null) {
                         realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getAimedDepartureTime(), zoneId);
                     }
-                    if (realtimeDepartureTime < realtimeArrivalTime) {
-                        realtimeDepartureTime = realtimeArrivalTime;
-                    }
+
                     int departureDelay = realtimeDepartureTime - departureTime;
 
                     newTimes.updateDepartureDelay(callCounter, departureDelay);
@@ -260,9 +258,6 @@ public class TimetableHelper {
 
                         if (realtimeArrivalTime == -1) {
                             realtimeArrivalTime = realtimeDepartureTime;
-                        }
-                        if (realtimeDepartureTime < realtimeArrivalTime) {
-                            realtimeDepartureTime = realtimeArrivalTime;
                         }
 
                         int arrivalDelay = realtimeArrivalTime - arrivalTime;
