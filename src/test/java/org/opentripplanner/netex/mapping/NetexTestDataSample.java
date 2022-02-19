@@ -35,6 +35,8 @@ import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
+import org.rutebanken.netex.model.Via_VersionedChildStructure;
+import org.rutebanken.netex.model.Vias_RelStructure;
 
 class NetexTestDataSample {
     public static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";
@@ -83,13 +85,17 @@ class NetexTestDataSample {
             timetabledPassingTimes.add(createTimetablePassingTime("TTPT-" + (i+1), 5, stopTimes[i]));
         }
 
+        final String DESTINATION_DISPLAY_ID_1 = "NSR:DestinationDisplay:1";
+        final String DESTINATION_DISPLAY_ID_2 = "NSR:DestinationDisplay:2";
 
         DestinationDisplay destinationBergen = new DestinationDisplay()
-                .withId("NSR:DestinationDisplay:1")
+                .withId(DESTINATION_DISPLAY_ID_1)
+                .withVias(new Vias_RelStructure().withVia(List.of(this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_2))))
                 .withFrontText(new MultilingualString().withValue("Bergen"));
 
         DestinationDisplay destinationStavanger = new DestinationDisplay()
-                .withId("NSR:DestinationDisplay:2")
+                .withId(DESTINATION_DISPLAY_ID_2)
+                .withVias(new Vias_RelStructure().withVia(List.of(this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_1))))
                 .withFrontText(new MultilingualString().withValue("Stavanger"));
 
         destinationDisplayById.add(destinationBergen);
@@ -141,6 +147,12 @@ class NetexTestDataSample {
             stopsById.add(Stop.stopForTest(stopId, 60.0, 10.0));
             quayIdByStopPointRef.add(pointsInLink.get(i).getId(), stopId);
         }
+    }
+
+    private Via_VersionedChildStructure createViaDestinationDisplayRef(String destinationDisplayId) {
+        return new Via_VersionedChildStructure()
+                .withDestinationDisplayRef(new DestinationDisplayRefStructure()
+                        .withRef(destinationDisplayId));
     }
 
     static DayTypeRefs_RelStructure createEveryDayRefs() {
