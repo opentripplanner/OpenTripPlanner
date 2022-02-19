@@ -1,0 +1,209 @@
+## MODE  ##
+
+# See the _ModeInputTypeDesign.md_ in the `org.opentripplanner.api.v2` package for design notes.
+
+
+"""
+TODO Description
+
+Note! For each of the fields in this type we merge each restriction to produce the final set of elements.
+Example: If `[[], [1, 2, 3], [2, 7]]` is returned, then the resulting set is: `[1, 2, 3, 7]`
+"""
+input TranssitModeRestriction {
+    access : [AccessModeRestriction!] = [WALK]
+    egress : [EgressModeRestriction!] = [WALK]
+    transfer : [TransferModeRestriction!] = [WALK]
+    transitModes : [TransitModeRestriction!] = []
+}
+
+"""
+Notes:
+- +StreetModeRestriction:WALK|+StreetModeRestriction:BICYCLE|+StreetModeRestriction:SCOOTER|
++StreetModeRestriction:CAR: When present these modes allow the journey to start or end by this
+mode as well as transitions to/from these.
+- (MODE)_RENT: Allow transition from (MODE) at a rental place/floating vihechle to the given mode.
+- (MODE)_PARK: Allow transition from/to (MODE) at a parking place from/to another allowed mode.
+- Only ONE pickup and droppoff is allowed pr Journey due to technical limitations(performance).
+- +StreetModeRestriction:FLEXIBLE_TRANSIT: this will also allow walking in both ends of the
++StreetModeRestriction:FLEXIBLE_TRANSIT leg.
+-
+"""
+enum StreetModeRestriction {
+    WALK,
+    BICYCLE, BICYCLE_RENT, BICYCLE_PARK
+    SCOOTER, SCOOTER_RENT, SCOOTER_PARK,
+    FLEXIBLE_TRANSIT
+    CAR, CAR_RENT, CAR_PARK
+}
+
+enum AccessModeRestriction {
+    WALK
+    BICYCLE, BICYCLE_RENT, BICYCLE_PARK
+    SCOOTER, SCOOTER_RENT, SCOOTER_PARK
+    FLEXIBLE_TRANSIT
+    CAR, CAR_RENT, CAR_PARK, CAR_DROPOFF
+}
+
+enum EgressModeRestriction {
+    WALK
+    BICYCLE, BICYCLE_RENT, BICYCLE_PARK
+    SCOOTER, SCOOTER_RENT, SCOOTER_PARK
+    FLEXIBLE_TRANSIT
+    CAR, CAR_RENT, CAR_PICKUP
+}
+
+enum TransferModeRestriction {
+    WALK
+    BICYCLE
+    SCOOTER
+}
+
+"""
+Note! If you set both +modes and +submodes then all +routes matching one of the sets are included.
+If +TransitModeRestriction:modes and +TransitModeRestriction:submodes are empty, **all** routes are
+included, except modes/submodes listed unde **not** included. Example: `{ modes: [BUS, TRAM], not:
+{ submodes: SCHOOL_BUS }` will select all +TransitMode:BUS and +TransitMode:TRAM +routes except
++TransitMode:SCHOOL_BUS.
+"""
+input TransitModeRestriction {
+    modes: [TransitMode!] = []
+    submodes: [TransitSubmode!] = []
+    not: TransitModeExcludeRestriction = {}
+}
+
+input TransitModeExcludeRestriction {
+    modes: [TransitMode!] = []
+    submodes: [TransitSubmode!] = []
+}
+
+enum TransitMode {
+    AIRPLANE
+    BUS
+    CABLE_CAR
+    COACH
+    FERRY
+    FUNICULAR
+    GONDOLA
+    MONORAIL
+    RAIL
+    SUBWAY
+    TRAM
+    TROLLEYBUS
+}
+
+enum TransitSubmode {
+    ## TODO OTP2 - Go through the list an reove tha one we do not support
+    INTERNATIONAL_FLIGHT
+    DOMESTIC_FLIGHT
+    INTERCONTINENTAL_FLIGHT
+    DOMESTIC_SCHEDULED_FLIGHT
+    SHUTTLE_FLIGHT
+    INTERCONTINENTAL_CHARTER_FLIGHT
+    INTERNATIONAL_CHARTER_FLIGHT
+    ROUND_TRIP_CHARTER_FLIGHT
+    SIGHTSEEING_FLIGHT
+    HELICOPTER_SERVICE
+    DOMESTIC_CHARTER_FLIGHT
+    SCHENGEN_AREA_FLIGHT
+    AIRSHIP_SERVICE
+    SHORT_HAUL_INTERNATIONAL_FLIGHT
+    CANAL_BARGE
+    # Bus
+    LOCAL_BUS
+    REGIONAL_BUS
+    EXPRESS_BUS
+    NIGHT_BUS
+    POST_BUS
+    SPECIAL_NEEDS_BUS
+    MOBILITY_BUS
+    MOBILITY_BUS_FOR_REGISTERED_DISABLED
+    SIGHTSEEING_BUS
+    SHUTTLE_BUS
+    HIGH_FREQUENCY_BUS
+    DEDICATED_LANE_BUS
+    SCHOOL_BUS
+    SCHOOL_AND_PUBLIC_SERVICE_BUS
+    RAIL_REPLACEMENT_BUS
+    DEMAND_AND_RESPONSE_BUS
+    AIRPORT_LINK_BUS
+    # Coach
+    INTERNATIONAL_COACH
+    NATIONAL_COACH
+    SHUTTLE_COACH
+    REGIONAL_COACH
+    SPECIAL_COACH
+    SCHOOL_COACH
+    SIGHTSEEING_COACH
+    TOURIST_COACH
+    COMMUTER_COACH
+    # Funicular
+    FUNICULAR
+    STREET_CABLE_CAR
+    ALL_FUNICULAR_SERVICES
+    UNDEFINED_FUNICULAR
+    # Metro
+    METRO
+    TUBE
+    URBAN_RAILWAY
+    # Tram
+    CITY_TRAM
+    LOCAL_TRAM
+    REGIONAL_TRAM
+    SIGHTSEEING_TRAM
+    SHUTTLE_TRAM
+    TRAIN_TRAM
+    # Telecabin
+    TELECABIN
+    CABLE_CAR
+    LIFT
+    CHAIR_LIFT
+    DRAG_LIFT
+    TELECABIN_LINK
+    # Rail
+    LOCAL_RAIL
+    HIGH_SPEED_RAIL
+    SUBURBAN_RAILWAY
+    REGIONAL_RAIL
+    INTERREGIONAL_RAIL
+    LONG_DISTANCE
+    INTERNATIONAL
+    SLEEPER_RAIL_SERVICE
+    NIGHT_RAIL
+    CAR_TRANSPORT_RAIL_SERVICE
+    TOURIST_RAILWAY
+    AIRPORT_LINK_RAIL
+    RAIL_SHUTTLE
+    REPLACEMENT_RAIL_SERVICE
+    SPECIAL_TRAIN
+    CROSS_COUNTRY_RAIL
+    RACK_AND_PINION_RAILWAY
+    # Water
+    INTERNATIONAL_CAR_FERRY
+    NATIONAL_CAR_FERRY
+    REGIONAL_CAR_FERRY
+    LOCAL_CAR_FERRY
+    INTERNATIONAL_PASSENGER_FERRY
+    NATIONAL_PASSENGER_FERRY
+    REGIONAL_PASSENGER_FERRY
+    LOCAL_PASSENGER_FERRY
+    POST_BOAT
+    TRAIN_FERRY
+    ROAD_FERRY_LINK
+    AIRPORT_BOAT_LINK
+    HIGH_SPEED_VEHICLE_SERVICE
+    HIGH_SPEED_PASSENGER_SERVICE
+    SIGHTSEEING_SERVICE
+    SCHOOL_BOAT
+    CABLE_FERRY
+    RIVER_BUS
+    SCHEDULED_FERRY
+    SHUTTLE_FERRY_SERVICE
+    # Taxi
+    COMMUNAL_TAXI
+    CHARTER_TAXI
+    WATER_TAXI
+    RAIL_TAXI
+    BIKE_TAXI
+    BLACK_CAB
+    MINI_CAB
+}

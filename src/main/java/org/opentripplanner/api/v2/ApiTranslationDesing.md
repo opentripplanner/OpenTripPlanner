@@ -1,6 +1,6 @@
+# Schema Design Notes
 
-
-# GraphQL Schema Dialect Design
+## GraphQL Schema Translation
 
 We will use a `csv` file to maintain the GTFS and Transmodel dialects for the main GraphQL API. 
  - A CSV file is easy to maintain
@@ -15,9 +15,9 @@ We will use a `csv` file to maintain the GTFS and Transmodel dialects for the ma
   `+Query:hero:episode`.
 
 
-## Example
+### Example
 
-### Given a GraphQL Schema
+#### Given a GraphQL Schema
  
 ```graphql
 "We use ISO 8601 for the +Date type."
@@ -30,7 +30,7 @@ type Query {
 }
 ```
 
-### With the following translation
+#### With the following translation
 
 > TODO : Can we remove the GQLType in the table
 
@@ -47,7 +47,7 @@ type Query {
 | `type` | Query | hero | episode | show | sequenceName |
 | `text` | Episodes | | | Shows | NamedSequenceInstancesOfDistributableUnit |
 
-### We get the following result
+We get the following result:
 
 
 #### GTFS GraphQL Schema
