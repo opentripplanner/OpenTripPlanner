@@ -94,9 +94,9 @@ public class TransferIndexGenerator {
                     .computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>())
                     .add(pattern);
 
-            for (Trip trip : tripPattern.getTrips()) {
-                patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern);
-            }
+            tripPattern.scheduledTripsAsStream().forEach(trip ->
+                patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern)
+            );
 
             for (StopLocation stop : tripPattern.getStops()) {
                 patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);

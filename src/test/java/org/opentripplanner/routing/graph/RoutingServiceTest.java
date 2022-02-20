@@ -60,7 +60,7 @@ public class RoutingServiceTest extends GtfsTest {
     public void testPatternsCoherent() {
         for (Trip trip : graph.index.getTripForId().values()) {
             TripPattern pattern = graph.index.getPatternForTrip().get(trip);
-            assertTrue(pattern.getTrips().contains(trip));
+            assertTrue(pattern.scheduledTripsAsStream().anyMatch(t -> t.equals(trip)));
         }
         /* This one depends on a feed where each TripPattern appears on only one route. */
         for (Route route : graph.index.getAllRoutes()) {

@@ -35,7 +35,7 @@ public class TripPatternMapper {
 
         ApiPatternDetail api = mapToApiShort(domain, ApiPatternDetail::new);
         api.stops = StopMapper.mapToApiShort(domain.getStops());
-        api.trips = TripMapper.mapToApiShort(domain.getTrips());
+        api.trips = TripMapper.mapToApiShort(domain.scheduledTripsAsStream());
         return api;
     }
 

@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.service;
 
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;

@@ -172,7 +172,9 @@ public class SpeedTest {
         printProfileStatistics();
 
         // close() sends the results to influxdb
-        uploadRegistry.close();
+        if(uploadRegistry != null) {
+            uploadRegistry.close();
+        }
 
         service.shutdown();
         System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());

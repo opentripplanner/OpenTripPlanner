@@ -45,7 +45,7 @@ public interface TripScheduleSearch<T extends RaptorTripSchedule> {
      * Note! The implementation may use a "fly-weight" pattern to implement this, which mean no
      * objects are created for the result, but the result object will instead be reused for the
      * next search. So, the caller MUST copy values over and NOT store references to the result
-     * object. As soon as a new call the the search is done, the result object is invalid.
+     * object. As soon as a new call the search is done, the result object is invalid.
      *
      * @param earliestBoardTime  The time of arrival(departure for reverse search) at the given stop.
      * @param stopPositionInPattern The stop to board

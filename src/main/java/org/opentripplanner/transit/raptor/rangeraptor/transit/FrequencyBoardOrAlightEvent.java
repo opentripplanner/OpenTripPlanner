@@ -41,6 +41,8 @@ public abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
         this.serviceDate = serviceDate;
     }
 
+    /* RaptorTripScheduleBoardOrAlightEvent implementation */
+
     @Override
     public int getTripIndex() {
         return tripTimes.getDepartureTime(0) + offset;
@@ -66,6 +68,8 @@ public abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
         return RaptorTransferConstraint.REGULAR_TRANSFER;
     }
 
+    /* RaptorTripSchedule implementation */
+
     @Override
     public int tripSortIndex() {
         return tripTimes.getDepartureTime(0) + offset;
@@ -86,6 +90,9 @@ public abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
     public int transitReluctanceFactorIndex() {
         return pattern.getMode().ordinal();
     }
+
+
+    /* TripSchedule implementation */
 
     @Override
     public TripTimes getOriginalTripTimes() {

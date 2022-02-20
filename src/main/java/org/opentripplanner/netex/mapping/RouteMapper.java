@@ -67,6 +67,7 @@ class RouteMapper {
         otpRoute.setBranding(findBranding(line));
         otpRoute.setLongName(line.getName().getValue());
         otpRoute.setShortName(line.getPublicCode());
+
         T2<TransitMode, String> mode = transportModeMapper.map(
                 line.getTransportMode(),
                 line.getTransportSubmode()
