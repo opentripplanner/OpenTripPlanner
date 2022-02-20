@@ -6,10 +6,12 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.util.IntIterators;
 
 /**
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedulesByDay
@@ -24,9 +26,9 @@ public class TripPatternForDates
 
     private final TripPatternWithRaptorStopIndexes tripPattern;
 
-    public final TripPatternForDate[] tripPatternForDates;
+    private final TripPatternForDate[] tripPatternForDates;
 
-    public final int[] offsets;
+    private final int[] offsets;
 
     private final int numberOfTripSchedules;
 
@@ -43,6 +45,23 @@ public class TripPatternForDates
 
     public TripPatternWithRaptorStopIndexes getTripPattern() {
         return tripPattern;
+    }
+
+
+    /* Support for frequency based routing */
+
+    public IntIterator tripPatternForDatesIndexIterator(boolean ascendingOnDate) {
+        return ascendingOnDate
+            ? IntIterators.intIncIterator(0, tripPatternForDates.length)
+            : IntIterators.intDecIterator(tripPatternForDates.length, 0);
+    }
+
+    public TripPatternForDate tripPatternForDate(int index) {
+        return tripPatternForDates[index];
+    }
+
+    public int tripPatternForDateOffsets(int index) {
+        return offsets[index];
     }
 
     // Implementing RaptorRoute

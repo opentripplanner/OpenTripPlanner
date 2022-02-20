@@ -23,4 +23,18 @@ public interface TripSchedule extends RaptorTripSchedule {
     TripPattern getOriginalTripPattern();
 
     LocalDate getServiceDate();
+
+    /**
+     * Return {@code true} if this trip is not based on a fixed schedule, but instead a
+     * frequency based scheduled trip. The {@link #frequencyHeadwayInSeconds()} is only defined for
+     * such trips.
+     */
+    default boolean isFrequencyBasedTrip() { return false; }
+
+    /**
+     * Return the {@code headway} for a frequency based trip. {@code -999} is returned for "normal"
+     * scheduled trips, but you should not relay on this. Instead, use the
+     * {@link #isFrequencyBasedTrip()} method to determine the trip type.
+     */
+    default int frequencyHeadwayInSeconds() { return -999; }
 }

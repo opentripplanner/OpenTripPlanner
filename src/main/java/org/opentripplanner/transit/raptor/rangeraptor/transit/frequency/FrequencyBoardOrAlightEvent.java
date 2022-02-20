@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.transit.raptor.rangeraptor.transit.frequency;
 
 import java.time.LocalDate;
 import org.opentripplanner.model.TripPattern;
@@ -9,7 +9,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
-public abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
+abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
         implements RaptorTripScheduleBoardOrAlightEvent<T>, TripSchedule {
 
     protected final RaptorTripPattern raptorTripPattern;
@@ -109,7 +109,11 @@ public abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
         return serviceDate;
     }
 
-    public int getHeadway() {
+    @Override
+    public boolean isFrequencyBasedTrip() { return true; }
+
+    @Override
+    public int frequencyHeadwayInSeconds() {
         return headway;
     }
 }

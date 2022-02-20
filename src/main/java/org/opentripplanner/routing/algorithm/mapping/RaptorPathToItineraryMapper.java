@@ -41,7 +41,6 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.FrequencyBoardOrAlightEvent;
 
 /**
  * This maps the paths found by the Raptor search algorithm to the itinerary structure currently used by OTP. The paths,
@@ -191,18 +190,18 @@ public class RaptorPathToItineraryMapper {
         leg.setIntermediateStops(
                 extractIntermediateStops(pathLeg, boardStopIndexInPattern, alightStopIndexInPattern));
 
-        if (tripSchedule instanceof FrequencyBoardOrAlightEvent) {
-            int headway = ((FrequencyBoardOrAlightEvent) tripSchedule).getHeadway();
-            leg.setNonExactFrequency(headway != 0);
-            leg.setHeadway(headway);
+        if (tripSchedule.isFrequencyBasedTrip()) {
+            int headwaySeconds = tripSchedule.frequencyHeadwayInSeconds();
+            leg.setNonExactFrequency(headwaySeconds != 0);
+            leg.setHeadway(headwaySeconds);
 
             // Fixup start time due to raptor handling of headways
             Calendar startTime = leg.getStartTime();
-            startTime.setTimeInMillis(startTime.getTimeInMillis() + headway * 1000L);
+            startTime.setTimeInMillis(startTime.getTimeInMillis() + headwaySeconds * 1000L);
 
             for (var intermediateStop : leg.getIntermediateStops()) {
                 Calendar departure = intermediateStop.departure;
-                departure.setTimeInMillis(departure.getTimeInMillis() + headway * 1000L);
+                departure.setTimeInMillis(departure.getTimeInMillis() + headwaySeconds * 1000L);
             }
         }
 
