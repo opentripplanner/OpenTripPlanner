@@ -150,6 +150,11 @@ class TransferMapper {
     TransferPoint fromPoint = mapTransferPoint(rhs.getFromStop(), rhs.getFromRoute(), fromTrip, false);
     TransferPoint toPoint = mapTransferPoint(rhs.getToStop(), rhs.getToRoute(), toTrip, true);
 
+    if (fromPoint == null || toPoint == null) {
+      LOG.warn("Transfer '{}' skipped - from_stop or to_stop not found on from_trip / to_trip", rhs.getId());
+      return null;
+    }
+
     return new ConstrainedTransfer(null, fromPoint, toPoint, constraint);
   }
 
