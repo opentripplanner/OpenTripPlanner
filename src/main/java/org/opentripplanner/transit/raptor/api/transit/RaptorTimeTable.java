@@ -28,13 +28,13 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
     int numberOfTripSchedules();
 
     /**
-     * Raptor provide a trips search for regular trip schedules, but in some cases it make
-     * seance to be able to override this - for example for frequency based trips.
+     * Raptor provides a trips search for regular trip schedules, but in some cases it makes
+     * sense to be able to override this - for example for frequency based trips.
      *
-     * @return {@code true} If you do not want to use the build in trip search and instead
-     *         provide your own. Make sure to implement the
+     * @return {@code true} If you do not want to use the built-in trip search and instead
+     *         will provide your own. Make sure to implement the
      *         {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
-     *         search.
+     *         searches.
      */
     boolean useCustomizedTripSearch();
 
