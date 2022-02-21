@@ -7,9 +7,9 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
-public final class TripFrequencyAlightSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
+public final class TripFrequencyAlightSearch<T extends RaptorTripSchedule> implements RaptorTripScheduleSearch<T> {
 
     private final TripPatternForDates timeTable;
 

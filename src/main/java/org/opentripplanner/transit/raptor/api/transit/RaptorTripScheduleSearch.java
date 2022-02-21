@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.transit.raptor.api.transit;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -23,7 +23,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface TripScheduleSearch<T extends RaptorTripSchedule> {
+public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
     /** Used in a trip search to indicate that all trips should be included in the search. */
     int UNBOUNDED_TRIP_INDEX = -1;
 

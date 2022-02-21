@@ -12,6 +12,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradadptor.transit.frequency.TripFrequencyAlightSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -163,7 +164,7 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+    public RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
         if (timeTable.isFrequencyBased()) {
             return new TripFrequencyAlightSearch<T>(timeTable);
         }
@@ -172,7 +173,7 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public TripScheduleSearch<T> createExactTripSearch(
+    public RaptorTripScheduleSearch<T> createExactTripSearch(
             RaptorTimeTable<T> timeTable
     ) {
         return new TripScheduleExactMatchSearch<>(

@@ -6,6 +6,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 
 /**
@@ -22,7 +23,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
-        implements TripScheduleSearch<T>, RaptorTripScheduleBoardOrAlightEvent<T>
+        implements RaptorTripScheduleSearch<T>, RaptorTripScheduleBoardOrAlightEvent<T>
 {
     private static final int NOT_SET = -1;
 
