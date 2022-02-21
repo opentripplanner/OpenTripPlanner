@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.opentripplanner.common.geometry.SphericalDistanceLibrary.distance;
-
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -27,7 +25,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     private final int traversalTime;
     private final double distance;
     private final int steps;
-    private final double angle;
+    private final double slope;
 
     private final boolean wheelchairAccessible;
     private final FeedScopedId id;
@@ -54,7 +52,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
             int traversalTime,
             double distance,
             int steps,
-            double angle,
+            double slope,
             boolean wheelchairAccessible
     ) {
         super(fromv, tov);
@@ -62,7 +60,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
         this.id = id;
         this.traversalTime = traversalTime;
         this.steps = steps;
-        this.angle = angle;
+        this.slope = slope;
         this.wheelchairAccessible = wheelchairAccessible;
         this.distance = distance;
     }
@@ -117,7 +115,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
             if (!this.wheelchairAccessible) {
                 return null;
             }
-            if (this.angle > s0.getOptions().maxWheelchairSlope) {
+            if (this.slope > s0.getOptions().maxWheelchairSlope) {
                 return null;
             }
         }

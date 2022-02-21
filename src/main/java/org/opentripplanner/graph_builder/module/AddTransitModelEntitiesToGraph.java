@@ -26,6 +26,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -170,19 +171,44 @@ public class AddTransitModelEntitiesToGraph {
 
     private void addBoardingAreasToGraph(Graph graph) {
         for (BoardingArea boardingArea : transitService.getAllBoardingAreas()) {
-            TransitBoardingAreaVertex boardingAreaVertex = new TransitBoardingAreaVertex(graph, boardingArea);
+            TransitBoardingAreaVertex boardingAreaVertex =
+                    new TransitBoardingAreaVertex(graph, boardingArea);
             stationElementNodes.put(boardingArea, boardingAreaVertex);
             if (boardingArea.getParentStop() != null) {
-                PathwayEdge.lowCost(
-                    boardingAreaVertex,
-                    stationElementNodes.get(boardingArea.getParentStop()),
-                    new NonLocalizedString(boardingArea.getName())
+
+                var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
+                double distance = distance(
+                        platformVertex.getCoordinate(),
+                        boardingAreaVertex.getCoordinate()
                 );
 
-                PathwayEdge.lowCost(
-                    stationElementNodes.get(boardingArea.getParentStop()),
-                    boardingAreaVertex,
-                    new NonLocalizedString(boardingArea.getName())
+                boolean wheelchair = boardingArea.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
+                var name = Optional.ofNullable(boardingArea.getName())
+                        .map(NonLocalizedString::new)
+                        .orElse(null);
+
+                new PathwayEdge(
+                        boardingAreaVertex,
+                        platformVertex,
+                        boardingArea.getId(),
+                        name,
+                        0,
+                        distance,
+                        0,
+                        0,
+                        wheelchair
+                );
+
+                new PathwayEdge(
+                        platformVertex,
+                        boardingAreaVertex,
+                        boardingArea.getId(),
+                        name,
+                        0,
+                        distance,
+                        0,
+                        0,
+                        wheelchair
                 );
             }
         }
