@@ -36,6 +36,8 @@ public class TripPatternForDates
 
     private final int numberOfTripSchedules;
 
+    private final boolean isFrequencyBased;
+
     TripPatternForDates(
             TripPatternWithRaptorStopIndexes tripPattern,
             List<TripPatternForDate> tripPatternForDates,
@@ -44,7 +46,16 @@ public class TripPatternForDates
         this.tripPattern = tripPattern;
         this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[]{});
         this.offsets = offsets.stream().mapToInt(i -> i).toArray();
-        this.numberOfTripSchedules = Arrays.stream(this.tripPatternForDates).mapToInt(TripPatternForDate::numberOfTripSchedules).sum();
+        int numberOfTripSchedules = 0;
+        boolean hasFrequencies = false;
+        for (TripPatternForDate tripPatternForDate : tripPatternForDates) {
+            numberOfTripSchedules += tripPatternForDate.numberOfTripSchedules();
+            if (tripPatternForDate.hasFrequencies()) {
+                hasFrequencies = true;
+            }
+        }
+        this.numberOfTripSchedules = numberOfTripSchedules;
+        this.isFrequencyBased = hasFrequencies;
     }
 
     public TripPatternWithRaptorStopIndexes getTripPattern() {
@@ -141,7 +152,7 @@ public class TripPatternForDates
 
     @Override
     public boolean useCustomizedTripSearch() {
-        return Arrays.stream(tripPatternForDates).anyMatch(TripPatternForDate::hasFrequencies);
+        return isFrequencyBased;
     }
 
     @Override
