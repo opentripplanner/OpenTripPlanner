@@ -19,7 +19,7 @@ class PathwayEdgeTest {
     Vertex to = new SimpleVertex(graph, "B", 10.001, 10.001);
 
     @Test
-    void zeroLengthPathway() {
+    void zeroLength() {
         var edge = new PathwayEdge(
                 from,
                 to,
@@ -36,7 +36,7 @@ class PathwayEdgeTest {
     }
 
     @Test
-    void zeroLengthPathwayWithSteps() {
+    void zeroLengthWithSteps() {
         var edge = new PathwayEdge(
                 from,
                 to,
@@ -65,6 +65,27 @@ class PathwayEdgeTest {
                 0,
                 true
         );
+
+        var state = assertThatEdgeIsTraversable(edge);
+        assertEquals(60, state.getElapsedTimeSeconds());
+        assertEquals(120, state.getWeight());
+    }
+
+    @Test
+    void traversalTimeOverridesLength() {
+        var edge = new PathwayEdge(
+                from,
+                to,
+                null,
+                new NonLocalizedString("pathway"),
+                60,
+                1000,
+                0,
+                0,
+                true
+        );
+
+        assertEquals(1000, edge.getDistanceMeters());
 
         var state = assertThatEdgeIsTraversable(edge);
         assertEquals(60, state.getElapsedTimeSeconds());
