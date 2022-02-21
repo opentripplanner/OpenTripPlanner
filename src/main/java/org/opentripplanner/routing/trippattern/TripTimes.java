@@ -10,7 +10,6 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
@@ -48,6 +47,17 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      * Field is private to force use of the getter method which does the necessary fallbacks.
      */
     private final String[] headsigns;
+
+    /**
+     * Contains a list of via names for each stop.
+     * This field provides info about intermediate stops between current stop and final trip destination.
+     * This is 2D array since there can be more than one via name/stop per each record in stop sequence).
+     * This is mapped from NeTEx DestinationDisplay.vias. No GTFS mapping at the moment.
+     * Outer array may be null if there are no vias in stop sequence. Inner array may be null if
+     * there are no vias for particular stop. This is done in order to save space.
+     * Field is private to force use of the getter method which does the necessary fallbacks.
+     */
+    private final String[][] headsignVias;
 
     /**
      * The time in seconds after midnight at which the vehicle should arrive at each stop according
@@ -126,6 +136,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
     private final BitSet timepoints;
 
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
     /**
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
      * The non-interpolated stoptimes should already be marked at timepoints by a previous filtering step.
@@ -156,6 +168,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
         this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(sequences);
         this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
+        this.headsignVias = deduplicator.deduplicateString2DArray(makeHeadsignViasArray(stopTimes));
+
         this.dropOffBookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, dropOffBookingInfos);
         this.pickupBookingInfos = deduplicator.deduplicateImmutableList(BookingInfo.class, pickupBookingInfos);
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
@@ -174,6 +188,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         this.trip = object.trip;
         this.serviceCode = object.serviceCode;
         this.headsigns = object.headsigns;
+        this.headsignVias = object.headsignVias;
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
         this.scheduledDepartureTimes = object.scheduledDepartureTimes;
         this.arrivalTimes = null;
@@ -226,6 +241,33 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         }
     }
 
+
+    /**
+     * Create 2D String array for via names for each stop in sequence.
+     * @return May be null if no vias are present in stop sequence.
+     */
+    private String[][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
+
+        if (stopTimes.stream().allMatch(st -> st.getHeadsignVias() == null || st.getHeadsignVias().isEmpty())) {
+            return null;
+        }
+
+        String[][] vias = new String[stopTimes.size()][];
+
+        int i = 0;
+        for (final StopTime st : stopTimes) {
+            if (st.getHeadsignVias() == null) {
+                vias[i] = EMPTY_STRING_ARRAY;
+                continue;
+            }
+
+            vias[i] = st.getHeadsignVias().toArray(EMPTY_STRING_ARRAY);
+            i++;
+        }
+
+        return vias;
+    }
+
     /**
      * Trips may also have null headsigns, in which case we should fall back on a Timetable or
      * Pattern-level headsign. Such a string will be available when we give TripPatterns or
@@ -238,6 +280,20 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         } else {
             return headsigns[stop];
         }
+    }
+
+    /**
+     * Return list of via names per particular stop.
+     * This field provides info about intermediate stops between current stop and final trip destination.
+     * Mapped from NeTEx DestinationDisplay.vias. No GTFS mapping at the moment.
+     *
+     * @return Empty list if there are no vias registered for a stop.
+     */
+    public List<String> getVia(final int stop) {
+        if (headsignVias == null || headsignVias[stop] == null) {
+            return List.of();
+        }
+        return List.of(headsignVias[stop]);
     }
 
     /** @return the time in seconds after midnight that the vehicle arrives at the stop. */

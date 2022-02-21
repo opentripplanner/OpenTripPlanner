@@ -24,6 +24,7 @@ public class Deduplicator implements Serializable {
     private final Map<IntArray, IntArray> canonicalIntArrays = Maps.newHashMap();
     private final Map<String, String> canonicalStrings = Maps.newHashMap();
     private final Map<StringArray, StringArray> canonicalStringArrays = Maps.newHashMap();
+    private final Map<String2DArray, String2DArray> canonicalString2DArrays = Maps.newHashMap();
     private final Map<Class<?>, Map<?, ?>> canonicalObjects = new HashMap<>();
     private final Map<Class<?>, Map<List<?>, List<?>>> canonicalLists = new HashMap<>();
 
@@ -35,6 +36,7 @@ public class Deduplicator implements Serializable {
         canonicalIntArrays.clear();
         canonicalStrings.clear();
         canonicalStringArrays.clear();
+        canonicalString2DArrays.clear();
         canonicalObjects.clear();
         canonicalLists.clear();
     }
@@ -82,6 +84,21 @@ public class Deduplicator implements Serializable {
             canonicalStringArrays.put(canonical, canonical);
         }
         incrementEffectCounter(StringArray.class);
+        return canonical.array;
+    }
+
+    /** Used to deduplicate list of via places for stop destinationDisplay. Stops may have the same via arrays.*/
+    @Nullable
+    public String[][] deduplicateString2DArray(String[][] original) {
+        if (original == null) {
+            return null;
+        }
+        String2DArray canonical = canonicalString2DArrays.get(new String2DArray(original, false));
+        if (canonical == null) {
+            canonical = new String2DArray(original, true);
+            canonicalString2DArrays.put(canonical, canonical);
+        }
+        incrementEffectCounter(String2DArray.class);
         return canonical.array;
     }
 
@@ -133,7 +150,8 @@ public class Deduplicator implements Serializable {
             .addObj("BitSet", sizeAndCount(canonicalBitSets.size(), BitSet.class))
             .addObj("IntArray", sizeAndCount(canonicalIntArrays.size(), IntArray.class))
             .addObj("String", sizeAndCount(canonicalStrings.size(), String.class))
-            .addObj("StringArray", sizeAndCount(canonicalStringArrays.size(), StringArray.class));
+            .addObj("StringArray", sizeAndCount(canonicalStringArrays.size(), StringArray.class))
+            .addObj("String2DArray", sizeAndCount(canonicalString2DArrays.size(), String2DArray.class));
 
         canonicalObjects.forEach((k,v) -> builder.addObj(k.getSimpleName(), sizeAndCount(v.size(), k)));
         canonicalLists.forEach((k,v) -> builder.addObj("List<"+ k.getSimpleName() + ">", sizeAndCount(v.size(), listKey(k))));
@@ -216,5 +234,36 @@ public class Deduplicator implements Serializable {
         }
         @Override
         public int hashCode() { return Arrays.hashCode(array); }
+    }
+
+    /** A wrapper for 2D string array */
+    private class String2DArray implements Serializable {
+        private static final long serialVersionUID = 20140524L;
+        final String[][] array;
+
+        private String2DArray(String[][] array, boolean deduplicate) {
+            if (deduplicate) {
+                this.array = new String[array.length][];
+                for (int i = 0; i < array.length; i++) {
+                    this.array[i] = deduplicateStringArray(array[i]);
+                }
+            } else {
+                this.array = array;
+            }
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof String2DArray)) {
+                return false;
+            }
+            String2DArray that = (String2DArray) other;
+            return Arrays.deepEquals(array, that.array);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.deepHashCode(array);
+        }
     }
 }
