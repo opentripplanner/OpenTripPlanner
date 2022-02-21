@@ -130,18 +130,21 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
                 // 1 step corresponds to 20cm, doubling that to compensate for elevation;
                 time = (int) (0.4 * Math.abs(steps) * s0.getOptions().walkSpeed);
             }
-            else {
-                // elevators often don't have a traversal time, distance or steps, so we need to add
-                // _some_ cost. the real cost is added in ElevatorHopEdge.
-                time = 1;
-            }
         }
 
-        double weight = time * s0.getOptions()
+        if (time > 0){
+            double weight = time * s0.getOptions()
                 .getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
 
-        s1.incrementTimeInSeconds(time);
-        s1.incrementWeight(weight);
+            s1.incrementTimeInSeconds(time);
+            s1.incrementWeight(weight);
+        } else {
+            // elevators often don't have a traversal time, distance or steps, so we need to add
+            // _some_ cost. the real cost is added in ElevatorHopEdge.
+            // adding a cost of 1 is analogous to FreeEdge
+            s1.incrementWeight(1);
+        }
+
         return s1.makeState();
     }
 }

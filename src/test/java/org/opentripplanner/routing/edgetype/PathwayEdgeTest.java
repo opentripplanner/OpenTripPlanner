@@ -20,6 +20,8 @@ class PathwayEdgeTest {
 
     @Test
     void zeroLength() {
+        // if elevators have a traversal time and distance of 0 we cannot interpolate the distance
+        // from the vertices as they most likely have identical coordinates
         var edge = new PathwayEdge(
                 from,
                 to,
@@ -119,7 +121,6 @@ class PathwayEdgeTest {
         var afterTraversal = edge.traverse(state);
         assertNotNull(afterTraversal);
 
-        assertTrue(afterTraversal.getElapsedTimeSeconds() > 0);
         assertTrue(afterTraversal.getWeight() > 0);
         return afterTraversal;
     }
