@@ -39,7 +39,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
                 null,
                 name,
                 0,
-                0, // distance is computed in the default constructor
+                0,
                 0,
                 0,
                 true
