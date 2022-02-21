@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit.frequency;
+package org.opentripplanner.routing.algorithm.raptoradadptor.transit.frequency;
 
 import java.time.LocalDate;
 import org.opentripplanner.model.TripPattern;
@@ -6,9 +6,9 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
-final class FrequencyAlightEvent<T extends RaptorTripSchedule> extends FrequencyBoardOrAlightEvent<T> {
+final class FrequencyBoardingEvent<T extends RaptorTripSchedule> extends FrequencyBoardOrAlightEvent<T> {
 
-    public FrequencyAlightEvent(
+    public FrequencyBoardingEvent(
             RaptorTripPattern raptorTripPattern,
             TripTimes tripTimes,
             TripPattern pattern,
@@ -17,6 +17,7 @@ final class FrequencyAlightEvent<T extends RaptorTripSchedule> extends Frequency
             int headway,
             int offset,
             LocalDate serviceDate
+
     ) {
         super(
                 raptorTripPattern,
@@ -30,15 +31,14 @@ final class FrequencyAlightEvent<T extends RaptorTripSchedule> extends Frequency
         );
     }
 
+    // Add headway here to report a late enough time to account for uncertainty
     @Override
     public int arrival(int stopPosInPattern) {
-        return tripTimes.getArrivalTime(stopPosInPattern) + offset;
+        return tripTimes.getArrivalTime(stopPosInPattern) + headway + offset;
     }
 
-    // Remove headway here to report an early enough departure time for the raptor search
     @Override
     public int departure(int stopPosInPattern) {
-        return tripTimes.getDepartureTime(stopPosInPattern) - headway + offset;
+        return tripTimes.getDepartureTime(stopPosInPattern) + offset;
     }
-
 }
