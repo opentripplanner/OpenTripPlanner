@@ -9,18 +9,18 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRapto
 
 public class TripPatternMapper {
 
+    private Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = new HashMap<>();
+
     /**
      * Convert all old TripPatterns into new ones, keeping a Map between the two. Do this conversion
      * up front (rather than lazily on demand) to ensure pattern IDs match the sequence of patterns
      * in source data.
      */
-    static Map<TripPattern, TripPatternWithRaptorStopIndexes> mapOldTripPatternToRaptorTripPattern(
+    Map<TripPattern, TripPatternWithRaptorStopIndexes> mapOldTripPatternToRaptorTripPattern(
             StopIndexForRaptor stopIndex, Collection<TripPattern> oldTripPatterns
     ) {
-        Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld;
-        newTripPatternForOld = new HashMap<>();
-
         for (TripPattern oldTripPattern : oldTripPatterns) {
+            if (newTripPatternForOld.containsKey(oldTripPattern)) {continue;}
             TripPatternWithRaptorStopIndexes newTripPattern = new TripPatternWithRaptorStopIndexes(
                     oldTripPattern,
                     stopIndex.listStopIndexesForStops(oldTripPattern.getStops())
