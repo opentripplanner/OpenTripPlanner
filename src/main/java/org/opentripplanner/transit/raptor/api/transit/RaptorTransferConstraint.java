@@ -13,6 +13,7 @@ public interface RaptorTransferConstraint {
     RaptorTransferConstraint REGULAR_TRANSFER = new RaptorTransferConstraint() {
         @Override public boolean isNotAllowed() { return false; }
         @Override public boolean isRegularTransfer() { return true; }
+        @Override public boolean isStaySeated() { return false; }
     };
 
 
@@ -28,4 +29,9 @@ public interface RaptorTransferConstraint {
      * Returns {@code true} if this is a regular transfer without any constrains.
      */
     boolean isRegularTransfer();
+
+    /**
+     * Also known as interlining of GTFS trips with the same block id.
+     */
+    boolean isStaySeated();
 }

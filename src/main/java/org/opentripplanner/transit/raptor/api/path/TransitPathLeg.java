@@ -95,6 +95,11 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
         return next;
     }
 
+    public boolean isStaySeatedOntoNextLeg() {
+        return constrainedTransferAfterLeg != null &&
+                constrainedTransferAfterLeg.getTransferConstraint().isStaySeated();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }

@@ -22,6 +22,7 @@ otp.config = {
         'en': otp.locale.English,
         'es': otp.locale.Spanish,
         'fr': otp.locale.French,
+        'hu': otp.locale.Hungarian,
         'it': otp.locale.Italian,
         'no': otp.locale.Norwegian,
         'pl': otp.locale.Polish,
@@ -204,8 +205,9 @@ otp.config = {
      */    
      
     timeFormat  : "h:mma",
-    dateFormat  : "MMM Do YYYY"
-
+    dateFormat  : "MMM Do YYYY",
+    apiTimeFormat : "h:mma",
+    apiDateFormat  : "MM-DD-YYYY"
 };
 var options = {
 	resGetPath: 'js/otp/locale/__lng__.json',

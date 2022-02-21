@@ -1,9 +1,10 @@
 package org.opentripplanner.ext.transmodelapi.model.network;
 
 import graphql.Scalars;
-import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
+import org.opentripplanner.model.TripTimeOnDate;
 
 public class DestinationDisplayType {
 
@@ -15,7 +16,13 @@ public class DestinationDisplayType {
                     .name("frontText")
                     .description("Name of destination to show on front of vehicle.")
                     .type(Scalars.GraphQLString)
-                    .dataFetcher(DataFetchingEnvironment::getSource)
+                    .dataFetcher(e -> ((TripTimeOnDate) e.getSource()).getHeadsign())
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("via")
+                    .description("Intermediary destinations which the vehicle will pass before reaching its final destination.")
+                    .type(new GraphQLList(Scalars.GraphQLString))
+                    .dataFetcher(e -> ((TripTimeOnDate) e.getSource()).getHeadsignVias())
                     .build())
             .build();
   }

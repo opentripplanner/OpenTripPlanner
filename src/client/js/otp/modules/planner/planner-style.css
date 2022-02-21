@@ -81,7 +81,7 @@
 
 .otp-itinsAccord-header-time {
     position:absolute;
-    width: 30px;
+    width: 38px;
     height: 12px;
     top: 4px;
     color: white;
@@ -100,7 +100,24 @@
     font-weight: bold;
     text-shadow: none;
     padding-top:3px;
-    text-align: left;
+    text-align: center;
+    overflow: hidden;
+}
+
+.otp-itinsAccord-header-segment .mode-icon {
+    width: 17px;
+    height: 17px;
+    display: inline-block;
+    margin-top: -1px;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+}
+
+.otp-itinsAccord-header-segment span {
+    vertical-align: top;
+    padding-left: 2px;
 }
 
 .otp-itinsAccord-header-groupSize {
