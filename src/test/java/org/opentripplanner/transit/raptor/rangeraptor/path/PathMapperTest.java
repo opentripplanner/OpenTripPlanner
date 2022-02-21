@@ -21,7 +21,7 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAnd
 import static org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase.flexCaseBWithOpeningHoursText;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.FlexAccessAndEgressPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;

@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit.frequency;
 
 import java.time.LocalDate;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;

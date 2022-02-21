@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit.frequency;
 
-import org.opentripplanner.routing.algorithm.raptor.transit.request.TripPatternForDates;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
