@@ -21,7 +21,7 @@ public enum OTPFeature {
     APIUpdaterStatus(true),
     MinimumTransferTimeIsDefinitive(false),
     OptimizeTransfers(true),
-    ParallelRouting(true),
+    ParallelRouting(false),
     TransferConstraints(true),
 
     // Sandbox extension features - Must be turned OFF by default

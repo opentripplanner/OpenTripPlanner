@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
@@ -60,10 +61,10 @@ public class StopTimesMapperTest {
 
         assertEquals(4, stopTimes.size());
 
-        assertStop(stopTimes.get(0),"NSR:Quay:1", 18000, "Bergen");
-        assertStop(stopTimes.get(1),"NSR:Quay:2", 18240, "Bergen");
-        assertStop(stopTimes.get(2),"NSR:Quay:3", 18600, "Stavanger");
-        assertStop(stopTimes.get(3),"NSR:Quay:4", 18900, "Stavanger");
+        assertStop(stopTimes.get(0),"NSR:Quay:1", 18000, "Bergen", List.of("Stavanger"));
+        assertStop(stopTimes.get(1),"NSR:Quay:2", 18240, "Bergen", null);
+        assertStop(stopTimes.get(2),"NSR:Quay:3", 18600, "Stavanger", List.of("Bergen"));
+        assertStop(stopTimes.get(3),"NSR:Quay:4", 18900, "Stavanger", null);
 
         Map<String, StopTime> map = result.stopTimeByNetexId;
 
@@ -73,9 +74,12 @@ public class StopTimesMapperTest {
         assertEquals(stopTimes.get(3), map.get("TTPT-4"));
     }
 
-    private void assertStop(StopTime stopTime, String stopId, long departureTime, String headsign) {
+    private void assertStop(StopTime stopTime, String stopId, long departureTime, String headsign, List<String> via) {
         assertEquals(stopId, stopTime.getStop().getId().getId());
         assertEquals(departureTime, stopTime.getDepartureTime());
         assertEquals(headsign, stopTime.getStopHeadsign());
+
+        List<String> stopTimeVia = stopTime.getHeadsignVias();
+        assertEquals(via, stopTimeVia);
     }
 }

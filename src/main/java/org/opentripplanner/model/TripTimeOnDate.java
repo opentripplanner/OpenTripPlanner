@@ -156,6 +156,10 @@ public class TripTimeOnDate {
         return tripTimes.getHeadsign(stopIndex);
     }
 
+    public List<String> getHeadsignVias() {
+        return tripTimes.getVia(stopIndex);
+    }
+
     public PickDrop getPickupType() {
         return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
             ? PickDrop.CANCELLED
