@@ -1,8 +1,11 @@
 package org.opentripplanner.graph_builder.module;
 
+import static org.opentripplanner.common.geometry.SphericalDistanceLibrary.distance;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -170,13 +173,13 @@ public class AddTransitModelEntitiesToGraph {
             TransitBoardingAreaVertex boardingAreaVertex = new TransitBoardingAreaVertex(graph, boardingArea);
             stationElementNodes.put(boardingArea, boardingAreaVertex);
             if (boardingArea.getParentStop() != null) {
-                PathwayEdge.withComputedDistance(
+                PathwayEdge.lowCost(
                     boardingAreaVertex,
                     stationElementNodes.get(boardingArea.getParentStop()),
                     new NonLocalizedString(boardingArea.getName())
                 );
 
-                PathwayEdge.withComputedDistance(
+                PathwayEdge.lowCost(
                     stationElementNodes.get(boardingArea.getParentStop()),
                     boardingAreaVertex,
                     new NonLocalizedString(boardingArea.getName())
@@ -196,13 +199,21 @@ public class AddTransitModelEntitiesToGraph {
                     createElevatorEdgesAndAddThemToGraph(graph, pathway, fromVertex, toVertex);
                 }
                 else {
+
+                    // the GTFS spec allows you to define a pathway which has neither traversal time, distance
+                    // nor steps. This would lead to traversal costs of 0, so we compute the distance from the
+                    // vertices as fallback.
+                    double distance = Optional.of(pathway.getLength())
+                            .filter(l -> l <= 0)
+                            .orElseGet(() -> distance(fromVertex.getCoordinate(), toVertex.getCoordinate()));
+
                     new PathwayEdge(
                         fromVertex,
                         toVertex,
                         pathway.getId(),
-                        pathway.getName() != null ? new NonLocalizedString(pathway.getName()) : null,
+                        Optional.ofNullable(pathway.getName()).map(NonLocalizedString::new).orElse(null),
                         pathway.getTraversalTime(),
-                        pathway.getLength(),
+                        distance,
                         pathway.getStairCount(),
                         pathway.getSlope(),
                         pathway.isPathwayModeWheelchairAccessible()
@@ -212,9 +223,9 @@ public class AddTransitModelEntitiesToGraph {
                             toVertex,
                             fromVertex,
                             pathway.getId(),
-                            pathway.getReversedName() != null ? new NonLocalizedString(pathway.getReversedName()) : null,
+                            Optional.ofNullable(pathway.getReversedName()).map(NonLocalizedString::new).orElse(null),
                             pathway.getTraversalTime(),
-                            pathway.getLength(),
+                            distance,
                             -1 * pathway.getStairCount(),
                             -1 * pathway.getSlope(),
                             pathway.isPathwayModeWheelchairAccessible()
@@ -277,8 +288,8 @@ public class AddTransitModelEntitiesToGraph {
             toVertexLevelName
         );
 
-        PathwayEdge.withComputedDistance(fromVertex, fromOffboardVertex, fromVertex.getName());
-        PathwayEdge.withComputedDistance(toOffboardVertex, toVertex, toVertex.getName());
+        PathwayEdge.lowCost(fromVertex, fromOffboardVertex, fromVertex.getName());
+        PathwayEdge.lowCost(toOffboardVertex, toVertex, toVertex.getName());
 
         ElevatorOnboardVertex fromOnboardVertex = new ElevatorOnboardVertex(
             graph,
@@ -308,8 +319,8 @@ public class AddTransitModelEntitiesToGraph {
         );
 
         if (pathway.isBidirectional()) {
-            PathwayEdge.withComputedDistance(fromOffboardVertex, fromVertex, fromVertex.getName());
-            PathwayEdge.withComputedDistance(toVertex, toOffboardVertex, toVertex.getName());
+            PathwayEdge.lowCost(fromOffboardVertex, fromVertex, fromVertex.getName());
+            PathwayEdge.lowCost(toVertex, toOffboardVertex, toVertex.getName());
             new ElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
             new ElevatorAlightEdge(
                 fromOnboardVertex,

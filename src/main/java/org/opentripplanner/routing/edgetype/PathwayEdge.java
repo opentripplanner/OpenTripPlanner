@@ -32,7 +32,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     private final boolean wheelchairAccessible;
     private final FeedScopedId id;
 
-    public static PathwayEdge withComputedDistance(Vertex fromV, Vertex toV, I18NString name) {
+    public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name) {
         return new PathwayEdge(
                 fromV,
                 toV,
@@ -64,15 +64,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
         this.steps = steps;
         this.angle = angle;
         this.wheelchairAccessible = wheelchairAccessible;
-
-        // the GTFS spec allows you to define a pathway which has neither traversal time, distance
-        // nor steps. if that happens we compute it from the coordinates of the vertices
-        if (traversalTime <= 0 && distance <= 0 && steps <= 0) {
-            this.distance = distance(fromv.getCoordinate(), tov.getCoordinate());
-        }
-        else {
-            this.distance = distance;
-        }
+        this.distance = distance;
     }
 
     public String getDirection() {
@@ -137,6 +129,11 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
             else if (steps > 0) {
                 // 1 step corresponds to 20cm, doubling that to compensate for elevation;
                 time = (int) (0.4 * Math.abs(steps) * s0.getOptions().walkSpeed);
+            }
+            else {
+                // elevators often don't have a traversal time, distance or steps, so we need to add
+                // _some_ cost. the real cost is added in ElevatorHopEdge.
+                time = 1;
             }
         }
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -18,12 +19,7 @@ class PathwayEdgeTest {
     Vertex to = new SimpleVertex(graph, "B", 10.001, 10.001);
 
     @Test
-    void testZeroLengthPathway() {
-
-        // GTFS pathways don't need to define traversal_time, distance or steps
-        // in such a case we compute the traversal time from the distance of the vertices rather
-        // than rendering them unpassable
-
+    void zeroLengthPathway() {
         var edge = new PathwayEdge(
                 from,
                 to,
@@ -40,12 +36,7 @@ class PathwayEdgeTest {
     }
 
     @Test
-    void testZeroLengthPathwayWithSteps() {
-
-        // GTFS pathways don't need to define traversal_time, distance or steps
-        // in such a case we compute the traversal time from the distance of the vertices rather
-        // than rendering them unpassable
-
+    void zeroLengthPathwayWithSteps() {
         var edge = new PathwayEdge(
                 from,
                 to,
@@ -61,16 +52,55 @@ class PathwayEdgeTest {
         assertThatEdgeIsTraversable(edge);
     }
 
-    private void assertThatEdgeIsTraversable(PathwayEdge edge) {
+    @Test
+    void traversalTime() {
+        var edge = new PathwayEdge(
+                from,
+                to,
+                null,
+                new NonLocalizedString("pathway"),
+                60,
+                0,
+                0,
+                0,
+                true
+        );
+
+        var state = assertThatEdgeIsTraversable(edge);
+        assertEquals(60, state.getElapsedTimeSeconds());
+        assertEquals(120, state.getWeight());
+    }
+
+    @Test
+    void distance() {
+        var edge = new PathwayEdge(
+                from,
+                to,
+                null,
+                new NonLocalizedString("pathway"),
+                0,
+                100,
+                0,
+                0,
+                true
+        );
+
+        var state = assertThatEdgeIsTraversable(edge);
+        assertEquals(133, state.getElapsedTimeSeconds());
+        assertEquals(266, state.getWeight());
+    }
+
+    private State assertThatEdgeIsTraversable(PathwayEdge edge) {
         var req = new RoutingRequest();
         req.setRoutingContext(graph, from, to);
         var state = new State(req);
 
-        var ret = edge.traverse(state);
-        assertNotNull(ret);
+        var afterTraversal = edge.traverse(state);
+        assertNotNull(afterTraversal);
 
-        assertTrue(ret.getElapsedTimeSeconds() > 0);
-        assertTrue(ret.getWeight() > 0);
+        assertTrue(afterTraversal.getElapsedTimeSeconds() > 0);
+        assertTrue(afterTraversal.getWeight() > 0);
+        return afterTraversal;
     }
 
 }
