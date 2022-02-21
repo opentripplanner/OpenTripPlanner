@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
+import java.util.function.IntUnaryOperator;
+
 /**
  * A TimeTable is a list of trips in service for the given search date and a limited time
  * before and after. This can be a subset of all trips available to speed up the trip search
@@ -19,6 +21,20 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
      * @param index the trip schedule index in pattern starting at 0.
      */
     T getTripSchedule(int index);
+
+    /**
+     * Get the arrival times of all trips at a specific stop index, sorted by time. The returned
+     * value takes the index the trip schedule index in pattern starting at 0 as input and returns
+     * the arrival time.
+     */
+    IntUnaryOperator getArrivalTimes(int stopPositionInPattern);
+
+    /**
+     * Get the departure times of all trips at a specific stop index, sorted by time. The returned
+     * value takes the index the trip schedule index in pattern starting at 0 as input and returns
+     * the departure time.
+     */
+    IntUnaryOperator getDepartureTimes(int stopPositionInPattern);
 
     /**
      * Number of trips in time-table.
