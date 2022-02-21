@@ -6,11 +6,15 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 
 /**
@@ -131,8 +135,17 @@ public class TripPatternForDates
     }
 
     @Override
-    public boolean isFrequencyBased() {
+    public boolean useCustomizedTripSearch() {
         return Arrays.stream(tripPatternForDates).anyMatch(TripPatternForDate::hasFrequencies);
+    }
+
+    @Override
+    public RaptorTripScheduleSearch<TripSchedule> createCustomizedTripSearch(
+            SearchDirection direction
+    ) {
+        return direction.isForward()
+                ? new TripFrequencyBoardSearch<>(this)
+                : new TripFrequencyAlightSearch<>(this);
     }
 
     @Override

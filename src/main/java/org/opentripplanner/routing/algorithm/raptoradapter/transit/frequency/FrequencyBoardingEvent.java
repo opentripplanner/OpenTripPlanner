@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradadptor.transit.frequency;
+package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import java.time.LocalDate;
 import org.opentripplanner.model.TripPattern;

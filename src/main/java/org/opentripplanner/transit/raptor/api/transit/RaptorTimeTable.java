@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
+
 /**
  * A TimeTable is a list of trips in service for the given search date and a limited time
  * before and after. This can be a subset of all trips available to speed up the trip search
@@ -25,7 +27,20 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
      */
     int numberOfTripSchedules();
 
-    default boolean isFrequencyBased() {
-        return false;
-    };
+    /**
+     * Raptor provide a trips search for regular trip schedules, but in some cases it make
+     * seance to be able to override this - for example for frequency based trips.
+     *
+     * @return {@code true} If you do not want to use the build in trip search and instead
+     *         provide your own. Make sure to implement the
+     *         {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
+     *         search.
+     */
+    boolean useCustomizedTripSearch();
+
+    /**
+     * Factory method to provide an alternative trip search in Raptor.
+     * @see #useCustomizedTripSearch()
+     */
+    RaptorTripScheduleSearch<T> createCustomizedTripSearch(SearchDirection direction);
 }

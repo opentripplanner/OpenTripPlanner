@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptoradadptor.transit.frequency;
+package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
