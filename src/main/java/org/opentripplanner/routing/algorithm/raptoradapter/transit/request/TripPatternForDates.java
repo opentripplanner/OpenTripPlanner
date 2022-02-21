@@ -64,6 +64,11 @@ public class TripPatternForDates
         return tripPatternForDates[index];
     }
 
+    /**
+     * @deprecated This is exposed because it is needed in the TripFrequencyNnnSearch classes,
+     *             but is realy an implementation detail that should not leak outside the class.
+     */
+    @Deprecated
     public int tripPatternForDateOffsets(int index) {
         return offsets[index];
     }
