@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -23,8 +23,11 @@ import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
+import org.opentripplanner.graph_builder.module.ned.ElevationModule;
+import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -46,19 +49,21 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.util.NonLocalizedString;
 
-import javax.annotation.Nullable;
-
 public class ConstantsForTests {
 
     public static final String CALTRAIN_GTFS = "src/test/resources/gtfs/caltrain_gtfs.zip";
 
     public static final String NETEX_MINIMAL = "src/test/resources/netex/netex_minimal.zip";
 
-    private static final String PORTLAND_GTFS = "src/test/resources/gtfs/portland.gtfs.zip";
+    private static final String PORTLAND_GTFS = "src/test/resources/portland/portland.gtfs.zip";
 
-    private static final String PORTLAND_CENTRAL_OSM = "src/test/resources/portland-central-filtered.osm.pbf";
+    private static final String PORTLAND_CENTRAL_OSM = "src/test/resources/portland/portland-central-filtered.osm.pbf";
 
-    private static final String PORTLAND_BIKE_SHARE_CSV = "src/test/resources/portland-vehicle-rental.csv";
+    private static final String PORTLAND_BIKE_SHARE_CSV = "src/test/resources/portland/portland-vehicle-rental.csv";
+
+    private static final String PORTLAND_NED = "src/test/resources/portland/portland-ned.tif";
+
+    private static final String PORTLAND_NED_WITH_NODATA = "src/test/resources/portland/portland-ned-nodata.tif";
 
     private static final String OSLO_EAST_OSM = "src/test/resources/oslo-east-filtered.osm.pbf";
 
@@ -93,6 +98,8 @@ public class ConstantsForTests {
 
     private Graph portlandGraph = null;
 
+    private Graph portlandGraphWithElevation = null;
+
     private final Graph minNetexGraph = null;
 
     private ConstantsForTests() {
@@ -118,22 +125,37 @@ public class ConstantsForTests {
      */
     public synchronized Graph getCachedPortlandGraph() {
         if (portlandGraph == null) {
-            portlandGraph = buildNewPortlandGraph();
+            portlandGraph = buildNewPortlandGraph(false);
         }
         return portlandGraph;
     }
 
     /**
-     * Builds a new graph using the Portland test data.
+     * Returns a cached copy of the Portland graph, which may have been initialized.
      */
-    public static Graph buildNewPortlandGraph() {
+    public synchronized Graph getCachedPortlandGraphWithElevation() {
+        if (portlandGraphWithElevation == null) {
+            portlandGraphWithElevation = buildNewPortlandGraph(true);
+        }
+        return portlandGraphWithElevation;
+    }
+
+    /**
+     * Builds a new graph using the Portland test data.
+     * @param withElevation
+     */
+    public static Graph buildNewPortlandGraph(boolean withElevation) {
         try {
             Graph graph = new Graph();
             // Add street data from OSM
             {
+                var edgeFactory = new DefaultStreetEdgeFactory();
+                edgeFactory.useElevationData = withElevation;
+
                 File osmFile = new File(PORTLAND_CENTRAL_OSM);
                 BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
                 OpenStreetMapModule osmModule = new OpenStreetMapModule(List.of(osmProvider));
+                osmModule.edgeFactory = edgeFactory;
                 osmModule.staticBikeParkAndRide = true;
                 osmModule.staticParkAndRide = true;
                 osmModule.skipVisibility = true;
@@ -147,6 +169,13 @@ public class ConstantsForTests {
             {
                 GraphBuilderModule streetTransitLinker = new StreetLinkerModule();
                 streetTransitLinker.buildGraph(graph, new HashMap<>());
+            }
+            // Add elevation data
+            if (withElevation) {
+                var elevationModule = new ElevationModule(new GeotiffGridCoverageFactoryImpl(
+                        new File(PORTLAND_NED_WITH_NODATA)
+                ));
+                elevationModule.buildGraph(graph, new HashMap<>());
             }
 
             graph.hasStreets = true;
@@ -294,7 +323,7 @@ public class ConstantsForTests {
                 );
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
