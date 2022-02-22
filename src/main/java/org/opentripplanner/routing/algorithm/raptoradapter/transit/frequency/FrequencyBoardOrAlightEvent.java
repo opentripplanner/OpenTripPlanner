@@ -8,7 +8,14 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
+/**
+ * Represents a result of a {@link RaptorTripScheduleSearch}, with materialized {@link TripTimes}.
+ * The concrete class will contain information on how to present the times to the user, as they
+ * contain both the headway and travel time as the duration for RAPTOR, on order to prevent too
+ * quick re-boarding after alighting.
+ */
 abstract class FrequencyBoardOrAlightEvent<T extends RaptorTripSchedule>
         implements RaptorTripScheduleBoardOrAlightEvent<T>, TripSchedule {
 

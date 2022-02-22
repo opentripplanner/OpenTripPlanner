@@ -6,6 +6,9 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
+/**
+ * Represents a result of a {@link TripFrequencyBoardSearch}, with materialized {@link TripTimes}
+ */
 final class FrequencyBoardingEvent<T extends RaptorTripSchedule> extends FrequencyBoardOrAlightEvent<T> {
 
     public FrequencyBoardingEvent(

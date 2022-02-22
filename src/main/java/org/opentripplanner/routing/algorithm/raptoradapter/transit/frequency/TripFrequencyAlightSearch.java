@@ -9,6 +9,10 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
+/**
+ * Searches for a concrete trip time for a frequency based pattern. The {@link FrequencyEntry}s are
+ * scanned to find the earliest possible departure time.
+ */
 public final class TripFrequencyAlightSearch<T extends RaptorTripSchedule> implements RaptorTripScheduleSearch<T> {
 
     private final TripPatternForDates timeTable;
