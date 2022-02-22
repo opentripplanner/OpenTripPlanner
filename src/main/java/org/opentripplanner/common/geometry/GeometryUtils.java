@@ -50,6 +50,11 @@ public class GeometryUtils {
         return factory.createLineString(coordinates);
     }
 
+    public static LineString makeLineString(List<Coordinate> coordinates) {
+        GeometryFactory factory = getGeometryFactory();
+        return factory.createLineString(coordinates.toArray(new Coordinate[]{}));
+    }
+
     public static LineString makeLineString(Coordinate[] coordinates) {
         GeometryFactory factory = getGeometryFactory();
         return factory.createLineString(coordinates);

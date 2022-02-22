@@ -88,6 +88,11 @@ public class ApiWalkStep {
      */
     public String elevation;
 
+    /**
+     * Is this step walking with a bike?
+     */
+    public Boolean walkingBike;
+
     public List<ApiAlert> alerts;
 
     public String toString() {

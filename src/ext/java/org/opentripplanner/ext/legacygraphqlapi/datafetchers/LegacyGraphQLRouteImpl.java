@@ -119,10 +119,10 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case Route:
+            case ROUTE:
               alerts.addAll(alertService.getRouteAlerts(getSource(environment).getId()));
               break;
-            case RouteType:
+            case ROUTE_TYPE:
               alerts.addAll(alertService.getRouteTypeAlerts(
                       getSource(environment).getGtfsType(),
                       getSource(environment).getId()
@@ -133,15 +133,15 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                       getSource(environment).getAgency().getId()
               ));
               break;
-            case Agency:
+            case AGENCY:
               alerts.addAll(
                       alertService.getAgencyAlerts(getSource(environment).getAgency().getId()));
               break;
-            case Trips:
+            case TRIPS:
               getTrips(environment).forEach(
                       trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
               break;
-            case StopsOnRoute:
+            case STOPS_ON_ROUTE:
               alerts.addAll(alertService.getAllAlerts().stream()
                       .filter(alert -> alert.getEntities()
                               .stream()
@@ -153,7 +153,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                 alerts.addAll(alertService.getStopAlerts(((StopLocation) stop).getId()));
               });
               break;
-            case StopsOnTrips:
+            case STOPS_ON_TRIPS:
               Iterable<Trip> trips = getTrips(environment);
               trips.forEach(trip -> {
                 alerts.addAll(alertService.getAllAlerts().stream()
@@ -165,7 +165,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                         .collect(Collectors.toList()));
               });
               break;
-            case Patterns:
+            case PATTERNS:
               alerts.addAll(
                       alertService.getDirectionAndRouteAlerts(0, getSource(environment).getId()));
               alerts.addAll(

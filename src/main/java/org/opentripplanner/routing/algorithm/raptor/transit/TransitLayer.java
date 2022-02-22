@@ -12,6 +12,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.TransferIndexGenerator;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TripPatternMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
@@ -43,6 +45,10 @@ public class TransitLayer {
 
   private final RaptorRequestTransferCache transferCache;
 
+  private final TripPatternMapper tripPatternMapper;
+
+  private final TransferIndexGenerator transferIndexGenerator;
+
   /**
    * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
    * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace
@@ -55,7 +61,9 @@ public class TransitLayer {
         transitLayer.transferService,
         transitLayer.stopIndex,
         transitLayer.transitDataZoneId,
-        transitLayer.transferCache
+        transitLayer.transferCache,
+        transitLayer.tripPatternMapper,
+        transitLayer.transferIndexGenerator
     );
   }
 
@@ -65,7 +73,9 @@ public class TransitLayer {
       TransferService transferService,
       StopIndexForRaptor stopIndex,
       ZoneId transitDataZoneId,
-      RaptorRequestTransferCache transferCache
+      RaptorRequestTransferCache transferCache,
+      TripPatternMapper tripPatternMapper,
+      TransferIndexGenerator transferIndexGenerator
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
@@ -73,6 +83,8 @@ public class TransitLayer {
     this.stopIndex = stopIndex;
     this.transitDataZoneId = transitDataZoneId;
     this.transferCache = transferCache;
+    this.tripPatternMapper = tripPatternMapper;
+    this.transferIndexGenerator = transferIndexGenerator;
   }
 
   public int getIndexByStop(Stop stop) {
@@ -133,6 +145,15 @@ public class TransitLayer {
   public RaptorRequestTransferCache getTransferCache() {
     return transferCache;
   }
+
+  public TripPatternMapper getTripPatternMapper() {
+    return tripPatternMapper;
+  }
+
+  public TransferIndexGenerator getTransferIndexGenerator() {
+    return transferIndexGenerator;
+  }
+
 
   /**
    * Replaces all the TripPatternForDates for a single date. This is an atomic operation according

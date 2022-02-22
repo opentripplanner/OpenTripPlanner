@@ -135,6 +135,14 @@
 - Expose maxStopToShapeSnapDistance as build-config.json parameter [#3874](https://github.com/opentripplanner/OpenTripPlanner/pull/3874)
 - Implement in-seat transfers per GTFS draft [#3831](https://github.com/opentripplanner/OpenTripPlanner/pull/3831)
 - Add stairsTimeFactor to StreetEdge [#3832](https://github.com/opentripplanner/OpenTripPlanner/pull/3832)
+- Make sure we keep the itinerary with the least number of transfers when grouping the itineraries [#3833](https://github.com/opentripplanner/OpenTripPlanner/pull/3833)
+- Don't expect every pattern in a route to have the specified stop with constrained transfers [#3868](https://github.com/opentripplanner/OpenTripPlanner/pull/3868)
+- Add support for creating constrained transfers from real-time generated patterns [#3878](https://github.com/opentripplanner/OpenTripPlanner/pull/3878)
+- Account for stay seated transfers when calculating the number of transfers [#3888](https://github.com/opentripplanner/OpenTripPlanner/pull/3888)
+- Add Hungarian translation [#3861](https://github.com/opentripplanner/OpenTripPlanner/pull/3861)
+- Add support for NeTEx VIA's [#3883](https://github.com/opentripplanner/OpenTripPlanner/pull/3883)
+- Turn ParallelRouting off [#3918](https://github.com/opentripplanner/OpenTripPlanner/pull/3918)
+- Make some list entries non-null in schema/docs [#3915](https://github.com/opentripplanner/OpenTripPlanner/pull/3915)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

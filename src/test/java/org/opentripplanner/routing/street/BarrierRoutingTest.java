@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -27,6 +28,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.PolylineEncoder;
 
 
 public class BarrierRoutingTest {
@@ -150,6 +152,7 @@ public class BarrierRoutingTest {
 
         assertAll(assertions.apply(itineraries));
 
-        return itineraries.get(0).legs.get(0).getLegGeometry().getPoints();
+        Geometry legGeometry = itineraries.get(0).legs.get(0).getLegGeometry();
+        return PolylineEncoder.createEncodings(legGeometry).getPoints();
     }
 }

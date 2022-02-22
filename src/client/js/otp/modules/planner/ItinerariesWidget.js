@@ -91,7 +91,7 @@ otp.widgets.ItinerariesWidget =
             // create an alert if we moved to another day
             var alerts = null;
             if(newItin.differentServiceDayFrom(oldItin)) {
-                alerts = [ "This itinerary departs on a different day from the previous one"];
+                alerts = [ _tr("This itinerary departs on a different day from the previous one") ];
             }
 
             // refresh all itinerary headers
@@ -169,10 +169,10 @@ otp.widgets.ItinerariesWidget =
         this.renderHeaders();
         this_.itinsAccord.accordion("resize");
 
-        this.$().resize(function(){
+        this.$().resize(_.throttle(function(){
             this_.itinsAccord.accordion("resize");
             this_.renderHeaders();
-        });
+        }, 100, {leading: false}));
 
         this.$().draggable({ cancel: "#"+divId });
 
@@ -250,7 +250,7 @@ otp.widgets.ItinerariesWidget =
         var maxSpan = itin.tripPlan.latestEndTime - itin.tripPlan.earliestStartTime;
         var startPct = (itin.itinData.startTime - itin.tripPlan.earliestStartTime) / maxSpan;
         var itinSpan = itin.getEndTime() - itin.getStartTime();
-        var timeWidth = 32;
+        var timeWidth = 40;
         var startPx = 20+timeWidth, endPx = div.width()-timeWidth - (itin.groupSize ? 48 : 0);
         var pxSpan = endPx-startPx;
         var leftPx = startPx + startPct * pxSpan;
@@ -260,7 +260,7 @@ otp.widgets.ItinerariesWidget =
 
         var timeStr = otp.util.Time.formatItinTime(itin.getStartTime(), otp.config.locale.time.time_format);
 	/*timeStr = timeStr.substring(0, timeStr.length - 1);*/
-        div.append('<div class="otp-itinsAccord-header-time" style="left: '+(leftPx-32)+'px;">' + timeStr + '</div>');
+        div.append('<div class="otp-itinsAccord-header-time" style="left: '+(leftPx-timeWidth)+'px;">' + timeStr + '</div>');
 
         var timeStr = otp.util.Time.formatItinTime(itin.getEndTime(), otp.config.locale.time.time_format);
 	/*timeStr = timeStr.substring(0, timeStr.length - 1);*/
@@ -274,7 +274,8 @@ otp.widgets.ItinerariesWidget =
             var widthPx = pxSpan * (leg.endTime - leg.startTime) / maxSpan - 1;
 
             //div.append('<div class="otp-itinsAccord-header-segment" style="width: '+widthPx+'px; left: '+leftPx+'px; background: '+this.getModeColor(leg.mode)+' url(images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat;"></div>');
-
+            var legTextColor = otp.util.Itin.getLegTextColor(leg);
+            var legBackgroundColor = otp.util.Itin.getLegBackgroundColor(leg);
             var routeTitle = _.chain([leg.mode, leg.agencyName, leg.routeShortName, leg.routeLongName])
                     .filter(function (value) { return !!value; })
                     .reduce(function (l, r) { return l ? l + " " + r : r; }, "")
@@ -284,11 +285,12 @@ otp.widgets.ItinerariesWidget =
             .css({
                 width: widthPx,
                 left: leftPx,
-                //background: this.getModeColor(leg.mode)
-                background: this.getModeColor(leg.mode)+' url('+otp.config.resourcePath+'images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat'
+                color: legTextColor,
+                background: legBackgroundColor,
             })
             .appendTo(div);
-            if(showRouteLabel) segment.append('<div style="margin-left:'+(widthPx/2+9)+'px;">'+leg.routeShortName+'</div>');
+            segment.append('<div class="mode-icon" style="background: ' + legTextColor + '; mask-image: url(' + otp.util.Itin.getModeIcon(leg.mode) + '); -webkit-mask-image: url(' + otp.util.Itin.getModeIcon(leg.mode) + ')"></div>');
+            if(showRouteLabel) segment.append('<span>'+leg.routeShortName+'</span>');
 
         }
 
@@ -298,20 +300,6 @@ otp.widgets.ItinerariesWidget =
         }
 
     },
-
-    getModeColor : function(mode) {
-        if(mode === "WALK") return '#bbb';
-        if(mode === "BICYCLE") return '#44f';
-        if(mode === "SCOOTER") return '#88f';
-        if(mode === "SUBWAY") return '#f00';
-        if(mode === "RAIL") return '#b00';
-        if(mode === "BUS") return '#0f0';
-        if(mode === "TRAM") return '#f00';
-        if(mode === "CAR") return '#444';
-        if(mode === "AIRPLANE") return '#f0f';
-        return '#aaa';
-    },
-
 
     municoderResultId : 0,
 
@@ -419,7 +407,7 @@ otp.widgets.ItinerariesWidget =
         var queryTime = otp.util.Time.constructQueryTime(itin.tripPlan.queryParams);
         if(itin.differentServiceDayFromQuery(itin.tripPlan.queryParams.originalQueryTime || queryTime)) {
             //TRANSLATORS: Shown as alert text before showing itinerary.
-            alerts = [ "This itinerary departs on a different day than the one searched for"];
+            alerts = [ _tr("This itinerary departs on a different day than the one searched for") ];
         }
 
         for(var i = 0; i < alerts.length; i++) {

@@ -368,51 +368,51 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       );
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
-        if (types.contains(LegacyGraphQLStopAlertType.Stop)) {
+        if (types.contains(LegacyGraphQLStopAlertType.STOP)) {
           alerts.addAll(alertService.getStopAlerts(id));
         }
-        if (types.contains(LegacyGraphQLStopAlertType.StopOnRoutes) || types.contains(
-                LegacyGraphQLStopAlertType.StopOnTrips)) {
+        if (types.contains(LegacyGraphQLStopAlertType.STOP_ON_ROUTES) || types.contains(
+                LegacyGraphQLStopAlertType.STOP_ON_TRIPS)) {
           alerts.addAll(alertService.getAllAlerts()
                   .stream()
                   .filter(alert -> alert.getEntities()
                           .stream()
                           .anyMatch(entity -> (
-                                  types.contains(LegacyGraphQLStopAlertType.StopOnRoutes) &&
+                                  types.contains(LegacyGraphQLStopAlertType.STOP_ON_ROUTES) &&
                                           entity instanceof EntitySelector.StopAndRoute
                                           && ((StopAndRoute) entity).stopAndRoute.stop.equals(id)
                           ) || (
                                   types.contains(
-                                          LegacyGraphQLStopAlertType.StopOnTrips) &&
+                                          LegacyGraphQLStopAlertType.STOP_ON_TRIPS) &&
                                           entity instanceof EntitySelector.StopAndTrip
                                           && ((EntitySelector.StopAndTrip) entity).stopAndTrip.stop.equals(
                                           id)
                           )))
                   .collect(Collectors.toList()));
         }
-        if (types.contains(LegacyGraphQLStopAlertType.Patterns) || types.contains(
-                LegacyGraphQLStopAlertType.Trips)) {
+        if (types.contains(LegacyGraphQLStopAlertType.PATTERNS) || types.contains(
+                LegacyGraphQLStopAlertType.TRIPS)) {
           getPatterns(environment).forEach(pattern -> {
-            if (types.contains(LegacyGraphQLStopAlertType.Patterns)) {
+            if (types.contains(LegacyGraphQLStopAlertType.PATTERNS)) {
               alerts.addAll(alertService.getDirectionAndRouteAlerts(
                       pattern.getDirection().gtfsCode,
                       pattern.getRoute().getId()
               ));
             }
-            if (types.contains(LegacyGraphQLStopAlertType.Trips)) {
+            if (types.contains(LegacyGraphQLStopAlertType.TRIPS)) {
               pattern.getTrips().forEach(trip -> {
                 alerts.addAll(alertService.getTripAlerts(trip.getId(), null));
               });
             }
           });
         }
-        if (types.contains(LegacyGraphQLStopAlertType.Routes) || types.contains(
-                LegacyGraphQLStopAlertType.AgenciesOfRoutes)) {
+        if (types.contains(LegacyGraphQLStopAlertType.ROUTES) || types.contains(
+                LegacyGraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
           getRoutes(environment).forEach(route -> {
-            if (types.contains(LegacyGraphQLStopAlertType.Routes)) {
+            if (types.contains(LegacyGraphQLStopAlertType.ROUTES)) {
               alerts.addAll(alertService.getRouteAlerts(route.getId()));
             }
-            if (types.contains(LegacyGraphQLStopAlertType.AgenciesOfRoutes)) {
+            if (types.contains(LegacyGraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
               alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
             }
           });

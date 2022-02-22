@@ -5,11 +5,13 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.plan.Leg;
@@ -56,7 +58,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<EncodedPolylineBean> legGeometry() {
+  public DataFetcher<Geometry> legGeometry() {
     return environment -> getSource(environment).getLegGeometry();
   }
 
@@ -170,26 +172,16 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<String> pickupType() {
     return environment -> {
-      if (getSource(environment).getBoardRule() == null) { return "SCHEDULED"; }
-      switch (getSource(environment).getBoardRule()) {
-        case "impossible": return "NONE";
-        case "mustPhone": return "CALL_AGENCY";
-        case "coordinateWithDriver": return "COORDINATE_WITH_DRIVER";
-        default: return "SCHEDULED";
-      }
+      if (getSource(environment).getBoardRule() == null) { return PickDrop.SCHEDULED.name(); }
+      return getSource(environment).getBoardRule().name();
     };
   }
 
   @Override
   public DataFetcher<String> dropoffType() {
     return environment -> {
-      if (getSource(environment).getAlightRule() == null) { return "SCHEDULED"; }
-      switch (getSource(environment).getAlightRule()) {
-        case "impossible": return "NONE";
-        case "mustPhone": return "CALL_AGENCY";
-        case "coordinateWithDriver": return "COORDINATE_WITH_DRIVER";
-        default: return "SCHEDULED";
-      }
+      if (getSource(environment).getAlightRule() == null) { return PickDrop.SCHEDULED.name(); }
+      return getSource(environment).getAlightRule().name();
     };
   }
 

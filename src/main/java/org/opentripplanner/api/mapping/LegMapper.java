@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.util.PolylineEncoder;
 
 public class LegMapper {
     private final WalkStepMapper walkStepMapper;
@@ -111,14 +113,14 @@ public class LegMapper {
         if(addIntermediateStops) {
             api.intermediateStops = placeMapper.mapStopArrivals(domain.getIntermediateStops());
         }
-        api.legGeometry = domain.getLegGeometry();
+        api.legGeometry = PolylineEncoder.createEncodings(domain.getLegGeometry());
         api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
         api.alerts = concatenateAlerts(
             streetNoteMaperMapper.mapToApi(domain.getStreetNotes()),
             alertMapper.mapToApi(domain.getTransitAlerts())
         );
-        api.boardRule = domain.getBoardRule();
-        api.alightRule = domain.getAlightRule();
+        api.boardRule = getBoardAlightMessage(domain.getBoardRule());
+        api.alightRule = getBoardAlightMessage(domain.getAlightRule());
 
         api.pickupBookingInfo = BookingInfoMapper.mapBookingInfo(domain.getPickupBookingInfo(), true);
         api.dropOffBookingInfo = BookingInfoMapper.mapBookingInfo(domain.getDropOffBookingInfo(), false);
@@ -127,6 +129,20 @@ public class LegMapper {
         api.walkingBike = domain.getWalkingBike();
 
         return api;
+    }
+
+    private static String getBoardAlightMessage (PickDrop boardAlightType) {
+        if (boardAlightType == null) { return null; }
+        switch (boardAlightType) {
+            case NONE:
+                return "impossible";
+            case CALL_AGENCY:
+                return "mustPhone";
+            case COORDINATE_WITH_DRIVER:
+                return "coordinateWithDriver";
+            default:
+                return null;
+        }
     }
 
     private static List<ApiAlert> concatenateAlerts(List<ApiAlert> a, List<ApiAlert> b) {
