@@ -26,7 +26,7 @@ import org.opentripplanner.kryo.RouterConfigSerializer;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 
-public final class MakeKryo {
+public final class KryoBuilder {
 
     /**
      * This method allows reproducibly creating Kryo (de)serializer instances with exactly the same
@@ -39,7 +39,7 @@ public final class MakeKryo {
      * non-transient fields of an instance. If the class has its own overridden Java serialization
      * methods Kryo will not automatically use those, a JavaSerializer must be registered.
      */
-    public static Kryo makeKryo() {
+    public static Kryo create() {
         // For generating a histogram of serialized classes with associated serializers:
         // Kryo kryo = new Kryo(new InstanceCountingClassResolver(), new MapReferenceResolver(), new DefaultStreamFactory());
         Kryo kryo = new Kryo();
@@ -60,9 +60,6 @@ public final class MakeKryo {
         kryo.register(Set.of(1).getClass(), new JavaImmutableSetSerializer());
         kryo.register(Map.of().getClass(), new JavaSerializer());
         kryo.register(Map.of(1, 1).getClass(), new JavaSerializer());
-
-        // Guava's ImmutableSet
-        ImmutableSetSerializer.registerSerializers(kryo);
 
         // Kryo's default instantiation and deserialization of BitSets leaves them empty.
         // The Kryo BitSet serializer in magro/kryo-serializers naively writes out a dense stream of booleans.

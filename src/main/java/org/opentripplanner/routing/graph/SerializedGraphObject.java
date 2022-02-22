@@ -9,7 +9,6 @@ import com.esotericsoftware.kryo.io.Output;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,7 +18,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
-import org.opentripplanner.routing.graph.kryosupport.MakeKryo;
+import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.util.OtpAppException;
@@ -130,7 +129,7 @@ public class SerializedGraphObject implements Serializable {
                 sourceDescription
             );
 
-            Kryo kryo = MakeKryo.makeKryo();
+            Kryo kryo = KryoBuilder.create();
             SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
             Graph graph = serObj.graph;
             LOG.debug("Graph read.");
@@ -153,7 +152,7 @@ public class SerializedGraphObject implements Serializable {
     private void save(OutputStream outputStream, String graphName, long size) {
         LOG.info("Writing graph " + graphName + " ...");
         outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
-        Kryo kryo = MakeKryo.makeKryo();
+        Kryo kryo = KryoBuilder.create();
         Output output = new Output(outputStream);
         output.write(OtpProjectInfo.projectInfo().graphFileHeaderInfo.header());
         kryo.writeClassAndObject(output, this);
