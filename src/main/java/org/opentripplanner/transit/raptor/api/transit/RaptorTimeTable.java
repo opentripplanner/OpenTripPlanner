@@ -24,15 +24,15 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
 
     /**
      * Get the arrival times of all trips at a specific stop index, sorted by time. The returned
-     * value takes the index the trip schedule index in pattern starting at 0 as input and returns
-     * the arrival time.
+     * function takes the trip index in the TimeTable as input and returns the arrival time as
+     * seconds from midnight on the search date.
      */
     IntUnaryOperator getArrivalTimes(int stopPositionInPattern);
 
     /**
      * Get the departure times of all trips at a specific stop index, sorted by time. The returned
-     * value takes the index the trip schedule index in pattern starting at 0 as input and returns
-     * the departure time.
+     * function takes the trip index in the TimeTable as input and returns the departure time as
+     * seconds from midnight on the search date.
      */
     IntUnaryOperator getDepartureTimes(int stopPositionInPattern);
 
