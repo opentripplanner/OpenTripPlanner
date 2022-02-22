@@ -31,8 +31,17 @@ public class TripPatternForDates
 
     private final int numberOfTripSchedules;
 
+    /**
+     * The arrival times in a nStops * numberOfTripSchedules sized array. The trips are stored first
+     * by the stop position and then by trip index, so with stops 1 and 2, and trips A and B, the
+     * order is [1A, 1B, 2A, 2B]
+     */
     private final int[] arrivalTimes;
 
+    /**
+     * The arrival times in a nStops * numberOfTripSchedules sized array. The order is the same as
+     * in arrivalTimes.
+     */
     private final int[] departureTimes;
 
     TripPatternForDates(
