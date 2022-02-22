@@ -177,11 +177,6 @@ public class AddTransitModelEntitiesToGraph {
             if (boardingArea.getParentStop() != null) {
 
                 var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
-                double distance = distance(
-                        platformVertex.getCoordinate(),
-                        boardingAreaVertex.getCoordinate()
-                );
-
                 boolean wheelchair = boardingArea.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
                 var name = Optional.ofNullable(boardingArea.getName())
                         .map(NonLocalizedString::new)
@@ -193,7 +188,7 @@ public class AddTransitModelEntitiesToGraph {
                         boardingArea.getId(),
                         name,
                         0,
-                        distance,
+                        0,
                         0,
                         0,
                         wheelchair
@@ -205,7 +200,7 @@ public class AddTransitModelEntitiesToGraph {
                         boardingArea.getId(),
                         name,
                         0,
-                        distance,
+                        0,
                         0,
                         0,
                         wheelchair
