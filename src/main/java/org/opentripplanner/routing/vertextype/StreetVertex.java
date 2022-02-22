@@ -1,17 +1,18 @@
 package org.opentripplanner.routing.vertextype;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-
-import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
-
-import java.util.*;
 
 /**
  * Abstract base class for vertices in the street layer of the graph.
@@ -44,7 +45,6 @@ public abstract class StreetVertex extends Vertex {
      * @return already localized street names and non-localized corner of x and unnamedStreet
      */
     public I18NString getIntersectionName() {
-        I18NString calculatedName = null;
         // generate names for corners when no name was given
         Set<I18NString> uniqueNameSet = new HashSet<>();
         for (Edge e : getOutgoing()) {
@@ -55,16 +55,12 @@ public abstract class StreetVertex extends Vertex {
         List<I18NString> uniqueNames = new ArrayList<>(uniqueNameSet);
 
         if (uniqueNames.size() > 1) {
-            calculatedName = locale -> new LocalizedString("corner", new String[]{
-                    uniqueNames.get(0).toString(locale),
-                    uniqueNames.get(1).toString(locale)
-            }).toString(locale);
+            return new LocalizedString("corner", uniqueNames.get(0), uniqueNames.get(1));
         } else if (uniqueNames.size() == 1) {
-            calculatedName = uniqueNames.get(0);
+            return uniqueNames.get(0);
         } else {
-            calculatedName = new LocalizedString("unnamedStreet");
+            return new LocalizedString("unnamedStreet");
         }
-        return calculatedName;
     }
 
     public boolean isConnectedToWalkingEdge() {

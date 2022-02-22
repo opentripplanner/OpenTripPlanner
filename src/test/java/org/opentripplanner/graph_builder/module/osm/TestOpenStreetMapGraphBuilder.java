@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
@@ -298,8 +299,11 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
     @Test
     public void testLocalizedString() {
-        LocalizedString localizedString = new LocalizedString("corner",
-                new String[]{"first", "second"});
+        LocalizedString localizedString = new LocalizedString(
+                "corner",
+                new NonLocalizedString("first"),
+                new NonLocalizedString("second")
+        );
 
         assertEquals("Kreuzung first mit second",
                 localizedString.toString(new Locale("de")));
