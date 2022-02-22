@@ -31,6 +31,14 @@ public interface Leg {
      */
     boolean isTransitLeg();
 
+    default boolean isScheduledTransitLeg() {
+        return false;
+    }
+
+    default ScheduledTransitLeg asScheduledTransitLeg() {
+        throw new ClassCastException();
+    }
+
     /**
      * For transit legs, if the rider should stay on the vehicle as it changes route names. This is
      * the same as a stay-seated transfer.
