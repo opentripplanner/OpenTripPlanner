@@ -188,7 +188,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
         return getAsDate(TimeZone.getDefault());
     }
 
-    private LocalDate toLocalDate() {
+    public LocalDate toLocalDate() {
         return LocalDate.of(year, month, day);
     }
 
