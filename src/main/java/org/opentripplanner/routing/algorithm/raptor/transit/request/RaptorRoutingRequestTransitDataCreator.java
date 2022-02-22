@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import static java.util.stream.Collectors.groupingBy;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,9 +85,10 @@ class RaptorRoutingRequestTransitDataCreator {
   ) {
 
     // Group TripPatternForDate objects by TripPattern
-    Map<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternForDateByPattern = patternForDateList
-        .stream()
-        .collect(groupingBy(TripPatternForDate::getTripPattern));
+    Map<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
+    for (TripPatternForDate patternForDate : patternForDateList) {
+      patternForDateByPattern.computeIfAbsent(patternForDate.getTripPattern(), k -> new ArrayList<>()).add(patternForDate);
+    }
 
     List<TripPatternForDates> combinedList = new ArrayList<>();
 
@@ -97,11 +98,8 @@ class RaptorRoutingRequestTransitDataCreator {
         .entrySet()) {
 
       // Sort by date
-      List<TripPatternForDate> patternsSorted = patternEntry
-          .getValue()
-          .stream()
-          .sorted(Comparator.comparing(TripPatternForDate::getLocalDate))
-          .collect(Collectors.toUnmodifiableList());
+      List<TripPatternForDate> patternsSorted = patternEntry.getValue();
+      patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
 
       // Calculate offsets per date
       List<Integer> offsets = new ArrayList<>();
