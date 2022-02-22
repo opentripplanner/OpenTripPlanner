@@ -24,6 +24,10 @@ public enum PickDrop {
     return routable;
   }
 
+  public boolean isNotRoutable() {
+    return !routable;
+  }
+
   public int getGtfsCode() {
     return gtfsCode;
   }

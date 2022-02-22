@@ -10,6 +10,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.Trip;
@@ -75,9 +76,9 @@ public class Leg {
 
     private Set<TransitAlert> transitAlerts = new HashSet<>();
 
-    private String boardRule;
+    private PickDrop boardRule;
 
-    private String alightRule;
+    private PickDrop alightRule;
 
     private BookingInfo dropOffBookingInfo = null;
 
@@ -254,8 +255,8 @@ public class Leg {
                 .addCol("walkSteps", walkSteps)
                 .addCol("streetNotes", streetNotes)
                 .addCol("transitAlerts", transitAlerts)
-                .addStr("boardRule", boardRule)
-                .addStr("alightRule", alightRule)
+                .addEnum("boardRule", boardRule)
+                .addEnum("alightRule", alightRule)
                 .addBool("walkingBike", walkingBike)
                 .addBool("rentedVehicle", rentedVehicle)
                 .addStr("bikeRentalNetwork", vehicleRentalNetwork)
@@ -533,19 +534,19 @@ public class Leg {
         this.transitAlerts = transitAlerts;
     }
 
-    public String getBoardRule() {
+    public PickDrop getBoardRule() {
         return boardRule;
     }
 
-    public void setBoardRule(String boardRule) {
+    public void setBoardRule(PickDrop boardRule) {
         this.boardRule = boardRule;
     }
 
-    public String getAlightRule() {
+    public PickDrop getAlightRule() {
         return alightRule;
     }
 
-    public void setAlightRule(String alightRule) {
+    public void setAlightRule(PickDrop alightRule) {
         this.alightRule = alightRule;
     }
 

@@ -314,7 +314,7 @@ otp.modules.planner.IconFactory = otp.Class({
         highlight = highlight || false;
         var html = '<div class="otp-itin-div-icon-topRow-'+quadrant[0]+'">';
         if(!isOrigin) html += '<img src="'+otp.config.resourcePath+'images/mode/arrow.png" style="margin-right:2px;">';
-        html += '<img src="'+otp.config.resourcePath+'images/mode/'+mode+'.png">';
+        html += '<img src="'+otp.util.Itin.getModeIcon(mode) + '">';
         if(isOrigin) html += '<img src="'+otp.config.resourcePath+'images/mode/arrow.png" style="margin-left:2px;">';
         html += '</div>';
         //Removes AM/PM at the end of time if it exists (Time is too long

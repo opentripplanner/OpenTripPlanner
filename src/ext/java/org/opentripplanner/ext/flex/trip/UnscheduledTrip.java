@@ -7,6 +7,7 @@ import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FlexLocationGroup;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
@@ -81,7 +82,7 @@ public class UnscheduledTrip extends FlexTrip {
     // Check if trip is possible
     if (fromIndex == -1 ||
         fromIndex > toIndex ||
-        stopTimes[toIndex].dropOffType == NONE.getGtfsCode()
+        getDropOffType(toIndex).isNotRoutable()
     ) {
       return Stream.empty();
     }
@@ -108,7 +109,7 @@ public class UnscheduledTrip extends FlexTrip {
     // Check if trip is possible
     if (toIndex == -1 ||
         fromIndex > toIndex ||
-        stopTimes[fromIndex].pickupType == NONE.getGtfsCode()
+        getPickupType(fromIndex).isNotRoutable()
     ) {
       return Stream.empty();
     }
@@ -169,6 +170,17 @@ public class UnscheduledTrip extends FlexTrip {
   }
 
   @Override
+  public PickDrop getBoardRule(int i) {
+    return stopTimes[i].pickupType;
+  }
+
+  @Override
+  public PickDrop getAlightRule(int i) {
+    return stopTimes[i].dropOffType;
+  }
+
+
+  @Override
   public boolean isBoardingPossible(NearbyStop stop) {
     return getFromIndex(stop) != -1;
   }
@@ -176,6 +188,14 @@ public class UnscheduledTrip extends FlexTrip {
   @Override
   public boolean isAlightingPossible(NearbyStop stop) {
     return getToIndex(stop) != -1;
+  }
+
+  public PickDrop getPickupType(int i) {
+    return stopTimes[i].pickupType;
+  }
+
+  public PickDrop getDropOffType(int i) {
+    return stopTimes[i].dropOffType;
   }
 
   private Collection<StopLocation> expandStops(StopLocation stop) {
@@ -186,7 +206,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   private int getFromIndex(NearbyStop accessEgress) {
     for (int i = 0; i < stopTimes.length; i++) {
-      if (stopTimes[i].pickupType == NONE.getGtfsCode()) continue;
+      if (getPickupType(i).isNotRoutable()) { continue; }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof FlexLocationGroup) {
         if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
@@ -204,7 +224,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   private int getToIndex(NearbyStop accessEgress) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
-      if (stopTimes[i].dropOffType == NONE.getGtfsCode()) continue;
+      if (getDropOffType(i).isNotRoutable()) { continue; }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof FlexLocationGroup) {
         if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
@@ -226,8 +246,8 @@ public class UnscheduledTrip extends FlexTrip {
     private final int flexWindowStart;
     private final int flexWindowEnd;
 
-    private final int pickupType;
-    private final int dropOffType;
+    private final PickDrop pickupType;
+    private final PickDrop dropOffType;
 
     private UnscheduledStopTime(StopTime st) {
       stop = st.getStop();
@@ -235,8 +255,8 @@ public class UnscheduledTrip extends FlexTrip {
       flexWindowStart = st.getFlexWindowStart();
       flexWindowEnd = st.getFlexWindowEnd();
 
-      pickupType = st.getPickupType().getGtfsCode();
-      dropOffType = st.getDropOffType().getGtfsCode();
+      pickupType = st.getPickupType();
+      dropOffType = st.getDropOffType();
     }
   }
 }

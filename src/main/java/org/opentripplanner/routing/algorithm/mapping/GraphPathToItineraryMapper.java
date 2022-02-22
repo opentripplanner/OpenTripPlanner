@@ -336,23 +336,6 @@ public abstract class GraphPathToItineraryMapper {
         return leg;
     }
 
-    /**
-     * This was originally in TransitUtils.handleBoardAlightType.
-     * Edges that always block traversal (forbidden pickups/dropoffs) are simply not ever created.
-     */
-    public static String getBoardAlightMessage (int boardAlightType) {
-        switch (boardAlightType) {
-        case 1:
-            return "impossible";
-        case 2:
-            return "mustPhone";
-        case 3:
-            return "coordinateWithDriver";
-        default:
-            return null;
-        }
-    }
-
     private static void setPathwayInfo(List<Leg> legs, State[][] legsStates) {
         OUTER:
         for (int i = 0; i < legsStates.length; i++) {

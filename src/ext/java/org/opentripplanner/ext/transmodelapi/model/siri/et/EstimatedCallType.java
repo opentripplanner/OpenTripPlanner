@@ -4,6 +4,7 @@ import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.PickDrop.NONE;
 
 import graphql.Scalars;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -206,7 +207,7 @@ public class EstimatedCallType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("destinationDisplay")
                     .type(destinationDisplayType)
-                    .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getHeadsign())
+                    .dataFetcher(DataFetchingEnvironment::getSource)
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")

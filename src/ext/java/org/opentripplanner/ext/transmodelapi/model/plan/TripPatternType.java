@@ -124,7 +124,7 @@ public class TripPatternType {
                                 + "a trip where the use walks to the Q train, transfers to the 6, "
                                 + "then walks to their destination, has four legs."
                         )
-                        .type(new GraphQLNonNull(new GraphQLList(legType)))
+                        .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(legType))))
                         .dataFetcher(env -> itinerary(env).legs)
                         .build())
                 .field(GraphQLFieldDefinition
