@@ -70,8 +70,6 @@ public class GraphSerializationTest {
      */
     @Test
     public void compareGraphToItself () {
-        // This graph does not make an ideal test because it doesn't have any street data.
-        // TODO switch to another graph that has both GTFS and OSM data
         Graph originalGraph = ConstantsForTests.getInstance().getCachedPortlandGraph();
         originalGraph.index();
         // We can exclude relatively few classes here, because the object trees are of course perfectly identical.

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -55,7 +54,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * Since the majority of StreetEdge instances don't have any turn restrictions,
      * we create a global instance of an empty set of turn restrictions.
      */
-    private static final ImmutableSet<TurnRestriction> NO_TURN_RESTRICTIONS = ImmutableSet.of();
+    private static final Set<TurnRestriction> NO_TURN_RESTRICTIONS = Set.of();
 
     /* TODO combine these with OSM highway= flags? */
     public static final int CLASS_STREET = 3;
@@ -139,7 +138,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * That would mean that every StreetEdge has its own empty instance which would increase
      * memory significantly.
      */
-    private ImmutableSet<TurnRestriction> turnRestrictions = NO_TURN_RESTRICTIONS;
+    private Set<TurnRestriction> turnRestrictions = NO_TURN_RESTRICTIONS;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -950,7 +949,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             // we make the turn restrictions unmodifiable after a copy-on-write modification
             var temp = new ArrayList<>(turnRestrictions);
             temp.add(turnRestriction);
-            turnRestrictions = ImmutableSet.copyOf(temp);
+            turnRestrictions = Set.copyOf(temp);
         }
     }
 
@@ -971,7 +970,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                     // we make the turn restrictions unmodifiable after a copy-on-write modification
                     var withRemoved = new ArrayList<>(turnRestrictions);
                     withRemoved.remove(turnRestriction);
-                    turnRestrictions = ImmutableSet.copyOf(withRemoved);
+                    turnRestrictions = Set.copyOf(withRemoved);
                 }
             }
         }
@@ -985,7 +984,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      *
      */
     @Nonnull
-    public ImmutableSet<TurnRestriction> getTurnRestrictions() {
+    public Set<TurnRestriction> getTurnRestrictions() {
         // this can be safely returned as it's unmodifiable
         return turnRestrictions;
     }
