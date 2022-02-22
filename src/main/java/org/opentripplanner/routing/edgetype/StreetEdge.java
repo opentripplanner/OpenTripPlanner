@@ -2,9 +2,10 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
@@ -49,12 +50,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     private StreetEdgeCostExtension costExtension;
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Since the majority of StreetEdge instances don't have any turn restrictions,
-     * we create a global instance of an empty set of turn restrictions.
-     */
-    private static final Set<TurnRestriction> NO_TURN_RESTRICTIONS = Set.of();
 
     /* TODO combine these with OSM highway= flags? */
     public static final int CLASS_STREET = 3;
@@ -138,7 +133,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * That would mean that every StreetEdge has its own empty instance which would increase
      * memory significantly.
      */
-    private Set<TurnRestriction> turnRestrictions = NO_TURN_RESTRICTIONS;
+    private List<TurnRestriction> turnRestrictions = List.of();
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -612,7 +607,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
     
     public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
-        for (TurnRestriction turnRestriction : getTurnRestrictions()) {
+        for (TurnRestriction turnRestriction : turnRestrictions) {
             /* FIXME: This is wrong for trips that end in the middle of turnRestriction.to
              */
 
@@ -947,9 +942,9 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         synchronized (this) {
             // in order to guarantee fast access without extra allocations
             // we make the turn restrictions unmodifiable after a copy-on-write modification
-            var temp = new ArrayList<>(turnRestrictions);
+            var temp = new HashSet<>(turnRestrictions);
             temp.add(turnRestriction);
-            turnRestrictions = Set.copyOf(temp);
+            turnRestrictions = List.copyOf(temp);
         }
     }
 
@@ -963,14 +958,14 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         synchronized (this) {
             if (turnRestrictions.contains(turnRestriction)) {
                 if (turnRestrictions.size() == 1) {
-                    turnRestrictions = NO_TURN_RESTRICTIONS;
+                    turnRestrictions = List.of();
                 }
                 else {
                     // in order to guarantee fast access without extra allocations
                     // we make the turn restrictions unmodifiable after a copy-on-write modification
-                    var withRemoved = new ArrayList<>(turnRestrictions);
+                    var withRemoved = new HashSet<>(turnRestrictions);
                     withRemoved.remove(turnRestriction);
-                    turnRestrictions = Set.copyOf(withRemoved);
+                    turnRestrictions = List.copyOf(withRemoved);
                 }
             }
         }
@@ -984,7 +979,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      *
      */
     @Nonnull
-    public Set<TurnRestriction> getTurnRestrictions() {
+    public Collection<TurnRestriction> getTurnRestrictions() {
         // this can be safely returned as it's unmodifiable
         return turnRestrictions;
     }
