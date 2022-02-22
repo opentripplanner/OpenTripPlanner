@@ -4,6 +4,7 @@ package org.opentripplanner.transit.raptor._data.transit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -36,6 +37,22 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     @Override
     public TestTripSchedule getTripSchedule(int index) {
         return schedules.get(index);
+    }
+
+    @Override
+    public IntUnaryOperator getArrivalTimes(int stopPositionInPattern) {
+        final int[] arrivalTimes = schedules.stream()
+                .mapToInt(schedule -> schedule.arrival(stopPositionInPattern))
+                .toArray();
+        return (int i) -> arrivalTimes[i];
+    }
+
+    @Override
+    public IntUnaryOperator getDepartureTimes(int stopPositionInPattern) {
+        final int[] departureTimes = schedules.stream()
+                .mapToInt(schedule -> schedule.departure(stopPositionInPattern))
+                .toArray();
+        return (int i) -> departureTimes[i];
     }
 
     @Override
