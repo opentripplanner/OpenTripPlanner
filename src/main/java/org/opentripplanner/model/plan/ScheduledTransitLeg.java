@@ -1,5 +1,6 @@
 package org.opentripplanner.model.plan;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -89,6 +90,26 @@ public class ScheduledTransitLeg implements Leg {
         List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(tripPattern, boardStopIndexInPattern, alightStopIndexInPattern);
         this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
         this.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
+    }
+
+    public boolean isScheduledTransitLeg() {
+        return true;
+    }
+
+    public ScheduledTransitLeg asScheduledTransitLeg() {
+        return this;
+    }
+
+    public TripTimes getTripTimes() {
+        return tripTimes;
+    }
+
+    public TripPattern getTripPattern() {
+        return tripPattern;
+    }
+
+    public Instant getServiceDateMidnight() {
+        return serviceDate.toZonedDateTime(zoneId, 0).toInstant();
     }
 
     private List<Coordinate> extractTransitLegCoordinates(TripPattern tripPattern, int boardStopIndexInPattern, int alightStopIndexInPattern) {

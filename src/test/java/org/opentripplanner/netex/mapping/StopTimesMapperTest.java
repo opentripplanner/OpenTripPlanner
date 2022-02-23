@@ -1,13 +1,18 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopTime;
@@ -15,6 +20,8 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.rutebanken.netex.model.TimetabledPassingTime;
 
 
 public class StopTimesMapperTest {
@@ -61,10 +68,10 @@ public class StopTimesMapperTest {
 
         assertEquals(4, stopTimes.size());
 
-        assertStop(stopTimes.get(0),"NSR:Quay:1", 18000, "Bergen", List.of("Stavanger"));
-        assertStop(stopTimes.get(1),"NSR:Quay:2", 18240, "Bergen", null);
-        assertStop(stopTimes.get(2),"NSR:Quay:3", 18600, "Stavanger", List.of("Bergen"));
-        assertStop(stopTimes.get(3),"NSR:Quay:4", 18900, "Stavanger", null);
+        assertStop(stopTimes.get(0), "NSR:Quay:1", 18000, "Bergen", List.of("Stavanger"));
+        assertStop(stopTimes.get(1), "NSR:Quay:2", 18240, "Bergen", null);
+        assertStop(stopTimes.get(2), "NSR:Quay:3", 18600, "Stavanger", List.of("Bergen"));
+        assertStop(stopTimes.get(3), "NSR:Quay:4", 18900, "Stavanger", null);
 
         Map<String, StopTime> map = result.stopTimeByNetexId;
 
@@ -74,12 +81,114 @@ public class StopTimesMapperTest {
         assertEquals(stopTimes.get(3), map.get("TTPT-4"));
     }
 
-    private void assertStop(StopTime stopTime, String stopId, long departureTime, String headsign, List<String> via) {
+    /**
+     * Test StopTime.timepoint mapping from NeTEx. Should be true if StopPointInJourneyPattern.isIsWaitPoint
+     * is true and corresponding TimetabledPassingTime.waitingTime is defined
+     * <p>
+     * The sample has 4 StopPointInJourneyPattern points with corresponding TimetabledPassingTime
+     * objects. The two last StopPointInJourneyPattern has withIsWaitPoint and undefined, so they
+     * should not set StopTime.timepoint = 1. The second TimetabledPassingTime.WaitingTime is
+     * undefined so it should also not set StopTime.timepoint = 1. Only the first StopTime has the
+     * correct criteria to map StopTime.timepoint = 1.
+     */
+    @Test
+    public void testWaitPointMapping() {
+        var netexSample = new NetexTestDataSample();
+
+        var points = netexSample.getJourneyPattern()
+                .getPointsInSequence()
+                .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+                .stream()
+                .map(StopPointInJourneyPattern.class::cast)
+                .collect(Collectors.toList());
+
+        assertEquals(4, points.size(), "Expected StopPointInJourneyPattern.size to be 4");
+
+        points.get(0).withIsWaitPoint(true);
+        points.get(1).withIsWaitPoint(true);
+        points.get(2).withIsWaitPoint(false);
+        points.get(3).withIsWaitPoint(null);
+
+        var passingTimes = netexSample.getTimetabledPassingTimes();
+        assertEquals(
+                points.size(), passingTimes.size(),
+                "Expected TimetabledPassingTimes size equal StopPointInJourneyPattern size"
+        );
+
+        // Utility function to find TimetabledPassingTime by StopPointInJourneyPattern.Id
+        Function<String, TimetabledPassingTime> findPassingTime =
+                (pointId) -> passingTimes.stream()
+                        .filter(t -> pointId.equals(
+                                t.getPointInJourneyPatternRef().getValue().getRef())
+                        ).findAny()
+                        .orElseThrow();
+
+        var firstPassingTime = findPassingTime.apply(points.get(0).getId());
+        var thirdPassingTime = findPassingTime.apply(points.get(2).getId());
+        var fourthPassingTime = findPassingTime.apply(points.get(3).getId());
+
+        // Make TimeTabledPassingTime valid waitPoint
+        firstPassingTime.setWaitingTime(Duration.ofSeconds(0));
+        thirdPassingTime.setWaitingTime(Duration.ofSeconds(10));
+        fourthPassingTime.setWaitingTime(Duration.ofSeconds(-5));
+
+        StopTimesMapper stopTimesMapper = new StopTimesMapper(
+                new DataImportIssueStore(false),
+                MappingSupport.ID_FACTORY,
+                netexSample.getStopsById(),
+                new EntityById<>(),
+                new EntityById<>(),
+                netexSample.getDestinationDisplayById(),
+                netexSample.getQuayIdByStopPointRef(),
+                new HierarchicalMap<>(),
+                new HierarchicalMapById<>(),
+                new HierarchicalMap<>()
+        );
+
+        StopTimesMapperResult result = stopTimesMapper.mapToStopTimes(
+                netexSample.getJourneyPattern(),
+                TRIP,
+                netexSample.getTimetabledPassingTimes(),
+                null
+        );
+
+        assertNotNull(result, "result must not be null");
+
+        var stopTimes = result.stopTimes;
+
+        assertEquals(4, stopTimes.size(), "Exptected 4 StopTime objects");
+
+        Assertions.assertAll(
+                () -> assertEquals(
+                        1, stopTimes.get(0).getTimepoint(),
+                        "StopTime expected to be waitPoint"
+                ),
+                () -> assertNotEquals(
+                        1, stopTimes.get(1).getTimepoint(),
+                        "StopTime expected to not be waitPoint"
+                ),
+                () -> assertNotEquals(
+                        1, stopTimes.get(2).getTimepoint(),
+                        "StopTime expected to not be waitPoint"
+                ),
+                () -> assertNotEquals(
+                        1, stopTimes.get(3).getTimepoint(),
+                        "StopTime expected to not be waitPoint"
+                )
+        );
+    }
+
+
+    private void assertStop(
+            StopTime stopTime, String stopId, long departureTime, String
+            headsign, List<String> via
+    ) {
         assertEquals(stopId, stopTime.getStop().getId().getId());
         assertEquals(departureTime, stopTime.getDepartureTime());
         assertEquals(headsign, stopTime.getStopHeadsign());
 
         List<String> stopTimeVia = stopTime.getHeadsignVias();
         assertEquals(via, stopTimeVia);
+
     }
 }

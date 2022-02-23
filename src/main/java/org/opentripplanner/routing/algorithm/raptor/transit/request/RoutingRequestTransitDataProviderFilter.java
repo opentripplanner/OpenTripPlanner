@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import java.util.EnumSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
@@ -21,7 +24,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final boolean includePlannedCancellations;
 
-  private final Set<AllowedTransitMode> allowedTransitModes;
+  private final Predicate<Trip> transitModeIsAllowed;
 
   private final Set<FeedScopedId> bannedRoutes;
 
@@ -34,9 +37,25 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
     this.requireWheelchairAccessible = requireWheelchairAccessible;
-    this.allowedTransitModes = allowedTransitModes;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
+    boolean hasOnlyMainModeFilters = allowedTransitModes.stream()
+            .noneMatch(AllowedTransitMode::hasSubMode);
+
+    // It is much faster to do a lookup in an EnumSet, so we use it if we don't want to filter
+    // using submodes
+    if (hasOnlyMainModeFilters) {
+      EnumSet<TransitMode> allowedMainModes = allowedTransitModes.stream()
+              .map(AllowedTransitMode::getMainMode)
+              .collect(Collectors.toCollection(() -> EnumSet.noneOf(TransitMode.class)));
+      transitModeIsAllowed = (Trip trip) -> allowedMainModes.contains(trip.getMode());
+    } else {
+      transitModeIsAllowed = (Trip trip) -> {
+        TransitMode transitMode = trip.getMode();
+        String netexSubmode = trip.getNetexSubmode();
+        return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, netexSubmode));
+      };
+    }
   }
 
   public RoutingRequestTransitDataProviderFilter(
@@ -59,7 +78,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   @Override
   public boolean tripTimesPredicate(TripTimes tripTimes) {
-    if (!transitModeIsAllowed(tripTimes)) {
+    if (!transitModeIsAllowed.test(tripTimes.getTrip())) {
       return false;
     }
 
@@ -81,15 +100,6 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {
     FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().getRoute().getId();
     return !bannedRoutes.contains(routeId);
-  }
-
-  private boolean transitModeIsAllowed(TripTimes tripTimes) {
-
-    Trip trip = tripTimes.getTrip();
-    TransitMode transitMode = trip.getMode();
-    String netexSubmode = trip.getNetexSubmode();
-
-    return allowedTransitModes.stream().anyMatch(m -> m.allows(transitMode, netexSubmode));
   }
 
   public static BikeAccess bikeAccessForTrip(Trip trip) {

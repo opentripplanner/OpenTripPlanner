@@ -35,6 +35,17 @@ public class AllowedTransitMode {
     );
   }
 
+  public TransitMode getMainMode() {
+    return mainMode;
+  }
+
+  /**
+   * Is the sub-mode set for this main mode
+   */
+  public boolean hasSubMode() {
+    return subMode != null;
+  }
+
   /**
    * Returns a set of AllowedModes that will cover all available TransitModes.
    */
