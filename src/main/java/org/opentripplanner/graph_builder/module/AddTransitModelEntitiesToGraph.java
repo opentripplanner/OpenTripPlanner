@@ -225,7 +225,7 @@ public class AddTransitModelEntitiesToGraph {
                     // nor steps. This would lead to traversal costs of 0, so we compute the distance from the
                     // vertices as fallback.
                     double distance = Optional.of(pathway.getLength())
-                            .filter(l -> l <= 0)
+                            .filter(l -> l > 0)
                             .orElseGet(() -> distance(fromVertex.getCoordinate(), toVertex.getCoordinate()));
 
                     new PathwayEdge(
