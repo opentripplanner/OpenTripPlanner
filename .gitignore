@@ -40,3 +40,8 @@ src/ext/resources/reportapi/report.csv
 
 streetGraph.obj
 graph.obj
+
+smoke-tests/*.jar
+smoke-tests/**/*.obj
+smoke-tests/**/*.pbf
+smoke-tests/**/*.zip
