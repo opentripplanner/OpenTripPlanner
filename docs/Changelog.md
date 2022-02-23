@@ -146,6 +146,7 @@
 - NeTEx mapping to StopTime.timepoint [#3898](https://github.com/opentripplanner/OpenTripPlanner/pull/3898)
 - Optimize RAPTOR trip search by pre-calculating arrival/departure time arrays [#3919](https://github.com/opentripplanner/OpenTripPlanner/pull/3919)
 - Make turn restrictions faster and thread-safe by moving them into StreetEdge [#3899](https://github.com/opentripplanner/OpenTripPlanner/pull/3899)
+- Rework leg creation [#3826](https://github.com/opentripplanner/OpenTripPlanner/pull/3826)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
