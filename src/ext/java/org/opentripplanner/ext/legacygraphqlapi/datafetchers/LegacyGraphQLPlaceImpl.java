@@ -2,7 +2,9 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.Locale;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVertexType;
 import org.opentripplanner.model.plan.Place;
@@ -18,7 +20,10 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> getSource(environment).place.name;
+    return environment -> {
+      Locale locale = LegacyGraphQLUtils.getLocale(environment);
+      return getSource(environment).place.name.toString(locale);
+    };
   }
 
   @Override
@@ -27,13 +32,13 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
       var place = getSource(environment).place;
       switch (place.vertexType) {
         case NORMAL:
-          return LegacyGraphQLVertexType.Normal.label;
+          return LegacyGraphQLVertexType.NORMAL.name();
         case TRANSIT:
-          return LegacyGraphQLVertexType.Transit.label;
+          return LegacyGraphQLVertexType.TRANSIT.name();
         case VEHICLERENTAL:
-          return LegacyGraphQLVertexType.Bikeshare.label;
+          return LegacyGraphQLVertexType.BIKESHARE.name();
         case VEHICLEPARKING:
-          return LegacyGraphQLVertexType.Bikepark.label;
+          return LegacyGraphQLVertexType.BIKEPARK.name();
         default:
           throw new IllegalStateException("Unhandled vertexType: " + place.vertexType.name());
       }

@@ -12,10 +12,9 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.I18NString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Locale;
 
 public class FlexTripEdge extends Edge {
 
@@ -77,13 +76,8 @@ public class FlexTripEdge extends Edge {
   }
 
   @Override
-  public String getName() {
+  public I18NString getName() {
     return null;
-  }
-
-  @Override
-  public String getName(Locale locale) {
-    return this.getName();
   }
 
   @Override

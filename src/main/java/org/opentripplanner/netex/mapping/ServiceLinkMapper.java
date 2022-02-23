@@ -70,14 +70,27 @@ class ServiceLinkMapper {
             linkInLinkSequence_versionedChildStructure)
             .getServiceLinkRef()
             .getRef();
-        shapePoints.addAll(mapServiceLink(
-            serviceLinkById.lookup(serviceLinkRef),
-            journeyPattern,
-            sequenceCounter,
-            distance,
-            quayIdByStopPointRef,
-            quayById
-        ));
+        ServiceLink serviceLink = serviceLinkById.lookup(serviceLinkRef);
+        
+        if(serviceLink !=null) {
+          shapePoints.addAll(
+                  mapServiceLink(
+                          serviceLink,
+                          journeyPattern,
+                          sequenceCounter,
+                          distance,
+                          quayIdByStopPointRef,
+                          quayById
+                  )
+          );
+        }
+        else {
+          issueStore.add(
+                  "MissingServiceLink",
+                  "ServiceLink not found in journey pattern %s",
+                  journeyPattern.getId()
+          );
+        }
       }
     }
     return shapePoints;

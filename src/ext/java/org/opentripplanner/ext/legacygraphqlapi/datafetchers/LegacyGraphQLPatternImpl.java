@@ -6,6 +6,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -106,15 +107,8 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   @Override
-  public DataFetcher<EncodedPolylineBean> patternGeometry() {
-    return environment -> {
-      LineString geometry = getSource(environment).getGeometry();
-      if (geometry == null) {
-        return null;
-      }
-
-      return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
-    };
+  public DataFetcher<Geometry> patternGeometry() {
+    return environment -> getSource(environment).getGeometry();
   }
 
   @Override
@@ -134,19 +128,19 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case Pattern:
+            case PATTERN:
               alerts.addAll(alertService.getDirectionAndRouteAlerts(
                       getSource(environment).getDirection().gtfsCode,
                       getRoute(environment).getId()
               ));
               break;
-            case Agency:
+            case AGENCY:
               alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
               break;
-            case Route:
+            case ROUTE:
               alerts.addAll(alertService.getRouteAlerts(getRoute(environment).getId()));
               break;
-            case RouteType:
+            case ROUTE_TYPE:
               int routeType = getRoute(environment).getGtfsType();
               alerts.addAll(alertService.getRouteTypeAlerts(
                       routeType,
@@ -157,11 +151,11 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
                       getAgency(environment).getId()
               ));
               break;
-            case Trips:
+            case TRIPS:
               getTrips(environment).forEach(
                       trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
               break;
-            case StopsOnPattern:
+            case STOPS_ON_PATTERN:
               alerts.addAll(alertService.getAllAlerts()
                       .stream()
                       .filter(alert -> alert.getEntities()
@@ -177,7 +171,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
                 alerts.addAll(alertService.getStopAlerts(stopId));
               });
               break;
-            case StopsOnTrips:
+            case STOPS_ON_TRIPS:
               Iterable<Trip> trips = getTrips(environment);
               trips.forEach(trip -> alerts.addAll(alertService.getAllAlerts()
                       .stream()

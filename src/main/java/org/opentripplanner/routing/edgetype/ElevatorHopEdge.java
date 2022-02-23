@@ -8,7 +8,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import org.locationtech.jts.geom.LineString;
-import java.util.Locale;
+import org.opentripplanner.util.I18NString;
 
 /**
  * A relatively low cost edge for travelling one level in an elevator.
@@ -85,7 +85,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     }
 
     @Override
-    public String getName() {
+    public I18NString getName() {
         return null;
     }
 
@@ -95,10 +95,5 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
 
     public String toString() {
         return "ElevatorHopEdge(" + fromv + " -> " + tov + ")";
-    }
-
-    @Override
-    public String getName(Locale locale) {
-        return this.getName();
     }
 }

@@ -80,10 +80,10 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case Agency:
+            case AGENCY:
               alerts.addAll(alertService.getAgencyAlerts(getSource(environment).getId()));
               break;
-            case RouteTypes:
+            case ROUTE_TYPES:
               alertService.getAllAlerts()
                       .stream()
                       .filter(alert -> alert.getEntities()
@@ -94,7 +94,7 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
                                       getSource(environment).getId())))
                       .forEach(alert -> alerts.add(alert));
               break;
-            case Routes:
+            case ROUTES:
               getRoutes(environment).forEach(
                       route -> alerts.addAll(alertService.getRouteAlerts(route.getId())));
               break;

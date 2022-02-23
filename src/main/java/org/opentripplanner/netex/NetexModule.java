@@ -29,8 +29,8 @@ import java.util.List;
  * but it is intended to be updated later to support other profiles.
  */
 public class NetexModule implements GraphBuilderModule {
-    private final static double MAX_STOP_TO_SHAPE_SNAP_DISTANCE = 150;
 
+    private final double maxStopToShapeSnapDistance;
     private final int subwayAccessTime;
     private final int maxInterlineDistance;
     private final String netexFeedId;
@@ -49,6 +49,7 @@ public class NetexModule implements GraphBuilderModule {
             String netexFeedId,
             int subwayAccessTime,
             int maxInterlineDistance,
+            double maxStopToShapeSnapDistance,
             ServiceDateInterval transitPeriodLimit,
             List<NetexBundle> netexBundles
     ) {
@@ -57,6 +58,7 @@ public class NetexModule implements GraphBuilderModule {
         this.maxInterlineDistance = maxInterlineDistance;
         this.transitPeriodLimit = transitPeriodLimit;
         this.netexBundles = netexBundles;
+        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     }
 
     @Override
@@ -104,7 +106,7 @@ public class NetexModule implements GraphBuilderModule {
                 new GeometryAndBlockProcessor(
                         otpService,
                         fareServiceFactory,
-                        MAX_STOP_TO_SHAPE_SNAP_DISTANCE,
+                        maxStopToShapeSnapDistance,
                         maxInterlineDistance
                 ).run(graph, issueStore);
             }

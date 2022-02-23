@@ -5,6 +5,8 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import java.util.Locale;
+import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.model.FlexStopLocation;
@@ -32,7 +34,10 @@ public class PlanPlaceType {
             .description(
                 "For transit quays, the name of the quay. For points of interest, the name of the POI.")
             .type(Scalars.GraphQLString)
-            .dataFetcher(environment -> ((Place) environment.getSource()).name)
+            .dataFetcher(environment -> {
+                Locale locale = TransmodelGraphQLUtils.getLocale(environment);
+                return ((Place) environment.getSource()).name.toString(locale);
+            })
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()

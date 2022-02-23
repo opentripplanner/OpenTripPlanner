@@ -50,7 +50,7 @@ config:
     fare: java.util.Map#Map<String, Object>
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
     Feed: String
-    Geometry: org.opentripplanner.util.model.EncodedPolylineBean#EncodedPolylineBean
+    Geometry: org.locationtech.jts.geom.Geometry#Geometry
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
     Mode: String
@@ -61,7 +61,7 @@ config:
     placeAtDistance: org.opentripplanner.routing.graphfinder.PlaceAtDistance#PlaceAtDistance
     placeAtDistanceConnection: graphql.relay.Connection#Connection<PlaceAtDistance>
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
-    Plan: org.opentripplanner.routing.api.response.RoutingResponse#RoutingResponse
+    Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     RealtimeState: String
     Route: org.opentripplanner.model.Route#Route
     serviceTimeRange: Object

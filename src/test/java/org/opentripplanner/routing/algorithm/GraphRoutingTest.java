@@ -7,8 +7,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Entrance;
@@ -22,7 +20,6 @@ import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
@@ -38,9 +35,6 @@ import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
@@ -49,6 +43,8 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
@@ -103,7 +99,7 @@ public abstract class GraphRoutingTest {
             return new StreetEdge(from, to,
                     GeometryUtils.makeLineString(
                             from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-                    String.format("%s%s street", from.getName(), to.getName()),
+                    String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                     length,
                     permissions,
                     false
@@ -121,7 +117,7 @@ public abstract class GraphRoutingTest {
                     new StreetEdge(from, to,
                             GeometryUtils.makeLineString(
                                     from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-                            String.format("%s%s street", from.getName(), to.getName()),
+                            String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                             length,
                             forwardPermissions,
                             false
@@ -129,7 +125,7 @@ public abstract class GraphRoutingTest {
                     new StreetEdge(to, from,
                             GeometryUtils.makeLineString(
                                     to.getLat(), to.getLon(), from.getLat(), from.getLon()),
-                            String.format("%s%s street", from.getName(), to.getName()),
+                            String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                             length,
                             reversePermissions,
                             true
@@ -137,55 +133,27 @@ public abstract class GraphRoutingTest {
             );
         }
 
-        public TurnRestriction turnRestriction(
-                Edge from,
-                Edge to,
-                TurnRestrictionType type,
-                TraverseModeSet modes
-        ) {
-            var turnRestriction = new TurnRestriction(from, to, type, modes);
-            graph.addTurnRestriction(from, turnRestriction);
-            return turnRestriction;
-        }
-
-        public TurnRestriction turnRestriction(Edge from, Edge to, TurnRestrictionType type) {
-            return turnRestriction(
-                    from, to, type, new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR));
-        }
-
-        public TurnRestriction bicycleTurnRestriction(
-                Edge from,
-                Edge to,
-                TurnRestrictionType type
-        ) {
-            return turnRestriction(from, to, type, new TraverseModeSet(TraverseMode.BICYCLE));
-        }
-
-        public TurnRestriction carTurnRestriction(Edge from, Edge to, TurnRestrictionType type) {
-            return turnRestriction(from, to, type, new TraverseModeSet(TraverseMode.CAR));
-        }
-
         public List<ElevatorEdge> elevator(StreetTraversalPermission permission, Vertex ... vertices) {
             List<ElevatorEdge> edges = new ArrayList<>();
             List<ElevatorOnboardVertex> onboardVertices = new ArrayList<>();
 
             for (Vertex v : vertices) {
-                var level = String.format("L-%s", v.getName());
+                var level = String.format("L-%s", v.getDefaultName());
                 var boardLabel = String.format("%s-onboard", level);
                 var alightLabel = String.format("%s-offboard", level);
 
                 var onboard = new ElevatorOnboardVertex(
-                        graph, boardLabel, v.getX(), v.getY(), boardLabel
+                        graph, boardLabel, v.getX(), v.getY(), new NonLocalizedString(boardLabel)
                 );
                 var offboard = new ElevatorOffboardVertex(
-                        graph, alightLabel, v.getX(), v.getY(), alightLabel
+                        graph, alightLabel, v.getX(), v.getY(), new NonLocalizedString(alightLabel)
                 );
 
                 new FreeEdge(v, offboard);
                 new FreeEdge(offboard, v);
 
                 edges.add(new ElevatorBoardEdge(offboard, onboard));
-                edges.add(new ElevatorAlightEdge(onboard, offboard, level));
+                edges.add(new ElevatorAlightEdge(onboard, offboard, new NonLocalizedString(level)));
 
                 onboardVertices.add(onboard);
             }
@@ -272,7 +240,7 @@ public abstract class GraphRoutingTest {
         public PathwayEdge pathway(Vertex from, Vertex to, int time, int length) {
             return new PathwayEdge(
                     from, to, null,
-                    String.format("%s%s pathway", from.getName(), to.getName()),
+                    new NonLocalizedString(String.format("%s%s pathway", from.getDefaultName(), to.getDefaultName())),
                     time, length, 0, 0, false
             );
         }
@@ -428,8 +396,8 @@ public abstract class GraphRoutingTest {
     public static String graphPathToString(GraphPath graphPath) {
         return graphPath.states.stream()
             .flatMap(s -> Stream.of(
-                s.getBackEdge() != null ? s.getBackEdge().getName() : null,
-                s.getVertex().getName()
+                s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
+                s.getVertex().getDefaultName()
             ))
             .filter(Objects::nonNull)
             .collect(Collectors.joining(" - "));

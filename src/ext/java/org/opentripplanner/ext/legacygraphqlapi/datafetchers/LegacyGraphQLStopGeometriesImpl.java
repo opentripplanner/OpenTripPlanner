@@ -17,17 +17,15 @@ public class LegacyGraphQLStopGeometriesImpl implements LegacyGraphQLStopGeometr
     }
 
     @Override
-    public DataFetcher<Iterable<EncodedPolylineBean>> googleEncoded() {
+    public DataFetcher<Iterable<Geometry>> googleEncoded() {
         return env -> {
-            var geometries = getSource(env);
-            var polylines = new ArrayList<EncodedPolylineBean>();
+            Geometry geometries = getSource(env);
+            ArrayList<Geometry> output = new ArrayList<>();
 
-            for(int i = 0; i < geometries.getNumGeometries(); i++) {
-               var geom = geometries.getGeometryN(i);
-               var polyline = PolylineEncoder.createEncodings(geom);
-               polylines.add(polyline);
+            for (int i = 0; i < geometries.getNumGeometries(); i++) {
+                output.add(geometries.getGeometryN(i));
             }
-            return polylines;
+            return output;
         };
     }
 

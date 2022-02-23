@@ -14,8 +14,10 @@ import static org.opentripplanner.api.mapping.RelativeDirectionMapper.mapRelativ
 
 public class WalkStepMapper {
     private final StreetNoteMaperMapper alertsMapper;
+    private final Locale locale;
 
     public WalkStepMapper(Locale locale) {
+        this.locale = locale;
         this.alertsMapper = new StreetNoteMaperMapper(locale);
     }
 
@@ -30,7 +32,7 @@ public class WalkStepMapper {
 
         api.distance = domain.distance;
         api.relativeDirection = mapRelativeDirection(domain.relativeDirection);
-        api.streetName = domain.streetName;
+        api.streetName = domain.streetName.toString(locale);
         api.absoluteDirection = mapAbsoluteDirection(domain.absoluteDirection);
         api.exit = domain.exit;
         api.stayOn = domain.stayOn;
@@ -41,6 +43,7 @@ public class WalkStepMapper {
             api.lat = domain.startLocation.latitude();
         }
         api.elevation = mapElevation(domain.elevation);
+        api.walkingBike = domain.walkingBike;
         api.alerts = alertsMapper.mapToApi(domain.streetNotes);
 
         return api;

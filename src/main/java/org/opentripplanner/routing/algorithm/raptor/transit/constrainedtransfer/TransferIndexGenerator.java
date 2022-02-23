@@ -5,9 +5,11 @@ import static org.opentripplanner.routing.algorithm.raptor.transit.constrainedtr
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Route;
@@ -30,10 +32,10 @@ public class TransferIndexGenerator {
     private static final boolean ALIGHT = false;
 
     private final Collection<ConstrainedTransfer> constrainedTransfers;
-    private final Map<Station, List<TripPatternWithRaptorStopIndexes>> patternsByStation = new HashMap<>();
-    private final Map<StopLocation, List<TripPatternWithRaptorStopIndexes>> patternsByStop = new HashMap<>();
-    private final Map<Route, List<TripPatternWithRaptorStopIndexes>> patternsByRoute = new HashMap<>();
-    private final Map<Trip, List<TripPatternWithRaptorStopIndexes>> patternsByTrip = new HashMap<>();
+    private final Map<Station, Set<TripPatternWithRaptorStopIndexes>> patternsByStation = new HashMap<>();
+    private final Map<StopLocation, Set<TripPatternWithRaptorStopIndexes>> patternsByStop = new HashMap<>();
+    private final Map<Route, Set<TripPatternWithRaptorStopIndexes>> patternsByRoute = new HashMap<>();
+    private final Map<Trip, Set<TripPatternWithRaptorStopIndexes>> patternsByTrip = new HashMap<>();
     private final StopIndexForRaptor stopIndex;
 
     public TransferIndexGenerator(
@@ -64,38 +66,72 @@ public class TransferIndexGenerator {
                         }
                     });
         }
-        sortAllTransfersByRanking();
+        sealConstrainedTransfers();
     }
 
-    private void sortAllTransfersByRanking() {
+    /**
+     * This sorts and seals the constrained transfers for all patterns in order to protect them from
+     * modification, while they are used in the routing.
+     *
+     * {@link TripPatternWithRaptorStopIndexes#sealConstrainedTransfers()}
+     */
+    private void sealConstrainedTransfers() {
         for (var patterns : patternsByRoute.values()) {
             for (var pattern : patterns) {
-                pattern.sortConstrainedTransfers();
+                pattern.sealConstrainedTransfers();
             }
         }
     }
 
+    /**
+     * Index scheduled patterns when loading the graph initially.
+     */
     private void setupPatternByTripIndex(Collection<TripPatternWithRaptorStopIndexes> tripPatterns) {
         for (TripPatternWithRaptorStopIndexes pattern : tripPatterns) {
             TripPattern tripPattern = pattern.getPattern();
 
             patternsByRoute
-                    .computeIfAbsent(tripPattern.getRoute(), t -> new ArrayList<>())
+                    .computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>())
                     .add(pattern);
 
             for (Trip trip : tripPattern.getTrips()) {
-                patternsByTrip.computeIfAbsent(trip, t -> new ArrayList<>()).add(pattern);
+                patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern);
             }
 
             for (StopLocation stop : tripPattern.getStops()) {
-                patternsByStop.computeIfAbsent(stop, t -> new ArrayList<>()).add(pattern);
+                patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);
                 Station station = stop.getParentStation();
                 if (station != null) {
-                    patternsByStation.computeIfAbsent(station, t -> new ArrayList<>()).add(pattern);
+                    patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
                 }
             }
         }
     }
+
+    /**
+     * Add information about a newly created pattern and timetables in the index, in order to be
+     * able to create constrained transfers for these patterns.
+     */
+    public void addRealtimeTrip(TripPatternWithRaptorStopIndexes pattern, List<Trip> trips) {
+        TripPattern tripPattern = pattern.getPattern();
+
+        patternsByRoute
+                .computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>())
+                .add(pattern);
+
+        for (Trip trip : trips) {
+            patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern);
+        }
+
+        for (StopLocation stop : tripPattern.getStops()) {
+            patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);
+            Station station = stop.getParentStation();
+            if (station != null) {
+                patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
+            }
+        }
+    }
+
 
     private Collection<TPoint> findTPoints(TransferPoint txPoint, boolean boarding) {
         if (txPoint.isStationTransferPoint()) {
@@ -184,9 +220,12 @@ public class TransferIndexGenerator {
 
         for (var pattern : patterns) {
             int stopPosInPattern = resolveStopPosInPattern.applyAsInt(pattern.getPattern());
-            int stopIndex = pattern.stopIndex(stopPosInPattern);
-            var sourcePoint = createTransferPointForPattern(route, stopIndex);
-            points.add(new TPoint(pattern, sourcePoint, null, stopPosInPattern));
+            // stopPosInPattern == -1 means stop is not on pattern
+            if (stopPosInPattern >= 0) {
+                int stopIndex = pattern.stopIndex(stopPosInPattern);
+                var sourcePoint = createTransferPointForPattern(route, stopIndex);
+                points.add(new TPoint(pattern, sourcePoint, null, stopPosInPattern));
+            }
         }
         return points;
     }
@@ -196,7 +235,7 @@ public class TransferIndexGenerator {
         // All trips have at least one pattern, no need to chech for null here
         var patterns = patternsByTrip.get(trip);
         int stopPosInPattern = point.getStopPositionInPattern();
-        int stopIndex = patterns.get(0).stopIndex(stopPosInPattern);
+        int stopIndex = patterns.iterator().next().stopIndex(stopPosInPattern);
         var sourcePoint = createTransferPointForPattern(trip, stopIndex);
         return patterns.stream()
                 .map(p -> new TPoint(p, sourcePoint, trip, stopPosInPattern))

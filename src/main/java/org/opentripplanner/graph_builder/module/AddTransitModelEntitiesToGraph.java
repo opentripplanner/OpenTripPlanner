@@ -36,6 +36,8 @@ import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,13 +173,13 @@ public class AddTransitModelEntitiesToGraph {
                 new PathwayEdge(
                     boardingAreaVertex,
                     stationElementNodes.get(boardingArea.getParentStop()),
-                    boardingArea.getName()
+                    new NonLocalizedString(boardingArea.getName())
                 );
 
                 new PathwayEdge(
                     stationElementNodes.get(boardingArea.getParentStop()),
                     boardingAreaVertex,
-                    boardingArea.getName()
+                    new NonLocalizedString(boardingArea.getName())
                 );
             }
         }
@@ -198,7 +200,7 @@ public class AddTransitModelEntitiesToGraph {
                         fromVertex,
                         toVertex,
                         pathway.getId(),
-                        pathway.getName(),
+                        pathway.getName() != null ? new NonLocalizedString(pathway.getName()) : null,
                         pathway.getTraversalTime(),
                         pathway.getLength(),
                         pathway.getStairCount(),
@@ -210,7 +212,7 @@ public class AddTransitModelEntitiesToGraph {
                             toVertex,
                             fromVertex,
                             pathway.getId(),
-                            pathway.getReversedName(),
+                            pathway.getReversedName() != null ? new NonLocalizedString(pathway.getReversedName()) : null,
                             pathway.getTraversalTime(),
                             pathway.getLength(),
                             -1 * pathway.getStairCount(),
@@ -243,15 +245,15 @@ public class AddTransitModelEntitiesToGraph {
         Vertex toVertex
     ) {
         StationElement fromStation = fromVertex.getStationElement();
-        String fromVertexLevelName = fromStation == null || fromStation.getLevelName() == null
+        I18NString fromVertexLevelName = fromStation == null || fromStation.getLevelName() == null
             ? fromVertex.getName()
-            : fromStation.getLevelName();
+            : new NonLocalizedString(fromStation.getLevelName());
         Double fromVertexLevelIndex = fromStation == null ? null : fromStation.getLevelIndex();
 
         StationElement toStation = toVertex.getStationElement();
-        String toVertexLevelName = toStation == null || toStation.getLevelName() == null
+        I18NString toVertexLevelName = toStation == null || toStation.getLevelName() == null
             ? toVertex.getName()
-            : toStation.getLevelName();
+            : new NonLocalizedString(toStation.getLevelName());
         Double toVertexLevelIndex = toStation == null ? null : toStation.getLevelIndex();
 
         double levels = 1;

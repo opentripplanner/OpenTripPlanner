@@ -3,8 +3,10 @@ package org.opentripplanner.routing.algorithm.mapping;
 import au.com.origin.snapshots.junit5.SnapshotExtension;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,9 +14,11 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.error.RoutingValidationException;
 
 @ExtendWith(SnapshotExtension.class)
 @ResourceLock(Resources.LOCALE)
@@ -52,15 +56,7 @@ public class BikeRentalSnapshotTest
         request.from = p1;
         request.to = p2;
 
-        expectArriveByToMatchDepartAtAndSnapshot(request, (departAt, arriveBy) -> {
-            /* The cost for switching between walking/biking is added the edge where switching occurs,
-             * because of this the times for departAt / arriveBy itineraries differ.
-             */
-            arriveBy.legs.get(1).setEndTime(departAt.legs.get(1).getEndTime());
-            arriveBy.legs.get(2).setStartTime(departAt.legs.get(2).getStartTime());
-
-            handleGeneralizedCost(departAt, arriveBy);
-        });
+        expectArriveByToMatchDepartAtAndSnapshot(request);
     }
 
     /**
@@ -105,7 +101,11 @@ public class BikeRentalSnapshotTest
         request.from = p1;
         request.to = p3;
 
-        expectArriveByToMatchDepartAtAndSnapshot(request);
+        try {
+            expectArriveByToMatchDepartAtAndSnapshot(request);
+        } catch (CompletionException e) {
+            RoutingValidationException.unwrapAndRethrowCompletionException(e);
+        }
     }
 
     @DisplayName("Egress BIKE_RENTAL")
@@ -116,6 +116,6 @@ public class BikeRentalSnapshotTest
         request.from = p3;
         request.to = p1;
 
-        expectArriveByToMatchDepartAtAndSnapshot(request, SnapshotTestBase::handleGeneralizedCost);
+        expectArriveByToMatchDepartAtAndSnapshot(request);
     }
 }

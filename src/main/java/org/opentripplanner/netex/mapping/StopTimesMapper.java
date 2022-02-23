@@ -8,6 +8,8 @@ import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -24,14 +26,19 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.DestinationDisplay_VersionStructure;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LineRefStructure;
+import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+import org.rutebanken.netex.model.Via_VersionedChildStructure;
+import org.rutebanken.netex.model.Vias_RelStructure;
 
 /**
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the StopTime has a reference
@@ -168,17 +175,23 @@ class StopTimesMapper {
         stopTime.setStop(stop);
         if (passingTime.getArrivalTime() != null || passingTime.getDepartureTime() != null) {
             stopTime.setArrivalTime(calculateOtpTime(
-                passingTime.getArrivalTime(),                 
-                passingTime.getArrivalDayOffset(),
-                passingTime.getDepartureTime(),
-                passingTime.getDepartureDayOffset()
+                    passingTime.getArrivalTime(),
+                    passingTime.getArrivalDayOffset(),
+                    passingTime.getDepartureTime(),
+                    passingTime.getDepartureDayOffset()
             ));
             stopTime.setDepartureTime(calculateOtpTime(
-                passingTime.getDepartureTime(),
-                passingTime.getDepartureDayOffset(),
-                passingTime.getArrivalTime(),
-                passingTime.getArrivalDayOffset()
+                    passingTime.getDepartureTime(),
+                    passingTime.getDepartureDayOffset(),
+                    passingTime.getArrivalTime(),
+                    passingTime.getArrivalDayOffset()
             ));
+
+            // From NeTEx we define timepoint as a waitpoint with waiting time defined (also 0)
+            if (Boolean.TRUE.equals(stopPoint.isIsWaitPoint())
+                    && passingTime.getWaitingTime() != null) {
+                stopTime.setTimepoint(1);
+            }
         } else if (passingTime.getEarliestDepartureTime() != null && passingTime.getLatestArrivalTime() != null) {
             stopTime.setFlexWindowStart(
                     calculateOtpTime(
@@ -195,6 +208,8 @@ class StopTimesMapper {
         } else {
             return null;
         }
+
+        List<String> vias = null;
 
         if (stopPoint != null) {
             if (isFalse(stopPoint.isForAlighting())) {
@@ -216,8 +231,30 @@ class StopTimesMapper {
             if (stopPoint.getDestinationDisplayRef() != null) {
                 DestinationDisplay destinationDisplay =
                         destinationDisplayById.lookup(stopPoint.getDestinationDisplayRef().getRef());
+
+                Vias_RelStructure viaValues = null;
+
                 if (destinationDisplay != null) {
                     currentHeadSign = destinationDisplay.getFrontText().getValue();
+                    viaValues = destinationDisplay.getVias();
+                }
+
+                if (viaValues != null && viaValues.getVia() != null) {
+                    vias = viaValues.getVia().stream()
+                            .map(Via_VersionedChildStructure::getDestinationDisplayRef)
+                            .filter(Objects::nonNull)
+                            .map(VersionOfObjectRefStructure::getRef)
+                            .filter(Objects::nonNull)
+                            .map(destinationDisplayById::lookup)
+                            .filter(Objects::nonNull)
+                            .map(DestinationDisplay_VersionStructure::getFrontText)
+                            .filter(Objects::nonNull)
+                            .map(MultilingualString::getValue)
+                            .collect(Collectors.toList());
+
+                    if (vias.isEmpty()) {
+                        vias = null;
+                    }
                 }
             }
         }
@@ -231,6 +268,7 @@ class StopTimesMapper {
         if (currentHeadSign != null) {
             stopTime.setStopHeadsign(currentHeadSign);
         }
+        stopTime.setHeadsignVias(vias);
         return stopTime;
     }
 

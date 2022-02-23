@@ -39,12 +39,12 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case Agencies:
+            case AGENCIES:
               List<Agency> agencies = getAgencies(environment);
               agencies.forEach(
                       agency -> alerts.addAll(alertService.getAgencyAlerts(agency.getId())));
               break;
-            case RouteTypes:
+            case ROUTE_TYPES:
               alertService.getAllAlerts()
                       .stream()
                       .filter(alert -> alert.getEntities()

@@ -53,7 +53,7 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
     public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
         if (v instanceof VehicleRentalStationVertex) {
             attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
-            attrs.label = v.getName();
+            attrs.label = v.getDefaultName();
         } else if (v instanceof IntersectionVertex) {
             attrs.color = Color.DARK_GRAY;
         } else {

@@ -452,13 +452,18 @@ public class TimetableHelper {
             return null;
         }
 
-        EstimatedVehicleJourney.EstimatedCalls journeyCalls = journey.getEstimatedCalls();
-
         List<EstimatedCall> estimatedCalls;
-        if (journeyCalls != null) {
-            estimatedCalls = journeyCalls.getEstimatedCalls();
+        List<RecordedCall> recordedCalls;
+        if (journey.getEstimatedCalls() != null) {
+            estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
         } else {
             estimatedCalls = EMPTY_LIST;
+        }
+
+        if (journey.getRecordedCalls() != null) {
+            recordedCalls = journey.getRecordedCalls().getRecordedCalls();
+        } else {
+            recordedCalls = EMPTY_LIST;
         }
 
         var stops = createModifiedStops(timetable, journey, routingService);
@@ -486,7 +491,40 @@ public class TimetableHelper {
             //stopTime.setId(oldTimes.getStopTimeIdByIndex(i));
 
             boolean foundMatch = false;
-            if (i >= numberOfRecordedCalls) {
+            if (i < numberOfRecordedCalls) {
+                for (RecordedCall recordedCall : recordedCalls) {
+                    if (alreadyVisited.contains(recordedCall)) {
+                        continue;
+                    }
+
+                    //Current stop is being updated
+                    var callStopRef = recordedCall.getStopPointRef().getValue();
+                    boolean stopsMatchById = stop.getId().getId().equals(callStopRef);
+
+                    if (!stopsMatchById && stop.isPartOfStation()) {
+                        var alternativeStop = routingService.getStopForId(
+                                new FeedScopedId(stop.getId().getFeedId(), callStopRef)
+                        );
+                        if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
+                            stopsMatchById = true;
+                            stopTime.setStop(alternativeStop);
+                        }
+
+                    }
+
+                    if (stopsMatchById) {
+                        foundMatch = true;
+
+                        if (recordedCall.isCancellation() != null && recordedCall.isCancellation()) {
+                            stopTime.cancel();
+                        }
+
+                        modifiedStops.add(stopTime);
+                        alreadyVisited.add(recordedCall);
+                        break;
+                    }
+                }
+            } else {
                 for (EstimatedCall estimatedCall : estimatedCalls) {
                     if (alreadyVisited.contains(estimatedCall)) {
                         continue;
@@ -533,6 +571,10 @@ public class TimetableHelper {
                         } else if (estimatedCall.getDepartureBoardingActivity() == null && i == (stops.size()-1)) {
                             //Last stop - default no pickup
                             stopTime.setPickupType(NONE);
+                        }
+
+                        if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
+                            stopTime.cancel();
                         }
 
                         if (estimatedCall.getDestinationDisplaies() != null && !estimatedCall.getDestinationDisplaies().isEmpty()) {

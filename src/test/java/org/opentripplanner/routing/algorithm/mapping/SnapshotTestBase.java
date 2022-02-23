@@ -41,6 +41,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -160,10 +161,6 @@ public abstract class SnapshotTestBase {
     }
 
     protected void expectArriveByToMatchDepartAtAndSnapshot(RoutingRequest request) {
-        expectArriveByToMatchDepartAtAndSnapshot(request, (departAt, arriveBy) -> {});
-    }
-
-    protected void expectArriveByToMatchDepartAtAndSnapshot(RoutingRequest request, BiConsumer<Itinerary, Itinerary> arriveByCorrecter) {
         Router router = getRouter();
 
         RoutingRequest departAt = request.clone();
@@ -182,7 +179,6 @@ public abstract class SnapshotTestBase {
         var departAtItinerary = departByItineraries.get(0);
         var arriveByItinerary = arriveByItineraries.get(0);
 
-        arriveByCorrecter.accept(departAtItinerary, arriveByItinerary);
         logDebugInformationOnFailure(arriveBy, () -> assertEquals(
                 asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
                 asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
@@ -356,18 +352,5 @@ public abstract class SnapshotTestBase {
         public String getOutputFormat() {
             return SerializerType.JSON.name();
         }
-    }
-
-    /**
-     * The generalizedCost for non-transit legs may differ for departAt / arriveBy searches,
-     * depending on where the costs were applied.
-     */
-    public static void handleGeneralizedCost(Itinerary departAt, Itinerary arriveBy) {
-        departAt.legs.stream()
-                .filter(l -> !l.getMode().isTransit())
-                .forEach(l -> l.setGeneralizedCost(0));
-        arriveBy.legs.stream()
-                .filter(l -> !l.getMode().isTransit())
-                .forEach(l -> l.setGeneralizedCost(0));
     }
 }

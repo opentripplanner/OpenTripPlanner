@@ -4,6 +4,7 @@ import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.PickDrop.NONE;
 
 import graphql.Scalars;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -149,6 +150,11 @@ public class EstimatedCallType {
                     .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getRealtimeState())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("stopPositionInPattern")
+                    .type(Scalars.GraphQLInt)
+                    .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStopIndex())
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("forBoarding")
                 .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
                 .description("Whether vehicle may be boarded at quay according to the planned data. "
@@ -201,7 +207,7 @@ public class EstimatedCallType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("destinationDisplay")
                     .type(destinationDisplayType)
-                    .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getHeadsign())
+                    .dataFetcher(DataFetchingEnvironment::getSource)
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")
