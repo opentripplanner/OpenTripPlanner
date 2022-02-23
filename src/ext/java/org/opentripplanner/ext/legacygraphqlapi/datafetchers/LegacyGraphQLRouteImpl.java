@@ -196,8 +196,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
             .getPatternsForRoute()
             .get(getSource(environment))
             .stream()
-            .map(TripPattern::getTrips)
-            .flatMap(Collection::stream)
+            .flatMap(TripPattern::scheduledTripsAsStream)
             .collect(Collectors.toSet());
   }
 

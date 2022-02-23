@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import java.util.function.IntUnaryOperator;
 
 /**
@@ -40,4 +41,21 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
      * Number of trips in time-table.
      */
     int numberOfTripSchedules();
+
+    /**
+     * Raptor provides a trips search for regular trip schedules, but in some cases it makes
+     * sense to be able to override this - for example for frequency based trips.
+     *
+     * @return {@code true} If you do not want to use the built-in trip search and instead
+     *         will provide your own. Make sure to implement the
+     *         {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
+     *         searches.
+     */
+    boolean useCustomizedTripSearch();
+
+    /**
+     * Factory method to provide an alternative trip search in Raptor.
+     * @see #useCustomizedTripSearch()
+     */
+    RaptorTripScheduleSearch<T> createCustomizedTripSearch(SearchDirection direction);
 }

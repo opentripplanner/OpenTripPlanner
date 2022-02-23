@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.routing.algorithm.raptor.path.PathDiff;
+import org.opentripplanner.routing.algorithm.raptoradapter.path.PathDiff;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;

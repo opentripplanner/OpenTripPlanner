@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 
 /**
@@ -20,14 +21,14 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule>
-        implements TripScheduleSearch<T> {
+        implements RaptorTripScheduleSearch<T> {
 
     private final int slack;
-    private final TripScheduleSearch<T> delegate;
+    private final RaptorTripScheduleSearch<T> delegate;
     private final TransitCalculator<T> calculator;
 
     TripScheduleExactMatchSearch(
-            TripScheduleSearch<T> delegate,
+            RaptorTripScheduleSearch<T> delegate,
             TransitCalculator<T> calculator,
             int slack
     ) {

@@ -151,7 +151,7 @@ public class GeometryAndBlockProcessor {
         LOG.info(progress.startMessage());
 
         tripPatterns.parallelStream().forEach(tripPattern -> {
-            for (Trip trip : tripPattern.getTrips()) {
+            tripPattern.scheduledTripsAsStream().forEach(trip -> {
                 // create geometries if they aren't already created
                 // note that this is not only done on new trip patterns, because it is possible that
                 // there would be a trip pattern with no geometry yet because it failed some of these tests
@@ -161,7 +161,7 @@ public class GeometryAndBlockProcessor {
                     geometriesByTripPattern.put(tripPattern,
                             createGeometry(trip.getShapeId(), transitService.getStopTimesForTrip(trip)));
                 }
-            }
+            });
             //Keep lambda! A method-ref would causes incorrect class and line number to be logged
             progress.step(m -> LOG.info(m));
         });
