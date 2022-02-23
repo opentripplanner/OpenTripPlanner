@@ -258,7 +258,8 @@ public class NetexMapper {
                 idFactory,
                 currentNetexIndex.getQuayById(),
                 tariffZoneMapper,
-                issueStore
+                issueStore,
+                currentNetexIndex.getStopPlaceById()
         );
         for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex.getStopPlaceById().lookup(stopPlaceId);
