@@ -211,6 +211,8 @@ public class ApiLeg {
 
      /**
       * Is this leg walking with a bike?
+      *
+      * @deprecated This is always null or false, the information is now stored per walk step
       */
     public Boolean walkingBike;
 

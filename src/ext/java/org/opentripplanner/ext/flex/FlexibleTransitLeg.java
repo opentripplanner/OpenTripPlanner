@@ -23,7 +23,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
- * particular vehicle, which is running a trip which is flexible, i.e. not using fixed schedule and
+ * particular vehicle, which is running on flexible trip, i.e. not using fixed schedule and
  * stops.
  */
 public class FlexibleTransitLeg implements Leg {

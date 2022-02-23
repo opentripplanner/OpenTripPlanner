@@ -122,8 +122,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 13.358,
-          "endTime": "2009-10-21T23:17:37.000+00:00",
+          "distance": 493.426,
+          "endTime": "2009-10-21T23:19:58.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:17:26.000+00:00",
             "bikeShareId": "-102309",
@@ -133,13 +133,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 288,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 2,
-            "points": "ic{tGl|{kVV@"
+            "length": 7,
+            "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
           },
-          "mode": "WALK",
+          "mode": "BICYCLE",
           "pathway": false,
           "realTime": false,
           "rentedBike": true,
@@ -158,46 +158,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "stayOn": false,
               "streetName": "way -102328 from 0",
               "walkingBike": true
-            }
-          ],
-          "to": {
-            "arrival": "2009-10-21T23:17:37.000+00:00",
-            "departure": "2009-10-21T23:17:37.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "transitLeg": false,
-          "walkingBike": true
-        },
-        {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 480.068,
-          "endTime": "2009-10-21T23:19:58.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:17:37.000+00:00",
-            "departure": "2009-10-21T23:17:37.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "generalizedCost": 236,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 6,
-            "points": "qb{tGn|{kVGsJEuKE}HAwAAo@"
-          },
-          "mode": "BICYCLE",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": true,
-          "route": "",
-          "startTime": "2009-10-21T23:17:37.000+00:00",
-          "steps": [
+            },
             {
               "absoluteDirection": "EAST",
               "area": false,
@@ -1774,8 +1735,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 13.358,
-          "endTime": "2009-10-21T23:30:37.000+00:00",
+          "distance": 493.426,
+          "endTime": "2009-10-21T23:32:58.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:30:26.000+00:00",
             "bikeShareId": "-102309",
@@ -1785,13 +1746,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 288,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 2,
-            "points": "ic{tGl|{kVV@"
+            "length": 7,
+            "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
           },
-          "mode": "WALK",
+          "mode": "BICYCLE",
           "pathway": false,
           "realTime": false,
           "rentedBike": true,
@@ -1810,46 +1771,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "stayOn": false,
               "streetName": "way -102328 from 0",
               "walkingBike": true
-            }
-          ],
-          "to": {
-            "arrival": "2009-10-21T23:30:37.000+00:00",
-            "departure": "2009-10-21T23:30:37.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "transitLeg": false,
-          "walkingBike": true
-        },
-        {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 480.068,
-          "endTime": "2009-10-21T23:32:58.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:30:37.000+00:00",
-            "departure": "2009-10-21T23:30:37.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "generalizedCost": 236,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 6,
-            "points": "qb{tGn|{kVGsJEuKE}HAwAAo@"
-          },
-          "mode": "BICYCLE",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": true,
-          "route": "",
-          "startTime": "2009-10-21T23:30:37.000+00:00",
-          "steps": [
+            },
             {
               "absoluteDirection": "EAST",
               "area": false,
@@ -2268,8 +2190,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 13.358,
-          "endTime": "2009-10-21T23:39:37.000+00:00",
+          "distance": 493.426,
+          "endTime": "2009-10-21T23:41:58.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:39:26.000+00:00",
             "bikeShareId": "-102309",
@@ -2279,13 +2201,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 288,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 2,
-            "points": "ic{tGl|{kVV@"
+            "length": 7,
+            "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
           },
-          "mode": "WALK",
+          "mode": "BICYCLE",
           "pathway": false,
           "realTime": false,
           "rentedBike": true,
@@ -2304,46 +2226,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "stayOn": false,
               "streetName": "way -102328 from 0",
               "walkingBike": true
-            }
-          ],
-          "to": {
-            "arrival": "2009-10-21T23:39:37.000+00:00",
-            "departure": "2009-10-21T23:39:37.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "transitLeg": false,
-          "walkingBike": true
-        },
-        {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 480.068,
-          "endTime": "2009-10-21T23:41:58.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:39:37.000+00:00",
-            "departure": "2009-10-21T23:39:37.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "generalizedCost": 236,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 6,
-            "points": "qb{tGn|{kVGsJEuKE}HAwAAo@"
-          },
-          "mode": "BICYCLE",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": true,
-          "route": "",
-          "startTime": "2009-10-21T23:39:37.000+00:00",
-          "steps": [
+            },
             {
               "absoluteDirection": "EAST",
               "area": false,
@@ -2644,6 +2527,257 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
 ]
 
 
+org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeRental=[
+  [
+    {
+      "arrivedAtDestinationWithRentedBicycle": false,
+      "duration": 477,
+      "elevationGained": 0.0,
+      "elevationLost": 0.0,
+      "endTime": "2009-10-21T23:17:57.000+00:00",
+      "fare": {
+        "details": { },
+        "fare": { }
+      },
+      "generalizedCost": 915,
+      "legs": [
+        {
+          "agencyTimeZoneOffset": -25200000,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 106.589,
+          "endTime": "2009-10-21T23:12:31.000+00:00",
+          "from": {
+            "departure": "2009-10-21T23:10:00.000+00:00",
+            "lat": 45.52832,
+            "lon": -122.70059,
+            "name": "SW Johnson St. & NW 24th Ave. (P1)",
+            "vertexType": "NORMAL"
+          },
+          "generalizedCost": 288,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 4,
+            "points": "}f{tGv}{kVjCA?e@WA"
+          },
+          "mode": "WALK",
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "route": "",
+          "startTime": "2009-10-21T23:10:00.000+00:00",
+          "steps": [
+            {
+              "absoluteDirection": "SOUTH",
+              "area": false,
+              "bogusName": false,
+              "distance": 78.527,
+              "elevation": "",
+              "lat": 45.52831993266165,
+              "lon": -122.70059632295107,
+              "relativeDirection": "DEPART",
+              "stayOn": false,
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
+            },
+            {
+              "absoluteDirection": "EAST",
+              "area": false,
+              "bogusName": false,
+              "distance": 14.704,
+              "elevation": "",
+              "lat": 45.527613800000005,
+              "lon": -122.70058100000001,
+              "relativeDirection": "LEFT",
+              "stayOn": false,
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
+            },
+            {
+              "absoluteDirection": "NORTH",
+              "area": false,
+              "bogusName": true,
+              "distance": 13.358,
+              "elevation": "",
+              "lat": 45.5276173,
+              "lon": -122.7003923,
+              "relativeDirection": "LEFT",
+              "stayOn": false,
+              "streetName": "way -102328 from 0",
+              "walkingBike": false
+            }
+          ],
+          "to": {
+            "arrival": "2009-10-21T23:12:31.000+00:00",
+            "bikeShareId": "-102309",
+            "departure": "2009-10-21T23:12:31.000+00:00",
+            "lat": 45.5277374,
+            "lon": -122.7003879,
+            "name": "-102309",
+            "vertexType": "BIKESHARE"
+          },
+          "transitLeg": false,
+          "walkingBike": false
+        },
+        {
+          "agencyTimeZoneOffset": -25200000,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 493.426,
+          "endTime": "2009-10-21T23:15:03.000+00:00",
+          "from": {
+            "arrival": "2009-10-21T23:12:31.000+00:00",
+            "bikeShareId": "-102309",
+            "departure": "2009-10-21T23:12:31.000+00:00",
+            "lat": 45.5277374,
+            "lon": -122.7003879,
+            "name": "-102309",
+            "vertexType": "BIKESHARE"
+          },
+          "generalizedCost": 288,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 7,
+            "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
+          },
+          "mode": "BICYCLE",
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": true,
+          "route": "",
+          "startTime": "2009-10-21T23:12:31.000+00:00",
+          "steps": [
+            {
+              "absoluteDirection": "SOUTH",
+              "area": false,
+              "bogusName": true,
+              "distance": 13.358,
+              "elevation": "",
+              "lat": 45.5277374,
+              "lon": -122.70038790000001,
+              "relativeDirection": "HARD_LEFT",
+              "stayOn": false,
+              "streetName": "way -102328 from 0",
+              "walkingBike": true
+            },
+            {
+              "absoluteDirection": "EAST",
+              "area": false,
+              "bogusName": false,
+              "distance": 480.068,
+              "elevation": "",
+              "lat": 45.5276173,
+              "lon": -122.7003923,
+              "relativeDirection": "LEFT",
+              "stayOn": false,
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
+            }
+          ],
+          "to": {
+            "arrival": "2009-10-21T23:15:03.000+00:00",
+            "bikeShareId": "-102323",
+            "departure": "2009-10-21T23:15:03.000+00:00",
+            "lat": 45.5278491,
+            "lon": -122.6942362,
+            "name": "-102323",
+            "vertexType": "BIKESHARE"
+          },
+          "transitLeg": false,
+          "walkingBike": false
+        },
+        {
+          "agencyTimeZoneOffset": -25200000,
+          "arrivalDelay": 0,
+          "departureDelay": 0,
+          "distance": 219.063,
+          "endTime": "2009-10-21T23:17:57.000+00:00",
+          "from": {
+            "arrival": "2009-10-21T23:15:03.000+00:00",
+            "bikeShareId": "-102323",
+            "departure": "2009-10-21T23:15:03.000+00:00",
+            "lat": 45.5278491,
+            "lon": -122.6942362,
+            "name": "-102323",
+            "vertexType": "BIKESHARE"
+          },
+          "generalizedCost": 338,
+          "interlineWithPreviousLeg": false,
+          "legGeometry": {
+            "length": 4,
+            "points": "ic{tG~uzkVEcJlCE?C"
+          },
+          "mode": "WALK",
+          "pathway": false,
+          "realTime": false,
+          "rentedBike": false,
+          "route": "",
+          "startTime": "2009-10-21T23:15:03.000+00:00",
+          "steps": [
+            {
+              "absoluteDirection": "EAST",
+              "area": false,
+              "bogusName": false,
+              "distance": 138.309,
+              "elevation": "",
+              "lat": 45.52773220198921,
+              "lon": -122.69423177172958,
+              "relativeDirection": "CONTINUE",
+              "stayOn": false,
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
+            },
+            {
+              "absoluteDirection": "SOUTH",
+              "area": false,
+              "bogusName": false,
+              "distance": 78.785,
+              "elevation": "",
+              "lat": 45.527765200000005,
+              "lon": -122.69245690000001,
+              "relativeDirection": "RIGHT",
+              "stayOn": false,
+              "streetName": "Northwest 20th Avenue",
+              "walkingBike": false
+            },
+            {
+              "absoluteDirection": "EAST",
+              "area": false,
+              "bogusName": false,
+              "distance": 1.969,
+              "elevation": "",
+              "lat": 45.527057000000006,
+              "lon": -122.6924259,
+              "relativeDirection": "LEFT",
+              "stayOn": false,
+              "streetName": "Northwest Hoyt Street",
+              "walkingBike": false
+            }
+          ],
+          "to": {
+            "arrival": "2009-10-21T23:17:57.000+00:00",
+            "lat": 45.52704,
+            "lon": -122.6924,
+            "name": "NW Hoyt St. & NW 20th Ave. (P2)",
+            "vertexType": "NORMAL"
+          },
+          "transitLeg": false,
+          "walkingBike": false
+        }
+      ],
+      "startTime": "2009-10-21T23:10:00.000+00:00",
+      "tooSloped": false,
+      "transfers": 0,
+      "transitTime": 0,
+      "waitingTime": 0,
+      "walkDistance": 819.078,
+      "walkLimitExceeded": false,
+      "walkTime": 477
+    }
+  ]
+]
+
+
 org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeRentalArrivingAtDestinationWithArriveBy=[
   [
     {
@@ -2740,8 +2874,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 13.358,
-          "endTime": "2009-10-21T23:07:18.000+00:00",
+          "distance": 711.971,
+          "endTime": "2009-10-21T23:10:00.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:06:53.000+00:00",
             "bikeShareId": "-102309",
@@ -2751,13 +2885,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 65,
+          "generalizedCost": 363,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 2,
-            "points": "ic{tGl|{kVV@"
+            "length": 11,
+            "points": "ic{tGl|{kVV@GsJL?F?tBCEuK?g@GmJEuK?C"
           },
-          "mode": "WALK",
+          "mode": "BICYCLE",
           "pathway": false,
           "realTime": false,
           "rentedBike": true,
@@ -2776,46 +2910,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "stayOn": false,
               "streetName": "way -102328 from 0",
               "walkingBike": true
-            }
-          ],
-          "to": {
-            "arrival": "2009-10-21T23:07:18.000+00:00",
-            "departure": "2009-10-21T23:07:18.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "transitLeg": false,
-          "walkingBike": true
-        },
-        {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 698.613,
-          "endTime": "2009-10-21T23:10:00.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:07:18.000+00:00",
-            "departure": "2009-10-21T23:07:18.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "generalizedCost": 298,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 10,
-            "points": "qb{tGn|{kVGsJL?F?tBCEuK?g@GmJEuK?C"
-          },
-          "mode": "BICYCLE",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": true,
-          "route": "",
-          "startTime": "2009-10-21T23:07:18.000+00:00",
-          "steps": [
+            },
             {
               "absoluteDirection": "EAST",
               "area": false,
@@ -2872,7 +2967,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 818.5600000000001,
+      "walkDistance": 818.56,
       "walkLimitExceeded": false,
       "walkTime": 338
     }
@@ -2976,8 +3071,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 13.358,
-          "endTime": "2009-10-21T23:12:42.000+00:00",
+          "distance": 712.489,
+          "endTime": "2009-10-21T23:15:37.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:12:31.000+00:00",
             "bikeShareId": "-102309",
@@ -2987,13 +3082,13 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             "name": "-102309",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 363,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 2,
-            "points": "ic{tGl|{kVV@"
+            "length": 10,
+            "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@EcJlCE?C"
           },
-          "mode": "WALK",
+          "mode": "BICYCLE",
           "pathway": false,
           "realTime": false,
           "rentedBike": true,
@@ -3012,46 +3107,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "stayOn": false,
               "streetName": "way -102328 from 0",
               "walkingBike": true
-            }
-          ],
-          "to": {
-            "arrival": "2009-10-21T23:12:42.000+00:00",
-            "departure": "2009-10-21T23:12:42.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "transitLeg": false,
-          "walkingBike": true
-        },
-        {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 699.131,
-          "endTime": "2009-10-21T23:15:37.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:12:42.000+00:00",
-            "departure": "2009-10-21T23:12:42.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "generalizedCost": 312,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 9,
-            "points": "qb{tGn|{kVGsJEuKE}HAwAAo@EcJlCE?C"
-          },
-          "mode": "BICYCLE",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": true,
-          "route": "",
-          "startTime": "2009-10-21T23:12:42.000+00:00",
-          "steps": [
+            },
             {
               "absoluteDirection": "EAST",
               "area": false,
@@ -3474,8 +3530,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 480.068,
-          "endTime": "2009-10-21T23:26:39.000+00:00",
+          "distance": 493.426,
+          "endTime": "2009-10-21T23:27:20.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:24:58.000+00:00",
             "bikeShareId": "-102323",
@@ -3485,11 +3541,11 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "-102323",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 196,
+          "generalizedCost": 277,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 6,
-            "points": "ic{tG~uzkV@n@@vAD|HDtKFrJ"
+            "length": 7,
+            "points": "ic{tG~uzkV@n@@vAD|HDtKFrJWA"
           },
           "mode": "BICYCLE",
           "pathway": false,
@@ -3510,46 +3566,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "stayOn": false,
               "streetName": "Northwest Irving Street",
               "walkingBike": false
-            }
-          ],
-          "to": {
-            "arrival": "2009-10-21T23:26:39.000+00:00",
-            "departure": "2009-10-21T23:26:39.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "transitLeg": false,
-          "walkingBike": false
-        },
-        {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 13.358,
-          "endTime": "2009-10-21T23:27:20.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:26:39.000+00:00",
-            "departure": "2009-10-21T23:26:39.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "generalizedCost": 81,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 2,
-            "points": "qb{tGn|{kVWA"
-          },
-          "mode": "WALK",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": true,
-          "route": "",
-          "startTime": "2009-10-21T23:26:39.000+00:00",
-          "steps": [
+            },
             {
               "absoluteDirection": "NORTH",
               "area": false,
@@ -4792,8 +4809,8 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 480.068,
-          "endTime": "2009-10-21T23:41:39.000+00:00",
+          "distance": 493.426,
+          "endTime": "2009-10-21T23:42:20.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:39:58.000+00:00",
             "bikeShareId": "-102323",
@@ -4803,11 +4820,11 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name": "-102323",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 196,
+          "generalizedCost": 277,
           "interlineWithPreviousLeg": false,
           "legGeometry": {
-            "length": 6,
-            "points": "ic{tG~uzkV@n@@vAD|HDtKFrJ"
+            "length": 7,
+            "points": "ic{tG~uzkV@n@@vAD|HDtKFrJWA"
           },
           "mode": "BICYCLE",
           "pathway": false,
@@ -4828,46 +4845,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "stayOn": false,
               "streetName": "Northwest Irving Street",
               "walkingBike": false
-            }
-          ],
-          "to": {
-            "arrival": "2009-10-21T23:41:39.000+00:00",
-            "departure": "2009-10-21T23:41:39.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "transitLeg": false,
-          "walkingBike": false
-        },
-        {
-          "agencyTimeZoneOffset": -25200000,
-          "arrivalDelay": 0,
-          "departureDelay": 0,
-          "distance": 13.358,
-          "endTime": "2009-10-21T23:42:20.000+00:00",
-          "from": {
-            "arrival": "2009-10-21T23:41:39.000+00:00",
-            "departure": "2009-10-21T23:41:39.000+00:00",
-            "lat": 45.5276173,
-            "lon": -122.7003923,
-            "name": "corner of Northwest Irving Street and way -102328 from 0",
-            "vertexType": "NORMAL"
-          },
-          "generalizedCost": 81,
-          "interlineWithPreviousLeg": false,
-          "legGeometry": {
-            "length": 2,
-            "points": "qb{tGn|{kVWA"
-          },
-          "mode": "WALK",
-          "pathway": false,
-          "realTime": false,
-          "rentedBike": true,
-          "route": "",
-          "startTime": "2009-10-21T23:41:39.000+00:00",
-          "steps": [
+            },
             {
               "absoluteDirection": "NORTH",
               "area": false,

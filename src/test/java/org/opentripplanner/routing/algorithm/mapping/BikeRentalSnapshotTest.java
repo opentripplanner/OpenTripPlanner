@@ -49,7 +49,6 @@ public class BikeRentalSnapshotTest
 
     @DisplayName("Direct BIKE_RENTAL")
     @Test
-    @Disabled("Pending change to skip bike walking legs")
     public void directBikeRental() {
         RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
