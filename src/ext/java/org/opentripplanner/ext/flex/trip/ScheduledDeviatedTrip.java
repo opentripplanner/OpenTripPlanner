@@ -21,6 +21,7 @@ import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FlexLocationGroup;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
@@ -78,7 +79,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
     for (int toIndex = fromIndex; toIndex < stopTimes.length; toIndex++) {
-      if (stopTimes[toIndex].dropOffType == NONE.getGtfsCode()) continue;
+      if (getDropOffType(toIndex).isNotRoutable()) { continue; }
       for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
         res.add(new FlexAccessTemplate(
                 access,
@@ -109,7 +110,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 
     for (int fromIndex = toIndex; fromIndex >= 0; fromIndex--) {
-      if (stopTimes[fromIndex].pickupType == NONE.getGtfsCode()) continue;
+      if (getPickupType(fromIndex).isNotRoutable()) { continue; }
       for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
         res.add(new FlexEgressTemplate(
                 egress,
@@ -166,6 +167,16 @@ public class ScheduledDeviatedTrip extends FlexTrip {
   }
 
   @Override
+  public PickDrop getBoardRule(int i) {
+    return stopTimes[i].pickupType;
+  }
+
+  @Override
+  public PickDrop getAlightRule(int i) {
+    return stopTimes[i].dropOffType;
+  }
+
+  @Override
   public boolean isBoardingPossible(NearbyStop stop) {
     return getFromIndex(stop) != -1;
   }
@@ -173,6 +184,14 @@ public class ScheduledDeviatedTrip extends FlexTrip {
   @Override
   public boolean isAlightingPossible(NearbyStop stop) {
     return getToIndex(stop) != -1;
+  }
+
+  public PickDrop getPickupType(int i) {
+    return stopTimes[i].pickupType;
+  }
+
+  public PickDrop getDropOffType(int i) {
+    return stopTimes[i].dropOffType;
   }
 
   private Collection<StopLocation> expandStops(StopLocation stop) {
@@ -183,7 +202,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   private int getFromIndex(NearbyStop accessEgress) {
     for (int i = 0; i < stopTimes.length; i++) {
-      if (stopTimes[i].pickupType == NONE.getGtfsCode()) continue; // No pickup allowed here
+      if (getPickupType(i).isNotRoutable()) { continue; }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof FlexLocationGroup) {
         if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
@@ -201,7 +220,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   private int getToIndex(NearbyStop accessEgress) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
-      if (stopTimes[i].dropOffType == NONE.getGtfsCode()) continue; // No drop off allowed here
+      if (getDropOffType(i).isNotRoutable()) { continue; }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof FlexLocationGroup) {
         if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
@@ -221,8 +240,8 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     private final StopLocation stop;
     private final int departureTime;
     private final int arrivalTime;
-    private final int pickupType;
-    private final int dropOffType;
+    private final PickDrop pickupType;
+    private final PickDrop dropOffType;
 
     private ScheduledDeviatedStopTime(StopTime st) {
       this.stop = st.getStop();
@@ -235,8 +254,8 @@ public class ScheduledDeviatedTrip extends FlexTrip {
       // TODO: Store the window for a stop, and allow the user to have an "unguaranteed"
       // pickup/dropoff between the start and end of the window
 
-      this.pickupType = st.getPickupType().getGtfsCode();
-      this.dropOffType = st.getDropOffType().getGtfsCode();
+      this.pickupType = st.getPickupType();
+      this.dropOffType = st.getDropOffType();
     }
   }
 }

@@ -91,8 +91,14 @@ public class LegTest implements PlanTestConstants {
   }
 
   private static Leg createLegIgnoreTime(int tripId, int fromStopIndex, int toStopIndex, ServiceDate service) {
-    Leg leg = TestItineraryBuilder.newItinerary(A, 99).bus(tripId, 99, 99, fromStopIndex, toStopIndex, B).build().firstLeg();
-    leg.setServiceDate(service);
-    return leg;
+    return TestItineraryBuilder.newItinerary(A, 99).bus(
+            tripId,
+            99,
+            99,
+            fromStopIndex,
+            toStopIndex,
+            B,
+            service.toLocalDate()
+    ).build().firstLeg();
   }
 }

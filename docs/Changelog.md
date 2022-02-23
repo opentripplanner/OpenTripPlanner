@@ -141,6 +141,11 @@
 - Account for stay seated transfers when calculating the number of transfers [#3888](https://github.com/opentripplanner/OpenTripPlanner/pull/3888)
 - Add Hungarian translation [#3861](https://github.com/opentripplanner/OpenTripPlanner/pull/3861)
 - Add support for NeTEx VIA's [#3883](https://github.com/opentripplanner/OpenTripPlanner/pull/3883)
+- Turn ParallelRouting off [#3918](https://github.com/opentripplanner/OpenTripPlanner/pull/3918)
+- Make some list entries non-null in schema/docs [#3915](https://github.com/opentripplanner/OpenTripPlanner/pull/3915)
+- NeTEx mapping to StopTime.timepoint [#3898](https://github.com/opentripplanner/OpenTripPlanner/pull/3898)
+- Optimize RAPTOR trip search by pre-calculating arrival/departure time arrays [#3919](https://github.com/opentripplanner/OpenTripPlanner/pull/3919)
+- Make turn restrictions faster and thread-safe by moving them into StreetEdge [#3899](https://github.com/opentripplanner/OpenTripPlanner/pull/3899)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

@@ -9,7 +9,6 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.util.time.DurationUtils;
 
 public interface PlanTestConstants {
-  ServiceDate SERVICE_DATE = new ServiceDate(2020, 9, 21);
   String FEED_ID = "F";
 
   int NOT_SET = -999_999;
