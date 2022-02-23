@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -19,13 +20,20 @@ public class TripTimeOnDate {
     private final int stopIndex;
     // This is only needed because TripTimes has no reference to TripPattern
     private final TripPattern tripPattern;
-    private final ServiceDay serviceDay;
+    private final Integer midnight;
 
     public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern, ServiceDay serviceDay) {
         this.tripTimes = tripTimes;
         this.stopIndex = stopIndex;
         this.tripPattern = tripPattern;
-        this.serviceDay = serviceDay;
+        this.midnight = serviceDay != null ? serviceDay.secondsSinceMidnight(0) : UNDEFINED;
+    }
+
+    public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern, Instant midnight) {
+        this.tripTimes = tripTimes;
+        this.stopIndex = stopIndex;
+        this.tripPattern = tripPattern;
+        this.midnight = (int) midnight.getEpochSecond();
     }
 
     /** Must pass in both Timetable and Trip, because TripTimes do not have a reference to StopPatterns. */
@@ -33,7 +41,7 @@ public class TripTimeOnDate {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));        
         List<TripTimeOnDate> out = new ArrayList<>();
         for (int i = 0; i < times.getNumStops(); ++i) {
-            out.add(new TripTimeOnDate(times, i, table.getPattern(), null));
+            out.add(new TripTimeOnDate(times, i, table.getPattern(), (ServiceDay) null));
         }
         return out;
     }
@@ -133,7 +141,7 @@ public class TripTimeOnDate {
     }
 
     public long getServiceDay() {
-        return serviceDay != null ? serviceDay.time(0) : UNDEFINED;
+        return midnight;
     }
 
     public Trip getTrip() {
@@ -146,6 +154,10 @@ public class TripTimeOnDate {
 
     public String getHeadsign() {
         return tripTimes.getHeadsign(stopIndex);
+    }
+
+    public List<String> getHeadsignVias() {
+        return tripTimes.getVia(stopIndex);
     }
 
     public PickDrop getPickupType() {

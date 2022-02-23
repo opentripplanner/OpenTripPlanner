@@ -157,10 +157,8 @@ public class TripPatternForDate {
 
     @Nullable
     public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes> filter) {
-        List<TripTimes> filteredTripTimes = tripTimes
-            .stream()
-            .filter(filter)
-            .collect(Collectors.toList());
+        ArrayList<TripTimes> filteredTripTimes = new ArrayList<>(tripTimes);
+        filteredTripTimes.removeIf(Predicate.not(filter));
 
         List<FrequencyEntry> filteredFrequencies = frequencies
             .stream()

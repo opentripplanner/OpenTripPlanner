@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.util.List;
 import org.opentripplanner.util.time.TimeUtils;
 
 
@@ -28,6 +29,8 @@ public final class StopTime implements Comparable<StopTime> {
     private int stopSequence;
 
     private String stopHeadsign;
+
+    private List<String> headsignVias;
 
     private String routeShortName;
 
@@ -75,6 +78,7 @@ public final class StopTime implements Comparable<StopTime> {
         this.flexContinuousDropOff = st.flexContinuousDropOff;
         this.dropOffBookingInfo = st.dropOffBookingInfo;
         this.pickupBookingInfo = st.pickupBookingInfo;
+        this.headsignVias = st.headsignVias;
     }
 
     /**
@@ -273,6 +277,14 @@ public final class StopTime implements Comparable<StopTime> {
 
     public void setPickupBookingInfo(BookingInfo pickupBookingInfo) {
         this.pickupBookingInfo = pickupBookingInfo;
+    }
+
+    public List<String> getHeadsignVias() {
+        return headsignVias;
+    }
+
+    public void setHeadsignVias(List<String> headsignVias) {
+        this.headsignVias = headsignVias;
     }
 
     public int compareTo(StopTime o) {

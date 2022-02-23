@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -38,6 +39,19 @@ public class TripPatternForDates
 
     private final boolean isFrequencyBased;
 
+    /**
+     * The arrival times in a nStops * numberOfTripSchedules sized array. The trips are stored first
+     * by the stop position and then by trip index, so with stops 1 and 2, and trips A and B, the
+     * order is [1A, 1B, 2A, 2B]
+     */
+    private final int[] arrivalTimes;
+
+    /**
+     * The arrival times in a nStops * numberOfTripSchedules sized array. The order is the same as
+     * in arrivalTimes.
+     */
+    private final int[] departureTimes;
+
     TripPatternForDates(
             TripPatternWithRaptorStopIndexes tripPattern,
             List<TripPatternForDate> tripPatternForDates,
@@ -46,6 +60,7 @@ public class TripPatternForDates
         this.tripPattern = tripPattern;
         this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[]{});
         this.offsets = offsets.stream().mapToInt(i -> i).toArray();
+
         int numberOfTripSchedules = 0;
         boolean hasFrequencies = false;
         for (TripPatternForDate tripPatternForDate : tripPatternForDates) {
@@ -56,6 +71,21 @@ public class TripPatternForDates
         }
         this.numberOfTripSchedules = numberOfTripSchedules;
         this.isFrequencyBased = hasFrequencies;
+
+        final int nStops = tripPattern.getStopIndexes().length;
+        this.arrivalTimes = new int[nStops * numberOfTripSchedules];
+        this.departureTimes = new int[nStops * numberOfTripSchedules];
+        int i = 0;
+        for (int d = 0; d < tripPatternForDates.size(); d++) {
+            int offset = this.offsets[d];
+            for (var trip : tripPatternForDates.get(d).tripTimes()) {
+                for (int s = 0; s < nStops; s++) {
+                    this.arrivalTimes[s * numberOfTripSchedules + i] = trip.getArrivalTime(s) + offset;
+                    this.departureTimes[s * numberOfTripSchedules + i] = trip.getDepartureTime(s) + offset;
+                }
+                i++;
+            }
+        }
     }
 
     public TripPatternWithRaptorStopIndexes getTripPattern() {
@@ -144,6 +174,18 @@ public class TripPatternForDates
             index -= tripPatternForDate.numberOfTripSchedules();
         }
         throw new IndexOutOfBoundsException("Index out of bound: " + index);
+    }
+
+    @Override
+    public IntUnaryOperator getArrivalTimes(int stopPositionInPattern) {
+        final int base = stopPositionInPattern * numberOfTripSchedules;
+        return (int i) -> arrivalTimes[base + i];
+    }
+
+    @Override
+    public IntUnaryOperator getDepartureTimes(int stopPositionInPattern) {
+        final int base = stopPositionInPattern * numberOfTripSchedules;
+        return (int i) -> departureTimes[base + i];
     }
 
     @Override public int numberOfTripSchedules() {

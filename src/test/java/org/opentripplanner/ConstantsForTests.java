@@ -109,16 +109,6 @@ public class ConstantsForTests {
     }
 
     /**
-     * Returns a cached copy of the Minimal NeTEx graph, which may have been initialized.
-     */
-    public synchronized Graph getCachedMinimalNetexGraph() {
-        if (minNetexGraph == null) {
-            minNetexGraph = buildNewMinimalNetexGraph();
-        }
-        return minNetexGraph;
-    }
-
-    /**
      * Returns a cached copy of the Portland graph, which may have been initialized.
      */
     public synchronized Graph getCachedPortlandGraph() {

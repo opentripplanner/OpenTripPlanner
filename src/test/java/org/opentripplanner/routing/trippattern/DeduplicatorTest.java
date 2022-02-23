@@ -23,6 +23,8 @@ public class DeduplicatorTest {
   private static final String STRING_2 = new String("Abba");
   private static final String[] STRING_ARRAY = {"Alf"};
   private static final String[] STRING_ARRAY_2 = {"Alf"};
+  private static final String[][] STRING_2D_ARRAY = new String[][] {{"test_1", "test_2"}, {"test_3", "test_4"}};
+  private static final String[][] STRING_2D_ARRAY_2 = new String[][] {{"test_1", "test_2"}, {"test_3", "test_4"}};
   private static final LocalDate DATE = LocalDate.of(2021, 1, 15);
   private static final LocalDate DATE_2 = LocalDate.of(2021, 1, 15);
   private static final LocalTime TIME = LocalTime.of(12, 45);
@@ -62,7 +64,7 @@ public class DeduplicatorTest {
     subject.reset();
 
     assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0)}",
+        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
         subject.toString()
     );
   }
@@ -74,7 +76,7 @@ public class DeduplicatorTest {
     assertSame(INT_ARRAY, subject.deduplicateIntArray(INT_ARRAY_2));
 
     assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 1(2), String: 0(0), StringArray: 0(0)}",
+        "Deduplicator{BitSet: 0(0), IntArray: 1(2), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
         subject.toString()
     );
 
@@ -90,7 +92,7 @@ public class DeduplicatorTest {
     assertSame(STRING, subject.deduplicateString(STRING_2));
 
     assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(2), StringArray: 0(0)}",
+        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(2), StringArray: 0(0), String2DArray: 0(0)}",
         subject.toString()
     );
 
@@ -106,7 +108,7 @@ public class DeduplicatorTest {
     assertSame(BIT_SET, subject.deduplicateBitSet(BIT_SET_2));
 
     assertEquals(
-        "Deduplicator{BitSet: 1(2), IntArray: 0(0), String: 0(0), StringArray: 0(0)}",
+        "Deduplicator{BitSet: 1(2), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
         subject.toString()
     );
 
@@ -122,13 +124,28 @@ public class DeduplicatorTest {
     assertSame(deduplicatedArray, subject.deduplicateStringArray(STRING_ARRAY_2));
 
     assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(1), StringArray: 1(2)}",
+        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(1), StringArray: 1(2), String2DArray: 0(0)}",
         subject.toString()
     );
 
     subject.reset();
     // After reset the "new" value is used
     assertNotSame(deduplicatedArray, subject.deduplicateStringArray(STRING_ARRAY_2));
+  }
+
+  @Test
+  public void deduplicateString2DArray() {
+    var deduplicatedArray = subject.deduplicateString2DArray(STRING_2D_ARRAY);
+
+    assertSame(deduplicatedArray, subject.deduplicateString2DArray(STRING_2D_ARRAY_2));
+
+    assertEquals(
+            "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 4(4), StringArray: 2(2), String2DArray: 1(2)}",
+            subject.toString());
+
+    subject.reset();
+    // After reset the "new" value is used
+    assertNotSame(deduplicatedArray, subject.deduplicateString2DArray(STRING_2D_ARRAY_2));
   }
 
   @Test
@@ -172,7 +189,7 @@ public class DeduplicatorTest {
   @Test
   public void testToStringForEmptyDeduplicator() {
     assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0)}",
+        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
         subject.toString()
     );
   }
@@ -188,13 +205,14 @@ public class DeduplicatorTest {
 
     assertEquals(
         "Deduplicator{"
-            + "BitSet: 1(1), "
-            + "IntArray: 1(1), "
-            + "String: 2(2), "
-            + "StringArray: 1(1), "
-            + "LocalDate: 1(2), "
-            + "List<LocalDate>: 1(1)"
-            + "}",
+                + "BitSet: 1(1), "
+                + "IntArray: 1(1), "
+                + "String: 2(2), "
+                + "StringArray: 1(1), "
+                + "String2DArray: 0(0), "
+                + "LocalDate: 1(2), "
+                + "List<LocalDate>: 1(1)"
+                + "}",
         subject.toString()
     );
   }
