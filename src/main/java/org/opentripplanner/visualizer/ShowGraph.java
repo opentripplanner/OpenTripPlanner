@@ -350,7 +350,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
      * Setup Processing applet
      */
     public void setup() {
-        size(getSize().width, getSize().height, P2D);
+        size(getSize().width, getSize().height, JAVA2D);
 
         /* Build spatial index of vertices and edges */
         buildSpatialIndex();
