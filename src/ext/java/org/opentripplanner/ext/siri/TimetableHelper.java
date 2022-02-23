@@ -498,11 +498,13 @@ public class TimetableHelper {
                     }
 
                     //Current stop is being updated
-                    boolean stopsMatchById = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
+                    var callStopRef = recordedCall.getStopPointRef().getValue();
+                    boolean stopsMatchById = stop.getId().getId().equals(callStopRef);
 
                     if (!stopsMatchById && stop.isPartOfStation()) {
-                        var alternativeStop = routingService
-                                .getStopForId(new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue()));
+                        var alternativeStop = routingService.getStopForId(
+                                new FeedScopedId(stop.getId().getFeedId(), callStopRef)
+                        );
                         if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
                             stopsMatchById = true;
                             stopTime.setStop(alternativeStop);
