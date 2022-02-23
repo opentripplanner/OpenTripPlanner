@@ -31,16 +31,25 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     private final FeedScopedId id;
 
     public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name) {
-        return new PathwayEdge(
+        return PathwayEdge.lowCost(
                 fromV,
                 toV,
                 null,
+                name,
+                true
+        );
+    }
+    public static PathwayEdge lowCost(Vertex fromV, Vertex toV, FeedScopedId id, I18NString name, boolean wheelchairAccessible) {
+        return new PathwayEdge(
+                fromV,
+                toV,
+                id,
                 name,
                 0,
                 0,
                 0,
                 0,
-                true
+                wheelchairAccessible
         );
     }
 

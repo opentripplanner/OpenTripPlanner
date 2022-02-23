@@ -182,27 +182,19 @@ public class AddTransitModelEntitiesToGraph {
                         .map(NonLocalizedString::new)
                         .orElse(null);
 
-                new PathwayEdge(
+                PathwayEdge.lowCost(
                         boardingAreaVertex,
                         platformVertex,
                         boardingArea.getId(),
                         name,
-                        0,
-                        0,
-                        0,
-                        0,
                         wheelchair
                 );
 
-                new PathwayEdge(
+                PathwayEdge.lowCost(
                         platformVertex,
                         boardingAreaVertex,
                         boardingArea.getId(),
                         name,
-                        0,
-                        0,
-                        0,
-                        0,
                         wheelchair
                 );
             }
