@@ -9,11 +9,13 @@ on:
       - master
       - dev-1.x
       - dev-2.x
+      - 2.1-rc
   pull_request:
     branches:
       - master
       - dev-1.x
       - dev-2.x
+      - 2.1-rc
 jobs:
   build:
     runs-on: ${{ matrix.os }}

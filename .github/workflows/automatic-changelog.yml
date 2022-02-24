@@ -2,7 +2,7 @@ name: Automatic changelog entry
 on:
   pull_request_target:
     branches:
-      - dev-2.x
+      - 2.1-rc
     types: [closed]
 
 jobs:
