@@ -400,9 +400,9 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               ));
             }
             if (types.contains(LegacyGraphQLStopAlertType.TRIPS)) {
-              pattern.getTrips().forEach(trip -> {
-                alerts.addAll(alertService.getTripAlerts(trip.getId(), null));
-              });
+              pattern.scheduledTripsAsStream().forEach(trip ->
+                alerts.addAll(alertService.getTripAlerts(trip.getId(), null))
+              );
             }
           });
         }

@@ -1,6 +1,10 @@
 # Changelog
 
-## 2.1.0 (in progress)
+## 2.2.0 (in progress)
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+
+
+## 2.1.0 (TODO - Waiting for actual release date)
 - Fix NullPointerException when a RealTime update do not match an existing TripPattern [#3284](https://github.com/opentripplanner/OpenTripPlanner/issues/3284)
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
@@ -147,7 +151,9 @@
 - Optimize RAPTOR trip search by pre-calculating arrival/departure time arrays [#3919](https://github.com/opentripplanner/OpenTripPlanner/pull/3919)
 - Make turn restrictions faster and thread-safe by moving them into StreetEdge [#3899](https://github.com/opentripplanner/OpenTripPlanner/pull/3899)
 - Rework leg creation [#3826](https://github.com/opentripplanner/OpenTripPlanner/pull/3826)
-[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+- Add routing using frequency trips [#3916](https://github.com/opentripplanner/OpenTripPlanner/pull/3916)
+- Remove ET realtime override code [#3912](https://github.com/opentripplanner/OpenTripPlanner/pull/3912)
+- Allow traversal of pathways without traversal time, distance or steps [#3910](https://github.com/opentripplanner/OpenTripPlanner/pull/3910)
 
 
 ## 2.0.0 (2020-11-27)

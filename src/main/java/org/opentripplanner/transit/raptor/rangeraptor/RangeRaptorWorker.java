@@ -22,7 +22,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTim
 import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleBoardSearch;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 
 
@@ -263,7 +263,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     private void boardWithRegularTransfer(
-            TripScheduleSearch<T> tripSearch,
+            RaptorTripScheduleSearch<T> tripSearch,
             int stopIndex,
             int stopPos,
             int prevArrivalTime,
@@ -357,7 +357,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * <p/>
      * This is protected to allow reverse search to override and create a alight search instead.
      */
-    private TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+    private RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
         if (!inFirstIteration && roundTracker.isFirstRound() && !hasTimeDependentAccess) {
             // For the first round of every iteration(except the first) we restrict the first
             // departure to happen within the time-window of the iteration. Another way to put this,

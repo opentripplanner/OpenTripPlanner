@@ -140,7 +140,10 @@ public class NetexBundleSmokeTest {
         assertEquals("Jernbanetorget", p.getTripHeadsign());
         assertEquals("RB", p.getFeedId());
         assertEquals("[<Stop RB:NSR:Quay:7203>, <Stop RB:NSR:Quay:8027>]", p.getStops().toString());
-        assertEquals("[<Trip RB:RUT:ServiceJourney:12-101375-1000>]", p.getTrips().toString());
+        assertEquals(
+                "[<Trip RB:RUT:ServiceJourney:12-101375-1000>]",
+                p.scheduledTripsAsStream().collect(Collectors.toList()).toString()
+        );
 
         // TODO OTP2 - Why?
         assertNull(p.getServices());

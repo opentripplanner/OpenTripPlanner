@@ -11,7 +11,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
@@ -208,9 +207,9 @@ public class GraphStats {
                 LOG.info("total number of patterns is: {}", nPatterns);
                 int nTrips = 0;
                 for (TripPattern ttp : patterns) {
-                    List<Trip> trips = ttp.getTrips();
-                    counts.add(trips.size());
-                    nTrips += trips.size();
+                    int patternNumTrips = (int) ttp.scheduledTripsAsStream().count();
+                    counts.add(patternNumTrips);
+                    nTrips += patternNumTrips;
                 }
                 LOG.info("total number of trips is: {}", nTrips);
                 LOG.info("average number of trips per pattern is: {}", nTrips/nPatterns);

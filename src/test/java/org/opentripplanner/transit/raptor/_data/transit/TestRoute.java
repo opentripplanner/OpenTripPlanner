@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
 
@@ -58,6 +60,19 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     @Override
     public int numberOfTripSchedules() {
         return schedules.size();
+    }
+
+    @Override
+    public boolean useCustomizedTripSearch() { return false; }
+
+    @Override
+    public RaptorTripScheduleSearch<TestTripSchedule> createCustomizedTripSearch(
+            SearchDirection direction
+    ) {
+        throw new IllegalStateException(
+                "Support for frequency based trips are not implemented here. " +
+                "This is outside the scope of the Raptor unit tests."
+        );
     }
 
     @Override

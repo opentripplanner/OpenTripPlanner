@@ -325,7 +325,7 @@ public class OtpTransitServiceBuilder {
         for (Map.Entry<StopPattern, TripPattern> e : tripPatterns.entries()) {
             TripPattern ptn = e.getValue();
             ptn.removeTrips(t -> !tripsById.containsKey(t.getId()));
-            if(ptn.getTrips().isEmpty()) {
+            if(ptn.scheduledTripsAsStream().findAny().isEmpty()) {
                 removePatterns.add(e);
             }
         }

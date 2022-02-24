@@ -1528,25 +1528,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return Math.max(0, value);
     }
 
-    public static void assertTriangleParameters(
-            Double triangleSafetyFactor,
-            Double triangleTimeFactor,
-            Double triangleSlopeFactor
-    )
-            throws ParameterException
-    {
-        if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
-            throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
-        }
-        if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
-            throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
-        }
-        // FIXME couldn't this be simplified by only specifying TWO of the values?
-        if (Math.abs(triangleSafetyFactor + triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
-            throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
-        }
-    }
-
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
     public ShortestPathTree getNewShortestPathTree() {
         return this.dominanceFunction.getNewShortestPathTree(this);

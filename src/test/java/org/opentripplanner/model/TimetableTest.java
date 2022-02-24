@@ -62,9 +62,9 @@ public class TimetableTest {
         patternIndex = new HashMap<>();
 
         for (TripPattern pattern : graph.tripPatternForId.values()) {
-            for (Trip trip : pattern.getTrips()) {
-                patternIndex.put(trip.getId(), pattern);
-            }
+            pattern.scheduledTripsAsStream().forEach(trip ->
+                patternIndex.put(trip.getId(), pattern)
+            );
         }
         
         pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
