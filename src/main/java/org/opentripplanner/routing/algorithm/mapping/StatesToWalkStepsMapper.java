@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -11,15 +9,16 @@ import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Process a list of states into a list of walking/driving instructions for a street leg.
@@ -360,10 +359,9 @@ public class StatesToWalkStepsMapper {
 
     private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
         return !(
-                (
-                        current.streetName != null && !current.streetNameNoParens()
-                                .equals(streetNameNoParens)
-                ) && (!current.bogusName || !edge.hasBogusName())
+            current.streetName.toString() != null
+                    && !(Objects.equals(current.streetNameNoParens(), streetNameNoParens))
+                    && (!current.bogusName || !edge.hasBogusName())
         );
     }
 
@@ -421,7 +419,10 @@ public class StatesToWalkStepsMapper {
         return step;
     }
 
-    private static String getNormalizedName(String streetName) {
+    public static String getNormalizedName(String streetName) {
+        if (streetName == null){
+            return null; //Avoid null reference exceptions with pathways which don't have names
+        }
         int idx = streetName.indexOf('(');
         if (idx > 0) {
             return streetName.substring(0, idx - 1);
