@@ -30,6 +30,9 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     private final boolean wheelchairAccessible;
     private final FeedScopedId id;
 
+    /**
+     * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean)}
+     */
     public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name) {
         return PathwayEdge.lowCost(
                 fromV,
@@ -39,6 +42,12 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
                 true
         );
     }
+
+    /**
+     * Create a PathwayEdge that doesn't have a traversal time, distance or steps.
+     *
+     * These are for edges which have an implied cost of almost zero just like a FreeEdge has.
+     */
     public static PathwayEdge lowCost(Vertex fromV, Vertex toV, FeedScopedId id, I18NString name, boolean wheelchairAccessible) {
         return new PathwayEdge(
                 fromV,
