@@ -84,7 +84,8 @@ class RaptorRoutingRequestTransitDataCreator {
       ZonedDateTime transitSearchTimeZero, List<TripPatternForDate> patternForDateList
   ) {
 
-    // Group TripPatternForDate objects by TripPattern
+    // Group TripPatternForDate objects by TripPattern.
+    // This is done in a loop to increase performance.
     Map<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
     for (TripPatternForDate patternForDate : patternForDateList) {
       patternForDateByPattern.computeIfAbsent(patternForDate.getTripPattern(), k -> new ArrayList<>()).add(patternForDate);
@@ -97,7 +98,7 @@ class RaptorRoutingRequestTransitDataCreator {
     for (Map.Entry<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternEntry : patternForDateByPattern
         .entrySet()) {
 
-      // Sort by date
+      // Sort by date. We can mutate the array, as it was created above in the grouping.
       List<TripPatternForDate> patternsSorted = patternEntry.getValue();
       patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
 
