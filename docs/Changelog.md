@@ -149,6 +149,7 @@
 - Rework leg creation [#3826](https://github.com/opentripplanner/OpenTripPlanner/pull/3826)
 - Add routing using frequency trips [#3916](https://github.com/opentripplanner/OpenTripPlanner/pull/3916)
 - Remove ET realtime override code [#3912](https://github.com/opentripplanner/OpenTripPlanner/pull/3912)
+- Allow traversal of pathways without traversal time, distance or steps [#3910](https://github.com/opentripplanner/OpenTripPlanner/pull/3910)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
