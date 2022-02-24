@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TimeZone;
@@ -139,7 +138,7 @@ public class RouteMapperTest {
                 new EntityById<>(),
                 netexEntityIndex.readOnlyView(),
                 TimeZone.getDefault().toString(),
-                ImmutableSet.of(RUT_FERRY_WITHOUT_BICYCLES_ID)
+                Set.of(RUT_FERRY_WITHOUT_BICYCLES_ID)
         );
 
         Route ferryWithBicycles = routeMapper.mapRoute(lineWithBicycles);

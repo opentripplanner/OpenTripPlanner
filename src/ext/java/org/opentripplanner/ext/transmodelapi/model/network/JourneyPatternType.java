@@ -53,7 +53,7 @@ public class JourneyPatternType {
             .name("serviceJourneys")
             .withDirective(gqlUtil.timingData)
             .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
-            .dataFetcher(environment -> ((TripPattern) environment.getSource()).getTrips())
+            .dataFetcher(e -> ((TripPattern) e.getSource()).scheduledTripsAsStream().collect(Collectors.toList()))
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("serviceJourneysForDate")

@@ -17,12 +17,12 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import java.util.Locale;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -144,14 +144,7 @@ public class TestStreetMatcher {
         }
     }
 
-    private static class SimpleVertex extends StreetVertex {
 
-        private static final long serialVersionUID = 1L;
-
-        public SimpleVertex(Graph g, String label, double lat, double lon) {
-            super(g, label, lon, lat, new NonLocalizedString(label));
-        }
-    }
 
     /* TODO explain why this exists and is "simple" */
     private static class SimpleEdge extends StreetEdge {

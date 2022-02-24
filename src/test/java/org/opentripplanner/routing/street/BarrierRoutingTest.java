@@ -60,21 +60,17 @@ public class BarrierRoutingTest {
                 (rr) -> rr.bikeWalkingReluctance = 1,
                 (itineraries) -> itineraries.stream()
                         .flatMap(i -> Stream.of(
-                                () -> assertEquals(
-                                        List.of(BICYCLE, WALK, BICYCLE, WALK, BICYCLE),
-                                        i.legs.stream()
-                                                .map(leg -> leg.getMode())
-                                                .collect(Collectors.toList())
-                                ),
+                                () -> assertEquals(1, i.legs.size()),
+                                () -> assertEquals(BICYCLE, i.legs.get(0).getMode()),
                                 () -> assertEquals(
                                         List.of(false, true, false, true, false),
-                                        i.legs.stream()
-                                                .map(leg -> leg.getWalkingBike())
+                                        i.legs.get(0).getWalkSteps().stream()
+                                                .map(step -> step.walkingBike)
                                                 .collect(Collectors.toList())
                                 )
                         ))
         );
-        assertThatPolylinesAreEqual(polyline2, "o~qgH_ccu@Bi@Bk@Bi@Bg@");
+        assertThatPolylinesAreEqual(polyline2, "o~qgH_ccu@Bi@Bk@Bi@Bg@NaA@_@Dm@Dq@a@KJy@@I@M@E??");
     }
 
     /**

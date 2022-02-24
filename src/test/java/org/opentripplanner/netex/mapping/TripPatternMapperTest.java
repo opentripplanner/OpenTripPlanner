@@ -53,9 +53,9 @@ public class TripPatternMapperTest {
         TripPattern tripPattern = r.tripPatterns.values().stream().findFirst().orElseThrow();
 
         assertEquals(4, tripPattern.numberOfStops());
-        assertEquals(1, tripPattern.getTrips().size());
+        assertEquals(1, tripPattern.scheduledTripsAsStream().count());
 
-        Trip trip = tripPattern.getTrips().get(0);
+        Trip trip = tripPattern.scheduledTripsAsStream().findFirst().get();
 
         assertEquals("RUT:ServiceJourney:1", trip.getId().getId());
         assertEquals("NSR:Quay:1", tripPattern.getStop(0).getId().getId());

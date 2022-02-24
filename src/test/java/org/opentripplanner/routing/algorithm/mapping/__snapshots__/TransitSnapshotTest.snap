@@ -16,7 +16,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 4923.150999999999,
+          "distance": 4923.151,
           "endTime": "2009-11-17T19:03:41.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -224,7 +224,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 4923.150999999999,
+      "walkDistance": 4923.151,
       "walkLimitExceeded": false,
       "walkTime": 3821
     },
@@ -272,7 +272,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 920.3299999999999,
+          "distance": 920.33,
           "endTime": "2009-11-17T18:12:58.000+00:00",
           "from": {
             "departure": "2009-11-17T18:01:00.000+00:00",
@@ -364,7 +364,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -581,6 +581,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:12:58.000+00:00",
           "steps": [ ],
@@ -605,7 +606,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 999.0980000000001,
+          "distance": 999.098,
           "endTime": "2009-11-17T18:38:41.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:25:49.000+00:00",
@@ -788,7 +789,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -1122,6 +1123,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:15",
           "routeLongName": "Belmont/NW 23rd",
           "routeShortName": "15",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:15:40.000+00:00",
           "steps": [ ],
@@ -1263,7 +1265,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 920.3299999999999,
+          "distance": 920.33,
           "endTime": "2009-11-17T18:27:58.000+00:00",
           "from": {
             "departure": "2009-11-17T18:16:00.000+00:00",
@@ -1355,7 +1357,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -1572,6 +1574,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:27:58.000+00:00",
           "steps": [ ],
@@ -1596,7 +1599,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 999.0980000000001,
+          "distance": 999.098,
           "endTime": "2009-11-17T18:53:55.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:41:03.000+00:00",
@@ -1779,7 +1782,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -2113,6 +2116,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:15",
           "routeLongName": "Belmont/NW 23rd",
           "routeShortName": "15",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:30:40.000+00:00",
           "steps": [ ],
@@ -2258,7 +2262,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 419.61499999999995,
+          "distance": 419.615,
           "endTime": "2009-11-17T18:42:54.000+00:00",
           "from": {
             "departure": "2009-11-17T18:37:30.000+00:00",
@@ -2324,7 +2328,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -2450,6 +2454,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:70",
           "routeLongName": "12th Ave",
           "routeShortName": "70",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:42:54.000+00:00",
           "steps": [ ],
@@ -2473,7 +2478,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -2638,6 +2643,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:77",
           "routeLongName": "Broadway/Halsey",
           "routeShortName": "77",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:54:29.000+00:00",
           "steps": [ ],
@@ -2718,7 +2724,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 1,
       "transitTime": 1293,
       "waitingTime": 208,
-      "walkDistance": 438.42099999999994,
+      "walkDistance": 438.421,
       "walkLimitExceeded": false,
       "walkTime": 348
     }
@@ -2744,7 +2750,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 4442.913999999999,
+          "distance": 4442.914,
           "endTime": "2009-11-17T18:57:31.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -2916,7 +2922,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 4442.913999999999,
+      "walkDistance": 4442.914,
       "walkLimitExceeded": false,
       "walkTime": 3451
     },
@@ -2964,7 +2970,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 87.019,
+          "distance": 87.01899999999999,
           "endTime": "2009-11-17T18:14:00.000+00:00",
           "from": {
             "departure": "2009-11-17T18:12:47.000+00:00",
@@ -3033,7 +3039,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -3250,6 +3256,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:14:00.000+00:00",
           "steps": [ ],
@@ -3274,7 +3281,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 913.815,
+          "distance": 913.8149999999999,
           "endTime": "2009-11-17T18:38:40.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:26:49.000+00:00",
@@ -3382,7 +3389,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 769,
       "waitingTime": 0,
-      "walkDistance": 1000.8340000000001,
+      "walkDistance": 1000.834,
       "walkLimitExceeded": false,
       "walkTime": 784
     },
@@ -3430,7 +3437,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 87.019,
+          "distance": 87.01899999999999,
           "endTime": "2009-11-17T18:29:00.000+00:00",
           "from": {
             "departure": "2009-11-17T18:27:47.000+00:00",
@@ -3499,7 +3506,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -3716,6 +3723,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:29:00.000+00:00",
           "steps": [ ],
@@ -3740,7 +3748,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 913.815,
+          "distance": 913.8149999999999,
           "endTime": "2009-11-17T18:54:10.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:42:19.000+00:00",
@@ -3848,7 +3856,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 799,
       "waitingTime": 0,
-      "walkDistance": 1000.8340000000001,
+      "walkDistance": 1000.834,
       "walkLimitExceeded": false,
       "walkTime": 784
     },
@@ -3896,7 +3904,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 87.019,
+          "distance": 87.01899999999999,
           "endTime": "2009-11-17T18:45:00.000+00:00",
           "from": {
             "departure": "2009-11-17T18:43:47.000+00:00",
@@ -3965,7 +3973,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -4182,6 +4190,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:45:00.000+00:00",
           "steps": [ ],
@@ -4206,7 +4215,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 913.815,
+          "distance": 913.8149999999999,
           "endTime": "2009-11-17T19:09:40.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:57:49.000+00:00",
@@ -4314,7 +4323,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 769,
       "waitingTime": 0,
-      "walkDistance": 1000.8340000000001,
+      "walkDistance": 1000.834,
       "walkLimitExceeded": false,
       "walkTime": 784
     },
@@ -4422,7 +4431,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -4509,6 +4518,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:70",
           "routeLongName": "12th Ave",
           "routeShortName": "70",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:46:00.000+00:00",
           "steps": [ ],
@@ -4532,7 +4542,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -4710,6 +4720,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:77",
           "routeLongName": "Broadway/Halsey",
           "routeShortName": "77",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:54:29.000+00:00",
           "steps": [ ],
@@ -4933,7 +4944,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -5228,6 +5239,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:15",
           "routeLongName": "Belmont/NW 23rd",
           "routeShortName": "15",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T19:02:00.000+00:00",
           "steps": [ ],
@@ -5412,7 +5424,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 4875.788999999999,
+          "distance": 4875.789,
           "endTime": "2009-11-17T19:03:24.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -5672,7 +5684,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 4875.788999999999,
+      "walkDistance": 4875.789,
       "walkLimitExceeded": false,
       "walkTime": 3804
     }
@@ -5698,7 +5710,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 4154.147999999998,
+          "distance": 4154.148,
           "endTime": "2009-11-17T18:53:50.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -5870,7 +5882,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 4154.147999999998,
+      "walkDistance": 4154.148,
       "walkLimitExceeded": false,
       "walkTime": 3230
     }
@@ -5896,7 +5908,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2985.4260000000004,
+          "distance": 2985.426,
           "endTime": "2009-11-17T18:39:26.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -6081,7 +6093,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 2985.4260000000004,
+      "walkDistance": 2985.426,
       "walkLimitExceeded": false,
       "walkTime": 2366
     }

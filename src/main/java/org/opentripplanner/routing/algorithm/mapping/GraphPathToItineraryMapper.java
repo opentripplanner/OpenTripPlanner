@@ -1,26 +1,23 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.stream.Stream;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.ext.flex.FlexLegMapper;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -43,8 +40,6 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO OTP2 There is still a lot of transit-related logic here that should be removed. We also need
-//      to decide where real-time updates should be applied to the itinerary.
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
  * returned by the OTP "planner" web service. TripPlans are made up of Itineraries, so the functions to produce them
@@ -73,30 +68,23 @@ public abstract class GraphPathToItineraryMapper {
 
     /**
      * Generate an itinerary from a {@link GraphPath}. This method first slices the list of states
-     * at the leg boundaries. These smaller state arrays are then used to generate legs. Finally the
-     * rest of the itinerary is generated based on the complete state array.
+     * at the leg boundaries. These smaller state arrays are then used to generate legs.
      *
      * @param path The graph path to base the itinerary on
      * @return The generated itinerary
      */
     public static Itinerary generateItinerary(GraphPath path) {
-
-        State[] states = new State[path.states.size()];
-        State lastState = path.states.getLast();
-        states = path.states.toArray(states);
-
-        Edge[] edges = new Edge[path.edges.size()];
-        edges = path.edges.toArray(edges);
-
         Graph graph = path.getRoutingContext().graph;
-
-        State[][] legsStates = sliceStates(states);
 
         List<Leg> legs = new ArrayList<>();
         WalkStep previousStep = null;
-
-        for (State[] legStates : legsStates) {
-            Leg leg = generateLeg(graph, legStates, previousStep);
+        for (List<State> legStates : sliceStates(path.states)) {
+            if (OTPFeature.FlexRouting.isOn() && legStates.get(1).backEdge instanceof FlexTripEdge) {
+                legs.add(generateFlexLeg(graph, legStates));
+                previousStep = null;
+                continue;
+            }
+            StreetLeg leg = generateLeg(graph, legStates, previousStep);
             legs.add(leg);
 
             List<WalkStep> walkSteps = leg.getWalkSteps();
@@ -108,18 +96,11 @@ public abstract class GraphPathToItineraryMapper {
             }
         }
 
-        boolean first = true;
-        for (Leg leg : legs) {
-            AlertToLegMapper.addTransitAlertPatchesToLeg(graph, leg, first);
-            first = false;
-        }
-
-        setPathwayInfo(legs, legsStates);
-
         Itinerary itinerary = new Itinerary(legs);
 
-        calculateElevations(itinerary, edges);
+        calculateElevations(itinerary, path.edges);
 
+        State lastState = path.states.getLast();
         itinerary.generalizedCost = (int) lastState.weight;
         itinerary.arrivedAtDestinationWithRentedVehicle = lastState.isRentingVehicleFromStation();
 
@@ -140,7 +121,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param edges The array of input edges
      * @return The coordinates of the points on the edges
      */
-    private static CoordinateArrayListSequence makeCoordinates(Edge[] edges) {
+    private static CoordinateArrayListSequence makeCoordinates(List<Edge> edges) {
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
 
         for (Edge edge : edges) {
@@ -159,193 +140,147 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Slice a {@link State} array at the leg boundaries. Leg switches occur when the mode changes,
-     * for instance from BICYCLE to WALK.
+     * Slice a {@link State} list at the leg boundaries.
      *
-     * @param states The one-dimensional array of input states
-     * @return An array of arrays of states belonging to a single leg (i.e. a two-dimensional array)
+     * @param states The list of input states
+     * @return A list of lists of states belonging to a single leg
      */
-    private static State[][] sliceStates(State[] states) {
-        boolean trivial = true;
-
-        for (State state : states) {
-            TraverseMode traverseMode = state.getBackMode();
-
-            if (traverseMode != null) {
-                trivial = false;
-                break;
-            }
+    private static List<List<State>> sliceStates(List<State> states) {
+        // Trivial case
+        if (states.stream().allMatch(state -> state.getBackMode() == null)) {
+            return List.of();
         }
 
-        if (trivial) {
-            return new State[][]{};
-        }
+        List<List<State>> legsStates = new LinkedList<>();
 
-        int[] legIndexPairs = {0, states.length - 1};
-        List<int[]> legsIndexes = new ArrayList<int[]>();
+        int previousBreak = 0;
 
-        TraverseMode lastMode = null;
-        for (int i = 1; i < states.length - 1; i++) {
-            var backState = states[i];
-            var forwardState = states[i + 1];
-            var backMode = backState.getBackMode();
-            var forwardMode = forwardState.getBackMode();
+        for (int i = 1; i < states.size() - 1; i++) {
+            var backState = states.get(i);
+            var forwardState = states.get(i + 1);
 
-            if (backMode != null) {
-                lastMode = backMode;
-            }
-
-            var modeChange = lastMode != forwardMode && lastMode != null && forwardMode != null;
+            var flexChange = forwardState.backEdge instanceof FlexTripEdge
+                    || backState.backEdge instanceof FlexTripEdge;
             var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
             var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
 
-            if (parkingChange) {
+            if (parkingChange || flexChange || rentalChange) {
+                int nextBreak = i;
+
                 /* Remove the state for actually parking (traversing VehicleParkingEdge) from the
                  * states so that the leg from/to edges correspond to the actual entrances.
                  * The actual time for parking is added to the walking leg in generateLeg().
                  */
-                legIndexPairs[1] = i;
-                legsIndexes.add(legIndexPairs);
-                legIndexPairs = new int[] {i + 1, states.length - 1};
-            }
-            else if (modeChange || rentalChange) {
-                legIndexPairs[1] = i;
-                legsIndexes.add(legIndexPairs);
-                legIndexPairs = new int[] {i, states.length - 1};
-            }
+                if (parkingChange) { nextBreak++; }
 
-            if (rentalChange || parkingChange) {
-                /* Clear the lastMode, so that switching modes doesn't re-trigger a mode change
-                 * a few states latter. */
-                lastMode = null;
+                if (nextBreak > previousBreak) {
+                    legsStates.add(states.subList(previousBreak, nextBreak + 1));
+                }
+
+                previousBreak = nextBreak;
             }
         }
 
         // Final leg
-        legsIndexes.add(legIndexPairs);
-
-        State[][] legsStates = new State[legsIndexes.size()][];
-
-        // Fill the two-dimensional array with states
-        for (int i = 0; i < legsStates.length; i++) {
-            legIndexPairs = legsIndexes.get(i);
-            legsStates[i] = new State[legIndexPairs[1] - legIndexPairs[0] + 1];
-            if (legIndexPairs[1] - legIndexPairs[0] + 1 >= 0)
-                System.arraycopy(
-                        states, legIndexPairs[0], legsStates[i], 0,
-                        legIndexPairs[1] - legIndexPairs[0] + 1
-                );
+        if (states.size() > previousBreak) {
+            legsStates.add(states.subList(previousBreak, states.size()));
         }
 
         return legsStates;
     }
 
     /**
-     * Generate one leg of an itinerary from a {@link State} array.
+     * Generate a flex leg from the states belonging to the flex leg
+     */
+    private static Leg generateFlexLeg(Graph graph, List<State> states) {
+        State fromState = states.get(0);
+        State toState = states.get(1);
+        FlexTripEdge flexEdge = (FlexTripEdge) toState.backEdge;
+        Calendar startTime = makeCalendar(fromState);
+        Calendar endTime = makeCalendar(toState);
+        int generalizedCost = (int) (toState.getWeight() - fromState.getWeight());
+
+        Leg leg = new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
+
+        AlertToLegMapper.addTransitAlertPatchesToLeg(graph, leg, true);
+        return leg;
+    }
+
+    /**
+     * Generate one leg of an itinerary from a list of {@link State}.
      *
-     * @param states The array of states to base the leg on
+     * @param states The list of states to base the leg on
      * @param previousStep the previous walk step, so that the first relative turn direction is
      *                     calculated correctly
      * @return The generated leg
      */
-    private static Leg generateLeg(Graph graph, State[] states, WalkStep previousStep) {
-        Leg leg = null;
-        FlexTripEdge flexEdge = null;
-
-        if (OTPFeature.FlexRouting.isOn()) {
-            flexEdge = (FlexTripEdge) Stream
-                .of(states)
+    private static StreetLeg generateLeg(Graph graph, List<State> states, WalkStep previousStep) {
+        List<Edge> edges = states.stream()
+                // The first back edge is part of the previous leg, skip it
                 .skip(1)
-                .map(state -> state.backEdge)
-                .filter(edge -> edge instanceof FlexTripEdge)
-                .findFirst()
-                .orElse(null);
-            if (flexEdge != null) {
-                leg = new Leg(flexEdge.getTrip());
-                leg.setFlexibleTrip(true);
-            }
-        }
+                .map(State::getBackEdge)
+                .collect(Collectors.toList());
 
-        if (leg == null) {
-            leg = new Leg(resolveMode(states));
-        }
+        State firstState = states.get(0);
+        State lastState = states.get(states.size() - 1);
 
-        Edge[] edges = new Edge[states.length - 1];
-
-        leg.setStartTime(makeCalendar(states[0]));
-        leg.setEndTime(makeCalendar(states[states.length - 1]));
-
-        // Calculate leg distance and fill array of edges
-        leg.setDistanceMeters(0.0);
-        for (int i = 0; i < edges.length; i++) {
-            edges[i] = states[i + 1].getBackEdge();
-            leg.setDistanceMeters(leg.getDistanceMeters() + edges[i].getDistanceMeters());
-        }
-
-        TimeZone timeZone = leg.getStartTime().getTimeZone();
-        leg.setAgencyTimeZoneOffset(timeZone.getOffset(leg.getStartTime().getTimeInMillis()));
-
-        if (flexEdge != null) {
-            FlexLegMapper.addFlexPlaces(leg, flexEdge);
-        } else {
-            addPlaces(leg, states);
-        }
+        double distanceMeters = edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         LineString geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
 
-        leg.setLegGeometry(geometry);
+        List<WalkStep> walkSteps = new StatesToWalkStepsMapper(graph, states, previousStep).generateWalkSteps();
 
-        leg.setGeneralizedCost(
-                (int) (states[states.length - 1].getWeight() - states[0].getWeight()));
+        /* For the from/to vertices to be in the correct place for vehicle parking
+         * the state for actually parking (traversing the VehicleParkEdge) is excluded
+         * from the list of states.
+         * This adds the time for parking to the walking leg.
+         */
+        var previousStateIsVehicleParking = firstState.getBackState() != null
+                && firstState.getBackEdge() instanceof VehicleParkingEdge;
 
-        leg.setWalkingBike(states[states.length - 1].isBackWalkingBike());
+        Calendar startTime = makeCalendar(
+                previousStateIsVehicleParking ? firstState.getBackState() : firstState
+        );
 
-        leg.setRentedVehicle(states[0].isRentingVehicle());
+        StreetLeg leg = new StreetLeg(
+                resolveMode(states),
+                startTime,
+                makeCalendar(lastState),
+                makePlace(firstState),
+                makePlace(lastState),
+                distanceMeters,
+                (int) (lastState.getWeight() - firstState.getWeight()),
+                geometry,
+                walkSteps
+        );
+
+        leg.setRentedVehicle(firstState.isRentingVehicle());
+        leg.setWalkingBike(false);
 
         if (leg.getRentedVehicle()) {
-            String vehicleRentalNetwork = states[0].getVehicleRentalNetwork();
+            String vehicleRentalNetwork = firstState.getVehicleRentalNetwork();
             if (vehicleRentalNetwork != null) {
                 leg.setVehicleRentalNetwork(vehicleRentalNetwork);
             }
         }
 
-        if (!leg.isTransitLeg()) {
-            leg.setWalkSteps(new StatesToWalkStepsMapper(graph, Arrays.asList(states), previousStep)
-                    .generateWalkSteps()
-            );
-        }
-
         addStreetNotes(graph, leg, states);
 
-        if (flexEdge != null) {
-            FlexLegMapper.fixFlexTripLeg(leg, flexEdge);
-        }
-
-        /* For the from/to vertices to be in the correct place for vehicle parking
-         * the state for actually parking (traversing the VehicleParkEdge) is excluded
-         * from the list of states.
-         * This add the time for parking to the walking leg.
-         */
-        var previousStateIsVehicleParking = states[0].getBackState() != null
-                && states[0].getBackEdge() instanceof VehicleParkingEdge;
-        if (previousStateIsVehicleParking) {
-            leg.setStartTime(makeCalendar(states[0].getBackState()));
-        }
+        setPathwayInfo(leg, states);
 
         return leg;
     }
 
-    private static void setPathwayInfo(List<Leg> legs, State[][] legsStates) {
-        OUTER:
-        for (int i = 0; i < legsStates.length; i++) {
-            for (int j = 1; j < legsStates[i].length; j++) {
-                if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
-                    PathwayEdge pe = (PathwayEdge) legsStates[i][j].getBackEdge();
-                    legs.get(i).setPathwayId(pe.getId());
-                    legs.get(i).setPathway(true);
-                    break OUTER;
-                }
+    /**
+     * TODO: This is mindless. Why is this set on leg, rather than on a walk step? Now only the first pathway is used
+     */
+    private static void setPathwayInfo(StreetLeg leg, List<State> legStates) {
+        for (State legsState : legStates) {
+            if (legsState.getBackEdge() instanceof PathwayEdge) {
+                PathwayEdge pe = (PathwayEdge) legsState.getBackEdge();
+                leg.setPathwayId(pe.getId());
+                return;
             }
         }
     }
@@ -356,7 +291,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param itinerary The itinerary to calculate the elevation changes for
      * @param edges The edges that go with the itinerary
      */
-    private static void calculateElevations(Itinerary itinerary, Edge[] edges) {
+    private static void calculateElevations(Itinerary itinerary, List<Edge> edges) {
         for (Edge edge : edges) {
             if (!(edge instanceof StreetEdge)) continue;
 
@@ -383,42 +318,40 @@ public abstract class GraphPathToItineraryMapper {
      * Resolve mode from states.
      * @param states The states that go with the leg
      */
-    private static TraverseMode resolveMode(State[] states) {
-        TraverseMode returnMode = TraverseMode.WALK;
-
+    private static TraverseMode resolveMode(List<State> states) {
         for (State state : states) {
-            TraverseMode mode = state.getBackMode();
+            TraverseMode mode = state.getNonTransitMode();
 
             if (mode != null) {
-                // Resolve correct mode if renting vehicle, and is not walking with it
-                if (state.isRentingVehicle() && !state.isBackWalkingBike()) {
+                // Resolve correct mode if renting vehicle
+                if (state.isRentingVehicle()) {
                     switch (state.stateData.rentalVehicleFormFactor) {
                         case BICYCLE:
                         case OTHER:
-                            returnMode = TraverseMode.BICYCLE;
-                            continue;
+                            return TraverseMode.BICYCLE;
                         case SCOOTER:
                         case MOPED:
-                            returnMode = TraverseMode.SCOOTER;
-                            continue;
+                            return TraverseMode.SCOOTER;
                         case CAR:
-                            returnMode = TraverseMode.CAR;
-                            continue;
+                            return TraverseMode.CAR;
                     }
+                } else {
+                    return mode;
                 }
-                returnMode = mode;
             }
         }
-        return returnMode;
+
+        // Fallback to walking
+        return TraverseMode.WALK;
     }
 
     /**
-     * Add mode and alerts fields to a {@link Leg}.
+     * Add mode and alerts fields to a {@link StreetLeg}.
      *
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addStreetNotes(Graph graph, Leg leg, State[] states) {
+    private static void addStreetNotes(Graph graph, StreetLeg leg, List<State> states) {
         for (State state : states) {
             Set<StreetNote> streetNotes = graph.streetNotesService.getNotes(state);
 
@@ -428,17 +361,6 @@ public abstract class GraphPathToItineraryMapper {
                 }
             }
         }
-    }
-
-    /**
-     * Add {@link Place} fields to a {@link Leg}.
-     *
-     * @param leg The leg to add the places to
-     * @param states The states that go with the leg
-     */
-    private static void addPlaces(Leg leg, State[] states) {
-        leg.setFrom(makePlace(states[0]));
-        leg.setTo(makePlace(states[states.length - 1]));
     }
 
     /**
@@ -477,21 +399,4 @@ public abstract class GraphPathToItineraryMapper {
     public static boolean isRentalDropOff(State state) {
         return state.getBackEdge() instanceof VehicleRentalEdge && state.getBackState().isRentingVehicle();
     }
-
-    private static List<P2<Double>> encodeElevationProfile(Edge edge, double distanceOffset, double heightOffset) {
-        if (!(edge instanceof StreetEdge)) {
-            return new ArrayList<P2<Double>>();
-        }
-        StreetEdge elevEdge = (StreetEdge) edge;
-        if (elevEdge.getElevationProfile() == null) {
-            return new ArrayList<P2<Double>>();
-        }
-        ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
-        Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
-        for (int i = 0; i < coordArr.length; i++) {
-            out.add(new P2<Double>(coordArr[i].x + distanceOffset, coordArr[i].y + heightOffset));
-        }
-        return out;
-    }
-
 }

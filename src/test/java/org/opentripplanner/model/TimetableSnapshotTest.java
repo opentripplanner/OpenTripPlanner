@@ -45,9 +45,9 @@ public class TimetableSnapshotTest {
 
         patternIndex = new HashMap<>();
         for (TripPattern tripPattern : graph.tripPatternForId.values()) {
-            for (Trip trip : tripPattern.getTrips()) {
-                patternIndex.put(trip.getId(), tripPattern);
-            }
+            tripPattern.scheduledTripsAsStream().forEach(trip ->
+                patternIndex.put(trip.getId(), tripPattern)
+            );
         }
     }
 
