@@ -34,14 +34,18 @@ import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
+import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
+import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
+import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
 
 public class AddTransitModelEntitiesToGraph {
     private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);
