@@ -8,17 +8,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.netex.mapping.calendar.DayOfWeekMapper.mapDayOfWeek;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.FRIDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.MONDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.NONE;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.SATURDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.SUNDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.THURSDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.TUESDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEDNESDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKDAYS;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKEND;
+import static org.rutebanken.netex.model.DayOfWeekEnumeration.*;
 
 public class DayOfWeekMapperTest {
 

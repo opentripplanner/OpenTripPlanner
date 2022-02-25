@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
@@ -16,6 +12,11 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class VehicleParkingEdgeTest extends GraphRoutingTest {
 

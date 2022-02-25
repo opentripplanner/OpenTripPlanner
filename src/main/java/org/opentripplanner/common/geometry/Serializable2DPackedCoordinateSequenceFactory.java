@@ -1,10 +1,10 @@
 package org.opentripplanner.common.geometry;
 
-import java.io.Serializable;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
+
+import java.io.Serializable;
 
 public class Serializable2DPackedCoordinateSequenceFactory implements Serializable, CoordinateSequenceFactory {
 

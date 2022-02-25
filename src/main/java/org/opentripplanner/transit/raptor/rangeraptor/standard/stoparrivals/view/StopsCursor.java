@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
-import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -9,6 +8,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Acce
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stops;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
+
+import java.util.function.ToIntFunction;
 
 
 /**

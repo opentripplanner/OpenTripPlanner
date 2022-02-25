@@ -2,12 +2,6 @@ package org.opentripplanner.updater.street_notes;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.wfs.WFSDataStore;
@@ -33,6 +27,13 @@ import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A graph updater that reads a WFS-interface and updates a DynamicStreetNotesSource.

@@ -7,17 +7,12 @@ import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.Branding;
+import org.opentripplanner.model.TransitMode;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.opentripplanner.model.TransitMode;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RouteMapperTest {
 

@@ -1,11 +1,5 @@
 package org.opentripplanner.ext.siri.updater;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
@@ -20,6 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class SiriSXUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);

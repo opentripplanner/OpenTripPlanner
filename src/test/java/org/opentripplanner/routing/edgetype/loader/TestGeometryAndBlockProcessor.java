@@ -1,15 +1,7 @@
 package org.opentripplanner.routing.edgetype.loader;
 
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import java.time.Instant;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
 import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
@@ -37,6 +29,11 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.TestUtils;
+
+import java.time.Instant;
+import java.util.*;
+
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.

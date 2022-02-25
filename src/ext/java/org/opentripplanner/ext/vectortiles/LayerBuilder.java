@@ -10,9 +10,9 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters;
 
 import java.util.List;
-import org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters;
 
 public abstract class LayerBuilder<T> {
   static private final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();

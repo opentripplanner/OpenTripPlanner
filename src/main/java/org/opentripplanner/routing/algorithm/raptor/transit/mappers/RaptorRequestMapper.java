@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -13,6 +10,10 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.util.OTPFeature;
+
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.Collection;
 
 public class RaptorRequestMapper {
     private final RoutingRequest request;

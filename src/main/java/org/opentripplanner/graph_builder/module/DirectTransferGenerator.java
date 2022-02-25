@@ -2,12 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -25,6 +19,12 @@ import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit

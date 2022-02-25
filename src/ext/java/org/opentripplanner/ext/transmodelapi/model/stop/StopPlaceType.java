@@ -1,37 +1,16 @@
 package org.opentripplanner.ext.transmodelapi.model.stop;
 
 import graphql.Scalars;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLTypeReference;
+import graphql.schema.*;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopCollection;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTimesInPattern;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.*;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

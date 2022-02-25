@@ -4,12 +4,13 @@ import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
-import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
 import org.opentripplanner.routing.api.request.RequestFunctions;
+
+import java.util.function.Consumer;
+import java.util.function.DoubleFunction;
 
 public class ItineraryFiltersInputType {
 

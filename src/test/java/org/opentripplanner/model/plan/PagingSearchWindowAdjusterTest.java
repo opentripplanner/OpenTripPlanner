@@ -1,14 +1,15 @@
 package org.opentripplanner.model.plan;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.util.time.DurationUtils.duration;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.common.model.P2;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.common.model.P2;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.util.time.DurationUtils.duration;
 
 
 class PagingSearchWindowAdjusterTest {

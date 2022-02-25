@@ -1,16 +1,17 @@
 package org.opentripplanner.model.plan.pagecursor;
 
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.util.time.TimeUtils;
+
+import java.time.Duration;
+import java.time.Instant;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
 import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
 import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
-
-import java.time.Duration;
-import java.time.Instant;
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.util.time.TimeUtils;
 
 @SuppressWarnings("ConstantConditions")
 class PageCursorFactoryTest implements PlanTestConstants {

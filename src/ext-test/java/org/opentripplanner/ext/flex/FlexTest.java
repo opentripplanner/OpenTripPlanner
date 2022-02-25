@@ -1,14 +1,6 @@
 package org.opentripplanner.ext.flex;
 
-import static graphql.Assert.assertFalse;
-
 import gnu.trove.set.hash.TIntHashSet;
-import java.io.File;
-import java.net.URISyntaxException;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.FakeGraph;
@@ -17,6 +9,15 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.OTPFeature;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static graphql.Assert.assertFalse;
 
 abstract public class FlexTest {
 

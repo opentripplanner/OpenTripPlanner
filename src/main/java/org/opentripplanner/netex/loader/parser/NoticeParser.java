@@ -1,11 +1,7 @@
 package org.opentripplanner.netex.loader.parser;
 
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.DataManagedObjectStructure;
-import org.rutebanken.netex.model.Notice;
-import org.rutebanken.netex.model.NoticeAssignment;
-import org.rutebanken.netex.model.NoticeAssignmentsInFrame_RelStructure;
-import org.rutebanken.netex.model.NoticesInFrame_RelStructure;
+import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

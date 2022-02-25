@@ -3,11 +3,7 @@ package org.opentripplanner.netex.mapping;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.LinearRing;
-import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.*;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 

@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.graphfinder;
 
-import java.util.Objects;
 import org.opentripplanner.model.base.ToStringBuilder;
+
+import java.util.Objects;
 
 /**
  * A place of any of the types defined in PlaceType at a specified distance.

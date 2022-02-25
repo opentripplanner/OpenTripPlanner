@@ -1,9 +1,5 @@
 package org.opentripplanner.updater.alerts;
 
-import static org.opentripplanner.updater.alerts.GtfsRealtimeCauseMapper.getAlertCauseForGtfsRtCause;
-import static org.opentripplanner.updater.alerts.GtfsRealtimeEffectMapper.getAlertEffectForGtfsRtEffect;
-import static org.opentripplanner.updater.alerts.GtfsRealtimeSeverityMapper.getAlertSeverityForGtfsRtSeverity;
-
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -22,6 +18,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.opentripplanner.updater.alerts.GtfsRealtimeCauseMapper.getAlertCauseForGtfsRtCause;
+import static org.opentripplanner.updater.alerts.GtfsRealtimeEffectMapper.getAlertEffectForGtfsRtEffect;
+import static org.opentripplanner.updater.alerts.GtfsRealtimeSeverityMapper.getAlertSeverityForGtfsRtSeverity;
 
 /**
  * This updater only includes GTFS-Realtime Service Alert feeds.

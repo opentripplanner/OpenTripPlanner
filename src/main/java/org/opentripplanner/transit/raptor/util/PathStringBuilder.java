@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.raptor.util;
 
-import java.util.Calendar;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.base.OtpNumberFormat;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
@@ -9,6 +7,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
+
+import javax.annotation.Nullable;
+import java.util.Calendar;
 
 /**
  * Create a path like: {@code Walk 5m - 101 - Transit 10:07 10:35 - 2111 - Walk 4m }

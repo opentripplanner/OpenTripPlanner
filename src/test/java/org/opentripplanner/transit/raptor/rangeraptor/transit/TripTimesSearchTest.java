@@ -1,15 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearch;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearchApproximateTime;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearch;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearchApproximateTime;
-import static org.opentripplanner.util.time.TimeUtils.timeToStrLong;
-
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.Access;
@@ -17,6 +7,11 @@ import org.opentripplanner.transit.raptor._data.stoparrival.Bus;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.util.time.TimeUtils;
+
+import static org.junit.Assert.*;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.*;
+import static org.opentripplanner.util.time.TimeUtils.timeToStrLong;
 
 
 public class TripTimesSearchTest implements RaptorTestConstants {

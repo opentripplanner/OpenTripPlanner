@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.interactivelauncher;
 
-import static org.opentripplanner.ext.interactivelauncher.DebugLoggingSupport.configureDebugLogging;
-
 import org.opentripplanner.ext.interactivelauncher.views.MainView;
 import org.opentripplanner.standalone.OTPMain;
+
+import static org.opentripplanner.ext.interactivelauncher.DebugLoggingSupport.configureDebugLogging;
 
 
 /**

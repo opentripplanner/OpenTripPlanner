@@ -1,31 +1,22 @@
 package org.opentripplanner.ext.flex.trip;
 
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.StopTime.MISSING_VALUE;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.*;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 /**
  * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop

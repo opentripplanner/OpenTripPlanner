@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class DestinationArrivalTest {
 

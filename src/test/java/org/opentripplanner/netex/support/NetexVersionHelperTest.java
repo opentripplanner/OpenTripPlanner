@@ -1,23 +1,18 @@
 package org.opentripplanner.netex.support;
 
-import static java.time.Month.MAY;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.netex.support.NetexVersionHelper.comparingVersion;
-import static org.opentripplanner.netex.support.NetexVersionHelper.firstValidDateTime;
-import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionIn;
-import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionedElementIn;
-import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
+import org.junit.Test;
+import org.rutebanken.netex.model.EntityInVersionStructure;
+import org.rutebanken.netex.model.ValidBetween;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import org.junit.Test;
-import org.rutebanken.netex.model.EntityInVersionStructure;
-import org.rutebanken.netex.model.ValidBetween;
+
+import static java.time.Month.MAY;
+import static org.junit.Assert.*;
+import static org.opentripplanner.netex.support.NetexVersionHelper.*;
 
 public class NetexVersionHelperTest {
 

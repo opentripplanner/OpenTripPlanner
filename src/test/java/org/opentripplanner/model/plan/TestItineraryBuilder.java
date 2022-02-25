@@ -1,9 +1,11 @@
 package org.opentripplanner.model.plan;
 
-import static java.time.ZoneOffset.UTC;
-import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
-import static org.opentripplanner.routing.core.TraverseMode.CAR;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -11,12 +13,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.util.time.TimeUtils;
+
+import static java.time.ZoneOffset.UTC;
+import static org.opentripplanner.routing.core.TraverseMode.*;
 
 /**
  * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily

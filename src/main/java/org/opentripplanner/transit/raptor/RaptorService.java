@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor;
 
-import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
@@ -13,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * A service for performing Range Raptor routing request.

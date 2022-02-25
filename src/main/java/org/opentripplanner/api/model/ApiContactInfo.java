@@ -1,7 +1,8 @@
 package org.opentripplanner.api.model;
 
-import java.io.Serializable;
 import org.opentripplanner.model.base.ToStringBuilder;
+
+import java.io.Serializable;
 
 /**
  * How to contact the agency to book a trip or requests information.

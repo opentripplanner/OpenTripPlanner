@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.vehicle_rental;
 
-import java.io.Serializable;
-import java.util.EnumMap;
 import org.entur.gbfs.v2_2.vehicle_types.GBFSVehicleType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

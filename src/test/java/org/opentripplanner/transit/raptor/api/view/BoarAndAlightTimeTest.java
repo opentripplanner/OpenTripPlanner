@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.api.view;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import static org.junit.Assert.assertEquals;
 
 public class BoarAndAlightTimeTest {
 

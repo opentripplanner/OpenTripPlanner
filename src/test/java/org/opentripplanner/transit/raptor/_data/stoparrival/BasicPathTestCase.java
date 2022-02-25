@@ -1,26 +1,11 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
-import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.util.time.DurationUtils.durationToStr;
-import static org.opentripplanner.util.time.TimeUtils.time;
-
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
-import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.path.*;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
@@ -29,6 +14,17 @@ import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
+import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.util.time.DurationUtils.durationToStr;
+import static org.opentripplanner.util.time.TimeUtils.time;
 
 
 /**

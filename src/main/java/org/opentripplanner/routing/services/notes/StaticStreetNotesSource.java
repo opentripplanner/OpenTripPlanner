@@ -1,10 +1,7 @@
 package org.opentripplanner.routing.services.notes;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
@@ -12,8 +9,10 @@ import org.opentripplanner.routing.graph.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.SetMultimap;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A notes source of static notes, usually created at graph building stage and not modified

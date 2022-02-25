@@ -1,9 +1,5 @@
 package org.opentripplanner.transit.raptor.service;
 
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
-
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
@@ -14,6 +10,11 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.Heuris
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
 
 /**
  * Thin wrapper around a {@link HeuristicSearch} to allow for some small additional features. This

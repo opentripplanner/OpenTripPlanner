@@ -1,11 +1,12 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
-import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.RoutingService;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class TripTimeShortHelper {
 

@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

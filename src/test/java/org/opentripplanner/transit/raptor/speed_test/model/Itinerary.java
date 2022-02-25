@@ -1,9 +1,10 @@
 package org.opentripplanner.transit.raptor.speed_test.model;
 
 
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.

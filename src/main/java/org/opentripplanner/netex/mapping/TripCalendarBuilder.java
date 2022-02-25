@@ -10,23 +10,10 @@ import org.opentripplanner.netex.issues.ObjectNotFound;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.calendar.DatedServiceJourneyMapper;
 import org.opentripplanner.netex.mapping.calendar.DayTypeAssignmentMapper;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingPeriod;
-import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.*;
 
 import javax.xml.bind.JAXBElement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TripCalendarBuilder {
 

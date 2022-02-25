@@ -1,5 +1,11 @@
 package org.opentripplanner.model.transfer;
 
+import org.opentripplanner.common.model.T2;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.Trip;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,11 +13,6 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 
 /**
  * A map from any TransferPoint to an instances of type E. This is used to look up

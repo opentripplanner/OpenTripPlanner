@@ -1,7 +1,8 @@
 package org.opentripplanner.ext.transmodelapi;
 
-import java.util.Collection;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
+
+import java.util.Collection;
 
 /**
  * Transmodel API parameters. These parameters configure the behaviour of some aspects of the

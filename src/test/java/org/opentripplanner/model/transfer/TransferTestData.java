@@ -1,10 +1,6 @@
 package org.opentripplanner.model.transfer;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.*;
 
 public class TransferTestData {
     static final String FEED_ID = "F";

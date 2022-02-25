@@ -1,12 +1,5 @@
 package org.opentripplanner.ext.dataoverlay;
 
-import java.awt.geom.Point2D;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
@@ -14,12 +7,11 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ucar.ma2.Array;
-import ucar.ma2.ArrayDouble;
-import ucar.ma2.ArrayFloat;
-import ucar.ma2.ArrayInt;
-import ucar.ma2.ArrayLong;
-import ucar.ma2.Index;
+import ucar.ma2.*;
+
+import java.awt.geom.Point2D;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * Class that updates the graph edges according to the generic grid data and configuration file

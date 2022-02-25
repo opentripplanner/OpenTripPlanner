@@ -1,9 +1,10 @@
 package org.opentripplanner.model.transfer;
 
-import java.io.Serializable;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.base.ValueObjectToStringBuilder;
+
+import java.io.Serializable;
 
 public final class RouteStationTransferPoint implements TransferPoint, Serializable {
 

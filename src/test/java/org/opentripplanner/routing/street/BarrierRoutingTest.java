@@ -1,18 +1,5 @@
 package org.opentripplanner.routing.street;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
-import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
-import static org.opentripplanner.routing.core.TraverseMode.CAR;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -29,6 +16,18 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.PolylineEncoder;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
+import static org.opentripplanner.routing.core.TraverseMode.*;
 
 
 public class BarrierRoutingTest {

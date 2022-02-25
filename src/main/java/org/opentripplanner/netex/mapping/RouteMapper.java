@@ -1,25 +1,18 @@
 package org.opentripplanner.netex.mapping;
 
-import java.util.Set;
-import javax.annotation.Nullable;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Branding;
+import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.BrandingRefStructure;
-import org.rutebanken.netex.model.FlexibleLine_VersionStructure;
-import org.rutebanken.netex.model.Line_VersionStructure;
-import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.OperatorRefStructure;
-import org.rutebanken.netex.model.PresentationStructure;
+import org.rutebanken.netex.model.*;
+
+import javax.annotation.Nullable;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import java.util.Set;
 
 /**
  * Maps NeTEx line to OTP Route.

@@ -1,22 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.*;
+import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.StopTransferPriority;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StopIndexForRaptorTest {
 

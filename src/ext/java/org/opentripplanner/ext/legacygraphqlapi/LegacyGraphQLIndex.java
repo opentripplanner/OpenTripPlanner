@@ -17,11 +17,9 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.micrometer.core.instrument.Metrics;
-import java.util.List;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
-import org.opentripplanner.ext.legacygraphqlapi.datafetchers.*;
-import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.*;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
@@ -31,13 +29,10 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.Response;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 class LegacyGraphQLIndex {
 

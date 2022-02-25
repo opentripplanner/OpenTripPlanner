@@ -1,13 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import com.google.common.collect.Multimap;
-import java.util.ArrayList;
-import java.util.List;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class TransfersMapper {
 

@@ -1,7 +1,8 @@
 package org.opentripplanner.model.plan;
 
-import java.util.Calendar;
 import org.opentripplanner.model.base.ToStringBuilder;
+
+import java.util.Calendar;
 
 
 /**

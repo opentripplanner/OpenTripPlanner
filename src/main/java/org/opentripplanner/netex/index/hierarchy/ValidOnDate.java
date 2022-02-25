@@ -1,11 +1,12 @@
 package org.opentripplanner.netex.index.hierarchy;
 
 
-import static org.opentripplanner.netex.support.NetexVersionHelper.firstValidDateTime;
-import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
+import org.rutebanken.netex.model.EntityInVersionStructure;
 
 import java.time.LocalDateTime;
-import org.rutebanken.netex.model.EntityInVersionStructure;
+
+import static org.opentripplanner.netex.support.NetexVersionHelper.firstValidDateTime;
+import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
 
 
 /**

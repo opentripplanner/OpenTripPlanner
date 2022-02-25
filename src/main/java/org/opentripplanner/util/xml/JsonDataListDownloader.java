@@ -3,6 +3,10 @@ package org.opentripplanner.util.xml;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.opentripplanner.util.HttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -11,9 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import org.opentripplanner.util.HttpUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JsonDataListDownloader<T> {
 

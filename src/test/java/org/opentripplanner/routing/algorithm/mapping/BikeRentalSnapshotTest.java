@@ -1,9 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
-import java.util.Locale;
-import java.util.Set;
-import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +14,10 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
+
+import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.CompletionException;
 
 @ExtendWith(SnapshotExtension.class)
 @ResourceLock(Resources.LOCALE)

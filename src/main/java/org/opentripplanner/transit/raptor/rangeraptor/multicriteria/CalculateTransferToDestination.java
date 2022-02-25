@@ -1,11 +1,12 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
-import java.util.List;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
+
+import java.util.List;
 
 /**
  * This class listen to pareto set egress stop arrivals and on accepted

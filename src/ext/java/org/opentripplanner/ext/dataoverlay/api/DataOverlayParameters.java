@@ -1,15 +1,16 @@
 package org.opentripplanner.ext.dataoverlay.api;
 
+import org.opentripplanner.common.model.T2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import org.opentripplanner.common.model.T2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The purpose of this class is to hold all parameters and their value in a map. It also contains

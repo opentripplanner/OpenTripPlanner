@@ -1,11 +1,12 @@
 package org.opentripplanner.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *

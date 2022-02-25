@@ -1,19 +1,15 @@
 package org.opentripplanner.netex.mapping;
 
-import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopCollection;
-import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.StopPlaceRefStructure;
 import org.rutebanken.netex.model.StopPlaceRefs_RelStructure;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 class GroupOfStationsMapper {
 

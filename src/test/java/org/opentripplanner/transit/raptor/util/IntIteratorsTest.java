@@ -4,9 +4,7 @@ import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor.util.IntIterators.intDecIterator;
-import static org.opentripplanner.transit.raptor.util.IntIterators.intIncIterator;
-import static org.opentripplanner.transit.raptor.util.IntIterators.singleValueIterator;
+import static org.opentripplanner.transit.raptor.util.IntIterators.*;
 
 public class IntIteratorsTest {
 

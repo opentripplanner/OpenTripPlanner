@@ -1,18 +1,18 @@
 package org.opentripplanner.ext.dataoverlay.routing;
 
-import static org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters.toStringKey;
-import static org.opentripplanner.ext.dataoverlay.api.ParameterType.PENALTY;
-import static org.opentripplanner.ext.dataoverlay.api.ParameterType.THRESHOLD;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.api.ParameterType;
-import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters.toStringKey;
+import static org.opentripplanner.ext.dataoverlay.api.ParameterType.PENALTY;
+import static org.opentripplanner.ext.dataoverlay.api.ParameterType.THRESHOLD;
 
 public class DataOverlayContext {
 

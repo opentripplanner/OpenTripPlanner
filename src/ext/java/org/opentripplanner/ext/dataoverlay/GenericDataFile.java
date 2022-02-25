@@ -1,12 +1,5 @@
 package org.opentripplanner.ext.dataoverlay;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.IndexVariable;
 import ucar.ma2.Array;
@@ -14,6 +7,14 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFiles;
 import ucar.nc2.Variable;
 import ucar.nc2.units.DateUnit;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generic data file which is read according to data-overlay-config.json settings

@@ -2,12 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model.scalars;
 
 import graphql.Scalars;
 import graphql.language.StringValue;
-import graphql.schema.Coercing;
-import graphql.schema.CoercingParseValueException;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLScalarType;
+import graphql.schema.*;
 
 import java.time.Duration;
 import java.time.LocalTime;

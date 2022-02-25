@@ -8,9 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.util.TableFormatter.Align.Center;
-import static org.opentripplanner.util.TableFormatter.Align.Left;
-import static org.opentripplanner.util.TableFormatter.Align.Right;
+import static org.opentripplanner.util.TableFormatter.Align.*;
 
 
 /**

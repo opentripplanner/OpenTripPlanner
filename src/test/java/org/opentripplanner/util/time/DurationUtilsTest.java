@@ -1,15 +1,14 @@
 package org.opentripplanner.util.time;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.time.Duration;
-import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DurationUtilsTest {
   private final Duration D3d = Duration.ofDays(3);

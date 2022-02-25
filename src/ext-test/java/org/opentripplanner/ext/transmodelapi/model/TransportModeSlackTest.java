@@ -1,10 +1,11 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
-import java.util.List;
-import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opentripplanner.model.TransitMode;
+
+import java.util.List;
+import java.util.Map;
 
 public class TransportModeSlackTest {
 

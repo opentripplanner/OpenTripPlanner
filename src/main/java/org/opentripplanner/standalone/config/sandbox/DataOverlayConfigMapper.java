@@ -1,13 +1,14 @@
 package org.opentripplanner.standalone.config.sandbox;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.IndexVariable;
 import org.opentripplanner.ext.dataoverlay.configuration.ParameterBinding;
 import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
 import org.opentripplanner.standalone.config.NodeAdapter;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DataOverlayConfigMapper {
 

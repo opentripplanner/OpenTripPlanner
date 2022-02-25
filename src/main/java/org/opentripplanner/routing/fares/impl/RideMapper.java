@@ -1,13 +1,14 @@
 package org.opentripplanner.routing.fares.impl;
 
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
 
 /**
  * Convert an OTP2 Itinerary to a list of Ride objects used by the fare calculators.

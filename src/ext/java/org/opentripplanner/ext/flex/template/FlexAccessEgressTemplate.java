@@ -1,12 +1,8 @@
 package org.opentripplanner.ext.flex.template;
 
 import com.google.common.base.MoreObjects;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -21,7 +17,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.ext.flex.FlexParameters;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public abstract class FlexAccessEgressTemplate {
   protected final NearbyStop accessEgress;

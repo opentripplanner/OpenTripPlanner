@@ -1,10 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferWithDuration;
@@ -13,6 +8,12 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public class Transfer {
     private final int toStop;

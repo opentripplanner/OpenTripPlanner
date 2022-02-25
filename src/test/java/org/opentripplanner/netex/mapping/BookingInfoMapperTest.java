@@ -1,21 +1,15 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-import java.time.Duration;
-import java.time.LocalTime;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BookingInfo;
-import org.rutebanken.netex.model.BookingArrangementsStructure;
-import org.rutebanken.netex.model.ContactStructure;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.FlexibleServiceProperties;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.PurchaseWhenEnumeration;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.rutebanken.netex.model.*;
+
+import java.time.Duration;
+import java.time.LocalTime;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class BookingInfoMapperTest {
 

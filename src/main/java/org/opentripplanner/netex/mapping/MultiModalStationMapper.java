@@ -1,12 +1,13 @@
 package org.opentripplanner.netex.mapping;
 
-import java.util.Collection;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.StopPlace;
+
+import java.util.Collection;
 
 class MultiModalStationMapper {
 

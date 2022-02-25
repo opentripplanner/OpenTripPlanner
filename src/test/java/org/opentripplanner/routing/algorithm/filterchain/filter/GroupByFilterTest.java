@@ -1,16 +1,17 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 public class GroupByFilterTest implements PlanTestConstants {
 

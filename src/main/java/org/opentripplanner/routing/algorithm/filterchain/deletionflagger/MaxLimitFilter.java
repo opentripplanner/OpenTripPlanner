@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import com.google.common.collect.Lists;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.ListSection;
+
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
 
 /**

@@ -1,9 +1,9 @@
 package org.opentripplanner.datastore.configure;
 
 import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.OtpDataStoreConfig;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.datastore.OtpDataStoreConfig;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceRepository;

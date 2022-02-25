@@ -3,14 +3,7 @@ package org.opentripplanner.common;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.csvreader.CsvReader;
-import com.google.common.collect.Collections2;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;

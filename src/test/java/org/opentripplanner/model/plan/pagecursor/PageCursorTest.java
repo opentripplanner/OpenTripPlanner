@@ -1,18 +1,19 @@
 package org.opentripplanner.model.plan.pagecursor;
 
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
-import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
-import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
-import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.TimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
+import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
+import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
+import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
 
 public class PageCursorTest {
 

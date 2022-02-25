@@ -1,8 +1,7 @@
 package org.opentripplanner.ext.flex.template;
 
 import com.google.common.collect.Lists;
-import java.util.Collection;
-import java.util.List;
+import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -15,7 +14,9 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.ext.flex.FlexParameters;
+
+import java.util.Collection;
+import java.util.List;
 
 public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   public FlexEgressTemplate(

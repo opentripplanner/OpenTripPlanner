@@ -1,17 +1,5 @@
 package org.opentripplanner.ext.flex;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
-
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -39,6 +27,17 @@ import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
 import org.opentripplanner.util.model.EncodedPolylineBean;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service

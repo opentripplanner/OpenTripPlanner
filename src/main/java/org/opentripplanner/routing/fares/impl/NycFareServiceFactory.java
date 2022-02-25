@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.fares.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class NycFareServiceFactory implements FareServiceFactory {
 

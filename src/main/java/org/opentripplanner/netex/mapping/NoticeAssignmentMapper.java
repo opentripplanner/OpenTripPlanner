@@ -2,23 +2,18 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.Collection;
-import java.util.Map;
-import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.StopTimeKey;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TimetabledPassingTime;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Maps NeTEx NoticeAssignment, which is the connection between a Notice and the object it refers

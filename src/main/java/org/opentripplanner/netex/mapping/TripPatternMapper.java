@@ -2,32 +2,19 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.*;
+
+import java.util.*;
 
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern contain the same

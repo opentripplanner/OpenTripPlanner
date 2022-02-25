@@ -1,16 +1,14 @@
 package org.opentripplanner.openstreetmap.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.function.Consumer;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.function.Consumer;
 
 /**
  * A base class for OSM entities containing common methods.

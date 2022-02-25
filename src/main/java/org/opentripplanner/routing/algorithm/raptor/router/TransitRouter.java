@@ -1,11 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
@@ -37,6 +31,13 @@ import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class TransitRouter {
     private static final Logger LOG = LoggerFactory.getLogger(TransitRouter.class);

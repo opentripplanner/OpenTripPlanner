@@ -1,19 +1,6 @@
 package org.opentripplanner.netex;
 
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayOfWeekEnumeration;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.rutebanken.netex.model.JourneyRefStructure;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDayRefStructure;
-import org.rutebanken.netex.model.OperatingPeriod;
-import org.rutebanken.netex.model.OperatingPeriodRefStructure;
-import org.rutebanken.netex.model.PropertiesOfDay_RelStructure;
-import org.rutebanken.netex.model.PropertyOfDay;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.rutebanken.netex.model.*;
 
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;

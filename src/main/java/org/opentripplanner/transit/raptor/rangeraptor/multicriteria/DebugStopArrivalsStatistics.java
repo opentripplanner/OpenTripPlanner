@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
+import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
+
 import static java.util.Locale.ROOT;
 import static org.opentripplanner.transit.raptor.api.debug.DebugTopic.STOP_ARRIVALS_STATISTICS;
-
-import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 
 
 /**

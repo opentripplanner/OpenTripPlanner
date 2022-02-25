@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.service;
 
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
-
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
+
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
 
 class HeuristicToRunResolver {
 

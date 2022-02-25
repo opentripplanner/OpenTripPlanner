@@ -1,16 +1,14 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
+
+import java.util.List;
+
+import static org.opentripplanner.model.plan.TestItineraryBuilder.*;
 
 public class RemoveBikeRentalWithMostlyWalkingTest {
 

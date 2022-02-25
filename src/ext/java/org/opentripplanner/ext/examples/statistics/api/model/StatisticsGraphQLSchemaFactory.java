@@ -2,13 +2,7 @@ package org.opentripplanner.ext.examples.statistics.api.model;
 
 import graphql.Scalars;
 import graphql.relay.Relay;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.GraphQLNamedOutputType;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLSchema;
-import graphql.schema.GraphQLTypeReference;
+import graphql.schema.*;
 import org.opentripplanner.routing.RoutingService;
 
 public class StatisticsGraphQLSchemaFactory {

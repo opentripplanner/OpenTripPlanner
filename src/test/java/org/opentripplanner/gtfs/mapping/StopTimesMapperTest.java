@@ -1,20 +1,16 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collection;
-import java.util.Collections;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+
+import java.util.Collection;
+import java.util.Collections;
+
+import static org.junit.Assert.*;
 
 public class StopTimesMapperTest {
     private static final String FEED_ID = "FEED";

@@ -1,11 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.stop;
 
 import graphql.Scalars;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
+import graphql.schema.*;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 import java.util.List;

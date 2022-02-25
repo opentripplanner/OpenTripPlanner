@@ -10,15 +10,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.LinkSequenceProjection;
-import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
-import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.Projections_RelStructure;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.ServiceLinkInJourneyPattern_VersionedChildStructure;
-import org.rutebanken.netex.model.ServiceLinkRefStructure;
+import org.rutebanken.netex.model.*;
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigDecimal;

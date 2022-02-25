@@ -4,37 +4,17 @@ import com.google.common.collect.Multimap;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopTimeKey;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Load a small NeTEx file set without failing. This is just a smoke test

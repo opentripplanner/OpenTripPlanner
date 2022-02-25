@@ -1,9 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+
+import javax.annotation.Nullable;
 
 
 /**

@@ -1,23 +1,10 @@
 package org.opentripplanner.ext.siri;
 
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.alertpatch.AlertUrl;
-import org.opentripplanner.routing.alertpatch.EntitySelector;
-import org.opentripplanner.routing.alertpatch.StopCondition;
-import org.opentripplanner.routing.alertpatch.TimePeriod;
-import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.alertpatch.*;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -27,29 +14,12 @@ import org.opentripplanner.util.TranslatedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.ifopt.siri20.StopPlaceRef;
-import uk.org.siri.siri20.AffectedLineStructure;
-import uk.org.siri.siri20.AffectedOperatorStructure;
-import uk.org.siri.siri20.AffectedRouteStructure;
-import uk.org.siri.siri20.AffectedStopPlaceStructure;
-import uk.org.siri.siri20.AffectedStopPointStructure;
-import uk.org.siri.siri20.AffectedVehicleJourneyStructure;
-import uk.org.siri.siri20.AffectsScopeStructure;
-import uk.org.siri.siri20.DataFrameRefStructure;
-import uk.org.siri.siri20.DefaultedTextStructure;
-import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
-import uk.org.siri.siri20.HalfOpenTimestampOutputRangeStructure;
-import uk.org.siri.siri20.InfoLinkStructure;
-import uk.org.siri.siri20.LineRef;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
-import uk.org.siri.siri20.NetworkRefStructure;
-import uk.org.siri.siri20.OperatorRefStructure;
-import uk.org.siri.siri20.PtSituationElement;
-import uk.org.siri.siri20.RoutePointTypeEnumeration;
-import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
-import uk.org.siri.siri20.StopPointRef;
-import uk.org.siri.siri20.VehicleJourneyRef;
-import uk.org.siri.siri20.WorkflowStatusEnumeration;
+import uk.org.siri.siri20.*;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 /**
  * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds.

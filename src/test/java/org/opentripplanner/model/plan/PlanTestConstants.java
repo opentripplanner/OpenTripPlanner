@@ -1,12 +1,12 @@
 package org.opentripplanner.model.plan;
 
-import static org.opentripplanner.util.time.TimeUtils.time;
-
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.util.time.DurationUtils;
+
+import static org.opentripplanner.util.time.TimeUtils.time;
 
 public interface PlanTestConstants {
   ServiceDate SERVICE_DATE = new ServiceDate(2020, 9, 21);

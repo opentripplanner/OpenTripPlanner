@@ -1,14 +1,15 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-
-import java.util.Arrays;
-import java.util.List;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 /**
  * Mock the TransferGenerator

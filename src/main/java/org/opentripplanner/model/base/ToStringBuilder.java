@@ -1,22 +1,18 @@
 package org.opentripplanner.model.base;
 
-import static java.lang.Boolean.TRUE;
-
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
+
+import javax.validation.constraints.NotNull;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.lang.Boolean.TRUE;
 
 /**
  * This toString builder which add elements to a compact string of the form:

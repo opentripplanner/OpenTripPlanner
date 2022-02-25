@@ -2,28 +2,11 @@ package org.opentripplanner.inspector;
 
 import com.jhlabs.awt.ShapeStroke;
 import com.jhlabs.awt.TextStroke;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.stream.Collectors;
 import org.locationtech.jts.awt.IdentityPointTransformation;
 import org.locationtech.jts.awt.PointShapeFactory;
 import org.locationtech.jts.awt.ShapeWriter;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.locationtech.jts.operation.buffer.OffsetCurveBuilder;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -31,6 +14,13 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+
+import java.awt.Polygon;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 /**
  * A TileRenderer implementation which get all edges/vertex in the bounding box of the tile, and

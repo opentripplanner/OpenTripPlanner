@@ -1,32 +1,21 @@
 package org.opentripplanner.model.impl;
 
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.gtfs.GtfsContextBuilder;
+import org.opentripplanner.model.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
-import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class OtpTransitServiceImplTest {
     private static final String FEED_ID = "Z";

@@ -8,11 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static java.util.Collections.singleton;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FareAttributeMapperTest {
     private static final org.onebusaway.gtfs.model.FareAttribute FARE_ATTRIBUTE = new org.onebusaway.gtfs.model.FareAttribute();

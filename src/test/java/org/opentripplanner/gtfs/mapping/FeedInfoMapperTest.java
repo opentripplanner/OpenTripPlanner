@@ -7,10 +7,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FeedInfoMapperTest {
     private static final org.onebusaway.gtfs.model.FeedInfo FEED_INFO = new org.onebusaway.gtfs.model.FeedInfo();

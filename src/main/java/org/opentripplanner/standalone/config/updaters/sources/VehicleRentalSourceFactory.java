@@ -1,16 +1,16 @@
 package org.opentripplanner.standalone.config.updaters.sources;
 
-import static org.opentripplanner.updater.DataSourceType.GBFS;
+import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
+import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
+import org.opentripplanner.util.OtpAppException;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
-import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
-import org.opentripplanner.util.OtpAppException;
+import static org.opentripplanner.updater.DataSourceType.GBFS;
 
 /**
  * This class is an object representation of the data source for a single real-time updater in

@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import org.opentripplanner.routing.algorithm.raptor.path.PathDiff;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
@@ -12,6 +9,10 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  *

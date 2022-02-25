@@ -4,13 +4,8 @@
 */
 package com.jhlabs.awt;
 
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.FlatteningPathIterator;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Rectangle2D;
+import java.awt.*;
+import java.awt.geom.*;
 
 /**
  * Stroke that draw a shape.

@@ -3,10 +3,11 @@ package org.opentripplanner.ext.interactivelauncher;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for integration with the OTP Debug log configuraton, reading loggers from the slf4j

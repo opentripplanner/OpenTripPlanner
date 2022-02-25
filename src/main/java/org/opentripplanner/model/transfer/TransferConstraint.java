@@ -1,15 +1,13 @@
 package org.opentripplanner.model.transfer;
 
-import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
-import static org.opentripplanner.model.transfer.TransferPriority.NOT_ALLOWED;
-import static org.opentripplanner.model.transfer.TransferPriority.PREFERRED;
-import static org.opentripplanner.model.transfer.TransferPriority.RECOMMENDED;
-
-import java.io.Serializable;
-import java.util.Objects;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
+
+import javax.annotation.Nullable;
+import java.io.Serializable;
+import java.util.Objects;
+
+import static org.opentripplanner.model.transfer.TransferPriority.*;
 
 /**
  * This class holds transfer constraint information.

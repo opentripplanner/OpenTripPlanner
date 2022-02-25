@@ -1,16 +1,13 @@
 package org.opentripplanner.routing.framework;
 
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.DistributionSummary;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Timer;
-import java.util.ArrayList;
-import java.util.List;
+import io.micrometer.core.instrument.*;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.api.resource.TransitTimingOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Keeps account of timing information within the different parts of the routing process, and is

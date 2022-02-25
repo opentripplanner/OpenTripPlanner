@@ -1,38 +1,20 @@
 package org.opentripplanner.netex.loader.parser;
 
-import static org.opentripplanner.util.logging.MaxCountLogger.maxCount;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import javax.xml.bind.JAXBElement;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.logging.MaxCountLogger;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.FlexibleStopAssignment;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.GroupOfLines;
-import org.rutebanken.netex.model.GroupsOfLinesInFrame_RelStructure;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPatternsInFrame_RelStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LinesInFrame_RelStructure;
-import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.NetworksInFrame_RelStructure;
-import org.rutebanken.netex.model.PassengerStopAssignment;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.RoutesInFrame_RelStructure;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
-import org.rutebanken.netex.model.Service_VersionFrameStructure;
-import org.rutebanken.netex.model.StopAssignmentsInFrame_RelStructure;
+import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.opentripplanner.util.logging.MaxCountLogger.maxCount;
 
 class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 

@@ -1,10 +1,8 @@
 package org.opentripplanner.routing.util;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
-import org.opentripplanner.routing.util.IncrementingIdGenerator;
-import org.opentripplanner.routing.util.UniqueIdGenerator;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class IncrementingIdGeneratorTest {

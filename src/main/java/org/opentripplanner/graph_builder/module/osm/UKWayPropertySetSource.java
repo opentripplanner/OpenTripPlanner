@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.*;
-
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+
+import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.LEFT_HAND_TRAFFIC;
 
 /**
  * OSM way properties for UK roads. 

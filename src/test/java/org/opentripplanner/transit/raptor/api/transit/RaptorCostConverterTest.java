@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class RaptorCostConverterTest {
   @Test

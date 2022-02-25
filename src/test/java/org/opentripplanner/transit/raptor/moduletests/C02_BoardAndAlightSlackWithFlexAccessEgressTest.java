@@ -1,14 +1,5 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
-import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -19,6 +10,15 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
 /**
  * FEATURE UNDER TEST

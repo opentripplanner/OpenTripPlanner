@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.AccessPathView;
+
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 public class Access extends AbstractStopArrival {
 

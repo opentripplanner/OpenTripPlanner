@@ -1,13 +1,14 @@
 package org.opentripplanner.ext.dataoverlay.configure;
 
-import java.io.File;
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.GenericDataFile;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.io.File;
 
 public class DataOverlayFactory {
 

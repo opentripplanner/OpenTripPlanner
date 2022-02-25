@@ -1,9 +1,10 @@
 package org.opentripplanner.api.mapping;
 
+import org.opentripplanner.model.BookingMethod;
+
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.BookingMethod;
 
 public class BookingMethodMapper {
 

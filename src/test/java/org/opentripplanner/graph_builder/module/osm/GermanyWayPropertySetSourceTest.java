@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+
+import static org.junit.Assert.assertEquals;
 
 public class GermanyWayPropertySetSourceTest {
 

@@ -1,10 +1,11 @@
 package org.opentripplanner.util.xml;
 
-import static java.util.Locale.ROOT;
+import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Map;
-import junit.framework.TestCase;
+
+import static java.util.Locale.ROOT;
 
 public class TestXmlDataListDownloader extends TestCase {
 

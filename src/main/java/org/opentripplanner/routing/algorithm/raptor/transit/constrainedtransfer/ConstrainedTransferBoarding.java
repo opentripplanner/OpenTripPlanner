@@ -1,9 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer;
 
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * A boarding event passed to Raptor to perform a boarding.

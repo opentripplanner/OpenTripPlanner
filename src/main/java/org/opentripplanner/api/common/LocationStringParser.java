@@ -1,7 +1,7 @@
 package org.opentripplanner.api.common;
 
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

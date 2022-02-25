@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.graphfinder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -10,6 +7,10 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DirectGraphFinderTest extends GraphRoutingTest {
 

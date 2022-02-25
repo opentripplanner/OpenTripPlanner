@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.function.DoubleFunction;
+import java.util.stream.Collectors;
 
 /**
  * This filter remove all transit results which have a generalized-cost higher than

@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import org.junit.Test;
 import org.opentripplanner.model.StopTransferPriority;
 import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class StopTransferPriorityMapperTest {
 

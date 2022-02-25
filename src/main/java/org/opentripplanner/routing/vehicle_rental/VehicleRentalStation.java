@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.vehicle_rental;
 
-import static java.util.Locale.ROOT;
-
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
@@ -12,7 +8,10 @@ import org.opentripplanner.util.I18NString;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Locale.ROOT;
 
 /**
  * Implements the {@link VehicleRentalPlace} class which contains Javadoc.

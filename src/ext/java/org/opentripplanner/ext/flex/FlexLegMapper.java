@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.flex;
 
-import java.util.ArrayList;
-import java.util.Locale;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+
+import java.util.ArrayList;
 
 public class FlexLegMapper {
 

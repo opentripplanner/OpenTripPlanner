@@ -1,12 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.timetable;
 
 import graphql.Scalars;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLTypeReference;
+import graphql.schema.*;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;

@@ -4,8 +4,8 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.BookingRule;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.ContactInfo;
 import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.ContactInfo;
 
 import java.time.Duration;
 import java.time.LocalTime;

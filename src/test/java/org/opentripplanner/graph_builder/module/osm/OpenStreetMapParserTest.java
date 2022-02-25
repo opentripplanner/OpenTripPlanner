@@ -1,17 +1,17 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URLDecoder;
-
 import gnu.trove.list.TLongList;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
+
+import java.io.File;
+import java.net.URLDecoder;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class OpenStreetMapParserTest {
 

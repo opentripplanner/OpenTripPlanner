@@ -16,14 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.opentripplanner.datastore.FileType.CONFIG;
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GRAPH;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.datastore.FileType.REPORT;
-import static org.opentripplanner.datastore.FileType.UNKNOWN;
+import static org.opentripplanner.datastore.FileType.*;
 import static org.opentripplanner.datastore.OtpDataStore.BUILD_REPORT_DIR;
 import static org.opentripplanner.datastore.base.LocalDataSourceRepository.isCurrentDir;
 import static org.opentripplanner.standalone.config.ConfigLoader.isConfigFile;

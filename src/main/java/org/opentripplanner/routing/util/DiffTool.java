@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.util;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import javax.annotation.Nullable;
 
 
 /**

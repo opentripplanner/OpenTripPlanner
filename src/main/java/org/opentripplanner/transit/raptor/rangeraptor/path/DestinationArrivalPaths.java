@@ -1,8 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.base.OtpNumberFormat;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
@@ -20,6 +17,10 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 import org.opentripplanner.util.logging.ThrottleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * The responsibility of this class is to collect result paths for destination arrivals.

@@ -1,10 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import java.util.Map;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TripPatternForDates;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+
+import java.util.Map;
 
 
 /**

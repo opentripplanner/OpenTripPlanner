@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer;
 
-import java.util.function.IntFunction;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
+
+import java.util.function.IntFunction;
 
 
 /**

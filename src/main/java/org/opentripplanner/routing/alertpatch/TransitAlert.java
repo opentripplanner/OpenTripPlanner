@@ -4,13 +4,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.util.I18NString;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TransitAlert implements Serializable {
     private static final long serialVersionUID = 8305126586053909836L;

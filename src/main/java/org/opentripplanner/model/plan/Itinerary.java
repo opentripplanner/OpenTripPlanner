@@ -1,17 +1,18 @@
 package org.opentripplanner.model.plan;
 
 
-import static java.util.Locale.ROOT;
+import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+
+import static java.util.Locale.ROOT;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.

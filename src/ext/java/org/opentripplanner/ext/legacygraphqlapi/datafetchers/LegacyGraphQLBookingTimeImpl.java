@@ -2,9 +2,10 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.time.format.DateTimeFormatter;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.BookingTime;
+
+import java.time.format.DateTimeFormatter;
 
 public class LegacyGraphQLBookingTimeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBookingTime {
     @Override

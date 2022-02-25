@@ -7,9 +7,7 @@ import java.util.Collections;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.function.Function.identity;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.opentripplanner.util.MapUtils.mapToList;
 
 /**

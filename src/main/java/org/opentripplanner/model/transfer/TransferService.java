@@ -1,16 +1,13 @@
 package org.opentripplanner.model.transfer;
 
-import static java.util.Comparator.comparingInt;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
+
+import javax.annotation.Nullable;
+import java.io.Serializable;
+import java.util.*;
+
+import static java.util.Comparator.comparingInt;
 
 /**
  * This class represents all transfer information in the graph. Transfers are grouped by

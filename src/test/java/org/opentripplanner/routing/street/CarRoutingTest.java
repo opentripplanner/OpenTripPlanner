@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.street;
 
-import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
-
-import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +16,10 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.PolylineEncoder;
+
+import java.time.Instant;
+
+import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 
 public class CarRoutingTest {

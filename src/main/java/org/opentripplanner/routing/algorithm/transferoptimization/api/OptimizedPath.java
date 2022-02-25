@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
-import java.util.function.Supplier;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -9,6 +8,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+
+import java.util.function.Supplier;
 
 
 /**

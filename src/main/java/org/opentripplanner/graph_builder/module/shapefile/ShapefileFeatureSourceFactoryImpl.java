@@ -1,12 +1,12 @@
 package org.opentripplanner.graph_builder.module.shapefile;
 
-import java.io.File;
-
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
+
+import java.io.File;
 
 public class ShapefileFeatureSourceFactoryImpl implements FeatureSourceFactory {
 

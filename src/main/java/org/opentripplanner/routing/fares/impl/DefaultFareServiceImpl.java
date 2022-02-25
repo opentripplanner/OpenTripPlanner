@@ -1,29 +1,17 @@
 package org.opentripplanner.routing.fares.impl;
 
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.FareComponent;
-import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 /** Holds information for doing the graph search on fares */
 class FareSearch {

@@ -1,5 +1,8 @@
 package org.opentripplanner.standalone.config;
 
+import org.apache.commons.io.IOUtils;
+import org.opentripplanner.util.OtpAppException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,8 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.io.IOUtils;
-import org.opentripplanner.util.OtpAppException;
 
 /**
  * Replaces a file include directive with the text content of the file "as is". For example:

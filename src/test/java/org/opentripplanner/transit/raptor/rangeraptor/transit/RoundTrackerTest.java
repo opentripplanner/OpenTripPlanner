@@ -1,13 +1,12 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RoundTrackerTest {
     private static final int ANY = 500;

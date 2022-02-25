@@ -1,6 +1,15 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
-import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.generalizedCostComparator;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.*;
+import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
+import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -9,24 +18,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
-import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance;
+
+import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.generalizedCostComparator;
 
 
 /**

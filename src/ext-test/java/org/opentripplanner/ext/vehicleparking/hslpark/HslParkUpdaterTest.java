@@ -1,14 +1,11 @@
 package org.opentripplanner.ext.vehicleparking.hslpark;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+
+import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HslParkUpdaterTest {
 

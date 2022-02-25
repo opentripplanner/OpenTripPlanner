@@ -9,14 +9,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.JourneyRefStructure;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDayRefStructure;
-import org.rutebanken.netex.model.OperatingPeriod;
-import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,10 +23,7 @@ import java.util.stream.Collectors;
 import static java.lang.Boolean.TRUE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayType;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignment;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeRefList;
-import static org.opentripplanner.netex.NetexTestDataSupport.jaxbElement;
+import static org.opentripplanner.netex.NetexTestDataSupport.*;
 
 public class TripCalendarBuilderTest {
 

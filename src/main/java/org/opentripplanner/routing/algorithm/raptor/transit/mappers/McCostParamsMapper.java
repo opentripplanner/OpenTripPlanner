@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
-import java.util.Arrays;
-import java.util.Map;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+
+import java.util.Arrays;
+import java.util.Map;
 
 public class McCostParamsMapper {
 

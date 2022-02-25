@@ -1,11 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import java.time.ZonedDateTime;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -14,15 +8,15 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalc
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.McCostParamsMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
-import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.*;
 import org.opentripplanner.util.OTPFeature;
+
+import javax.annotation.Nullable;
+import java.time.ZonedDateTime;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**

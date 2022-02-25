@@ -2,8 +2,8 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
 public class LegacyGraphQLCoordinatesImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLCoordinates {

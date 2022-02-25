@@ -1,9 +1,10 @@
 package org.opentripplanner.model.base;
 
-import java.time.Duration;
-import java.util.function.Function;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
+
+import java.time.Duration;
+import java.util.function.Function;
 
 /**
  * Use this to-string-builder to build value objects. A

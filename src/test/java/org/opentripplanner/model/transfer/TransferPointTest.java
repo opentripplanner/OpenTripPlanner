@@ -1,27 +1,11 @@
 package org.opentripplanner.model.transfer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.transfer.TransferTestData.POS_1;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_1;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_2;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1A;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1S;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2B;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2S;
-import static org.opentripplanner.model.transfer.TransferTestData.STATION;
-import static org.opentripplanner.model.transfer.TransferTestData.STATION_POINT;
-import static org.opentripplanner.model.transfer.TransferTestData.STOP_A;
-import static org.opentripplanner.model.transfer.TransferTestData.STOP_B;
-import static org.opentripplanner.model.transfer.TransferTestData.STOP_POINT_A;
-import static org.opentripplanner.model.transfer.TransferTestData.STOP_POINT_B;
-import static org.opentripplanner.model.transfer.TransferTestData.TRIP_11;
-import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_11_1;
-import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_21_3;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.opentripplanner.model.transfer.TransferTestData.*;
 
 public class TransferPointTest {
 

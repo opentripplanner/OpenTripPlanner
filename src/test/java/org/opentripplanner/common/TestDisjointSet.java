@@ -1,12 +1,10 @@
 package org.opentripplanner.common;
 
+import junit.framework.TestCase;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.Random;
-
-import org.junit.Test;
-import org.opentripplanner.common.DisjointSet;
-
-import junit.framework.TestCase;
 
 public class TestDisjointSet  extends TestCase{
 

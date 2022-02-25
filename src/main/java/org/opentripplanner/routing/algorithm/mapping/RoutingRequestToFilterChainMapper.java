@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import java.time.Instant;
-import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
@@ -9,6 +7,9 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChai
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
+
+import java.time.Instant;
+import java.util.function.Consumer;
 
 public class RoutingRequestToFilterChainMapper {
   /** Filter itineraries down to this limit, but not below. */

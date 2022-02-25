@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * This graph does a quick sanity check that the GraphQL schema can be built. It's much

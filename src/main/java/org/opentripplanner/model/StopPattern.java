@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;

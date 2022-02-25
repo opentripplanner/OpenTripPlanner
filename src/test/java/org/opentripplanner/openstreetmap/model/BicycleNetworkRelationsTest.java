@@ -1,13 +1,14 @@
 package org.opentripplanner.openstreetmap.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+
+import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BicycleNetworkRelationsTest {
 

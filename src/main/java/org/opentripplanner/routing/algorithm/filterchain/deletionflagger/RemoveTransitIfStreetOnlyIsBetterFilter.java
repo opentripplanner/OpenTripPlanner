@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Filter itineraries based on generalizedCost, compared with a on-street-all-the-way itinerary(if

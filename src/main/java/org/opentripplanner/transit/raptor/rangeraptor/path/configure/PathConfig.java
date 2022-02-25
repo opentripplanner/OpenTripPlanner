@@ -1,21 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path.configure;
 
 
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandard;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorStandardAndLatestDepature;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCost;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithCostAndLatestDeparture;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCost;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithRelaxedCostAndLatestDeparture;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetable;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndCost;
-import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.comparatorWithTimetableAndRelaxedCost;
-
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
+
+import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetComparators.*;
 
 /**
  * This class is responsible for creating a a result collector - the

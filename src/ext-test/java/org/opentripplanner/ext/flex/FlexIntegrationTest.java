@@ -1,22 +1,5 @@
 package org.opentripplanner.ext.flex;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.graph_builder.module.FakeGraph.getFileForResource;
-import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
-import static org.opentripplanner.routing.core.TraverseMode.BUS;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
-
-import java.io.File;
-import java.net.URISyntaxException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -35,6 +18,22 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.opentripplanner.graph_builder.module.FakeGraph.getFileForResource;
+import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
+import static org.opentripplanner.routing.core.TraverseMode.BUS;
+import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 /**
  * This test checks the combination of transit and flex works.

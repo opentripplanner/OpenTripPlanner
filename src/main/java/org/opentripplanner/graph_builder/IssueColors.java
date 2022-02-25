@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -1,11 +1,20 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
-
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
+import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.transit.raptor.api.request.Optimization;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -14,18 +23,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.model.modes.AllowedTransitMode;
-import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
-import org.opentripplanner.transit.raptor.api.request.Optimization;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
-import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
+
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
 
 
 public class SpeedTestRequest {

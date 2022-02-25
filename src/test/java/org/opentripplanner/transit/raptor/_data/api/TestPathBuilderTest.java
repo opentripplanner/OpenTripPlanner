@@ -1,32 +1,14 @@
 package org.opentripplanner.transit.raptor._data.api;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_DURATION;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_START;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_STRING;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.EGRESS_DURATION;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.L11_DURATION;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.L11_START;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.L21_DURATION;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.L21_START;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.L31_DURATION;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.L31_START;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.LINE_11;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.LINE_21;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.LINE_31;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TRANSIT_RELUCTANCE_INDEX;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_COST;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TX_DURATION;
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
-import static org.opentripplanner.util.time.TimeUtils.time;
-
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.*;
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.util.time.TimeUtils.time;
 
 
 /**

@@ -2,14 +2,8 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParentStationNotFound;
-import org.opentripplanner.model.BoardingArea;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StationElement;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.impl.EntityById;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;

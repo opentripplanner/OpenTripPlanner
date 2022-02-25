@@ -1,23 +1,6 @@
 package org.opentripplanner.ext.siri;
 
-import static java.util.Collections.EMPTY_LIST;
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.SCHEDULED;
-
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-import javax.xml.datatype.Duration;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.*;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.graph.Graph;
@@ -25,16 +8,16 @@ import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
-import uk.org.siri.siri20.CallStatusEnumeration;
-import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
-import uk.org.siri.siri20.EstimatedCall;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.MonitoredCallStructure;
-import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
-import uk.org.siri.siri20.RecordedCall;
-import uk.org.siri.siri20.VehicleActivityStructure;
+import uk.org.siri.siri20.*;
+
+import javax.xml.datatype.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
+
+import static java.util.Collections.EMPTY_LIST;
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
 public class TimetableHelper {
 

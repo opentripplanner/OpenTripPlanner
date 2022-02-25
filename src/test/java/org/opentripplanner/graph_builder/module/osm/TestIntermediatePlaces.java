@@ -1,13 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -27,6 +19,12 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+
+import java.util.Calendar;
+import java.util.List;
+import java.util.TimeZone;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests for planning with intermediate places

@@ -1,9 +1,5 @@
 package org.opentripplanner.standalone.config.updaters;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
@@ -11,6 +7,11 @@ import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class VehicleParkingUpdaterConfig {
 

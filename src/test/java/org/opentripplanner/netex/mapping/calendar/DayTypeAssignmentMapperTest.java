@@ -17,12 +17,7 @@ import java.util.stream.Collectors;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayType;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignment;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignmentWithOpDay;
-import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignmentWithPeriod;
-import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingDay;
-import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingPeriod;
+import static org.opentripplanner.netex.NetexTestDataSupport.*;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKDAYS;
 

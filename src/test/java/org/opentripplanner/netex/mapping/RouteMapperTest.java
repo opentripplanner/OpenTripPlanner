@@ -1,32 +1,23 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
-
 import com.google.common.collect.ImmutableSet;
-import java.util.Collections;
-import java.util.Set;
-import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Branding;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.Authority;
-import org.rutebanken.netex.model.BrandingRefStructure;
-import org.rutebanken.netex.model.GroupOfLinesRefStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.OrganisationRefStructure;
-import org.rutebanken.netex.model.PresentationStructure;
+import org.rutebanken.netex.model.*;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.TimeZone;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
 public class RouteMapperTest {
 

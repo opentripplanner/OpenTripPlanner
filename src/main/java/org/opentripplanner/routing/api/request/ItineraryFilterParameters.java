@@ -1,8 +1,9 @@
 package org.opentripplanner.routing.api.request;
 
 
-import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
+
+import java.util.function.DoubleFunction;
 
 /**
  * Group by Similarity filter parameters

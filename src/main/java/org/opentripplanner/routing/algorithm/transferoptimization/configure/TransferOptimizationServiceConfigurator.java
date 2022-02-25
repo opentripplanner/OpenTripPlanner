@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
-import java.util.function.IntFunction;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
@@ -18,6 +17,8 @@ import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import java.util.function.IntFunction;
 
 /**
  * Responsible for assembly of the prioritized-transfer services.

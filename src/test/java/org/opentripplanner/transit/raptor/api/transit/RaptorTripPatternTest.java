@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
+
+import static org.junit.Assert.assertEquals;
 
 public class RaptorTripPatternTest {
 

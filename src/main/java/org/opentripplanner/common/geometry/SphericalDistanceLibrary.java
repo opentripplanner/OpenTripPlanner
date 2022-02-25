@@ -1,19 +1,12 @@
 package org.opentripplanner.common.geometry;
 
-import static org.apache.commons.math3.util.FastMath.abs;
-import static org.apache.commons.math3.util.FastMath.atan2;
-import static org.apache.commons.math3.util.FastMath.cos;
-import static org.apache.commons.math3.util.FastMath.sin;
-import static org.apache.commons.math3.util.FastMath.sqrt;
-import static org.apache.commons.math3.util.FastMath.toDegrees;
-import static org.apache.commons.math3.util.FastMath.toRadians;
-
 import org.apache.commons.math3.util.FastMath;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+
+import static org.apache.commons.math3.util.FastMath.*;
 
 public abstract class SphericalDistanceLibrary {
 

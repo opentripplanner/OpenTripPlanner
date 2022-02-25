@@ -1,10 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMNode;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class RingTest {
 

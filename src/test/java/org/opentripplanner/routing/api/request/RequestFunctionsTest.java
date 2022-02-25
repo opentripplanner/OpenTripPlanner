@@ -4,7 +4,8 @@ import org.junit.Test;
 
 import java.util.function.DoubleFunction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class RequestFunctionsTest {
 

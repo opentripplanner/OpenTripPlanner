@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.ToIntFunction;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.ToIntFunction;
 
 public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule> {
 

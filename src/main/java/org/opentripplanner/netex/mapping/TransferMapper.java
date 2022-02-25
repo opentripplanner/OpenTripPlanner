@@ -1,7 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
-import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
@@ -18,6 +17,8 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.VehicleJourneyRefStructure;
+
+import javax.annotation.Nullable;
 
 public class TransferMapper {
 

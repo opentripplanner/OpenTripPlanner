@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.shapefile;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CaseBasedBooleanConverter implements SimpleFeatureConverter<Boolean> {
     public boolean defaultValue = false;

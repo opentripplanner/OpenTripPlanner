@@ -1,17 +1,18 @@
 package org.opentripplanner.routing.algorithm.filterchain.comparator;
 
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.defaultComparatorArriveBy;
-import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.defaultComparatorDepartAfter;
+import org.junit.Test;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.PlanTestConstants;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Test;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.PlanTestConstants;
+
+import static org.junit.Assert.assertEquals;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.defaultComparatorArriveBy;
+import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.defaultComparatorDepartAfter;
 
 public class SortOrderComparatorTest implements PlanTestConstants {
 

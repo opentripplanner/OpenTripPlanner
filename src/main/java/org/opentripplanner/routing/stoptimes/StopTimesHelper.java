@@ -1,31 +1,20 @@
 package org.opentripplanner.routing.stoptimes;
 
-import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
-import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
-import static org.opentripplanner.util.time.DateConstants.ONE_DAY_SECONDS;
-
 import com.google.common.collect.MinMaxPriorityQueue;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Queue;
-import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTimesInPattern;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
+
+import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
+import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
+import static org.opentripplanner.util.time.DateConstants.ONE_DAY_SECONDS;
 
 public class StopTimesHelper {
   /**

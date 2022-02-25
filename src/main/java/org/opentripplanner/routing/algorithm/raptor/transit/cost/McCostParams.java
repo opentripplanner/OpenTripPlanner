@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 
 
-import java.util.Objects;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * This class define how to calculate the cost when cost is part of the multi-criteria pareto function.

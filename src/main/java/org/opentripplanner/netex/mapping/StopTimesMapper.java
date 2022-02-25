@@ -1,37 +1,23 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.SCHEDULED;
-
-import java.math.BigInteger;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
-import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.FlexStopLocation;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.util.OTPFeature;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.*;
+
+import javax.annotation.Nullable;
+import javax.xml.bind.JAXBElement;
+import java.math.BigInteger;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.opentripplanner.model.PickDrop.*;
 
 /**
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the StopTime has a reference

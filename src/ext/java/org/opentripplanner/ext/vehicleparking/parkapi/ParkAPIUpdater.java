@@ -1,12 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -15,6 +9,8 @@ import org.opentripplanner.updater.GenericJsonDataSource;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
+
+import java.util.*;
 
 /**
  * Vehicle parking updater class for https://github.com/offenesdresden/ParkAPI format APIs.

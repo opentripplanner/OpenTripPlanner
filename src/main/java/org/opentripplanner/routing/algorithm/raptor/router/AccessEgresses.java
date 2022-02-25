@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
-import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
+
+import java.util.Collection;
 
 class AccessEgresses {
 

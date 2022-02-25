@@ -1,30 +1,21 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-
 import com.google.common.collect.Multimap;
+import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.*;
+import org.opentripplanner.model.impl.EntityById;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.rutebanken.netex.model.Notice;
+import org.rutebanken.netex.model.*;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Notice;
-import org.rutebanken.netex.model.NoticeAssignment;
-import org.rutebanken.netex.model.NoticeRefStructure;
-import org.rutebanken.netex.model.PointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+
+import static org.junit.Assert.assertEquals;
 
 public class NoticeAssignmentMapperTest {
 

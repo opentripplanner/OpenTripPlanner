@@ -1,11 +1,12 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
-import javax.validation.constraints.NotNull;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * This is a Request builder to help construct valid requests. Se the

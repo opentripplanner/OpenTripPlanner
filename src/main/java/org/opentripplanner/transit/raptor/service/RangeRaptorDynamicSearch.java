@@ -1,17 +1,5 @@
 package org.opentripplanner.transit.raptor.service;
 
-import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
-import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FORWARD;
-import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
-import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
@@ -25,6 +13,19 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FORWARD;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
+import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
 
 /**

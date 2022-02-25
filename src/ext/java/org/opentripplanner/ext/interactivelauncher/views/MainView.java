@@ -6,10 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-import static java.awt.GridBagConstraints.BOTH;
-import static java.awt.GridBagConstraints.CENTER;
-import static java.awt.GridBagConstraints.NONE;
-import static java.awt.GridBagConstraints.NORTH;
+import static java.awt.GridBagConstraints.*;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.BACKGROUND;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.debugLayout;
 

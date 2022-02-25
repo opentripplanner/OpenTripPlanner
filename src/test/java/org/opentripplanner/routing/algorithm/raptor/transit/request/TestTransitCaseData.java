@@ -1,10 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import java.time.LocalDate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
+
+import java.time.LocalDate;
 
 public final class TestTransitCaseData {
     public static final Station STATION_A = Station.stationForTest("A", 60.0, 11.1);

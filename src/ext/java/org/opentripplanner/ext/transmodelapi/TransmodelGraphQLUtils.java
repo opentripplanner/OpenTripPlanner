@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import graphql.schema.DataFetchingEnvironment;
+
 import java.util.Locale;
 import java.util.Map;
 

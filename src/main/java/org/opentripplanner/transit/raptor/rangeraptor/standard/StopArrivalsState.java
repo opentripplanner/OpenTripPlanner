@@ -1,13 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
-import java.util.Collection;
-import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This interface define a superset of operations to maintain the stop arrivals state, and

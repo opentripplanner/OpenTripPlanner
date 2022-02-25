@@ -1,26 +1,17 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
-import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
-import static graphql.schema.GraphQLNonNull.nonNull;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import graphql.Scalars;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInputObjectType;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import graphql.schema.*;
 import org.opentripplanner.model.TransitMode;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
+import static graphql.schema.GraphQLNonNull.nonNull;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 
 public class TransportModeSlack {
     private static final String BOARD_SLACK_DESCRIPTION;

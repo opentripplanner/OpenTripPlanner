@@ -1,10 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Transfer;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.*;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
 

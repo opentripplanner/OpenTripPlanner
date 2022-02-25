@@ -1,8 +1,9 @@
 package org.opentripplanner.gtfs.mapping;
 
-import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.model.Branding;
+
+import javax.annotation.Nullable;
 
 /** Responsible for mapping GTFS Route into the OTP Branding model. */
 public class BrandingMapper {

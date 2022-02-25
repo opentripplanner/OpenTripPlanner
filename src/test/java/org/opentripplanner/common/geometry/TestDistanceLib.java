@@ -1,10 +1,9 @@
 package org.opentripplanner.common.geometry;
 
+import junit.framework.TestCase;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-
-import junit.framework.TestCase;
 
 public class TestDistanceLib extends TestCase {
 

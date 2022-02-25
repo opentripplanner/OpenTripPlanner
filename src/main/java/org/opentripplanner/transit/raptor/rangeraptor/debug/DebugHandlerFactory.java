@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.debug;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
@@ -10,6 +9,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
+
+import javax.annotation.Nullable;
 
 
 /**

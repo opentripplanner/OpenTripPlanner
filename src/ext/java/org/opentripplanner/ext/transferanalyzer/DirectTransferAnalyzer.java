@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.transferanalyzer;
 
-import com.google.common.collect.Iterables;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferCouldNotBeRouted;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferRoutingDistanceTooLong;
@@ -16,12 +15,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

@@ -3,11 +3,11 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
-import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.WalkStep;
+
+import java.util.Locale;
 
 public class PathGuidanceType {
 

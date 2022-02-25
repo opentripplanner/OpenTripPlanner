@@ -1,13 +1,13 @@
 package org.opentripplanner.api.parameter;
 
-import static org.opentripplanner.model.modes.AllowedTransitMode.fromMainModeEnum;
-
-import java.util.Set;
-import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
+
+import static org.opentripplanner.model.modes.AllowedTransitMode.fromMainModeEnum;
 
 public enum ApiRequestMode {
     WALK(),

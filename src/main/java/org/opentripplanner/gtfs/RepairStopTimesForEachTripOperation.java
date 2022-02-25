@@ -2,19 +2,11 @@ package org.opentripplanner.gtfs;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.HopSpeedFast;
-import org.opentripplanner.graph_builder.issues.HopSpeedSlow;
-import org.opentripplanner.graph_builder.issues.HopZeroTime;
-import org.opentripplanner.graph_builder.issues.NegativeDwellTime;
-import org.opentripplanner.graph_builder.issues.NegativeHopTime;
-import org.opentripplanner.graph_builder.issues.RepeatedStops;
+import org.opentripplanner.graph_builder.issues.*;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
@@ -22,6 +14,10 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class is responsible for cleaning stop times, removing duplicates, correcting bad data

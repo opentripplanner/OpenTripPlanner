@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import java.util.Arrays;
-import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
@@ -10,6 +8,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripSched
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedulesByDay

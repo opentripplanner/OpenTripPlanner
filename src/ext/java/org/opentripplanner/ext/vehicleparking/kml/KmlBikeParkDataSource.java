@@ -1,9 +1,5 @@
 package org.opentripplanner.ext.vehicleparking.kml;
 
-import static java.util.Locale.ROOT;
-
-import java.util.List;
-import java.util.Locale;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.updater.DataSource;
@@ -11,6 +7,10 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+import static java.util.Locale.ROOT;
 
 /**
  * Load bike park from a KML placemarks. Use name as bike park name and point coordinates. Rely on:

@@ -1,29 +1,23 @@
 package org.opentripplanner.ext.actuator;
 
-import static graphql.execution.instrumentation.SimpleInstrumentationContext.noOp;
-import static graphql.execution.instrumentation.SimpleInstrumentationContext.whenCompleted;
-
 import graphql.ExecutionResult;
 import graphql.execution.instrumentation.ExecutionStrategyInstrumentationContext;
 import graphql.execution.instrumentation.Instrumentation;
 import graphql.execution.instrumentation.InstrumentationContext;
 import graphql.execution.instrumentation.InstrumentationState;
-import graphql.execution.instrumentation.parameters.InstrumentationCreateStateParameters;
-import graphql.execution.instrumentation.parameters.InstrumentationExecuteOperationParameters;
-import graphql.execution.instrumentation.parameters.InstrumentationExecutionParameters;
-import graphql.execution.instrumentation.parameters.InstrumentationExecutionStrategyParameters;
-import graphql.execution.instrumentation.parameters.InstrumentationFieldFetchParameters;
-import graphql.execution.instrumentation.parameters.InstrumentationFieldParameters;
-import graphql.execution.instrumentation.parameters.InstrumentationValidationParameters;
+import graphql.execution.instrumentation.parameters.*;
 import graphql.language.Document;
 import graphql.schema.GraphQLTypeUtil;
 import graphql.validation.ValidationError;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import javax.annotation.Nonnull;
+
+import static graphql.execution.instrumentation.SimpleInstrumentationContext.noOp;
+import static graphql.execution.instrumentation.SimpleInstrumentationContext.whenCompleted;
 
 /**
  * Using this instrumentation we can precisely measure how queries and data fetchers are executed

@@ -1,13 +1,5 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static java.time.ZoneOffset.UTC;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.model.plan.PlanTestConstants.A;
-import static org.opentripplanner.model.plan.PlanTestConstants.B;
-
-import java.time.Duration;
-import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
@@ -17,6 +9,15 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.util.time.TimeUtils;
+
+import java.time.Duration;
+import java.time.ZonedDateTime;
+
+import static java.time.ZoneOffset.UTC;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.model.plan.PlanTestConstants.A;
+import static org.opentripplanner.model.plan.PlanTestConstants.B;
 
 public class RoutingResponseMapperTest {
     static final ZonedDateTime TRANSIT_TIME_ZERO = TestItineraryBuilder.SERVICE_DAY

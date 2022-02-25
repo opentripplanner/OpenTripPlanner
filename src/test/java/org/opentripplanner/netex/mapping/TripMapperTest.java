@@ -7,15 +7,9 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPatternRefStructure;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.RouteRefStructure;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
-import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.*;
 
 import javax.xml.bind.JAXBElement;
-
 import java.util.Collections;
 import java.util.Map;
 

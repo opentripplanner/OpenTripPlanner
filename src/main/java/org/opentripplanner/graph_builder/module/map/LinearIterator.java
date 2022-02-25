@@ -1,9 +1,12 @@
 package org.opentripplanner.graph_builder.module.map;
 
-import java.util.Iterator;
-
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Lineal;
 import org.locationtech.jts.linearref.LinearLocation;
+
+import java.util.Iterator;
 
 /**
  * I copied this class from JTS but made a few changes.

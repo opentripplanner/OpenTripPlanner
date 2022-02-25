@@ -1,18 +1,19 @@
 package org.opentripplanner.routing.vertextype;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-
-import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
-import org.opentripplanner.util.NonLocalizedString;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Abstract base class for vertices in the street layer of the graph.

@@ -1,11 +1,12 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public enum SpeedTestProfile {

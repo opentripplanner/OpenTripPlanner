@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
-import java.util.List;
-import java.util.Map;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -11,6 +9,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPat
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListenerComposite;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetWithMarker;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * A pareto optimal set of stop arrivals for a given stop.

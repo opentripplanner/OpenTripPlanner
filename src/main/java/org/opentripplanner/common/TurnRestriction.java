@@ -1,9 +1,9 @@
 package org.opentripplanner.common;
 
-import java.io.Serializable;
-
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
+
+import java.io.Serializable;
 
 public class TurnRestriction implements Serializable {
     private static final long serialVersionUID = 6072427988268244536L;

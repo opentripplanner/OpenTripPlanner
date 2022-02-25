@@ -1,46 +1,22 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.BoardingArea;
-import org.opentripplanner.model.Entrance;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.FlexStopLocation;
-import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
-import org.opentripplanner.model.PathwayNode;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StationElement;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
-import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
-import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.model.*;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
-import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
-import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
-import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class AddTransitModelEntitiesToGraph {
     private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);

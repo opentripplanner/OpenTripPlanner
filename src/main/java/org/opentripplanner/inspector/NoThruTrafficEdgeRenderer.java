@@ -1,12 +1,13 @@
 package org.opentripplanner.inspector;
 
-import java.awt.Color;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+
+import java.awt.*;
 
 /**
  * Render no thru traffic restrictions for each street edge, along with a label describing the

@@ -1,14 +1,14 @@
 package org.opentripplanner.graph_builder.module.shapefile;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Calculates street traversal permissions based upon a fixed set of cases.

@@ -2,12 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.Scalars;
 import graphql.scalars.ExtendedScalars;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
+import graphql.schema.*;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.Itinerary;
 

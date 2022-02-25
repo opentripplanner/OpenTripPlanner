@@ -1,11 +1,12 @@
 package org.opentripplanner.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.List;
-import java.util.Map;
 import org.opentripplanner.util.xml.JsonDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 public abstract class GenericJsonDataSource<T> implements DataSource<T> {
 

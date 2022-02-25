@@ -1,8 +1,9 @@
 package org.opentripplanner.netex.index.api;
 
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 /**
  * A hierarchical read-only view on a multimap indexing a collections of

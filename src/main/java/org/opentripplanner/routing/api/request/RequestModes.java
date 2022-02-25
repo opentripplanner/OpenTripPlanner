@@ -4,8 +4,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 
 import javax.annotation.Nonnull;
-import java.util.HashSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 public class RequestModes {

@@ -1,13 +1,8 @@
 package org.opentripplanner.graph_builder.services;
 
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.util.I18NString;
 
 public class DefaultStreetEdgeFactory implements StreetEdgeFactory {

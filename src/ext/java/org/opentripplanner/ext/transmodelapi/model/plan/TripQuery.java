@@ -1,12 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.Scalars;
-import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLEnumType;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLScalarType;
+import graphql.schema.*;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;

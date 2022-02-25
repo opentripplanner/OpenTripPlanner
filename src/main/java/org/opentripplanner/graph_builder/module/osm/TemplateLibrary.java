@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class TemplateLibrary {
     private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");

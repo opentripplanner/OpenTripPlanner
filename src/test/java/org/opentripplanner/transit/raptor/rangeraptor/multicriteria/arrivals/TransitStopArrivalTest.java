@@ -1,16 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 
 public class TransitStopArrivalTest {
 

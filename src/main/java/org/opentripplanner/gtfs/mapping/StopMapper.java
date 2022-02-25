@@ -1,15 +1,11 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.FareZone;
 import org.opentripplanner.util.MapUtils;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {

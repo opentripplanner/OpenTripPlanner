@@ -1,13 +1,9 @@
 package org.opentripplanner.common.geometry;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
-import org.locationtech.jts.geom.CoordinateSequenceFactory;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SphericalDistanceLibraryTest {
 

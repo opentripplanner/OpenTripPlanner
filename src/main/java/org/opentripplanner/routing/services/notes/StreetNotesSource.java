@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.services.notes;
 
-import java.util.Set;
-
 import org.opentripplanner.routing.graph.Edge;
+
+import java.util.Set;
 
 /**
  * A source of notes for edges.

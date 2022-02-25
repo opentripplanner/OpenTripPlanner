@@ -1,19 +1,16 @@
 package org.opentripplanner.model.plan.pagecursor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import org.opentripplanner.model.plan.SortOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Base64;
-import javax.annotation.Nullable;
-import org.opentripplanner.model.plan.SortOrder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 final class PageCursorSerializer {
     private static final int NOT_SET = Integer.MIN_VALUE;

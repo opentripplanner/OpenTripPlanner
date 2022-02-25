@@ -1,10 +1,5 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opentripplanner.common.model.T2;
@@ -13,6 +8,12 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVertex> {
   private final Graph graph;

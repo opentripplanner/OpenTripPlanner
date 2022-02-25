@@ -1,13 +1,14 @@
 package org.opentripplanner.netex.index.hierarchy;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.time.LocalDateTime;
-import java.time.Month;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.TariffZone;
 import org.rutebanken.netex.model.ValidBetween;
+
+import java.time.LocalDateTime;
+import java.time.Month;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ValidOnDateTest {
     private final LocalDateTime D1 = LocalDateTime.of(2021, Month.MAY, 1, 12, 0);

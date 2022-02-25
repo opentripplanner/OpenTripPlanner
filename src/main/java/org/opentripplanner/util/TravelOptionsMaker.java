@@ -1,8 +1,8 @@
 package org.opentripplanner.util;
 
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.model.TransitMode;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -1,13 +1,14 @@
 package org.opentripplanner.api.mapping;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
 import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.util.PolylineEncoder;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 public class LegMapper {
     private final WalkStepMapper walkStepMapper;

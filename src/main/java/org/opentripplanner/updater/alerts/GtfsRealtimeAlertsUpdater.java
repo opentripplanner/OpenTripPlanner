@@ -1,9 +1,6 @@
 package org.opentripplanner.updater.alerts;
 
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Map;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
@@ -14,6 +11,10 @@ import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Map;
 
 /**
  * GTFS-RT alerts updater

@@ -1,14 +1,15 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
+
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 
 /**
  * This filter marks itineraries, which use same trips for most of their legs, but where some

@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.shapefile;
 
+import org.opengis.feature.simple.SimpleFeature;
+import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
-import org.opengis.feature.simple.SimpleFeature;
-import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 
 /**
  * A converter which is a composite of other converters. It can combine them with an "and" or "or"

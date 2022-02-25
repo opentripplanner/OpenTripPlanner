@@ -5,13 +5,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
+import org.rutebanken.netex.model.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

@@ -4,11 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.language.StringValue;
 import graphql.relay.Relay;
-import graphql.schema.Coercing;
-import graphql.schema.CoercingParseLiteralException;
-import graphql.schema.CoercingParseValueException;
-import graphql.schema.CoercingSerializeException;
-import graphql.schema.GraphQLScalarType;
+import graphql.schema.*;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeoJsonModule;
 

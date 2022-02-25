@@ -9,9 +9,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ParetoSetTest {
     private static final ParetoComparator<Vector> DIFFERENT = (l, r) -> l.v1 != r.v1;

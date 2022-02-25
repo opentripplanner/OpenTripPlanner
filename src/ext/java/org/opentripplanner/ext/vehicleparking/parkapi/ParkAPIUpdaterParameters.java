@@ -1,11 +1,12 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
+import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
+
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
-import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
 /**
  * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by {@link

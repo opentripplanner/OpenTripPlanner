@@ -1,27 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
-import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransfersMapper.mapTransfers;
-
 import com.google.common.collect.ArrayListMultimap;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
-import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.routing.algorithm.raptor.transit.*;
 import org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.graph.Graph;
@@ -29,6 +12,12 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransfersMapper.mapTransfers;
 
 /**
  * Maps the TransitLayer object from the OTP Graph object. The ServiceDay hierarchy is reversed,

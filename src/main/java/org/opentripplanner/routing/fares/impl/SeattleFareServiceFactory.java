@@ -1,18 +1,17 @@
 package org.opentripplanner.routing.fares.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.fares.FareService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
 

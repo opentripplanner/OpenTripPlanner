@@ -1,12 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 
-import static org.opentripplanner.transit.raptor.util.IntUtils.intArray;
-
-import java.util.BitSet;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
+
+import java.util.BitSet;
+
+import static org.opentripplanner.transit.raptor.util.IntUtils.intArray;
 
 
 /**

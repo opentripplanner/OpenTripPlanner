@@ -1,7 +1,8 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import java.util.function.Supplier;
 import org.locationtech.jts.geom.LineString;
+
+import java.util.function.Supplier;
 
 /**
  * This class contains the results from a FlexPathCalculator.

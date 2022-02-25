@@ -2,10 +2,6 @@ package org.opentripplanner.ext.vehiclerentalservicedirectory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
@@ -13,6 +9,10 @@ import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataS
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fetches GBFS endpoints from the micromobility aggregation service located at

@@ -1,12 +1,5 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
@@ -14,19 +7,14 @@ import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParamsBui
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
-import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.api.transit.*;
+import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
+
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {

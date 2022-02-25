@@ -1,19 +1,13 @@
 package org.opentripplanner.routing.fares.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Currency;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 

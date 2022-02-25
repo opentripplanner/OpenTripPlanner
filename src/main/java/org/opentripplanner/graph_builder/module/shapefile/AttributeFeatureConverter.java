@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.shapefile;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 /** 
  * Reads a single attribute from a feature and converts it to an object */

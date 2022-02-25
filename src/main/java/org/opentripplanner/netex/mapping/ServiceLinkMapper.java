@@ -1,9 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.xml.bind.JAXBElement;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Coordinate;
@@ -16,12 +12,12 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.ServiceLinkInJourneyPattern_VersionedChildStructure;
+import org.rutebanken.netex.model.*;
+
+import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Maps NeTEx ServiceLinks til OTP ShapePoints. NeTEx defines a ServiceLink as a link between an

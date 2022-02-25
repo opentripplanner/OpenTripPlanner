@@ -6,12 +6,13 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import java.util.stream.Collectors;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.util.ResourceBundleSingleton;
+
+import java.util.stream.Collectors;
 
 public class TripType {
   public static GraphQLObjectType create(

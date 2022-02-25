@@ -1,9 +1,9 @@
 package org.opentripplanner.api.resource;
 
 import org.geotools.geometry.Envelope2D;
-import org.opentripplanner.common.geometry.WebMercatorTile;
-import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
+import org.opentripplanner.common.geometry.MapTile;
+import org.opentripplanner.common.geometry.WebMercatorTile;
 import org.opentripplanner.inspector.TileRenderer;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;

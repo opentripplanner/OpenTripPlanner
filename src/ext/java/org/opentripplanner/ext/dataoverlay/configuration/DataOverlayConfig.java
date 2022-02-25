@@ -1,10 +1,9 @@
 package org.opentripplanner.ext.dataoverlay.configuration;
 
+import org.opentripplanner.model.base.ToStringBuilder;
+
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
-import org.opentripplanner.ext.dataoverlay.api.ParameterName;
-import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
  * POJO class describing expected data-overlay-config.json structure

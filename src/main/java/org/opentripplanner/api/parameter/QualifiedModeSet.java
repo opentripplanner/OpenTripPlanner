@@ -8,8 +8,8 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A set of qualified modes. The original intent was to allow a sequence of mode sets, but the shift to "long distance

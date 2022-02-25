@@ -2,31 +2,18 @@ package org.opentripplanner.gtfs.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.onebusaway.gtfs.model.Transfer;
+import org.opentripplanner.model.*;
+import org.opentripplanner.model.transfer.*;
+import org.opentripplanner.util.logging.ThrottleLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.onebusaway.gtfs.model.Transfer;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.RouteStationTransferPoint;
-import org.opentripplanner.model.transfer.RouteStopTransferPoint;
-import org.opentripplanner.model.transfer.StationTransferPoint;
-import org.opentripplanner.model.transfer.StopTransferPoint;
-import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.model.transfer.TransferPoint;
-import org.opentripplanner.model.transfer.TransferPriority;
-import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.util.logging.ThrottleLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for mapping GTFS Transfer into the OTP model.

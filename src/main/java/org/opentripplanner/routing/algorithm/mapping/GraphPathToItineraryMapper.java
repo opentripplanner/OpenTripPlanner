@@ -1,15 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -42,6 +33,9 @@ import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.stream.Stream;
 
 // TODO OTP2 There is still a lot of transit-related logic here that should be removed. We also need
 //      to decide where real-time updates should be applied to the itinerary.

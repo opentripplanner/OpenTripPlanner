@@ -1,12 +1,12 @@
 package org.opentripplanner.graph_builder.module.shapefile;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * A converter which is a composite of other converters. It can combine them with an "and" or "or"

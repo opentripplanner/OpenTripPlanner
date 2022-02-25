@@ -5,7 +5,6 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
@@ -15,6 +14,8 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+
+import java.util.Locale;
 
 public class PlanPlaceType {
 

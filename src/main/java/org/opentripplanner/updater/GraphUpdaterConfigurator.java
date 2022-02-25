@@ -1,26 +1,12 @@
 package org.opentripplanner.updater;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
-import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
-import org.opentripplanner.ext.siri.updater.SiriETUpdater;
-import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
-import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
-import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.*;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
-import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
-import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
-import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
+import org.opentripplanner.updater.stoptime.*;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
@@ -31,6 +17,9 @@ import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Sets up and starts all the graph updaters.

@@ -1,8 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.model.StopTransferPriority;
 import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
+
+import javax.annotation.Nullable;
 
 class StopTransferPriorityMapper {
 

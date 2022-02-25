@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.api.request;
 
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Use this class to configure Raptor Event Debugging. There are two ways to debug:

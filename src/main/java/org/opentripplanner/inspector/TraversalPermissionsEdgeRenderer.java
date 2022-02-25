@@ -1,16 +1,16 @@
 package org.opentripplanner.inspector;
 
-import java.awt.Color;
-
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
-import org.opentripplanner.routing.edgetype.*;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.*;
+
+import java.awt.*;
 
 /**
  * Render traversal permissions for each edge by color and label (walk, bicycle, car, stairs).

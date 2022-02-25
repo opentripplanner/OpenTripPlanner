@@ -5,11 +5,7 @@ import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Date;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Represents a day of transit services. 

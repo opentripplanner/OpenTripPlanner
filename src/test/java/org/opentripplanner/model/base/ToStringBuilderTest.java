@@ -1,20 +1,17 @@
 package org.opentripplanner.model.base;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.util.time.TimeUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Objects;
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.util.time.TimeUtils;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ToStringBuilderTest {
 

@@ -2,22 +2,11 @@ package org.opentripplanner.ext.transmodelapi.support;
 
 import graphql.Scalars;
 import graphql.introspection.Introspection.DirectiveLocation;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.GraphQLDirective;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInputObjectField;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLScalarType;
+import graphql.schema.*;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.ext.transmodelapi.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
-import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory;
-import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunctionScalarFactory;
-import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
-import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.*;
 import org.opentripplanner.routing.RoutingService;
 
 import java.util.List;

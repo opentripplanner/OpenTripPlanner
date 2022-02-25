@@ -1,23 +1,17 @@
 package org.opentripplanner.model.plan;
 
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
+
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
 * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a

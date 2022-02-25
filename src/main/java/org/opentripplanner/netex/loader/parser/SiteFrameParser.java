@@ -1,15 +1,8 @@
 package org.opentripplanner.netex.loader.parser;
 
-import org.opentripplanner.util.OTPFeature;
-import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.GroupOfStopPlaces;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.Site_VersionFrameStructure;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.TariffZone;
-import org.rutebanken.netex.model.Zone_VersionStructure;
+import org.opentripplanner.util.OTPFeature;
+import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

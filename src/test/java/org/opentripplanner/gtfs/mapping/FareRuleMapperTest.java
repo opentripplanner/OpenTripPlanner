@@ -5,15 +5,12 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.FareRule;
 import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FareRuleMapperTest {
     private static final String FEED_ID = "FEED";

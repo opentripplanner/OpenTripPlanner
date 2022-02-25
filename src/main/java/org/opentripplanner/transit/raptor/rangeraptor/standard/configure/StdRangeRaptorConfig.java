@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.configure;
 
-import java.util.function.BiFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
@@ -8,13 +7,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.path.configure.PathConfig;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivalTimeRoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivedAtDestinationCheck;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.MinTravelDurationRoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StdRangeRaptorWorkerState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StdWorkerState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.*;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimesOnlyStopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.SimpleArrivedAtDestinationCheck;
@@ -27,6 +20,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stop
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
+
+import java.util.function.BiFunction;
 
 
 /**

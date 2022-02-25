@@ -1,12 +1,13 @@
 package org.opentripplanner.gtfs;
 
-import java.io.File;
-import java.io.IOException;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.AgencyAndIdMapper;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MockGtfs {
 

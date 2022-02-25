@@ -1,27 +1,19 @@
 package org.opentripplanner.netex.mapping;
 
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.BookingMethod;
+import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.ContactInfo;
+import org.rutebanken.netex.model.*;
+
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.BookingTime;
-import org.opentripplanner.model.ContactInfo;
-import org.rutebanken.netex.model.BookingArrangementsStructure;
-import org.rutebanken.netex.model.BookingMethodEnumeration;
-import org.rutebanken.netex.model.ContactStructure;
-import org.rutebanken.netex.model.EntityStructure;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.FlexibleServiceProperties;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.PurchaseWhenEnumeration;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
 
 /**
  * Maps booking info from NeTEx BookingArrangements, FlexibleServiceProperties, and FlexibleLine

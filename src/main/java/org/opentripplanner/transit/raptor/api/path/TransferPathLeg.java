@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import java.util.Objects;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import java.util.Objects;
 
 /**
  * Represent a transfer leg in a path.

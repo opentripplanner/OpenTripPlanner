@@ -1,17 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
-import static java.util.stream.Collectors.toList;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.Issue;
@@ -27,6 +17,11 @@ import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZoneRef;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx also contains

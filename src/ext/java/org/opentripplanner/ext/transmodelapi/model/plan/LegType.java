@@ -1,18 +1,8 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
-
 import graphql.Scalars;
 import graphql.scalars.ExtendedScalars;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import graphql.schema.*;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
@@ -20,6 +10,12 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.util.PolylineEncoder;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
 
 public class LegType {
   public static GraphQLObjectType create(

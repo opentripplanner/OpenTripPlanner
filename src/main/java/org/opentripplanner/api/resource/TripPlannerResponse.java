@@ -1,12 +1,13 @@
 package org.opentripplanner.api.resource;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import javax.ws.rs.core.UriInfo;
 import org.opentripplanner.api.model.ApiTripPlan;
 import org.opentripplanner.api.model.ApiTripSearchMetadata;
 import org.opentripplanner.api.model.error.PlannerError;
+
+import javax.ws.rs.core.UriInfo;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 /** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
 public class TripPlannerResponse {

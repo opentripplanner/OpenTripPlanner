@@ -1,11 +1,11 @@
 package org.opentripplanner.api.resource;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /** An instance of CoordinateSequence that can be efficiently extended */
 public class CoordinateArrayListSequence implements CoordinateSequence, Cloneable {

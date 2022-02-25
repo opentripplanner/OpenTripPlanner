@@ -1,9 +1,10 @@
 package org.opentripplanner.model.plan;
 
+import org.opentripplanner.model.base.ToStringBuilder;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
  * A TripPlan is a set of ways to get from point A to point B at time T.

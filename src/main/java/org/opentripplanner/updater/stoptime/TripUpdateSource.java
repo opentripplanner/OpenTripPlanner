@@ -1,8 +1,8 @@
 package org.opentripplanner.updater.stoptime;
 
-import java.util.List;
-
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+
+import java.util.List;
 
 public interface TripUpdateSource {
     /**

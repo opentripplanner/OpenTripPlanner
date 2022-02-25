@@ -1,11 +1,10 @@
 package org.opentripplanner.inspector;
 
-import java.awt.Graphics2D;
-
-import org.opentripplanner.routing.graph.Graph;
-
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
+import org.opentripplanner.routing.graph.Graph;
+
+import java.awt.*;
 
 /**
  * Interface for a slippy map tile renderer.

@@ -1,15 +1,16 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
 

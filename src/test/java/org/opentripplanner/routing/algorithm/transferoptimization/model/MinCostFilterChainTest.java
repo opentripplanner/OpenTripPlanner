@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.base.ValueObjectToStringBuilder;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MinCostFilterChainTest {
     private final A v01 = new A("A", 0, 1);

@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs;
 
-import java.io.File;
-import java.io.IOException;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
@@ -13,6 +11,9 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.Deduplicator;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * This class helps building GtfsContext and post process

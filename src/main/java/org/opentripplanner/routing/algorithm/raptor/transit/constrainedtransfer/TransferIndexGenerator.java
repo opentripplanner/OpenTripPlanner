@@ -1,31 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer;
 
-import static org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.TransferPointForPatternFactory.createTransferPointForPattern;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.ToIntFunction;
-import java.util.stream.Collectors;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.model.transfer.RouteStationTransferPoint;
-import org.opentripplanner.model.transfer.RouteStopTransferPoint;
-import org.opentripplanner.model.transfer.StationTransferPoint;
-import org.opentripplanner.model.transfer.StopTransferPoint;
-import org.opentripplanner.model.transfer.TransferPoint;
-import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.model.*;
+import org.opentripplanner.model.transfer.*;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
+
+import java.util.*;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.TransferPointForPatternFactory.createTransferPointForPattern;
 
 public class TransferIndexGenerator {
     private static final boolean BOARD = true;

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 
 /**
  * Preferences for how to traverse the graph.

@@ -9,25 +9,21 @@ import com.google.transit.realtime.GtfsRealtime.Alert.Effect;
 import com.google.transit.realtime.GtfsRealtime.Alert.SeverityLevel;
 import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Date;
-import java.util.HashSet;
-import org.opentripplanner.routing.alertpatch.AlertCause;
-import org.opentripplanner.routing.alertpatch.AlertEffect;
-import org.opentripplanner.routing.alertpatch.AlertSeverity;
-import org.opentripplanner.routing.alertpatch.EntitySelector;
-import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.alertpatch.*;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.util.TranslatedString;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

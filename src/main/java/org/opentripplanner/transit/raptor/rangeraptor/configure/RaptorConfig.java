@@ -2,9 +2,6 @@ package org.opentripplanner.transit.raptor.rangeraptor.configure;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
@@ -21,6 +18,10 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.Heuris
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.service.RaptorSearchWindowCalculator;
 import org.opentripplanner.transit.raptor.service.RequestAlias;
+
+import javax.annotation.Nullable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**

@@ -1,13 +1,5 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
-import static org.opentripplanner.util.time.TimeUtils.time;
-
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
@@ -18,6 +10,14 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.util.time.TimeUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+import static org.opentripplanner.util.time.TimeUtils.time;
 
 /**
  * This test case construct two Raptor paths for forward and reverse search, with and without

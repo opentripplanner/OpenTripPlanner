@@ -1,12 +1,13 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.assertProperty;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+
+import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.assertProperty;
 
 
 /**

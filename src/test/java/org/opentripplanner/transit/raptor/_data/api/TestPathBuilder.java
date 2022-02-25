@@ -1,8 +1,5 @@
 package org.opentripplanner.transit.raptor._data.api;
 
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
-
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
@@ -11,6 +8,10 @@ import org.opentripplanner.transit.raptor.api.path.PathBuilder;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
+
+import javax.annotation.Nullable;
+
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
 
 
 /**

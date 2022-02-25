@@ -1,8 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import org.junit.Test;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.TransitMode;
@@ -10,6 +7,9 @@ import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 import org.rutebanken.netex.model.WaterSubmodeEnumeration;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TransportModeMapperTest {
   private final TransportModeMapper transportModeMapper = new TransportModeMapper();

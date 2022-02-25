@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.util;
 
-import java.util.Random;
-
 import junit.framework.TestCase;
-
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+
+import java.util.Random;
 
 public class TestFastDistance extends TestCase {
 

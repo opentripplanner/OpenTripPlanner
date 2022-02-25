@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
-import java.util.Iterator;
 import javax.validation.constraints.NotNull;
+import java.util.Iterator;
 
 
 /**

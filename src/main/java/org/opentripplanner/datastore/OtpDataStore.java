@@ -10,22 +10,11 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.datastore.FileType.CONFIG;
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GRAPH;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.datastore.FileType.REPORT;
-import static org.opentripplanner.datastore.FileType.UNKNOWN;
+import static org.opentripplanner.datastore.FileType.*;
 
 /**
  * The responsibility of this class is to provide access to all data sources OTP uses like the

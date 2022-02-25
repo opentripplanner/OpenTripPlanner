@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 
 /**

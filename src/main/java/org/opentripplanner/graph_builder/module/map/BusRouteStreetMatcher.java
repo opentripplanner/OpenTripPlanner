@@ -9,16 +9,11 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Uses the shapes from GTFS to determine which streets buses drive on. This is used to improve the quality of

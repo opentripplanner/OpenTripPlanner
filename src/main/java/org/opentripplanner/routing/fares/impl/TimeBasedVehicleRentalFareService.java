@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.fares.impl;
 
-import java.io.Serializable;
-import java.util.Currency;
-import java.util.List;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -10,6 +7,10 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
+
+import java.io.Serializable;
+import java.util.Currency;
+import java.util.List;
 
 /**
  * This appears to be used in combination with transit using an AddingMultipleFareService.

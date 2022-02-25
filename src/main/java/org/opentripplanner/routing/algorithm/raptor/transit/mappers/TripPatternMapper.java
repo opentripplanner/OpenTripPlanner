@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TripPatternMapper {
 

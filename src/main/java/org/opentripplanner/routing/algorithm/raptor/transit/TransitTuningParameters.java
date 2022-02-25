@@ -1,9 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import java.time.Duration;
-import java.util.List;
 import org.opentripplanner.model.StopTransferPriority;
 import org.opentripplanner.util.time.DurationUtils;
+
+import java.time.Duration;
+import java.util.List;
 
 public interface TransitTuningParameters {
 

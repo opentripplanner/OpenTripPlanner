@@ -1,11 +1,12 @@
 package org.opentripplanner.model.transfer;
 
-import java.io.Serializable;
-import java.util.Objects;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
+
+import javax.annotation.Nullable;
+import java.io.Serializable;
+import java.util.Objects;
 
 
 /**

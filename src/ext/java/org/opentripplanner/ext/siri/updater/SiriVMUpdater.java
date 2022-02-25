@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.siri.updater;
 
-import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
@@ -13,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
+
+import java.util.List;
 
 /**
  * Update OTP stop time tables from some (realtime) source

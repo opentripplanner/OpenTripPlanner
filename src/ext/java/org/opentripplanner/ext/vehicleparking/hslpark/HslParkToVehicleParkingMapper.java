@@ -2,11 +2,6 @@ package org.opentripplanner.ext.vehicleparking.hslpark;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryDeserializer;
 import org.opentripplanner.model.FeedScopedId;
@@ -18,6 +13,8 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Maps a HSL Park facility into a {@link VehicleParking}.

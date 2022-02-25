@@ -1,10 +1,5 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -12,16 +7,17 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
-import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.path.*;
 import org.opentripplanner.transit.raptor.speed_test.SpeedTestRequest;
 import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
 import org.opentripplanner.transit.raptor.speed_test.model.Leg;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 public class ItineraryMapper {
     private final SpeedTestRequest request;

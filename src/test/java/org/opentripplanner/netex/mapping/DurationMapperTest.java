@@ -1,9 +1,10 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.time.Duration;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class DurationMapperTest {
 

@@ -1,9 +1,10 @@
 package org.opentripplanner.standalone.config.sandbox;
 
-import java.util.Collection;
-import java.util.Set;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPIParameters;
 import org.opentripplanner.standalone.config.NodeAdapter;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @see TransmodelAPIParameters for documentation of parameters

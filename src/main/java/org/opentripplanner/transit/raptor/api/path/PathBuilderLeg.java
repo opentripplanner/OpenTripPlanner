@@ -1,17 +1,13 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import static org.opentripplanner.transit.raptor.api.transit.CostCalculator.ZERO_COST;
-
-import java.util.function.Predicate;
-import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.*;
 import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+
+import javax.annotation.Nullable;
+import java.util.function.Predicate;
+
+import static org.opentripplanner.transit.raptor.api.transit.CostCalculator.ZERO_COST;
 
 /**
  * This is the leg implementation for the {@link PathBuilder}. It Private inner class which help cashing and calculating values before constructing a path.

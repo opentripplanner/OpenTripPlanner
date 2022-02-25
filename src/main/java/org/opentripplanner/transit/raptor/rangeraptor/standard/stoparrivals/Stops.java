@@ -1,12 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 
-import java.util.function.Consumer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
+
+import java.util.function.Consumer;
 
 /**
  *

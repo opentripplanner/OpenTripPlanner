@@ -1,12 +1,13 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
 
-import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+
+import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toRaptorCost;
 
 /**
  * Simple implementation for {@link RaptorTransfer} for use in unit-tests.

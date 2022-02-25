@@ -1,8 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics;
 
-import java.util.Collection;
-import java.util.function.IntUnaryOperator;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
@@ -12,6 +9,10 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTim
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.util.time.TimeUtils;
+
+import java.util.Collection;
+import java.util.function.IntUnaryOperator;
+import java.util.stream.Collectors;
 
 
 /**

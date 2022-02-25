@@ -3,8 +3,6 @@ package org.opentripplanner.netex.mapping;
 import org.opentripplanner.model.Branding;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.PresentationStructure;
-import org.rutebanken.netex.model.PrivateCodeStructure;
 
 /** Responsible for mapping NeTEx Branding into the OTP model. */
 public class BrandingMapper {

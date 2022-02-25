@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
 import graphql.schema.DataFetchingEnvironment;
+
 import java.util.Locale;
 import java.util.Map;
 

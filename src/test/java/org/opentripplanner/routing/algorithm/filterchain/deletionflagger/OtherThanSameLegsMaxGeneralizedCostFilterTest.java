@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 class OtherThanSameLegsMaxGeneralizedCostFilterTest implements PlanTestConstants {
 

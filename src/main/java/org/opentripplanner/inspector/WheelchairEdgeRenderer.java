@@ -2,13 +2,13 @@ package org.opentripplanner.inspector;
 
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * Render important information for debugging wheelchair access (street slopes and transit stop accessibility)

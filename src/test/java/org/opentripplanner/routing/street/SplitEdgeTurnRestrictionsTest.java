@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.street;
 
-import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
-
-import java.io.IOException;
-import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
@@ -19,6 +15,11 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
+
+import java.io.IOException;
+import java.time.Instant;
+
+import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
 /*
  * When bus stops are added to graph they split an existing edge in two parts so that an artificial

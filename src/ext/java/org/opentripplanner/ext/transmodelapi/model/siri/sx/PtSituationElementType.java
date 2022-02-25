@@ -2,12 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model.siri.sx;
 
 import graphql.Scalars;
 import graphql.relay.Relay;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLTypeReference;
+import graphql.schema.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;

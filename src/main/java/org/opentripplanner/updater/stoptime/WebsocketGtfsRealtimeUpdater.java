@@ -1,11 +1,5 @@
 package org.opentripplanner.updater.stoptime;
 
-import static org.asynchttpclient.Dsl.asyncHttpClient;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -20,6 +14,13 @@ import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import static org.asynchttpclient.Dsl.asyncHttpClient;
 
 /**
  * This class starts an HTTP client which opens a websocket connection to a GTFS-RT data source. A

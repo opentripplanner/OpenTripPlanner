@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AdditionalSearchDaysTest {
 

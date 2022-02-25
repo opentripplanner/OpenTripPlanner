@@ -1,18 +1,12 @@
 package org.opentripplanner.netex.loader.parser;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.Interchange_VersionStructure;
-import org.rutebanken.netex.model.JourneyInterchangesInFrame_RelStructure;
-import org.rutebanken.netex.model.Journey_VersionStructure;
-import org.rutebanken.netex.model.JourneysInFrame_RelStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
-import org.rutebanken.netex.model.Timetable_VersionFrameStructure;
+import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> {
 

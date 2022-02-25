@@ -10,9 +10,9 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.util.OTPFeature;
 

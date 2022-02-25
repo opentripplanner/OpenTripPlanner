@@ -1,15 +1,15 @@
 package org.opentripplanner.routing.vehicle_rental;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.model.FeedScopedId;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.model.FeedScopedId;
 
 public class VehicleRentalStationService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;

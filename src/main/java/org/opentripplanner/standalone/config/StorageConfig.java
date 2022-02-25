@@ -6,10 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_DEM_PATTERN;
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_GTFS_PATTERN;
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_NETEX_PATTERN;
-import static org.opentripplanner.datastore.OtpDataStoreConfig.DEFAULT_OSM_PATTERN;
+import static org.opentripplanner.datastore.OtpDataStoreConfig.*;
 
 /**
  * Configure paths to each individual file resource. Use URIs to specify paths. If a parameter is

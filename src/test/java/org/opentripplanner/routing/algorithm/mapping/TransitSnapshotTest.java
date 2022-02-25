@@ -1,20 +1,17 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static java.util.Collections.emptySet;
-
 import au.com.origin.snapshots.junit5.SnapshotExtension;
-import java.util.Set;
-
 import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+
+import static java.util.Collections.emptySet;
 
 @ExtendWith(SnapshotExtension.class)
 public class TransitSnapshotTest

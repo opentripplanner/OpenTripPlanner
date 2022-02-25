@@ -1,17 +1,14 @@
 package org.opentripplanner.api.parameter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
-import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
-import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
-import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
-import static org.opentripplanner.routing.api.request.StreetMode.WALK;
-
-import java.util.Set;
-import javax.ws.rs.BadRequestException;
 import org.junit.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
+
+import javax.ws.rs.BadRequestException;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.routing.api.request.StreetMode.*;
 
 public class QualifiedModeSetTest {
     @Test

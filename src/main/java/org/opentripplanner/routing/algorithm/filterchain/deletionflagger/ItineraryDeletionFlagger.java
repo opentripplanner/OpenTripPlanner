@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * ItineraryDeletionFlagger is used to flag itineraries which should not be presented to the user.

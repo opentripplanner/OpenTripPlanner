@@ -3,23 +3,17 @@ package org.opentripplanner.util.logging;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.cache.GuavaCacheMetrics;
-import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics;
-import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmCompilationMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmHeapPressureMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmInfoMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
+import io.micrometer.core.instrument.binder.jvm.*;
 import io.micrometer.core.instrument.binder.logging.LogbackMetrics;
 import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
-import java.util.List;
-import java.util.concurrent.ForkJoinPool;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
+
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * This class is responsible for wiring up various metrics to micrometer, which we use for

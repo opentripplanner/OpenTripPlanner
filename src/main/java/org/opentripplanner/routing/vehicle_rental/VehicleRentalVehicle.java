@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.vehicle_rental;
 
-import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.util.I18NString;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 /**
  * Implements the {@link VehicleRentalPlace} class which contains Javadoc.

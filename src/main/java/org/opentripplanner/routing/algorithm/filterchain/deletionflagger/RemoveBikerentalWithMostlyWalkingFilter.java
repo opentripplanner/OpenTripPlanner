@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
+
+import java.util.function.Predicate;
 
 /**
  * This is used to filter out bike rental itineraries that contain mostly walking. The value

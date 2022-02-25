@@ -1,8 +1,9 @@
 package org.opentripplanner.model.transfer;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
+
+import javax.annotation.Nullable;
 
 /**
  * This interface is used to represent a point or location where a transfer start from or end.

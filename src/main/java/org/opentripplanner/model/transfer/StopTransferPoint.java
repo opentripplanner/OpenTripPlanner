@@ -1,7 +1,8 @@
 package org.opentripplanner.model.transfer;
 
-import java.io.Serializable;
 import org.opentripplanner.model.StopLocation;
+
+import java.io.Serializable;
 
 public class StopTransferPoint implements TransferPoint, Serializable {
 

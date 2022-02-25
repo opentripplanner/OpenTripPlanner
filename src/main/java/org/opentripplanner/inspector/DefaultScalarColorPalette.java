@@ -1,6 +1,6 @@
 package org.opentripplanner.inspector;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * A default ColorPalette with two ranges: min-max-maxMax. It modify the hue between two colors in

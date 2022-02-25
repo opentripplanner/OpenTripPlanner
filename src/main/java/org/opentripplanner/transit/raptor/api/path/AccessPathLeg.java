@@ -1,9 +1,10 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import java.util.Objects;
-import javax.annotation.Nonnull;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * Represent an access leg in a path. The access leg is the first leg from origin to the

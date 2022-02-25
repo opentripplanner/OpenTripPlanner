@@ -6,7 +6,7 @@ import org.rutebanken.netex.model.OperatingDay;
 
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class OperatingDayMapperTest {
   private static final LocalDateTime LD1 = LocalDateTime.of(2020, 11, 30, 20, 55);

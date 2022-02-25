@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
-
-import org.junit.jupiter.api.Test;
 
 public class TransferWaitTimeCostCalculatorTest {
   private static final double EPSILON = 0.005;

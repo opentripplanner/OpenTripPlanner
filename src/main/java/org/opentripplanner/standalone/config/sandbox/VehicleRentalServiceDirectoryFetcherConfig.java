@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
-import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.standalone.config.NodeAdapter;
 
 public class VehicleRentalServiceDirectoryFetcherConfig {
   public static VehicleRentalServiceDirectoryFetcherParameters create(NodeAdapter c) {

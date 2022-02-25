@@ -1,24 +1,18 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import gnu.trove.list.TLongList;
 import gnu.trove.map.TLongObjectMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.algorithm.Orientation;
+import org.locationtech.jts.geom.*;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.LinearRing;
-import org.locationtech.jts.geom.Polygon;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public class Ring {
 

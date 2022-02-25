@@ -1,9 +1,5 @@
 package org.opentripplanner.ext.dataoverlay;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
@@ -14,6 +10,11 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdgeCostExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Abstract grid data description class which is stored at StreetEdge.

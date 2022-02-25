@@ -1,19 +1,10 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toOtpDomainCost;
-
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.TimeZone;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -35,12 +26,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
-import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.PathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.path.*;
+
+import java.time.ZonedDateTime;
+import java.util.*;
+
+import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toOtpDomainCost;
 
 /**
  * This maps the paths found by the Raptor search algorithm to the itinerary structure currently used by OTP. The paths,

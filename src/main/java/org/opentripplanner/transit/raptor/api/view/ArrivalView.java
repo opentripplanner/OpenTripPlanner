@@ -1,12 +1,13 @@
 package org.opentripplanner.transit.raptor.api.view;
 
 
-import javax.annotation.Nullable;
 import org.opentripplanner.model.base.OtpNumberFormat;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
+
+import javax.annotation.Nullable;
 
 /**
  * The purpose of the stop-arrival-view is to provide a common interface for stop-arrivals for

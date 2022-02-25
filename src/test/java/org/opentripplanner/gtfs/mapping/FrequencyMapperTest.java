@@ -4,15 +4,12 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FrequencyMapperTest {
     private static final String FEED_ID = "FEED";

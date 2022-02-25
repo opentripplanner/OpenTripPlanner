@@ -1,12 +1,12 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
  * Specifies a class of OSM tagged entities (e.g. ways) by a list of tags and their values (which may be wildcards).

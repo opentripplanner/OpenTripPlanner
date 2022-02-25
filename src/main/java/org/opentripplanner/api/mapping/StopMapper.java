@@ -1,12 +1,13 @@
 package org.opentripplanner.api.mapping;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopShort;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class StopMapper {
 

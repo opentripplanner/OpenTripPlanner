@@ -1,16 +1,16 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.PlanTestConstants;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 class GroupByAllSameStationsTest implements PlanTestConstants {
 

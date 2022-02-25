@@ -2,16 +2,16 @@ package org.opentripplanner.model.plan;
 
 import com.google.common.collect.Lists;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.util.I18NString;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.util.I18NString;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:

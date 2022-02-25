@@ -2,15 +2,12 @@ package org.opentripplanner.util;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
  * This is used to localize strings for which localization are known beforehand.

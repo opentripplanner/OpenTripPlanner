@@ -2,13 +2,14 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.RoutingService;
+
+import java.util.stream.Collectors;
 
 public class LegacyGraphQLRouteTypeImpl
         implements LegacyGraphQLDataFetchers.LegacyGraphQLRouteType {

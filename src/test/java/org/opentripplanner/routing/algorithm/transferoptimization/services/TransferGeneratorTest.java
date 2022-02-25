@@ -1,28 +1,25 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
+import org.opentripplanner.transit.raptor._data.transit.*;
+import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.util.time.TimeUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
-import org.opentripplanner.transit.raptor._data.transit.TestRoute;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
-import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
-import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.util.time.TimeUtils;
 
 public class TransferGeneratorTest implements RaptorTestConstants {
 

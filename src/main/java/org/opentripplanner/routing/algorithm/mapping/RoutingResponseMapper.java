@@ -1,11 +1,5 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
@@ -19,6 +13,13 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Set;
 
 public class RoutingResponseMapper {
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResponseMapper.class);

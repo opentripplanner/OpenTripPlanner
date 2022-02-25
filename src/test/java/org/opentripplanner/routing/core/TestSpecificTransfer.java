@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
-
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;

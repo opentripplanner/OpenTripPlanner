@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.util;
 
 import junit.framework.TestCase;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;

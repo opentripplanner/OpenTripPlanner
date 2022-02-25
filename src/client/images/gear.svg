@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:export-ydpi="90.000000"
-   inkscape:export-xdpi="90.000000"
-   inkscape:export-filename="/home/jimmac/Desktop/wi-fi.png"
-   width="48px"
-   height="48px"
-   id="svg11300"
-   sodipodi:version="0.32"
-   inkscape:version="0.43+devel"
-   sodipodi:docbase="/home/tigert/cvs/freedesktop.org/tango-icon-theme/scalable/emblems"
-   sodipodi:docname="emblem-system.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:cc="http://web.resource.org/cc/"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+        xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+        inkscape:export-ydpi="90.000000"
+        inkscape:export-xdpi="90.000000"
+        inkscape:export-filename="/home/jimmac/Desktop/wi-fi.png"
+        width="48px"
+        height="48px"
+        id="svg11300"
+        sodipodi:version="0.32"
+        inkscape:version="0.43+devel"
+        sodipodi:docbase="/home/tigert/cvs/freedesktop.org/tango-icon-theme/scalable/emblems"
+        sodipodi:docname="emblem-system.svg"
+        inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs3">
     <linearGradient

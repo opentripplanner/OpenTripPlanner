@@ -1,17 +1,7 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
 import com.csvreader.CsvReader;
 import com.google.common.collect.Lists;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -44,6 +34,13 @@ import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class ConstantsForTests {
 

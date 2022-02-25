@@ -1,12 +1,13 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * Mutable version of {@link SearchParams}.

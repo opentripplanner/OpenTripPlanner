@@ -1,13 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 
-import java.util.Collection;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
+
+import java.util.Collection;
 
 
 /**

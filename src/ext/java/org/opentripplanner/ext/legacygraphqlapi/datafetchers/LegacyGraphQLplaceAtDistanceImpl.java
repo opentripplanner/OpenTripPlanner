@@ -2,13 +2,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.TypeResolutionEnvironment;
 import graphql.relay.Relay;
-import graphql.schema.DataFetcher;
-import graphql.schema.DataFetchingEnvironment;
-import graphql.schema.DataFetchingEnvironmentImpl;
-import graphql.schema.FieldCoordinates;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.TypeResolver;
+import graphql.schema.*;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 

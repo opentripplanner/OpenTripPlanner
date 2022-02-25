@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
-import java.util.function.IntFunction;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -9,6 +7,9 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import javax.annotation.Nullable;
+import java.util.function.IntFunction;
 
 /**
  * This a just an adaptor to look up transfers constraints. The adaptor hides the

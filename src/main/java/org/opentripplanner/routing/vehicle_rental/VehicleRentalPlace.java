@@ -1,10 +1,11 @@
 package org.opentripplanner.routing.vehicle_rental;
 
-import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.util.I18NString;
+
+import java.util.Set;
 
 /**
  * Represents a place where a rental vehicle can be rented from, or dropped off at.

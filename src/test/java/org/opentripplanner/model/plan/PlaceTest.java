@@ -1,13 +1,11 @@
 package org.opentripplanner.model.plan;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
+
+import static org.junit.Assert.*;
 
 public class PlaceTest {
 

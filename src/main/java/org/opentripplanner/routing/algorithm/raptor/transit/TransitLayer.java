@@ -1,14 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.transfer.TransferService;
@@ -16,6 +7,12 @@ import org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TripPatternMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+
+import javax.annotation.Nullable;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TransitLayer {
 

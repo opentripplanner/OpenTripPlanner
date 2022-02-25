@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -9,6 +7,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripSched
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.util.OTPFeature;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**

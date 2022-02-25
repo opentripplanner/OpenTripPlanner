@@ -1,40 +1,19 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
-import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
-import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.impl.EntityById;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
+import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.rutebanken.netex.model.*;
 
+import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
-import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.DestinationDisplayRefStructure;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPatternRefStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.RouteRefStructure;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
+
+import static org.opentripplanner.netex.mapping.MappingSupport.*;
 
 class NetexTestDataSample {
     public static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";

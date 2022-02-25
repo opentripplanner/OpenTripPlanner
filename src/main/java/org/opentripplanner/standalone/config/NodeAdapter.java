@@ -1,29 +1,6 @@
 package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.DoubleFunction;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.api.request.RequestFunctions;
@@ -31,6 +8,20 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
+
+import javax.validation.constraints.NotNull;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.DoubleFunction;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 
 /**

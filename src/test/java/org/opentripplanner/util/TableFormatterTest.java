@@ -5,9 +5,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.util.TableFormatter.Align.Center;
-import static org.opentripplanner.util.TableFormatter.Align.Left;
-import static org.opentripplanner.util.TableFormatter.Align.Right;
+import static org.opentripplanner.util.TableFormatter.Align.*;
 
 public class TableFormatterTest {
   @Test

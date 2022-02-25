@@ -1,36 +1,22 @@
 package org.opentripplanner.api.configuration;
 
-import static org.opentripplanner.util.OTPFeature.APIBikeRental;
-import static org.opentripplanner.util.OTPFeature.APIGraphInspectorTile;
-import static org.opentripplanner.util.OTPFeature.APIServerInfo;
-import static org.opentripplanner.util.OTPFeature.APIUpdaterStatus;
-import static org.opentripplanner.util.OTPFeature.ActuatorAPI;
-import static org.opentripplanner.util.OTPFeature.ReportApi;
-import static org.opentripplanner.util.OTPFeature.SandboxAPILegacyGraphQLApi;
-import static org.opentripplanner.util.OTPFeature.SandboxAPIMapboxVectorTilesApi;
-import static org.opentripplanner.util.OTPFeature.SandboxAPIParkAndRideApi;
-import static org.opentripplanner.util.OTPFeature.SandboxAPITransmodelApi;
-import static org.opentripplanner.util.OTPFeature.SandboxExampleAPIGraphStatistics;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import org.opentripplanner.api.resource.BikeRental;
-import org.opentripplanner.api.resource.GraphInspectorTileResource;
-import org.opentripplanner.api.resource.PlannerResource;
-import org.opentripplanner.api.resource.Routers;
-import org.opentripplanner.api.resource.ServerInfo;
-import org.opentripplanner.api.resource.UpdaterStatusResource;
+import org.opentripplanner.api.resource.*;
+import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.examples.statistics.api.resource.GraphStatisticsResource;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLAPI;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
-import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.index.IndexAPI;
 import org.opentripplanner.util.OTPFeature;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import static org.opentripplanner.util.OTPFeature.*;
 
 /**
  * Configure API resource endpoints.

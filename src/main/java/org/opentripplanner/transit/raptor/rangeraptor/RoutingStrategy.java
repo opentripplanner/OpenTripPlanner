@@ -1,11 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
+import org.opentripplanner.transit.raptor.api.transit.*;
+
 import java.util.function.IntConsumer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 
 
 /**

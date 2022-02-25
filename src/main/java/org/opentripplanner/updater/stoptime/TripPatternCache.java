@@ -1,11 +1,7 @@
 package org.opentripplanner.updater.stoptime;
 
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.*;
 import org.opentripplanner.routing.graph.Graph;
 
 import javax.validation.constraints.NotNull;

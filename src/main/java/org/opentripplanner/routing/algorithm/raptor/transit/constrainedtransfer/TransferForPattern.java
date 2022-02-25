@@ -1,8 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
+
+import javax.annotation.Nullable;
 
 
 /**

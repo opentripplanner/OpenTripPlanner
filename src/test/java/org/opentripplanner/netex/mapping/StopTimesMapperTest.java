@@ -1,11 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-
-import java.math.BigInteger;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Map;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
@@ -14,6 +8,13 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+
+import java.math.BigInteger;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class StopTimesMapperTest {

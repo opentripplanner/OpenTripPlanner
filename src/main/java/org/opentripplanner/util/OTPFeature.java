@@ -1,12 +1,12 @@
 package org.opentripplanner.util;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * The purpose of this class is to be able to turn features on and off.

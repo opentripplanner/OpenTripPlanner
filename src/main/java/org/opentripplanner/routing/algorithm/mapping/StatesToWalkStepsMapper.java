@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -20,6 +18,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Process a list of states into a list of walking/driving instructions for a street leg.

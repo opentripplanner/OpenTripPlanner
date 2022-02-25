@@ -1,16 +1,17 @@
 package org.opentripplanner.model;
 
-import static org.opentripplanner.common.geometry.GeometryUtils.getGeometryFactory;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.locationtech.jts.algorithm.ConvexHull;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
-import org.locationtech.jts.algorithm.ConvexHull;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryCollection;
+
+import static org.opentripplanner.common.geometry.GeometryUtils.getGeometryFactory;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a

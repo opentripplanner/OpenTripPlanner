@@ -1,25 +1,17 @@
 package org.opentripplanner.standalone.config;
 
-import java.time.Duration;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 
+import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
 public class NodeAdapterTest {

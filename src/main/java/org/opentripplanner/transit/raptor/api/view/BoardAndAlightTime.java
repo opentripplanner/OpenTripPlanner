@@ -1,8 +1,9 @@
 package org.opentripplanner.transit.raptor.api.view;
 
-import java.util.Objects;
 import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import java.util.Objects;
 
 /**
  * Board and alight time tuple value object.

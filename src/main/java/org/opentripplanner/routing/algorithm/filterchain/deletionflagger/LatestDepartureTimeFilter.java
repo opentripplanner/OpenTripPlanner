@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 
 import java.time.Instant;
+import java.util.function.Predicate;
 
 public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
     public static final String TAG = "latest-departure-time-limit";

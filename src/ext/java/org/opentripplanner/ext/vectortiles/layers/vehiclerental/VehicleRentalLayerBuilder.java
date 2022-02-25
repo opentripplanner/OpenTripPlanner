@@ -8,9 +8,9 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.vectortiles.LayerBuilder;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.graph.Graph;
 
 import java.util.List;
 import java.util.Map;

@@ -1,25 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.DATE;
-import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.OFFSET;
-import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.id;
-import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.stopIndex;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.*;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -27,6 +8,11 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.util.time.TimeUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.routing.algorithm.raptor.transit.request.TestTransitCaseData.*;
 
 public class TestRouteData {
 

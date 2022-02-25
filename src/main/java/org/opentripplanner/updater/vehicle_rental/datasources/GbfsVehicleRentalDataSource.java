@@ -1,11 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.entur.gbfs.v2_2.free_bike_status.GBFSFreeBikeStatus;
 import org.entur.gbfs.v2_2.station_information.GBFSStationInformation;
 import org.entur.gbfs.v2_2.station_status.GBFSStation;
@@ -21,6 +15,13 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by demory on 2017-03-14.

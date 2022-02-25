@@ -3,14 +3,15 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import org.opentripplanner.routing.algorithm.raptor.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 public class RaptorRequestTransferCache {
 

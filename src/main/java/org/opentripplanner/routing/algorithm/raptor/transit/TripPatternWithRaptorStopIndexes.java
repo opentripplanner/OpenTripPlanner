@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
@@ -9,6 +8,8 @@ import org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.
 import org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.TransferForPatternByStopPos;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+
+import java.util.Objects;
 
 public class TripPatternWithRaptorStopIndexes {
 

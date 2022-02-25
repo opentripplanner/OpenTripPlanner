@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.algorithm.filterchain.comparator;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.comparingInt;
-
-import java.util.Comparator;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.util.CompositeComparator;
+
+import java.util.Comparator;
+
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingInt;
 
 /**
  * This comparator implements the itinerary sort order defined by the {@link SortOrder}.

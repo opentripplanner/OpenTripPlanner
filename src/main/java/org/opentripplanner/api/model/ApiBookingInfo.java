@@ -1,9 +1,10 @@
 package org.opentripplanner.api.model;
 
+import org.opentripplanner.model.base.ToStringBuilder;
+
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Set;
-import org.opentripplanner.model.base.ToStringBuilder;
 
 /**
  * Info about how a trip might be booked at a particular stop. All of this is pass-through

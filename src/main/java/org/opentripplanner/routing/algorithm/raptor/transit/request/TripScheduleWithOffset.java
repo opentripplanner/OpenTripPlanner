@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import java.time.LocalDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+
+import java.time.LocalDate;
 
 /**
  * This represents a single trip within a TripPattern, but with a time offset in seconds. This is used to represent

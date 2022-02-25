@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
+
+import java.util.function.Predicate;
 
 /**
  * Filter itineraries and remove all itineraries where all legs are walking.

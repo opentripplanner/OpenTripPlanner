@@ -1,13 +1,14 @@
 package org.opentripplanner.netex.support;
 
-import static java.util.Comparator.comparingInt;
+import org.rutebanken.netex.model.EntityInVersionStructure;
+import org.rutebanken.netex.model.ValidBetween;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import org.rutebanken.netex.model.EntityInVersionStructure;
-import org.rutebanken.netex.model.ValidBetween;
+
+import static java.util.Comparator.comparingInt;
 
 /**
  * Utility class to help working with versioned NeTEx element.

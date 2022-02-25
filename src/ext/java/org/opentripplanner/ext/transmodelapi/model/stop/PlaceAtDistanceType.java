@@ -6,9 +6,6 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import java.util.ArrayList;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
@@ -16,11 +13,10 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PlaceAtDistanceType {
 

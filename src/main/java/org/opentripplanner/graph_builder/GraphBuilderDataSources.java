@@ -16,10 +16,7 @@ import java.io.File;
 import java.util.EnumSet;
 import java.util.Set;
 
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
+import static org.opentripplanner.datastore.FileType.*;
 
 
 /**

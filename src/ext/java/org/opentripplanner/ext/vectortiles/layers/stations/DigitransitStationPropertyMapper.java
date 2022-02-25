@@ -5,8 +5,6 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StationElement;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.graph.Graph;
 

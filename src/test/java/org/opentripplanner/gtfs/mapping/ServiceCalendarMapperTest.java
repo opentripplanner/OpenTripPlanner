@@ -8,10 +8,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.opentripplanner.model.calendar.ServiceDate.MAX_DATE;
 import static org.opentripplanner.model.calendar.ServiceDate.MIN_DATE;
 

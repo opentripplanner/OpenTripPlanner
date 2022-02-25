@@ -1,13 +1,14 @@
 package org.opentripplanner.standalone.config;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.io.File;
-import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.IOException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class IncludeFileDirectiveTest {
     private static final String FILE_PREFIX = "o_o_standalone_config_IncludeFileDirectiveTest_";

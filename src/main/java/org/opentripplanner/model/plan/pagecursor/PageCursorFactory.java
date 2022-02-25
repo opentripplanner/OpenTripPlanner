@@ -1,14 +1,15 @@
 package org.opentripplanner.model.plan.pagecursor;
 
-import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
-import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
+import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.plan.SortOrder;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import javax.annotation.Nullable;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.model.plan.SortOrder;
+
+import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
+import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
 
 public class PageCursorFactory {
     private final SortOrder sortOrder;

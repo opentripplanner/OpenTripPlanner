@@ -1,16 +1,13 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import java.util.stream.Collectors;
 import org.opentripplanner.ext.interactivelauncher.Model;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.*;
 
 class DataSourcesView {
   private final Box panel = Box.createVerticalBox();

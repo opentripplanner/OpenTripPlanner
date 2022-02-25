@@ -2,11 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test.model;
 
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * A TripPlan is a set of ways to get from point A to point B at time T.

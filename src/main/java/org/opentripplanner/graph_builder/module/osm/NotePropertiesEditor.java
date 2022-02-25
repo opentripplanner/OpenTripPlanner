@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.beans.PropertyEditorSupport;
-
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+
+import java.beans.PropertyEditorSupport;
 
 public class NotePropertiesEditor extends PropertyEditorSupport {
     private NoteProperties value;

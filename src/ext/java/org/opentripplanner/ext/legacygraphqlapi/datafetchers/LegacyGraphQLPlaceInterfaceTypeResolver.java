@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
-import static org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLNodeTypeResolver.queryContainsFragment;
-
 import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
@@ -11,6 +9,8 @@ import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+
+import static org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLNodeTypeResolver.queryContainsFragment;
 
 public class LegacyGraphQLPlaceInterfaceTypeResolver implements TypeResolver {
 

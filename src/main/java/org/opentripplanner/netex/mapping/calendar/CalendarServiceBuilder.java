@@ -6,11 +6,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 

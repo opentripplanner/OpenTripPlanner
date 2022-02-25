@@ -1,18 +1,14 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
+import org.opentripplanner.ext.interactivelauncher.Model;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.swing.Box;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import org.opentripplanner.ext.interactivelauncher.Model;
+
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.*;
 
 class OptionsView {
   private final Box panel = Box.createVerticalBox();

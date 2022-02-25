@@ -1,9 +1,8 @@
 package org.opentripplanner.graph_builder.module.shapefile;
 
+import junit.framework.TestCase;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-
-import junit.framework.TestCase;
 
 
 public class TestCaseBasedTraversalPermissionConverter extends TestCase {

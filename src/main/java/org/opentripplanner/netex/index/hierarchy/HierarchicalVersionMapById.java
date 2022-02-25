@@ -1,17 +1,16 @@
 package org.opentripplanner.netex.index.hierarchy;
 
-import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionIn;
-import static org.opentripplanner.netex.support.NetexVersionHelper.latestVersionedElementIn;
-import static org.opentripplanner.netex.support.NetexVersionHelper.versionOf;
-
 import com.google.common.collect.Multimap;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
+import org.rutebanken.netex.model.EntityInVersionStructure;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
-import org.rutebanken.netex.model.EntityInVersionStructure;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+
+import static org.opentripplanner.netex.support.NetexVersionHelper.*;
 
 /**
  * A hierarchical multimap indexing a collections of {@link EntityInVersionStructure} values by

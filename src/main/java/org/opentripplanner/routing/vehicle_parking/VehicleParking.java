@@ -1,16 +1,11 @@
 package org.opentripplanner.routing.vehicle_parking;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.I18NString;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Vehicle parking locations, which may allow bicycle and/or car parking.

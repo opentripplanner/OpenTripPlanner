@@ -7,11 +7,7 @@ import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.SimpleConcreteEdge;
-import org.opentripplanner.routing.graph.SimpleConcreteVertex;
-import org.opentripplanner.routing.graph.TemporaryConcreteEdge;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graph.*;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -21,9 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class AStarTest {
 

@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.beans.PropertyEditorSupport;
-
 import org.opentripplanner.common.model.P2;
+
+import java.beans.PropertyEditorSupport;
 
 public class SafetyFeaturesEditor extends PropertyEditorSupport {
     private P2<Double> value;

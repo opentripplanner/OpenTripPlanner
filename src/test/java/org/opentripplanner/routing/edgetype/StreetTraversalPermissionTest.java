@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+
+import static org.junit.Assert.*;
 
 public class StreetTraversalPermissionTest {
 

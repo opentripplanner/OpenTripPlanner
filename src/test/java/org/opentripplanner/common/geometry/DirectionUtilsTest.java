@@ -1,15 +1,13 @@
 package org.opentripplanner.common.geometry;
 
+import junit.framework.TestCase;
+import org.geotools.referencing.GeodeticCalculator;
+import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import junit.framework.TestCase;
-
-import org.geotools.referencing.GeodeticCalculator;
-import org.junit.Test;
-
-import org.locationtech.jts.geom.Coordinate;
 
 public class DirectionUtilsTest extends TestCase {
 

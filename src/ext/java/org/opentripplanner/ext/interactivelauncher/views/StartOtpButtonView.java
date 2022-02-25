@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
 import javax.swing.*;
-
 import java.awt.event.ActionListener;
 
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.adjustSize;

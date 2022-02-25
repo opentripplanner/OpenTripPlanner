@@ -2,8 +2,8 @@ package org.opentripplanner.ext.vectortiles.layers.vehiclerental;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 
 import java.util.Collection;
 import java.util.List;

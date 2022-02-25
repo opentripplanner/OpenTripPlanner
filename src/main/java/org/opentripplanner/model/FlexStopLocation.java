@@ -1,8 +1,9 @@
 package org.opentripplanner.model;
 
-import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+
+import java.util.Optional;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the

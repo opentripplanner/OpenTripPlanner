@@ -1,11 +1,5 @@
 package org.opentripplanner.api.mapping;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.api.model.ApiVehicleParkingSpaces;
 import org.opentripplanner.api.model.ApiVehicleParkingWithEntrance;
@@ -14,6 +8,9 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VehicleParkingWithEntrance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PlaceMapper {
 

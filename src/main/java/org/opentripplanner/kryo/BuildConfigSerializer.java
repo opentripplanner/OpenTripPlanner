@@ -4,8 +4,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.ConfigLoader;
 
 
 /**

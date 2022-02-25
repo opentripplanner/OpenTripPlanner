@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
-
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;

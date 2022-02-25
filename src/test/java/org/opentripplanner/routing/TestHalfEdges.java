@@ -1,17 +1,5 @@
 package org.opentripplanner.routing;
 
-import static com.google.common.collect.Iterables.filter;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-
-import java.time.Instant;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,6 +34,15 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TestUtils;
+
+import java.time.Instant;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.google.common.collect.Iterables.filter;
+import static org.junit.Assert.*;
 
 public class TestHalfEdges {
 

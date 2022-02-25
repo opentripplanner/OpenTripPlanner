@@ -1,8 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 
-import java.util.Collection;
-import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -11,6 +9,9 @@ import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 
 /**

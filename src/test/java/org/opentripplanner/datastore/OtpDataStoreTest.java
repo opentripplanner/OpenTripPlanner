@@ -21,17 +21,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.datastore.FileType.CONFIG;
-import static org.opentripplanner.datastore.FileType.DEM;
-import static org.opentripplanner.datastore.FileType.GRAPH;
-import static org.opentripplanner.datastore.FileType.GTFS;
-import static org.opentripplanner.datastore.FileType.NETEX;
-import static org.opentripplanner.datastore.FileType.OSM;
-import static org.opentripplanner.datastore.FileType.REPORT;
-import static org.opentripplanner.datastore.FileType.UNKNOWN;
+import static org.junit.Assert.*;
+import static org.opentripplanner.datastore.FileType.*;
 import static org.opentripplanner.standalone.config.CommandLineParameters.createCliForTest;
 
 public class OtpDataStoreTest {

@@ -1,23 +1,5 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.ACCESS_START;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_STRING;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.EGRESS_END;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.RAPTOR_ITERATION_START_TIME;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
-import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.basicTripStops;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.util.time.TimeUtils.time;
-import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
@@ -25,6 +7,17 @@ import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.*;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.util.time.TimeUtils.time;
+import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 
 
 public class PathTest implements RaptorTestConstants {

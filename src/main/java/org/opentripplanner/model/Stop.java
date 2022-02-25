@@ -1,13 +1,14 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.common.geometry.GeometryUtils;
+
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.TimeZone;
-import javax.validation.constraints.NotNull;
-import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.geometry.GeometryUtils;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a

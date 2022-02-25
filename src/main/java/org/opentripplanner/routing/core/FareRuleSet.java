@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FeedScopedId;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.common.model.P2;
 
 public class FareRuleSet implements Serializable {
 

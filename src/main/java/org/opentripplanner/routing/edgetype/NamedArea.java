@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.io.Serializable;
-
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.util.I18NString;
+
+import java.io.Serializable;
 
 /**
  * A named area is a subset of an area with a certain set of properties

@@ -1,15 +1,16 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.FlexAccessEgressAdapter;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class AccessEgressMapper {
 

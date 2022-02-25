@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.graph;
 
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-
 import com.conveyal.kryo.TIntArrayListSerializer;
 import com.conveyal.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
@@ -19,20 +17,6 @@ import de.javakaffee.kryoserializers.guava.HashMultimapSerializer;
 import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.kryo.BuildConfigSerializer;
@@ -46,6 +30,12 @@ import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.io.*;
+import java.util.*;
+
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * This is the class that get serialized/deserialized into/from the file <em>graph.obj</em>.

@@ -1,13 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import static java.util.stream.Collectors.toMap;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
+
+import static java.util.stream.Collectors.toMap;
 
 public class RaptorTransferIndex {
 

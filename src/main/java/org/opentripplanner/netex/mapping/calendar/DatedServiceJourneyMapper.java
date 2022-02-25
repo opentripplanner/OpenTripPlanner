@@ -7,11 +7,7 @@ import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingDayRefStructure;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.opentripplanner.netex.mapping.support.ServiceAlterationFilter.isRunning;
 

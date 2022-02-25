@@ -14,9 +14,7 @@ import java.net.URI;
 import java.util.Collection;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.opentripplanner.ext.datastore.gs.GsHelper.toUri;
 
 

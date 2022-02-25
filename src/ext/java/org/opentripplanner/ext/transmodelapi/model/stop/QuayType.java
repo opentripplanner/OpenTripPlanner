@@ -1,27 +1,17 @@
 package org.opentripplanner.ext.transmodelapi.model.stop;
 
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
-
 import graphql.Scalars;
-import graphql.schema.GraphQLArgument;
-import graphql.schema.GraphQLFieldDefinition;
-import graphql.schema.GraphQLInterfaceType;
-import graphql.schema.GraphQLList;
-import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLTypeReference;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import graphql.schema.*;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.*;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 
 public class QuayType {
 

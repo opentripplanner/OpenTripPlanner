@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -11,18 +9,6 @@ import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.net.URI;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -52,6 +38,16 @@ import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
 import org.opentripplanner.util.OtpAppException;
+
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.net.URI;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 /**
  * Test response times for a large batch of origin/destination points.

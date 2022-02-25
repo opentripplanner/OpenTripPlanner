@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.cost;
 
 
-import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+
+import javax.annotation.Nullable;
 
 /**
  * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.

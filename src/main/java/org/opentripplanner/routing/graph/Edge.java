@@ -1,15 +1,15 @@
 package org.opentripplanner.routing.graph;
 
-import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.util.I18NString;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import org.opentripplanner.util.I18NString;
+import java.util.Objects;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances;

@@ -2,15 +2,16 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.TariffZone;
 import org.rutebanken.netex.model.TariffZoneRef;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 class TariffZoneMapper {
   private final LocalDateTime startOfPeriod;

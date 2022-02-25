@@ -2,16 +2,7 @@ package org.opentripplanner.model.impl;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;

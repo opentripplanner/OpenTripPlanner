@@ -1,11 +1,11 @@
 package org.opentripplanner.common.geometry;
 
-import java.io.Serializable;
-import java.lang.ref.SoftReference;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
+
+import java.io.Serializable;
+import java.lang.ref.SoftReference;
 
 /**
  * A {@link CoordinateSequence} implementation based on a packed arrays. In this implementation,

@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
@@ -17,6 +14,10 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class contains the logic for repeatedly building shortest path trees and accumulating paths through

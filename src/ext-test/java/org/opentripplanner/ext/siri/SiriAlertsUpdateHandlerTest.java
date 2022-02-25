@@ -1,45 +1,22 @@
 package org.opentripplanner.ext.siri;
 
+import org.junit.Test;
+import org.opentripplanner.GtfsTest;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.*;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.updater.GraphUpdaterManager;
+import uk.org.ifopt.siri20.StopPlaceRef;
+import uk.org.siri.siri20.*;
+
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.junit.Test;
-import org.opentripplanner.GtfsTest;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.alertpatch.AlertSeverity;
-import org.opentripplanner.routing.alertpatch.AlertUrl;
-import org.opentripplanner.routing.alertpatch.EntitySelector;
-import org.opentripplanner.routing.alertpatch.StopCondition;
-import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.updater.GraphUpdaterManager;
-import uk.org.ifopt.siri20.StopPlaceRef;
-import uk.org.siri.siri20.AffectedLineStructure;
-import uk.org.siri.siri20.AffectedRouteStructure;
-import uk.org.siri.siri20.AffectedStopPlaceStructure;
-import uk.org.siri.siri20.AffectedStopPointStructure;
-import uk.org.siri.siri20.AffectedVehicleJourneyStructure;
-import uk.org.siri.siri20.AffectsScopeStructure;
-import uk.org.siri.siri20.DataFrameRefStructure;
-import uk.org.siri.siri20.DefaultedTextStructure;
-import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
-import uk.org.siri.siri20.HalfOpenTimestampOutputRangeStructure;
-import uk.org.siri.siri20.InfoLinkStructure;
-import uk.org.siri.siri20.LineRef;
-import uk.org.siri.siri20.PtSituationElement;
-import uk.org.siri.siri20.RoutePointTypeEnumeration;
-import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.SeverityEnumeration;
-import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
-import uk.org.siri.siri20.SituationNumber;
-import uk.org.siri.siri20.StopPointRef;
-import uk.org.siri.siri20.VehicleJourneyRef;
-import uk.org.siri.siri20.WorkflowStatusEnumeration;
 
 public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   private static final String FEED_ID = "FEED";

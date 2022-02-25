@@ -1,7 +1,6 @@
 package org.opentripplanner.common.geometry;
 
 import org.apache.commons.math3.util.FastMath;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;

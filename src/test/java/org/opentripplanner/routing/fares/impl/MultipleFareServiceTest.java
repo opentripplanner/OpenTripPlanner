@@ -1,17 +1,18 @@
 package org.opentripplanner.routing.fares.impl;
 
-import static graphql.Assert.assertNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static graphql.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * 

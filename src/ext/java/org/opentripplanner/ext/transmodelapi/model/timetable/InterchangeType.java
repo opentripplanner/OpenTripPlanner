@@ -5,13 +5,14 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import java.util.function.Function;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
+
+import java.util.function.Function;
 
 public class InterchangeType {
 

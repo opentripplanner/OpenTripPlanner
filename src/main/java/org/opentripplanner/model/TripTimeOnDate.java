@@ -1,11 +1,12 @@
 package org.opentripplanner.model;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Represents a Trip at a specific stop index and on a specific service day. This is a read-only

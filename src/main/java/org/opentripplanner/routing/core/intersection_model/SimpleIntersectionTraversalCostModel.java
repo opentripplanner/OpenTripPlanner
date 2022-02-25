@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.core.intersection_model;
 
-import java.io.Serializable;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -8,6 +7,8 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel
         implements Serializable {
