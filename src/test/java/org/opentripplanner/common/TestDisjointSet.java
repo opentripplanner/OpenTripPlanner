@@ -9,8 +9,7 @@ import org.opentripplanner.common.DisjointSet;
 import junit.framework.TestCase;
 
 public class TestDisjointSet  extends TestCase{
-
-    @Test
+    
     public void testSimple() {
         DisjointSet<String> set = new DisjointSet<String>();
         set.union("cats", "dogs");
