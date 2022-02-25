@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2.2.0 (in progress)
+- Optimize merging of trip patterns on dates [#3925](https://github.com/opentripplanner/OpenTripPlanner/pull/3925)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
