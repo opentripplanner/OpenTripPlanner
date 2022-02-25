@@ -1,5 +1,7 @@
 package org.opentripplanner.api.mapping;
 
+import static org.opentripplanner.api.mapping.ElevationMapper.mapElevation;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -114,6 +116,7 @@ public class LegMapper {
             api.intermediateStops = placeMapper.mapStopArrivals(domain.getIntermediateStops());
         }
         api.legGeometry = PolylineEncoder.createEncodings(domain.getLegGeometry());
+        api.legElevation = mapElevation(domain.getLegElevation());
         api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
         api.alerts = concatenateAlerts(
             streetNoteMaperMapper.mapToApi(domain.getStreetNotes()),

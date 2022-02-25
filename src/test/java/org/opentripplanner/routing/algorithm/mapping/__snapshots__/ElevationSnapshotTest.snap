@@ -3,8 +3,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1050,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 4.09,
+      "elevationLost": 15.430000000000003,
       "endTime": "2009-10-21T23:32:24.000+00:00",
       "fare": {
         "details": {
@@ -55,6 +55,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 305,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,63.7,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.3,79,67.4,93,66.6,107,66.2",
           "legGeometry": {
             "length": 4,
             "points": "}f{tGv}{kVjCA?e@WA"
@@ -135,6 +136,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 317,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,474,NaN,493,NaN",
           "legGeometry": {
             "length": 7,
             "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
@@ -410,6 +412,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 284,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,13,NaN,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,88,NaN,188,NaN",
           "legGeometry": {
             "length": 15,
             "points": "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
@@ -458,8 +461,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1345,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 23.44,
+      "elevationLost": 4.590000000000003,
       "endTime": "2009-10-21T23:37:54.000+00:00",
       "fare": {
         "details": {
@@ -510,6 +513,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 993,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,63.7,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.3,79,67.4,89,67.8,99,68.3,109,68.7,119,69.2,129,69.8,139,70.3,149,70.6,156,70.7,166,71.0,176,71.5,186,72.0,196,72.4,206,73.0,216,73.4,226,73.7,236,73.8,241,74.1,251,74.8,261,75.8,271,76.8,281,77.8,291,78.8,301,79.6,311,79.8,317,79.8,327,79.6,333,79.3,343,79.6,353,79.6,363,79.8,373,80.0,383,80.5,393,80.8,403,81.1,413,81.5,422,81.9,432,82.1,442,82.1,452,82.5,462,82.8,472,82.7,482,83.6,492,85.5,502,85.9,509,86.1,519,85.4,529,84.5,539,83.7,549,83.1,554,82.8,554,NaN,566,NaN",
           "legGeometry": {
             "length": 34,
             "points": "}f{tGv}{kVjCAjCEnCCFCFErACj@CLMHGFJLNNNDBDBDBF@FBLBH@FBDBNHNJLDPLb@Z^XPNNTBQT{ARJEP"
@@ -783,6 +787,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 577,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,34,NaN,34,29.5,48,29.7,58,29.5,68,29.4,78,29.3,88,29.3,98,29.2,108,29.2,121,29.1,127,29.1,137,29.1,147,29.1,157,29.1,167,29.2,177,29.2,187,29.2,194,29.2,200,29.2,210,29.3,220,29.3,230,29.4,240,29.4,250,29.3,260,29.3,270,29.2,279,29.2,279,NaN,379,NaN",
           "legGeometry": {
             "length": 23,
             "points": "oeztGxiwkVE?AgA?OKCKAM?iBBI?K?wBBK?K?sBDM@?E?MCgD?A?O?C?M?a@"
@@ -870,8 +875,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1360,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 23.310000000000002,
+      "elevationLost": 4.3500000000000085,
       "endTime": "2009-10-21T23:38:09.000+00:00",
       "fare": {
         "details": {
@@ -922,6 +927,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 993,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,63.7,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.3,79,67.4,89,67.8,99,68.3,109,68.7,119,69.2,129,69.8,139,70.3,149,70.6,156,70.7,166,71.0,176,71.5,186,72.0,196,72.4,206,73.0,216,73.4,226,73.7,236,73.8,241,74.1,251,74.8,261,75.8,271,76.8,281,77.8,291,78.8,301,79.6,311,79.8,317,79.8,327,79.6,333,79.3,343,79.6,353,79.6,363,79.8,373,80.0,383,80.5,393,80.8,403,81.1,413,81.5,422,81.9,432,82.1,442,82.1,452,82.5,462,82.8,472,82.7,482,83.6,492,85.5,502,85.9,509,86.1,519,85.4,529,84.5,539,83.7,549,83.1,554,82.8,554,NaN,566,NaN",
           "legGeometry": {
             "length": 34,
             "points": "}f{tGv}{kVjCAjCEnCCFCFErACj@CLMHGFJLNNNDBDBDBF@FBLBH@FBDBNHNJLDPLb@Z^XPNNTBQT{ARJEP"
@@ -1208,6 +1214,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 471,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,22,NaN,22,29.5,32,29.5,46,29.6,59,29.7,69,29.5,79,29.4,89,29.4,99,29.4,109,29.4,119,29.4,131,29.3,138,29.3,148,29.3,158,29.3,168,29.4,178,29.4,188,29.4,198,29.4,205,29.4,211,29.3,211,NaN,308,NaN",
           "legGeometry": {
             "length": 18,
             "points": "qeztGn|vkVK@?v@@f@?RWBK@kBBI?K?wBBI?K?I?mBBK@?M?a@"
@@ -1295,8 +1302,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 993,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 0.46000000000000085,
+      "elevationLost": 7.6100000000000065,
       "endTime": "2009-10-21T23:40:10.000+00:00",
       "fare": {
         "details": {
@@ -1347,6 +1354,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 319,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,67.4,1,67.5,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,160,NaN,220,NaN",
           "legGeometry": {
             "length": 6,
             "points": "}f{tGv}{kVC?mCBmCD@zCN?"
@@ -1616,8 +1624,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1050,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 4.09,
+      "elevationLost": 15.430000000000003,
       "endTime": "2009-10-21T23:45:24.000+00:00",
       "fare": {
         "details": {
@@ -1668,6 +1676,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 305,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,63.7,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.3,79,67.4,93,66.6,107,66.2",
           "legGeometry": {
             "length": 4,
             "points": "}f{tGv}{kVjCA?e@WA"
@@ -1748,6 +1757,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 317,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,474,NaN,493,NaN",
           "legGeometry": {
             "length": 7,
             "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
@@ -2023,6 +2033,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 284,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,13,NaN,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,88,NaN,188,NaN",
           "legGeometry": {
             "length": 15,
             "points": "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
@@ -2071,8 +2082,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1050,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 4.09,
+      "elevationLost": 15.430000000000003,
       "endTime": "2009-10-21T23:54:24.000+00:00",
       "fare": {
         "details": {
@@ -2123,6 +2134,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 305,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,63.7,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.3,79,67.4,93,66.6,107,66.2",
           "legGeometry": {
             "length": 4,
             "points": "}f{tGv}{kVjCA?e@WA"
@@ -2203,6 +2215,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 317,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,474,NaN,493,NaN",
           "legGeometry": {
             "length": 7,
             "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
@@ -2478,6 +2491,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 284,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,13,NaN,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,88,NaN,188,NaN",
           "legGeometry": {
             "length": 15,
             "points": "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
@@ -2532,8 +2546,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 2109,
-      "elevationGained": 1.1700000000093098,
-      "elevationLost": 1000044.5499999999,
+      "elevationGained": 2.3499999999115175,
+      "elevationLost": 2000092.9100000001,
       "endTime": "2009-10-21T23:10:00.000+00:00",
       "fare": {
         "details": { },
@@ -2556,6 +2570,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           },
           "generalizedCost": 45639,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,67.4,1,67.5,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,170,59.8,180,59.5,190,59.2,200,59.1,210,58.8,220,58.6,230,58.4,240,58.0,250,57.7,260,57.4,270,57.0,280,56.6,290,56.2,300,55.9,310,55.7,318,55.5,327,55.1,337,54.7,347,54.4,357,54.0,367,53.5,377,53.2,387,53.0,397,52.8,407,52.2,417,51.7,427,51.3,437,50.7,447,50.5,457,50.7,469,51.2,477,51.0,484,50.7,494,50.6,504,50.4,514,50.1,524,49.8,534,49.6,544,49.3,554,49.0,564,48.8,574,48.4,584,48.2,594,47.9,604,47.6,614,47.3,627,47.0,634,46.8,644,46.7,654,46.5,664,46.4,674,46.4,684,46.2,694,45.8,704,45.5,714,45.3,724,45.1,734,44.8,744,44.5,754,44.2,764,44.1,774,43.9,784,43.6,792,43.5,802,43.3,812,43.1,822,43.0,832,42.7,842,42.5,852,42.3,862,42.3,872,42.0,882,41.8,892,41.6,902,41.4,912,41.2,922,40.9,932,40.8,942,40.5,950,40.4,1029,-999979.8,1506,-999979.8,1516,-999979.8,1925,-999979.8,1935,-999979.8,3136,-999979.8,3136,NaN,3358,NaN,3358,-999979.8,3632,-999979.8,3632,-999979.8,3764,-999979.8",
           "legGeometry": {
             "length": 118,
             "points": "}f{tGv}{kVC?mCBmCDGaK?S?Q?CEmJAS?OEoJ?Q?SGaKEaK?SO@_CBaCDK?A?M@_CBoCBkCDoCBmCBmCDDNBHRvB@L@Z?f@AXAf@Ad@C\\CVCREZEVUvAQbA_@xBKd@O|@]lBOhAMx@UnBSfAHwAHgAHw@Fo@Hs@J_ASf@CNe@jCKp@Qv@Sn@Qj@_@x@Wd@a@h@YZYVUPYPc@RUFk@PWFWBa@By@BoCD]CkBBW@UBQFWHCe@Gm@EeAMmBGiAGoAWWg@s@EEGKIM]i@k@w@A?QWOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
@@ -2766,8 +2781,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 484,
-      "elevationGained": 6.289999999999999,
-      "elevationLost": 15.25,
+      "elevationGained": 12.61,
+      "elevationLost": 30.5,
       "endTime": "2009-10-21T23:18:04.000+00:00",
       "fare": {
         "details": { },
@@ -2790,6 +2805,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           },
           "generalizedCost": 305,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,63.7,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.3,79,67.4,93,66.6,107,66.2",
           "legGeometry": {
             "length": 4,
             "points": "}f{tGv}{kVjCA?e@WA"
@@ -2870,6 +2886,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           },
           "generalizedCost": 317,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,474,NaN,493,NaN",
           "legGeometry": {
             "length": 7,
             "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
@@ -2937,6 +2954,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           },
           "generalizedCost": 350,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,138,NaN,138,48.9,148,49.2,158,49.5,168,49.8,178,50.1,188,50.4,198,50.7,208,51.0,217,51.2,219,51.1",
           "legGeometry": {
             "length": 4,
             "points": "ic{tG~uzkVEcJlCE?C"
@@ -3017,8 +3035,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 2001,
-      "elevationGained": 0.46000000000000085,
-      "elevationLost": 1000043.8300000001,
+      "elevationGained": 0.9299999998928996,
+      "elevationLost": 2000091.4700000002,
       "endTime": "2009-10-21T23:43:21.000+00:00",
       "fare": {
         "details": { },
@@ -3041,6 +3059,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
           },
           "generalizedCost": 3901,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,67.4,1,67.5,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,170,59.8,180,59.5,190,59.2,200,59.1,210,58.8,220,58.6,230,58.4,240,58.0,250,57.7,260,57.4,270,57.0,280,56.6,290,56.2,300,55.9,310,55.7,318,55.5,398,-999979.8,556,-999979.8,556,NaN,635,NaN,635,-999979.8,715,-999979.8,715,NaN,794,NaN,794,-999979.8,873,-999979.8,873,NaN,1092,NaN,1092,-999979.8,1814,-999979.8,1814,NaN,2036,NaN,2036,-999979.8,2310,-999979.8,2310,-999979.8,2442,-999979.8",
           "legGeometry": {
             "length": 93,
             "points": "}f{tGv}{kVC?mCBmCDGaK?SM?_CDK?Y@c@?m@@I?K?M@sBBM?K?G?W@qA@O?K@sBBO@M?wA@S@E?M?K?uBDK?K?eA@m@@M@K@e@@iED_@@Y@aA?s@@kA@aA@mCBC@MDi@?c@CcBByBBS@K@E??IEGGG?IM@C_@Ce@Gm@EeAMmBGiAGoAWWg@s@EEGKIM]i@k@w@A?QWOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
@@ -3225,8 +3244,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1120,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 7.470000000000006,
+      "elevationLost": 1.3200000000000038,
       "endTime": "2009-10-21T23:31:15.000+00:00",
       "fare": {
         "details": {
@@ -3277,6 +3296,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 260,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,18,NaN,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,96,NaN,168,NaN",
           "legGeometry": {
             "length": 10,
             "points": "ssztGh_wkV?`@?LK?uBBK??F?JBbDN?"
@@ -3524,6 +3544,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 900,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,9,NaN,9,52.6,19,52.7,29,52.9,43,53.0,53,53.2,63,53.3,73,53.4,83,53.6,93,53.7,103,54.0,113,54.3,123,54.6,133,54.9,143,55.2,153,55.4,167,55.7,177,55.7,187,55.5,197,55.3,207,55.1,217,55.0,227,54.8,237,54.7,247,54.5,257,54.7,267,55.1,277,55.4,287,55.7,297,56.0,307,56.3,317,56.5,327,56.7,337,57.0,347,57.3,357,57.7,367,57.9,377,58.1,387,58.2,397,58.5,405,58.8,405,NaN,564,NaN,564,63.7,565,63.7",
           "legGeometry": {
             "length": 10,
             "points": "wb{tG`wzkV?LO?@vAD|HoCBFvK?j@DhJB?"
@@ -3624,8 +3645,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1255,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 4.450000000000017,
+      "elevationLost": 23.150000000000016,
       "endTime": "2009-10-21T23:35:02.000+00:00",
       "fare": {
         "details": {
@@ -3676,6 +3697,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 444,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,98,NaN,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,250,NaN,288,NaN",
           "legGeometry": {
             "length": 17,
             "points": "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJA?D@L?lAE?"
@@ -3936,6 +3958,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 813,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,9,NaN,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
           "legGeometry": {
             "length": 34,
             "points": "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDkC@"
@@ -4023,8 +4046,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1264,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 1000044.38,
+      "elevationLost": 0.8400000000000034,
       "endTime": "2009-10-21T23:39:31.000+00:00",
       "fare": {
         "details": {
@@ -4075,6 +4098,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 392,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,18,NaN,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.2,116,29.3,126,29.2,136,29.2,146,29.2,156,29.2,166,29.3,176,29.3,183,29.3,195,29.4,205,29.5,215,29.6,225,29.6,235,29.6,250,29.4,250,NaN,253,NaN",
           "legGeometry": {
             "length": 15,
             "points": "ssztGh_wkV?`@?LK?uBBK?K@sBBM??D?L@\\?lCC??E"
@@ -4322,6 +4346,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 1141,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,25,NaN,25,-999979.8,341,-999979.8,421,60.2,431,60.4,441,60.6,451,60.9,461,61.2,471,61.5,481,61.8,491,62.0,499,62.2,509,62.5,519,62.9,529,63.3,539,63.5,549,63.3,559,63.2,569,63.4,579,63.7,581,63.7",
           "legGeometry": {
             "length": 12,
             "points": "}~{tGnq{kV?LVAF?J?FtKlCClCEnCElCElCCB?"
@@ -4396,8 +4421,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1524,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 1.2100000000000009,
+      "elevationLost": 0.5300000000000047,
       "endTime": "2009-10-21T23:46:08.000+00:00",
       "fare": {
         "details": {
@@ -4448,6 +4473,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 945,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,98,NaN,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,263,29.6,273,29.6,283,29.5,293,29.5,303,29.7,314,29.6,324,29.7,334,29.7,344,29.7,354,29.8,367,29.8,375,29.9,385,29.9,395,30.0,405,30.0,415,30.1,425,30.0,438,30.1,447,30.0,447,NaN,619,NaN",
           "legGeometry": {
             "length": 37,
             "points": "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJAVCJAF@F@b@NPHFBD@fA`@JDJBhBx@NFNJ~Ap@F@LFLFhBx@@?HDBOBOGE"
@@ -4773,6 +4799,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 387,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,251,NaN,251,63.7,252,63.7",
           "legGeometry": {
             "length": 11,
             "points": "cb{tGnp{kV?JG?M?O??@oBBM??j@DhJB?"
@@ -4847,8 +4874,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1120,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 7.470000000000006,
+      "elevationLost": 1.3200000000000038,
       "endTime": "2009-10-21T23:46:15.000+00:00",
       "fare": {
         "details": {
@@ -4899,6 +4926,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 260,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,18,NaN,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,96,NaN,168,NaN",
           "legGeometry": {
             "length": 10,
             "points": "ssztGh_wkV?`@?LK?uBBK??F?JBbDN?"
@@ -5146,6 +5174,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 900,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,9,NaN,9,52.6,19,52.7,29,52.9,43,53.0,53,53.2,63,53.3,73,53.4,83,53.6,93,53.7,103,54.0,113,54.3,123,54.6,133,54.9,143,55.2,153,55.4,167,55.7,177,55.7,187,55.5,197,55.3,207,55.1,217,55.0,227,54.8,237,54.7,247,54.5,257,54.7,267,55.1,277,55.4,287,55.7,297,56.0,307,56.3,317,56.5,327,56.7,337,57.0,347,57.3,357,57.7,367,57.9,377,58.1,387,58.2,397,58.5,405,58.8,405,NaN,564,NaN,564,63.7,565,63.7",
           "legGeometry": {
             "length": 10,
             "points": "wb{tG`wzkV?LO?@vAD|HoCBFvK?j@DhJB?"
@@ -5246,8 +5275,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1315,
-      "elevationGained": 0.0,
-      "elevationLost": 0.0,
+      "elevationGained": 4.450000000000017,
+      "elevationLost": 23.150000000000016,
       "endTime": "2009-10-21T23:51:02.000+00:00",
       "fare": {
         "details": {
@@ -5298,6 +5327,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 444,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,98,NaN,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,250,NaN,288,NaN",
           "legGeometry": {
             "length": 17,
             "points": "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJA?D@L?lAE?"
@@ -5558,6 +5588,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 813,
           "interlineWithPreviousLeg": false,
+          "legElevation": "0,NaN,9,NaN,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
           "legGeometry": {
             "length": 34,
             "points": "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDkC@"
