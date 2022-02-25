@@ -51,27 +51,6 @@ public class Station extends TransitEntity implements StopCollection {
 
   public Station(
           FeedScopedId id,
-          String name,
-          WgsCoordinate coordinate,
-          String code,
-          String description,
-          String url,
-          TimeZone timezone,
-          StopTransferPriority priority
-  ) {
-    super(id);
-    this.name = new NonLocalizedString(name);
-    this.coordinate = coordinate;
-    this.code = code;
-    this.description = description;
-    this.url = new NonLocalizedString(url);
-    this.timezone = timezone;
-    this.priority = priority == null ? DEFAULT_PRIORITY : priority;
-    this.geometry = computeGeometry(coordinate, childStops);
-  }
-
-  public Station(
-          FeedScopedId id,
           I18NString name,
           WgsCoordinate coordinate,
           String code,
@@ -99,11 +78,11 @@ public class Station extends TransitEntity implements StopCollection {
   public static Station stationForTest(String idAndName, double lat, double lon) {
     return new Station(
             new FeedScopedId("F", idAndName),
-            idAndName,
+            new NonLocalizedString(idAndName),
             new WgsCoordinate(lat, lon),
             idAndName,
             "Station " + idAndName,
-            null,
+            new NonLocalizedString(null),
             null,
             StopTransferPriority.ALLOWED
     );

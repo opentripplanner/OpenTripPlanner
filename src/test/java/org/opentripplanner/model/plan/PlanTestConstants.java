@@ -2,11 +2,9 @@ package org.opentripplanner.model.plan;
 
 import static org.opentripplanner.util.time.TimeUtils.time;
 
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.time.DurationUtils;
 
@@ -85,7 +83,6 @@ public interface PlanTestConstants {
             null,
             null
     );
-
     return Place.forStop(stop);
   }
 }

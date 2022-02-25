@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslationHelper;
 
 /**
@@ -60,11 +61,11 @@ class StationMapper {
 
     return new Station(
         mapAgencyAndId(rhs.getId()),
-        rhs.getName(),
+        new NonLocalizedString(rhs.getName()),
         WgsCoordinateMapper.mapToDomain(rhs),
         rhs.getCode(),
         rhs.getDesc(),
-        rhs.getUrl(),
+        new NonLocalizedString(rhs.getUrl()),
         rhs.getTimezone() == null ? null : TimeZone.getTimeZone(rhs.getTimezone()),
         // Use default cost priority
         null

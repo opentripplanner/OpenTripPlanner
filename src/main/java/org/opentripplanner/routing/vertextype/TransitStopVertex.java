@@ -98,6 +98,7 @@ public class TransitStopVertex extends Vertex {
             return this.stop;
     }
 
+    @Override
     public StationElement getStationElement() {
         return this.stop;
     }

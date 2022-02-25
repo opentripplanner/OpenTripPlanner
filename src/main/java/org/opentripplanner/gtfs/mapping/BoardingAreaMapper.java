@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Boarding areas into the OTP model. */
@@ -58,7 +59,7 @@ class BoardingAreaMapper {
 
     return new BoardingArea(
             base.getId(),
-            base.getName(),
+            new NonLocalizedString(base.getName()),
             base.getCode(),
             base.getDescription(),
             base.getCoordinate(),

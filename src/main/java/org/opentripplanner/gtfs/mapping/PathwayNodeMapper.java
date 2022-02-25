@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Node into the OTP model. */
@@ -49,7 +50,7 @@ class PathwayNodeMapper {
 
         return new PathwayNode(
             base.getId(),
-            base.getName(),
+            new NonLocalizedString(base.getName()),
             base.getCode(),
             base.getDescription(),
             base.getCoordinate(),

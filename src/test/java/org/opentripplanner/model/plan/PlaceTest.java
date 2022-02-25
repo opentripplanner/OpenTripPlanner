@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
@@ -52,7 +51,7 @@ public class PlaceTest {
     }
 
     private static Stop stop(String stopId, double lat, double lon) {
-        return new Stop(
+       return new Stop(
                 new FeedScopedId("S", stopId),
                 null,
                 null,

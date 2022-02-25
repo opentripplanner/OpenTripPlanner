@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslationHelper;
 
 /**
@@ -62,7 +63,7 @@ class EntranceMapper {
 
         return new Entrance(
                 base.getId(),
-                base.getName(),
+                new NonLocalizedString(base.getName()),
                 base.getCode(),
                 base.getDescription(),
                 base.getCoordinate(),
