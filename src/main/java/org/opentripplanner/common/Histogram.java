@@ -111,9 +111,9 @@ public class Histogram {
             row.append(' ');
         }
 
-        String start = new Integer(minBin).toString();
+        String start = Integer.valueOf(minBin).toString();
         row.replace(0, start.length(), start);
-        String end = new Integer(maxBin).toString();
+        String end = Integer.valueOf(maxBin).toString();
         row.replace(row.length() - end.length(), row.length(), end);
         System.out.println(row);
     }
