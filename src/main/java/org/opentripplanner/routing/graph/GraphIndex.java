@@ -85,10 +85,10 @@ public class GraphIndex {
         for (TripPattern pattern : graph.tripPatternForId.values()) {
             patternsForFeedId.put(pattern.getFeedId(), pattern);
             patternsForRoute.put(pattern.getRoute(), pattern);
-            for (Trip trip : pattern.getTrips()) {
+            pattern.scheduledTripsAsStream().forEach(trip -> {
                 patternForTrip.put(trip, pattern);
                 tripForId.put(trip.getId(), trip);
-            }
+            });
             for (StopLocation stop : pattern.getStops()) {
                 patternsForStopId.put(stop, pattern);
             }

@@ -134,8 +134,7 @@ public class LineType {
                           .getPatternsForRoute()
                           .get(environment.getSource())
                           .stream()
-                          .map(TripPattern::getTrips)
-                          .flatMap(Collection::stream)
+                          .flatMap(TripPattern::scheduledTripsAsStream)
                           .distinct()
                           .collect(Collectors.toList());
 

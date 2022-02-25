@@ -35,8 +35,8 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  */
 public class ScheduledTransitLeg implements Leg {
 
-    private final TripTimes tripTimes;
-    private final TripPattern tripPattern;
+    protected final TripTimes tripTimes;
+    protected final TripPattern tripPattern;
 
     private final Calendar startTime;
     private final Calendar endTime;
@@ -49,13 +49,13 @@ public class ScheduledTransitLeg implements Leg {
     private final ConstrainedTransfer transferFromPrevLeg;
     private final ConstrainedTransfer transferToNextLeg;
 
-    private final Integer boardStopPosInPattern;
-    private final Integer alightStopPosInPattern;
+    protected final Integer boardStopPosInPattern;
+    protected final Integer alightStopPosInPattern;
 
     private final int generalizedCost;
 
-    private final ServiceDate serviceDate;
-    private final ZoneId zoneId;
+    protected final ServiceDate serviceDate;
+    protected final ZoneId zoneId;
 
     public ScheduledTransitLeg(
             TripTimes tripTimes,

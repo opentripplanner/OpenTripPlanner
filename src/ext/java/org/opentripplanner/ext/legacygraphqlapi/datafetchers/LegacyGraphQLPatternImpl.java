@@ -21,8 +21,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -213,7 +211,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   private List<Trip> getTrips(DataFetchingEnvironment environment) {
-    return getSource(environment).getTrips();
+    return getSource(environment).scheduledTripsAsStream().collect(Collectors.toList());
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

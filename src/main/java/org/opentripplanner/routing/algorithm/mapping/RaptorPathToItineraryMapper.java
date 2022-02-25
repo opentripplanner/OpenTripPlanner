@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter.toOtpDomainCost;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toOtpDomainCost;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -8,17 +8,18 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.plan.FrequencyTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
-import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferWithDuration;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -155,19 +156,38 @@ public class RaptorPathToItineraryMapper {
             pathLeg.toTime(), pathLeg.toStop()
         );
 
-        ScheduledTransitLeg leg = new ScheduledTransitLeg(
-                tripSchedule.getOriginalTripTimes(),
-                tripSchedule.getOriginalTripPattern(),
-                boardStopIndexInPattern,
-                alightStopIndexInPattern,
-                createCalendar(pathLeg.fromTime()),
-                createCalendar(pathLeg.toTime()),
-                tripSchedule.getServiceDate(),
-                transitSearchTimeZero.getZone().normalized(),
-                (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
-                (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg(),
-                toOtpDomainCost(pathLeg.generalizedCost())
-        );
+        Leg leg;
+        if (tripSchedule.isFrequencyBasedTrip()) {
+            int frequencyHeadwayInSeconds = tripSchedule.frequencyHeadwayInSeconds();
+            leg = new FrequencyTransitLeg(
+                    tripSchedule.getOriginalTripTimes(),
+                    tripSchedule.getOriginalTripPattern(),
+                    boardStopIndexInPattern,
+                    alightStopIndexInPattern,
+                    createCalendar(pathLeg.fromTime() + frequencyHeadwayInSeconds),
+                    createCalendar(pathLeg.toTime()),
+                    tripSchedule.getServiceDate(),
+                    transitSearchTimeZero.getZone().normalized(),
+                    (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
+                    (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg(),
+                    toOtpDomainCost(pathLeg.generalizedCost()),
+                    frequencyHeadwayInSeconds
+            );
+        } else {
+            leg = new ScheduledTransitLeg(
+                    tripSchedule.getOriginalTripTimes(),
+                    tripSchedule.getOriginalTripPattern(),
+                    boardStopIndexInPattern,
+                    alightStopIndexInPattern,
+                    createCalendar(pathLeg.fromTime()),
+                    createCalendar(pathLeg.toTime()),
+                    tripSchedule.getServiceDate(),
+                    transitSearchTimeZero.getZone().normalized(),
+                    (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
+                    (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg(),
+                    toOtpDomainCost(pathLeg.generalizedCost())
+            );
+        }
 
         AlertToLegMapper.addTransitAlertPatchesToLeg(
             graph,
