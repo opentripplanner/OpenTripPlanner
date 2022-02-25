@@ -1,9 +1,37 @@
 package org.opentripplanner.graph_builder.module;
 
+import static org.opentripplanner.common.geometry.SphericalDistanceLibrary.distance;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.model.*;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BoardingArea;
+import org.opentripplanner.model.Entrance;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FlexLocationGroup;
+import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.MultiModalStation;
+import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.Pathway;
+import org.opentripplanner.model.PathwayNode;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.StationElement;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
+import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.*;
@@ -140,19 +168,31 @@ public class AddTransitModelEntitiesToGraph {
 
     private void addBoardingAreasToGraph(Graph graph) {
         for (BoardingArea boardingArea : transitService.getAllBoardingAreas()) {
-            TransitBoardingAreaVertex boardingAreaVertex = new TransitBoardingAreaVertex(graph, boardingArea);
+            TransitBoardingAreaVertex boardingAreaVertex =
+                    new TransitBoardingAreaVertex(graph, boardingArea);
             stationElementNodes.put(boardingArea, boardingAreaVertex);
             if (boardingArea.getParentStop() != null) {
-                new PathwayEdge(
-                    boardingAreaVertex,
-                    stationElementNodes.get(boardingArea.getParentStop()),
-                    new NonLocalizedString(boardingArea.getName())
+
+                var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
+                boolean wheelchair = boardingArea.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
+                var name = Optional.ofNullable(boardingArea.getName())
+                        .map(NonLocalizedString::new)
+                        .orElse(null);
+
+                PathwayEdge.lowCost(
+                        boardingAreaVertex,
+                        platformVertex,
+                        boardingArea.getId(),
+                        name,
+                        wheelchair
                 );
 
-                new PathwayEdge(
-                    stationElementNodes.get(boardingArea.getParentStop()),
-                    boardingAreaVertex,
-                    new NonLocalizedString(boardingArea.getName())
+                PathwayEdge.lowCost(
+                        platformVertex,
+                        boardingAreaVertex,
+                        boardingArea.getId(),
+                        name,
+                        wheelchair
                 );
             }
         }
@@ -169,13 +209,21 @@ public class AddTransitModelEntitiesToGraph {
                     createElevatorEdgesAndAddThemToGraph(graph, pathway, fromVertex, toVertex);
                 }
                 else {
+
+                    // the GTFS spec allows you to define a pathway which has neither traversal time, distance
+                    // nor steps. This would lead to traversal costs of 0, so we compute the distance from the
+                    // vertices as fallback.
+                    double distance = Optional.of(pathway.getLength())
+                            .filter(l -> l > 0)
+                            .orElseGet(() -> distance(fromVertex.getCoordinate(), toVertex.getCoordinate()));
+
                     new PathwayEdge(
                         fromVertex,
                         toVertex,
                         pathway.getId(),
                         Optional.ofNullable(pathway.getName()).map(NonLocalizedString::new).orElse((NonLocalizedString)PathwayEdge.DEFAULT_NAME),
                         pathway.getTraversalTime(),
-                        pathway.getLength(),
+                        distance,
                         pathway.getStairCount(),
                         pathway.getSlope(),
                         pathway.isPathwayModeWheelchairAccessible()
@@ -185,9 +233,9 @@ public class AddTransitModelEntitiesToGraph {
                             toVertex,
                             fromVertex,
                             pathway.getId(),
-                            pathway.getReversedName() != null ? new NonLocalizedString(pathway.getReversedName()) : null,
+                            Optional.ofNullable(pathway.getReversedName()).map(NonLocalizedString::new).orElse(null),
                             pathway.getTraversalTime(),
-                            pathway.getLength(),
+                            distance,
                             -1 * pathway.getStairCount(),
                             -1 * pathway.getSlope(),
                             pathway.isPathwayModeWheelchairAccessible()
@@ -250,8 +298,8 @@ public class AddTransitModelEntitiesToGraph {
             toVertexLevelName
         );
 
-        new PathwayEdge(fromVertex, fromOffboardVertex, fromVertex.getName());
-        new PathwayEdge(toOffboardVertex, toVertex, toVertex.getName());
+        PathwayEdge.lowCost(fromVertex, fromOffboardVertex, fromVertex.getName());
+        PathwayEdge.lowCost(toOffboardVertex, toVertex, toVertex.getName());
 
         ElevatorOnboardVertex fromOnboardVertex = new ElevatorOnboardVertex(
             graph,
@@ -281,8 +329,8 @@ public class AddTransitModelEntitiesToGraph {
         );
 
         if (pathway.isBidirectional()) {
-            new PathwayEdge(fromOffboardVertex, fromVertex, fromVertex.getName());
-            new PathwayEdge(toVertex, toOffboardVertex, toVertex.getName());
+            PathwayEdge.lowCost(fromOffboardVertex, fromVertex, fromVertex.getName());
+            PathwayEdge.lowCost(toVertex, toOffboardVertex, toVertex.getName());
             new ElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
             new ElevatorAlightEdge(
                 fromOnboardVertex,

@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import static java.util.stream.Collectors.groupingBy;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper.secondsSinceStartOfTime;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,10 +84,12 @@ class RaptorRoutingRequestTransitDataCreator {
       ZonedDateTime transitSearchTimeZero, List<TripPatternForDate> patternForDateList
   ) {
 
-    // Group TripPatternForDate objects by TripPattern
-    Map<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternForDateByPattern = patternForDateList
-        .stream()
-        .collect(groupingBy(TripPatternForDate::getTripPattern));
+    // Group TripPatternForDate objects by TripPattern.
+    // This is done in a loop to increase performance.
+    Map<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
+    for (TripPatternForDate patternForDate : patternForDateList) {
+      patternForDateByPattern.computeIfAbsent(patternForDate.getTripPattern(), k -> new ArrayList<>()).add(patternForDate);
+    }
 
     List<TripPatternForDates> combinedList = new ArrayList<>();
 
@@ -96,12 +98,9 @@ class RaptorRoutingRequestTransitDataCreator {
     for (Map.Entry<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternEntry : patternForDateByPattern
         .entrySet()) {
 
-      // Sort by date
-      List<TripPatternForDate> patternsSorted = patternEntry
-          .getValue()
-          .stream()
-          .sorted(Comparator.comparing(TripPatternForDate::getLocalDate))
-          .collect(Collectors.toUnmodifiableList());
+      // Sort by date. We can mutate the array, as it was created above in the grouping.
+      List<TripPatternForDate> patternsSorted = patternEntry.getValue();
+      patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
 
       // Calculate offsets per date
       List<Integer> offsets = new ArrayList<>();

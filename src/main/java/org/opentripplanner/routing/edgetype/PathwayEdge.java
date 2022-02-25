@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -12,8 +13,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
-import java.util.Objects;
-
 /**
  * A walking pathway as described in GTFS
  */
@@ -23,37 +22,65 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
 
     private final I18NString name;
-    private int traversalTime;
-    private double distance;
-    private int steps;
-    private double angle;
+    private final int traversalTime;
+    private final double distance;
+    private final int steps;
+    private final double slope;
 
-    private boolean wheelchairAccessible = true;
-    private FeedScopedId id;
+    private final boolean wheelchairAccessible;
+    private final FeedScopedId id;
 
-    public PathwayEdge(Vertex fromv, Vertex tov, I18NString name) {
-        super(fromv, tov);
-        this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
+    /**
+     * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean)}
+     */
+    public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name) {
+        return PathwayEdge.lowCost(
+                fromV,
+                toV,
+                null,
+                name,
+                true
+        );
+    }
+
+    /**
+     * Create a PathwayEdge that doesn't have a traversal time, distance or steps.
+     *
+     * These are for edges which have an implied cost of almost zero just like a FreeEdge has.
+     */
+    public static PathwayEdge lowCost(Vertex fromV, Vertex toV, FeedScopedId id, I18NString name, boolean wheelchairAccessible) {
+        return new PathwayEdge(
+                fromV,
+                toV,
+                id,
+                name,
+                0,
+                0,
+                0,
+                0,
+                wheelchairAccessible
+        );
     }
 
     public PathwayEdge(
-        Vertex fromv,
-        Vertex tov,
-        FeedScopedId id,
-        I18NString name,
-        int traversalTime,
-        double distance,
-        int steps,
-        double angle,
-        boolean wheelchairAccessible
+            Vertex fromv,
+            Vertex tov,
+            FeedScopedId id,
+            I18NString name,
+            int traversalTime,
+            double distance,
+            int steps,
+            double slope,
+            boolean wheelchairAccessible
     ) {
-        this(fromv, tov, name != null ? name : tov.getName());
+        super(fromv, tov);
+        this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
         this.id = id;
         this.traversalTime = traversalTime;
-        this.distance = distance;
         this.steps = steps;
-        this.angle = angle;
+        this.slope = slope;
         this.wheelchairAccessible = wheelchairAccessible;
+        this.distance = distance;
     }
 
     public String getDirection() {
@@ -68,7 +95,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     public double getEffectiveWalkDistance() {
         if (traversalTime > 0) {
             return 0;
-        } else {
+        }
+        else {
             return distance;
         }
     }
@@ -79,8 +107,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
     }
 
     public LineString getGeometry() {
-        Coordinate[] coordinates = new Coordinate[] { getFromVertex().getCoordinate(),
-                getToVertex().getCoordinate() };
+        Coordinate[] coordinates = new Coordinate[]{
+                getFromVertex().getCoordinate(),
+                getToVertex().getCoordinate()
+        };
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
@@ -89,11 +119,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
         return name;
     }
 
-    public void setWheelchairAccessible(boolean wheelchairAccessible) {
-        this.wheelchairAccessible = wheelchairAccessible;
-    }
-
-    public FeedScopedId getId( ){ return id; }
+    public FeedScopedId getId() {return id;}
 
     public State traverse(State s0) {
         StateEditor s1 = createEditorForWalking(s0, this);
@@ -107,7 +133,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
             if (!this.wheelchairAccessible) {
                 return null;
             }
-            if (this.angle > s0.getOptions().maxWheelchairSlope) {
+            if (this.slope > s0.getOptions().maxWheelchairSlope) {
                 return null;
             }
         }
@@ -122,14 +148,19 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
             }
         }
 
-        if (time <= 0) {
-            return null;
+        if (time > 0){
+            double weight = time * s0.getOptions()
+                .getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
+
+            s1.incrementTimeInSeconds(time);
+            s1.incrementWeight(weight);
+        } else {
+            // elevators often don't have a traversal time, distance or steps, so we need to add
+            // _some_ cost. the real cost is added in ElevatorHopEdge.
+            // adding a cost of 1 is analogous to FreeEdge
+            s1.incrementWeight(1);
         }
 
-        double weight = time * s0.getOptions().getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
-
-        s1.incrementTimeInSeconds(time);
-        s1.incrementWeight(weight);
         return s1.makeState();
     }
 }
