@@ -157,7 +157,7 @@ public class TripTimeOnDate {
     }
 
     public List<String> getHeadsignVias() {
-        return tripTimes.getVia(stopIndex);
+        return tripTimes.getHeadsignVias(stopIndex);
     }
 
     public PickDrop getPickupType() {
