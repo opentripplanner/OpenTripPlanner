@@ -1,16 +1,14 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Objects;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -33,7 +31,11 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
     public PathwayEdge(Vertex fromv, Vertex tov, I18NString name) {
         super(fromv, tov);
-        this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
+        if (name.toString() == null){
+            this.name = DEFAULT_NAME;
+        } else {
+            this.name = name;
+        }
     }
 
     public PathwayEdge(
