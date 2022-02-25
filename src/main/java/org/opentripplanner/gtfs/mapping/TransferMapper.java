@@ -138,12 +138,12 @@ class TransferMapper {
 
     // If this transfer do not give any advantages in the routing, then drop it
     if(constraint.isRegularTransfer()) {
-      LOG.warn("Transfer skipped - no effect on routing: " + rhs);
+      LOG.warn("Transfer skipped - no effect on routing: {}", rhs);
       return null;
     }
 
     if (constraint.isStaySeated() && (fromTrip == null || toTrip == null)) {
-      LOG.warn("Transfer skipped - from_trip_id and to_trip_id must exist for in-seat transfer");
+      LOG.warn("Transfer skipped - from_trip_id and to_trip_id must exist for in-seat transfer: {}", rhs);
       return null;
     }
 
@@ -151,7 +151,7 @@ class TransferMapper {
     TransferPoint toPoint = mapTransferPoint(rhs.getToStop(), rhs.getToRoute(), toTrip, true);
 
     if (fromPoint == null || toPoint == null) {
-      LOG.warn("Transfer '{}' skipped - from_stop or to_stop not found on from_trip / to_trip", rhs.getId());
+      LOG.warn("Transfer skipped - from_stop or to_stop not found on from_trip / to_trip: {}", rhs);
       return null;
     }
 
