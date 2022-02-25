@@ -12,6 +12,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
+import java.util.Objects;
+
 /**
  * A walking pathway as described in GTFS
  */
@@ -31,11 +33,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
     public PathwayEdge(Vertex fromv, Vertex tov, I18NString name) {
         super(fromv, tov);
-        if (name.toString() == null){
-            this.name = DEFAULT_NAME;
-        } else {
-            this.name = name;
-        }
+        this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
     }
 
     public PathwayEdge(
