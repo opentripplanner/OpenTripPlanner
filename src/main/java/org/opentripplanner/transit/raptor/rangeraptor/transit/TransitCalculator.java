@@ -13,6 +13,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating
@@ -100,15 +101,26 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
     String exceedsTimeLimitReason();
 
     /**
-     * Return true is the first argument (subject) is the best time, and false if not. If both
-     * are equal false is returned.
+     * Forward search: Return {@code true} if the first argument ({@code subject}) is
+     * BEFORE the second argument ({@code candidate}). If both are equal {@code false} is returned.
      * <p/>
-     * In a normal forward search "best" is considered BEFORE in time, while AFTER in time
-     * is considered best in a reverse search.
+     * Reverse search: Return {@code true} if the first argument ({@code subject}) is
+     * AFTER the second argument ({@code candidate}). If both are equal {@code false} is returned.
      *
-     * @return true is subject is better then the candidate; if not false.
+     * @return true if subject is better than the candidate; if not false.
      */
-    boolean isBest(int subject, int candidate);
+    boolean isBefore(int subject, int candidate);
+
+    /**
+     * Forward search: Return {@code true} if the first argument ({@code subject}) is
+     * AFTER the second argument ({@code candidate}). If both are equal {@code false} is returned.
+     * <p/>
+     * Reverse search: Return {@code true} if the first argument ({@code subject}) is
+     * BEFORE the second argument ({@code candidate}). If both are equal {@code false} is returned.
+     *
+     * @return true if subject is better than the candidate; if not false.
+     */
+    boolean isAfter(int subject, int candidate);
 
     /**
      * Uninitialized time values is set to this value to mark them as not set, and to mark the
@@ -158,13 +170,13 @@ public interface TransitCalculator<T extends RaptorTripSchedule> {
      * @param timeTable the trip time-table to search
      * @return The trip search strategy implementation.
      */
-    TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable);
+    RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable);
 
     /**
      * Same as {@link #createTripSearch(RaptorTimeTable)}, but create a
      * trip search that only accept exact trip timeLimit matches.
      */
-    TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
+    RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
 
     /**
      * Return a transfer provider for the given pattern. When searching forward the

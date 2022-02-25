@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import lombok.val;
 import org.opentripplanner.common.model.T2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,16 +49,16 @@ public class DataOverlayParameters implements Serializable {
      * created to receive all input and filter out the data-overlay parameters.
      */
     public static DataOverlayParameters parseQueryParams(Map<String, List<String>> params) {
-        val result = new DataOverlayParameters();
+        var result = new DataOverlayParameters();
         for (String key : params.keySet()) {
-            val name = resolveKey(key);
+            var name = resolveKey(key);
             if (name != null) {
                 List<String> values = params.get(key);
                 if(values == null || values.isEmpty()) {
                     LOG.warn("The data-overlay parameter value is missing. Parameter: {}", key);
                     continue;
                 }
-                val value = resolveValue(values.get(0));
+                var value = resolveValue(values.get(0));
                 if(value == null) {
                     LOG.warn("The data-overlay parameter value is null. Parameter: {}", key);
                     continue;

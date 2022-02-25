@@ -7,7 +7,7 @@ import org.opentripplanner.standalone.OTPMain;
 
 
 /**
- * This class provide a main method to start a GUI witch can start OTPMain.
+ * This class provide a main method to start a GUI which can start OTPMain.
  * <p>
  * The UI allow the user to select a OTP configuration data set. The list of
  * data location is created by searching the a root data source directory.

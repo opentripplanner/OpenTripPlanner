@@ -5,6 +5,7 @@ import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +15,9 @@ public class TransitEntranceVertex extends Vertex {
 
   private static final long serialVersionUID = 1L;
 
-  private boolean wheelchairEntrance;
+  private final boolean wheelchairEntrance;
 
-  private Entrance entrance;
+  private final Entrance entrance;
 
   /**
    * @param entrance The transit model entrance reference.
@@ -26,17 +27,13 @@ public class TransitEntranceVertex extends Vertex {
         graph,
         entrance.getId().toString(),
         entrance.getCoordinate().longitude(),
-        entrance.getCoordinate().latitude()
+        entrance.getCoordinate().latitude(),
+        entrance.getName()
     );
     this.entrance = entrance;
     this.wheelchairEntrance = entrance.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
     graph.expandToInclude(entrance.getCoordinate().longitude(), entrance.getCoordinate().latitude());
-  }
-
-  @Override
-  public String getName() {
-    return entrance.getName().toString();
   }
 
   public boolean isWheelchairEntrance() {

@@ -11,7 +11,7 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * This class takes a list of transit legs and returns the best leg based on the {@link
  * TransferOptimizedFilterFactory} and the earliest-boarding-time. The filter is used to pick the
- * best leg from the legs witch can be boarded after the earliest-boarding-time.
+ * best leg from the legs which can be boarded after the earliest-boarding-time.
  * <p>
  * HOW IT WORKS
  * <p>
@@ -22,7 +22,7 @@ import org.opentripplanner.util.time.TimeUtils;
  * selected set is filtered, and are elements dropped. Dropped elements represent none optimal
  * paths.
  * <p>
- * Elements in the reminding set witch can not be boarded is kept in the remaining set for the next
+ * Elements in the reminding set which can not be boarded is kept in the remaining set for the next
  * call to the {@link #next(int)} method.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.

@@ -11,6 +11,10 @@ public final class Trip extends TransitEntity {
 
     private Operator operator;
 
+    private TransitMode mode;
+
+    private String netexSubmode;
+
     private FeedScopedId serviceId;
 
     private String tripShortName;
@@ -54,6 +58,8 @@ public final class Trip extends TransitEntity {
         this.route = obj.route;
         this.operator = obj.operator;
         this.serviceId = obj.serviceId;
+        this.mode = obj.mode;
+        this.netexSubmode = obj.netexSubmode;
         this.tripShortName = obj.tripShortName;
         this.tripHeadsign = obj.tripHeadsign;
         this.routeShortName = obj.routeShortName;
@@ -101,6 +107,22 @@ public final class Trip extends TransitEntity {
         this.serviceId = serviceId;
     }
 
+    public TransitMode getMode() {
+        return mode == null ? getRoute().getMode() : mode;
+    }
+
+    public void setMode(TransitMode mode) {
+        this.mode = mode.equals(getRoute().getMode()) ? null : mode;
+    }
+
+    public String getNetexSubmode() {
+        return netexSubmode == null ? getRoute().getNetexSubmode() : netexSubmode;
+    }
+
+    public void setNetexSubmode(String netexSubmode) {
+        this.netexSubmode = netexSubmode == null || netexSubmode.equals(getRoute().getNetexSubmode()) ? null : netexSubmode;
+    }
+
     /**
      * Public code or identifier for the journey. Equal to NeTEx PublicCode. GTFS and NeTEx have
      * additional constraints on this fields that are not enforced in OTP.
@@ -114,8 +136,8 @@ public final class Trip extends TransitEntity {
     }
 
     /**
-     * Return human friendly short info to identify the trip when mode, from/to stop and
-     * times are known. This method is meant for logging, and should not be exposed in any API.
+     * Return human friendly short info to identify the trip when mode, from/to stop and times are
+     * known. This method is meant for debug/logging, and should not be exposed in any API.
      */
     public String logInfo() {
         if(hasValue(tripShortName)) { return tripShortName; }

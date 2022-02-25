@@ -9,6 +9,7 @@ import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
@@ -62,21 +63,23 @@ class StopMapper {
                       null, gtfsStop.getUrl()
               ),
               gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
-              TransitModeMapper.mapMode(gtfsStop.getVehicleType())
+              TransitModeMapper.mapMode(gtfsStop.getVehicleType()),
+              null
       );
     }
 
     return new Stop(base.getId(),
-        base.getName(),
+        new NonLocalizedString(base.getName()),
         base.getCode(),
         base.getDescription(),
         base.getCoordinate(),
         base.getWheelchairBoarding(),
         base.getLevel(),
         gtfsStop.getPlatformCode(), fareZones,
-        gtfsStop.getUrl(),
+        new NonLocalizedString(gtfsStop.getUrl()),
         gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
-        TransitModeMapper.mapMode(gtfsStop.getVehicleType())
+        TransitModeMapper.mapMode(gtfsStop.getVehicleType()),
+        null
     );
   }
 

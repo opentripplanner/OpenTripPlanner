@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
@@ -54,7 +55,7 @@ public class WalkStep {
     /**
      * The name of the street.
      */
-    public String streetName;
+    public I18NString streetName;
 
     /**
      * The absolute direction of this step.
@@ -96,6 +97,11 @@ public class WalkStep {
     public final Set<StreetNote> streetNotes = new HashSet<>();
 
     public double angle;
+
+    /**
+     * Is this step walking with a bike?
+     */
+    public boolean walkingBike;
 
     /**
      * The street edges that make up this walkStep.
@@ -167,11 +173,11 @@ public class WalkStep {
     }
 
     public String streetNameNoParens() {
-        int idx = streetName.indexOf('(');
+        int idx = streetName.toString().indexOf('(');
         if (idx <= 0) {
-            return streetName;
+            return streetName.toString();
         }
-        return streetName.substring(0, idx - 1);
+        return streetName.toString().substring(0, idx - 1);
     }
 
     @Override

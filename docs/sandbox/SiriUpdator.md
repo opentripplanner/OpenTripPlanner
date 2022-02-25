@@ -1,5 +1,5 @@
 # Siri Updator
-Support for consuming SIRI ET, SX and ET messages. The updator is developed to support the Norwegian SIRI profile witch is a subset of the SIRI specification. 
+Support for consuming SIRI ET, SX and ET messages. The updator is developed to support the Norwegian SIRI profile which is a subset of the SIRI specification. 
 
 ## Contact Info
 - Lasse Tyrihjell, Entur, Norway
@@ -7,6 +7,7 @@ Support for consuming SIRI ET, SX and ET messages. The updator is developed to s
 
 ## Changelog
 - Initial version of SIRI updator (October 2019)
+- Include situations with no or no handled entity selectors with Unknown EntitySelector (December 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3780)
 
 
 ## Documentation

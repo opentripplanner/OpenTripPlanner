@@ -3,7 +3,7 @@ package org.opentripplanner.netex.index.hierarchy;
 import javax.annotation.Nullable;
 
 /**
- * This is a hierarchical wrapper around a singe element witch provide the
+ * This is a hierarchical wrapper around a singe element which provide the
  * ability to create <em>parent</em> and <em>child</em> relationship with
  * fallback from the child value to the parent value [if the child does not
  * have a value].

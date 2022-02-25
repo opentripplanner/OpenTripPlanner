@@ -52,7 +52,7 @@ class StationMapper {
         stopPlace.getDescription() != null ? stopPlace.getDescription().getValue() : null,
         null,
         null,
-        TransferPriorityMapper.mapToDomain(stopPlace.getWeighting())
+        StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting())
     );
 
     if (station.getCoordinate() == null) {

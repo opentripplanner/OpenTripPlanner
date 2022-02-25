@@ -9,12 +9,19 @@ public class VehicleParkingWithEntrance {
 
     private final VehicleParkingEntrance entrance;
 
+    /**
+     * Was realtime data used when parking at this VehicleParking.
+     */
+    private final boolean realtime;
+
     VehicleParkingWithEntrance(
             VehicleParking vehicleParking,
-            VehicleParkingEntrance entrance
+            VehicleParkingEntrance entrance,
+            boolean realtime
     ) {
         this.vehicleParking = vehicleParking;
         this.entrance = entrance;
+        this.realtime = realtime;
     }
 
     public VehicleParking getVehicleParking() {
@@ -25,6 +32,10 @@ public class VehicleParkingWithEntrance {
         return this.entrance;
     }
 
+    public boolean isRealtime() {
+        return realtime;
+    }
+
     public static VehicleParkingWithEntranceBuilder builder() {
         return new VehicleParkingWithEntranceBuilder();
     }
@@ -33,6 +44,7 @@ public class VehicleParkingWithEntrance {
 
         private VehicleParking vehicleParking;
         private VehicleParkingEntrance entrance;
+        private boolean realtime;
 
         VehicleParkingWithEntranceBuilder() {}
 
@@ -50,8 +62,15 @@ public class VehicleParkingWithEntrance {
             return this;
         }
 
+        public VehicleParkingWithEntranceBuilder realtime(
+                boolean realtime
+        ) {
+            this.realtime = realtime;
+            return this;
+        }
+
         public VehicleParkingWithEntrance build() {
-            return new VehicleParkingWithEntrance(vehicleParking, entrance);
+            return new VehicleParkingWithEntrance(vehicleParking, entrance, realtime);
         }
     }
 }

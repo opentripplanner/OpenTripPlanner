@@ -58,7 +58,7 @@ otp.util.Time = {
         if(otp.config.locale.time.time_format && otp.config.locale.time.time_format.slice(-1) !== 'a') {
             //It should always return 12 hour am/pm time because that is what
             //server expects
-            return moment(time, otp.config.locale.time.time_format).format("h:mma");
+            return moment(time, otp.config.locale.time.time_format).format(otp.config.apiTimeFormat);
         }
         if(time == null || time.length < 1) return time;
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import java.time.Duration;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.model.FeedScopedId;
@@ -22,6 +23,9 @@ import static org.junit.Assert.fail;
 import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
 public class NodeAdapterTest {
+
+    public static final Duration D3h = Duration.ofHours(3);
+
     private enum AnEnum { A, B, C }
 
     @Test
@@ -204,12 +208,27 @@ public class NodeAdapterTest {
     }
 
     @Test(expected = OtpAppException.class)
-    public void testParsePeriodDateThrowsException() throws Exception {
+    public void testParsePeriodDateThrowsException() {
         // Given
         NodeAdapter subject  = newNodeAdapterForTest("{ 'foo' : 'bar' }");
 
         // Then
         subject.asDateOrRelativePeriod("foo", null);
+    }
+
+    @Test
+    public void asDuration() {
+        NodeAdapter subject  = newNodeAdapterForTest("{ key1 : 'PT1s', key2 : '4d3h2m1s' }");
+        assertEquals("PT1S", subject.asDuration("key1", null).toString());
+        assertEquals("PT99H2M1S", subject.asDuration("key2", null).toString());
+        assertEquals("PT3H", subject.asDuration("missing-key", D3h).toString());
+    }
+
+    @Test
+    public void asDurations() {
+        NodeAdapter subject  = newNodeAdapterForTest("{ key1 : ['PT1s', '2h'] }");
+        assertEquals("[PT1S, PT2H]", subject.asDurations("key1", List.of()).toString());
+        assertEquals("[PT3H]", subject.asDurations("missing-key", List.of(D3h)).toString());
     }
 
     @Test
@@ -224,8 +243,8 @@ public class NodeAdapterTest {
 
     @Test
     public void asPattern() {
-        NodeAdapter subject  = newNodeAdapterForTest("{ aPtn : 'Ab*a' }");
-        assertEquals("Ab*a",  subject.asPattern("aPtn", "ABC").toString());
+        NodeAdapter subject  = newNodeAdapterForTest("{ key : 'Ab*a' }");
+        assertEquals("Ab*a",  subject.asPattern("key", "ABC").toString());
         assertEquals("ABC",  subject.asPattern("missingField", "ABC").toString());
     }
 
@@ -336,5 +355,14 @@ public class NodeAdapterTest {
                 Set.of("X"),
                 subject.asTextSet("nonExisting", Set.of("X"))
         );
+    }
+
+    @Test
+    public void isNonEmptyArray() {
+        NodeAdapter subject = newNodeAdapterForTest("{ foo : ['A'], bar: [], foobar: true }");
+        assertTrue(subject.path("foo").isNonEmptyArray());
+        assertFalse(subject.path("bar").isNonEmptyArray());
+        assertFalse(subject.path("foobar").isNonEmptyArray());
+        assertFalse(subject.path("missing").isNonEmptyArray());
     }
 }

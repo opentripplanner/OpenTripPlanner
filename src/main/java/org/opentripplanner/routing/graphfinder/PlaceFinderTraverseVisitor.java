@@ -1,5 +1,11 @@
 package org.opentripplanner.routing.graphfinder;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
@@ -7,19 +13,12 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static java.util.stream.Collectors.toList;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
 /**
  * A TraverseVisitor used in finding various types of places while walking the street graph.
@@ -125,7 +124,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
           .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))
           .filter(pattern -> filterByRoutes == null
               || filterByRoutes.contains(pattern.getRoute().getId()))
-          .filter(pattern -> pattern.canBoard(pattern.getStopIndex(stop)))
+          .filter(pattern -> pattern.canBoard(stop))
           .collect(toList());
 
       for (TripPattern pattern : patterns) {

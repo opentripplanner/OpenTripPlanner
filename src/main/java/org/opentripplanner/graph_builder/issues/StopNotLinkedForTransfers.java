@@ -18,7 +18,7 @@ public class StopNotLinkedForTransfers implements DataImportIssue {
 
     @Override
     public String getHTMLMessage() {
-        return String.format(HTMLFMT, stop.getLat(), stop.getLon(), stop.getName(), stop.getStop().getId());
+        return String.format(HTMLFMT, stop.getLat(), stop.getLon(), stop.getDefaultName(), stop.getStop().getId());
     }
 
     @Override

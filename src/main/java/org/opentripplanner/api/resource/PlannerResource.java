@@ -17,7 +17,6 @@ import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.PageCursor;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -123,7 +122,7 @@ public class PlannerResource extends RoutingResource {
             sb.append(' ');
             sb.append(request.arriveBy ? "ARRIVE" : "DEPART");
             sb.append(' ');
-            sb.append(LocalDateTime.ofInstant(request.getDateTimeOriginalSearch(), ZoneId.systemDefault()));
+            sb.append(LocalDateTime.ofInstant(request.getDateTime(), ZoneId.systemDefault()));
             sb.append(' ');
             sb.append(request.streetSubRequestModes.getAsStr());
             sb.append(' ');

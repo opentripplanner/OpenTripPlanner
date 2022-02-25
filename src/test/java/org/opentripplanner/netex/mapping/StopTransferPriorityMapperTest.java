@@ -13,23 +13,23 @@ public class StopTransferPriorityMapperTest {
   @Test
   public void mapToDomain() {
 
-    assertNull(TransferPriorityMapper.mapToDomain(null));
+    assertNull(StopTransferPriorityMapper.mapToDomain(null));
 
     assertEquals(
         StopTransferPriority.DISCOURAGED,
-        TransferPriorityMapper.mapToDomain(InterchangeWeightingEnumeration.NO_INTERCHANGE)
+        StopTransferPriorityMapper.mapToDomain(InterchangeWeightingEnumeration.NO_INTERCHANGE)
     );
     assertEquals(
         StopTransferPriority.ALLOWED,
-        TransferPriorityMapper.mapToDomain(InterchangeWeightingEnumeration.INTERCHANGE_ALLOWED)
+        StopTransferPriorityMapper.mapToDomain(InterchangeWeightingEnumeration.INTERCHANGE_ALLOWED)
     );
     assertEquals(
         StopTransferPriority.PREFERRED,
-        TransferPriorityMapper.mapToDomain(InterchangeWeightingEnumeration.PREFERRED_INTERCHANGE)
+        StopTransferPriorityMapper.mapToDomain(InterchangeWeightingEnumeration.PREFERRED_INTERCHANGE)
     );
     assertEquals(
         StopTransferPriority.RECOMMENDED,
-        TransferPriorityMapper.mapToDomain(InterchangeWeightingEnumeration.RECOMMENDED_INTERCHANGE)
+        StopTransferPriorityMapper.mapToDomain(InterchangeWeightingEnumeration.RECOMMENDED_INTERCHANGE)
     );
   }
 }

@@ -59,8 +59,8 @@ public class GraphStatisticsModule implements GraphBuilderModule {
 
         for (Edge e : graph.getEdges()) {
             edgeTypeDistribution.add(new ConstantQuantifiable<String>(e.getClass().toString()));
-            edgeNameDistribution.add(new NumberQuantifiable<Integer>(e.getName() == null ? 0 : e
-                    .getName().length()), e.getName());
+            edgeNameDistribution.add(new NumberQuantifiable<Integer>(e.getDefaultName() == null ? 0 : e
+                    .getDefaultName().length()), e.getDefaultName());
             if (e.getGeometry() != null) {
                 LineString geometry = e.getGeometry();
                 geomSizeDistribution.add(new NumberQuantifiable<Integer>(geometry.getNumPoints()));
@@ -70,8 +70,8 @@ public class GraphStatisticsModule implements GraphBuilderModule {
         }
         for (Vertex v : graph.getVertices()) {
             vertexTypeDistribution.add(new ConstantQuantifiable<String>(v.getClass().toString()));
-            vertexNameDistribution.add(new NumberQuantifiable<Integer>(v.getName() == null ? 0 : v
-                    .getName().length()), v.getName());
+            vertexNameDistribution.add(new NumberQuantifiable<Integer>(v.getDefaultName() == null ? 0 : v
+                    .getDefaultName().length()), v.getDefaultName());
             vertexLabelDistribution.add(new NumberQuantifiable<Integer>(v.getLabel().length()),
                     v.getLabel());
         }

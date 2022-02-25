@@ -5,13 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.OtpDefaultSortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 public class GroupByFilterTest implements PlanTestConstants {
 
@@ -60,7 +59,7 @@ public class GroupByFilterTest implements PlanTestConstants {
      */
     @Test
     public void testMerging() {
-        // Given these 3 itineraries witch all should be grouped in the same group
+        // Given these 3 itineraries which all should be grouped in the same group
         Itinerary i1 = newItinerary(A).bus(1, 1, 11, E).build();
         Itinerary i11 = newItinerary(A).bus(11, 5, 16, E).build();
         Itinerary i12 = newItinerary(A).bus(12, 5, 16, E).build();
@@ -95,7 +94,7 @@ public class GroupByFilterTest implements PlanTestConstants {
         return new GroupByFilter<>(
             i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
             List.of(
-                new SortingFilter(new OtpDefaultSortOrder(false)),
+                new SortingFilter(SortOrderComparator.defaultComparatorDepartAfter()),
                 new DeletionFlaggingFilter(new MaxLimitFilter("test", maxNumberOfItinerariesPrGroup))
             )
         );

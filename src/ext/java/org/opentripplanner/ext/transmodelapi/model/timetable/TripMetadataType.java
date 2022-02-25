@@ -19,12 +19,14 @@ public class TripMetadataType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("searchWindowUsed")
-            .description("The search-window used in the current trip request. Use the value in "
-                + "the next request and set the request 'dateTime' to "
-                + "'nextDateTime' or 'prevDateTime' to get the previous/next "
-                + "\"window\" of results. No duplicate trips should be returned, "
-                + "unless a trip is delayed and new realtime-data is available." + "Unit: minutes.")
-            .deprecate("Use pageCursor instead")
+            .description(
+                    "This is the time window used by the raptor search. The input searchWindow "
+                    + "is an optional parameter and is dynamically assigned if not set. OTP might "
+                    + "override the value if it is too small or too large. When paging OTP adjusts "
+                    + "it to the appropriate size, depending on the number of itineraries found in "
+                    + "the current search window. The scaling of the search window ensures faster "
+                    + "paging and limits resource usage. The unit is seconds."
+            )
             .type(new GraphQLNonNull(Scalars.GraphQLInt))
             .dataFetcher(e -> ((TripSearchMetadata) e.getSource()).searchWindowUsed.toMinutes())
             .build())

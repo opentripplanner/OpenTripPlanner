@@ -53,7 +53,7 @@ public interface TransferOptimized {
      *
      * @see TransferWaitTimeCostCalculator
      */
-    int waitTimeOptimizedCost();
+    int generalizedCostWaitTimeOptimized();
 
     /**
      * Optimize so that the transfers happens as early as possible. This is normally the case when

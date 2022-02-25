@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.routing.algorithm.raptor.transit.cost.DefaultCostCalculator;
-import org.opentripplanner.routing.algorithm.raptor.transit.cost.McCostParamsBuilder;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.debug.TestDebugLogger;
+import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -31,14 +31,18 @@ import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
 
-  private static final TransferConstraint GUARANTEED = TransferConstraint.create()
-          .guaranteed().build();
+  public static final TransferConstraint TX_GUARANTEED = TransferConstraint.create().guaranteed()
+          .build();
+  public static final TransferConstraint TX_NOT_ALLOWED = TransferConstraint.create().notAllowed()
+          .build();
+  public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint.create().minTransferTime(3600)
+          .build();
 
   private final List<List<RaptorTransfer>> transfersFromStop = new ArrayList<>();
   private final List<List<RaptorTransfer>> transfersToStop = new ArrayList<>();
   private final List<Set<TestRoute>> routesByStop = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
-  private final List<ConstrainedTransfer> guaranteedTransfers = new ArrayList<>();
+  private final List<ConstrainedTransfer> constrainedTransfers = new ArrayList<>();
   private final McCostParamsBuilder costParamsBuilder = new McCostParamsBuilder();
 
   @Override
@@ -137,7 +141,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     if(debug.stops().isEmpty()) {
       debug.addStops(stopsVisited());
     }
-    var logger = new TestDebugLogger(true);
+    var logger = new SystemErrDebugLogger(true);
 
     debug
         .stopArrivalListener(logger::stopArrivalLister)
@@ -175,26 +179,33 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
           TestTripSchedule fromTrip, int fromStop,
           TestTripSchedule toTrip, int toStop
   ) {
+    return withConstrainedTransfer(fromTrip, fromStop, toTrip, toStop, TX_GUARANTEED);
+  }
+
+  public void clearConstrainedTransfers() {
+    constrainedTransfers.clear();
+    for (TestRoute route : routes) {
+      route.clearTransferConstraints();
+    }
+  }
+
+  public TestTransitData withConstrainedTransfer(
+          TestTripSchedule fromTrip, int fromStop,
+          TestTripSchedule toTrip, int toStop,
+          TransferConstraint constraint
+  ) {
     int fromStopPos = fromTrip.pattern().findStopPositionAfter(0, fromStop);
     int toStopPos = toTrip.pattern().findStopPositionAfter(0, toStop);
 
     for (TestRoute route : routes) {
-      for (int i = 0; i < route.timetable().numberOfTripSchedules(); i++) {
-        var trip = route.timetable().getTripSchedule(i);
-        if(toTrip == trip) {
-          route.addGuaranteedTxForwardSearch(fromTrip, fromStopPos, trip, i, toStopPos);
-        }
-        if(fromTrip == trip) {
-          route.addGuaranteedTxReverseSearch(toTrip, toStopPos, trip, i, fromStopPos);
-        }
-      }
+      route.addTransferConstraint(fromTrip, fromStopPos, toTrip, toStopPos, constraint);
     }
-    guaranteedTransfers.add(
+    constrainedTransfers.add(
         new ConstrainedTransfer(
             null,
-            new TestTransferPoint(fromStop, fromTrip),
-            new TestTransferPoint(toStop, toTrip),
-            GUARANTEED
+            new TestTransferPoint(fromStop, fromTrip, false),
+            new TestTransferPoint(toStop, toTrip, false),
+            constraint
         )
     );
     return this;
@@ -204,13 +215,13 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     return costParamsBuilder;
   }
 
-  public ConstrainedTransfer findGuaranteedTransfer(
+  public ConstrainedTransfer findConstrainedTransfer(
           TestTripSchedule fromTrip,
           int fromStop,
           TestTripSchedule toTrip,
           int toStop
   ) {
-    for (ConstrainedTransfer tx : guaranteedTransfers) {
+    for (ConstrainedTransfer tx : constrainedTransfers) {
       if(
           ((TestTransferPoint)tx.getFrom()).matches(fromTrip, fromStop) &&
           ((TestTransferPoint)tx.getTo()).matches(toTrip, toStop)
@@ -226,7 +237,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
       @Override protected ConstrainedTransfer findTransfer(
               TripStopTime<TestTripSchedule> from, TestTripSchedule toTrip, int toStop
       ) {
-        return findGuaranteedTransfer(from.trip(), from.stop(), toTrip, toStop);
+        return findConstrainedTransfer(from.trip(), from.stop(), toTrip, toStop);
       }
     };
   }

@@ -118,6 +118,10 @@ public abstract class StationElement extends TransitEntity {
    * (element).
    */
   public boolean isPartOfSameStationAs(StopLocation other) {
+    if (other == null) {
+      return false;
+    }
+
     return isPartOfStation() && parentStation.equals(other.getParentStation());
   }
 

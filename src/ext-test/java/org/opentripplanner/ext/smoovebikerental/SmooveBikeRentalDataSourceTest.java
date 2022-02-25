@@ -13,14 +13,14 @@ class SmooveBikeRentalDataSourceTest {
     void makeStation() {
         SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource(
                 new SmooveBikeRentalDataSourceParameters(
-                        "file:src/test/resources/bike/smoove.json",
+                        "file:src/ext-test/resources/smoovebikerental/smoove.json",
                         null,
                         true,
                         Map.of()
                 )
         );
         assertTrue(source.update());
-        List<VehicleRentalPlace> rentalStations = source.getStations();
+        List<VehicleRentalPlace> rentalStations = source.getUpdates();
 
         // Invalid station without coordinates shoulf be ignored, so only 3
         assertEquals(4, rentalStations.size());
@@ -79,14 +79,14 @@ class SmooveBikeRentalDataSourceTest {
     void makeStationWithoutOverloading() {
         SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource(
                 new SmooveBikeRentalDataSourceParameters(
-                        "file:src/test/resources/bike/smoove.json",
+                        "file:src/ext-test/resources/smoovebikerental/smoove.json",
                         null,
                         false,
                         Map.of()
                 )
         );
         assertTrue(source.update());
-        List<VehicleRentalPlace> rentalStations = source.getStations();
+        List<VehicleRentalPlace> rentalStations = source.getUpdates();
 
         VehicleRentalPlace hamn = rentalStations.get(0);
         assertEquals(11, hamn.getSpacesAvailable());

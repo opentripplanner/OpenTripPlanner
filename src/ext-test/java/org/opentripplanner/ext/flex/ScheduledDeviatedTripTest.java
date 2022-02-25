@@ -22,7 +22,8 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
@@ -35,7 +36,9 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 
 /**
  * This tests that the feed for the Cobb County Flex service is processed correctly. This service
@@ -171,20 +174,21 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
         var itineraries = getItineraries(from, to, router);
 
-        assertEquals(1, itineraries.size());
+        assertEquals(2, itineraries.size());
 
         var itin = itineraries.get(0);
         var leg = itin.legs.get(0);
 
-        assertEquals("cujv", leg.from.stop.getId().getId());
-        assertEquals("yz85", leg.to.stop.getId().getId());
+        assertEquals("cujv", leg.getFrom().stop.getId().getId());
+        assertEquals("yz85", leg.getTo().stop.getId().getId());
 
-        var intermediateStops = leg.intermediateStops;
+        var intermediateStops = leg.getIntermediateStops();
         assertEquals(1, intermediateStops.size());
         assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
+        EncodedPolylineBean legGeometry = PolylineEncoder.createEncodings(leg.getLegGeometry());
         assertThatPolylinesAreEqual(
-                leg.legGeometry.getPoints(),
+                legGeometry.getPoints(),
                 "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"
         );
 
@@ -203,7 +207,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
         var feedId = graph.getFeedIds().iterator().next();
         var pattern = graph.tripPatternForId.get(new FeedScopedId(feedId, "090z:0:01"));
 
-        assertEquals(3, pattern.getStops().size());
+        assertEquals(3, pattern.numberOfStops());
 
         var tripTimes = pattern.getScheduledTimetable().getTripTimes(0);
         var arrivalTime = tripTimes.getArrivalTime(1);
@@ -226,15 +230,19 @@ public class ScheduledDeviatedTripTest extends FlexTest {
             Router router
     ) {
         RoutingRequest request = new RoutingRequest();
-        Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 25, 12, 0, 0);
+        Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
         request.setDateTime(dateTime);
         request.from = from;
         request.to = to;
 
+        var time = dateTime.atZone(ZoneId.of("America/New_York"));
+        var additionalSearchDays = AdditionalSearchDays.defaults(time);
+
         var result = TransitRouter.route(
                 request,
                 router,
-                dateTime.atZone(ZoneId.of("America/New_York")),
+                time,
+                additionalSearchDays,
                 new DebugTimingAggregator()
         );
 

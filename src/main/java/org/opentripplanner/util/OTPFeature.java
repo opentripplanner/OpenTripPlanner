@@ -19,23 +19,24 @@ public enum OTPFeature {
     APIServerInfo(true),
     APIGraphInspectorTile(true),
     APIUpdaterStatus(true),
+    MinimumTransferTimeIsDefinitive(false),
     OptimizeTransfers(true),
-    ParallelRouting(true),
+    ParallelRouting(false),
     TransferConstraints(true),
 
     // Sandbox extension features - Must be turned OFF by default
     ActuatorAPI(false),
+    DataOverlay(false),
     FlexRouting(false),
     FloatingBike(false),
     GoogleCloudStorage(false),
     ReportApi(false),
-    SandboxAPITransmodelApi(false),
     SandboxAPILegacyGraphQLApi(false),
     SandboxAPIMapboxVectorTilesApi(false),
+    SandboxAPITransmodelApi(false),
     SandboxExampleAPIGraphStatistics(false),
     SandboxAPIParkAndRideApi(false),
-    TransferAnalyzer(false),
-    DataOverlay(false);
+    TransferAnalyzer(false);
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 

@@ -45,6 +45,7 @@ import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.ext.transmodelapi.model.framework.AuthorityType;
+import org.opentripplanner.ext.transmodelapi.model.framework.BrandingType;
 import org.opentripplanner.ext.transmodelapi.model.framework.InfoLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.MultilingualStringType;
 import org.opentripplanner.ext.transmodelapi.model.framework.NoticeType;
@@ -144,6 +145,7 @@ public class TransmodelGraphQLSchema {
     GraphQLOutputType serverInfoType = ServerInfoType.create();
     GraphQLOutputType authorityType = AuthorityType.create(LineType.REF, PtSituationElementType.REF, gqlUtil);
     GraphQLOutputType operatorType = OperatorType.create(LineType.REF, ServiceJourneyType.REF, gqlUtil);
+    GraphQLOutputType brandingType = BrandingType.create();
     GraphQLOutputType noticeType = NoticeType.create();
     GraphQLOutputType rentalVehicleTypeType = RentalVehicleTypeType.create();
 
@@ -185,7 +187,8 @@ public class TransmodelGraphQLSchema {
           presentationType,
           JourneyPatternType.REF,
           ServiceJourneyType.REF,
-          PtSituationElementType.REF
+          PtSituationElementType.REF,
+          brandingType
       );
       GraphQLOutputType interchangeType = InterchangeType.create(lineType, ServiceJourneyType.REF);
 
@@ -598,7 +601,7 @@ public class TransmodelGraphQLSchema {
           .argument(GraphQLArgument.newArgument()
               .name("maximumDistance")
               .description("Maximum distance (in meters) to search for from the specified location. Default is 2000m.")
-              .defaultValue(2000)
+              .defaultValueProgrammatic(2000)
               .type(new GraphQLNonNull(Scalars.GraphQLFloat))
               .build())
           .argument(GraphQLArgument.newArgument()
@@ -760,8 +763,10 @@ public class TransmodelGraphQLSchema {
                 .type(new GraphQLNonNull(Scalars.GraphQLID))
                 .build())
             .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment).getRouteForId(TransitIdMapper
-                  .mapIDToDomain(environment.getArgument("id")));
+                final String id = environment.getArgument("id");
+                if (id.isBlank()) { return null; }
+                return GqlUtil.getRoutingService(environment)
+                        .getRouteForId(TransitIdMapper.mapIDToDomain(id));
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -857,11 +862,7 @@ public class TransmodelGraphQLSchema {
                     .filter(route -> publicCodes.contains(route.getShortName()));
               }
               if (environment.getArgument("transportModes") != null) {
-
-                Set<TraverseMode> modes = (
-                    (List<TraverseMode>) environment.getArgument("transportModes")
-                ).stream().filter(TraverseMode::isTransit).collect(Collectors.toSet());
-                // TODO OTP2 - FIX THIS, THIS IS A BUG
+                Set<TransitMode> modes = Set.copyOf(environment.getArgument("transportModes"));
                 stream = stream.filter(route -> modes.contains(route.getMode()));
               }
               if ((environment.getArgument("authorities") instanceof Collection)) {

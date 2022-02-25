@@ -26,6 +26,7 @@ config:
     GeoJson: org.locationtech.jts.geom.Geometry
   mappers:
     Agency: org.opentripplanner.model.Agency#Agency
+    RouteType: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel#LegacyGraphQLRouteTypeModel
     Alert: org.opentripplanner.routing.alertpatch.TransitAlert#TransitAlert
     AlertCauseType: String
     AlertEffectType: String
@@ -49,7 +50,7 @@ config:
     fare: java.util.Map#Map<String, Object>
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
     Feed: String
-    Geometry: org.opentripplanner.util.model.EncodedPolylineBean#EncodedPolylineBean
+    Geometry: org.locationtech.jts.geom.Geometry#Geometry
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
     Mode: String
@@ -60,7 +61,7 @@ config:
     placeAtDistance: org.opentripplanner.routing.graphfinder.PlaceAtDistance#PlaceAtDistance
     placeAtDistanceConnection: graphql.relay.Connection#Connection<PlaceAtDistance>
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
-    Plan: org.opentripplanner.routing.api.response.RoutingResponse#RoutingResponse
+    Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     RealtimeState: String
     Route: org.opentripplanner.model.Route#Route
     serviceTimeRange: Object
@@ -69,13 +70,14 @@ config:
     stopAtDistance: org.opentripplanner.routing.graphfinder.NearbyStop#NearbyStop
     stopAtDistanceConnection: graphql.relay.Connection#Connection<NearbyStop>
     stopAtDistanceEdge: graphql.relay.Edge#Edge<NearbyStop>
-    StopOnRoute: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRoute#LegacyGraphQLStopOnRoute
-    StopOnTrip: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTrip#LegacyGraphQLStopOnTrip
+    StopOnRoute: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel#LegacyGraphQLStopOnRouteModel
+    StopOnTrip: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel#LegacyGraphQLStopOnTripModel
     Stoptime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
     TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.model.Trip#Trip
+    Unknown: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel#LegacyGraphQLUnknownModel
     VehicleParking: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     VehicleParkingSpaces: org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces#VehicleParkingSpaces
     VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParkingState#VehicleParkingState

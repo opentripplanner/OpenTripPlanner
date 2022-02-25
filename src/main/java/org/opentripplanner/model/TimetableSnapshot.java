@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,6 +159,32 @@ public class TimetableSnapshot {
 
         return pattern.getScheduledTimetable();
     }
+
+    public void removeRealtimeUpdatedTripTimes(TripPattern tripPattern, FeedScopedId tripId, ServiceDate serviceDate) {
+        SortedSet<Timetable> sortedTimetables = this.timetables.get(tripPattern);
+        if (sortedTimetables != null) {
+
+            TripTimes tripTimesToRemove = null;
+            for (Timetable timetable : sortedTimetables) {
+                if (timetable.isValidFor(serviceDate)) {
+                    final int tripIndex = timetable.getTripIndex(tripId);
+                    if (tripIndex == -1) {
+                        LOG.debug("No triptimes to remove for trip {}", tripId);
+                    } else if (tripTimesToRemove != null) {
+                        LOG.debug("Found two triptimes to remove for trip {}", tripId);
+                    } else {
+                        tripTimesToRemove = timetable.getTripTimes(tripIndex);
+                    }
+                }
+            }
+
+            if (tripTimesToRemove != null) {
+                for (Timetable sortedTimetable : sortedTimetables) {
+                    sortedTimetable.getTripTimes().remove(tripTimesToRemove);
+                }
+            }
+        }
+    }
     
     /**
      * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as
@@ -223,13 +249,16 @@ public class TimetableSnapshot {
         if (tripIndex == -1) {
             // Trip not found, add it
             tt.addTripTimes(updatedTripTimes);
+        } else {
+            // Set updated trip times of trip
+            tt.setTripTimes(tripIndex, updatedTripTimes);
+        }
+
+        if (pattern.isCreatedByRealtimeUpdater()) {
             // Remember this pattern for the added trip id and service date
             FeedScopedId tripId = updatedTripTimes.getTrip().getId();
             TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
             lastAddedTripPattern.put(tripIdAndServiceDate, pattern);
-        } else {
-            // Set updated trip times of trip
-            tt.setTripTimes(tripIndex, updatedTripTimes);
         }
 
         // To make these trip patterns visible for departureRow searches.
@@ -323,6 +352,15 @@ public class TimetableSnapshot {
                 feedId.equals(lastAddedTripPattern.getTripId().getFeedId())
         );
     }
+
+    /**
+     * Removes the latest added trip pattern from the cache. This should be done when removing the
+     * trip times from the timetable the trip has been added to.
+     */
+    public void removeLastAddedTripPattern(FeedScopedId feedScopedTripId, ServiceDate serviceDate) {
+        lastAddedTripPattern.remove(new TripIdAndServiceDate(feedScopedTripId, serviceDate));
+    }
+
 
     /**
      * Removes all Timetables which are valid for a ServiceDate on-or-before the one supplied.

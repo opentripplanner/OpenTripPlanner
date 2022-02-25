@@ -340,9 +340,9 @@ otp.modules.planner.PlannerModule =
        	    queryParams = {
                 fromPlace: this.getStartOTPString(),
                 toPlace: this.getEndOTPString(),
-                time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format("h:mma"),
+                time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format(otp.config.apiTimeFormat),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
-                date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
+                date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format(otp.config.apiDateFormat) : moment().format(otp.config.apiDateFormat),
                 mode: this.mode
             };
             if(this.mode !== "CAR") _.extend(queryParams, { maxWalkDistance: this.maxWalkDistance} );
@@ -522,7 +522,9 @@ otp.modules.planner.PlannerModule =
             // draw the polyline
             var polyline = new L.Polyline(otp.util.Geo.decodePolyline(leg.legGeometry.points));
             var weight = 8;
-            polyline.setStyle({ color : this.getModeColor(leg.mode), weight: weight});
+            var legColor = otp.util.Itin.getLegBackgroundColor(leg);
+
+            polyline.setStyle({ color : legColor, weight: weight});
             this.pathLayer.addLayer(polyline);
             polyline.leg = leg;
             polyline.bindPopup("("+leg.routeShortName+") "+leg.routeLongName);

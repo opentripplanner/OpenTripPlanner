@@ -85,10 +85,10 @@ public class GraphIndex {
         for (TripPattern pattern : graph.tripPatternForId.values()) {
             patternsForFeedId.put(pattern.getFeedId(), pattern);
             patternsForRoute.put(pattern.getRoute(), pattern);
-            for (Trip trip : pattern.getTrips()) {
+            pattern.scheduledTripsAsStream().forEach(trip -> {
                 patternForTrip.put(trip, pattern);
                 tripForId.put(trip.getId(), trip);
-            }
+            });
             for (StopLocation stop : pattern.getStops()) {
                 patternsForStopId.put(stop, pattern);
             }
@@ -188,7 +188,7 @@ public class GraphIndex {
     }
 
     /**
-     * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
+     * Returns all the patterns for a specific stop. If timetableSnapshot is included, new patterns
      * added by realtime updates are added to the collection. A set is used here because trip
      * patterns that were updated by realtime data is both part of the GraphIndex and the
      * TimetableSnapshot.

@@ -19,16 +19,16 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * This toString builder witch add elements to a compact string of the form:
+ * This toString builder which add elements to a compact string of the form:
  * <p>
  * {@code ClassName{field1:value, field2:value, ...}}
  * <p>
  * Fields equals to 'ignoreValue' is NOT added to the result string. This produces a short and easy
  * to read result. You should use {@code null} as 'ignoreValue' if the field is nullable.
  * <p>
- * The naming of the 'add' methods should give a hint to witch type the value have, this make it
+ * The naming of the 'add' methods should give a hint to which type the value have, this make it
  * easier to choose the right method and less error prune as compared with relaying on pure
- * override, witch often result in a wrong method call.
+ * override, which often result in a wrong method call.
  * <p>
  * The builder should be independent of locale, the value should always be formatted the same way,
  * this allows us to use the toString in unit tests.

@@ -31,7 +31,7 @@ public class VehicleRentalUpdaterParameters implements PollingGraphUpdaterParame
     return configRef;
   }
 
-  VehicleRentalDataSourceParameters sourceParameters() {
+  public VehicleRentalDataSourceParameters sourceParameters() {
     return source;
   }
 }

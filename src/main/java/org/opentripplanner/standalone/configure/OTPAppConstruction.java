@@ -55,7 +55,7 @@ public class OTPAppConstruction {
     }
 
     /**
-     * Create or retrieve a data store witch provide access to files, remote or local.
+     * Create or retrieve a data store which provide access to files, remote or local.
      */
     public OtpDataStore store() {
         if(store == null) {

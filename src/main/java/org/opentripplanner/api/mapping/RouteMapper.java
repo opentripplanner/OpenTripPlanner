@@ -3,6 +3,7 @@ package org.opentripplanner.api.mapping;
 import org.opentripplanner.api.model.ApiRoute;
 import org.opentripplanner.api.model.ApiRouteShort;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Branding;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,14 +25,20 @@ public class RouteMapper {
         api.shortName = domain.getShortName();
         api.longName = domain.getLongName();
         api.mode = TraverseModeMapper.mapToApi(domain.getMode());
-        api.type = domain.getType();
+        api.type = domain.getGtfsType() != null
+            ? domain.getGtfsType()
+            : RouteTypeMapper.mapToApi(domain.getMode());
         api.desc = domain.getDesc();
         api.url = domain.getUrl();
         api.color = domain.getColor();
         api.textColor = domain.getTextColor();
         api.bikesAllowed = BikeAccessMapper.mapToApi(domain.getBikesAllowed());
         api.sortOrder = domain.isSortOrderSet() ? domain.getSortOrder() : null;
-        api.brandingUrl = domain.getBrandingUrl();
+
+        Branding branding = domain.getBranding();
+        if (branding != null) {
+            api.brandingUrl = branding.getUrl();
+        }
 
         return api;
     }

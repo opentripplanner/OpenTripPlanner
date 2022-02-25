@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -11,6 +12,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -91,7 +93,7 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
 
     @Override
     public boolean exceedsTimeLimit(int time) {
-        return isBest(earliestAcceptableDepartureTime, time);
+        return isBefore(earliestAcceptableDepartureTime, time);
     }
 
     @Override
@@ -101,9 +103,13 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public boolean isBest(final int subject, final int candidate) {
-        // The latest time is the best when searching in reverse
+    public boolean isBefore(final int subject, final int candidate) {
         return subject > candidate;
+    }
+
+    @Override
+    public boolean isAfter(int subject, int candidate) {
+        return subject < candidate;
     }
 
     @Override
@@ -158,12 +164,16 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+    public RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+        if (timeTable.useCustomizedTripSearch()) {
+            return timeTable.createCustomizedTripSearch(SearchDirection.REVERSE);
+        }
+
         return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, timeTable);
     }
 
     @Override
-    public TripScheduleSearch<T> createExactTripSearch(
+    public RaptorTripScheduleSearch<T> createExactTripSearch(
             RaptorTimeTable<T> timeTable
     ) {
         return new TripScheduleExactMatchSearch<>(

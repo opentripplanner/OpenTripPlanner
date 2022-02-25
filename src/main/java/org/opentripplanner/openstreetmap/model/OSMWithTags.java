@@ -3,6 +3,10 @@ package org.opentripplanner.openstreetmap.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.function.Consumer;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -118,6 +122,24 @@ public class OSMWithTags {
         }
         return null;
     }
+
+    /**
+     * Get tag and convert it to an integer. If the tag exist, but can not be parsed into a
+     * number, then the error handler is called with the value witch failed to parse.
+     */
+    public OptionalInt getTagAsInt(String tag, Consumer<String> errorHandler) {
+        String value = getTag(tag);
+        if (value != null) {
+            try {
+                return OptionalInt.of(Integer.parseInt(value));
+            }
+            catch (NumberFormatException e) {
+                errorHandler.accept(value);
+            }
+        }
+        return OptionalInt.empty();
+    }
+
 
     /**
      * Checks is a tag contains the specified value.

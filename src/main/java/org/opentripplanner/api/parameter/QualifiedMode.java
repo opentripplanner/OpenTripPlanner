@@ -1,24 +1,39 @@
 package org.opentripplanner.api.parameter;
 
-import com.google.common.collect.Sets;
 import javax.ws.rs.BadRequestException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 
 public class QualifiedMode implements Serializable {
     private static final long serialVersionUID = 1L;
     
     public final ApiRequestMode mode;
-    public final Set<Qualifier> qualifiers = Sets.newHashSet();
+    public final Set<Qualifier> qualifiers;
 
     public QualifiedMode(String qMode) {
         try {
+            Collection<Qualifier> qualifiers = new ArrayList<>();
+            StringBuilder mode = new StringBuilder();
+
             String[] elements = qMode.split("_");
-            mode = ApiRequestMode.valueOf(elements[0].trim());
+            mode.append(elements[0].trim());
             for (int i = 1; i < elements.length; i++) {
-                Qualifier q = Qualifier.valueOf(elements[i].trim());
-                qualifiers.add(q);
+                String element = elements[i].trim();
+                if(element.isBlank()) { continue; }
+                try {
+                    Qualifier q = Qualifier.valueOf(element);
+                    qualifiers.add(q);
+                }
+                catch (IllegalArgumentException e) {
+                    mode.append("_");
+                    mode.append(element);
+                }
             }
+
+            this.mode = ApiRequestMode.valueOf(mode.toString());
+            this.qualifiers = Set.copyOf(qualifiers);
         }
         catch (IllegalArgumentException | IndexOutOfBoundsException e) {
             throw new BadRequestException(
@@ -29,7 +44,7 @@ public class QualifiedMode implements Serializable {
 
     public QualifiedMode(ApiRequestMode mode, Qualifier... qualifiers) {
         this.mode = mode;
-        this.qualifiers.addAll(Set.of(qualifiers));
+        this.qualifiers = Set.of(qualifiers);
     }
 
     public String toString() {

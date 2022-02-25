@@ -132,7 +132,9 @@ otp.modules.multimodal.MultimodalPlannerModule =
         /*if(restoring) {
             this.optionsWidget.restorePlan(tripPlan);
         }*/
-        this.drawItinerary(tripPlan.itineraries[0]);
+        if (tripPlan.itineraries.length > 0) {
+            this.drawItinerary(tripPlan.itineraries[0]);
+        }
     },
 
     restoreTrip : function(queryParams) {

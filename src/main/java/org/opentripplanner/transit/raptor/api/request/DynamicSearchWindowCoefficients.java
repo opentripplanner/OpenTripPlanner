@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.api.request;
 /**
  * The dynamic search window coefficients is used to calculate EDT(earliest-departure-time),
  * LAT(latest-arrival-time) and SW(raptor-search-window) request parameters using heuristics.
- * The heuristics perform a Raptor search (one-iteration) to find a trip witch we use to find a
+ * The heuristics perform a Raptor search (one-iteration) to find a trip which we use to find a
  * lower bound for the travel duration time - the "minTransitTime". The heuristic search is used
  * for other purposes too, and is very fast.
  * <p>

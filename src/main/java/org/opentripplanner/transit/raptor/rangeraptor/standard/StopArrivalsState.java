@@ -41,13 +41,7 @@ public interface StopArrivalsState<T extends RaptorTripSchedule> {
     default void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {}
 
     @Nullable
-    default TransitArrival<T> previousTransit(int boardStopIndex) {
-        throw new IllegalStateException(
-                "The implementation of this interface is not compatible with the request" +
-                "configuration. For example the BestTimesOnlyStopArrivalsState can not be used " +
-                "with constrained transfers."
-        );
-    }
+    TransitArrival<T> previousTransit(int boardStopIndex);
 
     default Collection<Path<T>> extractPaths() { return List.of(); }
 }

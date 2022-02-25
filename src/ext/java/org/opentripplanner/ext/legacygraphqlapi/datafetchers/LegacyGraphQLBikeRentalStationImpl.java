@@ -10,6 +10,10 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import java.util.List;
 
 public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBikeRentalStation {
+
+    final String STATE_ON = "Station on";
+    final String STATE_OFF = "Station off";
+
     @Override
     public DataFetcher<Relay.ResolvedGlobalId> id() {
         return environment -> new Relay.ResolvedGlobalId(
@@ -40,10 +44,19 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<String> state() {
-        return environment ->
-                getSource(environment).isAllowDropoff() && getSource(environment).isAllowPickup()
-                        ? "Station on"
-                        : "Station off";
+        return environment -> {
+            var rentalPlace = getSource(environment);
+
+            if(rentalPlace.isFloatingVehicle() && rentalPlace.isAllowPickup()) {
+                return STATE_ON;
+            }
+            else if(rentalPlace.isAllowDropoff() && rentalPlace.isAllowPickup()) {
+               return STATE_ON;
+            }
+            else {
+                return STATE_OFF;
+            }
+        };
     }
 
     @Override

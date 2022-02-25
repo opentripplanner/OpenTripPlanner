@@ -3,6 +3,7 @@ package org.opentripplanner.inspector;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -39,6 +40,15 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
                 attrs.color = slopePalette.getColor(pse.getMaxSlope());
                 attrs.label = String.format("%.02f", pse.getMaxSlope());
             }
+        } else if (e instanceof ElevatorHopEdge) {
+            ElevatorHopEdge ehe = (ElevatorHopEdge) e;
+            if (!ehe.wheelchairAccessible) {
+                attrs.color = NO_WHEELCHAIR_COLOR;
+                attrs.label = "wheelchair=no";
+            } else {
+                attrs.color = Color.GREEN;
+                attrs.label = "elevator";
+            }
         } else {
             return false;
         }
@@ -57,7 +67,7 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
             if(((TransitStopVertex) v).getStop().getWheelchairBoarding()
                     == WheelChairBoarding.NOT_POSSIBLE)
                 attrs.color = NO_WHEELCHAIR_COLOR;
-            attrs.label = v.getName();
+            attrs.label = v.getDefaultName();
         } else  {
             return false;
         }

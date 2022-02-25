@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -24,7 +26,6 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
@@ -44,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, CarPickupableEdge {
 
-    private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
     private StreetEdgeCostExtension costExtension;
 
@@ -56,8 +57,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     public static final int CLASS_OTHERPATH = 5;
     public static final int CLASS_OTHER_PLATFORM = 8;
     public static final int CLASS_TRAIN_PLATFORM = 16;
-    public static final int ANY_PLATFORM_MASK = 24;
-    public static final int CROSSING_CLASS_MASK = 7; // ignore platform
     public static final int CLASS_LINK = 32; // on/offramps; OSM calls them "links"
 
     private static final double GREENWAY_SAFETY_FACTOR = 0.1;
@@ -118,6 +117,23 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
+
+    /**
+     * The set of turn restrictions of this edge. Since most instances don't have any, we reuse
+     * a global instance in order to conserve memory.
+     *
+     * This field is optimized for low memory consumption and fast access, but modification is
+     * synchronized since it can happen concurrently.
+     *
+     * Why not use null to represent no turn restrictions?
+     * This would mean that the access would also need to be synchronized but since that is a very
+     * hot code path, it needs to be fast.
+     *
+     * Why not use a concurrent collection?
+     * That would mean that every StreetEdge has its own empty instance which would increase
+     * memory significantly.
+     */
+    private List<TurnRestriction> turnRestrictions = List.of();
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       I18NString name, double length,
@@ -383,7 +399,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                     time = weight = getEffectiveBikeDistance() / speed;
                 } else {
                     // take slopes into account when walking
-                    // FIXME: this causes steep stairs to be avoided. see #1297.
                     time = weight = getEffectiveWalkDistance() / speed;
                 }
                 break;
@@ -539,7 +554,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             // NOTE: Automobiles have variable speeds depending on the edge type
             return calculateCarSpeed(options);
         }
-        return options.getSpeed(traverseMode, walkingBike);
+        final double speed = options.getSpeed(traverseMode, walkingBike);
+        return isStairs() ? (speed / options.stairsTimeFactor) : speed;
     }
 
     /**
@@ -591,7 +607,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     }
     
     public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
-        for (TurnRestriction turnRestriction : getTurnRestrictions(state.getOptions().rctx.graph)) {
+        for (TurnRestriction turnRestriction : turnRestrictions) {
             /* FIXME: This is wrong for trips that end in the middle of turnRestriction.to
              */
 
@@ -612,21 +628,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         return true;
     }
 
-	@Override
-	public String getName() {
-		return this.name.toString();
-	}
-
 	/**
 	* Gets non-localized I18NString (Used when splitting edges)
 	* @return non-localized Name
 	*/
-	public I18NString getRawName() {
+	public I18NString getName() {
 		return this.name;
-	}
-
-	public String getName(Locale locale) {
-		return this.name.toString(locale);
 	}
 
 	public void setName(I18NString name) {
@@ -765,17 +772,13 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 		return (int) Math.round(this.outAngle * 180 / 128.0);
 	}
 
-    protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
-        return graph.getTurnRestrictions(this);
-    }
-
     public void setCostExtension(StreetEdgeCostExtension costExtension) {
         this.costExtension = costExtension;
     }
 
     /** Split this street edge and return the resulting street edges. After splitting, the original
      * edge will be removed from the graph. */
-    public P2<StreetEdge> splitDestructively(SplitterVertex v, Graph graph) {
+    public P2<StreetEdge> splitDestructively(SplitterVertex v) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
         StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, permission, this.isBack());
@@ -829,7 +832,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         }
 
         var splitEdges = new P2<>(e1, e2);
-        copyRestrictionsToSplitEdges(this, splitEdges, graph);
+        copyRestrictionsToSplitEdges(this, splitEdges);
         return splitEdges;
     }
 
@@ -838,8 +841,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     public P2<StreetEdge> splitNonDestructively(
         SplitterVertex v,
         DisposableEdgeCollection tempEdges,
-        LinkingDirection direction,
-        Graph graph
+        LinkingDirection direction
     ) {
         P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
@@ -852,6 +854,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             e1.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
             e1.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e1.setStreetClass(this.getStreetClass());
+            e1.setStairs(this.isStairs());
             tempEdges.addEdge(e1);
         }
         if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
@@ -860,11 +863,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             e2.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
             e2.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
             e2.setStreetClass(this.getStreetClass());
+            e2.setStairs(this.isStairs());
             tempEdges.addEdge(e2);
         }
 
         var splitEdges = new P2<>(e1, e2);
-        copyRestrictionsToSplitEdges(this, splitEdges, graph);
+        copyRestrictionsToSplitEdges(this, splitEdges);
         return splitEdges;
     }
 
@@ -872,27 +876,26 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * Copy restrictions having former edge as from to appropriate split edge, as well as
      * restrictions on incoming edges.
      */
-    private static void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> splitEdges, Graph graph) {
+    private static void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> splitEdges) {
 
-        graph.getTurnRestrictions(edge).forEach(restriction -> {
+        edge.getTurnRestrictions().forEach(restriction -> {
             // figure which one is the "from" edge
             StreetEdge fromEdge = shouldUseFirstSplitEdge(edge, restriction) ? splitEdges.first : splitEdges.second;
 
             TurnRestriction splitTurnRestriction = new TurnRestriction(fromEdge, restriction.to,
-                    restriction.type, restriction.modes
+                    restriction.type, restriction.modes, restriction.time
             );
-            splitTurnRestriction.time = restriction.time;
             LOG.debug(
                     "Recreate new restriction {} with split edge as from edge {}", splitTurnRestriction,
                     fromEdge
             );
-            graph.addTurnRestriction(fromEdge, splitTurnRestriction);
+            fromEdge.addTurnRestriction(splitTurnRestriction);
             // Not absolutely necessary, as old edge will not be accessible, but for good housekeeping
-            graph.removeTurnRestriction(edge, restriction);
+            edge.removeTurnRestriction(restriction);
         });
 
-        applyToAdjacentEdges(edge, splitEdges.second, edge.getToVertex().getOutgoing(), graph);
-        applyToAdjacentEdges(edge, splitEdges.first, edge.getFromVertex().getIncoming(), graph);
+        applyToAdjacentEdges(edge, splitEdges.second, edge.getToVertex().getOutgoing());
+        applyToAdjacentEdges(edge, splitEdges.first, edge.getFromVertex().getIncoming());
     }
 
     private static boolean shouldUseFirstSplitEdge(StreetEdge edge, TurnRestriction restriction) {
@@ -902,32 +905,83 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     private static void applyToAdjacentEdges(
             StreetEdge formerEdge,
             StreetEdge newToEdge,
-            Collection<Edge> adjacentEdges,
-            Graph graph
+            Collection<Edge> adjacentEdges
     ) {
         adjacentEdges.stream()
-                .flatMap(originatingEdge -> graph.getTurnRestrictions(originatingEdge).stream())
+                .filter(StreetEdge.class::isInstance)
+                .map(StreetEdge.class::cast)
+                .flatMap(originatingEdge -> originatingEdge.getTurnRestrictions().stream())
                 .filter(restriction -> restriction.to == formerEdge)
-                .forEach(restriction -> applyRestrictionsToNewEdge(newToEdge, restriction, graph));
+                .forEach(restriction -> applyRestrictionsToNewEdge(newToEdge, restriction));
     }
 
     private static void applyRestrictionsToNewEdge(
             StreetEdge newEdge,
-            TurnRestriction restriction,
-            Graph graph
+            TurnRestriction restriction
     ) {
         TurnRestriction splitTurnRestriction = new TurnRestriction(restriction.from,
-                newEdge, restriction.type, restriction.modes
+                newEdge, restriction.type, restriction.modes, restriction.time
         );
-        splitTurnRestriction.time = restriction.time;
         LOG.debug(
                 "Recreate new restriction {} with split edge as to edge {}", splitTurnRestriction,
                 newEdge
         );
-        graph.addTurnRestriction(restriction.from, splitTurnRestriction);
+        restriction.from.addTurnRestriction(splitTurnRestriction);
         // Former turn restriction needs to be removed. Especially no only_turn
-        // restriction to a non existent edge must not survive
-        graph.removeTurnRestriction(restriction.from, restriction);
+        // restriction to a non-existent edge must not survive
+        restriction.from.removeTurnRestriction(restriction);
+    }
+
+    /**
+     * Add a {@link TurnRestriction} to this edge.
+     *
+     * This method is thread-safe as modifying the underlying set is synchronized.
+     */
+    public void addTurnRestriction(TurnRestriction turnRestriction) {
+        if (turnRestriction == null) { return; }
+        synchronized (this) {
+            // in order to guarantee fast access without extra allocations
+            // we make the turn restrictions unmodifiable after a copy-on-write modification
+            var temp = new HashSet<>(turnRestrictions);
+            temp.add(turnRestriction);
+            turnRestrictions = List.copyOf(temp);
+        }
+    }
+
+    /**
+     * Remove a {@link TurnRestriction} from this edge.
+     *
+     * This method is thread-safe as modifying the underlying set is synchronized.
+     */
+    public void removeTurnRestriction(TurnRestriction turnRestriction) {
+        if (turnRestriction == null) { return; }
+        synchronized (this) {
+            if (turnRestrictions.contains(turnRestriction)) {
+                if (turnRestrictions.size() == 1) {
+                    turnRestrictions = List.of();
+                }
+                else {
+                    // in order to guarantee fast access without extra allocations
+                    // we make the turn restrictions unmodifiable after a copy-on-write modification
+                    var withRemoved = new HashSet<>(turnRestrictions);
+                    withRemoved.remove(turnRestriction);
+                    turnRestrictions = List.copyOf(withRemoved);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the immutable {@link Set} of {@link TurnRestriction} that belongs to this {@link StreetEdge}.
+     *
+     * This method is thread-safe, even if {@link StreetEdge#addTurnRestriction}
+     * or {@link StreetEdge#removeTurnRestriction} is called concurrently.
+     *
+     */
+    @Nonnull
+    public Collection<TurnRestriction> getTurnRestrictions() {
+        // this can be safely returned as it's unmodifiable
+        return turnRestrictions;
     }
 
     /**

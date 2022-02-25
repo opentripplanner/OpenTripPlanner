@@ -81,7 +81,7 @@ public class StreetWithElevationEdge extends StreetEdge {
     public PackedCoordinateSequence getElevationProfile() {
         return CompactElevationProfile.uncompactElevationProfileWithRegularSamples(
                 packedElevationProfile,
-                getEffectiveWalkDistance()
+                getDistanceMeters()
         );
     }
 
@@ -99,7 +99,7 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public double getEffectiveBikeDistance() {
-        return effectiveBikeDistanceFactor * getDistanceMeters();
+        return (isStairs() ? 1 : effectiveWalkDistanceFactor) * getDistanceMeters();
     }
 
     @Override
@@ -109,12 +109,12 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public double getEffectiveWalkDistance() {
-        return effectiveWalkDistanceFactor * getDistanceMeters();
+        return (isStairs() ? 1 : effectiveWalkDistanceFactor) * getDistanceMeters();
     }
 
     @Override
     public String toString() {
-        return "StreetWithElevationEdge(" + getName() + ", " + fromv + " -> "
+        return "StreetWithElevationEdge(" + getDefaultName() + ", " + fromv + " -> "
                 + tov + " length=" + this.getDistanceMeters() + " carSpeed=" + this.getCarSpeed()
                 + " permission=" + this.getPermission() + ")";
     }

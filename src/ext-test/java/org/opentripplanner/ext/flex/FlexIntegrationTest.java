@@ -83,19 +83,19 @@ public class FlexIntegrationTest {
         assertEquals(4, itin.legs.size());
 
         var walkToBus = itin.legs.get(0);
-        assertEquals(TraverseMode.WALK, walkToBus.mode);
+        assertEquals(TraverseMode.WALK, walkToBus.getMode());
 
         var bus = itin.legs.get(1);
-        assertEquals(BUS, bus.mode);
+        assertEquals(BUS, bus.getMode());
         assertEquals("30", bus.getRoute().getShortName());
 
         var transfer = itin.legs.get(2);
-        assertEquals(TraverseMode.WALK, transfer.mode);
+        assertEquals(TraverseMode.WALK, transfer.getMode());
 
         var flex = itin.legs.get(3);
-        assertEquals(BUS, flex.mode);
+        assertEquals(BUS, flex.getMode());
         assertEquals("Zone 2", flex.getRoute().getShortName());
-        assertTrue(flex.flexibleTrip);
+        assertTrue(flex.isFlexibleTrip());
     }
 
     @Test
@@ -108,23 +108,23 @@ public class FlexIntegrationTest {
         assertEquals(5, itin.legs.size());
 
         var firstBus = itin.legs.get(0);
-        assertEquals(BUS, firstBus.mode);
+        assertEquals(BUS, firstBus.getMode());
         assertEquals("856", firstBus.getRoute().getShortName());
 
         var transferToSecondBus = itin.legs.get(1);
-        assertEquals(WALK, transferToSecondBus.mode);
+        assertEquals(WALK, transferToSecondBus.getMode());
 
         var secondBus = itin.legs.get(2);
-        assertEquals(BUS, secondBus.mode);
+        assertEquals(BUS, secondBus.getMode());
         assertEquals("30", secondBus.getRoute().getShortName());
 
         var transferToFlex = itin.legs.get(3);
-        assertEquals(WALK, transferToFlex.mode);
+        assertEquals(WALK, transferToFlex.getMode());
 
         var finalFlex = itin.legs.get(4);
-        assertEquals(BUS, finalFlex.mode);
+        assertEquals(BUS, finalFlex.getMode());
         assertEquals("Zone 2", finalFlex.getRoute().getShortName());
-        assertTrue(finalFlex.flexibleTrip);
+        assertTrue(finalFlex.isFlexibleTrip());
     }
 
     private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {

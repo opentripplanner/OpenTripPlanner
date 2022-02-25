@@ -49,8 +49,6 @@ public class ApiPlace {
      */
     public Calendar departure = null;
 
-    public String orig;
-
     public String zoneId;
 
     /**

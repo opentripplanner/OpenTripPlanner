@@ -22,7 +22,7 @@ public class StopUnlinked implements DataImportIssue {
 
     @Override
     public String getHTMLMessage() {
-        return String.format(HTMLFMT, stop.getStop().getLat(), stop.getStop().getLon(), stop.getName(), stop.getStop().getId());
+        return String.format(HTMLFMT, stop.getStop().getLat(), stop.getStop().getLon(), stop.getDefaultName(), stop.getStop().getId());
     }
 
     @Override

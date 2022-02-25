@@ -60,7 +60,7 @@ public class RoutingServiceTest extends GtfsTest {
     public void testPatternsCoherent() {
         for (Trip trip : graph.index.getTripForId().values()) {
             TripPattern pattern = graph.index.getPatternForTrip().get(trip);
-            assertTrue(pattern.getTrips().contains(trip));
+            assertTrue(pattern.scheduledTripsAsStream().anyMatch(t -> t.equals(trip)));
         }
         /* This one depends on a feed where each TripPattern appears on only one route. */
         for (Route route : graph.index.getAllRoutes()) {
@@ -70,7 +70,8 @@ public class RoutingServiceTest extends GtfsTest {
         }
         for (var stop : graph.index.getAllStops()) {
             for (TripPattern pattern : graph.index.getPatternsForStop(stop)) {
-                assertTrue(pattern.getStopPattern().containsStop(stop.getId().toString()));
+                int stopPos = pattern.findStopPosition(stop);
+                assertTrue("Stop position exist", stopPos >= 0);
             }
         }
     }

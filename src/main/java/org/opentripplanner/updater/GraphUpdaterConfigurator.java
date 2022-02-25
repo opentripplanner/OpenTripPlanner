@@ -23,10 +23,12 @@ import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +113,8 @@ public abstract class GraphUpdaterConfigurator {
         List<GraphUpdater> updaters = new ArrayList<>();
 
         for (VehicleRentalUpdaterParameters configItem : config.getVehicleRentalParameters()) {
-            updaters.add(new VehicleRentalUpdater(configItem));
+            var source = VehicleRentalDataSourceFactory.create(configItem.sourceParameters());
+            updaters.add(new VehicleRentalUpdater(configItem, source));
         }
         for (GtfsRealtimeAlertsUpdaterParameters configItem : config.getGtfsRealtimeAlertsUpdaterParameters()) {
             updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
@@ -138,7 +141,8 @@ public abstract class GraphUpdaterConfigurator {
             updaters.add(new MqttGtfsRealtimeUpdater(configItem));
         }
         for (VehicleParkingUpdaterParameters configItem : config.getVehicleParkingUpdaterParameters()) {
-            updaters.add(new VehicleParkingUpdater(configItem));
+            var source = VehicleParkingDataSourceFactory.create(configItem);
+            updaters.add(new VehicleParkingUpdater(configItem, source));
         }
         for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
             updaters.add(new WinkkiPollingGraphUpdater(configItem));

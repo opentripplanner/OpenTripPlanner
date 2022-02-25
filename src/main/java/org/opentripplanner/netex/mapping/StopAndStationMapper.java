@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.Issue;
-import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -85,9 +85,7 @@ class StopAndStationMapper {
 
         Station station = mapStopPlaceAllVersionsToStation(selectedStopPlace);
         Collection<FareZone> fareZones = mapTariffZones(selectedStopPlace);
-        TransitMode transitMode = TransitModeMapper.mapMode(
-            stopPlaceTypeMapper.getTransportMode(selectedStopPlace)
-        );
+        T2<TransitMode, String> transitMode = stopPlaceTypeMapper.map(selectedStopPlace);
 
         // Loop through all versions of the StopPlace in order to collect all quays, even if they
         // were deleted in never versions of the StopPlace
@@ -151,7 +149,7 @@ class StopAndStationMapper {
         Quay quay,
         Station station,
         Collection<FareZone> fareZones,
-        TransitMode transitMode
+        T2<TransitMode, String> transitMode
     ) {
         // TODO OTP2 - This assumption is only valid because Norway have a
         //           - national stop register, we should add all stops/quays

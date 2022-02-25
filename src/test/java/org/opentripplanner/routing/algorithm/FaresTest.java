@@ -14,7 +14,8 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -75,7 +76,7 @@ public class FaresTest {
 
         // long trip
 
-        startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
+        startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 2, 14, 0, 0);
 
         from = GenericLocation.fromStopId("Origin", portlandId, "8389");
         to = GenericLocation.fromStopId("Destination", portlandId, "1252");
@@ -123,8 +124,8 @@ public class FaresTest {
         var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
         var peakItinerary = getItineraries(from, to, onPeakStartTime, router).get(1);
         var leg = peakItinerary.legs.get(0);
-        assertTrue(toLocalTime(leg.startTime).isAfter(LocalTime.parse("08:00")));
-        assertTrue(toLocalTime(leg.startTime).isBefore(LocalTime.parse("09:00")));
+        assertTrue(toLocalTime(leg.getStartTime()).isAfter(LocalTime.parse("08:00")));
+        assertTrue(toLocalTime(leg.getStartTime()).isBefore(LocalTime.parse("09:00")));
 
         assertEquals(new Money(USD, 275), peakItinerary.fare.getFare(FareType.regular));
 
@@ -261,10 +262,14 @@ public class FaresTest {
         request.from = from;
         request.to = to;
 
+        var zonedDateTime = time.atZone(ZoneId.of("America/Los_Angeles"));
+        var additionalSearchDays = AdditionalSearchDays.defaults(zonedDateTime);
+
         var result = TransitRouter.route(
                 request,
                 router,
-                time.atZone(ZoneId.of("America/Los_Angeles")),
+                zonedDateTime,
+                additionalSearchDays,
                 new DebugTimingAggregator()
         );
         return result.getItineraries();

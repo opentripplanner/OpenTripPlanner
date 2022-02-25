@@ -40,6 +40,8 @@ public interface StopLocation {
 
   default TransitMode getVehicleType() { return null; }
 
+  default String getVehicleSubmode() { return null; }
+
   default double getLat() {
     return getCoordinate().latitude();
   }

@@ -151,14 +151,14 @@ public class Itinerary {
      * Time that the trip departs.
      */
     public Calendar startTime() {
-        return firstLeg().startTime;
+        return firstLeg().getStartTime();
     }
 
     /**
      * Time that the trip arrives.
      */
     public Calendar endTime() {
-        return lastLeg().endTime;
+        return lastLeg().getEndTime();
     }
 
     /**
@@ -166,14 +166,14 @@ public class Itinerary {
      * Unit: seconds.
      */
     public int departureDelay() {
-        return firstLeg().departureDelay;
+        return firstLeg().getDepartureDelay();
     }
     /**
      * Reflects the arrivalDelay on the last Leg
      * Unit: seconds.
      */
     public int arrivalDelay() {
-        return lastLeg().arrivalDelay;
+        return lastLeg().getArrivalDelay();
     }
 
 
@@ -189,7 +189,7 @@ public class Itinerary {
      * Total distance in meters.
      */
     public double distanceMeters() {
-        return legs.stream().mapToDouble(it -> it.distanceMeters).sum();
+        return legs.stream().mapToDouble(it -> it.getDistanceMeters()).sum();
     }
 
     /**
@@ -242,7 +242,7 @@ public class Itinerary {
     }
 
     public void timeShiftToStartAt(Calendar afterTime) {
-        Calendar startTimeFirstLeg = firstLeg().startTime;
+        Calendar startTimeFirstLeg = firstLeg().getStartTime();
         long adjustmentMilliSeconds =
             afterTime.getTimeInMillis() - startTimeFirstLeg.getTimeInMillis();
         timeShift(adjustmentMilliSeconds);
@@ -250,8 +250,8 @@ public class Itinerary {
 
     private void timeShift(long adjustmentMilliSeconds) {
         for (Leg leg : this.legs) {
-            leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + adjustmentMilliSeconds);
-            leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + adjustmentMilliSeconds);
+            leg.getStartTime().setTimeInMillis(leg.getStartTime().getTimeInMillis() + adjustmentMilliSeconds);
+            leg.getEndTime().setTimeInMillis(leg.getEndTime().getTimeInMillis() + adjustmentMilliSeconds);
         }
     }
 
@@ -274,10 +274,10 @@ public class Itinerary {
     @Override
     public String toString() {
         return ToStringBuilder.of(Itinerary.class)
-                .addStr("from", firstLeg().from.toStringShort())
-                .addStr("to", lastLeg().to.toStringShort())
-                .addTimeCal("start", firstLeg().startTime)
-                .addTimeCal("end", lastLeg().endTime)
+                .addStr("from", firstLeg().getFrom().toStringShort())
+                .addStr("to", lastLeg().getTo().toStringShort())
+                .addTimeCal("start", firstLeg().getStartTime())
+                .addTimeCal("end", lastLeg().getEndTime())
                 .addNum("nTransfers", nTransfers, -1)
                 .addDurationSec("duration", durationSeconds)
                 .addNum("generalizedCost", generalizedCost)
@@ -320,7 +320,7 @@ public class Itinerary {
     public String toStr() {
         // No translater needed, stop indexes are never passed to the builder
         PathStringBuilder buf = new PathStringBuilder(null);
-        buf.stop(firstLeg().from.name);
+        buf.stop(firstLeg().getFrom().name.toString());
 
         for (Leg leg : legs) {
             buf.sep();
@@ -328,14 +328,15 @@ public class Itinerary {
                 buf.walk((int)leg.getDuration());
             }
             else if(leg.isTransitLeg()) {
-              buf.transit(leg.mode, leg.getTrip().logInfo(), leg.startTime, leg.endTime);
+              buf.transit(
+                      leg.getMode(), leg.getTrip().logInfo(), leg.getStartTime(), leg.getEndTime());
             }
             else {
-                buf.other(leg.mode, leg.startTime, leg.endTime);
+                buf.other(leg.getMode(), leg.getStartTime(), leg.getEndTime());
             }
 
             buf.sep();
-            buf.stop(leg.to.name);
+            buf.stop(leg.getTo().name.toString());
         }
 
         buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));
