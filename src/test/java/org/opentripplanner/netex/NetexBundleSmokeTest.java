@@ -98,7 +98,7 @@ public class NetexBundleSmokeTest {
         Map<FeedScopedId, MultiModalStation> map = multiModalStations.stream()
                         .collect(Collectors.toMap(MultiModalStation::getId, s -> s));
         MultiModalStation multiModalStation = map.get(fId("NSR:StopPlace:58243"));
-        assertEquals("Bergkrystallen", multiModalStation.getName());
+        assertEquals("Bergkrystallen", multiModalStation.getName().toString());
         assertEquals(59.866603, multiModalStation.getLat(), 0.000001);
         assertEquals(10.821614, multiModalStation.getLon(), 0.000001);
         assertEquals(3, multiModalStations.size());

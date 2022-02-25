@@ -15,20 +15,17 @@ import org.onebusaway.gtfs.model.Translation;
  */
 
 public final class TranslationHelper {
-
-
     public static final String TABLE_FEED_INFO = "feed_info";
     public static final String TABLE_STOPS = "stops";
 
     public static final String STOP_NAME = "stop_name";
     public static final String STOP_URL = "stop_url";
 
-    private static String feedLanguage = null;
+    private String feedLanguage = null;
 
-    private static Map<String, Map<String, List<Translation>>> translationMap =
-            new HashMap<>();
+    private final Map<String, Map<String, List<Translation>>> translationMap = new HashMap<>();
 
-    public TranslationHelper(Collection<Translation> allTranslations, Collection<FeedInfo> feedInfos) {
+    public void importTranslations(Collection<Translation> allTranslations, Collection<FeedInfo> feedInfos) {
         if (feedInfos.iterator().hasNext()) {
             feedLanguage = feedInfos.iterator().next().getLang();
         }
@@ -77,13 +74,21 @@ public final class TranslationHelper {
         List<Translation> translationList = null;
         String key = recordSubId != null ? String.join("_", recordId, recordSubId) : recordId;
         if (tableName.equals(TABLE_FEED_INFO)) {
-            translationList = translationMap.get(tableName).get("");
+            Map<String, List<Translation>> feeds = translationMap.get(tableName);
+            if (feeds != null) {
+                translationList = feeds.get("");
+            }
         }
         else {
-            translationList = translationMap.get(tableName + "_by_record").get(key);
+            Map<String, List<Translation>> translationsByKey = translationMap.get(tableName + "_by_record");
+            if (translationsByKey != null) {
+                translationList = translationsByKey.get(key);
+            }
             if (translationList == null) {
-                translationList = translationMap.get(tableName + "_by_field")
-                        .get(defaultValue);
+                Map<String, List<Translation>> translationsByValue = translationMap.get(tableName + "_by_field");
+                if (translationsByValue != null) {
+                    translationList = translationsByValue.get(defaultValue);
+                }
             }
         }
         if (translationList != null) {

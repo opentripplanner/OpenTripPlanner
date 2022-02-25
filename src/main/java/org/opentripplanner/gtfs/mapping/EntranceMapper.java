@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.Entrance;
+import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslationHelper;
@@ -13,30 +14,24 @@ import org.opentripplanner.util.TranslationHelper;
  */
 class EntranceMapper {
 
-    private Map<org.onebusaway.gtfs.model.Stop, Entrance> mappedEntrances = new HashMap<>();
+    private final Map<org.onebusaway.gtfs.model.Stop, Entrance> mappedEntrances = new HashMap<>();
+
+    private final TranslationHelper translationHelper;
+
+    EntranceMapper(TranslationHelper translationHelper) {
+        this.translationHelper = translationHelper;
+    }
 
     Collection<Entrance> map(Collection<org.onebusaway.gtfs.model.Stop> allEntrances) {
         return MapUtils.mapToList(allEntrances, this::map);
     }
 
-    /**
-     * Map from GTFS to OTP model, {@code null} safe.
-     */
-    Entrance map(org.onebusaway.gtfs.model.Stop original) {
-        return map(original, null);
+    /** Map from GTFS to OTP model, {@code null} safe. */
+    Entrance map(org.onebusaway.gtfs.model.Stop orginal) {
+        return orginal == null ? null : mappedEntrances.computeIfAbsent(orginal, this::doMap);
     }
 
-    Entrance map(org.onebusaway.gtfs.model.Stop original, TranslationHelper translationHelper) {
-        return original == null
-                ? null
-                : mappedEntrances.computeIfAbsent(
-                        original, k -> doMap(original, translationHelper));
-    }
-
-    private Entrance doMap(
-            org.onebusaway.gtfs.model.Stop gtfsStop,
-            TranslationHelper translationHelper
-    ) {
+    private Entrance doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
         if (gtfsStop.getLocationType()
                 != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
             throw new IllegalArgumentException(
@@ -46,24 +41,16 @@ class EntranceMapper {
 
         StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
-        if (translationHelper != null) {
-            return new Entrance(
-                    base.getId(),
-                    translationHelper.getTranslation(TranslationHelper.TABLE_STOPS,
-                            TranslationHelper.STOP_NAME, base.getId().getId(),
-                            null, base.getName()
-                    ),
-                    base.getCode(),
-                    base.getDescription(),
-                    base.getCoordinate(),
-                    base.getWheelchairBoarding(),
-                    base.getLevel()
-            );
-        }
+        final I18NString name = translationHelper.getTranslation(
+                TranslationHelper.TABLE_STOPS,
+                TranslationHelper.STOP_NAME,
+                base.getId().getId(),
+                null,
+                base.getName());
 
         return new Entrance(
                 base.getId(),
-                new NonLocalizedString(base.getName()),
+                name,
                 base.getCode(),
                 base.getDescription(),
                 base.getCoordinate(),

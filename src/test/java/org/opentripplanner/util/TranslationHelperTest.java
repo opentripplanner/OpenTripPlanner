@@ -31,7 +31,7 @@ public class TranslationHelperTest {
     private static final String STOP_NAME = "stop_name";
     private static final String STOP_URL = "stop_url";
 
-    private static TranslationHelper helper = null;
+    private static final TranslationHelper helper = new TranslationHelper();
 
     //Translation's structure:
     //table_name,field_name,language,translation,record_id,record_sub_id,field_value
@@ -65,7 +65,7 @@ public class TranslationHelperTest {
             t.setFieldValue(translations[x][6]);
             ALL_TRANSLATIONS.add(t);
         }
-        helper = new TranslationHelper(ALL_TRANSLATIONS, FEED_INFOS);
+        helper.importTranslations(ALL_TRANSLATIONS, FEED_INFOS);
     }
 
     @Test

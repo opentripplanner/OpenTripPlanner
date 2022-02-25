@@ -7,6 +7,7 @@ import org.opentripplanner.model.WheelChairBoarding;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.opentripplanner.util.TranslationHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -57,7 +58,7 @@ public class BoardingAreaMapperTest  {
     STOP.setZoneId(ZONE_ID);
   }
 
-  private BoardingAreaMapper subject = new BoardingAreaMapper();
+  private BoardingAreaMapper subject = new BoardingAreaMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() {
@@ -75,7 +76,7 @@ public class BoardingAreaMapperTest  {
     assertEquals(DESC, result.getDescription());
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
-    assertEquals(NAME, result.getName());
+    assertEquals(NAME, result.getName().toString());
     assertEquals(WHEELCHAIR_BOARDING, result.getWheelchairBoarding());
   }
 
@@ -90,7 +91,7 @@ public class BoardingAreaMapperTest  {
     assertNotNull(result.getId());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertNull(result.getName());
+    assertNull(result.getName().toString());
     assertNull(result.getParentStop());
     assertNull(result.getCode());
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());

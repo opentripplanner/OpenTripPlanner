@@ -15,6 +15,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.util.TranslationHelper;
 
 public class StopTimesMapperTest {
     private static final String FEED_ID = "FEED";
@@ -68,7 +69,7 @@ public class StopTimesMapperTest {
         STOP_TIME.setTrip(TRIP);
     }
 
-    private final StopMapper stopMapper = new StopMapper();
+    private final StopMapper stopMapper = new StopMapper(new TranslationHelper());
     private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
     private final LocationMapper locationMapper = new LocationMapper();
     private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper);

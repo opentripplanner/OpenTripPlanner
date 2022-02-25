@@ -19,22 +19,19 @@ import org.opentripplanner.util.TranslationHelper;
 public class GTFSToOtpTransitServiceMapper {
     private final AgencyMapper agencyMapper;
 
-    private final StationMapper stationMapper = new StationMapper();
+    private final StationMapper stationMapper;
 
-    private final StopMapper stopMapper = new StopMapper();
+    private final StopMapper stopMapper;
 
-    private final EntranceMapper entranceMapper = new EntranceMapper();
+    private final EntranceMapper entranceMapper;
 
-    private final PathwayNodeMapper pathwayNodeMapper = new PathwayNodeMapper();
+    private final PathwayNodeMapper pathwayNodeMapper;
 
-    private final BoardingAreaMapper boardingAreaMapper = new BoardingAreaMapper();
+    private final BoardingAreaMapper boardingAreaMapper;
 
     private final LocationMapper locationMapper = new LocationMapper();
 
-    private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
-        stopMapper,
-        locationMapper
-    );
+    private final LocationGroupMapper locationGroupMapper;
 
     private final FareAttributeMapper fareAttributeMapper = new FareAttributeMapper();
 
@@ -46,12 +43,7 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final ServiceCalendarMapper serviceCalendarMapper = new ServiceCalendarMapper();
 
-    private final PathwayMapper pathwayMapper = new PathwayMapper(
-        stopMapper,
-        entranceMapper,
-        pathwayNodeMapper,
-        boardingAreaMapper
-    );
+    private final PathwayMapper pathwayMapper;
 
     private final RouteMapper routeMapper;
 
@@ -71,6 +63,8 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
+    private final TranslationHelper translationHelper;
+
     public GTFSToOtpTransitServiceMapper(
             String feedId,
             DataImportIssueStore issueStore,
@@ -78,8 +72,24 @@ public class GTFSToOtpTransitServiceMapper {
     ) {
         this.issueStore = issueStore;
         this.data = data;
+        translationHelper = new TranslationHelper();
         feedInfoMapper = new FeedInfoMapper(feedId);
         agencyMapper = new AgencyMapper(feedId);
+        stationMapper = new StationMapper(translationHelper);
+        stopMapper = new StopMapper(translationHelper);
+        entranceMapper = new EntranceMapper(translationHelper);
+        pathwayNodeMapper = new PathwayNodeMapper(translationHelper);
+        boardingAreaMapper = new BoardingAreaMapper(translationHelper);
+        locationGroupMapper = new LocationGroupMapper(
+                stopMapper,
+                locationMapper
+        );
+        pathwayMapper = new PathwayMapper(
+                stopMapper,
+                entranceMapper,
+                pathwayNodeMapper,
+                boardingAreaMapper
+        );
         routeMapper = new RouteMapper(agencyMapper, issueStore);
         tripMapper = new TripMapper(routeMapper);
         bookingRuleMapper = new BookingRuleMapper();
@@ -95,8 +105,7 @@ public class GTFSToOtpTransitServiceMapper {
     }
 
     public void mapStopTripAndRouteDatantoBuilder() {
-        TranslationHelper translationHelper =
-                new TranslationHelper(data.getAllTranslations(), data.getAllFeedInfos());
+        translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
         builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
         builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
@@ -110,7 +119,7 @@ public class GTFSToOtpTransitServiceMapper {
             builder.getShapePoints().put(shapePoint.getShapeId(), shapePoint);
         }
 
-        mapGtfsStopsToOtpTypes(data, translationHelper);
+        mapGtfsStopsToOtpTypes(data);
 
         builder.getLocations().addAll(locationMapper.map(data.getAllLocations()));
         builder.getLocationGroups().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
@@ -135,31 +144,33 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
     }
 
-    private void mapGtfsStopsToOtpTypes(GtfsRelationalDao data, TranslationHelper translationHelper) {
+
+    private void mapGtfsStopsToOtpTypes(GtfsRelationalDao data) {
         StopToParentStationLinker stopToParentStationLinker = new StopToParentStationLinker(issueStore);
         for (org.onebusaway.gtfs.model.Stop it : data.getAllStops()) {
             if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
-                Stop stop = stopMapper.map(it, translationHelper);
+                Stop stop = stopMapper.map(it);
                 builder.getStops().add(stop);
                 stopToParentStationLinker.addStationElement(stop, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
-                Station station = stationMapper.map(it, translationHelper);
+                Station station = stationMapper.map(it);
                 builder.getStations().add(station);
                 stopToParentStationLinker.addStation(station);
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
-                Entrance entrance = entranceMapper.map(it, translationHelper);
+                Entrance entrance = entranceMapper.map(it);
                 builder.getEntrances().add(entrance);
                 stopToParentStationLinker.addStationElement(entrance, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE) {
-                PathwayNode pathwayNode = pathwayNodeMapper.map(it, translationHelper);
+                PathwayNode pathwayNode = pathwayNodeMapper.map(it);
                 builder.getPathwayNodes().add(pathwayNode);
                 stopToParentStationLinker.addStationElement(pathwayNode, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA) {
-                BoardingArea boardingArea = boardingAreaMapper.map(it, translationHelper);
+                BoardingArea boardingArea = boardingAreaMapper.map(it);
                 builder.getBoardingAreas().add(boardingArea);
                 stopToParentStationLinker.addBoardingArea(boardingArea, it.getParentStation());
             }
         }
+
         stopToParentStationLinker.link();
     }
 }
