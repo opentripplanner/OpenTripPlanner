@@ -4,16 +4,12 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 import static java.util.Collections.emptyList;
 
 import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 
@@ -36,7 +32,7 @@ public final class Stops<T extends RaptorTripSchedule> {
      */
     public Stops(
             int nStops,
-            Collection<RaptorTransfer> egressPath,
+            EgressPaths egressPaths,
             DestinationArrivalPaths<T> paths,
             DebugHandlerFactory<T> debugHandlerFactory
     ) {
@@ -46,14 +42,7 @@ public final class Stops<T extends RaptorTripSchedule> {
         this.debugHandlerFactory = debugHandlerFactory;
         this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
-        Collection<Map.Entry<Integer, List<RaptorTransfer>>> groupedEgressPaths = egressPath
-            .stream()
-            .collect(Collectors.groupingBy(RaptorTransfer::stop))
-            .entrySet();
-
-        for (Map.Entry<Integer, List<RaptorTransfer>> it : groupedEgressPaths) {
-            glueTogetherEgressStopWithDestinationArrivals(it, paths);
-        }
+        glueTogetherEgressStopWithDestinationArrivals(egressPaths, paths);
     }
 
     boolean updateExist() {
@@ -107,15 +96,15 @@ public final class Stops<T extends RaptorTripSchedule> {
      * stop, the "glue" make sure new destination arrivals is added to the destination arrivals.
      */
     private void glueTogetherEgressStopWithDestinationArrivals(
-            Map.Entry<Integer, List<RaptorTransfer>> egressPaths,
+            EgressPaths egressPaths,
             DestinationArrivalPaths<T> paths
     ) {
-        int stop = egressPaths.getKey();
-        // The factory is creating the actual "glue"
-        this.stops[stop] = StopArrivalParetoSet.createEgressStopArrivalSet(
-                egressPaths,
-                paths,
-                debugHandlerFactory
-        );
+        egressPaths.byStop().forEachEntry((stop, list) -> {
+            // The factory is creating the actual "glue"
+            this.stops[stop] = StopArrivalParetoSet.createEgressStopArrivalSet(
+                    stop, list, paths, debugHandlerFactory
+            );
+            return true;
+        });
     }
 }

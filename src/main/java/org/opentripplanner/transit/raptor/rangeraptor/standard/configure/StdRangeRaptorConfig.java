@@ -186,7 +186,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         // Use the  adapter to play the role of the destination arrival check
         setDestinationCheck(pathsAdapter);
 
-        stops().setupEgressStopStates(ctx.egressPaths(), pathsAdapter::add);
+        stops().setupEgressStopStates(ctx.egressPaths(), pathsAdapter);
 
         return destinationArrivalPaths;
     }

@@ -20,6 +20,7 @@ public interface RaptorTestConstants {
   int D4m = durationInSeconds("4m");
   int D5m = durationInSeconds("5m");
   int D7m = durationInSeconds("7m");
+  int D8m = durationInSeconds("8m");
   int D10m = durationInSeconds("10m");
   int D20m = durationInSeconds("20m");
 

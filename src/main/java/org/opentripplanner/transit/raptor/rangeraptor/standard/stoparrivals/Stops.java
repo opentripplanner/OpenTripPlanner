@@ -1,12 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 
-import java.util.function.Consumer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArrivalListener;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 
 /**
  *
@@ -31,30 +32,17 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
      * Setup egress arrivals with a callback which is notified when a new transit egress arrival happens.
      */
     public void setupEgressStopStates(
-            Iterable<RaptorTransfer> egressPaths,
-            Consumer<EgressStopArrivalState<T>> transitArrivalCallback
+            EgressPaths egressPaths,
+            DestinationArrivalListener destinationArrivalListener
     ) {
-        for (int round = 1; round < stops.length; round++) {
-            for (RaptorTransfer egressPath : egressPaths) {
-                if(stops[round][egressPath.stop()] == null) {
-                    EgressStopArrivalState<T> state = new EgressStopArrivalState<>(
-                        round,
-                        egressPath,
-                        transitArrivalCallback
-                    );
-                    stops[round][egressPath.stop()] = state;
-                }
-                else {
-                    throw new IllegalStateException(""
-                        + "Currently Raptor do not support multiple access/egress paths to the "
-                        + "same stop. If this exception occurs and OTP was serving a normal "
-                        + "use-case, then this needs to be fixed. For example this needs to be "
-                        + "fixed if OTP should support more than on access/egress mode. "
-                        + "See issue #3300. Details: "
-                        + "State exist for stop: " + egressPath.stop() + ", round: " + round
-                    );
-                }
-            }
+        for (int i = 1; i < stops.length; i++) {
+            final int round = i;
+            egressPaths.byStop().forEachEntry((stop, list) -> {
+                stops[round][stop] = new EgressStopArrivalState<>(
+                        stop, round, list, destinationArrivalListener
+                );
+                return true;
+            });
         }
     }
 
@@ -137,6 +125,6 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         }
         if(state.arrivedByAccess()) { return null; }
         
-        return TransitArrival.create(state.trip(), stopIndex, state.transitTime());
+        return TransitArrival.create(state.trip(), stopIndex, state.transitArrivalTime());
     }
 }

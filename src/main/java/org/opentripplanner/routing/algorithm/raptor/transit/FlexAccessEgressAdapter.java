@@ -30,6 +30,13 @@ public class FlexAccessEgressAdapter extends AccessEgress {
   }
 
   @Override
+  public boolean hasOpeningHours() {
+    // TODO OTP2: THIS SHOULD BE IMPLEMENTED SO WE CAN FILTER FLEX ACCESS AND EGRESS
+    //            IN ROUTING, IT IS SET TO TRUE NOW TO ASSUME ALL FLEX HAS OPENING HOURS
+    return true;
+  }
+
+  @Override
   public int numberOfRides() {
     // We only support one flex leg at the moment
     return 1;

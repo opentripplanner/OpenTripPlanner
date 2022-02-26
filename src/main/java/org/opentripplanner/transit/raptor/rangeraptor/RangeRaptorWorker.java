@@ -1,13 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
-import static java.util.stream.Collectors.groupingBy;
 
 import io.micrometer.core.instrument.Timer;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -19,6 +15,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleBoardSearch;
@@ -57,6 +54,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleE
 @SuppressWarnings("Duplicates")
 public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Worker<T> {
 
+    private static final int ACCESS_ROUND_ZERO = 0;
     private final RoutingStrategy<T> transitWorker;
 
     /**
@@ -85,9 +83,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
     private final WorkerPerformanceTimers timers;
 
-    private final Map<Integer, List<RaptorTransfer>> accessArrivedByWalking;
-
-    private final Map<Integer, List<RaptorTransfer>> accessArrivedOnBoard;
+    private final AccessPaths accessPaths;
 
     private final LifeCycleEventPublisher lifeCycle;
 
@@ -107,7 +103,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             RoutingStrategy<T> transitWorker,
             RaptorTransitDataProvider<T> transitData,
             SlackProvider slackProvider,
-            Collection<RaptorTransfer> accessPaths,
+            AccessPaths accessPaths,
             RoundProvider roundProvider,
             TransitCalculator<T> calculator,
             LifeCycleEventPublisher lifeCyclePublisher,
@@ -120,9 +116,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         this.slackProvider = slackProvider;
         this.calculator = calculator;
         this.timers = timers;
-        this.accessArrivedByWalking = groupByRound(accessPaths, Predicate.not(RaptorTransfer::stopReachedOnBoard));
-        this.accessArrivedOnBoard = groupByRound(accessPaths, RaptorTransfer::stopReachedOnBoard);
-        this.minNumberOfRounds = calculateMaxNumberOfRides(accessPaths);
+        this.accessPaths = accessPaths;
+        this.minNumberOfRounds = accessPaths.calculateMaxNumberOfRides();
         this.enableTransferConstraints = enableTransferConstraints;
 
         // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
@@ -167,7 +162,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * Perform one minute of a RAPTOR search.
      */
     private void runRaptorForMinute() {
-        addAccessPaths(accessArrivedByWalking.get(0));
+        addAccessPaths(accessPaths.arrivedOnStreetByNunOfRides().get(ACCESS_ROUND_ZERO));
 
         while (hasMoreRounds()) {
             lifeCycle.prepareForNextRound(roundTracker.nextRound());
@@ -176,13 +171,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             // more transfers as that will be rare and complicates the code
             findAllTransitForRound();
 
-            addAccessPaths(accessArrivedOnBoard.get(round()));
+            addAccessPaths(accessPaths.arrivedOnBoardByNunOfRides().get(round()));
 
             transfersForRound();
 
             lifeCycle.roundComplete(state.isDestinationReachedInCurrentRound());
 
-            addAccessPaths(accessArrivedByWalking.get(round()));
+            addAccessPaths(accessPaths.arrivedOnStreetByNunOfRides().get(round()));
         }
 
         // This state is repeatedly modified as the outer loop progresses over departure minutes.
@@ -410,22 +405,6 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      */
     private int earliestBoardTime(int prevArrivalTime, int boardSlack) {
         return calculator.plusDuration(prevArrivalTime,  boardSlack);
-    }
-
-    /**
-     * Filter the given input keeping all elements satisfying the include predicate and return
-     * a unmodifiable list.
-     */
-    private  static <T extends RaptorTransfer> Map<Integer, List<T>> groupByRound(
-        Collection<T> input, Predicate<T> include
-    ) {
-        return input.stream()
-            .filter(include)
-            .collect(groupingBy(RaptorTransfer::numberOfRides));
-    }
-
-    private int calculateMaxNumberOfRides(Collection<RaptorTransfer> accessPaths) {
-        return accessPaths.stream().mapToInt(RaptorTransfer::numberOfRides).max().orElse(0);
     }
 
     // Track time spent, measure performance

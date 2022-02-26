@@ -43,6 +43,9 @@ public class AccessEgress implements RaptorTransfer {
     return durationInSeconds;
   }
 
+  @Override
+  public boolean hasOpeningHours() { return false; }
+
   public State getLastState() {
     return lastState;
   }

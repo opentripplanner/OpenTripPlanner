@@ -131,6 +131,13 @@ public final class BestTimes {
     }
 
     /**
+     * @return return true if stop is reached.
+     */
+    public boolean isStopReachedByTransit(int stop) {
+        return transitTime(stop) != calculator.unreachedTime();
+    }
+
+    /**
      * Set the initial access time at the given stop, but only if the new access
      * is better than a stop arrival from previous rounds.
      * <p/>

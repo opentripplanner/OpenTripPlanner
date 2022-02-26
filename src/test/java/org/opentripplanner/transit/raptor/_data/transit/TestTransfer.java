@@ -153,7 +153,7 @@ public class TestTransfer implements RaptorTransfer {
 
     @Override
     public int earliestDepartureTime(int requestedDepartureTime) {
-        if (opening == null || closing == null) {
+        if (!hasOpeningHours()) {
             return requestedDepartureTime;
         }
 
@@ -171,7 +171,7 @@ public class TestTransfer implements RaptorTransfer {
 
     @Override
     public int latestArrivalTime(int requestedArrivalTime) {
-        if (opening == null || closing == null) {
+        if (!hasOpeningHours()) {
             return requestedArrivalTime;
         }
 
@@ -190,6 +190,11 @@ public class TestTransfer implements RaptorTransfer {
             return closeAtArrival;
         }
         return requestedArrivalTime;
+    }
+
+    @Override
+    public boolean hasOpeningHours() {
+        return opening != null || closing != null;
     }
 
     @Override

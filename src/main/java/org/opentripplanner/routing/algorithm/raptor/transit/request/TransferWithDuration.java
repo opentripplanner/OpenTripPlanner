@@ -36,6 +36,11 @@ public class TransferWithDuration implements RaptorTransfer {
     }
 
     @Override
+    public boolean hasOpeningHours() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         return asString();
     }

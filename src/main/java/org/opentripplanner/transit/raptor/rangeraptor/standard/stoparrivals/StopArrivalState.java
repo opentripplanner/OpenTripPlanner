@@ -1,10 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.util.IntUtils;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
@@ -29,7 +27,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
     /**
      * Used to initialize all none time based attributes.
      */
-    private static final int NOT_SET = -1;
+    static final int NOT_SET = -1;
 
 
     // Best time - access, transit or transfer
@@ -69,7 +67,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         return accessOrTransferPath.durationInSeconds();
     }
 
-    public final int transitTime() {
+    public final int transitArrivalTime() {
         return transitArrivalTime;
     }
 
@@ -124,8 +122,8 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         return bestArrivalTime != NOT_SET;
     }
 
-    public void arriveByTransit(int time, int boardStop, int boardTime, T trip) {
-        this.transitArrivalTime = time;
+    public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
+        this.transitArrivalTime = arrivalTime;
         this.trip = trip;
         this.boardTime = boardTime;
         this.boardStop = boardStop;
@@ -141,7 +139,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
      * Set the time at a transit index iff it is optimal. This sets both the best time and the
      * transfer time
      */
-    public final void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
+    public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
         this.bestArrivalTime = arrivalTime;
         this.transferFromStop = fromStop;
         this.accessOrTransferPath = transferPath;
@@ -153,14 +151,22 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
 
     @Override
     public String toString() {
-      return String.format("Arrival { time: %s, Transit: %s %s-%s, trip: %s, Transfer from: %s %s }",
-                TimeUtils.timeToStrCompact(bestArrivalTime, NOT_SET),
-                IntUtils.intToString(boardStop, NOT_SET),
-                TimeUtils.timeToStrCompact(boardTime, NOT_SET),
-                TimeUtils.timeToStrCompact(transitArrivalTime, NOT_SET),
-                trip == null ? "" : trip.pattern().debugInfo(),
-                IntUtils.intToString(transferFromStop, NOT_SET),
-          accessOrTransferPath != null ? DurationUtils.durationToStr(accessOrTransferPath.durationInSeconds(), NOT_SET) : ""
-        );
+        return toStringAddBody(ToStringBuilder.of(EgressStopArrivalState.class)).toString();
     }
+
+    /** This allows subclasses to attach content and type to their own toString() */
+    ToStringBuilder toStringAddBody(ToStringBuilder builder) {
+        builder
+            .addServiceTime("time", bestArrivalTime, NOT_SET)
+            .addNum("boardStop", boardStop, NOT_SET)
+            .addServiceTime("boardTime", boardTime, NOT_SET)
+            .addServiceTime("transitArrivalTime", transitArrivalTime, NOT_SET)
+            .addObj("trip", trip == null ? null : trip.pattern().debugInfo())
+            .addNum("transferFromStop", transferFromStop, NOT_SET);
+        if(accessOrTransferPath != null) {
+            builder.addDurationSec("", accessOrTransferPath.durationInSeconds());
+        }
+        return builder;
+    }
+
 }

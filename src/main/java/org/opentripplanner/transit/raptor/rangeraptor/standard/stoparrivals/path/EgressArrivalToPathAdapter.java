@@ -1,11 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.path;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivedAtDestinationCheck;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArrivalListener;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.EgressStopArrivalState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
@@ -25,15 +27,17 @@ import org.opentripplanner.util.time.TimeUtils;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements ArrivedAtDestinationCheck {
+public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
+        ArrivedAtDestinationCheck, DestinationArrivalListener {
     private final DestinationArrivalPaths<T> paths;
     private final TransitCalculator<T> calculator;
     private final StopsCursor<T> cursor;
     private final DebugHandler<ArrivalView<?>> debugHandler;
 
     private boolean newElementSet;
-    private EgressStopArrivalState<T> bestEgressStopArrival = null;
     private int bestDestinationTime = -1;
+    private int bestRound = -1;
+    private RaptorTransfer bestEgressPath;
 
     public EgressArrivalToPathAdapter(
             DestinationArrivalPaths<T> paths,
@@ -51,18 +55,24 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
         this.debugHandler = debugHandlerFactory.debugStopArrival();
     }
 
-    public void add(EgressStopArrivalState<T> egressStopArrival) {
-        // TODO: Check earliestDepartureTime?
-        int time = destinationArrivalTime(egressStopArrival);
-        if (calculator.isBefore(time, bestDestinationTime)) {
+    @Override
+    public void newDestinationArrival(
+            int round, int fromStopArrivalTime, RaptorTransfer egressPath
+    ) {
+        int arrivalTime = calculator.plusDuration(
+                fromStopArrivalTime, egressPath.durationInSeconds()
+        );
+
+        if (calculator.isBefore(arrivalTime, bestDestinationTime)) {
             newElementSet = true;
-            bestDestinationTime = time;
-            bestEgressStopArrival = egressStopArrival;
+            bestDestinationTime = arrivalTime;
+            bestEgressPath = egressPath;
+            bestRound = round;
         } else {
             if (debugHandler != null) {
                 debugHandler.reject(
-                        cursor.stop(egressStopArrival.round(), egressStopArrival.stop()),
-                        cursor.stop(bestEgressStopArrival.round(), bestEgressStopArrival.stop()),
+                        cursor.stop(round, egressPath.stop()),
+                        cursor.stop(bestRound, bestEgressPath.stop()),
                         "A better destination arrival time for the current iteration exist: "
                                 + TimeUtils.timeToStrLong(bestDestinationTime)
                 );
@@ -72,19 +82,16 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
 
     private void setupIteration() {
         newElementSet = false;
-        bestEgressStopArrival = null;
         bestDestinationTime = calculator.unreachedTime();
+        bestEgressPath = null;
+        bestRound = -1;
     }
 
     private void roundComplete() {
         if (newElementSet) {
-            addToPath(bestEgressStopArrival);
+            addNewElementToPath();
             newElementSet = false;
         }
-    }
-
-    private int destinationArrivalTime(EgressStopArrivalState<T> arrival) {
-        return calculator.plusDuration(arrival.transitTime(), arrival.egressPath().durationInSeconds());
     }
 
     @Override
@@ -92,7 +99,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
         return newElementSet;
     }
 
-    private void addToPath(final EgressStopArrivalState<T> it) {
-        paths.add(cursor.transit(it.round(), it.stop()), it.egressPath());
+    private void addNewElementToPath() {
+        paths.add(cursor.stop(bestRound, bestEgressPath.stop()), bestEgressPath);
     }
 }
