@@ -39,7 +39,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
       = "Flex 2m 1x ~ B ~ "
       + "BUS R1 0:04 0:06 ~ C ~ "
       + "Flex 2m 1x "
-      + "[0:00:30 0:09:10 8m40s]";
+      + "[0:00:30 0:09:10 8m40s 2tx]";
 
   @BeforeEach
   public void setup() {

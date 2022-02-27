@@ -41,18 +41,18 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
 
   /** Board R1 at stop B and alight at stop E */
   private final String OPTIMAL_PATH =
-          "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s";
+          "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s 0tx";
 
   /** Board R1 at first possible stop A (not B) and arrive at stop E (the earliest arrival time) */
   public static final String EXP_PATH_BEST_ARRIVAL_TIME =
-          "Walk 1s ~ A ~ BUS R1 0:10 0:34 ~ E ~ Walk 10s [0:09:59 0:34:10 24m11s]";
+          "Walk 1s ~ A ~ BUS R1 0:10 0:34 ~ E ~ Walk 10s [0:09:59 0:34:10 24m11s 0tx]";
 
   /**
    * Searching in REVERSE we will "board" R1 at the first possible stop F and "alight" at the
    * optimal stop B (the best "arrival-time").
    */
   public static final String EXP_PATH_BEST_ARRIVAL_TIME_REVERSE =
-          "Walk 10s ~ B ~ BUS R1 0:14 0:38 ~ F ~ Walk 1s [0:13:50 0:38:01 24m11s]";
+          "Walk 10s ~ B ~ BUS R1 0:14 0:38 ~ F ~ Walk 1s [0:13:50 0:38:01 24m11s 0tx]";
 
   /** Expect the optimal path to be found. */
   private final String EXP_PATH_MIN_TRAVEL_DURATION = OPTIMAL_PATH + "]";
