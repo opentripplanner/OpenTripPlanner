@@ -46,9 +46,6 @@ final class Transfer<T extends RaptorTripSchedule>
 
     @Override
     public ArrivalView<T> previous() {
-        // The previous stop-arrival is either a transit-stop-arrival(normal case) or a FLEX-access-stop-arrival arriving
-        // on-board. Thus, we need to use the cursor `stop(...)`method and not the `transit(...)`
-        return cursor.stop(round(), arrival.transferFromStop());
+        return cursor.onBoardAccessOrTransit(round(), arrival.transferFromStop());
     }
-
 }

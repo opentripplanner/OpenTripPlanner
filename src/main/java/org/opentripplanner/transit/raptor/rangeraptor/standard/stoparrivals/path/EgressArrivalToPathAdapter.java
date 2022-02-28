@@ -8,7 +8,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivedAtDestinationCheck;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArrivalListener;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.EgressStopArrivalState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
@@ -71,8 +70,8 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
         } else {
             if (debugHandler != null) {
                 debugHandler.reject(
-                        cursor.stop(round, egressPath.stop()),
-                        cursor.stop(bestRound, bestEgressPath.stop()),
+                        arrivalState(round, egressPath),
+                        arrivalState(bestRound, bestEgressPath),
                         "A better destination arrival time for the current iteration exist: "
                                 + TimeUtils.timeToStrLong(bestDestinationTime)
                 );
@@ -100,6 +99,10 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
     }
 
     private void addNewElementToPath() {
-        paths.add(cursor.stop(bestRound, bestEgressPath.stop()), bestEgressPath);
+        paths.add(arrivalState(bestRound, bestEgressPath), bestEgressPath);
+    }
+
+    private ArrivalView<T> arrivalState(int round, RaptorTransfer egress) {
+        return cursor.stop(round, egress.stop(), egress.stopReachedOnBoard());
     }
 }

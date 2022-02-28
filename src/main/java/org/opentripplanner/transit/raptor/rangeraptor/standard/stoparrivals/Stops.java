@@ -67,10 +67,11 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
 
     void setAccessTime(int time, RaptorTransfer access) {
         final int stop = access.stop();
-        if (stops[round()][stop] == null) {
+        var other = stops[round()][stop];
+        if (other == null) {
             stops[round()][stop] = new AccessStopArrivalState<>(time, access);
         } else {
-            stops[round()][stop] = new AccessStopArrivalState<>(time, access, stops[round()][stop]);
+            stops[round()][stop] = new AccessStopArrivalState<>(time, access, other);
         }
     }
 

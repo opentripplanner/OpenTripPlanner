@@ -43,6 +43,8 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
     private int transferFromStop = NOT_SET;
     private RaptorTransfer accessOrTransferPath = null;
 
+    public StopArrivalState() { }
+
     StopArrivalState(StopArrivalState<T> other) {
         this.bestArrivalTime = other.bestArrivalTime;
         this.transitArrivalTime = other.transitArrivalTime;
@@ -52,8 +54,6 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         this.transferFromStop = other.transferFromStop;
         this.accessOrTransferPath = other.accessOrTransferPath;
     }
-
-    public StopArrivalState() { }
 
     public final int time() {
         return bestArrivalTime;
@@ -168,5 +168,4 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         }
         return builder;
     }
-
 }

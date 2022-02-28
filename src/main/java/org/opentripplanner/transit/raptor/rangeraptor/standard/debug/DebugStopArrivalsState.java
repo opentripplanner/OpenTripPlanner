@@ -39,7 +39,7 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     @Override
     public void setAccessTime(int arrivalTime, RaptorTransfer access) {
         delegate.setAccessTime(arrivalTime, access);
-        debug.acceptAccess(access.stop());
+        debug.acceptAccess(access.stop(), access.stopReachedOnBoard());
     }
 
     @Override
@@ -57,6 +57,7 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     public void setNewBestTransitTime(int stop, int alightTime, T trip, int boardStop, int boardTime, boolean newBestOverall) {
         debug.dropOldStateAndAcceptNewState(
                 stop,
+                true,
                 () -> delegate.setNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime, newBestOverall)
         );
     }
@@ -71,6 +72,7 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
         debug.dropOldStateAndAcceptNewState(
                 transfer.stop(),
+                false,
                 () -> delegate.setNewBestTransferTime(fromStop, arrivalTime, transfer)
         );
     }

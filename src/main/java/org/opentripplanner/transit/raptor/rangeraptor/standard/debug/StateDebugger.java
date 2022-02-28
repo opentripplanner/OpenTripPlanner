@@ -28,9 +28,9 @@ class StateDebugger<T extends RaptorTripSchedule> {
         this.debugHandlerStopArrivals = dFactory.debugStopArrival();
     }
 
-    void acceptAccess(int stop) {
+    void acceptAccess(int stop, boolean stopReachedOnBoard) {
         if(isDebug(stop)) {
-            accept(stop);
+            accept(stop, stopReachedOnBoard);
         }
     }
 
@@ -40,11 +40,11 @@ class StateDebugger<T extends RaptorTripSchedule> {
         }
     }
 
-    void dropOldStateAndAcceptNewState(int stop, Runnable body) {
+    void dropOldStateAndAcceptNewState(int stop, boolean stopReachedOnBoard, Runnable body) {
         if (isDebug(stop)) {
-            drop(stop);
+            drop(stop, stopReachedOnBoard);
             body.run();
-            accept(stop);
+            accept(stop, stopReachedOnBoard);
         } else {
             body.run();
         }
@@ -69,13 +69,13 @@ class StateDebugger<T extends RaptorTripSchedule> {
         return debugHandlerStopArrivals.isDebug(stop);
     }
 
-    private void accept(int stop) {
-        debugHandlerStopArrivals.accept(cursor.stop(round(), stop));
+    private void accept(int stop, boolean stopReachedOnBoard) {
+        debugHandlerStopArrivals.accept(cursor.stop(round(), stop, stopReachedOnBoard));
     }
 
-    private void drop(int stop) {
+    private void drop(int stop, boolean stopReachedOnBoard) {
         if(cursor.exist(round(), stop)) {
-            debugHandlerStopArrivals.drop(cursor.stop(round(), stop), null, null);
+            debugHandlerStopArrivals.drop(cursor.stop(round(), stop, stopReachedOnBoard), null, null);
         }
     }
 

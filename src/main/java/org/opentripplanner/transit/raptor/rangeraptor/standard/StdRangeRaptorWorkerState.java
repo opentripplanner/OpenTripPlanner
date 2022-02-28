@@ -123,10 +123,17 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
             return;
         }
 
+
         if (newOverallBestTime(stop, arrivalTime)) {
             bestTimes.setAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
             stopArrivalsState.setAccessTime(arrivalTime, accessPath);
         }
+        // TODO TGR: This do not account for arriving onBoard, with a time worse than the
+        //           best time walking to the same stop. The needed code is something like this:
+        // else if(accessPath is on-board && newBestOnStreetTime(stop, arrivalTime)) {
+        //   bestTimes.setOnBoardAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
+        //   stopArrivalsState.setOnBoardAccessTime(arrivalTime, accessPath);
+        // }
         else {
             stopArrivalsState.rejectAccessTime(arrivalTime, accessPath);
         }
