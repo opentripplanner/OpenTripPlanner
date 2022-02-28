@@ -189,11 +189,12 @@ public class GraphIndex {
         return patternsForStopId.get(stop);
     }
 
-    public List<Trip> getTripsForStop(StopLocation stop) {
-        return getPatternsForStop(stop)
-                .stream()
-                .flatMap(t -> t.getTrips().stream())
-                .collect(Collectors.toCollection(ArrayList::new));
+    public Collection<Trip> getTripsForStop(StopLocation stop) {
+        var ret = new ArrayList<Trip>(0);
+        for(var t : getPatternsForStop(stop)) {
+            ret.addAll(t.getTrips());
+        }
+        return ret;
     }
 
     /**
