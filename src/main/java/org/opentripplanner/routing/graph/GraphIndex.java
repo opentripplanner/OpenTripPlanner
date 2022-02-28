@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
@@ -188,12 +189,10 @@ public class GraphIndex {
         return patternsForStopId.get(stop);
     }
 
-    public List<Trip> getTripsForStop(StopLocation stop) {
-        var ret = new ArrayList<Trip>(0);
-        for(TripPattern pattern : getPatternsForStop(stop)) {
-            ret.addAll(pattern.getTrips());
-        }
-        return ret;
+    public Collection<Trip> getTripsForStop(StopLocation stop) {
+        return getPatternsForStop(stop).stream()
+                .flatMap(TripPattern::scheduledTripsAsStream)
+                .collect(Collectors.toList());
     }
 
     /**
