@@ -16,16 +16,20 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern;
+import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 
@@ -51,6 +55,9 @@ class TripPatternMapper {
 
     private final Multimap<String, ServiceJourney> serviceJourniesByPatternId = ArrayListMultimap.create();
 
+    private ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById;
+    private final Map<String, List<DatedServiceJourney>> datedServiceJourneys;
+
     private final TripMapper tripMapper;
 
     private final StopTimesMapper stopTimesMapper;
@@ -75,6 +82,8 @@ class TripPatternMapper {
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, ServiceJourney> serviceJourneyById,
             ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
+            ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById,
+            Map<String, List<DatedServiceJourney>> datedServiceJourneys,
             Map<String, FeedScopedId> serviceIds,
             Deduplicator deduplicator
     ) {
@@ -82,6 +91,8 @@ class TripPatternMapper {
         this.idFactory = idFactory;
         this.routeById = routeById;
         this.otpRouteById = otpRouteById;
+        this.operatingDayById = operatingDayById;
+        this.datedServiceJourneys = datedServiceJourneys;
         this.tripMapper = new TripMapper(
             idFactory,
             issueStore,
@@ -127,10 +138,30 @@ class TripPatternMapper {
         }
 
         List<Trip> trips = new ArrayList<>();
+        List<TripOnServiceDate> tripOnServiceDates = new ArrayList<>();
 
         for (ServiceJourney serviceJourney : serviceJourneys) {
             Trip trip = tripMapper.mapServiceJourney(serviceJourney);
 
+            if(datedServiceJourneys.containsKey(serviceJourney.getId())) {
+                for (DatedServiceJourney datedServiceJourney : datedServiceJourneys.get(
+                        serviceJourney.getId())) {
+                    var opDay = operatingDayById.lookup(
+                            datedServiceJourney.getOperatingDayRef().getRef());
+                    if (opDay == null) {
+                        continue;
+                    }
+                    ServiceDate serviceDate =
+                            new ServiceDate(opDay.getCalendarDate().toLocalDate());
+
+                    tripOnServiceDates.add(
+                            new TripOnServiceDate(idFactory.createId(datedServiceJourney.getId()),
+                                    trip, serviceDate,
+                                    TripServiceAlterationMapper.mapAlteration(
+                                            datedServiceJourney.getServiceAlteration())
+                            ));
+                }
+            }
             // Unable to map ServiceJourney, problem logged by the mapper above
             if(trip == null) { continue; }
 
@@ -157,6 +188,8 @@ class TripPatternMapper {
 
         // No trips successfully mapped
         if(trips.isEmpty()) { return result; }
+
+        result.tripOnServiceDates.addAll(tripOnServiceDates);
 
         // TODO OTP2 Trips containing FlexStopLocations are not added to StopPatterns until support
         //           for this is added.

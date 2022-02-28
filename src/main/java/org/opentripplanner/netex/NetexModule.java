@@ -79,7 +79,7 @@ public class NetexModule implements GraphBuilderModule {
                         issueStore
                 );
                 transitBuilder.limitServiceDays(transitPeriodLimit, issueStore);
-
+                graph.getTripOnServiceDates().addAll(transitBuilder.getTripOnServiceDates().values());
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 if (OTPFeature.FlexRouting.isOn()) {
