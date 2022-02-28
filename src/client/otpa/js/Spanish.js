@@ -27,7 +27,7 @@ otp.locale.Spanish = {
 
         bikeSpeed : [ [ '2.778', '10 km/h' ], [ '3.333', '12 km/h' ], [ '4.167', '15 km/h' ], [ '5.556', '20 km/h' ] ],
 
-        modes : [ [ "TRANSIT,WALK", "Transporte publico" ], [ "BICYCLE", "Bicicleta" ], [ "WALK", "Andando" ], [ "CAR", "Coche" ],
+        modes : [ [ "TRANSIT,WALK", "Transporte público" ], [ "BICYCLE", "Bicicleta" ], [ "WALK", "Andando" ], [ "CAR", "Coche" ],
             [ "CAR_PARK,WALK,TRANSIT", "P+R (Coche y transporte público)" ] ],
 
         transitModes : [ [ "BUS", "Autobús" ], [ "TRAM", "Tranvía" ], [ "SUBWAY", "Metro" ], [ "RAIL", "Tren" ] ],
