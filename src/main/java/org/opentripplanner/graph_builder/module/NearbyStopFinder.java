@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -17,9 +18,11 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.BikeToStopSkipEdgeStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.ComposingSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.VehicleToStopSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.strategies.VehicleToStopSkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
@@ -54,14 +57,6 @@ public class NearbyStopFinder {
 
     private DirectGraphFinder directGraphFinder;
 
-    public final static Set<StreetMode> vehicleToStopModes =
-            Set.of(
-                    StreetMode.BIKE,
-                    StreetMode.BIKE_TO_PARK,
-                    StreetMode.BIKE_RENTAL,
-                    StreetMode.CAR_TO_PARK,
-                    StreetMode.CAR_PICKUP
-            );
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
@@ -195,6 +190,8 @@ public class NearbyStopFinder {
 
         var astar = new AStar();
 
+        final DurationSkipEdgeStrategy durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimitInSeconds);
+
         // if we compute the accesses for Park+Ride, Bike+Ride and Bike+Transit we don't want to
         // search the full durationLimit as this returns way too many stops.
         // this is both slow and returns suboptimal results as it favours long drives with short
@@ -202,15 +199,18 @@ public class NearbyStopFinder {
         // therefore, we use a heuristic based on the number of routes and their mode to determine
         // what are "good" stops for those accesses. if we have reached a threshold of "good" stops
         // we stop the access search.
-        if (!reverseDirection && vehicleToStopModes.contains(routingRequest.modes.accessMode)) {
-            var strategy = new VehicleToStopSkipEdgeStrategy(
-                    durationLimitInSeconds,
-                    graph.index::getRoutesForStop
-            );
-            astar.setSkipEdgeStrategy(strategy);
+        if (!reverseDirection && VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.modes.accessMode)) {
+            var strategy = new VehicleToStopSkipEdgeStrategy(graph.index::getRoutesForStop);
+            var composingStrategy = new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+            astar.setSkipEdgeStrategy(composingStrategy);
+        }
+        else if (!reverseDirection && routingRequest.modes.accessMode == StreetMode.BIKE) {
+            var strategy = new BikeToStopSkipEdgeStrategy(graph.index::getTripsForStop);
+            var composingStrategy = new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+            astar.setSkipEdgeStrategy(composingStrategy);
         }
         else {
-            astar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(durationLimitInSeconds));
+            astar.setSkipEdgeStrategy(durationSkipEdgeStrategy);
         }
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 

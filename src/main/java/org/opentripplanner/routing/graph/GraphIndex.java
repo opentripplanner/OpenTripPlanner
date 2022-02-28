@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
@@ -185,6 +186,13 @@ public class GraphIndex {
 
     public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
         return patternsForStopId.get(stop);
+    }
+
+    public Collection<Trip> getTripsForStop(StopLocation stop) {
+        return getPatternsForStop(stop)
+                .stream()
+                .flatMap(t -> t.getTrips().stream())
+                .collect(Collectors.toList());
     }
 
     /**
