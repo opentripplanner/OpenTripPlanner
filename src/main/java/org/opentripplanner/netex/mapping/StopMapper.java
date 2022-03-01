@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -14,6 +15,9 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.AccessibilityAssessment;
+import org.rutebanken.netex.model.AccessibilityLimitation;
+import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
+import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 
@@ -117,25 +121,20 @@ class StopMapper {
       defaultValue = WheelChairBoarding.NO_INFORMATION;
     }
 
-    if (accessibilityAssessment == null || accessibilityAssessment.getLimitations() == null
-            || accessibilityAssessment.getLimitations().getAccessibilityLimitation() == null ||
-            accessibilityAssessment.getLimitations()
-                    .getAccessibilityLimitation()
-                    .getWheelchairAccess() == null || accessibilityAssessment.getLimitations()
-            .getAccessibilityLimitation()
-            .getWheelchairAccess()
-            .value() == null) {
+    return Optional.ofNullable(accessibilityAssessment)
+            .map(AccessibilityAssessment::getLimitations)
+            .map(AccessibilityLimitations_RelStructure::getAccessibilityLimitation)
+            .map(AccessibilityLimitation::getWheelchairAccess)
+            .map(this::fromLimitationStatusEnumeration)
+            .orElse(defaultValue);
+  }
 
-      return defaultValue;
-
+  private WheelChairBoarding fromLimitationStatusEnumeration(LimitationStatusEnumeration wheelChairLimitation) {
+    if (wheelChairLimitation == null) {
+      return WheelChairBoarding.NO_INFORMATION;
     }
 
-    var wheelchairAccessValue = accessibilityAssessment.getLimitations()
-            .getAccessibilityLimitation()
-            .getWheelchairAccess()
-            .value();
-
-    switch (wheelchairAccessValue) {
+    switch (wheelChairLimitation.value()) {
       case "true":
         return WheelChairBoarding.POSSIBLE;
       case "false":
@@ -143,7 +142,6 @@ class StopMapper {
       default:
         return WheelChairBoarding.NO_INFORMATION;
     }
-
   }
 
 }
