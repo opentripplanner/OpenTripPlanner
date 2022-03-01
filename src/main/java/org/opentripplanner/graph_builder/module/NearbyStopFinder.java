@@ -203,7 +203,7 @@ public class NearbyStopFinder {
             var composingStrategy = new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
             astar.setSkipEdgeStrategy(composingStrategy);
         }
-        else if (!reverseDirection && routingRequest.modes.accessMode == StreetMode.BIKE) {
+        else if (routingRequest.modes.accessMode == StreetMode.BIKE) {
             var strategy = new BikeToStopSkipEdgeStrategy(graph.index::getTripsForStop);
             var composingStrategy = new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
             astar.setSkipEdgeStrategy(composingStrategy);
