@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import java.util.List;
 import java.util.Set;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -10,10 +9,10 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class ComposingSkipEdgeStrategy implements SkipEdgeStrategy {
 
-    final List<SkipEdgeStrategy> strategies;
+    final SkipEdgeStrategy[] strategies;
 
     public ComposingSkipEdgeStrategy(SkipEdgeStrategy... strategies) {
-        this.strategies = List.of(strategies);
+        this.strategies = strategies;
     }
 
     @Override
