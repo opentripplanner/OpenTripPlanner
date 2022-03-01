@@ -3,6 +3,7 @@
 ## 2.2.0 (in progress)
 - Optimize merging of trip patterns on dates [#3925](https://github.com/opentripplanner/OpenTripPlanner/pull/3925)
 - Fix default value for transit alerts [#3934](https://github.com/opentripplanner/OpenTripPlanner/pull/3934)
+- Add the visualizer to the interactive launcher [#3932](https://github.com/opentripplanner/OpenTripPlanner/pull/3932)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
