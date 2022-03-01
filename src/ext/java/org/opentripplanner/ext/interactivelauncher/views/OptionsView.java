@@ -5,7 +5,6 @@ import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSec
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -20,6 +19,7 @@ class OptionsView {
   private final JCheckBox buildTransitGraphChk;
   private final JCheckBox saveGraphChk;
   private final JCheckBox startOptServerChk;
+  private final JCheckBox startOptVisualizerChk;
   private final Model model;
 
   OptionsView(Model model) {
@@ -28,6 +28,7 @@ class OptionsView {
     this.buildTransitGraphChk = new JCheckBox("Transit graph", model.isBuildTransit());
     this.saveGraphChk = new JCheckBox("Save graph", model.isSaveGraph());
     this.startOptServerChk = new JCheckBox("Serve graph", model.isServeGraph());
+    this.startOptVisualizerChk = new JCheckBox("Visualizer", model.isVisualizer());
 
     addComp(new JLabel("Build graph"), panel);
     addSectionSpace(panel);
@@ -38,11 +39,13 @@ class OptionsView {
     // Toggle [ ] save on/off
     buildStreetGraphChk.addActionListener(this::onBuildGraphChkChanged);
     buildTransitGraphChk.addActionListener(this::onBuildGraphChkChanged);
+    startOptServerChk.addActionListener(this::onStartOptServerChkChanged);
 
     addComp(new JLabel("Actions"), panel);
     addSectionSpace(panel);
     addComp(saveGraphChk, panel);
     addComp(startOptServerChk, panel);
+    addComp(startOptVisualizerChk, panel);
 
     addDebugCheckBoxes(model);
     addSectionDoubleSpace(panel);
@@ -75,6 +78,7 @@ class OptionsView {
     bind(buildTransitGraphChk, model::setBuildTransit);
     bind(saveGraphChk, model::setSaveGraph);
     bind(startOptServerChk, model::setServeGraph);
+    bind(startOptVisualizerChk, model::setVisualizer);
   }
 
   void bind(JCheckBox box, Consumer<Boolean> modelUpdate) {
@@ -92,5 +96,10 @@ class OptionsView {
   private void onBuildGraphChkChanged(ActionEvent e) {
     saveGraphChk.setEnabled(buildStreet() || buildTransit());
     startOptServerChk.setEnabled(buildTransit() || !buildStreet());
+    startOptVisualizerChk.setEnabled(buildTransit() || !buildStreet());
+  }
+
+  private void onStartOptServerChkChanged(ActionEvent actionEvent) {
+    startOptVisualizerChk.setEnabled(startOptServerChk.isEnabled() && startOptServerChk.isSelected());
   }
 }

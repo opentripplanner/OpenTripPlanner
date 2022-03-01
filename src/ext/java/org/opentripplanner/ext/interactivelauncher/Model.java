@@ -31,6 +31,7 @@ public class Model implements Serializable {
     private boolean buildTransit = true;
     private boolean saveGraph = false;
     private boolean serveGraph = true;
+    private boolean visualizer = false;
 
 
     public Model() {
@@ -140,6 +141,15 @@ public class Model implements Serializable {
         notifyChangeListener();
     }
 
+    public boolean isVisualizer() {
+        return visualizer;
+    }
+
+    public void setVisualizer(boolean visualizer) {
+        this.visualizer = visualizer;
+        notifyChangeListener();
+    }
+
     public Map<String, Boolean> getDebugLogging() {
         return debugLogging;
     }
@@ -161,6 +171,7 @@ public class Model implements Serializable {
                 + (buildTransit ? ", buildTransit" : "")
                 + (saveGraph ? ", saveGraph" : "")
                 + (serveGraph ? ", serveGraph" : "")
+                + (visualizer ? ", visualizer" : "")
                 + ')';
     }
 
@@ -203,6 +214,7 @@ public class Model implements Serializable {
 
         if (saveGraph && (buildTransit || buildStreet)) { args.add("--save"); }
         if (serveGraph && !buildStreetOnly()) { args.add("--serve"); }
+        if (serveGraph && !buildStreetOnly() && visualizer) { args.add("--visualize"); }
 
         args.add(getDataSourceDirectory());
 
