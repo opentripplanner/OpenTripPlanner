@@ -7,6 +7,12 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
+/**
+ * Use several strategies in composition with each other, for example by limiting by time and number
+ * of stops visited. Only one needs to be skipped in order for {@link
+ * ComposingSkipEdgeStrategy#shouldSkipEdge(Set, Set, State, Edge, ShortestPathTree,
+ * RoutingRequest)} to return null.
+ */
 public class ComposingSkipEdgeStrategy implements SkipEdgeStrategy {
 
     final SkipEdgeStrategy[] strategies;

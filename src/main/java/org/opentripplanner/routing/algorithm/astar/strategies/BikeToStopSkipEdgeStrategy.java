@@ -13,6 +13,11 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
+/**
+ * When wanting to take a bike onto transit we want to improve the performance by limiting the
+ * number of accesses to those stops which actually have trips where you can take the bike on.
+ * Once we have reached enough of trips we skip all further edges.
+ */
 public class BikeToStopSkipEdgeStrategy
         implements SkipEdgeStrategy {
 
