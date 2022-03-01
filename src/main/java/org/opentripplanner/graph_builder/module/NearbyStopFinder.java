@@ -20,6 +20,7 @@ import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.BikeToStopSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.ComposingSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.VehicleToStopSkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -188,29 +189,9 @@ public class NearbyStopFinder {
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
 
         var astar = new AStar();
+        var skipEdgeStrategy = getSkipEdgeStrategy(reverseDirection, routingRequest);
+        astar.setSkipEdgeStrategy(skipEdgeStrategy);
 
-        final DurationSkipEdgeStrategy durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimitInSeconds);
-
-        // if we compute the accesses for Park+Ride, Bike+Ride and Bike+Transit we don't want to
-        // search the full durationLimit as this returns way too many stops.
-        // this is both slow and returns suboptimal results as it favours long drives with short
-        // transit legs.
-        // therefore, we use a heuristic based on the number of routes and their mode to determine
-        // what are "good" stops for those accesses. if we have reached a threshold of "good" stops
-        // we stop the access search.
-        if (!reverseDirection && VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.modes.accessMode)) {
-            var strategy = new VehicleToStopSkipEdgeStrategy(graph.index::getRoutesForStop);
-            var composingStrategy = new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
-            astar.setSkipEdgeStrategy(composingStrategy);
-        }
-        else if (routingRequest.modes.accessMode == StreetMode.BIKE) {
-            var strategy = new BikeToStopSkipEdgeStrategy(graph.index::getTripsForStop);
-            var composingStrategy = new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
-            astar.setSkipEdgeStrategy(composingStrategy);
-        }
-        else {
-            astar.setSkipEdgeStrategy(durationSkipEdgeStrategy);
-        }
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
         // Only used if OTPFeature.FlexRouting.isOn()
@@ -261,6 +242,36 @@ public class NearbyStopFinder {
             routingRequest.cleanup();
         }
         return stopsFound;
+    }
+
+    private SkipEdgeStrategy getSkipEdgeStrategy(
+            boolean reverseDirection,
+            RoutingRequest routingRequest
+    ) {
+        var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimitInSeconds);
+
+        // if we compute the accesses for Park+Ride, Bike+Ride and Bike+Transit we don't want to
+        // search the full durationLimit as this returns way too many stops.
+        // this is both slow and returns suboptimal results as it favours long drives with short
+        // transit legs.
+        // therefore, we use a heuristic based on the number of routes and their mode to determine
+        // what are "good" stops for those accesses. if we have reached a threshold of "good" stops
+        // we stop the access search.
+        if (!reverseDirection
+                && OTPFeature.VehicleToStopHeuristics.isOn()
+                && VehicleToStopSkipEdgeStrategy.applicableModes.contains(
+                routingRequest.modes.accessMode)) {
+            var strategy = new VehicleToStopSkipEdgeStrategy(graph.index::getRoutesForStop);
+            return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+        }
+        else if (OTPFeature.VehicleToStopHeuristics.isOn()
+                && routingRequest.modes.accessMode == StreetMode.BIKE) {
+            var strategy = new BikeToStopSkipEdgeStrategy(graph.index::getTripsForStop);
+            return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+        }
+        else {
+            return durationSkipEdgeStrategy;
+        }
     }
 
     private boolean canBoardFlex(State state, boolean reverse) {
