@@ -40,11 +40,21 @@ class StateDebugger<T extends RaptorTripSchedule> {
         }
     }
 
-    void dropOldStateAndAcceptNewState(int stop, boolean stopReachedOnBoard, Runnable body) {
+    void dropOldStateAndAcceptNewTransit(int stop, boolean newBestOverall, Runnable body) {
         if (isDebug(stop)) {
-            drop(stop, stopReachedOnBoard);
+            drop(stop, newBestOverall);
             body.run();
-            accept(stop, stopReachedOnBoard);
+            accept(stop, true);
+        } else {
+            body.run();
+        }
+    }
+
+    void dropOldStateAndAcceptNewTransfer(int stop, Runnable body) {
+        if (isDebug(stop)) {
+            drop(stop, true);
+            body.run();
+            accept(stop, false);
         } else {
             body.run();
         }
@@ -73,9 +83,20 @@ class StateDebugger<T extends RaptorTripSchedule> {
         debugHandlerStopArrivals.accept(cursor.stop(round(), stop, stopReachedOnBoard));
     }
 
-    private void drop(int stop, boolean stopReachedOnBoard) {
-        if(cursor.exist(round(), stop)) {
-            debugHandlerStopArrivals.drop(cursor.stop(round(), stop, stopReachedOnBoard), null, null);
+    private void drop(int stop, boolean newBestOverall) {
+        if(!cursor.exist(round(), stop)) { return; }
+
+        ArrivalView<T> arrival = null;
+
+        if(newBestOverall) {
+            arrival = cursor.bestStopArrival(round(), stop);
+        }
+        else if (cursor.transitExist(round(), stop)) {
+            arrival = cursor.transit(round(), stop);
+        }
+
+        if(arrival != null) {
+            debugHandlerStopArrivals.drop(arrival, null, null);
         }
     }
 

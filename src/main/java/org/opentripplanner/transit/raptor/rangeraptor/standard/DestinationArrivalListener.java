@@ -6,6 +6,7 @@ public interface DestinationArrivalListener {
     void newDestinationArrival(
             int round,
             int fromStopArrivalTime,
+            boolean stopReachedOnBoard,
             RaptorTransfer egressPath
     );
 }

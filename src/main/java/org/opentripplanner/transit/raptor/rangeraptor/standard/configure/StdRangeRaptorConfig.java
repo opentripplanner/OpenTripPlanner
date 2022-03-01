@@ -179,8 +179,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
                 destinationArrivalPaths,
                 ctx.calculator(),
                 stopsCursor(),
-                ctx.lifeCycle(),
-                ctx.debugFactory()
+                ctx.lifeCycle()
         );
 
         // Use the  adapter to play the role of the destination arrival check

@@ -45,7 +45,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final CostCalculator costCalculator;
     private final SlackProvider slackProvider;
     private final PathMapper<T> pathMapper;
-    private final DebugHandler<ArrivalView<?>> debugHandler;
+    private final DebugHandler<Path<?>> debugPathHandler;
     private final RaptorStopNameResolver stopNameResolver;
     private boolean reachedCurrentRound = false;
     private int iterationDepartureTime = -1;
@@ -65,7 +65,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         this.costCalculator = costCalculator;
         this.slackProvider = slackProvider;
         this.pathMapper = pathMapper;
-        this.debugHandler = debugHandlerFactory.debugStopArrival();
+        this.debugPathHandler = debugHandlerFactory.debugPathArrival();
         this.stopNameResolver = stopNameResolver;
         lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
@@ -75,41 +75,11 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         ArrivalView<T> stopArrival,
         RaptorTransfer egressPath
     ) {
-        int departureTime = transitCalculator.departureTime(egressPath, stopArrival.arrivalTime());
+        var destArrival = createDestinationArrivalView(stopArrival, egressPath);
 
-        if (departureTime == -1) { return; }
+        if(destArrival == null) { return; }
 
-        if(egressPath.hasRides()) {
-            departureTime = transitCalculator.plusDuration(
-                departureTime,
-                slackProvider.accessEgressWithRidesTransferSlack()
-            );
-        }
-
-        int arrivalTime = transitCalculator.plusDuration(
-            departureTime,
-            egressPath.durationInSeconds()
-        );
-
-        int waitTimeInSeconds = Math.abs(departureTime - stopArrival.arrivalTime());
-
-        // If the aggregatedCost is zero(StdRaptor), then cost calculation is skipped.
-        // If the aggregatedCost exist(McRaptor), then the cost of waiting is added.
-        int additionalCost = 0;
-
-        if(costCalculator != null) {
-            additionalCost += costCalculator.waitCost(waitTimeInSeconds);
-            additionalCost += costCalculator.costEgress(egressPath);
-        }
-
-        DestinationArrival<T> destArrival = new DestinationArrival<>(
-            egressPath,
-            stopArrival,
-            arrivalTime,
-            additionalCost
-        );
-
-        if (transitCalculator.exceedsTimeLimit(arrivalTime)) {
+        if (transitCalculator.exceedsTimeLimit(destArrival.arrivalTime())) {
             debugRejectByTimeLimitOptimization(destArrival);
         } else {
             Path<T> path = pathMapper.mapToPath(destArrival);
@@ -146,11 +116,27 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         return paths;
     }
 
+    public void debugReject(ArrivalView<T> stopArrival, RaptorTransfer egress, String reason) {
+        if (isDebugOn()) {
+            debugReject(createDestinationArrivalView(stopArrival, egress), reason);
+        }
+    }
+
+    public void debugReject(DestinationArrival<T> arrival, String reason) {
+        if (isDebugOn()) {
+            var path = pathMapper.mapToPath(arrival);
+            debugPathHandler.reject(path, null, reason);
+        }
+    }
+
     @Override
     public String toString() {
         return paths.toString((p) -> p.toString(stopNameResolver));
     }
 
+    public final boolean isDebugOn() {
+        return debugPathHandler != null;
+    }
 
     /* private methods */
 
@@ -159,9 +145,48 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     }
 
     private void debugRejectByTimeLimitOptimization(DestinationArrival<T> destArrival) {
-        if (debugHandler != null) {
-            debugHandler.reject(destArrival.previous(), null, transitCalculator.exceedsTimeLimitReason());
+        if (isDebugOn()) {
+            debugReject(destArrival, transitCalculator.exceedsTimeLimitReason());
         }
+    }
+
+    private DestinationArrival<T> createDestinationArrivalView(
+            ArrivalView<T> stopArrival,
+            RaptorTransfer egressPath
+    ) {
+        int departureTime = transitCalculator.departureTime(egressPath, stopArrival.arrivalTime());
+
+        if (departureTime == -1) { return null; }
+
+        if(egressPath.hasRides()) {
+            departureTime = transitCalculator.plusDuration(
+                    departureTime,
+                    slackProvider.accessEgressWithRidesTransferSlack()
+            );
+        }
+
+        int arrivalTime = transitCalculator.plusDuration(
+                departureTime,
+                egressPath.durationInSeconds()
+        );
+
+        int waitTimeInSeconds = Math.abs(departureTime - stopArrival.arrivalTime());
+
+        // If the aggregatedCost is zero(StdRaptor), then cost calculation is skipped.
+        // If the aggregatedCost exist(McRaptor), then the cost of waiting is added.
+        int additionalCost = 0;
+
+        if(costCalculator != null) {
+            additionalCost += costCalculator.waitCost(waitTimeInSeconds);
+            additionalCost += costCalculator.costEgress(egressPath);
+        }
+
+        return new DestinationArrival<>(
+                egressPath,
+                stopArrival,
+                arrivalTime,
+                additionalCost
+        );
     }
 
     /**

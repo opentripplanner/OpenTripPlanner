@@ -44,8 +44,8 @@ public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends 
     public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
         super.transferToStop(fromStop, arrivalTime, transferPath);
         for (RaptorTransfer egressPath : egressPaths) {
-            if(egressPath.hasRides()) {
-                callback.newDestinationArrival(round, arrivalTime, egressPath);
+            if(egressPath.stopReachedOnBoard()) {
+                callback.newDestinationArrival(round, arrivalTime, transferPath.stopReachedOnBoard(), egressPath);
             }
         }
     }
@@ -54,7 +54,7 @@ public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends 
     public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
         super.arriveByTransit(arrivalTime, boardStop, boardTime, trip);
         for (RaptorTransfer egressPath : egressPaths) {
-            callback.newDestinationArrival(round, arrivalTime, egressPath);
+            callback.newDestinationArrival(round, arrivalTime, true, egressPath);
         }
     }
 
