@@ -1,7 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -14,10 +13,6 @@ import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.rutebanken.netex.model.AccessibilityAssessment;
-import org.rutebanken.netex.model.AccessibilityLimitation;
-import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
-import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 
@@ -94,54 +89,14 @@ class StopMapper {
     var stopPlace = stopPlaceIndex.lookupLastVersionById(stopPlaceId.getId());
 
     if (stopPlace != null) {
-      defaultWheelChairBoarding = wheelChairBoarding(
+      defaultWheelChairBoarding = WheelChairMapper.wheelChairBoarding(
               stopPlace.getAccessibilityAssessment(),
               WheelChairBoarding.NO_INFORMATION
       );
     }
 
-    return wheelChairBoarding(quay.getAccessibilityAssessment(), defaultWheelChairBoarding);
-  }
-
-  /**
-   * If input and containing objects are not null, get the LimitationStatusEnumeration and map to
-   * internal {@link WheelChairBoarding} enumeration.
-   *
-   * @param accessibilityAssessment NeTEx object wrapping information regarding
-   *                                WheelChairBoarding
-   * @param defaultValue            If no {@link AccessibilityAssessment} is defined, default to
-   *                                this value
-   * @return Mapped enumerator, {@link WheelChairBoarding#NO_INFORMATION} if no value is found
-   */
-  private WheelChairBoarding wheelChairBoarding(
-          AccessibilityAssessment accessibilityAssessment,
-          WheelChairBoarding defaultValue
-  ) {
-    if (defaultValue == null) {
-      defaultValue = WheelChairBoarding.NO_INFORMATION;
-    }
-
-    return Optional.ofNullable(accessibilityAssessment)
-            .map(AccessibilityAssessment::getLimitations)
-            .map(AccessibilityLimitations_RelStructure::getAccessibilityLimitation)
-            .map(AccessibilityLimitation::getWheelchairAccess)
-            .map(this::fromLimitationStatusEnumeration)
-            .orElse(defaultValue);
-  }
-
-  private WheelChairBoarding fromLimitationStatusEnumeration(LimitationStatusEnumeration wheelChairLimitation) {
-    if (wheelChairLimitation == null) {
-      return WheelChairBoarding.NO_INFORMATION;
-    }
-
-    switch (wheelChairLimitation.value()) {
-      case "true":
-        return WheelChairBoarding.POSSIBLE;
-      case "false":
-        return WheelChairBoarding.NOT_POSSIBLE;
-      default:
-        return WheelChairBoarding.NO_INFORMATION;
-    }
+    return WheelChairMapper.wheelChairBoarding(
+            quay.getAccessibilityAssessment(), defaultWheelChairBoarding);
   }
 
 }
