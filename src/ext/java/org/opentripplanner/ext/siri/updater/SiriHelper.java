@@ -48,11 +48,6 @@ public class SiriHelper {
         return SiriXml.toXml(request);
     }
 
-    public static String createETServiceRequestAsXml(String requestorRef) throws JAXBException {
-        Siri request = createETServiceRequest(requestorRef, -1);
-        return SiriXml.toXml(request);
-    }
-
     public static String createETServiceRequestAsXml(String requestorRef, int previewIntervalMillis) throws JAXBException {
         Siri request = createETServiceRequest(requestorRef, previewIntervalMillis);
         return SiriXml.toXml(request);
