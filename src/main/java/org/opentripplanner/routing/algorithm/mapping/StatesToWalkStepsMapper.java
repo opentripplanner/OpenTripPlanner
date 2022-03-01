@@ -362,7 +362,7 @@ public class StatesToWalkStepsMapper {
     private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
         return !(
             current.streetName.toString() != null
-                    && !(Objects.equals(current.streetNameNoParens(), streetNameNoParens))
+                    && !(java.util.Objects.equals(current.streetNameNoParens(), streetNameNoParens))
                     && (!current.bogusName || !edge.hasBogusName())
         );
     }
