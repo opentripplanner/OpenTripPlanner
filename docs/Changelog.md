@@ -5,6 +5,7 @@
 - Fix default value for transit alerts [#3934](https://github.com/opentripplanner/OpenTripPlanner/pull/3934)
 - Add the visualizer to the interactive launcher [#3932](https://github.com/opentripplanner/OpenTripPlanner/pull/3932)
 - Fix date handling for estimated calls for service journey on specific date in Transmodel API [#3935](https://github.com/opentripplanner/OpenTripPlanner/pull/3935)
+- feat: refactor a deprecated integer conversion in Histogram class [#3939](https://github.com/opentripplanner/OpenTripPlanner/pull/3939)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
