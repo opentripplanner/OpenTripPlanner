@@ -8,6 +8,9 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.onebusaway.gtfs.model.Transfer;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.IgnoredGtfsTransfer;
+import org.opentripplanner.graph_builder.issues.InvalidGtfsTransfer;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -89,22 +92,25 @@ class TransferMapper {
   private final TripMapper tripMapper;
 
   private final TripStopTimes stopTimesByTrip;
+  private final DataImportIssueStore issueStore;
 
   private final Multimap<Route, Trip> tripsByRoute = ArrayListMultimap.create();
 
 
   TransferMapper(
-      RouteMapper routeMapper,
-      StationMapper stationMapper,
-      StopMapper stopMapper,
-      TripMapper tripMapper,
-      TripStopTimes stopTimesByTrip
+          RouteMapper routeMapper,
+          StationMapper stationMapper,
+          StopMapper stopMapper,
+          TripMapper tripMapper,
+          TripStopTimes stopTimesByTrip,
+          DataImportIssueStore issueStore
   ) {
     this.routeMapper = routeMapper;
     this.stationMapper = stationMapper;
     this.stopMapper = stopMapper;
     this.tripMapper = tripMapper;
     this.stopTimesByTrip = stopTimesByTrip;
+    this.issueStore = issueStore;
   }
 
   static TransferPriority mapTypeToPriority(int type) {
@@ -138,17 +144,22 @@ class TransferMapper {
 
     // If this transfer do not give any advantages in the routing, then drop it
     if(constraint.isRegularTransfer()) {
-      LOG.warn("Transfer skipped - no effect on routing: " + rhs);
+      issueStore.add(new IgnoredGtfsTransfer(rhs));
       return null;
     }
 
     if (constraint.isStaySeated() && (fromTrip == null || toTrip == null)) {
-      LOG.warn("Transfer skipped - from_trip_id and to_trip_id must exist for in-seat transfer");
+      issueStore.add(new InvalidGtfsTransfer("from_trip_id and to_trip_id must exist for in-seat transfer", rhs));
       return null;
     }
 
     TransferPoint fromPoint = mapTransferPoint(rhs.getFromStop(), rhs.getFromRoute(), fromTrip, false);
     TransferPoint toPoint = mapTransferPoint(rhs.getToStop(), rhs.getToRoute(), toTrip, true);
+
+    if (fromPoint == null || toPoint == null) {
+      issueStore.add(new InvalidGtfsTransfer("fromPoint / toPoint doesn't exist", rhs));
+      return null;
+    }
 
     return new ConstrainedTransfer(null, fromPoint, toPoint, constraint);
   }
