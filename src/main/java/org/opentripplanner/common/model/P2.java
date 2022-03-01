@@ -24,6 +24,7 @@ public class P2<E> extends T2<E, E> {
         }
     }
 
+    @Override
     public String toString() {
         return "P2(" + first + ", " + second + ")";
     }
