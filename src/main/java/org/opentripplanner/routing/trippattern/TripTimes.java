@@ -289,7 +289,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
      *
      * @return Empty list if there are no vias registered for a stop.
      */
-    public List<String> getVia(final int stop) {
+    public List<String> getHeadsignVias(final int stop) {
         if (headsignVias == null || headsignVias[stop] == null) {
             return List.of();
         }
