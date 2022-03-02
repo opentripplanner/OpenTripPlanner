@@ -1,5 +1,12 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
+import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
+import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_PICKUP;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
+import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
+
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.model.Route;
@@ -37,11 +44,12 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
 
     public final static Set<StreetMode> applicableModes =
             Set.of(
-                    StreetMode.BIKE_TO_PARK,
-                    StreetMode.BIKE_RENTAL,
-                    StreetMode.CAR_TO_PARK,
-                    StreetMode.CAR_PICKUP,
-                    StreetMode.CAR_RENTAL
+                    BIKE_TO_PARK,
+                    BIKE_RENTAL,
+                    CAR_TO_PARK,
+                    CAR_PICKUP,
+                    CAR_RENTAL,
+                    SCOOTER_RENTAL
             );
 
 
@@ -72,7 +80,8 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
                 sumOfScores = sumOfScores + score;
             }
             return false;
-        } else {
+        }
+        else {
             return sumOfScores >= maxScore;
         }
     }
