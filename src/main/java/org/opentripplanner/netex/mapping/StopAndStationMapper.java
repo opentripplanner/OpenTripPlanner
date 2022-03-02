@@ -63,10 +63,11 @@ class StopAndStationMapper {
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
             TariffZoneMapper tariffZoneMapper,
-            DataImportIssueStore issueStore
+            DataImportIssueStore issueStore,
+            ReadOnlyHierarchicalVersionMapById<StopPlace> stopPlaceIndex
     ) {
         this.stationMapper = new StationMapper(issueStore, idFactory);
-        this.stopMapper = new StopMapper(idFactory, issueStore);
+        this.stopMapper = new StopMapper(idFactory, issueStore, stopPlaceIndex);
         this.tariffZoneMapper = tariffZoneMapper;
         this.quayIndex = quayIndex;
         this.issueStore = issueStore;
