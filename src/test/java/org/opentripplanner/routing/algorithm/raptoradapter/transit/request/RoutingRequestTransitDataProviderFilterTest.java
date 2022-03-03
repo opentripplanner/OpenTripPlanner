@@ -41,6 +41,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+        Set.of(),
         Set.of()
     );
 
@@ -58,7 +59,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
-        Set.of(TEST_ROUTE_ID)
+        Set.of(TEST_ROUTE_ID),
+        Set.of()
     );
 
     boolean valid = filter.tripPatternPredicate(tripPatternForDate);
@@ -88,6 +90,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
             false,
             false,
             allowedModes,
+            Set.of(),
             Set.of()
     );
 
@@ -103,6 +106,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+        Set.of(),
         Set.of()
     );
 
@@ -120,6 +124,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         Set.of(),
+        Set.of(),
         Set.of()
     );
 
@@ -136,6 +141,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         true,
         false,
+        Set.of(),
         Set.of(),
         Set.of()
     );
@@ -191,6 +197,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         true,
         Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+        Set.of(),
         Set.of()
     );
 
@@ -209,6 +216,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         false,
         false,
+        Set.of(),
         Set.of(),
         Set.of()
     );
