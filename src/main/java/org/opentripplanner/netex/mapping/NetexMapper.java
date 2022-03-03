@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -39,8 +41,10 @@ import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.LineRefStructure;
+import org.rutebanken.netex.model.LineRefs_RelStructure;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 
 /**
@@ -228,23 +232,31 @@ public class NetexMapper {
     private void mapGroupsOfLines () {
         GroupOfRoutesMapper mapper = new GroupOfRoutesMapper(idFactory);
 
-        for (GroupOfLines groupOfLines : currentNetexIndex.getGroupsOfLinesById().localValues()) {
-            // Create OTP model for GroupOfLines
-            GroupOfRoutes model = mapper.mapGroupOfRoutes(groupOfLines);
+        currentNetexIndex.getGroupsOfLinesById().localValues().forEach(gol -> {
+            GroupOfRoutes model = mapper.mapGroupOfRoutes(gol);
 
-            for (JAXBElement<? extends LineRefStructure> ref : groupOfLines.getMembers().getLineRef()) {
-                FeedScopedId routeId = idFactory.createId(ref.getValue().getRef());
-
-                // At this point no routes are created yet
-                // So we put all group of lines in multimap
-                // RouteMapper can then use this map to populate Routes with correct GroupsOfLines
-                transitBuilder.getGroupsOfRoutesByRouteId().put(routeId, model);
-            }
+            Optional.ofNullable(gol.getMembers())
+                    .stream()
+                    .map(LineRefs_RelStructure::getLineRef)
+                    .filter(Objects::nonNull)
+                    .flatMap(Collection::stream)
+                    .filter(Objects::nonNull)
+                    .map(JAXBElement::getValue)
+                    .filter(Objects::nonNull)
+                    .map(VersionOfObjectRefStructure::getRef)
+                    .filter(Objects::nonNull)
+                    .forEach(ref -> {
+                        FeedScopedId routeId = idFactory.createId(ref);
+                        // At this point no routes are created yet
+                        // So we put all group of lines in multimap
+                        // RouteMapper can then use this map to populate Routes with correct GroupsOfLines
+                        transitBuilder.getGroupsOfRoutesByRouteId().put(routeId, model);
+                    });
 
             // Create this index as well
             // In case relation is set on Line
             transitBuilder.getGroupOfRouteById().add(model);
-        }
+        });
     }
 
     private void mapOperators() {
