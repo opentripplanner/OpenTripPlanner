@@ -33,7 +33,7 @@ public enum OTPFeature {
     ReportApi(false),
     SandboxAPILegacyGraphQLApi(false),
     SandboxAPIMapboxVectorTilesApi(false),
-    SandboxAPITransmodelApi(true),
+    SandboxAPITransmodelApi(false),
     SandboxExampleAPIGraphStatistics(false),
     SandboxAPIParkAndRideApi(false),
     TransferAnalyzer(false);
