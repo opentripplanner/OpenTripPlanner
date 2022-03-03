@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -105,9 +105,15 @@ public final class ConstrainedBoardingSearch
             int stopIndex
     ) {
         final Trip trip = tripSchedule.getOriginalTripTimes().getTrip();
-        return currentTransfers.stream()
-                .filter(t -> t.matchesSourcePoint(stopIndex, trip))
-                .collect(Collectors.toList());
+        // for performance reasons we use a for loop here as streams are much slower.
+        // i experimented with LinkedList and ArrayList and LinkedList was faster.
+        var result = new LinkedList<TransferForPattern>();
+        for (var t : currentTransfers) {
+            if (t.matchesSourcePoint(stopIndex, trip)) {
+                result.add(t);
+            }
+        }
+        return result;
     }
 
     /**
