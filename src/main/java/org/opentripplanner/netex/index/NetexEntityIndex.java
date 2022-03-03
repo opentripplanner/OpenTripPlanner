@@ -224,6 +224,11 @@ public class NetexEntityIndex {
             }
 
             @Override
+            public ReadOnlyHierarchicalMapById<GroupOfLines> getGroupsOfLinesById() {
+                return groupOfLinesById;
+            }
+
+            @Override
             public ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById() {
                 return authoritiesById;
             }

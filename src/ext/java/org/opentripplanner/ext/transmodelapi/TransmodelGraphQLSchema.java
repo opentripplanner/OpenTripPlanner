@@ -56,6 +56,7 @@ import org.opentripplanner.ext.transmodelapi.model.framework.ServerInfoType;
 import org.opentripplanner.ext.transmodelapi.model.framework.SystemNoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ValidityPeriodType;
 import org.opentripplanner.ext.transmodelapi.model.network.DestinationDisplayType;
+import org.opentripplanner.ext.transmodelapi.model.network.GroupOfLinesType;
 import org.opentripplanner.ext.transmodelapi.model.network.JourneyPatternType;
 import org.opentripplanner.ext.transmodelapi.model.network.LineType;
 import org.opentripplanner.ext.transmodelapi.model.network.PresentationType;
@@ -177,6 +178,7 @@ public class TransmodelGraphQLSchema {
 
     // Network
     GraphQLObjectType presentationType = PresentationType.create();
+    GraphQLOutputType groupOfLinesType = GroupOfLinesType.create();
     GraphQLOutputType destinationDisplayType = DestinationDisplayType.create();
     GraphQLOutputType lineType = LineType.create(
           bookingArrangementType,
@@ -188,7 +190,8 @@ public class TransmodelGraphQLSchema {
           JourneyPatternType.REF,
           ServiceJourneyType.REF,
           PtSituationElementType.REF,
-          brandingType
+          brandingType,
+          groupOfLinesType
       );
       GraphQLOutputType interchangeType = InterchangeType.create(lineType, ServiceJourneyType.REF);
 
