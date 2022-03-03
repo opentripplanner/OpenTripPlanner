@@ -8,6 +8,7 @@
 - feat: refactor a deprecated integer conversion in Histogram class [#3939](https://github.com/opentripplanner/OpenTripPlanner/pull/3939)
 - Via headsign bugfix [#3936](https://github.com/opentripplanner/OpenTripPlanner/pull/3936)
 - NeTEx mapping for WheelChairBoarding [#3945](https://github.com/opentripplanner/OpenTripPlanner/pull/3945)
+- OTP support for NeTEx GroupOfLines [#3928](https://github.com/opentripplanner/OpenTripPlanner/pull/3928)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
