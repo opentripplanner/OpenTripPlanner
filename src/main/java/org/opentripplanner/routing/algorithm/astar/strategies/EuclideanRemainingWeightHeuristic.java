@@ -47,13 +47,20 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
      * On a non-transit trip, the remaining weight is simply distance / street speed.
      */
     @Override
-    public double estimateRemainingWeight (State s) {
+    public double estimateRemainingWeight(State s) {
         Vertex sv = s.getVertex();
-        double euclideanDistance = SphericalDistanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
+        double euclideanDistance =
+                SphericalDistanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
+
         // After parking or finishing the rental of a vehicle, you can't ever move faster than walking speed.
-        final boolean useWalkSpeed = !arriveBy && (
-                s.isVehicleParked() || s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED
-        );
+        boolean useWalkSpeed;
+        if (arriveBy) {
+            useWalkSpeed = s.getVehicleRentalState() == VehicleRentalState.BEFORE_RENTING;
+        }
+        else {
+            useWalkSpeed = s.isVehicleParked()
+                    || s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED;
+        }
 
         final double streetSpeed = useWalkSpeed ? walkingSpeed : maxStreetSpeed;
         return euclideanDistance / streetSpeed;
