@@ -240,8 +240,9 @@ public class Timetable implements Serializable {
                             : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
                     if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
                         newTimes.setCancelled(i);
-                        newTimes.updateArrivalDelay(i, delay);
-                        newTimes.updateDepartureDelay(i, delay);
+                        int delayOrZero = delay != null ? delay : 0;
+                        newTimes.updateArrivalDelay(i, delayOrZero);
+                        newTimes.updateDepartureDelay(i, delayOrZero);
                     } else if (scheduleRelationship ==
                             StopTimeUpdate.ScheduleRelationship.NO_DATA) {
                         newTimes.updateArrivalDelay(i, 0);
