@@ -30,6 +30,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   private static final FeedScopedId TEST_ROUTE_ID = new FeedScopedId("TEST", "ROUTE");
 
+  private static final FeedScopedId TEST_TRIP_ID = new FeedScopedId("TEST", "TRIP");
+
   private static final Stop STOP_FOR_TEST = Stop.stopForTest("TEST:STOP", 0, 0);
 
   @Test
@@ -64,6 +66,24 @@ public class RoutingRequestTransitDataProviderFilterTest {
     );
 
     boolean valid = filter.tripPatternPredicate(tripPatternForDate);
+
+    assertFalse(valid);
+  }
+
+  @Test
+  public void bannedTripFilteringTest() {
+    TripTimes tripTimes = createTestTripTimes();
+
+    var filter = new RoutingRequestTransitDataProviderFilter(
+            false,
+            false,
+            false,
+            Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+            Set.of(),
+            Set.of(TEST_TRIP_ID)
+    );
+
+    boolean valid = filter.tripTimesPredicate(tripTimes);
 
     assertFalse(valid);
   }
@@ -170,9 +190,9 @@ public class RoutingRequestTransitDataProviderFilterTest {
   }
 
   private TripTimes createTestTripTimes() {
-    Trip trip = new Trip(new FeedScopedId("TEST", "TRIP"));
+    Trip trip = new Trip(TEST_TRIP_ID);
     trip.setBikesAllowed(BikeAccess.NOT_ALLOWED);
-    trip.setRoute(new Route(new FeedScopedId("TEST", "ROUTE")));
+    trip.setRoute(new Route(TEST_ROUTE_ID));
     trip.setMode(TransitMode.BUS);
     trip.setNetexSubmode(TransmodelTransportSubmode.LOCAL_BUS.getValue());
 
