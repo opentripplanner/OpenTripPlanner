@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.CompactLineString;
@@ -299,11 +299,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     }
 
     public Trip getTrip(int tripIndex) {
-        return getTrips().get(tripIndex);
-    }
-
-    public int getTripIndex(Trip trip) {
-        return getTrips().indexOf(trip);
+        return scheduledTimetable.getTripTimes(tripIndex).getTrip();
     }
 
     /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
@@ -337,7 +333,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * since it is redundant.
      */
     public void add(FrequencyEntry freq) {
-        getTrips().add(freq.tripTimes.getTrip());
         scheduledTimetable.addFrequencyEntry(freq);
         if (this.getRoute() != freq.tripTimes.getTrip().getRoute()) {
             LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.",
@@ -352,17 +347,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * @param removeTrip it the predicate returns true
      */
     public void removeTrips(Predicate<Trip> removeTrip) {
-        getTrips().removeIf(removeTrip);
-        if(getTrips().isEmpty()) {
-            scheduledTimetable.getTripTimes().clear();
-        }
-        else {
-            scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
-        }
-    }
-
-    public TripPattern getOriginalTripPattern() {
-        return originalTripPattern;
+        scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
     }
 
     public void setOriginalTripPattern(TripPattern originalTripPattern) {
@@ -373,7 +358,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * The direction for all the trips in this pattern.
      */
     public Direction getDirection() {
-        return getTrips().get(0).getDirection();
+        return scheduledTimetable.getDirection();
     }
 
     /**
@@ -382,8 +367,8 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * this rule may arise if unscheduled trips are added to a Timetable. For that case we need
      * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
      */
-    public List<Trip> getTrips() {
-        return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList());
+    public Stream<Trip> scheduledTripsAsStream() {
+        return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).distinct();
     }
 
     /**
@@ -395,7 +380,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         return scheduledTimetable;
     }
 
-    boolean isCreatedByRealtimeUpdater() {
+    /**
+     * Has the TripPattern been created by a real-time update.
+     */
+    public boolean isCreatedByRealtimeUpdater() {
         return createdByRealtimeUpdater;
     }
 
@@ -547,7 +535,17 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
                     sb.append(" express");
                 } else {
                     // The final fallback: reference a specific trip ID.
-                    sb.append(" like trip " + pattern.getTrips().get(0).getId());
+                    Trip trip = null;
+                    if (!pattern.scheduledTimetable.getTripTimes().isEmpty()) {
+                        trip = pattern.scheduledTimetable.getTripTimes().get(0).getTrip();
+                    } else if (!pattern.scheduledTimetable.getFrequencyEntries().isEmpty()) {
+                        trip = pattern.scheduledTimetable.getFrequencyEntries().get(0).tripTimes.getTrip();
+                    }
+
+                    if (trip != null) {
+                        sb.append(" like trip ").append(trip.getId());
+                    }
+
                 }
                 pattern.setName((sb.toString()));
             } // END foreach PATTERN
@@ -572,7 +570,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      */
     public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
         setServices(new BitSet());
-        for (Trip trip : getTrips()) {
+        scheduledTripsAsStream().forEach (trip -> {
             FeedScopedId serviceId = trip.getServiceId();
             if (serviceCodes.containsKey(serviceId)) {
                 services.set(serviceCodes.get(serviceId));
@@ -580,7 +578,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
             else {
                 LOG.warn("Service " + serviceId + " not found in service codes not found.");
             }
-        }
+        });
         scheduledTimetable.setServiceCodes (serviceCodes);
     }
 
@@ -602,7 +600,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     }
 
     public String getTripHeadsign() {
-        return getTrips().get(0).getTripHeadsign();
+        return scheduledTimetable.getTripTimes(0).getTrip().getTripHeadsign();
     }
 
     public static boolean idsAreUniqueAndNotNull(Collection<TripPattern> tripPatterns) {

@@ -1,10 +1,22 @@
 package org.opentripplanner.netex.mapping;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
+import org.rutebanken.netex.model.AccessibilityAssessment;
+import org.rutebanken.netex.model.AccessibilityLimitation;
+import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
+import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
@@ -13,13 +25,127 @@ import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.VehicleModeEnumeration;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import static org.junit.Assert.assertEquals;
-
 public class StopAndStationMapperTest {
+
+    @Test
+    public void testWheelChairBoarding() {
+
+        var stopPlace = createStopPlace(
+                "ST:StopPlace:1",
+                "Lunce C",
+                "1",
+                55.707005,
+                13.186816,
+                VehicleModeEnumeration.BUS
+        );
+
+        // Create on quay with access, one without, and one with NULL
+        var quay1 = createQuay(
+                "ST:Quay:1",
+                "Quay1",
+                "1",
+                55.706063,
+                13.186708,
+                "a"
+        );
+        var quay2 = createQuay(
+                "ST:Quay:2",
+                "Quay2",
+                "1",
+                55.706775,
+                13.186482,
+                "a"
+        );
+
+        var quay3 = createQuay(
+                "ST:Quay:3",
+                "Quay3",
+                "1",
+                55.707330,
+                13.186397,
+                "a"
+        );
+
+        var quay4 = createQuay(
+                "ST:Quay:4",
+                "Quay4",
+                "1",
+                55.707330,
+                13.186397,
+                "a"
+        );
+
+        quay1.withAccessibilityAssessment(
+                createAccessibilityAssessment(LimitationStatusEnumeration.TRUE));
+
+        quay2.withAccessibilityAssessment(
+                createAccessibilityAssessment(LimitationStatusEnumeration.FALSE));
+
+        stopPlace.setQuays(new Quays_RelStructure().withQuayRefOrQuay(quay1)
+                .withQuayRefOrQuay(quay2)
+                .withQuayRefOrQuay(quay3));
+
+        var stopPlaceById = new HierarchicalVersionMapById<StopPlace>();
+        stopPlaceById.add(stopPlace);
+
+        var stopAndStationMapper = new StopAndStationMapper(
+                MappingSupport.ID_FACTORY,
+                new HierarchicalVersionMapById<>(),
+                null,
+                new DataImportIssueStore(false),
+                stopPlaceById
+        );
+
+        stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
+
+        var stops = stopAndStationMapper.resultStops;
+
+        assertEquals(3, stops.size(), "Stops.size must be 3 found " + stops.size());
+
+        assertWheelChairBoarding("ST:Quay:1", WheelChairBoarding.POSSIBLE, stops);
+        assertWheelChairBoarding("ST:Quay:2", WheelChairBoarding.NOT_POSSIBLE, stops);
+        assertWheelChairBoarding("ST:Quay:3", WheelChairBoarding.NO_INFORMATION, stops);
+
+        // Now test with AccessibilityAssessment set on StopPlace (should be default)
+        stopPlace.withAccessibilityAssessment(
+                createAccessibilityAssessment(LimitationStatusEnumeration.TRUE));
+
+        // Add quay with no AccessibilityAssessment, then it should take default from stopPlace
+        stopPlace.getQuays().withQuayRefOrQuay(quay4);
+
+        stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
+
+        assertEquals(4, stops.size(), "stops.size must be 4 found " + stops.size());
+        assertWheelChairBoarding("ST:Quay:4", WheelChairBoarding.POSSIBLE, stops);
+    }
+
+    /**
+     * Utility function to assert WheelChairBoarding from Stop.
+     *
+     * @param quayId   ID to find corresponding Stop
+     * @param expected Expected WheelChairBoarding value in assertion
+     * @param stops    Find correct stop from list
+     */
+    private void assertWheelChairBoarding(
+            String quayId,
+            WheelChairBoarding expected,
+            List<Stop> stops
+    ) {
+        var wheelChairBoarding = stops.stream()
+                .filter(s -> s.getId().getId().equals(quayId))
+                .findAny()
+                .map(Stop::getWheelchairBoarding)
+                .orElse(null);
+
+        assertNotNull(wheelChairBoarding, "wheelChairBoarding must not be null");
+        assertEquals(
+                expected,
+                wheelChairBoarding,
+                () -> "wheelChairBoarding should be " + expected + " found " + wheelChairBoarding
+                        + " for quayId = " + quayId
+        );
+    }
+
     @Test
     public void mapStopPlaceAndQuays() {
         Collection<StopPlace> stopPlaces = new ArrayList<>();
@@ -83,7 +209,7 @@ public class StopAndStationMapperTest {
         stopPlaceOld.setQuays(
                 new Quays_RelStructure()
                         .withQuayRefOrQuay(quay1a)
-                    .withQuayRefOrQuay(quay3)
+                        .withQuayRefOrQuay(quay3)
         );
 
         HierarchicalVersionMapById<Quay> quaysById = new HierarchicalVersionMapById<>();
@@ -92,11 +218,16 @@ public class StopAndStationMapperTest {
         quaysById.add(quay2);
         quaysById.add(quay3);
 
+        var stopPlaceById = new HierarchicalVersionMapById<StopPlace>();
+        stopPlaceById.add(stopPlaceNew);
+        stopPlaceById.add(stopPlaceOld);
+
         StopAndStationMapper stopMapper = new StopAndStationMapper(
                 MappingSupport.ID_FACTORY,
                 quaysById,
                 null,
-                new DataImportIssueStore(false)
+                new DataImportIssueStore(false),
+                stopPlaceById
         );
 
         stopMapper.mapParentAndChildStops(stopPlaces);
@@ -166,4 +297,21 @@ public class StopAndStationMapperTest {
                                 .withLongitude(new BigDecimal(lon))
                 );
     }
+
+    /**
+     * Utility function to create AccessibilityAssessment and inject correct value.
+     *
+     * @param wheelChairAccess Value to WheelChairAccess
+     * @return AccessibilityAssessment with injected value
+     */
+    private AccessibilityAssessment createAccessibilityAssessment(LimitationStatusEnumeration wheelChairAccess) {
+        var accessibilityLimitation =
+                new AccessibilityLimitation().withWheelchairAccess(wheelChairAccess);
+
+        var limitations = new AccessibilityLimitations_RelStructure().withAccessibilityLimitation(
+                accessibilityLimitation);
+
+        return new AccessibilityAssessment().withLimitations(limitations);
+    }
+
 }

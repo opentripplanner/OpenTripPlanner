@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.timetable;
 
 import graphql.Scalars;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -107,7 +108,7 @@ public class TimetabledPassingTimeType {
             .newFieldDefinition()
             .name("destinationDisplay")
             .type(destinationDisplayType)
-            .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getHeadsign())
+            .dataFetcher(DataFetchingEnvironment::getSource)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()

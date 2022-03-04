@@ -393,11 +393,11 @@ otp.widgets.tripoptions.TimeSelector =
         //var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
         //$('#'+this.id+'-picker').datepicker("setDate", new Date(m));
         if(data.queryParams.date) {
-            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, otp.config.locale.time.date_format)));
+            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, otp.config.apiDateFormat)));
             this.tripWidget.module.date = data.queryParams.date;
         }
         if(data.queryParams.time) {
-            $('#'+this.id+'-time').val(moment(data.queryParams.time, otp.config.locale.time.time_format).format(otp.config.locale.time.time_format));
+            $('#'+this.id+'-time').val(moment(data.queryParams.time, otp.config.apiTimeFormat).format(otp.config.locale.time.time_format));
             this.tripWidget.module.time = data.queryParams.time;
         }
         if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {
@@ -549,6 +549,8 @@ otp.widgets.tripoptions.ModeSelector =
         for(i = 0; i < this.modeControls.length; i++) {
             this.modeControls[i].restorePlan(data);
         }
+
+        this.refreshModeControls();
     },
 
     controlPadding : "8px",
@@ -785,6 +787,7 @@ otp.widgets.tripoptions.BikeTriangle =
 
     id           :  null,
     bikeTriangle :  null,
+    defaultValues: {time: 0.33, slope: 0.33, safety: 0.33},
 
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
@@ -798,7 +801,10 @@ otp.widgets.tripoptions.BikeTriangle =
     },
 
     doAfterLayout : function() {
-        if(!this.bikeTriangle) this.bikeTriangle = new otp.widgets.BikeTrianglePanel(this.id);
+        if(!this.bikeTriangle) {
+            this.bikeTriangle = new otp.widgets.BikeTrianglePanel(this.id);
+            this.bikeTriangle.setValues(this.defaultValues.time, this.defaultValues.slope, this.defaultValues.safety);
+        }
         var this_ = this;
         this.bikeTriangle.onChanged = function() {
             var formData = this_.bikeTriangle.getFormData();
@@ -808,15 +814,24 @@ otp.widgets.tripoptions.BikeTriangle =
                 triangleSlopeFactor : formData.triangleSlopeFactor,
                 triangleSafetyFactor : formData.triangleSafetyFactor,
             });
-
         };
     },
 
     restorePlan : function(planData) {
         if(planData.queryParams.optimize === 'TRIANGLE') {
-            this.bikeTriangle.setValues(planData.queryParams.triangleTimeFactor,
-                                        planData.queryParams.triangleSlopeFactor,
-                                        planData.queryParams.triangleSafetyFactor);
+            if (this.bikeTriangle) {
+                this.bikeTriangle.setValues(
+                    planData.queryParams.triangleTimeFactor,
+                    planData.queryParams.triangleSlopeFactor,
+                    planData.queryParams.triangleSafetyFactor);
+            } else {
+                // doAfterLayout creates the bikeTriangle, which hasn't yet run
+                this.defaultValues = {
+                    time: planData.queryParams.triangleTimeFactor,
+                    slope: planData.queryParams.triangleSlopeFactor,
+                    safety: planData.queryParams.triangleSafetyFactor,
+                };
+            }
         }
     },
 

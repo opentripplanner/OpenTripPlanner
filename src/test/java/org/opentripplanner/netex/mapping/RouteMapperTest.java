@@ -3,16 +3,19 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ArrayListMultimap;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.model.GroupOfRoutes;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Branding;
 import org.opentripplanner.model.impl.EntityById;
@@ -31,6 +34,8 @@ import org.rutebanken.netex.model.PresentationStructure;
 public class RouteMapperTest {
 
     private static final String NETWORK_ID = "RUT:Network:1";
+    private static final String GROUP_OF_LINES_ID_1 = "RUT:GroupOfLines:1";
+    private static final String GROUP_OF_LINES_ID_2 = "RUT:GroupOfLines:2";
     private static final String AUTHORITY_ID = "RUT:Authority:1";
     private static final String BRANDING_ID = "RUT:Branding:1";
     private static final String RUT_LINE_ID = "RUT:Line:1";
@@ -50,6 +55,8 @@ public class RouteMapperTest {
                 MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 new EntityById<>(),
+                new EntityById<>(),
+                ArrayListMultimap.create(),
                 new EntityById<>(),
                 netexEntityIndex.readOnlyView(),
                 TimeZone.getDefault().toString(),
@@ -87,6 +94,8 @@ public class RouteMapperTest {
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
                 transitBuilder.getBrandingsById(),
+                transitBuilder.getGroupsOfRoutesByRouteId(),
+                transitBuilder.getGroupOfRouteById(),
                 netexIndex.readOnlyView(),
                 TIME_ZONE,
                 EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -114,6 +123,8 @@ public class RouteMapperTest {
                 new EntityById<>(),
                 new EntityById<>(),
                 new EntityById<>(),
+                ArrayListMultimap.create(),
+                new EntityById<>(),
                 netexEntityIndex.readOnlyView(),
                 TimeZone.getDefault().toString(),
                 EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -137,9 +148,11 @@ public class RouteMapperTest {
                 new EntityById<>(),
                 new EntityById<>(),
                 new EntityById<>(),
+                ArrayListMultimap.create(),
+                new EntityById<>(),
                 netexEntityIndex.readOnlyView(),
                 TimeZone.getDefault().toString(),
-                ImmutableSet.of(RUT_FERRY_WITHOUT_BICYCLES_ID)
+                Set.of(RUT_FERRY_WITHOUT_BICYCLES_ID)
         );
 
         Route ferryWithBicycles = routeMapper.mapRoute(lineWithBicycles);
@@ -160,6 +173,8 @@ public class RouteMapperTest {
                 new EntityById<>(),
                 new EntityById<>(),
                 new EntityById<>(),
+                ArrayListMultimap.create(),
+                new EntityById<>(),
                 netexEntityIndex.readOnlyView(),
                 TimeZone.getDefault().toString(),
                 EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -176,7 +191,7 @@ public class RouteMapperTest {
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
 
         transitBuilder.getBrandingsById()
-                .add(new Branding(MappingSupport.ID_FACTORY.createId(BRANDING_ID)));
+                .add(new Branding(MappingSupport.ID_FACTORY.createId(BRANDING_ID), null, null, null, null, null));
 
         Line line = createExampleLine();
 
@@ -186,6 +201,8 @@ public class RouteMapperTest {
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
                 transitBuilder.getBrandingsById(),
+                ArrayListMultimap.create(),
+                new EntityById<>(),
                 netexIndex.readOnlyView(),
                 TIME_ZONE,
                 EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -196,6 +213,39 @@ public class RouteMapperTest {
         Branding branding = route.getBranding();
         assertNotNull(branding);
         assertEquals(BRANDING_ID, branding.getId().getId());
+    }
+
+    @Test
+    public void mapRouteWithGroupOfRoutes() {
+        NetexEntityIndex netexIndex = new NetexEntityIndex();
+        OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+
+        Line line = createExampleLine();
+
+        line.getRepresentedByGroupRef().setRef(GROUP_OF_LINES_ID_1);
+        transitBuilder.getGroupOfRouteById().add(createGroupOfRoutes(GROUP_OF_LINES_ID_1));
+        transitBuilder.getGroupsOfRoutesByRouteId().put(MappingSupport.ID_FACTORY.createId(RUT_LINE_ID), createGroupOfRoutes(GROUP_OF_LINES_ID_2));
+
+        RouteMapper routeMapper = new RouteMapper(
+                new DataImportIssueStore(false),
+                MappingSupport.ID_FACTORY,
+                transitBuilder.getAgenciesById(),
+                transitBuilder.getOperatorsById(),
+                transitBuilder.getBrandingsById(),
+                transitBuilder.getGroupsOfRoutesByRouteId(),
+                transitBuilder.getGroupOfRouteById(),
+                netexIndex.readOnlyView(),
+                TIME_ZONE,
+                EMPTY_FERRY_WITHOUT_BICYCLE_IDS
+        );
+
+        Route route = routeMapper.mapRoute(line);
+
+        List<GroupOfRoutes> groupsOfLines = route.getGroupsOfRoutes();
+
+        assertEquals(2, groupsOfLines.size());
+        assertTrue(groupsOfLines.stream().anyMatch(gol -> GROUP_OF_LINES_ID_1.equals(gol.getId().getId())));
+        assertTrue(groupsOfLines.stream().anyMatch(gol -> GROUP_OF_LINES_ID_2.equals(gol.getId().getId())));
     }
 
     private Line createExampleLine() {
@@ -222,5 +272,10 @@ public class RouteMapperTest {
                 "Ruter AS",
                 TIME_ZONE
         );
+    }
+
+    private GroupOfRoutes createGroupOfRoutes(String id) {
+        return new GroupOfRoutes(MappingSupport.ID_FACTORY.createId(id), null,
+                null, null, null);
     }
 }

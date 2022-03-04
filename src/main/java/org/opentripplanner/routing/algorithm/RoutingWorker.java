@@ -10,17 +10,18 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
-import org.opentripplanner.routing.algorithm.raptor.router.AdditionalSearchDays;
-import org.opentripplanner.routing.algorithm.raptor.router.FilterTransitWhenDirectModeIsEmpty;
-import org.opentripplanner.routing.algorithm.raptor.router.TransitRouter;
-import org.opentripplanner.routing.algorithm.raptor.router.street.DirectFlexRouter;
-import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -86,11 +87,16 @@ public class RoutingWorker {
         var routingErrors = Collections.synchronizedSet(new HashSet<RoutingError>());
 
         if (OTPFeature.ParallelRouting.isOn()) {
-            CompletableFuture.allOf(
-                    CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
-                    CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
-                    CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
-            ).join();
+            try {
+                CompletableFuture.allOf(
+                        CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
+                        CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
+                        CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
+                ).join();
+            }
+            catch (CompletionException e) {
+                RoutingValidationException.unwrapAndRethrowCompletionException(e);
+            }
         } else {
             // Direct street routing
             routeDirectStreet(itineraries, routingErrors);

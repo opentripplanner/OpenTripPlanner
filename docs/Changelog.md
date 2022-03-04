@@ -1,6 +1,18 @@
 # Changelog
 
-## 2.1.0 (in progress)
+## 2.2.0 (in progress)
+- Optimize merging of trip patterns on dates [#3925](https://github.com/opentripplanner/OpenTripPlanner/pull/3925)
+- Fix default value for transit alerts [#3934](https://github.com/opentripplanner/OpenTripPlanner/pull/3934)
+- Add the visualizer to the interactive launcher [#3932](https://github.com/opentripplanner/OpenTripPlanner/pull/3932)
+- Fix date handling for estimated calls for service journey on specific date in Transmodel API [#3935](https://github.com/opentripplanner/OpenTripPlanner/pull/3935)
+- feat: refactor a deprecated integer conversion in Histogram class [#3939](https://github.com/opentripplanner/OpenTripPlanner/pull/3939)
+- Via headsign bugfix [#3936](https://github.com/opentripplanner/OpenTripPlanner/pull/3936)
+- NeTEx mapping for WheelChairBoarding [#3945](https://github.com/opentripplanner/OpenTripPlanner/pull/3945)
+- OTP support for NeTEx GroupOfLines [#3928](https://github.com/opentripplanner/OpenTripPlanner/pull/3928)
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+
+
+## 2.1.0 (TODO - Waiting for actual release date)
 - Fix NullPointerException when a RealTime update do not match an existing TripPattern [#3284](https://github.com/opentripplanner/OpenTripPlanner/issues/3284)
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
@@ -137,7 +149,19 @@
 - Add stairsTimeFactor to StreetEdge [#3832](https://github.com/opentripplanner/OpenTripPlanner/pull/3832)
 - Make sure we keep the itinerary with the least number of transfers when grouping the itineraries [#3833](https://github.com/opentripplanner/OpenTripPlanner/pull/3833)
 - Don't expect every pattern in a route to have the specified stop with constrained transfers [#3868](https://github.com/opentripplanner/OpenTripPlanner/pull/3868)
-[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+- Add support for creating constrained transfers from real-time generated patterns [#3878](https://github.com/opentripplanner/OpenTripPlanner/pull/3878)
+- Account for stay seated transfers when calculating the number of transfers [#3888](https://github.com/opentripplanner/OpenTripPlanner/pull/3888)
+- Add Hungarian translation [#3861](https://github.com/opentripplanner/OpenTripPlanner/pull/3861)
+- Add support for NeTEx VIA's [#3883](https://github.com/opentripplanner/OpenTripPlanner/pull/3883)
+- Turn ParallelRouting off [#3918](https://github.com/opentripplanner/OpenTripPlanner/pull/3918)
+- Make some list entries non-null in schema/docs [#3915](https://github.com/opentripplanner/OpenTripPlanner/pull/3915)
+- NeTEx mapping to StopTime.timepoint [#3898](https://github.com/opentripplanner/OpenTripPlanner/pull/3898)
+- Optimize RAPTOR trip search by pre-calculating arrival/departure time arrays [#3919](https://github.com/opentripplanner/OpenTripPlanner/pull/3919)
+- Make turn restrictions faster and thread-safe by moving them into StreetEdge [#3899](https://github.com/opentripplanner/OpenTripPlanner/pull/3899)
+- Rework leg creation [#3826](https://github.com/opentripplanner/OpenTripPlanner/pull/3826)
+- Add routing using frequency trips [#3916](https://github.com/opentripplanner/OpenTripPlanner/pull/3916)
+- Remove ET realtime override code [#3912](https://github.com/opentripplanner/OpenTripPlanner/pull/3912)
+- Allow traversal of pathways without traversal time, distance or steps [#3910](https://github.com/opentripplanner/OpenTripPlanner/pull/3910)
 
 
 ## 2.0.0 (2020-11-27)

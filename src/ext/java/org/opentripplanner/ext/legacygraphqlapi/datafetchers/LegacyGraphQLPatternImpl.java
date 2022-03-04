@@ -6,6 +6,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -20,8 +21,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -106,15 +105,8 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   @Override
-  public DataFetcher<EncodedPolylineBean> patternGeometry() {
-    return environment -> {
-      LineString geometry = getSource(environment).getGeometry();
-      if (geometry == null) {
-        return null;
-      }
-
-      return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
-    };
+  public DataFetcher<Geometry> patternGeometry() {
+    return environment -> getSource(environment).getGeometry();
   }
 
   @Override
@@ -219,7 +211,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   }
 
   private List<Trip> getTrips(DataFetchingEnvironment environment) {
-    return getSource(environment).getTrips();
+    return getSource(environment).scheduledTripsAsStream().collect(Collectors.toList());
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

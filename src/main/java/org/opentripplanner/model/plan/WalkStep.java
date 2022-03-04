@@ -2,16 +2,16 @@ package org.opentripplanner.model.plan;
 
 import com.google.common.collect.Lists;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.util.I18NString;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.util.I18NString;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
@@ -99,6 +99,11 @@ public class WalkStep {
     public double angle;
 
     /**
+     * Is this step walking with a bike?
+     */
+    public boolean walkingBike;
+
+    /**
      * The street edges that make up this walkStep.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
@@ -168,11 +173,15 @@ public class WalkStep {
     }
 
     public String streetNameNoParens() {
-        int idx = streetName.toString().indexOf('(');
-        if (idx <= 0) {
-            return streetName.toString();
+        var str = streetName.toString();
+        if (str == null){
+            return null; //Avoid null reference exceptions with pathways which don't have names
         }
-        return streetName.toString().substring(0, idx - 1);
+        int idx = str.indexOf('(');
+        if (idx > 0) {
+            return str.substring(0, idx - 1);
+        }
+        return str;
     }
 
     @Override

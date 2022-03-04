@@ -1,11 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import java.util.function.IntUnaryOperator;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 
 /**
@@ -22,7 +24,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrA
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
-        implements TripScheduleSearch<T>, RaptorTripScheduleBoardOrAlightEvent<T>
+        implements RaptorTripScheduleSearch<T>, RaptorTripScheduleBoardOrAlightEvent<T>
 {
     private static final int NOT_SET = -1;
 
@@ -32,6 +34,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
 
     private int earliestBoardTime;
     private int stopPositionInPattern;
+    private IntUnaryOperator departureTimes;
+
     private T candidateTrip;
     private int candidateTripIndex = NOT_SET;
 
@@ -93,6 +97,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
     ) {
         this.earliestBoardTime = earliestTime;
         this.stopPositionInPattern = stopPositionInPattern;
+        this.departureTimes = timeTable.getDepartureTimes(stopPositionInPattern);
         this.candidateTrip = null;
         this.candidateTripIndex = NOT_SET;
 
@@ -156,21 +161,20 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
     @Nullable
     private RaptorTripScheduleBoardOrAlightEvent<T> findBoardingBySteppingBackwardsInTime(int tripIndexUpperBound) {
         for (int i = tripIndexUpperBound-1; i >= 0; --i) {
-            T trip = timeTable.getTripSchedule(i);
-            final int boardTime = trip.departure(stopPositionInPattern);
-
-            if (boardTime >= earliestBoardTime) {
-                candidateTrip = trip;
+            if (departureTimes.applyAsInt(i) >= earliestBoardTime) {
                 candidateTripIndex = i;
             } else {
                 // this trip arrives too early. We can break out of the loop since
                 // trips are sorted by departure time (trips in given schedule)
                 // Trips passing another trip is not accounted for if both are in service.
-                return candidateTrip == null ? null : this;
+                break;
             }
         }
-        return candidateTrip == null ? null : this;
+        if (candidateTripIndex == NOT_SET) { return null; }
+        candidateTrip = timeTable.getTripSchedule(candidateTripIndex);
+        return this;
     }
+
 
     /**
      * This method search for the first scheduled trip boarding, after or equals to
@@ -181,11 +185,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
     @Nullable
     private RaptorTripScheduleBoardOrAlightEvent<T> findBoardingBySteppingForwardInTime(final int tripIndexLowerBound) {
         for (int i = tripIndexLowerBound; i < nTrips; ++i) {
-            T trip = timeTable.getTripSchedule(i);
-            final int boardTime = trip.departure(stopPositionInPattern);
-
-            if (boardTime >= earliestBoardTime) {
-                candidateTrip = trip;
+            if (departureTimes.applyAsInt(i) >= earliestBoardTime) {
+                candidateTrip = timeTable.getTripSchedule(i);
                 candidateTripIndex = i;
                 return this;
             }
@@ -208,11 +209,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule>
         while (upper - lower > nTripsBinarySearchThreshold) {
             int m = (lower + upper) / 2;
 
-            RaptorTripSchedule trip = timeTable.getTripSchedule(m);
-
-            int departure = trip.departure(stopPositionInPattern);
-
-            if (departure >= earliestBoardTime) {
+            if (departureTimes.applyAsInt(m) >= earliestBoardTime) {
                 upper = m;
             }
             else {

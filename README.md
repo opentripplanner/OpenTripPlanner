@@ -11,7 +11,7 @@ If you do not want to test or explore this version, please switch to the final 1
 
 ## Performance Test
 
-[📊 Speed Bench Mark](https://otp-performance.leonard.io/) We run the SpeedTest (included in the code) to measure the performance for every PR merged into OTP. The test uses a fixed Norwegian Netex data set and Grafana is used to display the results.
+[📊 Speed Benchmark](https://otp-performance.leonard.io/) We run the SpeedTest (included in the code) to measure the performance for every PR merged into OTP. The test uses a fixed Norwegian Netex data set and Grafana is used to display the results. Each run is listed under the [GitHub Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/performance-test.yml). If you need to run the test locally you can [download the NeTex file](https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip) from the Continuous Integration Pipeline. There is a [text file](test/ci-performance-test/travelSearch-expected-results.csv) with the expected results witch might need to be updated when OTP is changed and the test fails. The OSM data used is the [norway-210101.osm.pbf](https://download.geofabrik.de/europe/norway-210101.osm.pbf) file from Geofabrik OSM extract from January 1st 2021.
 
 
 ## Repository layout

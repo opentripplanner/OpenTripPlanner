@@ -33,7 +33,7 @@ public enum ResourceBundleSingleton {
         }
         try {
             ResourceBundle resourceBundle = null;
-            if (key.equals("corner") || key.equals("unnamedStreet")) {
+            if (key.equals("corner") || key.equals("unnamedStreet") || key.equals("origin") || key.equals("destination")) {
                 resourceBundle = ResourceBundle.getBundle("internals", locale, noFallbackControl);
             } else {
                 resourceBundle = ResourceBundle.getBundle("WayProperties", locale, noFallbackControl);

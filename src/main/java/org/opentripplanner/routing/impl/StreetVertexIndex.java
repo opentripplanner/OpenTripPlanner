@@ -27,6 +27,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.ProgressTracker;
+import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,10 +230,10 @@ public class StreetVertexIndex {
     String name;
     if (location.label == null || location.label.isEmpty()) {
       if (endVertex) {
-        name = "Destination";
+        name = ResourceBundleSingleton.INSTANCE.localize("destination", options.locale);
       }
       else {
-        name = "Origin";
+        name = ResourceBundleSingleton.INSTANCE.localize("origin", options.locale);
       }
     }
     else {

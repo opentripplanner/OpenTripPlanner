@@ -16,7 +16,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 4923.150999999999,
+          "distance": 4923.151,
           "endTime": "2009-11-17T19:03:41.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -48,7 +48,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64847039626407,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Southeast Morrison Street"
+              "streetName": "Southeast Morrison Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -60,7 +61,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6594795,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 261187797 from 2"
+              "streetName": "way 261187797 from 2",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -72,7 +74,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65974310000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Southeast 6th Avenue"
+              "streetName": "Southeast 6th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -84,7 +87,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6597447,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Southeast Belmont Street"
+              "streetName": "Southeast Belmont Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHWEST",
@@ -96,7 +100,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.66074710000001,
               "relativeDirection": "LEFT",
               "stayOn": true,
-              "streetName": "Southeast Belmont Street"
+              "streetName": "Southeast Belmont Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -108,7 +113,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6658345,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "way 131623794 from 0"
+              "streetName": "way 131623794 from 0",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -120,7 +126,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.665947,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Southeast Water Avenue"
+              "streetName": "Southeast Water Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -132,7 +139,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6660075,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Morrison Bridge"
+              "streetName": "Morrison Bridge",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -144,7 +152,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6738909,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 144373674 from 1"
+              "streetName": "way 144373674 from 1",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -156,7 +165,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67391230000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Southwest Alder Street"
+              "streetName": "Southwest Alder Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -168,7 +178,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69024660000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -180,7 +191,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.696357,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 22nd Avenue"
+              "streetName": "Northwest 22nd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -192,7 +204,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69663860000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -211,7 +224,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 4923.150999999999,
+      "walkDistance": 4923.151,
       "walkLimitExceeded": false,
       "walkTime": 3821
     },
@@ -259,7 +272,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 920.3299999999999,
+          "distance": 920.33,
           "endTime": "2009-11-17T18:12:58.000+00:00",
           "from": {
             "departure": "2009-11-17T18:01:00.000+00:00",
@@ -291,7 +304,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64847039626407,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Southeast Morrison Street"
+              "streetName": "Southeast Morrison Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -303,7 +317,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64959560000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Southeast 16th Avenue"
+              "streetName": "Southeast 16th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -315,7 +330,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64955280000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Northeast 16th Avenue"
+              "streetName": "Northeast 16th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHEAST",
@@ -327,7 +343,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6495675,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northeast Sandy Boulevard"
+              "streetName": "Northeast Sandy Boulevard",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -347,7 +364,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -564,6 +581,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:12:58.000+00:00",
           "steps": [ ],
@@ -588,7 +606,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 999.0980000000001,
+          "distance": 999.098,
           "endTime": "2009-11-17T18:38:41.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:25:49.000+00:00",
@@ -624,7 +642,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69490673448706,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -636,7 +655,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.696357,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 22nd Avenue"
+              "streetName": "Northwest 22nd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -648,7 +668,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69663860000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -747,7 +768,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64847039626407,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Southeast Morrison Street"
+              "streetName": "Southeast Morrison Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -767,7 +789,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -1101,6 +1123,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:15",
           "routeLongName": "Belmont/NW 23rd",
           "routeShortName": "15",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:15:40.000+00:00",
           "steps": [ ],
@@ -1161,7 +1184,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69870264831422,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue"
+              "streetName": "Northwest 23rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -1173,7 +1197,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69866750000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1240,7 +1265,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 920.3299999999999,
+          "distance": 920.33,
           "endTime": "2009-11-17T18:27:58.000+00:00",
           "from": {
             "departure": "2009-11-17T18:16:00.000+00:00",
@@ -1272,7 +1297,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64847039626407,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Southeast Morrison Street"
+              "streetName": "Southeast Morrison Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -1284,7 +1310,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64959560000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Southeast 16th Avenue"
+              "streetName": "Southeast 16th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -1296,7 +1323,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64955280000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Northeast 16th Avenue"
+              "streetName": "Northeast 16th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHEAST",
@@ -1308,7 +1336,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6495675,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northeast Sandy Boulevard"
+              "streetName": "Northeast Sandy Boulevard",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1328,7 +1357,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -1545,6 +1574,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:27:58.000+00:00",
           "steps": [ ],
@@ -1569,7 +1599,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 999.0980000000001,
+          "distance": 999.098,
           "endTime": "2009-11-17T18:53:55.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:41:03.000+00:00",
@@ -1605,7 +1635,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69490673448706,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -1617,7 +1648,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.696357,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 22nd Avenue"
+              "streetName": "Northwest 22nd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -1629,7 +1661,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69663860000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1728,7 +1761,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64847039626407,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Southeast Morrison Street"
+              "streetName": "Southeast Morrison Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -1748,7 +1782,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -2082,6 +2116,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:15",
           "routeLongName": "Belmont/NW 23rd",
           "routeShortName": "15",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:30:40.000+00:00",
           "steps": [ ],
@@ -2142,7 +2177,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69870264831422,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue"
+              "streetName": "Northwest 23rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -2154,7 +2190,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69866750000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2225,7 +2262,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 419.61499999999995,
+          "distance": 419.615,
           "endTime": "2009-11-17T18:42:54.000+00:00",
           "from": {
             "departure": "2009-11-17T18:37:30.000+00:00",
@@ -2257,7 +2294,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64847039626407,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Southeast Morrison Street"
+              "streetName": "Southeast Morrison Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -2269,7 +2307,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6536511,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Southeast 12th Avenue"
+              "streetName": "Southeast 12th Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2289,7 +2328,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -2415,6 +2454,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:70",
           "routeLongName": "12th Ave",
           "routeShortName": "70",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:42:54.000+00:00",
           "steps": [ ],
@@ -2438,7 +2478,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -2603,6 +2643,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:77",
           "routeLongName": "Broadway/Halsey",
           "routeShortName": "77",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:54:29.000+00:00",
           "steps": [ ],
@@ -2663,7 +2704,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69644484256081,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2682,7 +2724,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 1,
       "transitTime": 1293,
       "waitingTime": 208,
-      "walkDistance": 438.42099999999994,
+      "walkDistance": 438.421,
       "walkLimitExceeded": false,
       "walkTime": 348
     }
@@ -2708,7 +2750,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 4442.913999999999,
+          "distance": 4442.914,
           "endTime": "2009-11-17T18:57:31.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -2743,7 +2785,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65362253301092,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northeast 12th Avenue"
+              "streetName": "Northeast 12th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -2755,7 +2798,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6536312,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "East Burnside Street"
+              "streetName": "East Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -2767,7 +2811,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6648816,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Burnside Bridge"
+              "streetName": "Burnside Bridge",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -2779,7 +2824,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67010870000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -2791,7 +2837,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67338950000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 3rd Avenue"
+              "streetName": "Northwest 3rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -2803,7 +2850,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67371650000001,
               "relativeDirection": "SLIGHTLY_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Hoyt Street"
+              "streetName": "Northwest Hoyt Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -2815,7 +2863,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6755629,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -2827,7 +2876,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6755935,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -2839,7 +2889,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67662320000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Station Way"
+              "streetName": "Northwest Station Way",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -2851,7 +2902,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.679511,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2870,7 +2922,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 4442.913999999999,
+      "walkDistance": 4442.914,
       "walkLimitExceeded": false,
       "walkTime": 3451
     },
@@ -2918,7 +2970,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 87.019,
+          "distance": 87.01899999999999,
           "endTime": "2009-11-17T18:14:00.000+00:00",
           "from": {
             "departure": "2009-11-17T18:12:47.000+00:00",
@@ -2953,7 +3005,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65362253301092,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northeast 12th Avenue"
+              "streetName": "Northeast 12th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -2965,7 +3018,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65363380000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 162042138 from 0"
+              "streetName": "way 162042138 from 0",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -2985,7 +3039,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -3202,6 +3256,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:14:00.000+00:00",
           "steps": [ ],
@@ -3226,7 +3281,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 913.815,
+          "distance": 913.8149999999999,
           "endTime": "2009-11-17T18:38:40.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:26:49.000+00:00",
@@ -3262,7 +3317,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.70071990797962,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHEAST",
@@ -3274,7 +3330,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.701384,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Place"
+              "streetName": "Northwest 24th Place",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -3286,7 +3343,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.70033570000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Westover Road"
+              "streetName": "Northwest Westover Road",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -3298,7 +3356,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.7004445,
               "relativeDirection": "SLIGHTLY_RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -3310,7 +3369,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.70070630000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3329,7 +3389,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 769,
       "waitingTime": 0,
-      "walkDistance": 1000.8340000000001,
+      "walkDistance": 1000.834,
       "walkLimitExceeded": false,
       "walkTime": 784
     },
@@ -3377,7 +3437,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 87.019,
+          "distance": 87.01899999999999,
           "endTime": "2009-11-17T18:29:00.000+00:00",
           "from": {
             "departure": "2009-11-17T18:27:47.000+00:00",
@@ -3412,7 +3472,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65362253301092,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northeast 12th Avenue"
+              "streetName": "Northeast 12th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -3424,7 +3485,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65363380000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 162042138 from 0"
+              "streetName": "way 162042138 from 0",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3444,7 +3506,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -3661,6 +3723,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:29:00.000+00:00",
           "steps": [ ],
@@ -3685,7 +3748,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 913.815,
+          "distance": 913.8149999999999,
           "endTime": "2009-11-17T18:54:10.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:42:19.000+00:00",
@@ -3721,7 +3784,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.70071990797962,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHEAST",
@@ -3733,7 +3797,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.701384,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Place"
+              "streetName": "Northwest 24th Place",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -3745,7 +3810,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.70033570000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Westover Road"
+              "streetName": "Northwest Westover Road",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -3757,7 +3823,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.7004445,
               "relativeDirection": "SLIGHTLY_RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -3769,7 +3836,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.70070630000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3788,7 +3856,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 799,
       "waitingTime": 0,
-      "walkDistance": 1000.8340000000001,
+      "walkDistance": 1000.834,
       "walkLimitExceeded": false,
       "walkTime": 784
     },
@@ -3836,7 +3904,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 87.019,
+          "distance": 87.01899999999999,
           "endTime": "2009-11-17T18:45:00.000+00:00",
           "from": {
             "departure": "2009-11-17T18:43:47.000+00:00",
@@ -3871,7 +3939,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65362253301092,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northeast 12th Avenue"
+              "streetName": "Northeast 12th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -3883,7 +3952,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65363380000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 162042138 from 0"
+              "streetName": "way 162042138 from 0",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -3903,7 +3973,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -4120,6 +4190,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:20",
           "routeLongName": "Burnside/Stark",
           "routeShortName": "20",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:45:00.000+00:00",
           "steps": [ ],
@@ -4144,7 +4215,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 913.815,
+          "distance": 913.8149999999999,
           "endTime": "2009-11-17T19:09:40.000+00:00",
           "from": {
             "arrival": "2009-11-17T18:57:49.000+00:00",
@@ -4180,7 +4251,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.70071990797962,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHEAST",
@@ -4192,7 +4264,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.701384,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Place"
+              "streetName": "Northwest 24th Place",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -4204,7 +4277,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.70033570000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Westover Road"
+              "streetName": "Northwest Westover Road",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -4216,7 +4290,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.7004445,
               "relativeDirection": "SLIGHTLY_RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 24th Avenue"
+              "streetName": "Northwest 24th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "EAST",
@@ -4228,7 +4303,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.70070630000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -4247,7 +4323,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 769,
       "waitingTime": 0,
-      "walkDistance": 1000.8340000000001,
+      "walkDistance": 1000.834,
       "walkLimitExceeded": false,
       "walkTime": 784
     },
@@ -4334,7 +4410,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65362253301092,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northeast 12th Avenue"
+              "streetName": "Northeast 12th Avenue",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -4354,7 +4431,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -4441,6 +4518,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:70",
           "routeLongName": "12th Ave",
           "routeShortName": "70",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:46:00.000+00:00",
           "steps": [ ],
@@ -4464,7 +4542,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -4642,6 +4720,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:77",
           "routeLongName": "Broadway/Halsey",
           "routeShortName": "77",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T18:54:29.000+00:00",
           "steps": [ ],
@@ -4702,7 +4781,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69870264831422,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue"
+              "streetName": "Northwest 23rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -4714,7 +4794,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69866750000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -4816,7 +4897,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65362253301092,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northeast 12th Avenue"
+              "streetName": "Northeast 12th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTH",
@@ -4828,7 +4910,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6536312,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Southeast 12th Avenue"
+              "streetName": "Southeast 12th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -4840,7 +4923,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6536511,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Southeast Morrison Street"
+              "streetName": "Southeast Morrison Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -4860,7 +4944,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
         {
           "agencyId": "prt:prt",
           "agencyName": "TriMet",
-          "agencyTimeZoneOffset": 0,
+          "agencyTimeZoneOffset": -28800000,
           "agencyUrl": "http://trimet.org",
           "arrivalDelay": 0,
           "departureDelay": 0,
@@ -5155,6 +5239,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "routeId": "prt:15",
           "routeLongName": "Belmont/NW 23rd",
           "routeShortName": "15",
+          "routeType": 3,
           "serviceDate": "2009-11-17",
           "startTime": "2009-11-17T19:02:00.000+00:00",
           "steps": [ ],
@@ -5215,7 +5300,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69853023095405,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "way 158083864 from 0"
+              "streetName": "way 158083864 from 0",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5227,7 +5313,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69861290000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue"
+              "streetName": "Northwest 23rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5239,7 +5326,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69864600000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Marshall Street"
+              "streetName": "Northwest Marshall Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5251,7 +5339,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6987072,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 158083033 from 0"
+              "streetName": "way 158083033 from 0",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5263,7 +5352,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69870940000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Northwest 23rd Avenue"
+              "streetName": "Northwest 23rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5275,7 +5365,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.69876060000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "way 158083032 from 0"
+              "streetName": "way 158083032 from 0",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5287,7 +5378,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.698768,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5332,7 +5424,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 4875.788999999999,
+          "distance": 4875.789,
           "endTime": "2009-11-17T19:03:24.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -5364,7 +5456,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.64856484453956,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Southeast 17th Avenue"
+              "streetName": "Southeast 17th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5376,7 +5469,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6485648,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Southeast Stark Street"
+              "streetName": "Southeast Stark Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5388,7 +5482,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65373050000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 226431264 from 0"
+              "streetName": "way 226431264 from 0",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -5400,7 +5495,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6537325,
               "relativeDirection": "LEFT",
               "stayOn": true,
-              "streetName": "way 226431263 from 21"
+              "streetName": "way 226431263 from 21",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5412,7 +5508,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65431720000001,
               "relativeDirection": "RIGHT",
               "stayOn": true,
-              "streetName": "way 226431263 from 23"
+              "streetName": "way 226431263 from 23",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5424,7 +5521,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6546522,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Southeast Oak Street"
+              "streetName": "Southeast Oak Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5436,7 +5534,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.66128140000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "way 257064467 from 1"
+              "streetName": "way 257064467 from 1",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5448,7 +5547,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.66178300000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Southeast Martin Luther King, Junior Boulevard"
+              "streetName": "Southeast Martin Luther King, Junior Boulevard",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5460,7 +5560,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.66176650000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "East Burnside Street"
+              "streetName": "East Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5472,7 +5573,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6648816,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Burnside Bridge"
+              "streetName": "Burnside Bridge",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5484,7 +5586,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67010870000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5496,7 +5599,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67338950000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 3rd Avenue"
+              "streetName": "Northwest 3rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5508,7 +5612,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67371650000001,
               "relativeDirection": "SLIGHTLY_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Hoyt Street"
+              "streetName": "Northwest Hoyt Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5520,7 +5625,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6755629,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5532,7 +5638,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6755935,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5544,7 +5651,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67662320000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Station Way"
+              "streetName": "Northwest Station Way",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5556,7 +5664,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.679511,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5575,7 +5684,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 4875.788999999999,
+      "walkDistance": 4875.789,
       "walkLimitExceeded": false,
       "walkTime": 3804
     }
@@ -5601,7 +5710,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 4154.147999999998,
+          "distance": 4154.148,
           "endTime": "2009-11-17T18:53:50.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -5636,7 +5745,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.65362253301092,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Northeast 12th Avenue"
+              "streetName": "Northeast 12th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5648,7 +5758,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6536312,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "East Burnside Street"
+              "streetName": "East Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5660,7 +5771,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6648816,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Burnside Bridge"
+              "streetName": "Burnside Bridge",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5672,7 +5784,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67010870000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "West Burnside Street"
+              "streetName": "West Burnside Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5684,7 +5797,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67338950000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 3rd Avenue"
+              "streetName": "Northwest 3rd Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5696,7 +5810,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67371650000001,
               "relativeDirection": "SLIGHTLY_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Hoyt Street"
+              "streetName": "Northwest Hoyt Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5708,7 +5823,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6755629,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 5th Avenue"
+              "streetName": "Northwest 5th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5720,7 +5836,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6755935,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Irving Street"
+              "streetName": "Northwest Irving Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5732,7 +5849,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67662320000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest Station Way"
+              "streetName": "Northwest Station Way",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5744,7 +5862,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.679511,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5763,7 +5882,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 4154.147999999998,
+      "walkDistance": 4154.148,
       "walkLimitExceeded": false,
       "walkTime": 3230
     }
@@ -5789,7 +5908,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset": -28800000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 2985.4260000000004,
+          "distance": 2985.426,
           "endTime": "2009-11-17T18:39:26.000+00:00",
           "from": {
             "departure": "2009-11-17T18:00:00.000+00:00",
@@ -5824,7 +5943,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.66779676192563,
               "relativeDirection": "DEPART",
               "stayOn": false,
-              "streetName": "Interstate/Rose Quarter Northbound Yellow Line MAX Platform"
+              "streetName": "Interstate/Rose Quarter Northbound Yellow Line MAX Platform",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHWEST",
@@ -5836,7 +5956,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.66822160000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 125785939 from 4"
+              "streetName": "way 125785939 from 4",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -5848,7 +5969,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.66836730000001,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "North Interstate Avenue"
+              "streetName": "North Interstate Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHWEST",
@@ -5860,7 +5982,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67197920000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "way 117315127 from 2"
+              "streetName": "way 117315127 from 2",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -5872,7 +5995,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67202800000001,
               "relativeDirection": "RIGHT",
               "stayOn": true,
-              "streetName": "way 117315115 from 0"
+              "streetName": "way 117315115 from 0",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHWEST",
@@ -5884,7 +6008,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67204310000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Broadway Bridge"
+              "streetName": "Broadway Bridge",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "SOUTHWEST",
@@ -5896,7 +6021,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67746670000001,
               "relativeDirection": "CONTINUE",
               "stayOn": false,
-              "streetName": "Northwest Broadway"
+              "streetName": "Northwest Broadway",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5908,7 +6034,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.67780010000001,
               "relativeDirection": "UTURN_RIGHT",
               "stayOn": true,
-              "streetName": "Northwest Broadway"
+              "streetName": "Northwest Broadway",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTHWEST",
@@ -5920,7 +6047,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6778163,
               "relativeDirection": "SLIGHTLY_LEFT",
               "stayOn": false,
-              "streetName": "Northwest Lovejoy Street"
+              "streetName": "Northwest Lovejoy Street",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "NORTH",
@@ -5932,7 +6060,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6813836,
               "relativeDirection": "RIGHT",
               "stayOn": false,
-              "streetName": "Northwest 10th Avenue"
+              "streetName": "Northwest 10th Avenue",
+              "walkingBike": false
             },
             {
               "absoluteDirection": "WEST",
@@ -5944,7 +6073,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "lon": -122.6814307,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Northrup Street"
+              "streetName": "Northwest Northrup Street",
+              "walkingBike": false
             }
           ],
           "to": {
@@ -5963,7 +6093,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers": 0,
       "transitTime": 0,
       "waitingTime": 0,
-      "walkDistance": 2985.4260000000004,
+      "walkDistance": 2985.426,
       "walkLimitExceeded": false,
       "walkTime": 2366
     }

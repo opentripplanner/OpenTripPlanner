@@ -1,5 +1,6 @@
 package org.opentripplanner.api.mapping;
 
+import java.util.stream.Stream;
 import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.model.FeedScopedId;
@@ -47,8 +48,8 @@ public class TripMapper {
         return api;
     }
 
-    public static List<ApiTripShort> mapToApiShort(Collection<Trip> domain) {
+    public static List<ApiTripShort> mapToApiShort(Stream<Trip> domain) {
         if(domain == null) { return null; }
-        return domain.stream().map(TripMapper::mapToApiShort).collect(Collectors.toList());
+        return domain.map(TripMapper::mapToApiShort).collect(Collectors.toList());
     }
 }
