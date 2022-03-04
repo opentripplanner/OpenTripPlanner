@@ -239,9 +239,9 @@ public class Timetable implements Serializable {
                             update.hasScheduleRelationship() ? update.getScheduleRelationship()
                             : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
                     if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
-                        LOG.warn("Partially canceled trips are unsupported by this method." +
-                                " Skipping TripUpdate.");
-                        return null;
+                        newTimes.setCancelled(i);
+                        newTimes.updateArrivalDelay(i, delay);
+                        newTimes.updateDepartureDelay(i, delay);
                     } else if (scheduleRelationship ==
                             StopTimeUpdate.ScheduleRelationship.NO_DATA) {
                         newTimes.updateArrivalDelay(i, 0);
