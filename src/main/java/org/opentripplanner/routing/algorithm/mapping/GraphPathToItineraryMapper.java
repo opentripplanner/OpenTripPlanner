@@ -335,7 +335,11 @@ public abstract class GraphPathToItineraryMapper {
                         case CAR:
                             return TraverseMode.CAR;
                     }
-                } else {
+                }
+                else if (state.isVehicleParked()) {
+                    return TraverseMode.WALK;
+                }
+                else {
                     return mode;
                 }
             }
