@@ -13,7 +13,6 @@ import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.StopPlace;
 
 class StopMapper {
 
@@ -38,7 +37,7 @@ class StopMapper {
           Station parentStation,
           Collection<FareZone> fareZones,
           T2<TransitMode, String> transitMode,
-          StopPlace stopPlace
+          WheelChairBoarding wheelChairBoarding
   ) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
@@ -47,15 +46,13 @@ class StopMapper {
       return null;
     }
 
-    var wheelchairBoarding = wheelChairBoardingFromQuay(quay, stopPlace);
-
     Stop stop = new Stop(
             idFactory.createId(quay.getId()),
             parentStation.getName(),
             quay.getPublicCode(),
             quay.getDescription() != null ? quay.getDescription().getValue() : null,
             WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
-            wheelchairBoarding,
+            wheelChairBoarding,
             null,
             null,
             fareZones,
@@ -70,27 +67,5 @@ class StopMapper {
     return stop;
   }
 
-  /**
-   * Get WheelChairBoarding from Quay and parent Station.
-   *
-   * @param quay      NeTEx quay could contain information about accessability
-   * @param stopPlace Parent StopPlace for given Quay
-   * @return not null value with default NO_INFORMATION if nothing defined in quay or
-   * parentStation.
-   */
-  private WheelChairBoarding wheelChairBoardingFromQuay(Quay quay, StopPlace stopPlace) {
-
-    var defaultWheelChairBoarding = WheelChairBoarding.NO_INFORMATION;
-
-    if (stopPlace != null) {
-      defaultWheelChairBoarding = WheelChairMapper.wheelChairBoarding(
-              stopPlace.getAccessibilityAssessment(),
-              WheelChairBoarding.NO_INFORMATION
-      );
-    }
-
-    return WheelChairMapper.wheelChairBoarding(
-            quay.getAccessibilityAssessment(), defaultWheelChairBoarding);
-  }
 
 }

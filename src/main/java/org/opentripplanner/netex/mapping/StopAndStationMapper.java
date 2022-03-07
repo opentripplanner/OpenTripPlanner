@@ -19,6 +19,7 @@ import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -164,8 +165,11 @@ class StopAndStationMapper {
             return;
         }
 
-        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, stopPlace);
-        if (stop == null) return;
+        var wheelchairBoarding = wheelChairBoardingFromQuay(quay, stopPlace);
+
+        Stop stop =
+                stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchairBoarding);
+        if (stop == null) {return;}
 
         station.addChildStop(stop);
 
@@ -211,4 +215,28 @@ class StopAndStationMapper {
     private static StopPlace first(List<StopPlace> stops) {
         return stops.get(0);
     }
+
+    /**
+     * Get WheelChairBoarding from Quay and parent Station.
+     *
+     * @param quay      NeTEx quay could contain information about accessability
+     * @param stopPlace Parent StopPlace for given Quay
+     * @return not null value with default NO_INFORMATION if nothing defined in quay or
+     * parentStation.
+     */
+    private WheelChairBoarding wheelChairBoardingFromQuay(Quay quay, StopPlace stopPlace) {
+
+        var defaultWheelChairBoarding = WheelChairBoarding.NO_INFORMATION;
+
+        if (stopPlace != null) {
+            defaultWheelChairBoarding = WheelChairMapper.wheelChairBoarding(
+                    stopPlace.getAccessibilityAssessment(),
+                    WheelChairBoarding.NO_INFORMATION
+            );
+        }
+
+        return WheelChairMapper.wheelChairBoarding(
+                quay.getAccessibilityAssessment(), defaultWheelChairBoarding);
+    }
+
 }
