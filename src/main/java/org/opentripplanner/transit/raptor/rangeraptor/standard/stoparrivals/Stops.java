@@ -15,7 +15,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
  */
 public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTransfers {
 
-    private final StopArrivalState<T>[][] stops;
+    private final DefaultStopArrivalState<T>[][] stops;
     private final RoundProvider roundProvider;
 
     public Stops(
@@ -25,7 +25,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     ) {
         this.roundProvider = roundProvider;
         //noinspection unchecked
-        this.stops = (StopArrivalState<T>[][]) new StopArrivalState[nRounds][nStops];
+        this.stops = (DefaultStopArrivalState<T>[][]) new DefaultStopArrivalState[nRounds][nStops];
     }
 
     /**
@@ -47,11 +47,11 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     }
 
     public boolean exist(int round, int stop) {
-        StopArrivalState<T> s = get(round, stop);
+        DefaultStopArrivalState<T> s = get(round, stop);
         return s != null && s.reached();
     }
 
-    public StopArrivalState<T> get(int round, int stop) {
+    public DefaultStopArrivalState<T> get(int round, int stop) {
         return stops[round][stop];
     }
 
@@ -80,13 +80,13 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
      */
     void transferToStop(int fromStop, RaptorTransfer transfer, int arrivalTime) {
         int stop = transfer.stop();
-        StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
+        DefaultStopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
 
         state.transferToStop(fromStop, arrivalTime, transfer);
     }
 
     void transitToStop(int stop, int time, int boardStop, int boardTime, T trip, boolean bestTime) {
-        StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
+        DefaultStopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
 
         state.arriveByTransit(time, boardStop, boardTime, trip);
 
@@ -102,9 +102,9 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
 
     /* private methods */
 
-    private StopArrivalState<T> findOrCreateStopIndex(final int round, final int stop) {
+    private DefaultStopArrivalState<T> findOrCreateStopIndex(final int round, final int stop) {
         if (stops[round][stop] == null) {
-            stops[round][stop] = new StopArrivalState<>();
+            stops[round][stop] = new DefaultStopArrivalState<>();
         }
         return get(round, stop);
     }
@@ -116,7 +116,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     TransitArrival<T> previousTransit(int boardStopIndex) {
         final int prevRound = round() - 1;
         int stopIndex = boardStopIndex;
-        StopArrivalState<T> state = stops[prevRound][boardStopIndex];
+        DefaultStopArrivalState<T> state = stops[prevRound][boardStopIndex];
 
         // We check for transfer before access, since a FLEX arrive on-board
         // can be followed by a transfer

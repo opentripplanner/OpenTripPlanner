@@ -3,16 +3,16 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.vie
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.TransitPathView;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.DefaultStopArrivalState;
 
 final class Transit<T extends RaptorTripSchedule>
     extends StopArrivalViewAdapter<T>
     implements TransitPathView<T>
 {
-    private final StopArrivalState<T> arrival;
+    private final DefaultStopArrivalState<T> arrival;
     private final StopsCursor<T> cursor;
 
-    Transit(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
+    Transit(int round, int stop, DefaultStopArrivalState<T> arrival, StopsCursor<T> cursor) {
         super(round, stop);
         this.arrival = arrival;
         this.cursor = cursor;

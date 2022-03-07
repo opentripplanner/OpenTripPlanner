@@ -14,7 +14,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArriva
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends StopArrivalState<T> {
+public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends DefaultStopArrivalState<T> {
     private final int round;
     private final int stop;
     private final RaptorTransfer[] egressPaths;

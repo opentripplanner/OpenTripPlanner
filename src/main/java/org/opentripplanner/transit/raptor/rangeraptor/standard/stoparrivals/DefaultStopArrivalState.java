@@ -22,7 +22,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class StopArrivalState<T extends RaptorTripSchedule> {
+public class DefaultStopArrivalState<T extends RaptorTripSchedule> {
 
     /**
      * Used to initialize all none time based attributes.
@@ -43,9 +43,9 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
     private int transferFromStop = NOT_SET;
     private RaptorTransfer accessOrTransferPath = null;
 
-    public StopArrivalState() { }
+    public DefaultStopArrivalState() { }
 
-    StopArrivalState(StopArrivalState<T> other) {
+    DefaultStopArrivalState(DefaultStopArrivalState<T> other) {
         this.bestArrivalTime = other.bestArrivalTime;
         this.transitArrivalTime = other.transitArrivalTime;
         this.trip = other.trip;

@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.AccessStopArrivalState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.DefaultStopArrivalState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stops;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
@@ -58,7 +58,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      * Return a fictive Transfer arrival for the rejected transfer stop arrival.
      */
     public Transfer<T> rejectedTransfer(int round, int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
-        StopArrivalState<T> arrival = new StopArrivalState<>();
+        DefaultStopArrivalState<T> arrival = new DefaultStopArrivalState<>();
         arrival.transferToStop(fromStop, arrivalTime, transfer);
         return new Transfer<>(round, toStop, arrival, this);
     }
@@ -67,7 +67,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      * Return a fictive Transit arrival for the rejected transit stop arrival.
      */
     public Transit<T> rejectedTransit(int round, int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
-            StopArrivalState<T> arrival = new StopArrivalState<>();
+            DefaultStopArrivalState<T> arrival = new DefaultStopArrivalState<>();
             arrival.arriveByTransit(alightTime, boardStop, boardTime, trip);
             return new Transit<>(round, alightStop, arrival, this);
     }
@@ -81,7 +81,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      * @return the current transit state, if found
      */
     public Transit<T> transit(int round, int stop) {
-        StopArrivalState<T> arrival = stops.get(round, stop);
+        DefaultStopArrivalState<T> arrival = stops.get(round, stop);
         return new Transit<>(round, stop, arrival, this);
     }
 
@@ -191,7 +191,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      * A transfer is only present if it has the earliest arrival time. If, not the transit
      * is the has the best arrival time and we return that.
      */
-    private ArrivalView<T> newTransitOrTransfer(int round, int stop, StopArrivalState<T> arrival) {
+    private ArrivalView<T> newTransitOrTransfer(int round, int stop, DefaultStopArrivalState<T> arrival) {
         return arrival.arrivedByTransfer()
                 ? new Transfer<>(round, stop, arrival, this)
                 : new Transit<>(round, stop, arrival, this);
