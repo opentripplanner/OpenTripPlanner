@@ -10,7 +10,6 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.Quay;
@@ -22,16 +21,12 @@ class StopMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  private final ReadOnlyHierarchicalVersionMapById<StopPlace> stopPlaceIndex;
-
   StopMapper(
           FeedScopedIdFactory idFactory,
-          DataImportIssueStore issueStore,
-          ReadOnlyHierarchicalVersionMapById<StopPlace> stopPlaceIndex
+          DataImportIssueStore issueStore
   ) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
-    this.stopPlaceIndex = stopPlaceIndex;
   }
 
   /**
@@ -42,7 +37,8 @@ class StopMapper {
           Quay quay,
           Station parentStation,
           Collection<FareZone> fareZones,
-          T2<TransitMode, String> transitMode
+          T2<TransitMode, String> transitMode,
+          StopPlace stopPlace
   ) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
@@ -51,7 +47,7 @@ class StopMapper {
       return null;
     }
 
-    var wheelchairBoarding = wheelChairBoardingFromQuay(quay, parentStation);
+    var wheelchairBoarding = wheelChairBoardingFromQuay(quay, stopPlace);
 
     Stop stop = new Stop(
             idFactory.createId(quay.getId()),
@@ -77,16 +73,14 @@ class StopMapper {
   /**
    * Get WheelChairBoarding from Quay and parent Station.
    *
-   * @param quay          NeTEx quay could contain information about accessability
-   * @param parentStation Used to get a default WheelChairBoarding if not found from Quay.
+   * @param quay      NeTEx quay could contain information about accessability
+   * @param stopPlace Parent StopPlace for given Quay
    * @return not null value with default NO_INFORMATION if nothing defined in quay or
    * parentStation.
    */
-  private WheelChairBoarding wheelChairBoardingFromQuay(Quay quay, Station parentStation) {
+  private WheelChairBoarding wheelChairBoardingFromQuay(Quay quay, StopPlace stopPlace) {
 
     var defaultWheelChairBoarding = WheelChairBoarding.NO_INFORMATION;
-    var stopPlaceId = parentStation.getId();
-    var stopPlace = stopPlaceIndex.lookupLastVersionById(stopPlaceId.getId());
 
     if (stopPlace != null) {
       defaultWheelChairBoarding = WheelChairMapper.wheelChairBoarding(

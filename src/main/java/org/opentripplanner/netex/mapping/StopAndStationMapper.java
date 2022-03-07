@@ -63,11 +63,10 @@ class StopAndStationMapper {
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
             TariffZoneMapper tariffZoneMapper,
-            DataImportIssueStore issueStore,
-            ReadOnlyHierarchicalVersionMapById<StopPlace> stopPlaceIndex
+            DataImportIssueStore issueStore
     ) {
         this.stationMapper = new StationMapper(issueStore, idFactory);
-        this.stopMapper = new StopMapper(idFactory, issueStore, stopPlaceIndex);
+        this.stopMapper = new StopMapper(idFactory, issueStore);
         this.tariffZoneMapper = tariffZoneMapper;
         this.quayIndex = quayIndex;
         this.issueStore = issueStore;
@@ -92,7 +91,8 @@ class StopAndStationMapper {
         // were deleted in never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Quay quay : listOfQuays(stopPlace)) {
-                addNewStopToParentIfNotPresent(quay, station, fareZones, transitMode);
+                addNewStopToParentIfNotPresent(
+                        quay, station, fareZones, transitMode, selectedStopPlace);
             }
         }
     }
@@ -147,10 +147,11 @@ class StopAndStationMapper {
     }
 
     private void addNewStopToParentIfNotPresent(
-        Quay quay,
-        Station station,
-        Collection<FareZone> fareZones,
-        T2<TransitMode, String> transitMode
+            Quay quay,
+            Station station,
+            Collection<FareZone> fareZones,
+            T2<TransitMode, String> transitMode,
+            StopPlace stopPlace
     ) {
         // TODO OTP2 - This assumption is only valid because Norway have a
         //           - national stop register, we should add all stops/quays
@@ -163,7 +164,7 @@ class StopAndStationMapper {
             return;
         }
 
-        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode);
+        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, stopPlace);
         if (stop == null) return;
 
         station.addChildStop(stop);
