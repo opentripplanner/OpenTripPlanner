@@ -22,7 +22,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DefaultStopArrivalState<T extends RaptorTripSchedule> {
+class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArrivalState<T> {
 
     /**
      * Used to initialize all none time based attributes.
@@ -55,42 +55,47 @@ public class DefaultStopArrivalState<T extends RaptorTripSchedule> {
         this.accessOrTransferPath = other.accessOrTransferPath;
     }
 
+    @Override
     public final int time() {
         return bestArrivalTime;
     }
 
+    @Override
     public RaptorTransfer accessPath() {
         return accessOrTransferPath;
     }
 
-    public final int accessDuration() {
-        return accessOrTransferPath.durationInSeconds();
-    }
-
+    @Override
     public final int transitArrivalTime() {
         return transitArrivalTime;
     }
 
+    @Override
     public final T trip() {
         return trip;
     }
 
+    @Override
     public final int boardTime() {
         return boardTime;
     }
 
+    @Override
     public final int boardStop() {
         return boardStop;
     }
 
+    @Override
     public final int transferFromStop() {
         return transferFromStop;
     }
 
+    @Override
     public final int transferDuration() {
         return accessOrTransferPath.durationInSeconds();
     }
 
+    @Override
     public boolean arrivedByAccess() {
         return false;
     }
@@ -98,6 +103,7 @@ public class DefaultStopArrivalState<T extends RaptorTripSchedule> {
     /**
      * A transit arrival exist, but it might be a better transfer arrival as well.
      */
+    @Override
     public final boolean arrivedByTransit() {
         return transitArrivalTime != NOT_SET;
     }
@@ -105,10 +111,12 @@ public class DefaultStopArrivalState<T extends RaptorTripSchedule> {
     /**
      * The best arrival is by transfer.
      */
+    @Override
     public final boolean arrivedByTransfer() {
         return transferFromStop != NOT_SET;
     }
 
+    @Override
     public final RaptorTransfer transferPath() {
         return accessOrTransferPath;
     }
@@ -118,10 +126,12 @@ public class DefaultStopArrivalState<T extends RaptorTripSchedule> {
         this.accessOrTransferPath = accessPath;
     }
 
-    final boolean reached() {
+    @Override
+    public final boolean reached() {
         return bestArrivalTime != NOT_SET;
     }
 
+    @Override
     public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
         this.transitArrivalTime = arrivalTime;
         this.trip = trip;
@@ -129,7 +139,8 @@ public class DefaultStopArrivalState<T extends RaptorTripSchedule> {
         this.boardStop = boardStop;
     }
 
-    final void setBestTimeTransit(int time) {
+    @Override
+    public final void setBestTimeTransit(int time) {
         this.bestArrivalTime = time;
         // The transfer is cleared since it is not the fastest alternative any more.
         this.transferFromStop = NOT_SET;
@@ -139,14 +150,11 @@ public class DefaultStopArrivalState<T extends RaptorTripSchedule> {
      * Set the time at a transit index iff it is optimal. This sets both the best time and the
      * transfer time
      */
+    @Override
     public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
         this.bestArrivalTime = arrivalTime;
         this.transferFromStop = fromStop;
         this.accessOrTransferPath = transferPath;
-    }
-
-    public AccessStopArrivalState<T> asAccessStopArrivalState() {
-        return (AccessStopArrivalState<T>) this;
     }
 
     @Override

@@ -4,16 +4,16 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.TransferPathView;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.DefaultStopArrivalState;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 
 final class Transfer<T extends RaptorTripSchedule>
     extends StopArrivalViewAdapter<T>
     implements TransferPathView
 {
-    private final DefaultStopArrivalState<T> arrival;
+    private final StopArrivalState<T> arrival;
     private final StopsCursor<T> cursor;
 
-    Transfer(int round, int stop, DefaultStopArrivalState<T> arrival, StopsCursor<T> cursor) {
+    Transfer(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
         super(round, stop);
         this.arrival = arrival;
         this.cursor = cursor;

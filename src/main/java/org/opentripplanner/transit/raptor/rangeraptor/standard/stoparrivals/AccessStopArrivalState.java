@@ -4,14 +4,14 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.time.TimeUtils;
 
-public class AccessStopArrivalState<T extends RaptorTripSchedule> extends DefaultStopArrivalState<T> {
+class AccessStopArrivalState<T extends RaptorTripSchedule> extends DefaultStopArrivalState<T> {
 
-  public AccessStopArrivalState(int time, RaptorTransfer accessPath) {
+  AccessStopArrivalState(int time, RaptorTransfer accessPath) {
     setAccessTime(time, accessPath);
   }
 
-  public AccessStopArrivalState(int time, RaptorTransfer accessPath, DefaultStopArrivalState<T> other) {
-    super(other);
+  AccessStopArrivalState(int time, RaptorTransfer accessPath, StopArrivalState<T> other) {
+    super((DefaultStopArrivalState<T>) other);
     setAccessTime(time, accessPath);
   }
 
@@ -25,7 +25,7 @@ public class AccessStopArrivalState<T extends RaptorTripSchedule> extends Defaul
     return String.format(
         "Access Arrival { time: %s, duration: %s }",
         TimeUtils.timeToStrLong(time()),
-        TimeUtils.timeToStrCompact(accessDuration())
+        TimeUtils.timeToStrCompact(accessPath().durationInSeconds())
     );
   }
 }
