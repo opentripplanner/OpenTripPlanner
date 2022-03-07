@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping.calendar;
 
+import com.google.common.collect.ArrayListMultimap;
 import org.junit.Test;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
@@ -39,7 +40,7 @@ public class DatedServiceJourneyMapperTest {
 
   @Test
   public void indexDSJBySJIdWithEmptyInput() {
-    assertEquals(Map.of(), DatedServiceJourneyMapper.indexDSJBySJId(new HierarchicalMapById<>()));
+    assertEquals(ArrayListMultimap.create(), DatedServiceJourneyMapper.indexDSJBySJId(new HierarchicalMapById<>()));
   }
 
   @Test
@@ -51,7 +52,7 @@ public class DatedServiceJourneyMapperTest {
     HierarchicalMapById<DatedServiceJourney> input = new HierarchicalMapById<>();
     input.addAll(List.of(dsj1, dsj2, dsj3));
 
-    Map<String, List<DatedServiceJourney>> result = DatedServiceJourneyMapper.indexDSJBySJId(input);
+    ArrayListMultimap<String, DatedServiceJourney> result = DatedServiceJourneyMapper.indexDSJBySJId(input);
 
     assertEquals("DSJ-1, DSJ-3", listIdsSortedAsStr(result.get(SJ_1)));
     assertEquals("DSJ-2", listIdsSortedAsStr(result.get(SJ_2)));

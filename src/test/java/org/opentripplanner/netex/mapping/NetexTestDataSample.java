@@ -4,6 +4,7 @@ import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
+import com.google.common.collect.ArrayListMultimap;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -63,7 +64,7 @@ class NetexTestDataSample {
     private final HierarchicalMapById<ServiceJourney> serviceJourneyById = new HierarchicalMapById<>();
     private final HierarchicalMapById<Route> routesById = new HierarchicalMapById<>();
     private final HierarchicalMapById<OperatingDay> operatingDaysById = new HierarchicalMapById<>();
-    private final Map<String, List<DatedServiceJourney>> datedServiceJourneyBySjId = new HashMap<>();
+    private final ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneyBySjId = ArrayListMultimap.create();
 
     private final EntityById<org.opentripplanner.model.Route> otpRouteByid = new EntityById<>();
 
@@ -152,7 +153,6 @@ class NetexTestDataSample {
                     );
             serviceJourneyById.add(serviceJourney);
 
-            datedServiceJourneyBySjId.put(SERVICE_JOURNEY_ID, new ArrayList());
             for(int i=0; i<DATED_SERVICE_JOURNEY_ID.size(); i++) {
                 OperatingDay operatingDay = new OperatingDay()
                         .withId(OPERATING_DAYS.get(i))
@@ -166,7 +166,7 @@ class NetexTestDataSample {
                         .withOperatingDayRef(
                                 new OperatingDayRefStructure().withRef(operatingDay.getId()));
 
-                datedServiceJourneyBySjId.get(SERVICE_JOURNEY_ID).add(datedServiceJourney);
+                datedServiceJourneyBySjId.put(SERVICE_JOURNEY_ID, datedServiceJourney);
 
             }
         }
@@ -229,7 +229,7 @@ class NetexTestDataSample {
         return operatingDaysById;
     }
 
-    Map<String, List<DatedServiceJourney>> getDatedServiceJourneyBySjId() {
+    ArrayListMultimap<String, DatedServiceJourney> getDatedServiceJourneyBySjId() {
         return datedServiceJourneyBySjId;
     }
 

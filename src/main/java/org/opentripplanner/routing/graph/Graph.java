@@ -239,7 +239,7 @@ public class Graph implements Serializable {
      */
     public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
 
-    public Collection<TripOnServiceDate> tripOnServiceDates = new ArrayList();
+    public Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = Maps.newHashMap();
 
     /** Pre-generated transfers between all stops. */
     public final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
@@ -958,7 +958,7 @@ public class Graph implements Serializable {
         return tripPatternForId.values();
     }
 
-    public Collection<TripOnServiceDate> getTripOnServiceDates() {
+    public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDates() {
         return tripOnServiceDates;
     }
 

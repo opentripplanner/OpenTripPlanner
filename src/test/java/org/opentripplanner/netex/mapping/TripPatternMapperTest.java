@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.common.collect.ArrayListMultimap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class TripPatternMapperTest {
                 sample.getServiceJourneyById(),
                 new HierarchicalMapById<>(),
                 new HierarchicalMapById<>(),
-                new HashMap<>(),
+                ArrayListMultimap.create(),
                 Map.of(NetexTestDataSample.SERVICE_JOURNEY_ID, SERVICE_ID),
                 new Deduplicator()
         );

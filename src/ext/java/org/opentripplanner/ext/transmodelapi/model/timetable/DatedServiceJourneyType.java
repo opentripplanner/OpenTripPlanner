@@ -27,6 +27,7 @@ public class DatedServiceJourneyType {
                 .field(GqlUtil.newTransitIdField())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("OperatingDayDate")
+                        .description("The date this service runs. The date used is based on the service date as opposed to calendar date.")
                         .type(Scalars.GraphQLString)
                         .dataFetcher(environment -> (
                                 tripOnServiceDate(environment).getServiceDate().toString()
@@ -34,6 +35,7 @@ public class DatedServiceJourneyType {
                 )
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("ServiceJourney")
+                        .description("The service journey this Dated Service Journey is based on")
                         .type(new GraphQLNonNull(serviceJourneyType))
                         .dataFetcher(environment -> (
                                         tripOnServiceDate(environment).getTrip()
@@ -41,6 +43,7 @@ public class DatedServiceJourneyType {
                         ))
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("TripAlteration")
+                        .description("Alterations specified on the Trip in the planned data")
                         .type(SERVICE_ALTERATION)
                         .dataFetcher(environment -> tripOnServiceDate(environment).getTripAlteration())
                 )

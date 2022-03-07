@@ -8,21 +8,27 @@ import org.opentripplanner.model.calendar.ServiceDate;
 public class DatedServiceJourneyHelper {
 
     /**
-     * Gets a TripOnServiceDate from a timetable snapshot if it has realtime updates
-     * otherwise from the graph index
+     * Gets a TripOnServiceDate from a timetable snapshot if it has realtime updates otherwise from
+     * the graph index
+     *
      * @param routingService
      * @param tripId
      * @param serviceDate
      * @return
      */
-    public static TripOnServiceDate getTripOnServiceDate(RoutingService routingService, FeedScopedId tripId, ServiceDate serviceDate) {
+    public static TripOnServiceDate getTripOnServiceDate(
+            RoutingService routingService,
+            FeedScopedId tripId,
+            ServiceDate serviceDate
+    ) {
 
         var tuple = new T2<>(tripId, serviceDate);
         if (routingService.getTimetableSnapshot() != null) {
             if (routingService
                     .getTimetableSnapshot()
                     .getLastAddedTripOnServiceDateByTripIdAndServiceDate()
-                    .containsKey(tuple)) {
+                    .containsKey(tuple)
+            ) {
 
                 return routingService
                         .getTimetableSnapshot()
@@ -34,17 +40,22 @@ public class DatedServiceJourneyHelper {
     }
 
     /**
-     * Gets a TripOnServiceDate from a timetable snapshot if it has realtime updates
-     * otherwise from the graph index
+     * Gets a TripOnServiceDate from a timetable snapshot if it has realtime updates otherwise from
+     * the graph index
+     *
      * @param routingService
      * @param datedServiceJourneyId
      * @return
      */
-    public static TripOnServiceDate getTripOnServiceDate(RoutingService routingService, FeedScopedId datedServiceJourneyId) {
+    public static TripOnServiceDate getTripOnServiceDate(
+            RoutingService routingService,
+            FeedScopedId datedServiceJourneyId
+    ) {
         if (routingService
                 .getTimetableSnapshot()
                 .getLastAddedTripOnServiceDate()
-                .containsKey(datedServiceJourneyId)) {
+                .containsKey(datedServiceJourneyId)
+        ) {
 
             return routingService
                     .getTimetableSnapshot()

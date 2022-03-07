@@ -83,7 +83,7 @@ public class NetexMapper {
      */
     private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
 
-    private final Map<String, List<DatedServiceJourney>> datedServiceJourneysBySjId = new HashMap<>();
+    private final ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneysBySjId = ArrayListMultimap.create();
 
 
     public NetexMapper(

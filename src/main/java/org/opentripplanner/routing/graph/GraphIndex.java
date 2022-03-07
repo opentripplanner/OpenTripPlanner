@@ -107,7 +107,7 @@ public class GraphIndex {
             }
         }
 
-        for(TripOnServiceDate tripOnServiceDate : graph.tripOnServiceDates) {
+        for(TripOnServiceDate tripOnServiceDate : graph.tripOnServiceDates.values()) {
             tripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
             tripOnServiceDateForTripAndDay.put(
                     new T2<>(tripOnServiceDate.getTrip().getId(), tripOnServiceDate.getServiceDate()), tripOnServiceDate);

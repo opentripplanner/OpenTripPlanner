@@ -7,6 +7,7 @@ import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -79,7 +80,9 @@ public class NetexModule implements GraphBuilderModule {
                         issueStore
                 );
                 transitBuilder.limitServiceDays(transitPeriodLimit, issueStore);
-                graph.getTripOnServiceDates().addAll(transitBuilder.getTripOnServiceDates().values());
+                for(TripOnServiceDate tripOnServiceDate : transitBuilder.getTripOnServiceDates().values()) {
+                    graph.getTripOnServiceDates().put(tripOnServiceDate.getId(), tripOnServiceDate);
+                }
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 if (OTPFeature.FlexRouting.isOn()) {

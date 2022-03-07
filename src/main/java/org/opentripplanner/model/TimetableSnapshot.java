@@ -114,7 +114,7 @@ public class TimetableSnapshot {
     private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
 
     private HashMap<FeedScopedId, TripOnServiceDate> lastAddedTripOnServiceDate = new HashMap<>();
-    private HashMap<T2<FeedScopedId, ServiceDate>, TripOnServiceDate> lastAddedTripOnServiceDateByTripIdAndServiceDate = new HashMap<>();
+    private HashMap<TripIdAndServiceDate, TripOnServiceDate> lastAddedTripOnServiceDateByTripIdAndServiceDate = new HashMap<>();
 
     /**
      * This maps contains all of the new or updated TripPatterns added by realtime data indexed on
@@ -307,7 +307,7 @@ public class TimetableSnapshot {
         ret.lastAddedTripOnServiceDate =
                 (HashMap<FeedScopedId, TripOnServiceDate>) this.lastAddedTripOnServiceDate.clone();
         ret.lastAddedTripOnServiceDateByTripIdAndServiceDate =
-                (HashMap<T2<FeedScopedId, ServiceDate>, TripOnServiceDate>) this.lastAddedTripOnServiceDateByTripIdAndServiceDate.clone();
+                (HashMap<TripIdAndServiceDate, TripOnServiceDate>) this.lastAddedTripOnServiceDateByTripIdAndServiceDate.clone();
         this.dirtyTimetables.clear();
         this.dirty = false;
 
@@ -442,14 +442,14 @@ public class TimetableSnapshot {
     public void addLastAddedTripOnServiceDate(Trip trip, ServiceDate serviceDate, FeedScopedId datedServiceJourneyId, TripOnServiceDate tripOnServiceDate) {
         lastAddedTripOnServiceDate.put(datedServiceJourneyId, tripOnServiceDate);
         lastAddedTripOnServiceDateByTripIdAndServiceDate.put(
-                new T2(trip.getId(), serviceDate), tripOnServiceDate);
+                new TripIdAndServiceDate(trip.getId(), serviceDate), tripOnServiceDate);
     }
 
     public HashMap<FeedScopedId, TripOnServiceDate> getLastAddedTripOnServiceDate() {
         return lastAddedTripOnServiceDate;
     }
 
-    public HashMap<T2<FeedScopedId, ServiceDate>, TripOnServiceDate> getLastAddedTripOnServiceDateByTripIdAndServiceDate() {
+    public HashMap<TripIdAndServiceDate, TripOnServiceDate> getLastAddedTripOnServiceDateByTripIdAndServiceDate() {
         return lastAddedTripOnServiceDateByTripIdAndServiceDate;
     }
 }
