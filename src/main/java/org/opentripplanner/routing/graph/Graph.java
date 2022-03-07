@@ -348,9 +348,11 @@ public class Graph implements Serializable {
         if (e != null) {
             streetNotesService.removeStaticNotes(e);
 
-            if (e.fromv != null) {
-                e.fromv.removeOutgoing(e);
+            if (e instanceof StreetEdge) {
+                ((StreetEdge) e).removeAllTurnRestrictions();
+            }
 
+            if (e.fromv != null) {
                 e.fromv.getIncoming()
                         .stream()
                         .filter(StreetEdge.class::isInstance)
@@ -363,6 +365,7 @@ public class Graph implements Serializable {
                             }
                         });
 
+                e.fromv.removeOutgoing(e);
                 e.fromv = null;
             }
 

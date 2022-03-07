@@ -1,10 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Collection;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -81,12 +78,6 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     @Override
     public int getOutAngle() {
         return parentEdge.getInAngle();
-    }
-
-    @Nonnull
-    @Override
-    public Collection<TurnRestriction> getTurnRestrictions() {
-        return parentEdge.getTurnRestrictions();
     }
 
     /**
