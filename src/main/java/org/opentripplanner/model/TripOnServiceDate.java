@@ -7,9 +7,9 @@ import org.opentripplanner.model.calendar.ServiceDate;
  */
 public class TripOnServiceDate extends TransitEntity {
 
-    private Trip trip;
-    private ServiceDate serviceDate;
-    private TripAlteration tripAlteration;
+    private final Trip trip;
+    private final ServiceDate serviceDate;
+    private final TripAlteration tripAlteration;
 
     public TripOnServiceDate(FeedScopedId id, Trip trip, ServiceDate serviceDate, TripAlteration tripAlteration) {
         super(id);
@@ -30,7 +30,4 @@ public class TripOnServiceDate extends TransitEntity {
         return tripAlteration;
     }
 
-    public void setTripAlteration(TripAlteration tripAlteration) {
-        this.tripAlteration = tripAlteration;
-    }
 }
