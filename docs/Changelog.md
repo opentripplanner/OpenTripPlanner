@@ -1,6 +1,14 @@
 # Changelog
 
 ## 2.2.0 (in progress)
+- Optimize merging of trip patterns on dates [#3925](https://github.com/opentripplanner/OpenTripPlanner/pull/3925)
+- Fix default value for transit alerts [#3934](https://github.com/opentripplanner/OpenTripPlanner/pull/3934)
+- Add the visualizer to the interactive launcher [#3932](https://github.com/opentripplanner/OpenTripPlanner/pull/3932)
+- Fix date handling for estimated calls for service journey on specific date in Transmodel API [#3935](https://github.com/opentripplanner/OpenTripPlanner/pull/3935)
+- feat: refactor a deprecated integer conversion in Histogram class [#3939](https://github.com/opentripplanner/OpenTripPlanner/pull/3939)
+- Via headsign bugfix [#3936](https://github.com/opentripplanner/OpenTripPlanner/pull/3936)
+- NeTEx mapping for WheelChairBoarding [#3945](https://github.com/opentripplanner/OpenTripPlanner/pull/3945)
+- OTP support for NeTEx GroupOfLines [#3928](https://github.com/opentripplanner/OpenTripPlanner/pull/3928)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
