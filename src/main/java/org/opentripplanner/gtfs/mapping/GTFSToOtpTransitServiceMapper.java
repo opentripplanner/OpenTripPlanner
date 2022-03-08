@@ -139,7 +139,8 @@ public class GTFSToOtpTransitServiceMapper {
                 stationMapper,
                 stopMapper,
                 tripMapper,
-                builder.getStopTimesSortedByTrip()
+                builder.getStopTimesSortedByTrip(),
+                issueStore
         );
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
     }

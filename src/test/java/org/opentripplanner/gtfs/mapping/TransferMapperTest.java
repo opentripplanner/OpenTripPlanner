@@ -45,6 +45,8 @@ public class TransferMapperTest {
 
     private static final Transfer TRANSFER = new Transfer();
 
+    private static final DataImportIssueStore issueStore = new DataImportIssueStore(true);
+
     static {
         FROM_ROUTE.setId(AGENCY_AND_ID);
         FROM_STOP.setId(AGENCY_AND_ID);
@@ -69,7 +71,8 @@ public class TransferMapperTest {
             STATION_MAPPER,
             STOP_MAPPER,
             TRIP_MAPPER,
-            new TripStopTimes()
+            new TripStopTimes(),
+            issueStore
     );
 
     /*

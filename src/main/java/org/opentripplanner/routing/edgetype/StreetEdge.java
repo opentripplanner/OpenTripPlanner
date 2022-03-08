@@ -3,10 +3,8 @@ package org.opentripplanner.routing.edgetype;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -876,60 +874,44 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * Copy restrictions having former edge as from to appropriate split edge, as well as
      * restrictions on incoming edges.
      */
-    private static void copyRestrictionsToSplitEdges(StreetEdge edge, P2<StreetEdge> splitEdges) {
-
-        edge.getTurnRestrictions().forEach(restriction -> {
-            // figure which one is the "from" edge
-            StreetEdge fromEdge = shouldUseFirstSplitEdge(edge, restriction) ? splitEdges.first : splitEdges.second;
-
-            TurnRestriction splitTurnRestriction = new TurnRestriction(fromEdge, restriction.to,
-                    restriction.type, restriction.modes, restriction.time
-            );
-            LOG.debug(
-                    "Recreate new restriction {} with split edge as from edge {}", splitTurnRestriction,
-                    fromEdge
-            );
-            fromEdge.addTurnRestriction(splitTurnRestriction);
-            // Not absolutely necessary, as old edge will not be accessible, but for good housekeeping
-            edge.removeTurnRestriction(restriction);
-        });
-
-        applyToAdjacentEdges(edge, splitEdges.second, edge.getToVertex().getOutgoing());
-        applyToAdjacentEdges(edge, splitEdges.first, edge.getFromVertex().getIncoming());
-    }
-
-    private static boolean shouldUseFirstSplitEdge(StreetEdge edge, TurnRestriction restriction) {
-        return restriction.to.getToVertex() == edge.getToVertex();
-    }
-
-    private static void applyToAdjacentEdges(
-            StreetEdge formerEdge,
-            StreetEdge newToEdge,
-            Collection<Edge> adjacentEdges
+    private static void copyRestrictionsToSplitEdges(
+            StreetEdge edge,
+            P2<StreetEdge> splitEdges
     ) {
-        adjacentEdges.stream()
-                .filter(StreetEdge.class::isInstance)
-                .map(StreetEdge.class::cast)
-                .flatMap(originatingEdge -> originatingEdge.getTurnRestrictions().stream())
-                .filter(restriction -> restriction.to == formerEdge)
-                .forEach(restriction -> applyRestrictionsToNewEdge(newToEdge, restriction));
+
+        // Copy turn restriction which have a .to of this edge (present on the incoming edges of fromv)
+        if (splitEdges.first != null) {
+            edge.getFromVertex().getIncoming()
+                    .stream()
+                    .filter(StreetEdge.class::isInstance)
+                    .map(StreetEdge.class::cast)
+                    .flatMap(originatingEdge -> originatingEdge.getTurnRestrictions().stream())
+                    .filter(restriction -> restriction.to == edge)
+                    .forEach(restriction -> applyRestrictionsToNewEdge(restriction.from, splitEdges.first, restriction));
+        }
+
+        // Copy turn restriction which have a .from of this edge (present on the original street edge)
+        if (splitEdges.second != null) {
+            edge.getTurnRestrictions()
+                    .forEach(existingTurnRestriction -> applyRestrictionsToNewEdge(
+                            splitEdges.second, existingTurnRestriction.to,
+                            existingTurnRestriction
+                    ));
+        }
     }
 
     private static void applyRestrictionsToNewEdge(
-            StreetEdge newEdge,
+            StreetEdge fromEdge,
+            StreetEdge toEdge,
             TurnRestriction restriction
     ) {
-        TurnRestriction splitTurnRestriction = new TurnRestriction(restriction.from,
-                newEdge, restriction.type, restriction.modes, restriction.time
+        TurnRestriction splitTurnRestriction = new TurnRestriction(
+                fromEdge, toEdge, restriction.type, restriction.modes, restriction.time
         );
         LOG.debug(
-                "Recreate new restriction {} with split edge as to edge {}", splitTurnRestriction,
-                newEdge
+                "Created new restriction for split edges: {}", splitTurnRestriction
         );
-        restriction.from.addTurnRestriction(splitTurnRestriction);
-        // Former turn restriction needs to be removed. Especially no only_turn
-        // restriction to a non-existent edge must not survive
-        restriction.from.removeTurnRestriction(restriction);
+        fromEdge.addTurnRestriction(splitTurnRestriction);
     }
 
     /**
@@ -971,15 +953,22 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         }
     }
 
+    public void removeAllTurnRestrictions() {
+        if (turnRestrictions == null) { return; }
+        synchronized (this) {
+            turnRestrictions = List.of();
+        }
+    }
+
     /**
-     * Get the immutable {@link Set} of {@link TurnRestriction} that belongs to this {@link StreetEdge}.
+     * Get the immutable {@link List} of {@link TurnRestriction}s that belongs to this {@link StreetEdge}.
      *
      * This method is thread-safe, even if {@link StreetEdge#addTurnRestriction}
      * or {@link StreetEdge#removeTurnRestriction} is called concurrently.
      *
      */
     @Nonnull
-    public Collection<TurnRestriction> getTurnRestrictions() {
+    public List<TurnRestriction> getTurnRestrictions() {
         // this can be safely returned as it's unmodifiable
         return turnRestrictions;
     }

@@ -46,6 +46,7 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class AddTransitModelEntitiesToGraph {
     private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);
 
@@ -220,7 +221,7 @@ public class AddTransitModelEntitiesToGraph {
                         fromVertex,
                         toVertex,
                         pathway.getId(),
-                        Optional.ofNullable(pathway.getName()).map(NonLocalizedString::new).orElse(null),
+                        Optional.ofNullable(pathway.getName()).map(NonLocalizedString::new).orElse((NonLocalizedString)PathwayEdge.DEFAULT_NAME),
                         pathway.getTraversalTime(),
                         distance,
                         pathway.getStairCount(),

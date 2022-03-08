@@ -13,6 +13,7 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
@@ -22,6 +23,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 public class QuayType {
@@ -97,7 +99,16 @@ public class QuayType {
                     .name("wheelchairAccessible")
                     .type(EnumTypes.WHEELCHAIR_BOARDING)
                     .description("Whether this quay is suitable for wheelchair boarding.")
-                    .dataFetcher(environment -> (((StopLocation) environment.getSource()).getWheelchairBoarding()))
+                    .dataFetcher(environment -> {
+                        var wheelChairBoarding =
+                                (((StopLocation) environment.getSource()).getWheelchairBoarding());
+
+                        return Objects.requireNonNullElse(
+                                wheelChairBoarding,
+                                WheelChairBoarding.NO_INFORMATION
+                        ).gtfsCode;
+
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("publicCode")
@@ -229,21 +240,22 @@ public class QuayType {
                     .name("situations")
                     .description("Get all situations active for the quay.")
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                .dataFetcher(env -> {
-                  return GqlUtil.getRoutingService(env).getTransitAlertService()
-                      .getStopAlerts(((StopLocation)env.getSource()).getId());
-                })
+                    .dataFetcher(env -> {
+                        return GqlUtil.getRoutingService(env).getTransitAlertService()
+                                .getStopAlerts(((StopLocation) env.getSource()).getId());
+                    })
                     .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
 //                        .name("stopType")
 //                        .type(stopTypeEnum)
 //                        .dataFetcher(environment -> (((StopLocation) environment.getSource()).getStopType()))
 //                        .build())
-           .field(GraphQLFieldDefinition.newFieldDefinition()
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("tariffZones")
                     .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
-                    .dataFetcher(environment -> ((StopLocation) environment.getSource()).getFareZones())
+                    .dataFetcher(
+                            environment -> ((StopLocation) environment.getSource()).getFareZones())
                     .build())
-           .build();
+            .build();
   }
 }

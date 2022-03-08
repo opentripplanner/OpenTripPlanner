@@ -266,7 +266,7 @@ public interface Leg {
     }
 
     default Set<TransitAlert> getTransitAlerts() {
-        return null;
+        return Set.of();
     }
 
     default PickDrop getBoardRule() {

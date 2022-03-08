@@ -1,6 +1,10 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public final class Route extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
@@ -12,6 +16,8 @@ public final class Route extends TransitEntity {
     private Operator operator;
 
     private Branding branding;
+
+    private List<GroupOfRoutes> groupsOfRoutes = new ArrayList<>();
 
     private String shortName;
 
@@ -184,5 +190,13 @@ public final class Route extends TransitEntity {
 
     public void setNetexSubmode(String netexSubmode) {
         this.netexSubmode = netexSubmode;
+    }
+
+    public List<GroupOfRoutes> getGroupsOfRoutes() {
+        return groupsOfRoutes;
+    }    
+    
+    public void setGroupsOfRoutes(Collection<GroupOfRoutes> list) {
+        groupsOfRoutes = List.copyOf(list);
     }
 }
