@@ -65,11 +65,19 @@ public final class TranslationHelper {
     }
 
     public I18NString getTranslation(
-            Field field,
+            Class<?> clazz,
+            String fieldName,
             String recordId,
             String recordSubId,
             String defaultValue
     ) {
+        Field field;
+        try {
+            field = clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+
         CsvFields csvFields = field.getDeclaringClass().getAnnotation(CsvFields.class);
         String fileName = csvFields.filename();
         String prefix = csvFields.prefix();
@@ -81,7 +89,7 @@ public final class TranslationHelper {
                 .map(CsvField::name).orElse("");
 
         String tableName = fileName.replace(".txt", "");
-        String fieldName = csvFieldName.isEmpty()
+        String translationFieldName = csvFieldName.isEmpty()
             ? prefix + getObjectFieldNameAsCSVFieldName(field.getName(), fieldNameConvention)
             : csvFieldName;
 
@@ -109,7 +117,7 @@ public final class TranslationHelper {
             HashMap<String, String> hm = new HashMap<>();
             hm.put(feedLanguage, defaultValue);
             for (Translation translation : translationList) {
-                if (fieldName.equals(translation.getFieldName())) {
+                if (translationFieldName.equals(translation.getFieldName())) {
                     hm.put(translation.getLanguage(), translation.getTranslation());
                 }
             }

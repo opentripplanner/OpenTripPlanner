@@ -2,7 +2,6 @@ package org.opentripplanner.util;
 
 import static org.junit.Assert.assertEquals;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
@@ -24,12 +23,6 @@ public class TranslationHelperTest {
     private static Collection<FeedInfo> FEED_INFOS = new ArrayList<>();
 
     private static final TranslationHelper helper = new TranslationHelper();
-
-    private static final Field stopNameField;
-    private static final Field stopUrlField;
-    private static final Field feedPublisherNameField;
-    private static final Field feedPublisherUrlField;
-    private static final Field stopTimeHeadsignField;
 
     //Translation's structure:
     //table_name,field_name,language,translation,record_id,record_sub_id,field_value
@@ -64,17 +57,6 @@ public class TranslationHelperTest {
             ALL_TRANSLATIONS.add(t);
         }
         helper.importTranslations(ALL_TRANSLATIONS, FEED_INFOS);
-
-        try {
-            stopNameField = org.onebusaway.gtfs.model.Stop.class.getDeclaredField("name");
-            stopUrlField = org.onebusaway.gtfs.model.Stop.class.getDeclaredField("url");
-            feedPublisherNameField = org.onebusaway.gtfs.model.FeedInfo.class.getDeclaredField("publisherName");
-            feedPublisherUrlField = org.onebusaway.gtfs.model.FeedInfo.class.getDeclaredField("publisherUrl");
-            stopTimeHeadsignField = org.onebusaway.gtfs.model.StopTime.class.getDeclaredField("stopHeadsign");
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     @Test
@@ -111,11 +93,22 @@ public class TranslationHelperTest {
         for (Stop stop : stops) {
             I18NString nameTranslation =
                     helper.getTranslation(
-                            stopNameField, stop.getId().getId(), null, stop.getName());
+                            org.onebusaway.gtfs.model.Stop.class,
+                            "name",
+                            stop.getId().getId(),
+                            null,
+                            stop.getName()
+                    );
 
             I18NString urlTranslation =
                     helper.getTranslation(
-                            stopUrlField, stop.getId().getId(), null, stop.getUrl());
+                            org.onebusaway.gtfs.model.Stop.class,
+                            "url",
+                            stop.getId().getId(),
+                            null,
+                            stop.getUrl()
+                    );
+
             String id = stop.getId().getId();
             switch (id) {
                 case "1":
@@ -165,13 +158,19 @@ public class TranslationHelperTest {
 
         I18NString nameTranslation =
                 helper.getTranslation(
-                        feedPublisherNameField, feed.getId(), null,
+                        org.onebusaway.gtfs.model.FeedInfo.class,
+                        "publisherName",
+                        feed.getId(),
+                        null,
                         feed.getPublisherName()
                 );
 
         I18NString urlTranslation =
                 helper.getTranslation(
-                        feedPublisherUrlField, feed.getId(), null,
+                        org.onebusaway.gtfs.model.FeedInfo.class,
+                        "publisherUrl",
+                        feed.getId(),
+                        null,
                         feed.getPublisherUrl()
                 );
         assertEquals("Feed name", nameTranslation.toString());
@@ -217,7 +216,12 @@ public class TranslationHelperTest {
 
             I18NString headSignTranslation =
                     helper.getTranslation(
-                            stopTimeHeadsignField, id, null, stopTime.getStopHeadsign());
+                            org.onebusaway.gtfs.model.StopTime.class,
+                            "stopHeadsign",
+                            id,
+                            null,
+                            stopTime.getStopHeadsign()
+                    );
 
             switch (id) {
                 case "1_1":

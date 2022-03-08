@@ -2,13 +2,11 @@ package org.opentripplanner.gtfs.mapping;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslationHelper;
 
 /**
@@ -43,17 +41,9 @@ class StationMapper {
               + rhs.getLocationType());
     }
 
-    Field nameField;
-    Field urlField;
-    try {
-      nameField = org.onebusaway.gtfs.model.Stop.class.getDeclaredField("name");
-      urlField = org.onebusaway.gtfs.model.Stop.class.getDeclaredField("url");
-    } catch (NoSuchFieldException e) {
-      throw new RuntimeException(e);
-    }
-
     final I18NString name = translationHelper.getTranslation(
-      nameField,
+      org.onebusaway.gtfs.model.Stop.class,
+      "name",
       rhs.getId().getId(),
       null,
       rhs.getName());
@@ -62,7 +52,8 @@ class StationMapper {
 
     if (rhs.getUrl() != null) {
         url = translationHelper.getTranslation(
-          urlField,
+          org.onebusaway.gtfs.model.Stop.class,
+          "url",
           rhs.getId().getId(),
           null,
           rhs.getUrl());

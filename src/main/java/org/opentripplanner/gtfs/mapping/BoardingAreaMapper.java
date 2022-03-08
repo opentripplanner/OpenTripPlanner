@@ -1,13 +1,11 @@
 package org.opentripplanner.gtfs.mapping;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.MapUtils;
-import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Boarding areas into the OTP model. */
@@ -39,15 +37,9 @@ class BoardingAreaMapper {
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
-    Field nameField;
-    try {
-      nameField = org.onebusaway.gtfs.model.Stop.class.getDeclaredField("name");
-    } catch (NoSuchFieldException e) {
-      throw new RuntimeException(e);
-    }
-
     final I18NString name = translationHelper.getTranslation(
-        nameField,
+        org.onebusaway.gtfs.model.Stop.class,
+        "name",
         base.getId().getId(),
         null,
         base.getName());
