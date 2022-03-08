@@ -481,6 +481,7 @@ public class TimetableHelper {
             stopTime.setArrivalTime(oldTimes.getScheduledArrivalTime(i));
             stopTime.setDepartureTime(oldTimes.getScheduledDepartureTime(i));
             stopTime.setStopHeadsign(oldTimes.getHeadsign(i));
+            stopTime.setHeadsignVias(oldTimes.getHeadsignVias(i));
 
             // TODO: Do we need to set the StopTime.id?
             //stopTime.setId(oldTimes.getStopTimeIdByIndex(i));

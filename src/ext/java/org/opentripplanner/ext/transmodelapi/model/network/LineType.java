@@ -38,7 +38,8 @@ public class LineType {
       GraphQLOutputType journeyPatternType,
       GraphQLOutputType serviceJourneyType,
       GraphQLOutputType ptSituationElementType,
-      GraphQLOutputType brandingType
+      GraphQLOutputType brandingType,
+      GraphQLOutputType groupOfLinesType
   ) {
     return GraphQLObjectType.newObject()
             .name(NAME)
@@ -179,6 +180,12 @@ public class LineType {
                 .deprecate("BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
                 .dataFetcher(environment -> null)
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("groupOfLines")
+                    .description("Groups of lines that line is a part of.")
+                    .type(new GraphQLNonNull(new GraphQLList(groupOfLinesType)))
+                    .dataFetcher(environment -> ((Route) environment.getSource()).getGroupsOfRoutes())
+                    .build())
             .build();
   }
 }

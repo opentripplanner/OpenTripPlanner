@@ -1,12 +1,15 @@
 package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.model.Branding;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.PresentationStructure;
 import org.rutebanken.netex.model.PrivateCodeStructure;
 
-/** Responsible for mapping NeTEx Branding into the OTP model. */
+/**
+ * Responsible for mapping NeTEx Branding into the OTP model.
+ */
 public class BrandingMapper {
 
     private final FeedScopedIdFactory idFactory;
@@ -17,31 +20,29 @@ public class BrandingMapper {
 
     /**
      * Convert NeTEx Branding entity into OTP model.
+     *
      * @param branding NeTEx branding entity
      * @return OTP Branding model
      */
     public Branding mapBranding(org.rutebanken.netex.model.Branding branding) {
-        Branding brandingEntity = new Branding(idFactory.createId(branding.getId()));
+        final FeedScopedId id = idFactory.createId(branding.getId());
 
-        MultilingualString shortName = branding.getShortName();
-        MultilingualString name = branding.getName();
-        MultilingualString description = branding.getDescription();
+        final String shortName = branding.getShortName() != null ?
+                branding.getShortName().getValue()
+                : null;
 
-        brandingEntity.setUrl(branding.getUrl());
-        brandingEntity.setImage(branding.getImage());
+        final String name = branding.getName() != null ?
+                branding.getName().getValue()
+                : null;
 
-        if (shortName != null) {
-            brandingEntity.setShortName(shortName.getValue());
-        }
+        final String description = branding.getDescription() != null ?
+                branding.getDescription().getValue()
+                : null;
 
-        if (name != null) {
-            brandingEntity.setName(name.getValue());
-        }
+        final String url = branding.getUrl();
 
-        if (description != null) {
-            brandingEntity.setDescription(description.getValue());
-        }
+        final String image = branding.getImage();
 
-        return brandingEntity;
+        return new Branding(id, shortName, name, url, description, image);
     }
 }

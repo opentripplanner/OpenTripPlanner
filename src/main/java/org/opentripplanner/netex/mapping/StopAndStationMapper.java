@@ -19,6 +19,7 @@ import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -91,7 +92,8 @@ class StopAndStationMapper {
         // were deleted in never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Quay quay : listOfQuays(stopPlace)) {
-                addNewStopToParentIfNotPresent(quay, station, fareZones, transitMode);
+                addNewStopToParentIfNotPresent(
+                        quay, station, fareZones, transitMode, selectedStopPlace);
             }
         }
     }
@@ -146,10 +148,11 @@ class StopAndStationMapper {
     }
 
     private void addNewStopToParentIfNotPresent(
-        Quay quay,
-        Station station,
-        Collection<FareZone> fareZones,
-        T2<TransitMode, String> transitMode
+            Quay quay,
+            Station station,
+            Collection<FareZone> fareZones,
+            T2<TransitMode, String> transitMode,
+            StopPlace stopPlace
     ) {
         // TODO OTP2 - This assumption is only valid because Norway have a
         //           - national stop register, we should add all stops/quays
@@ -162,8 +165,11 @@ class StopAndStationMapper {
             return;
         }
 
-        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode);
-        if (stop == null) return;
+        var wheelchairBoarding = wheelChairBoardingFromQuay(quay, stopPlace);
+
+        Stop stop =
+                stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchairBoarding);
+        if (stop == null) {return;}
 
         station.addChildStop(stop);
 
@@ -209,4 +215,28 @@ class StopAndStationMapper {
     private static StopPlace first(List<StopPlace> stops) {
         return stops.get(0);
     }
+
+    /**
+     * Get WheelChairBoarding from Quay and parent Station.
+     *
+     * @param quay      NeTEx quay could contain information about accessability
+     * @param stopPlace Parent StopPlace for given Quay
+     * @return not null value with default NO_INFORMATION if nothing defined in quay or
+     * parentStation.
+     */
+    private WheelChairBoarding wheelChairBoardingFromQuay(Quay quay, StopPlace stopPlace) {
+
+        var defaultWheelChairBoarding = WheelChairBoarding.NO_INFORMATION;
+
+        if (stopPlace != null) {
+            defaultWheelChairBoarding = WheelChairMapper.wheelChairBoarding(
+                    stopPlace.getAccessibilityAssessment(),
+                    WheelChairBoarding.NO_INFORMATION
+            );
+        }
+
+        return WheelChairMapper.wheelChairBoarding(
+                quay.getAccessibilityAssessment(), defaultWheelChairBoarding);
+    }
+
 }

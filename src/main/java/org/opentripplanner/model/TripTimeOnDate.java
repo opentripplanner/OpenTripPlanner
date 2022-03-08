@@ -20,20 +20,20 @@ public class TripTimeOnDate {
     private final int stopIndex;
     // This is only needed because TripTimes has no reference to TripPattern
     private final TripPattern tripPattern;
-    private final Integer midnight;
+    private final long midnight;
 
     public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern, ServiceDay serviceDay) {
         this.tripTimes = tripTimes;
         this.stopIndex = stopIndex;
         this.tripPattern = tripPattern;
-        this.midnight = serviceDay != null ? serviceDay.secondsSinceMidnight(0) : UNDEFINED;
+        this.midnight = serviceDay != null ? serviceDay.time(0) : UNDEFINED;
     }
 
     public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern, Instant midnight) {
         this.tripTimes = tripTimes;
         this.stopIndex = stopIndex;
         this.tripPattern = tripPattern;
-        this.midnight = (int) midnight.getEpochSecond();
+        this.midnight = midnight.getEpochSecond();
     }
 
     /** Must pass in both Timetable and Trip, because TripTimes do not have a reference to StopPatterns. */
@@ -157,7 +157,7 @@ public class TripTimeOnDate {
     }
 
     public List<String> getHeadsignVias() {
-        return tripTimes.getVia(stopIndex);
+        return tripTimes.getHeadsignVias(stopIndex);
     }
 
     public PickDrop getPickupType() {

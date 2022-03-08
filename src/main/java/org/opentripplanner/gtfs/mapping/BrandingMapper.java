@@ -18,9 +18,6 @@ public class BrandingMapper {
             return null;
         }
 
-        Branding branding = new Branding();
-        branding.setUrl(route.getBrandingUrl());
-
-        return branding;
+        return new Branding(null, null, null, route.getBrandingUrl(), null, null);
     }
 }

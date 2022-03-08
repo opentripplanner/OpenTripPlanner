@@ -8,12 +8,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.GroupOfRoutes;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
@@ -35,8 +39,10 @@ import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
+import org.rutebanken.netex.model.LineRefs_RelStructure;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 
 /**
@@ -180,6 +186,7 @@ public class NetexMapper {
         Map<String, FeedScopedId> serviceIds = createCalendarForServiceJourney();
 
         mapRoute();
+        mapGroupsOfLines();
         mapTripPatterns(serviceIds);
         mapNoticeAssignments();
 
@@ -218,6 +225,36 @@ public class NetexMapper {
         for (Branding branding : currentNetexIndex.getBrandingById().localValues()) {
             transitBuilder.getBrandingsById().add(mapper.mapBranding(branding));
         }
+    }
+
+    private void mapGroupsOfLines () {
+        GroupOfRoutesMapper mapper = new GroupOfRoutesMapper(idFactory);
+
+        currentNetexIndex.getGroupsOfLinesById().localValues().forEach(gol -> {
+            GroupOfRoutes model = mapper.mapGroupOfRoutes(gol);
+
+            Optional.ofNullable(gol.getMembers())
+                    .stream()
+                    .map(LineRefs_RelStructure::getLineRef)
+                    .filter(Objects::nonNull)
+                    .flatMap(Collection::stream)
+                    .filter(Objects::nonNull)
+                    .map(JAXBElement::getValue)
+                    .filter(Objects::nonNull)
+                    .map(VersionOfObjectRefStructure::getRef)
+                    .filter(Objects::nonNull)
+                    .forEach(ref -> {
+                        FeedScopedId routeId = idFactory.createId(ref);
+                        // At this point no routes are created yet
+                        // So we put all group of lines in multimap
+                        // RouteMapper can then use this map to populate Routes with correct GroupsOfLines
+                        transitBuilder.getGroupsOfRoutesByRouteId().put(routeId, model);
+                    });
+
+            // Create this index as well
+            // In case relation is set on Line
+            transitBuilder.getGroupOfRouteById().add(model);
+        });
     }
 
     private void mapOperators() {
@@ -346,6 +383,8 @@ public class NetexMapper {
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
                 transitBuilder.getBrandingsById(),
+                transitBuilder.getGroupsOfRoutesByRouteId(),
+                transitBuilder.getGroupOfRouteById(),
                 currentNetexIndex,
                 currentNetexIndex.getTimeZone(),
                 ferryIdsNotAllowedForBicycle
