@@ -36,13 +36,6 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
 /**
  * This represents a street segment.
  * 
@@ -941,13 +934,10 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             double fromDistance,
             double toDistance
     ) {
-        StreetElevationExtension.addToEdge(
-                this,
-                ElevationUtils.getPartialElevationProfile(
-                        parentEdge.getElevationProfile(), fromDistance, toDistance
-                ),
-                false
+        var profile = ElevationUtils.getPartialElevationProfile(
+                parentEdge.getElevationProfile(), fromDistance, toDistance
         );
+        StreetElevationExtension.addToEdge(this, profile, true);
     }
 
     /**

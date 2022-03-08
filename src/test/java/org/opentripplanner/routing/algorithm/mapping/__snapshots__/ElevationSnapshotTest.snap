@@ -3,8 +3,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1035,
-      "elevationGained": 4.869999999999994,
-      "elevationLost": 16.149999999999995,
+      "elevationGained": 5.009754028320298,
+      "elevationLost": 16.153650588989255,
       "endTime": "2009-10-21T23:32:25.000+00:00",
       "fare": {
         "details": {
@@ -38,14 +38,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           }
         }
       },
-      "generalizedCost": 2159,
+      "generalizedCost": 2160,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 106.589,
-          "endTime": "2009-10-21T23:17:47.000+00:00",
+          "endTime": "2009-10-21T23:17:48.000+00:00",
           "from": {
             "departure": "2009-10-21T23:15:10.000+00:00",
             "lat": 45.52832,
@@ -53,9 +53,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 302,
+          "generalizedCost": 304,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4,93,66.6,107,66.2",
+          "legElevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4,79,67.4,93,66.6,107,66.2",
           "legGeometry": {
             "length": 4,
             "points": "}f{tGv}{kVjCA?e@WA"
@@ -72,7 +72,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "area": false,
               "bogusName": false,
               "distance": 78.527,
-              "elevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4",
+              "elevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4",
               "lat": 45.52831993266165,
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
@@ -108,9 +108,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:17:47.000+00:00",
+            "arrival": "2009-10-21T23:17:48.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:17:47.000+00:00",
+            "departure": "2009-10-21T23:17:48.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -124,11 +124,11 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 493.426,
-          "endTime": "2009-10-21T23:19:56.000+00:00",
+          "endTime": "2009-10-21T23:19:57.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:17:47.000+00:00",
+            "arrival": "2009-10-21T23:17:48.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:17:47.000+00:00",
+            "departure": "2009-10-21T23:17:48.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -136,7 +136,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 343,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,484,52.4,493,52.2",
+          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,474,52.5,484,52.4,493,52.2",
           "legGeometry": {
             "length": 7,
             "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
@@ -146,7 +146,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": true,
           "route": "",
-          "startTime": "2009-10-21T23:17:47.000+00:00",
+          "startTime": "2009-10-21T23:17:48.000+00:00",
           "steps": [
             {
               "absoluteDirection": "SOUTH",
@@ -166,7 +166,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "area": false,
               "bogusName": false,
               "distance": 480.068,
-              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.6,615,52.4,625,52.2",
+              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.5,615,52.4,625,52.2",
               "lat": 45.5276173,
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
@@ -176,9 +176,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:19:56.000+00:00",
+            "arrival": "2009-10-21T23:19:57.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:19:56.000+00:00",
+            "departure": "2009-10-21T23:19:57.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
@@ -194,17 +194,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "distance": 29.461000000000002,
           "endTime": "2009-10-21T23:20:25.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:19:56.000+00:00",
+            "arrival": "2009-10-21T23:19:57.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:19:56.000+00:00",
+            "departure": "2009-10-21T23:19:57.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 50,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,52.0,10,52.2,20,52.5,19,52.6,29,52.4",
+          "legElevation": "0,52.2,2,52.2,12,52.5,19,52.5,19,52.6,29,52.4",
           "legGeometry": {
             "length": 5,
             "points": "ic{tG~uzkV@n@M@C??H"
@@ -214,14 +214,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:19:56.000+00:00",
+          "startTime": "2009-10-21T23:19:57.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 19.289,
-              "elevation": "0,52.0,10,52.2,20,52.5,19,52.6",
+              "elevation": "0,52.2,2,52.2,12,52.5,19,52.5",
               "lat": 45.52773220198921,
               "lon": -122.69423177172958,
               "relativeDirection": "HARD_LEFT",
@@ -413,7 +413,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 286,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.3,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,98,29.4,108,29.5,118,29.5,128,29.5,138,29.5,148,29.4,161,29.3,170,29.3,180,29.5,188,29.6",
+          "legElevation": "0,29.3,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,98,29.4,108,29.5,118,29.5,128,29.5,138,29.5,148,29.4,161,29.3,170,29.3,170,29.3,180,29.5,188,29.6",
           "legGeometry": {
             "length": 15,
             "points": "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
@@ -461,9 +461,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1001,
-      "elevationGained": 3.150000000000002,
-      "elevationLost": 4.260000000000005,
+      "duration": 1000,
+      "elevationGained": 3.150002670288089,
+      "elevationLost": 3.9339511871337933,
       "endTime": "2009-10-21T23:40:10.000+00:00",
       "fare": {
         "details": {
@@ -497,7 +497,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           }
         }
       },
-      "generalizedCost": 1805,
+      "generalizedCost": 1803,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -506,15 +506,15 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "distance": 220.146,
           "endTime": "2009-10-21T23:26:21.000+00:00",
           "from": {
-            "departure": "2009-10-21T23:23:29.000+00:00",
+            "departure": "2009-10-21T23:23:30.000+00:00",
             "lat": 45.52832,
             "lon": -122.70059,
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 336,
+          "generalizedCost": 334,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,64.1,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,170,60.7,180,61.1,190,61.6,200,61.9,210,62.4,220,62.9",
+          "legElevation": "0,63.7,1,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,170,60.7,180,61.1,190,61.6,200,61.9,210,62.4,220,62.9",
           "legGeometry": {
             "length": 6,
             "points": "}f{tGv}{kVC?mCBmCD@zCN?"
@@ -524,14 +524,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:23:29.000+00:00",
+          "startTime": "2009-10-21T23:23:30.000+00:00",
           "steps": [
             {
               "absoluteDirection": "NORTH",
               "area": false,
               "bogusName": false,
               "distance": 159.625,
-              "elevation": "0,64.1,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2",
+              "elevation": "0,63.7,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2",
               "lat": 45.52831993266165,
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
@@ -773,20 +773,20 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "walkingBike": false
         }
       ],
-      "startTime": "2009-10-21T23:23:29.000+00:00",
+      "startTime": "2009-10-21T23:23:30.000+00:00",
       "tooSloped": false,
       "transfers": 0,
       "transitTime": 791,
       "waitingTime": 0,
       "walkDistance": 270.084,
       "walkLimitExceeded": false,
-      "walkTime": 210
+      "walkTime": 209
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1035,
-      "elevationGained": 4.869999999999994,
-      "elevationLost": 16.149999999999995,
+      "elevationGained": 5.009754028320298,
+      "elevationLost": 16.153650588989255,
       "endTime": "2009-10-21T23:45:25.000+00:00",
       "fare": {
         "details": {
@@ -820,14 +820,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           }
         }
       },
-      "generalizedCost": 2159,
+      "generalizedCost": 2160,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 106.589,
-          "endTime": "2009-10-21T23:30:47.000+00:00",
+          "endTime": "2009-10-21T23:30:48.000+00:00",
           "from": {
             "departure": "2009-10-21T23:28:10.000+00:00",
             "lat": 45.52832,
@@ -835,9 +835,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 302,
+          "generalizedCost": 304,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4,93,66.6,107,66.2",
+          "legElevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4,79,67.4,93,66.6,107,66.2",
           "legGeometry": {
             "length": 4,
             "points": "}f{tGv}{kVjCA?e@WA"
@@ -854,7 +854,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "area": false,
               "bogusName": false,
               "distance": 78.527,
-              "elevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4",
+              "elevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4",
               "lat": 45.52831993266165,
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
@@ -890,9 +890,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:30:47.000+00:00",
+            "arrival": "2009-10-21T23:30:48.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:30:47.000+00:00",
+            "departure": "2009-10-21T23:30:48.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -906,11 +906,11 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 493.426,
-          "endTime": "2009-10-21T23:32:56.000+00:00",
+          "endTime": "2009-10-21T23:32:57.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:30:47.000+00:00",
+            "arrival": "2009-10-21T23:30:48.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:30:47.000+00:00",
+            "departure": "2009-10-21T23:30:48.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -918,7 +918,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 343,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,484,52.4,493,52.2",
+          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,474,52.5,484,52.4,493,52.2",
           "legGeometry": {
             "length": 7,
             "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
@@ -928,7 +928,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": true,
           "route": "",
-          "startTime": "2009-10-21T23:30:47.000+00:00",
+          "startTime": "2009-10-21T23:30:48.000+00:00",
           "steps": [
             {
               "absoluteDirection": "SOUTH",
@@ -948,7 +948,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "area": false,
               "bogusName": false,
               "distance": 480.068,
-              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.6,615,52.4,625,52.2",
+              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.5,615,52.4,625,52.2",
               "lat": 45.5276173,
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
@@ -958,9 +958,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:32:56.000+00:00",
+            "arrival": "2009-10-21T23:32:57.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:32:56.000+00:00",
+            "departure": "2009-10-21T23:32:57.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
@@ -976,17 +976,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "distance": 29.461000000000002,
           "endTime": "2009-10-21T23:33:25.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:32:56.000+00:00",
+            "arrival": "2009-10-21T23:32:57.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:32:56.000+00:00",
+            "departure": "2009-10-21T23:32:57.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 50,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,52.0,10,52.2,20,52.5,19,52.6,29,52.4",
+          "legElevation": "0,52.2,2,52.2,12,52.5,19,52.5,19,52.6,29,52.4",
           "legGeometry": {
             "length": 5,
             "points": "ic{tG~uzkV@n@M@C??H"
@@ -996,14 +996,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:32:56.000+00:00",
+          "startTime": "2009-10-21T23:32:57.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 19.289,
-              "elevation": "0,52.0,10,52.2,20,52.5,19,52.6",
+              "elevation": "0,52.2,2,52.2,12,52.5,19,52.5",
               "lat": 45.52773220198921,
               "lon": -122.69423177172958,
               "relativeDirection": "HARD_LEFT",
@@ -1195,7 +1195,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 286,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.3,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,98,29.4,108,29.5,118,29.5,128,29.5,138,29.5,148,29.4,161,29.3,170,29.3,180,29.5,188,29.6",
+          "legElevation": "0,29.3,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,98,29.4,108,29.5,118,29.5,128,29.5,138,29.5,148,29.4,161,29.3,170,29.3,170,29.3,180,29.5,188,29.6",
           "legGeometry": {
             "length": 15,
             "points": "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
@@ -1244,8 +1244,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1035,
-      "elevationGained": 4.869999999999994,
-      "elevationLost": 16.149999999999995,
+      "elevationGained": 5.009754028320298,
+      "elevationLost": 16.153650588989255,
       "endTime": "2009-10-21T23:54:25.000+00:00",
       "fare": {
         "details": {
@@ -1279,14 +1279,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           }
         }
       },
-      "generalizedCost": 2159,
+      "generalizedCost": 2160,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 106.589,
-          "endTime": "2009-10-21T23:39:47.000+00:00",
+          "endTime": "2009-10-21T23:39:48.000+00:00",
           "from": {
             "departure": "2009-10-21T23:37:10.000+00:00",
             "lat": 45.52832,
@@ -1294,9 +1294,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 302,
+          "generalizedCost": 304,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4,93,66.6,107,66.2",
+          "legElevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4,79,67.4,93,66.6,107,66.2",
           "legGeometry": {
             "length": 4,
             "points": "}f{tGv}{kVjCA?e@WA"
@@ -1313,7 +1313,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "area": false,
               "bogusName": false,
               "distance": 78.527,
-              "elevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4",
+              "elevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4",
               "lat": 45.52831993266165,
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
@@ -1349,9 +1349,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:39:47.000+00:00",
+            "arrival": "2009-10-21T23:39:48.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:39:47.000+00:00",
+            "departure": "2009-10-21T23:39:48.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -1365,11 +1365,11 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 493.426,
-          "endTime": "2009-10-21T23:41:56.000+00:00",
+          "endTime": "2009-10-21T23:41:57.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:39:47.000+00:00",
+            "arrival": "2009-10-21T23:39:48.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:39:47.000+00:00",
+            "departure": "2009-10-21T23:39:48.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -1377,7 +1377,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 343,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,484,52.4,493,52.2",
+          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,474,52.5,484,52.4,493,52.2",
           "legGeometry": {
             "length": 7,
             "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
@@ -1387,7 +1387,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": true,
           "route": "",
-          "startTime": "2009-10-21T23:39:47.000+00:00",
+          "startTime": "2009-10-21T23:39:48.000+00:00",
           "steps": [
             {
               "absoluteDirection": "SOUTH",
@@ -1407,7 +1407,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "area": false,
               "bogusName": false,
               "distance": 480.068,
-              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.6,615,52.4,625,52.2",
+              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.5,615,52.4,625,52.2",
               "lat": 45.5276173,
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
@@ -1417,9 +1417,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:41:56.000+00:00",
+            "arrival": "2009-10-21T23:41:57.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:41:56.000+00:00",
+            "departure": "2009-10-21T23:41:57.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
@@ -1435,17 +1435,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "distance": 29.461000000000002,
           "endTime": "2009-10-21T23:42:25.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:41:56.000+00:00",
+            "arrival": "2009-10-21T23:41:57.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:41:56.000+00:00",
+            "departure": "2009-10-21T23:41:57.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 50,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,52.0,10,52.2,20,52.5,19,52.6,29,52.4",
+          "legElevation": "0,52.2,2,52.2,12,52.5,19,52.5,19,52.6,29,52.4",
           "legGeometry": {
             "length": 5,
             "points": "ic{tG~uzkV@n@M@C??H"
@@ -1455,14 +1455,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:41:56.000+00:00",
+          "startTime": "2009-10-21T23:41:57.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 19.289,
-              "elevation": "0,52.0,10,52.2,20,52.5,19,52.6",
+              "elevation": "0,52.2,2,52.2,12,52.5,19,52.5",
               "lat": 45.52773220198921,
               "lon": -122.69423177172958,
               "relativeDirection": "HARD_LEFT",
@@ -1654,7 +1654,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 286,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.3,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,98,29.4,108,29.5,118,29.5,128,29.5,138,29.5,148,29.4,161,29.3,170,29.3,180,29.5,188,29.6",
+          "legElevation": "0,29.3,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,98,29.4,108,29.5,118,29.5,128,29.5,138,29.5,148,29.4,161,29.3,170,29.3,170,29.3,180,29.5,188,29.6",
           "legGeometry": {
             "length": 15,
             "points": "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
@@ -1702,9 +1702,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1001,
-      "elevationGained": 3.150000000000002,
-      "elevationLost": 4.260000000000005,
+      "duration": 1000,
+      "elevationGained": 3.150002670288089,
+      "elevationLost": 3.9339511871337933,
       "endTime": "2009-10-21T23:56:10.000+00:00",
       "fare": {
         "details": {
@@ -1738,7 +1738,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           }
         }
       },
-      "generalizedCost": 1805,
+      "generalizedCost": 1803,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -1747,15 +1747,15 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "distance": 220.146,
           "endTime": "2009-10-21T23:42:21.000+00:00",
           "from": {
-            "departure": "2009-10-21T23:39:29.000+00:00",
+            "departure": "2009-10-21T23:39:30.000+00:00",
             "lat": 45.52832,
             "lon": -122.70059,
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 336,
+          "generalizedCost": 334,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,64.1,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,170,60.7,180,61.1,190,61.6,200,61.9,210,62.4,220,62.9",
+          "legElevation": "0,63.7,1,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,170,60.7,180,61.1,190,61.6,200,61.9,210,62.4,220,62.9",
           "legGeometry": {
             "length": 6,
             "points": "}f{tGv}{kVC?mCBmCD@zCN?"
@@ -1765,14 +1765,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:39:29.000+00:00",
+          "startTime": "2009-10-21T23:39:30.000+00:00",
           "steps": [
             {
               "absoluteDirection": "NORTH",
               "area": false,
               "bogusName": false,
               "distance": 159.625,
-              "elevation": "0,64.1,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2",
+              "elevation": "0,63.7,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2",
               "lat": 45.52831993266165,
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
@@ -2014,20 +2014,20 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "walkingBike": false
         }
       ],
-      "startTime": "2009-10-21T23:39:29.000+00:00",
+      "startTime": "2009-10-21T23:39:30.000+00:00",
       "tooSloped": false,
       "transfers": 0,
       "transitTime": 791,
       "waitingTime": 0,
       "walkDistance": 270.084,
       "walkLimitExceeded": false,
-      "walkTime": 210
+      "walkTime": 209
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 1035,
-      "elevationGained": 4.869999999999994,
-      "elevationLost": 16.149999999999995,
+      "elevationGained": 5.009754028320298,
+      "elevationLost": 16.153650588989255,
       "endTime": "2009-10-22T00:03:25.000+00:00",
       "fare": {
         "details": {
@@ -2061,14 +2061,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           }
         }
       },
-      "generalizedCost": 2159,
+      "generalizedCost": 2160,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 106.589,
-          "endTime": "2009-10-21T23:48:47.000+00:00",
+          "endTime": "2009-10-21T23:48:48.000+00:00",
           "from": {
             "departure": "2009-10-21T23:46:10.000+00:00",
             "lat": 45.52832,
@@ -2076,9 +2076,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 302,
+          "generalizedCost": 304,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4,93,66.6,107,66.2",
+          "legElevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4,79,67.4,93,66.6,107,66.2",
           "legGeometry": {
             "length": 4,
             "points": "}f{tGv}{kVjCA?e@WA"
@@ -2095,7 +2095,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "area": false,
               "bogusName": false,
               "distance": 78.527,
-              "elevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4",
+              "elevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4",
               "lat": 45.52831993266165,
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
@@ -2131,9 +2131,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:48:47.000+00:00",
+            "arrival": "2009-10-21T23:48:48.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:48:47.000+00:00",
+            "departure": "2009-10-21T23:48:48.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -2147,11 +2147,11 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 493.426,
-          "endTime": "2009-10-21T23:50:56.000+00:00",
+          "endTime": "2009-10-21T23:50:57.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:48:47.000+00:00",
+            "arrival": "2009-10-21T23:48:48.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:48:47.000+00:00",
+            "departure": "2009-10-21T23:48:48.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -2159,7 +2159,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 343,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,484,52.4,493,52.2",
+          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,474,52.5,484,52.4,493,52.2",
           "legGeometry": {
             "length": 7,
             "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
@@ -2169,7 +2169,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": true,
           "route": "",
-          "startTime": "2009-10-21T23:48:47.000+00:00",
+          "startTime": "2009-10-21T23:48:48.000+00:00",
           "steps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2189,7 +2189,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "area": false,
               "bogusName": false,
               "distance": 480.068,
-              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.6,615,52.4,625,52.2",
+              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.5,615,52.4,625,52.2",
               "lat": 45.5276173,
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
@@ -2199,9 +2199,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:50:56.000+00:00",
+            "arrival": "2009-10-21T23:50:57.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:50:56.000+00:00",
+            "departure": "2009-10-21T23:50:57.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
@@ -2217,17 +2217,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "distance": 29.461000000000002,
           "endTime": "2009-10-21T23:51:25.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:50:56.000+00:00",
+            "arrival": "2009-10-21T23:50:57.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:50:56.000+00:00",
+            "departure": "2009-10-21T23:50:57.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 51,
+          "generalizedCost": 50,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,52.0,10,52.2,20,52.5,19,52.6,29,52.4",
+          "legElevation": "0,52.2,2,52.2,12,52.5,19,52.5,19,52.6,29,52.4",
           "legGeometry": {
             "length": 5,
             "points": "ic{tG~uzkV@n@M@C??H"
@@ -2237,14 +2237,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:50:56.000+00:00",
+          "startTime": "2009-10-21T23:50:57.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 19.289,
-              "elevation": "0,52.0,10,52.2,20,52.5,19,52.6",
+              "elevation": "0,52.2,2,52.2,12,52.5,19,52.5",
               "lat": 45.52773220198921,
               "lon": -122.69423177172958,
               "relativeDirection": "HARD_LEFT",
@@ -2436,7 +2436,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
           },
           "generalizedCost": 286,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.3,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,98,29.4,108,29.5,118,29.5,128,29.5,138,29.5,148,29.4,161,29.3,170,29.3,180,29.5,188,29.6",
+          "legElevation": "0,29.3,13,29.5,23,29.5,33,29.5,43,29.5,53,29.5,63,29.4,73,29.4,83,29.3,88,29.2,98,29.4,108,29.5,118,29.5,128,29.5,138,29.5,148,29.4,161,29.3,170,29.3,170,29.3,180,29.5,188,29.6",
           "legGeometry": {
             "length": 15,
             "points": "}rztGlnwkVM??C?[?SC_D?M?E?MCgD?A?O?C?M?a@"
@@ -2491,8 +2491,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 597,
-      "elevationGained": 0.7000000000000028,
-      "elevationLost": 8.38000000000001,
+      "elevationGained": 0.7000018310546992,
+      "elevationLost": 7.728395080566415,
       "endTime": "2009-10-21T23:10:00.000+00:00",
       "fare": {
         "details": { },
@@ -2515,7 +2515,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
           },
           "generalizedCost": 1106,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,64.1,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,160,NaN,2229,NaN,2229,55.5,2272,55.5,2272,NaN,2635,NaN",
+          "legElevation": "0,63.7,1,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,160,NaN,2078,NaN,2078,55.5,2112,55.5,2229,55.5,2272,55.5,2272,NaN,2635,NaN",
           "legGeometry": {
             "length": 59,
             "points": "}f{tGv}{kVC?mCBmCDoCDmCDmCBoCDmCDkCDoCB_CBM@iGEE@MB[H}@@s@@GsKAkCCkCA}BCkE?EAcEoCB{BBS@K?wDD}@@I?IAECKMKOIKyAmBCCQScB`DeAzBOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
@@ -2532,7 +2532,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
               "area": false,
               "bogusName": false,
               "distance": 1032.385,
-              "elevation": "0,64.1,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2",
+              "elevation": "0,63.7,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2",
               "lat": 45.52831993266165,
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
@@ -2571,7 +2571,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBike=[
               "area": false,
               "bogusName": false,
               "distance": 298.61,
-              "elevation": "",
+              "elevation": "147,55.5,181,55.5,181,55.5,299,55.5",
               "lat": 45.541291900000004,
               "lon": -122.69403120000001,
               "relativeDirection": "LEFT",
@@ -2648,21 +2648,21 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle": false,
       "duration": 459,
-      "elevationGained": 12.239999999999995,
-      "elevationLost": 38.55999999999999,
+      "elevationGained": 12.529360656738277,
+      "elevationLost": 36.97238433837891,
       "endTime": "2009-10-21T23:17:39.000+00:00",
       "fare": {
         "details": { },
         "fare": { }
       },
-      "generalizedCost": 981,
+      "generalizedCost": 982,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 106.589,
-          "endTime": "2009-10-21T23:12:37.000+00:00",
+          "endTime": "2009-10-21T23:12:38.000+00:00",
           "from": {
             "departure": "2009-10-21T23:10:00.000+00:00",
             "lat": 45.52832,
@@ -2670,9 +2670,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 302,
+          "generalizedCost": 304,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4,93,66.6,107,66.2",
+          "legElevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4,79,67.4,93,66.6,107,66.2",
           "legGeometry": {
             "length": 4,
             "points": "}f{tGv}{kVjCA?e@WA"
@@ -2689,7 +2689,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
               "area": false,
               "bogusName": false,
               "distance": 78.527,
-              "elevation": "0,64.1,10,64.1,20,64.7,30,65.2,40,65.8,50,66.3,60,66.8,70,67.2,79,67.4",
+              "elevation": "0,63.7,9,64.1,19,64.7,29,65.2,39,65.8,49,66.3,59,66.8,69,67.2,79,67.4",
               "lat": 45.52831993266165,
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
@@ -2725,9 +2725,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:12:37.000+00:00",
+            "arrival": "2009-10-21T23:12:38.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:12:37.000+00:00",
+            "departure": "2009-10-21T23:12:38.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -2741,11 +2741,11 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 493.426,
-          "endTime": "2009-10-21T23:14:46.000+00:00",
+          "endTime": "2009-10-21T23:14:47.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:12:37.000+00:00",
+            "arrival": "2009-10-21T23:12:38.000+00:00",
             "bikeShareId": "-102309",
-            "departure": "2009-10-21T23:12:37.000+00:00",
+            "departure": "2009-10-21T23:12:38.000+00:00",
             "lat": 45.5277374,
             "lon": -122.7003879,
             "name": "-102309",
@@ -2753,7 +2753,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           },
           "generalizedCost": 343,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,484,52.4,493,52.2",
+          "legElevation": "0,66.2,13,66.6,23,65.7,33,64.9,43,64.1,53,63.1,63,62.5,73,62.5,83,62.1,93,61.9,103,61.7,113,61.4,123,61.1,133,60.9,143,60.6,158,60.2,168,59.9,178,59.6,188,59.3,198,59.0,208,58.7,218,58.4,228,58.1,238,57.8,248,57.5,258,57.1,268,56.8,278,56.6,288,56.4,298,56.2,308,55.9,316,55.7,326,55.5,336,55.3,346,55.0,356,54.7,366,54.4,376,54.1,386,53.8,396,53.6,406,53.5,416,53.3,426,53.3,440,53.0,450,52.9,460,52.8,474,52.6,474,52.5,484,52.4,493,52.2",
           "legGeometry": {
             "length": 7,
             "points": "ic{tGl|{kVV@GsJEuKE}HAwAAo@"
@@ -2763,7 +2763,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           "realTime": false,
           "rentedBike": true,
           "route": "",
-          "startTime": "2009-10-21T23:12:37.000+00:00",
+          "startTime": "2009-10-21T23:12:38.000+00:00",
           "steps": [
             {
               "absoluteDirection": "SOUTH",
@@ -2783,7 +2783,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
               "area": false,
               "bogusName": false,
               "distance": 480.068,
-              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.6,615,52.4,625,52.2",
+              "elevation": "0,66.6,10,65.7,20,64.9,30,64.1,40,63.1,50,62.5,60,62.5,70,62.1,80,61.9,90,61.7,100,61.4,110,61.1,120,60.9,130,60.6,145,60.2,289,60.2,299,59.9,309,59.6,319,59.3,329,59.0,339,58.7,349,58.4,359,58.1,369,57.8,379,57.5,389,57.1,399,56.8,409,56.6,419,56.4,429,56.2,439,55.9,447,55.7,447,55.7,457,55.5,467,55.3,477,55.0,487,54.7,497,54.4,507,54.1,517,53.8,527,53.6,537,53.5,547,53.3,557,53.3,571,53.0,571,53.0,581,52.9,591,52.8,605,52.6,605,52.5,615,52.4,625,52.2",
               "lat": 45.5276173,
               "lon": -122.7003923,
               "relativeDirection": "LEFT",
@@ -2793,9 +2793,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:14:46.000+00:00",
+            "arrival": "2009-10-21T23:14:47.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:14:46.000+00:00",
+            "departure": "2009-10-21T23:14:47.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
@@ -2811,17 +2811,17 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           "distance": 219.063,
           "endTime": "2009-10-21T23:17:39.000+00:00",
           "from": {
-            "arrival": "2009-10-21T23:14:46.000+00:00",
+            "arrival": "2009-10-21T23:14:47.000+00:00",
             "bikeShareId": "-102323",
-            "departure": "2009-10-21T23:14:46.000+00:00",
+            "departure": "2009-10-21T23:14:47.000+00:00",
             "lat": 45.5278491,
             "lon": -122.6942362,
             "name": "-102323",
             "vertexType": "BIKESHARE"
           },
-          "generalizedCost": 335,
+          "generalizedCost": 334,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,52.4,10,52.2,20,51.9,30,51.6,40,51.3,50,51.2,60,51.2,70,50.7,80,50.9,90,50.5,100,50.4,110,50.0,120,49.7,130,49.4,140,49.0,138,48.9,148,49.2,158,49.5,168,49.8,178,50.1,188,50.4,198,50.7,208,51.0,217,51.2,219,51.1",
+          "legElevation": "0,52.2,1,52.2,11,51.8,21,51.6,31,51.3,41,51.2,51,51.2,61,50.7,71,50.9,81,50.5,91,50.4,101,50.0,111,49.7,121,49.4,131,49.0,138,48.9,138,48.9,148,49.2,158,49.5,168,49.8,178,50.1,188,50.4,198,50.7,208,51.0,217,51.2,217,51.2,219,51.1",
           "legGeometry": {
             "length": 4,
             "points": "ic{tG~uzkVEcJlCE?C"
@@ -2831,14 +2831,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:14:46.000+00:00",
+          "startTime": "2009-10-21T23:14:47.000+00:00",
           "steps": [
             {
               "absoluteDirection": "EAST",
               "area": false,
               "bogusName": false,
               "distance": 138.309,
-              "elevation": "0,52.4,10,52.2,20,51.9,30,51.6,40,51.3,50,51.2,60,51.2,70,50.7,80,50.9,90,50.5,100,50.4,110,50.0,120,49.7,130,49.4,140,49.0,138,48.9",
+              "elevation": "0,52.2,1,52.2,11,51.8,21,51.6,31,51.3,41,51.2,51,51.2,61,50.7,71,50.9,81,50.5,91,50.4,101,50.0,111,49.7,121,49.4,131,49.0,138,48.9",
               "lat": 45.52773220198921,
               "lon": -122.69423177172958,
               "relativeDirection": "CONTINUE",
@@ -2901,22 +2901,22 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
   [
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1881,
-      "elevationGained": 0.7000000000000028,
-      "elevationLost": 17.820000000000007,
-      "endTime": "2009-10-21T23:41:21.000+00:00",
+      "duration": 1880,
+      "elevationGained": 0.700001831054756,
+      "elevationLost": 17.168395080566476,
+      "endTime": "2009-10-21T23:41:20.000+00:00",
       "fare": {
         "details": { },
         "fare": { }
       },
-      "generalizedCost": 3663,
+      "generalizedCost": 3660,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
           "distance": 2442.081,
-          "endTime": "2009-10-21T23:41:21.000+00:00",
+          "endTime": "2009-10-21T23:41:20.000+00:00",
           "from": {
             "departure": "2009-10-21T23:10:00.000+00:00",
             "lat": 45.52832,
@@ -2924,9 +2924,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
             "name": "SW Johnson St. & NW 24th Ave. (P1)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 3663,
+          "generalizedCost": 3660,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,64.1,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,170,59.8,180,59.5,190,59.2,200,59.1,210,58.8,220,58.6,230,58.4,240,58.0,250,57.7,260,57.4,270,57.0,280,56.6,290,56.2,300,55.9,310,55.7,318,55.5,556,55.5,556,NaN,635,NaN,635,55.5,873,55.5,873,NaN,1092,NaN,1092,55.5,1814,55.5,1814,NaN,2036,NaN,2036,55.5,2079,55.5,2079,NaN,2442,NaN",
+          "legElevation": "0,63.7,1,63.7,1,63.7,11,63.4,21,63.2,31,63.3,41,63.5,51,63.3,61,62.9,71,62.5,81,62.2,91,62.0,101,61.7,111,61.5,121,61.2,131,60.9,141,60.6,151,60.3,160,60.2,170,59.8,180,59.5,190,59.2,200,59.1,210,58.8,220,58.6,230,58.4,240,58.0,250,57.7,260,57.4,270,57.0,280,56.6,290,56.2,300,55.9,310,55.7,318,55.5,398,55.5,404,55.5,418,55.5,439,55.5,469,55.5,476,55.5,556,55.5,556,NaN,635,NaN,635,55.5,715,55.5,715,NaN,794,NaN,794,55.5,873,55.5,873,NaN,953,NaN,953,55.5,981,55.5,1092,55.5,1546,55.5,1556,55.5,1571,55.5,1584,55.5,1617,55.5,1645,55.5,1814,55.5,1814,NaN,1884,NaN,1884,55.5,1919,55.5,2036,55.5,2079,55.5,2079,NaN,2442,NaN",
           "legGeometry": {
             "length": 93,
             "points": "}f{tGv}{kVC?mCBmCDGaK?SM?_CDK?Y@c@?m@@I?K?M@sBBM?K?G?W@qA@O?K@sBBO@M?wA@S@E?M?K?uBDK?K?eA@m@@M@K@e@@iED_@@Y@aA?s@@kA@aA@mCBC@MDi@?c@CcBByBBS@K@E??IEGGG?IM@C_@Ce@Gm@EeAMmBGiAGoAWWg@s@EEGKIM]i@k@w@A?QWOVYj@eCxECF{@eAq@nAcAzBeAbBKDy@Ou@a@k@]c@_@Ws@M{@BsA"
@@ -2943,7 +2943,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
               "area": false,
               "bogusName": false,
               "distance": 159.625,
-              "elevation": "0,64.1,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2",
+              "elevation": "0,63.7,1,63.7,3,63.7,13,63.4,23,63.2,33,63.3,43,63.5,53,63.3,63,62.9,73,62.5,83,62.2,83,62.2,93,62.0,103,61.7,113,61.5,123,61.2,133,60.9,143,60.6,153,60.3,161,60.2",
               "lat": 45.52831993266165,
               "lon": -122.70059632295107,
               "relativeDirection": "DEPART",
@@ -2969,7 +2969,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
               "area": false,
               "bogusName": false,
               "distance": 1228.4150000000002,
-              "elevation": "0,55.5,80,55.5,80,55.5,86,55.5,86,55.5,100,55.5,100,55.5,121,55.5,121,55.5,151,55.5,151,55.5,158,55.5,158,55.5,238,55.5,317,55.5,397,55.5,397,55.5,454,55.5,454,55.5,465,55.5,465,55.5,476,55.5,476,55.5,555,55.5,774,55.5,792,55.5,792,55.5,806,55.5,806,55.5,843,55.5,843,55.5,872,55.5,872,55.5,951,55.5,951,55.5,1033,55.5,1033,55.5,1139,55.5,1139,55.5,1228,55.5",
+              "elevation": "0,55.5,80,55.5,80,55.5,86,55.5,86,55.5,100,55.5,100,55.5,121,55.5,121,55.5,151,55.5,151,55.5,158,55.5,158,55.5,238,55.5,317,55.5,397,55.5,476,55.5,555,55.5,634,55.5,662,55.5,662,55.5,774,55.5,774,55.5,792,55.5,792,55.5,806,55.5,806,55.5,843,55.5,843,55.5,872,55.5,872,55.5,951,55.5,951,55.5,1033,55.5,1033,55.5,1139,55.5,1139,55.5,1228,55.5",
               "lat": 45.529794700000004,
               "lon": -122.6986155,
               "relativeDirection": "LEFT",
@@ -3021,7 +3021,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
               "area": false,
               "bogusName": false,
               "distance": 151.738,
-              "elevation": "",
+              "elevation": "0,55.5,35,55.5,35,55.5,152,55.5",
               "lat": 45.542148700000006,
               "lon": -122.69546620000001,
               "relativeDirection": "LEFT",
@@ -3070,7 +3070,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
             }
           ],
           "to": {
-            "arrival": "2009-10-21T23:41:21.000+00:00",
+            "arrival": "2009-10-21T23:41:20.000+00:00",
             "lat": 45.54549,
             "lon": -122.69659,
             "name": "Sulzer Pump (P4)",
@@ -3087,7 +3087,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directWalk=[
       "waitingTime": 0,
       "walkDistance": 2442.081,
       "walkLimitExceeded": false,
-      "walkTime": 1881
+      "walkTime": 1880
     }
   ]
 ]
@@ -3097,9 +3097,9 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
   [
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1126,
-      "elevationGained": 13.139999999999997,
-      "elevationLost": 2.4499999999999993,
+      "duration": 1125,
+      "elevationGained": 15.030002822875975,
+      "elevationLost": 4.226008529663083,
       "endTime": "2009-10-21T23:31:21.000+00:00",
       "fare": {
         "details": {
@@ -3133,7 +3133,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         }
       },
-      "generalizedCost": 2302,
+      "generalizedCost": 2305,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -3142,15 +3142,15 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "distance": 167.86599999999999,
           "endTime": "2009-10-21T23:14:50.000+00:00",
           "from": {
-            "departure": "2009-10-21T23:12:35.000+00:00",
+            "departure": "2009-10-21T23:12:36.000+00:00",
             "lat": 45.52523,
             "lon": -122.67525,
             "name": "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 260,
+          "generalizedCost": 259,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.6,10,29.6,20,29.5,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.3,116,29.4,126,29.4,136,29.4,146,29.4,156,29.3,168,29.3",
+          "legElevation": "0,29.6,0,29.5,10,29.5,18,29.3,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.3,116,29.4,126,29.4,136,29.4,146,29.4,156,29.3,168,29.3",
           "legGeometry": {
             "length": 10,
             "points": "ssztGh_wkV?`@?LK?uBBK??F?JBbDN?"
@@ -3160,14 +3160,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:12:35.000+00:00",
+          "startTime": "2009-10-21T23:12:36.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 17.975,
-              "elevation": "0,29.6,10,29.6,20,29.5,18,29.3",
+              "elevation": "0,29.6,0,29.5,10,29.5,18,29.3",
               "lat": 45.52522794293369,
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
@@ -3383,7 +3383,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 564.623,
+          "distance": 562.979,
           "endTime": "2009-10-21T23:31:21.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:23:32.000+00:00",
@@ -3396,12 +3396,12 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 919,
+          "generalizedCost": 923,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,52.7,9,52.6,19,52.4,29,52.1,39,51.9,49,51.7,59,51.4,69,51.2,79,50.9,89,50.7,99,50.9,109,51.1,119,51.3,129,51.5,139,51.5,149,51.7,159,52.0,169,52.3,179,52.6,189,52.9,199,53.3,209,53.4,219,53.7,229,54.0,239,54.3,246,54.5,256,54.7,266,55.1,276,55.4,286,55.7,296,56.0,306,56.3,316,56.5,326,56.7,336,57.0,346,57.3,356,57.7,366,57.9,376,58.1,386,58.2,396,58.5,405,58.8,415,59.0,422,59.1,432,59.4,442,59.5,452,59.7,462,60.0,472,60.5,482,61.0,492,61.3,502,61.6,512,62.0,522,62.3,532,62.6,542,62.9,552,63.1,563,63.7,565,63.7",
+          "legElevation": "0,52.7,9,52.6,19,52.7,29,52.9,43,53.0,53,53.2,63,53.3,73,53.4,83,53.6,93,53.7,103,54.0,113,54.3,123,54.6,133,54.9,143,55.2,153,55.4,167,55.7,177,56.0,187,56.3,197,56.5,207,56.6,217,56.9,227,57.2,237,57.5,247,57.8,257,58.1,267,58.5,277,58.8,287,59.1,297,59.3,307,59.6,317,59.9,325,60.2,335,60.5,345,60.8,355,61.1,365,61.2,375,61.5,385,61.8,395,62.0,405,62.3,415,62.5,425,62.7,435,63.6,445,64.5,455,65.3,470,66.6,484,67.4,484,67.4,494,67.2,504,66.8,514,66.3,524,65.8,534,65.2,544,64.7,554,64.1,563,63.7",
           "legGeometry": {
-            "length": 12,
-            "points": "wb{tG`wzkV?LO?M@C?oBBM?FrKFvK?j@DhJB?"
+            "length": 9,
+            "points": "wb{tG`wzkV?LO?@vAD|HDtKFrJ?d@kC@"
           },
           "mode": "WALK",
           "pathway": false,
@@ -3414,8 +3414,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "absoluteDirection": "NORTH",
               "area": false,
               "bogusName": false,
-              "distance": 88.68100000000001,
-              "elevation": "0,52.7,9,52.6,18,52.6,28,52.4,28,52.4,38,52.1,48,51.9,58,51.7,68,51.4,78,51.2,88,50.9,98,50.7",
+              "distance": 8.969,
+              "elevation": "0,52.7,9,52.6",
               "lat": 45.52764696458245,
               "lon": -122.69447686508221,
               "relativeDirection": "DEPART",
@@ -3427,24 +3427,24 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
-              "distance": 474.523,
-              "elevation": "0,50.7,10,50.9,20,51.1,30,51.3,40,51.5,50,51.5,60,51.7,70,52.0,80,52.3,90,52.6,100,52.9,110,53.3,120,53.4,130,53.7,140,54.0,150,54.3,157,54.5,157,54.5,167,54.7,177,55.1,187,55.4,197,55.7,207,56.0,217,56.3,227,56.5,237,56.7,247,57.0,257,57.3,267,57.7,277,57.9,287,58.1,297,58.2,307,58.5,316,58.8,316,58.8,326,59.0,334,59.1,334,59.1,344,59.4,354,59.5,364,59.7,374,60.0,384,60.5,394,61.0,404,61.3,414,61.6,424,62.0,434,62.3,444,62.6,454,62.9,464,63.1,475,63.7",
-              "lat": 45.5284442,
-              "lon": -122.69450710000001,
+              "distance": 475.483,
+              "elevation": "0,52.6,10,52.7,20,52.9,34,53.0,34,53.0,44,53.2,54,53.3,64,53.4,74,53.6,84,53.7,94,54.0,104,54.3,114,54.6,124,54.9,134,55.2,144,55.4,158,55.7,158,55.7,168,56.0,178,56.3,188,56.5,198,56.6,208,56.9,218,57.2,228,57.5,238,57.8,248,58.1,258,58.5,268,58.8,278,59.1,288,59.3,298,59.6,308,59.9,316,60.2,316,60.2,326,60.5,336,60.8,346,61.1,356,61.2,366,61.5,376,61.8,386,62.0,396,62.3,406,62.5,416,62.7,426,63.6,436,64.5,446,65.3,461,66.6,461,66.6,475,67.4",
+              "lat": 45.527727600000006,
+              "lon": -122.69447930000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Johnson Street",
+              "streetName": "Northwest Irving Street",
               "walkingBike": false
             },
             {
-              "absoluteDirection": "SOUTH",
+              "absoluteDirection": "NORTH",
               "area": false,
               "bogusName": false,
-              "distance": 1.419,
-              "elevation": "0,63.7,1,63.7",
-              "lat": 45.5283327,
-              "lon": -122.70059660000001,
-              "relativeDirection": "LEFT",
+              "distance": 78.527,
+              "elevation": "0,67.4,10,67.2,20,66.8,30,66.3,40,65.8,50,65.2,60,64.7,70,64.1,79,63.7",
+              "lat": 45.527613800000005,
+              "lon": -122.70058100000001,
+              "relativeDirection": "RIGHT",
               "stayOn": false,
               "streetName": "Northwest 24th Avenue",
               "walkingBike": false
@@ -3461,20 +3461,20 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "walkingBike": false
         }
       ],
-      "startTime": "2009-10-21T23:12:35.000+00:00",
+      "startTime": "2009-10-21T23:12:36.000+00:00",
       "tooSloped": false,
       "transfers": 0,
       "transitTime": 522,
       "waitingTime": 0,
-      "walkDistance": 732.489,
+      "walkDistance": 730.845,
       "walkLimitExceeded": false,
-      "walkTime": 604
+      "walkTime": 603
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1257,
-      "elevationGained": 5.480000000000022,
-      "elevationLost": 23.62000000000002,
+      "duration": 1256,
+      "elevationGained": 5.480002822875992,
+      "elevationLost": 23.576008529663095,
       "endTime": "2009-10-21T23:35:04.000+00:00",
       "fare": {
         "details": {
@@ -3517,7 +3517,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "distance": 287.815,
           "endTime": "2009-10-21T23:18:00.000+00:00",
           "from": {
-            "departure": "2009-10-21T23:14:07.000+00:00",
+            "departure": "2009-10-21T23:14:08.000+00:00",
             "lat": 45.52523,
             "lon": -122.67525,
             "name": "NW Everett St. & NW 5th Ave. (P3)",
@@ -3525,7 +3525,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 442,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.6,10,29.6,20,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,260,29.7,270,29.8,280,29.7,288,29.7",
+          "legElevation": "0,29.6,0,29.5,10,29.5,18,29.3,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,260,29.7,270,29.8,280,29.7,288,29.7",
           "legGeometry": {
             "length": 17,
             "points": "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJA?D@L?lAE?"
@@ -3535,14 +3535,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:14:07.000+00:00",
+          "startTime": "2009-10-21T23:14:08.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 17.975,
-              "elevation": "0,29.6,10,29.6,20,29.5,18,29.3",
+              "elevation": "0,29.6,0,29.5,10,29.5,18,29.3",
               "lat": 45.52522794293369,
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
@@ -3786,7 +3786,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 818,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
+          "legElevation": "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
           "legGeometry": {
             "length": 34,
             "points": "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDkC@"
@@ -3862,20 +3862,20 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "walkingBike": false
         }
       ],
-      "startTime": "2009-10-21T23:14:07.000+00:00",
+      "startTime": "2009-10-21T23:14:08.000+00:00",
       "tooSloped": false,
       "transfers": 0,
       "transitTime": 603,
       "waitingTime": 0,
       "walkDistance": 851.5160000000001,
       "walkLimitExceeded": false,
-      "walkTime": 654
+      "walkTime": 653
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1144,
-      "elevationGained": 4.350000000000001,
-      "elevationLost": 1.1400000000000041,
+      "duration": 1143,
+      "elevationGained": 4.415277175903327,
+      "elevationLost": 1.0902490997314551,
       "endTime": "2009-10-21T23:37:31.000+00:00",
       "fare": {
         "details": {
@@ -3918,7 +3918,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "distance": 252.875,
           "endTime": "2009-10-21T23:21:53.000+00:00",
           "from": {
-            "departure": "2009-10-21T23:18:27.000+00:00",
+            "departure": "2009-10-21T23:18:28.000+00:00",
             "lat": 45.52523,
             "lon": -122.67525,
             "name": "NW Everett St. & NW 5th Ave. (P3)",
@@ -3926,7 +3926,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 391,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.6,10,29.6,20,29.5,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.2,116,29.3,126,29.2,136,29.2,146,29.2,156,29.2,166,29.3,176,29.3,183,29.3,195,29.4,205,29.5,215,29.6,225,29.6,235,29.6,250,29.4,253,29.4",
+          "legElevation": "0,29.6,0,29.5,10,29.5,18,29.3,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.2,116,29.3,126,29.2,136,29.2,146,29.2,156,29.2,166,29.3,176,29.3,176,29.3,183,29.3,195,29.4,205,29.5,215,29.6,225,29.6,235,29.6,250,29.4,253,29.4",
           "legGeometry": {
             "length": 15,
             "points": "ssztGh_wkV?`@?LK?uBBK?K@sBBM??D?L@\\?lCC??E"
@@ -3936,14 +3936,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:18:27.000+00:00",
+          "startTime": "2009-10-21T23:18:28.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 17.975,
-              "elevation": "0,29.6,10,29.6,20,29.5,18,29.3",
+              "elevation": "0,29.6,0,29.5,10,29.5,18,29.3",
               "lat": 45.52522794293369,
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
@@ -4174,7 +4174,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 901,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,55.5,25,55.5,25,NaN,421,NaN,421,60.2,431,60.4,441,60.6,451,60.9,461,61.2,471,61.5,481,61.8,491,62.0,499,62.2,509,62.5,519,62.9,529,63.3,539,63.5,549,63.3,559,63.2,569,63.4,579,63.7,581,63.7",
+          "legElevation": "0,55.5,14,55.5,25,55.5,25,NaN,421,NaN,421,60.2,431,60.4,441,60.6,451,60.9,461,61.2,471,61.5,481,61.8,491,62.0,499,62.2,509,62.5,519,62.9,529,63.3,539,63.5,549,63.3,559,63.2,569,63.4,579,63.7,579,63.7,581,63.7",
           "legGeometry": {
             "length": 12,
             "points": "}~{tGnq{kV?LVAF?J?FtKlCClCEnCElCElCCB?"
@@ -4237,20 +4237,20 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "walkingBike": false
         }
       ],
-      "startTime": "2009-10-21T23:18:27.000+00:00",
+      "startTime": "2009-10-21T23:18:28.000+00:00",
       "tooSloped": false,
       "transfers": 0,
       "transitTime": 477,
       "waitingTime": 0,
       "walkDistance": 833.505,
       "walkLimitExceeded": false,
-      "walkTime": 667
+      "walkTime": 666
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1536,
-      "elevationGained": 9.480000000000008,
-      "elevationLost": 4.800000000000011,
+      "duration": 1535,
+      "elevationGained": 9.480002822875981,
+      "elevationLost": 4.756008529663092,
       "endTime": "2009-10-21T23:46:18.000+00:00",
       "fare": {
         "details": {
@@ -4293,7 +4293,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "distance": 618.758,
           "endTime": "2009-10-21T23:29:00.000+00:00",
           "from": {
-            "departure": "2009-10-21T23:20:42.000+00:00",
+            "departure": "2009-10-21T23:20:43.000+00:00",
             "lat": 45.52523,
             "lon": -122.67525,
             "name": "NW Everett St. & NW 5th Ave. (P3)",
@@ -4301,7 +4301,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 949,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.6,10,29.6,20,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,263,29.6,273,29.6,283,29.5,293,29.5,303,29.7,314,29.6,324,29.7,334,29.7,344,29.7,354,29.8,367,29.8,375,29.9,385,29.9,395,30.0,405,30.0,415,30.1,425,30.0,438,30.1,447,30.0,457,29.9,467,29.9,477,30.0,487,30.0,497,30.0,507,30.1,514,30.1,526,30.2,536,30.3,546,30.3,556,30.5,566,30.6,576,30.7,586,30.8,599,30.9,605,30.9,619,30.9",
+          "legElevation": "0,29.6,0,29.5,10,29.5,18,29.3,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,263,29.6,273,29.6,283,29.5,293,29.5,303,29.7,314,29.6,324,29.7,334,29.7,344,29.7,354,29.8,367,29.8,375,29.9,385,29.9,395,30.0,405,30.0,415,30.1,425,30.0,438,30.1,438,30.1,447,30.0,447,30.0,457,29.9,467,29.9,477,30.0,487,30.0,497,30.0,507,30.1,514,30.1,526,30.2,536,30.3,546,30.3,556,30.5,566,30.6,576,30.7,586,30.8,599,30.9,605,30.9,619,30.9",
           "legGeometry": {
             "length": 37,
             "points": "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJAVCJAF@F@b@NPHFBD@fA`@JDJBhBx@NFNJ~Ap@F@LFLFhBx@@?HDBOBOGE"
@@ -4311,14 +4311,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:20:42.000+00:00",
+          "startTime": "2009-10-21T23:20:43.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 17.975,
-              "elevation": "0,29.6,10,29.6,20,29.5,18,29.3",
+              "elevation": "0,29.6,0,29.5,10,29.5,18,29.3",
               "lat": 45.52522794293369,
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
@@ -4627,7 +4627,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 410,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,60.3,12,60.2,22,60.5,32,60.8,42,61.1,52,61.2,62,61.5,72,61.8,82,62.0,92,62.3,102,62.5,112,62.7,122,63.6,132,64.5,142,65.3,157,66.6,171,67.4,181,67.2,191,66.8,201,66.3,211,65.8,221,65.2,231,64.7,241,64.1,250,63.7",
+          "legElevation": "0,60.3,12,60.2,22,60.5,32,60.8,42,61.1,52,61.2,62,61.5,72,61.8,82,62.0,92,62.3,102,62.5,112,62.7,122,63.6,132,64.5,142,65.3,157,66.6,171,67.4,171,67.4,181,67.2,191,66.8,201,66.3,211,65.8,221,65.2,231,64.7,241,64.1,250,63.7",
           "legGeometry": {
             "length": 7,
             "points": "cb{tGnp{kV?JG?M?FrJ?d@kC@"
@@ -4690,20 +4690,20 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "walkingBike": false
         }
       ],
-      "startTime": "2009-10-21T23:20:42.000+00:00",
+      "startTime": "2009-10-21T23:20:43.000+00:00",
       "tooSloped": false,
       "transfers": 0,
       "transitTime": 827,
       "waitingTime": 0,
       "walkDistance": 868.7760000000001,
       "walkLimitExceeded": false,
-      "walkTime": 709
+      "walkTime": 708
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1126,
-      "elevationGained": 13.139999999999997,
-      "elevationLost": 2.4499999999999993,
+      "duration": 1125,
+      "elevationGained": 15.030002822875975,
+      "elevationLost": 4.226008529663083,
       "endTime": "2009-10-21T23:46:21.000+00:00",
       "fare": {
         "details": {
@@ -4737,7 +4737,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         }
       },
-      "generalizedCost": 2302,
+      "generalizedCost": 2305,
       "legs": [
         {
           "agencyTimeZoneOffset": -25200000,
@@ -4746,15 +4746,15 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "distance": 167.86599999999999,
           "endTime": "2009-10-21T23:29:50.000+00:00",
           "from": {
-            "departure": "2009-10-21T23:27:35.000+00:00",
+            "departure": "2009-10-21T23:27:36.000+00:00",
             "lat": 45.52523,
             "lon": -122.67525,
             "name": "NW Everett St. & NW 5th Ave. (P3)",
             "vertexType": "NORMAL"
           },
-          "generalizedCost": 260,
+          "generalizedCost": 259,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.6,10,29.6,20,29.5,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.3,116,29.4,126,29.4,136,29.4,146,29.4,156,29.3,168,29.3",
+          "legElevation": "0,29.6,0,29.5,10,29.5,18,29.3,18,29.3,28,29.3,38,29.3,48,29.3,58,29.3,68,29.4,78,29.3,88,29.3,96,29.3,106,29.3,116,29.4,126,29.4,136,29.4,146,29.4,156,29.3,168,29.3",
           "legGeometry": {
             "length": 10,
             "points": "ssztGh_wkV?`@?LK?uBBK??F?JBbDN?"
@@ -4764,14 +4764,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:27:35.000+00:00",
+          "startTime": "2009-10-21T23:27:36.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 17.975,
-              "elevation": "0,29.6,10,29.6,20,29.5,18,29.3",
+              "elevation": "0,29.6,0,29.5,10,29.5,18,29.3",
               "lat": 45.52522794293369,
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
@@ -4987,7 +4987,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "agencyTimeZoneOffset": -25200000,
           "arrivalDelay": 0,
           "departureDelay": 0,
-          "distance": 564.623,
+          "distance": 562.979,
           "endTime": "2009-10-21T23:46:21.000+00:00",
           "from": {
             "arrival": "2009-10-21T23:38:32.000+00:00",
@@ -5000,12 +5000,12 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "vertexType": "TRANSIT",
             "zoneId": "1"
           },
-          "generalizedCost": 919,
+          "generalizedCost": 923,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,52.7,9,52.6,19,52.4,29,52.1,39,51.9,49,51.7,59,51.4,69,51.2,79,50.9,89,50.7,99,50.9,109,51.1,119,51.3,129,51.5,139,51.5,149,51.7,159,52.0,169,52.3,179,52.6,189,52.9,199,53.3,209,53.4,219,53.7,229,54.0,239,54.3,246,54.5,256,54.7,266,55.1,276,55.4,286,55.7,296,56.0,306,56.3,316,56.5,326,56.7,336,57.0,346,57.3,356,57.7,366,57.9,376,58.1,386,58.2,396,58.5,405,58.8,415,59.0,422,59.1,432,59.4,442,59.5,452,59.7,462,60.0,472,60.5,482,61.0,492,61.3,502,61.6,512,62.0,522,62.3,532,62.6,542,62.9,552,63.1,563,63.7,565,63.7",
+          "legElevation": "0,52.7,9,52.6,19,52.7,29,52.9,43,53.0,53,53.2,63,53.3,73,53.4,83,53.6,93,53.7,103,54.0,113,54.3,123,54.6,133,54.9,143,55.2,153,55.4,167,55.7,177,56.0,187,56.3,197,56.5,207,56.6,217,56.9,227,57.2,237,57.5,247,57.8,257,58.1,267,58.5,277,58.8,287,59.1,297,59.3,307,59.6,317,59.9,325,60.2,335,60.5,345,60.8,355,61.1,365,61.2,375,61.5,385,61.8,395,62.0,405,62.3,415,62.5,425,62.7,435,63.6,445,64.5,455,65.3,470,66.6,484,67.4,484,67.4,494,67.2,504,66.8,514,66.3,524,65.8,534,65.2,544,64.7,554,64.1,563,63.7",
           "legGeometry": {
-            "length": 12,
-            "points": "wb{tG`wzkV?LO?M@C?oBBM?FrKFvK?j@DhJB?"
+            "length": 9,
+            "points": "wb{tG`wzkV?LO?@vAD|HDtKFrJ?d@kC@"
           },
           "mode": "WALK",
           "pathway": false,
@@ -5018,8 +5018,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "absoluteDirection": "NORTH",
               "area": false,
               "bogusName": false,
-              "distance": 88.68100000000001,
-              "elevation": "0,52.7,9,52.6,18,52.6,28,52.4,28,52.4,38,52.1,48,51.9,58,51.7,68,51.4,78,51.2,88,50.9,98,50.7",
+              "distance": 8.969,
+              "elevation": "0,52.7,9,52.6",
               "lat": 45.52764696458245,
               "lon": -122.69447686508221,
               "relativeDirection": "DEPART",
@@ -5031,24 +5031,24 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
-              "distance": 474.523,
-              "elevation": "0,50.7,10,50.9,20,51.1,30,51.3,40,51.5,50,51.5,60,51.7,70,52.0,80,52.3,90,52.6,100,52.9,110,53.3,120,53.4,130,53.7,140,54.0,150,54.3,157,54.5,157,54.5,167,54.7,177,55.1,187,55.4,197,55.7,207,56.0,217,56.3,227,56.5,237,56.7,247,57.0,257,57.3,267,57.7,277,57.9,287,58.1,297,58.2,307,58.5,316,58.8,316,58.8,326,59.0,334,59.1,334,59.1,344,59.4,354,59.5,364,59.7,374,60.0,384,60.5,394,61.0,404,61.3,414,61.6,424,62.0,434,62.3,444,62.6,454,62.9,464,63.1,475,63.7",
-              "lat": 45.5284442,
-              "lon": -122.69450710000001,
+              "distance": 475.483,
+              "elevation": "0,52.6,10,52.7,20,52.9,34,53.0,34,53.0,44,53.2,54,53.3,64,53.4,74,53.6,84,53.7,94,54.0,104,54.3,114,54.6,124,54.9,134,55.2,144,55.4,158,55.7,158,55.7,168,56.0,178,56.3,188,56.5,198,56.6,208,56.9,218,57.2,228,57.5,238,57.8,248,58.1,258,58.5,268,58.8,278,59.1,288,59.3,298,59.6,308,59.9,316,60.2,316,60.2,326,60.5,336,60.8,346,61.1,356,61.2,366,61.5,376,61.8,386,62.0,396,62.3,406,62.5,416,62.7,426,63.6,436,64.5,446,65.3,461,66.6,461,66.6,475,67.4",
+              "lat": 45.527727600000006,
+              "lon": -122.69447930000001,
               "relativeDirection": "LEFT",
               "stayOn": false,
-              "streetName": "Northwest Johnson Street",
+              "streetName": "Northwest Irving Street",
               "walkingBike": false
             },
             {
-              "absoluteDirection": "SOUTH",
+              "absoluteDirection": "NORTH",
               "area": false,
               "bogusName": false,
-              "distance": 1.419,
-              "elevation": "0,63.7,1,63.7",
-              "lat": 45.5283327,
-              "lon": -122.70059660000001,
-              "relativeDirection": "LEFT",
+              "distance": 78.527,
+              "elevation": "0,67.4,10,67.2,20,66.8,30,66.3,40,65.8,50,65.2,60,64.7,70,64.1,79,63.7",
+              "lat": 45.527613800000005,
+              "lon": -122.70058100000001,
+              "relativeDirection": "RIGHT",
               "stayOn": false,
               "streetName": "Northwest 24th Avenue",
               "walkingBike": false
@@ -5065,20 +5065,20 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "walkingBike": false
         }
       ],
-      "startTime": "2009-10-21T23:27:35.000+00:00",
+      "startTime": "2009-10-21T23:27:36.000+00:00",
       "tooSloped": false,
       "transfers": 0,
       "transitTime": 522,
       "waitingTime": 0,
-      "walkDistance": 732.489,
+      "walkDistance": 730.845,
       "walkLimitExceeded": false,
-      "walkTime": 604
+      "walkTime": 603
     },
     {
       "arrivedAtDestinationWithRentedBicycle": false,
-      "duration": 1317,
-      "elevationGained": 5.480000000000022,
-      "elevationLost": 23.62000000000002,
+      "duration": 1316,
+      "elevationGained": 5.480002822875992,
+      "elevationLost": 23.576008529663095,
       "endTime": "2009-10-21T23:51:04.000+00:00",
       "fare": {
         "details": {
@@ -5121,7 +5121,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "distance": 287.815,
           "endTime": "2009-10-21T23:33:00.000+00:00",
           "from": {
-            "departure": "2009-10-21T23:29:07.000+00:00",
+            "departure": "2009-10-21T23:29:08.000+00:00",
             "lat": 45.52523,
             "lon": -122.67525,
             "name": "NW Everett St. & NW 5th Ave. (P3)",
@@ -5129,7 +5129,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 442,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,29.6,10,29.6,20,29.5,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,260,29.7,270,29.8,280,29.7,288,29.7",
+          "legElevation": "0,29.6,0,29.5,10,29.5,18,29.3,18,29.3,28,29.4,38,29.3,48,29.3,58,29.3,68,29.2,78,29.2,86,29.3,86,29.3,98,29.3,104,29.4,114,29.4,124,29.4,134,29.4,144,29.4,154,29.3,164,29.3,170,29.3,177,29.3,187,29.4,197,29.4,207,29.4,237,29.4,250,29.7,260,29.7,270,29.8,280,29.7,288,29.7",
           "legGeometry": {
             "length": 17,
             "points": "ssztGh_wkV?`@?LJAlBCH?J?H?vBCJ?H?jBCJA?D@L?lAE?"
@@ -5139,14 +5139,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "realTime": false,
           "rentedBike": false,
           "route": "",
-          "startTime": "2009-10-21T23:29:07.000+00:00",
+          "startTime": "2009-10-21T23:29:08.000+00:00",
           "steps": [
             {
               "absoluteDirection": "WEST",
               "area": false,
               "bogusName": false,
               "distance": 17.975,
-              "elevation": "0,29.6,10,29.6,20,29.5,18,29.3",
+              "elevation": "0,29.6,0,29.5,10,29.5,18,29.3",
               "lat": 45.52522794293369,
               "lon": -122.67524992342938,
               "relativeDirection": "DEPART",
@@ -5390,7 +5390,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           },
           "generalizedCost": 818,
           "interlineWithPreviousLeg": false,
-          "legElevation": "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
+          "legElevation": "0,82.0,9,82.8,19,83.4,29,84.1,39,85.0,49,85.7,55,86.1,65,85.8,75,85.2,85,83.4,95,82.6,105,82.8,115,82.3,125,82.2,135,82.0,142,81.9,152,81.5,162,81.1,172,80.8,182,80.5,192,80.0,202,79.8,212,79.6,222,79.6,231,79.3,241,79.7,246,79.8,256,79.8,266,79.4,276,78.4,286,77.5,296,76.5,306,75.5,316,74.5,323,74.1,328,73.8,338,73.7,348,73.4,358,73.0,368,72.4,378,72.0,388,71.5,398,71.0,407,70.7,417,70.5,427,70.1,437,69.7,447,69.1,457,68.7,467,68.2,477,67.7,485,67.4,485,67.4,495,67.2,505,66.8,515,66.3,525,65.8,535,65.2,545,64.7,555,64.1,564,63.7",
           "legGeometry": {
             "length": 34,
             "points": "ikztGh~{kVNDEVUzACPOUQO_@Yc@[QMMEOKOIECGCIAMCGCGAECECECOOMOGKIFMLk@BsABGDGBoCBkCDkC@"
@@ -5466,14 +5466,14 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           "walkingBike": false
         }
       ],
-      "startTime": "2009-10-21T23:29:07.000+00:00",
+      "startTime": "2009-10-21T23:29:08.000+00:00",
       "tooSloped": false,
       "transfers": 0,
       "transitTime": 663,
       "waitingTime": 0,
       "walkDistance": 851.5160000000001,
       "walkLimitExceeded": false,
-      "walkTime": 654
+      "walkTime": 653
     }
   ]
 ]

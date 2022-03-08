@@ -11,7 +11,9 @@ public class StreetElevationExtension implements Serializable {
 
     private final double distanceMeters;
 
-    private final byte[] packedElevationProfile;
+    private final byte[] compactedElevationProfile;
+
+    private final PackedCoordinateSequence packedElevationProfile;
 
     private final double effectiveBicycleSafetyDistance;
 
@@ -27,7 +29,8 @@ public class StreetElevationExtension implements Serializable {
 
     private StreetElevationExtension(
             double distanceMeters,
-            byte[] packedElevationProfile,
+            boolean computed,
+            PackedCoordinateSequence packedElevationProfile,
             float effectiveBicycleSafetyFactor,
             double effectiveBikeDistanceFactor,
             double effectiveBikeWorkFactor,
@@ -36,20 +39,31 @@ public class StreetElevationExtension implements Serializable {
             boolean flattened
     ) {
         this.distanceMeters = distanceMeters;
-        this.packedElevationProfile = packedElevationProfile;
         this.effectiveBicycleSafetyDistance = effectiveBicycleSafetyFactor * distanceMeters;
         this.effectiveBikeDistance = effectiveBikeDistanceFactor * distanceMeters;
         this.effectiveBikeWorkCost = effectiveBikeWorkFactor * distanceMeters;
         this.effectiveWalkDistance = effectiveWalkDistanceFactor * distanceMeters;
         this.maxSlope = maxSlope;
         this.flattened = flattened;
+
+        if (computed) {
+            this.compactedElevationProfile = null;
+            this.packedElevationProfile = packedElevationProfile;
+        } else {
+            this.compactedElevationProfile = CompactElevationProfile.compactElevationProfileWithRegularSamples(packedElevationProfile);
+            this.packedElevationProfile = null;
+        }
     }
 
     public PackedCoordinateSequence getElevationProfile() {
-        return CompactElevationProfile.uncompactElevationProfileWithRegularSamples(
-                packedElevationProfile,
-                distanceMeters
-        );
+        if (compactedElevationProfile != null) {
+            return CompactElevationProfile.uncompactElevationProfileWithRegularSamples(
+                    compactedElevationProfile,
+                    distanceMeters
+            );
+        } else {
+            return packedElevationProfile;
+        }
     }
 
     public double getEffectiveBicycleSafetyDistance() {
@@ -95,7 +109,7 @@ public class StreetElevationExtension implements Serializable {
     ) {
         if (elevationProfile != null && elevationProfile.size() >= 2) {
             if (!streetEdge.isSlopeOverride() || computed) {
-                var extension = calculateForEdge(streetEdge, elevationProfile);
+                var extension = calculateForEdge(streetEdge, elevationProfile, computed);
                 streetEdge.setElevationExtension(extension);
             }
         }
@@ -103,13 +117,12 @@ public class StreetElevationExtension implements Serializable {
 
     private static StreetElevationExtension calculateForEdge(
             StreetEdge streetEdge,
-            PackedCoordinateSequence elevationProfile
+            PackedCoordinateSequence elevationProfile,
+            boolean computed
     ) {
         boolean slopeLimit = streetEdge.getPermission().allows(StreetTraversalPermission.CAR);
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elevationProfile, slopeLimit);
 
-        var packedElevationProfile =
-                CompactElevationProfile.compactElevationProfileWithRegularSamples(elevationProfile);
         var effectiveBikeDistanceFactor = costs.slopeSpeedFactor;
         var effectiveBikeWorkFactor = costs.slopeWorkFactor;
         var effectiveWalkDistanceFactor = costs.effectiveWalkFactor;
@@ -135,7 +148,8 @@ public class StreetElevationExtension implements Serializable {
 
         return new StreetElevationExtension(
                 streetEdge.getDistanceMeters(),
-                packedElevationProfile,
+                computed,
+                elevationProfile,
                 effectiveBicycleSafetyFactor,
                 effectiveBikeDistanceFactor,
                 effectiveBikeWorkFactor,
