@@ -117,7 +117,7 @@ public class NetexBundleSmokeTest {
         Map<FeedScopedId, Stop> map = stops.stream().collect(Collectors.toMap(Stop::getId, s -> s));
 
         Stop quay = map.get(fId("NSR:Quay:122003"));
-        assertEquals("N/A", quay.getName());
+        assertEquals("N/A", quay.getName().toString());
         assertEquals(59.909803, quay.getLat(), 0.000001);
         assertEquals(10.748062, quay.getLon(), 0.000001);
         assertEquals("RB:NSR:StopPlace:3995", quay.getParentStation().getId().toString());
@@ -128,7 +128,7 @@ public class NetexBundleSmokeTest {
     private void assertStations(Collection<Station> stations) {
         Map<FeedScopedId, Station> map = stations.stream().collect(Collectors.toMap(Station::getId, s -> s));
         Station station = map.get(fId("NSR:StopPlace:5825"));
-        assertEquals("Bergkrystallen T", station.getName());
+        assertEquals("Bergkrystallen T", station.getName().toString());
         assertEquals(59.866297, station.getLat(), 0.000001);
         assertEquals(10.821484, station.getLon(), 0.000001);
         assertEquals(5, stations.size());
