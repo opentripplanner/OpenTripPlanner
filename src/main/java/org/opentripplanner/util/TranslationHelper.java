@@ -1,10 +1,15 @@
 package org.opentripplanner.util;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import org.onebusaway.csv_entities.schema.annotations.CsvField;
+import org.onebusaway.csv_entities.schema.annotations.CsvFieldNameConvention;
+import org.onebusaway.csv_entities.schema.annotations.CsvFields;
 import org.onebusaway.gtfs.model.FeedInfo;
 import org.onebusaway.gtfs.model.Translation;
 
@@ -15,11 +20,7 @@ import org.onebusaway.gtfs.model.Translation;
  */
 
 public final class TranslationHelper {
-    public static final String TABLE_FEED_INFO = "feed_info";
-    public static final String TABLE_STOPS = "stops";
-
-    public static final String STOP_NAME = "stop_name";
-    public static final String STOP_URL = "stop_url";
+    private static final String TABLE_FEED_INFO = "feed_info";
 
     private String feedLanguage = null;
 
@@ -31,7 +32,7 @@ public final class TranslationHelper {
         }
 
         Map<String, List<Translation>> byTableName =
-                allTranslations.stream().collect(Collectors.groupingBy(t -> t.getTableName()));
+                allTranslations.stream().collect(Collectors.groupingBy(Translation::getTableName));
 
         for (Map.Entry<String, List<Translation>> i : byTableName.entrySet()) {
             String tableName = i.getKey();
@@ -58,19 +59,32 @@ public final class TranslationHelper {
                 translationMap.put(tableName + "_by_field", i.getValue()
                         .stream()
                         .filter(t -> t.getFieldValue() != null && t.getRecordId() == null)
-                        .collect(Collectors.groupingBy(
-                                t -> t.getFieldValue())));
+                        .collect(Collectors.groupingBy(Translation::getFieldValue)));
             }
         }
     }
 
     public I18NString getTranslation(
-            String tableName,
-            String fieldName,
+            Field field,
             String recordId,
             String recordSubId,
             String defaultValue
     ) {
+        CsvFields csvFields = field.getDeclaringClass().getAnnotation(CsvFields.class);
+        String fileName = csvFields.filename();
+        String prefix = csvFields.prefix();
+        CsvFieldNameConvention fieldNameConvention = csvFields.fieldNameConvention();
+
+        // Fields with default name are initialized with an empty string.
+        // Without any configuration, no annotation is used.
+        String csvFieldName = Optional.ofNullable(field.getAnnotation(CsvField.class))
+                .map(CsvField::name).orElse("");
+
+        String tableName = fileName.replace(".txt", "");
+        String fieldName = csvFieldName.isEmpty()
+            ? prefix + getObjectFieldNameAsCSVFieldName(field.getName(), fieldNameConvention)
+            : csvFieldName;
+
         List<Translation> translationList = null;
         String key = recordSubId != null ? String.join("_", recordId, recordSubId) : recordId;
         if (tableName.equals(TABLE_FEED_INFO)) {
@@ -103,4 +117,32 @@ public final class TranslationHelper {
         }
         return new NonLocalizedString(defaultValue);
     }
+
+    private String getObjectFieldNameAsCSVFieldName(String fieldName,
+            CsvFieldNameConvention fieldNameConvention) {
+
+        if (fieldNameConvention == CsvFieldNameConvention.CAMEL_CASE)
+            return fieldName;
+
+        if (fieldNameConvention == CsvFieldNameConvention.CAPITALIZED_CAMEL_CASE) {
+            return fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+        }
+
+        StringBuilder b = new StringBuilder();
+        boolean wasUpperCase = false;
+
+        for (int i = 0; i < fieldName.length(); i++) {
+            char c = fieldName.charAt(i);
+            boolean isUpperCase = Character.isUpperCase(c);
+            if (isUpperCase)
+                c = Character.toLowerCase(c);
+            if (isUpperCase && !wasUpperCase)
+                b.append('_');
+            b.append(c);
+            wasUpperCase = isUpperCase;
+        }
+
+        return b.toString();
+    }
+
 }

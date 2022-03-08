@@ -2,6 +2,7 @@ package org.opentripplanner.util;
 
 import static org.junit.Assert.assertEquals;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
@@ -22,16 +23,13 @@ public class TranslationHelperTest {
     private static Collection<Translation> ALL_TRANSLATIONS = new ArrayList<>();
     private static Collection<FeedInfo> FEED_INFOS = new ArrayList<>();
 
-    private static final String TABLE_FEED_INFO = "feed_info";
-    private static final String TABLE_STOP_TIMES = "stop_times";
-    private static final String TABLE_STOPS = "stops";
-    private static final String FEED_PUBLISHER_NAME = "feed_publisher_name";
-    private static final String FEED_PUBLISHER_URL = "feed_publisher_url";
-    private static final String STOP_HEADSIGN = "stop_headsign";
-    private static final String STOP_NAME = "stop_name";
-    private static final String STOP_URL = "stop_url";
-
     private static final TranslationHelper helper = new TranslationHelper();
+
+    private static final Field stopNameField;
+    private static final Field stopUrlField;
+    private static final Field feedPublisherNameField;
+    private static final Field feedPublisherUrlField;
+    private static final Field stopTimeHeadsignField;
 
     //Translation's structure:
     //table_name,field_name,language,translation,record_id,record_sub_id,field_value
@@ -66,6 +64,17 @@ public class TranslationHelperTest {
             ALL_TRANSLATIONS.add(t);
         }
         helper.importTranslations(ALL_TRANSLATIONS, FEED_INFOS);
+
+        try {
+            stopNameField = org.onebusaway.gtfs.model.Stop.class.getDeclaredField("name");
+            stopUrlField = org.onebusaway.gtfs.model.Stop.class.getDeclaredField("url");
+            feedPublisherNameField = org.onebusaway.gtfs.model.FeedInfo.class.getDeclaredField("publisherName");
+            feedPublisherUrlField = org.onebusaway.gtfs.model.FeedInfo.class.getDeclaredField("publisherUrl");
+            stopTimeHeadsignField = org.onebusaway.gtfs.model.StopTime.class.getDeclaredField("stopHeadsign");
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Test
@@ -102,11 +111,11 @@ public class TranslationHelperTest {
         for (Stop stop : stops) {
             I18NString nameTranslation =
                     helper.getTranslation(
-                            TABLE_STOPS, STOP_NAME, stop.getId().getId(), null, stop.getName());
+                            stopNameField, stop.getId().getId(), null, stop.getName());
 
             I18NString urlTranslation =
                     helper.getTranslation(
-                            TABLE_STOPS, STOP_URL, stop.getId().getId(), null, stop.getUrl());
+                            stopUrlField, stop.getId().getId(), null, stop.getUrl());
             String id = stop.getId().getId();
             switch (id) {
                 case "1":
@@ -156,13 +165,13 @@ public class TranslationHelperTest {
 
         I18NString nameTranslation =
                 helper.getTranslation(
-                        TABLE_FEED_INFO, FEED_PUBLISHER_NAME, feed.getId(), null,
+                        feedPublisherNameField, feed.getId(), null,
                         feed.getPublisherName()
                 );
 
         I18NString urlTranslation =
                 helper.getTranslation(
-                        TABLE_FEED_INFO, FEED_PUBLISHER_URL, feed.getId(), null,
+                        feedPublisherUrlField, feed.getId(), null,
                         feed.getPublisherUrl()
                 );
         assertEquals("Feed name", nameTranslation.toString());
@@ -208,7 +217,7 @@ public class TranslationHelperTest {
 
             I18NString headSignTranslation =
                     helper.getTranslation(
-                            TABLE_STOP_TIMES, STOP_HEADSIGN, id, null, stopTime.getStopHeadsign());
+                            stopTimeHeadsignField, id, null, stopTime.getStopHeadsign());
 
             switch (id) {
                 case "1_1":

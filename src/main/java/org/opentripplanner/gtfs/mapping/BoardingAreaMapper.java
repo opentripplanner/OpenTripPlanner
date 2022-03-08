@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +39,15 @@ class BoardingAreaMapper {
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
+    Field nameField;
+    try {
+      nameField = org.onebusaway.gtfs.model.Stop.class.getDeclaredField("name");
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(e);
+    }
+
     final I18NString name = translationHelper.getTranslation(
-        TranslationHelper.TABLE_STOPS,
-        TranslationHelper.STOP_NAME,
+        nameField,
         base.getId().getId(),
         null,
         base.getName());
