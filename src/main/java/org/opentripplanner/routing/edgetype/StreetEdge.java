@@ -1,5 +1,12 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
@@ -844,9 +851,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             throw new IllegalStateException("Split street is longer than original street!");
         }
 
-        for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
-            copyPropertiesToSplitEdge(e);
-        }
+        copyPropertiesToSplitEdge(e1, 0, e1.getDistanceMeters());
+        copyPropertiesToSplitEdge(e2, e1.getDistanceMeters(), getDistanceMeters());
 
         var splitEdges = new P2<>(e1, e2);
         copyRestrictionsToSplitEdges(this, splitEdges);
@@ -867,12 +873,12 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
         if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
             e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name, this.isBack());
-            copyPropertiesToSplitEdge(e1);
+            copyPropertiesToSplitEdge(e1, 0, e1.getDistanceMeters());
             tempEdges.addEdge(e1);
         }
         if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
             e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name, this.isBack());
-            copyPropertiesToSplitEdge(e2);
+            copyPropertiesToSplitEdge(e2, getDistanceMeters() - e2.getDistanceMeters(), getDistanceMeters());
             tempEdges.addEdge(e2);
         }
 
@@ -881,32 +887,67 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         return splitEdges;
     }
 
-    protected void copyPropertiesToSplitEdge(StreetEdge splitEdge) {
+    public Optional<Edge> createPartialEdge(StreetVertex from, StreetVertex to) {
+        LineString parent = getGeometry();
+        LineString head = GeometryUtils.getInteriorSegment(
+                parent,
+                getFromVertex().getCoordinate(),
+                from.getCoordinate()
+        );
+        LineString tail = GeometryUtils.getInteriorSegment(
+                parent,
+                to.getCoordinate(),
+                getToVertex().getCoordinate()
+        );
+
+        if (parent.getLength() > head.getLength() + tail.getLength()) {
+            LineString partial = GeometryUtils.getInteriorSegment(
+                    parent,
+                    from.getCoordinate(),
+                    to.getCoordinate()
+            );
+
+            double startRatio = head.getLength() / parent.getLength();
+            double start = getDistanceMeters() * startRatio;
+            double lengthRatio = partial.getLength() / parent.getLength();
+            double length = getDistanceMeters() * lengthRatio;
+
+            var tempEdge = new TemporaryPartialStreetEdge(
+                    this,
+                    from,
+                    to,
+                    partial,
+                    getName(),
+                    length
+            );
+            copyPropertiesToSplitEdge(tempEdge, start, start + length);
+            return Optional.of(tempEdge);
+        }
+        else {
+            return Optional.empty();
+        }
+    }
+
+    protected void copyPropertiesToSplitEdge(StreetEdge splitEdge, double fromDistance, double toDistance) {
         splitEdge.flags = this.flags;
         splitEdge.setBicycleSafetyFactor(bicycleSafetyFactor);
         splitEdge.setStreetClass(getStreetClass());
         splitEdge.setCarSpeed(getCarSpeed());
-        splitEdge.setElevationExtensionUsingParent(this);
+        splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);
     }
 
-    protected void setElevationExtensionUsingParent(StreetEdge parentEdge) {
-        if (parentEdge.getFromVertex() == getFromVertex()) {
-            StreetElevationExtension.addToEdge(
-                    this,
-                    ElevationUtils.getPartialElevationProfile(
-                            parentEdge.getElevationProfile(), 0, getDistanceMeters()
-                    ),
-                    false
-            );
-        } else {
-            StreetElevationExtension.addToEdge(
-                    this,
-                    ElevationUtils.getPartialElevationProfile(
-                            parentEdge.getElevationProfile(), parentEdge.getDistanceMeters() - getDistanceMeters(), parentEdge.getDistanceMeters()
-                    ),
-                    false
-            );
-        }
+    protected void setElevationExtensionUsingParent(
+            StreetEdge parentEdge,
+            double fromDistance,
+            double toDistance
+    ) {
+        StreetElevationExtension.addToEdge(
+                this,
+                ElevationUtils.getPartialElevationProfile(
+                        parentEdge.getElevationProfile(), fromDistance, toDistance
+                ),
+                false
+        );
     }
 
     /**
