@@ -543,9 +543,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /**
      * Do not use certain trips
      *
-     * @deprecated TODO OTP2: Needs to be implemented
+     * Currently, only trips, which are completely banned are filtered out.
      */
-    @Deprecated
     public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
 
     /**
