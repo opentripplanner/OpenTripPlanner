@@ -425,9 +425,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         for (int index = 0; index < stopTimeUpdates.size(); ++index) {
             final StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
 
-            // Determine whether stop is skipped
-            final boolean skippedStop = isStopSkipped(stopTimeUpdate);
-
             // Check stop sequence
             if (stopTimeUpdate.hasStopSequence()) {
                 final Integer stopSequence = stopTimeUpdate.getStopSequence();
@@ -455,9 +452,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 if (stop != null) {
                     // Remember stop
                     stops.add(stop);
-                } else if (skippedStop) {
-                    // Set a null value for a skipped stop
-                    stops.add(null);
                 } else {
                     LOG.warn("Graph doesn't contain stop id \"{}\" of trip update, skipping.",
                             stopTimeUpdate.getStopId());
@@ -468,53 +462,32 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 return null;
             }
 
-            // Only check arrival and departure times for non-skipped stops
-            if (!skippedStop) {
-                // Check arrival time
-                if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
-                    // Check for increasing time
-                    final Long time = stopTimeUpdate.getArrival().getTime();
-                    if (previousTime != null && previousTime > time) {
-                        LOG.warn("Trip update contains decreasing times, skipping.");
-                        return null;
-                    }
-                    previousTime = time;
-                } else {
-                    // Only first non-skipped stop is allowed to miss arrival time
-                    // TODO: should we support only requiring an arrival time on the last stop and interpolate?
-                    for (int earlierIndex = 0; earlierIndex < index; earlierIndex++) {
-                        final StopTimeUpdate earlierStopTimeUpdate = stopTimeUpdates.get(earlierIndex);
-                        // Determine whether earlier stop is skipped
-                        final boolean earlierSkippedStop = isStopSkipped(earlierStopTimeUpdate);
-                        if (!earlierSkippedStop) {
-                            LOG.warn("Trip update misses arrival time, skipping.");
-                            return null;
-                        }
-                    }
+            // Check arrival time
+            if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
+                // Check for increasing time
+                final Long time = stopTimeUpdate.getArrival().getTime();
+                if (previousTime != null && previousTime > time) {
+                    LOG.warn("Trip update contains decreasing times, skipping.");
+                    return null;
                 }
+                previousTime = time;
+            } else {
+                LOG.warn("Trip update misses arrival time, skipping.");
+                return null;
+            }
 
-                // Check departure time
-                if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
-                    // Check for increasing time
-                    final Long time = stopTimeUpdate.getDeparture().getTime();
-                    if (previousTime != null && previousTime > time) {
-                        LOG.warn("Trip update contains decreasing times, skipping.");
-                        return null;
-                    }
-                    previousTime = time;
-                } else {
-                    // Only last non-skipped stop is allowed to miss departure time
-                    // TODO: should we support only requiring a departure time on the first stop and interpolate?
-                    for (int laterIndex = stopTimeUpdates.size() - 1; laterIndex > index; laterIndex--) {
-                        final StopTimeUpdate laterStopTimeUpdate = stopTimeUpdates.get(laterIndex);
-                        // Determine whether later stop is skipped
-                        final boolean laterSkippedStop = isStopSkipped(laterStopTimeUpdate);
-                        if (!laterSkippedStop) {
-                            LOG.warn("Trip update misses departure time, skipping.");
-                            return null;
-                        }
-                    }
+            // Check departure time
+            if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
+                // Check for increasing time
+                final Long time = stopTimeUpdate.getDeparture().getTime();
+                if (previousTime != null && previousTime > time) {
+                    LOG.warn("Trip update contains decreasing times, skipping.");
+                    return null;
                 }
+                previousTime = time;
+            } else {
+                LOG.warn("Trip update misses departure time, skipping.");
+                return null;
             }
         }
         return stops;
@@ -645,56 +618,50 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             final StopTimeUpdate stopTimeUpdate = tripUpdate.getStopTimeUpdate(index);
             final var stop = stops.get(index);
 
-            // Determine whether stop is skipped
-            final boolean skippedStop = isStopSkipped(stopTimeUpdate);
-
-            // Only create stop time for non-skipped stops
-            if (!skippedStop) {
-                // Create stop time
-                final StopTime stopTime = new StopTime();
-                stopTime.setTrip(trip);
-                stopTime.setStop(stop);
-                // Set arrival time
-                if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
-                    final long arrivalTime = stopTimeUpdate.getArrival().getTime() - midnightSecondsSinceEpoch;
-                    if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-                        LOG.warn("ADDED trip has invalid arrival time (compared to start date in "
-                                + "TripDescriptor), skipping.");
-                        return false;
-                    }
-                    stopTime.setArrivalTime((int) arrivalTime);
+            // Create stop time
+            final StopTime stopTime = new StopTime();
+            stopTime.setTrip(trip);
+            stopTime.setStop(stop);
+            // Set arrival time
+            if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
+                final long arrivalTime = stopTimeUpdate.getArrival().getTime() - midnightSecondsSinceEpoch;
+                if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
+                    LOG.warn("ADDED trip has invalid arrival time (compared to start date in "
+                            + "TripDescriptor), skipping.");
+                    return false;
                 }
-                // Set departure time
-                if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
-                    final long departureTime = stopTimeUpdate.getDeparture().getTime() - midnightSecondsSinceEpoch;
-                    if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-                        LOG.warn("ADDED trip has invalid departure time (compared to start date in "
-                                + "TripDescriptor), skipping.");
-                        return false;
-                    }
-                    stopTime.setDepartureTime((int) departureTime);
-                }
-                stopTime.setTimepoint(1); // Exact time
-                if (stopTimeUpdate.hasStopSequence()) {
-                    stopTime.setStopSequence(stopTimeUpdate.getStopSequence());
-                }
-                // Set pickup type
-                // Set different pickup type for last stop
-                if (index == tripUpdate.getStopTimeUpdateCount() - 1) {
-                    stopTime.setPickupType(NONE); // No pickup available
-                } else {
-                    stopTime.setPickupType(SCHEDULED); // Regularly scheduled pickup
-                }
-                // Set drop off type
-                // Set different drop off type for first stop
-                if (index == 0) {
-                    stopTime.setDropOffType(NONE); // No drop off available
-                } else {
-                    stopTime.setDropOffType(SCHEDULED); // Regularly scheduled drop off
-                }
-                // Add stop time to list
-                stopTimes.add(stopTime);
+                stopTime.setArrivalTime((int) arrivalTime);
             }
+            // Set departure time
+            if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
+                final long departureTime = stopTimeUpdate.getDeparture().getTime() - midnightSecondsSinceEpoch;
+                if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
+                    LOG.warn("ADDED trip has invalid departure time (compared to start date in "
+                            + "TripDescriptor), skipping.");
+                    return false;
+                }
+                stopTime.setDepartureTime((int) departureTime);
+            }
+            stopTime.setTimepoint(1); // Exact time
+            if (stopTimeUpdate.hasStopSequence()) {
+                stopTime.setStopSequence(stopTimeUpdate.getStopSequence());
+            }
+            // Set pickup type
+            // Set different pickup type for last stop
+            if (index == tripUpdate.getStopTimeUpdateCount() - 1) {
+                stopTime.setPickupType(NONE); // No pickup available
+            } else {
+                stopTime.setPickupType(SCHEDULED); // Regularly scheduled pickup
+            }
+            // Set drop off type
+            // Set different drop off type for first stop
+            if (index == 0) {
+                stopTime.setDropOffType(NONE); // No drop off available
+            } else {
+                stopTime.setDropOffType(SCHEDULED); // Regularly scheduled drop off
+            }
+            // Add stop time to list
+            stopTimes.add(stopTime);
         }
 
         // TODO: filter/interpolate stop times like in PatternHopFactory?
