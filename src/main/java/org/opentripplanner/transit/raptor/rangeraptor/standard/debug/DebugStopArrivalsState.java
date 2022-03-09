@@ -39,7 +39,7 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     @Override
     public void setAccessTime(int arrivalTime, RaptorTransfer access) {
         delegate.setAccessTime(arrivalTime, access);
-        debug.acceptAccess(access.stop(), access.stopReachedOnBoard());
+        debug.acceptAccessPath(access.stop(), access.stopReachedOnBoard());
     }
 
     @Override
@@ -54,22 +54,38 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     }
 
     @Override
-    public void setNewBestTransitTime(int stop, int alightTime, T trip, int boardStop, int boardTime, boolean newBestOverall) {
-        debug.dropOldStateAndAcceptNewTransit(
-                stop, newBestOverall,
-                () -> delegate.setNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime, newBestOverall)
+    public void setNewBestTransitTime(
+            int stop,
+            int alightTime,
+            T trip,
+            int boardStop,
+            int boardTime,
+            boolean newBestOverall
+    ) {
+        debug.dropOldStateAndAcceptNewOnBoardArrival(
+                stop,
+                newBestOverall,
+                () -> delegate.setNewBestTransitTime(
+                        stop, alightTime, trip, boardStop, boardTime, newBestOverall
+                )
         );
     }
 
     @Override
-    public void rejectNewBestTransitTime(int stop, int alightTime, T trip, int boardStop, int boardTime) {
+    public void rejectNewBestTransitTime(
+            int stop,
+            int alightTime,
+            T trip,
+            int boardStop,
+            int boardTime
+    ) {
         debug.rejectTransit(stop, alightTime, trip, boardStop, boardTime);
         delegate.rejectNewBestTransitTime(stop, alightTime, trip, boardStop, boardTime);
     }
 
     @Override
     public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
-        debug.dropOldStateAndAcceptNewTransfer(
+        debug.dropOldStateAndAcceptNewOnStreetArrival(
                 transfer.stop(),
                 () -> delegate.setNewBestTransferTime(fromStop, arrivalTime, transfer)
         );

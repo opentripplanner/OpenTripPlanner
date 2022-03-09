@@ -49,14 +49,14 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     /**
      * Return a fictive Transfer arrival for the rejected transfer stop arrival.
      */
-    public Access<T> rejectedAccess(int round, RaptorTransfer accessPath, int arrivalTime) {
+    public Access<T> fictiveAccess(int round, RaptorTransfer accessPath, int arrivalTime) {
         return new Access<>(round, arrivalTime, accessPath);
     }
 
     /**
      * Return a fictive Transfer arrival for the rejected transfer stop arrival.
      */
-    public Transfer<T> rejectedTransfer(int round, int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
+    public Transfer<T> fictiveTransfer(int round, int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
         StopArrivalState<T> arrival = StopArrivalState.create();
         arrival.transferToStop(fromStop, arrivalTime, transfer);
         return new Transfer<>(round, toStop, arrival, this);
@@ -65,7 +65,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     /**
      * Return a fictive Transit arrival for the rejected transit stop arrival.
      */
-    public Transit<T> rejectedTransit(int round, int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
+    public Transit<T> fictiveTransit(int round, int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
             StopArrivalState<T> arrival = StopArrivalState.create();
             arrival.arriveByTransit(alightTime, boardStop, boardTime, trip);
             return new Transit<>(round, alightStop, arrival, this);

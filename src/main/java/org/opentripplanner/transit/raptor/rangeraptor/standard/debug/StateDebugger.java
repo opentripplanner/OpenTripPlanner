@@ -28,7 +28,7 @@ class StateDebugger<T extends RaptorTripSchedule> {
         this.debugHandlerStopArrivals = dFactory.debugStopArrival();
     }
 
-    void acceptAccess(int stop, boolean stopReachedOnBoard) {
+    void acceptAccessPath(int stop, boolean stopReachedOnBoard) {
         if(isDebug(stop)) {
             accept(stop, stopReachedOnBoard);
         }
@@ -36,11 +36,11 @@ class StateDebugger<T extends RaptorTripSchedule> {
 
     void rejectAccessPath(RaptorTransfer accessPath, int arrivalTime) {
         if (isDebug(accessPath.stop())) {
-            reject(cursor.rejectedAccess(round(), accessPath, arrivalTime));
+            reject(cursor.fictiveAccess(round(), accessPath, arrivalTime));
         }
     }
 
-    void dropOldStateAndAcceptNewTransit(int stop, boolean newBestOverall, Runnable body) {
+    void dropOldStateAndAcceptNewOnBoardArrival(int stop, boolean newBestOverall, Runnable body) {
         if (isDebug(stop)) {
             drop(stop, newBestOverall);
             body.run();
@@ -50,7 +50,7 @@ class StateDebugger<T extends RaptorTripSchedule> {
         }
     }
 
-    void dropOldStateAndAcceptNewTransfer(int stop, Runnable body) {
+    void dropOldStateAndAcceptNewOnStreetArrival(int stop, Runnable body) {
         if (isDebug(stop)) {
             drop(stop, true);
             body.run();
@@ -62,13 +62,13 @@ class StateDebugger<T extends RaptorTripSchedule> {
 
     void rejectTransit(int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
         if (isDebug(alightStop)) {
-            reject(cursor.rejectedTransit(round(), alightStop, alightTime, trip, boardStop, boardTime));
+            reject(cursor.fictiveTransit(round(), alightStop, alightTime, trip, boardStop, boardTime));
         }
     }
 
     void rejectTransfer(int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
         if (isDebug(transfer.stop())) {
-            reject(cursor.rejectedTransfer(round(), fromStop, transfer, toStop, arrivalTime));
+            reject(cursor.fictiveTransfer(round(), fromStop, transfer, toStop, arrivalTime));
         }
     }
 
