@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
@@ -99,16 +100,18 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
     // expect: With 3 optimal solutions for both access and egress we get 3 x 3 = 9 optimal
     //         alternatives then timetable is enabled.
-    assertEquals(""
-            + "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]\n"
-            + "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]\n"
-            + "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]\n"
-            + "Walk 7m ~ C ~ BUS R1 0:18 0:36 ~ G ~ Walk 4m [0:11 0:40 29m 0tx $3000]\n"
-            + "Walk 4m ~ B ~ BUS R1 0:14 0:36 ~ G ~ Walk 4m [0:10 0:40 30m 0tx $2880]\n"
-            + "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s 0tx $2642]\n"
-            + "Walk 7m ~ C ~ BUS R1 0:18 0:40 ~ H ~ Walk 1s [0:11 0:40:01 29m1s 0tx $2762]\n"
-            + "Walk 4m ~ B ~ BUS R1 0:14 0:40 ~ H ~ Walk 1s [0:10 0:40:01 30m1s 0tx $2642]\n"
-            + "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]",
+    assertEquals(
+        join(
+            "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]",
+            "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]",
+            "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]",
+            "Walk 7m ~ C ~ BUS R1 0:18 0:36 ~ G ~ Walk 4m [0:11 0:40 29m 0tx $3000]",
+            "Walk 4m ~ B ~ BUS R1 0:14 0:36 ~ G ~ Walk 4m [0:10 0:40 30m 0tx $2880]",
+            "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s 0tx $2642]",
+            "Walk 7m ~ C ~ BUS R1 0:18 0:40 ~ H ~ Walk 1s [0:11 0:40:01 29m1s 0tx $2762]",
+            "Walk 4m ~ B ~ BUS R1 0:14 0:40 ~ H ~ Walk 1s [0:10 0:40:01 30m1s 0tx $2642]",
+            "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]"
+        ),
         PathUtils.pathsToString(response)
     );
   }
@@ -127,12 +130,14 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
 
     // expect: Expect pareto optimal results with earliest-arrival-time and cost as the criteria,
     //         but not departure-time.
-    assertEquals(""
-            + "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]\n"
-            + "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]\n"
-            + "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]\n"
-            + "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s 0tx $2642]\n"
-            + "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]",
+    assertEquals(
+        join(
+            "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m 0tx $3120]",
+            "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m 0tx $3000]",
+            "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s 0tx $2762]",
+            "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s 0tx $2642]",
+            "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s 0tx $2404]"
+        ),
         PathUtils.pathsToString(response)
     );
   }

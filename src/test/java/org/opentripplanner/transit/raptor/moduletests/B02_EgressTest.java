@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
@@ -89,10 +90,11 @@ public class B02_EgressTest implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     // expect: All pareto optimal paths
-    assertEquals(""
-            + "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx $2080]\n"
-            + "Walk 20s ~ B ~ BUS R1 0:10 0:24 ~ F ~ Walk 4m [0:09:40 0:28 18m20s 0tx $1960]\n"
-            + "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx $1722]",
+    assertEquals(join(
+            "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s 0tx $2080]",
+            "Walk 20s ~ B ~ BUS R1 0:10 0:24 ~ F ~ Walk 4m [0:09:40 0:28 18m20s 0tx $1960]",
+            "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s 0tx $1722]"
+        ),
         PathUtils.pathsToString(response)
     );
   }

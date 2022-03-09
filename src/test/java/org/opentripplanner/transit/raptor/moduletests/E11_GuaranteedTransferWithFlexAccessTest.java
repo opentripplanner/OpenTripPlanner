@@ -69,6 +69,7 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
     @Test
     public void standard() {
         requestBuilder.profile(RaptorProfile.STANDARD);
+        requestBuilder.searchParams().searchOneIterationOnly();
 
         var response = raptorService.route(requestBuilder.build(), data);
 
@@ -85,6 +86,7 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
         requestBuilder
                 .profile(RaptorProfile.STANDARD)
                 .searchDirection(SearchDirection.REVERSE);
+        requestBuilder.searchParams().searchOneIterationOnly();
 
         var response = raptorService.route(requestBuilder.build(), data);
 

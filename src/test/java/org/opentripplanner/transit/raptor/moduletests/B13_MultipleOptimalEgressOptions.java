@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.moduletests;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
@@ -138,7 +139,7 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
         withFlexEgressAsBestDestinationArrivalTime();
         requestBuilder.profile(MULTI_CRITERIA);
         assertEquals(
-                EXPECTED_MC_FLEX + "\n" + EXPECTED_MC_WALK_6M,
+                join(EXPECTED_MC_FLEX, EXPECTED_MC_WALK_6M),
                 runSearch()
         );
     }
