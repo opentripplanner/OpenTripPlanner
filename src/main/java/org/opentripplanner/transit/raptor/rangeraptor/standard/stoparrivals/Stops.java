@@ -65,7 +65,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         return unreachedMinNumberOfTransfers();
     }
 
-    void setAccessTime(int time, RaptorTransfer access) {
+    void setAccessTime(int time, RaptorTransfer access, boolean bestTime) {
         final int stop = access.stop();
         var other = getOrCreateStopIndex(round(), stop);
 

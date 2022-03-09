@@ -126,7 +126,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
         boolean bestTime = newOverallBestTime(stop, arrivalTime);
 
         if(reachedOnBoard || bestTime) {
-            stopArrivalsState.setAccessTime(arrivalTime, accessPath);
+            stopArrivalsState.setAccessTime(arrivalTime, accessPath, bestTime);
         }
         else {
             stopArrivalsState.rejectAccessTime(arrivalTime, accessPath);
