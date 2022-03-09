@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * This is to support strings which can't be localized.
@@ -20,6 +21,16 @@ public class NonLocalizedString implements I18NString, Serializable {
             throw new IllegalArgumentException();
         }
         this.name = name;
+    }
+
+    /**
+     * Check is name is non-null and returns an instance of {@link NonLocalizedString}, otherwise
+     * returns null.
+     */
+    @Nullable
+    public static NonLocalizedString ofNullable(String name){
+        if(name == null) return null;
+        else return new NonLocalizedString(name);
     }
 
     @Override
