@@ -141,19 +141,6 @@ public final class BestTimes {
     }
 
     /**
-     * Set the initial access time at the given stop, but only if the new access
-     * is better than a stop arrival from previous rounds.
-     * <p/>
-     * This is equivalent to calling {@link #updateNewBestTime(int, int)}
-     */
-    public void setAccessStopTime(final int stop, final int time, final boolean arrivedViaTransit) {
-        updateNewBestTime(stop, time);
-        if (arrivedViaTransit) {
-           updateOnBoardBestTime(stop, time);
-        }
-    }
-
-    /**
      * @return true iff new best time is updated
      */
     public boolean updateOnBoardBestTime(int stop, int time) {

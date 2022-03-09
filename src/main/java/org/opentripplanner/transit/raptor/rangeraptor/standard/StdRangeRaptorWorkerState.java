@@ -119,21 +119,15 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
         // (or departure time at the last stop if we search backwards).
         int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
 
-        if (exceedsTimeLimit(arrivalTime)) {
-            return;
-        }
+        if (exceedsTimeLimit(arrivalTime)) { return; }
 
+        boolean reachedOnBoard = accessPath.stopReachedOnBoard() &&
+                newOnBoardBestTime(stop, arrivalTime);
+        boolean bestTime = newOverallBestTime(stop, arrivalTime);
 
-        if (newOverallBestTime(stop, arrivalTime)) {
-            bestTimes.setAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
+        if(reachedOnBoard || bestTime) {
             stopArrivalsState.setAccessTime(arrivalTime, accessPath);
         }
-        // TODO TGR: This do not account for arriving onBoard, with a time worse than the
-        //           best time walking to the same stop. The needed code is something like this:
-        // else if(accessPath is on-board && newBestOnStreetTime(stop, arrivalTime)) {
-        //   bestTimes.setOnBoardAccessStopTime(stop, arrivalTime, accessPath.stopReachedOnBoard());
-        //   stopArrivalsState.setOnBoardAccessTime(arrivalTime, accessPath);
-        // }
         else {
             stopArrivalsState.rejectAccessTime(arrivalTime, accessPath);
         }
@@ -150,8 +144,10 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
         if (newOnBoardBestTime(stop, arrivalTime)) {
             // transitTimes upper bounds bestTimes
-            final boolean newBestOverall = newOverallBestTime(stop, arrivalTime);
-            stopArrivalsState.setNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime, newBestOverall);
+            final boolean newOverallBestTime = newOverallBestTime(stop, arrivalTime);
+            stopArrivalsState.setNewBestTransitTime(
+                    stop, arrivalTime, trip, boardStop, boardTime, newOverallBestTime
+            );
         } else {
             stopArrivalsState.rejectNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime);
         }

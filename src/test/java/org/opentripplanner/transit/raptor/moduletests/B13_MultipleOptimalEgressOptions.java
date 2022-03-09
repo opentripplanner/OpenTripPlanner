@@ -127,7 +127,6 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
     }
 
     @Test
-    @Ignore("This test fails, I will fix that in a new commit.")
     public void standardReverseWalking() {
         withWalkingAsBestDestinationArrivalTime();
         requestBuilder.profile(STANDARD).searchDirection(REVERSE);

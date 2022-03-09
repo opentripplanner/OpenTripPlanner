@@ -79,9 +79,7 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
         );
     }
 
-    //TODO: Enable after #3725 is fixed
     @Test
-    @Disabled
     public void standardReverse() {
         requestBuilder
                 .profile(RaptorProfile.STANDARD)
