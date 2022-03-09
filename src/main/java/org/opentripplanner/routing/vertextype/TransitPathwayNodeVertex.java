@@ -28,7 +28,7 @@ public class TransitPathwayNodeVertex extends Vertex {
         node.getId().toString(),
         node.getCoordinate().longitude(),
         node.getCoordinate().latitude(),
-        new NonLocalizedString(node.getName())
+        NonLocalizedString.ofNullable(node.getName())
     );
     this.node = node;
     this.wheelchairEntrance = node.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
