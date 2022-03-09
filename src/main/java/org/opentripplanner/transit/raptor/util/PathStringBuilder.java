@@ -45,7 +45,7 @@ public class PathStringBuilder {
 
     /**
      * The given {@code stopIndex} is translated to stop name using the {@code stopNameTranslator}
-     * set in the constructor. If not translater is set the stopIndex is used.
+     * set in the constructor. If not translator is set the stopIndex is used.
      */
     public PathStringBuilder stop(int stopIndex) {
         return stop(stopNameResolver.apply(stopIndex));

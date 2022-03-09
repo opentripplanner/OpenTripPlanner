@@ -408,7 +408,6 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     }
 
     // Track time spent, measure performance
-    // TODO TGR - Replace by performance tests
     private Timer timerRoute() { return timers.timerRoute(); }
     private Timer timerByMinuteScheduleSearch() { return timers.timerByMinuteScheduleSearch(); }
     private Timer timerByMinuteTransfers() { return timers.timerByMinuteTransfers(); }

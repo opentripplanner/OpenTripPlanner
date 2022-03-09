@@ -148,14 +148,14 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
 
     /* private methods */
 
-    /** This method is part of the Worker life cycle */
+    /** This method is called by the Worker life cycle */
     private void setupIteration() {
         arrivalsCache.clear();
         // clear all touched stops to avoid constant re-exploration
         stops.clearTouchedStopsAndSetStopMarkers();
     }
 
-    /** This method is part of Worker life cycle */
+    /** This method is called by the Worker life cycle */
     private void transitsForRoundComplete() {
         stops.clearTouchedStopsAndSetStopMarkers();
         commitCachedArrivals();

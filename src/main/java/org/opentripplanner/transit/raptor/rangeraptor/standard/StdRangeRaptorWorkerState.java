@@ -148,7 +148,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
             return;
         }
 
-        if (newTransitBestTime(stop, arrivalTime)) {
+        if (newOnBoardBestTime(stop, arrivalTime)) {
             // transitTimes upper bounds bestTimes
             final boolean newBestOverall = newOverallBestTime(stop, arrivalTime);
             stopArrivalsState.setNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime, newBestOverall);
@@ -204,12 +204,12 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
     /* private methods */
 
-    private boolean newTransitBestTime(int stop, int alightTime) {
-        return bestTimes.updateOnBoardBestTime(stop, alightTime);
-    }
-
     private boolean newOverallBestTime(int stop, int alightTime) {
         return bestTimes.updateNewBestTime(stop, alightTime);
+    }
+
+    private boolean newOnBoardBestTime(int stop, int alightTime) {
+        return bestTimes.updateOnBoardBestTime(stop, alightTime);
     }
 
     private boolean exceedsTimeLimit(int time) {

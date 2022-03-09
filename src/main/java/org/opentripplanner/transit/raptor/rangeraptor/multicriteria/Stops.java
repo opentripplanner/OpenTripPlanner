@@ -68,6 +68,8 @@ public final class Stops<T extends RaptorTripSchedule> {
     Iterable<AbstractStopArrival<T>> listArrivalsAfterMarker(final int stop) {
         StopArrivalParetoSet<T> it = stops[stop];
         if(it==null) {
+            // Uses Collections.emptyList() witch is slightly
+            // more efficient than List.of()
             return emptyList();
         }
         return it.elementsAfterMarker();

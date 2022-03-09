@@ -10,6 +10,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.raptor.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
@@ -182,8 +183,11 @@ public class SystemErrDebugLogger implements DebugLogger {
         );
     }
 
-    private static String details(String action, String optReason, String element) {
-        return concat(optReason,  action + ", element: " + element);
+    private static String details(String action, String optReason, @Nullable String element) {
+        StringBuilder buf = new StringBuilder();
+        buf.append(action).append(": ").append(element);
+        if(isNotBlank(optReason)) { buf.append("  # ").append(optReason); }
+        return buf.toString();
     }
 
     private String path(ArrivalView<?> a) {
@@ -237,7 +241,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         if(a.arrivedAtDestination()) {
             return a.egressPath().egress().durationInSeconds();
         }
-        throw new IllegalStateException("Unsuported type: " + a.getClass());
+        throw new IllegalStateException("Unsupported type: " + a.getClass());
     }
 
     private void printRoundHeader(int round) {
@@ -248,13 +252,6 @@ public class SystemErrDebugLogger implements DebugLogger {
         System.err.println(arrivalTableFormatter.printHeader());
     }
 
-    private static String concat(String s, String t) {
-        if(s == null || s.isEmpty()) {
-            return t == null ? "" : t;
-        }
-        return s + ", " + (t == null ? "" : t);
-    }
-
     private String legType(ArrivalView<?> a) {
         if (a.arrivedByAccess()) { return "Access"; }
         if (a.arrivedByTransit()) { return "Transit"; }
@@ -262,5 +259,9 @@ public class SystemErrDebugLogger implements DebugLogger {
         if (a.arrivedByTransfer()) { return "Walk"; }
         if (a.arrivedAtDestination()) { return "Egress"; }
         throw new IllegalStateException("Unknown mode for: " + this);
+    }
+
+    private static boolean isNotBlank(String text) {
+        return text != null && !text.isBlank();
     }
 }
