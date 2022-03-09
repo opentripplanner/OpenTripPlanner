@@ -1,5 +1,7 @@
 package org.opentripplanner.model;
 
+import javax.annotation.Nullable;
+
 /**
  * Acts as the supertype for all entities, except stations, created from the GTFS stops table. Most
  * of the fields are shared between the types, and eg. in pathways the namespace any of them can be
@@ -42,6 +44,7 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Name of the station element if provided.
    */
+  @Nullable
   public String getName() {
     return name;
   }
