@@ -45,21 +45,17 @@ class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArriv
     private int transferFromStop = NOT_SET;
     private RaptorTransfer transferPath = null;
 
-    public DefaultStopArrivalState() { }
+    DefaultStopArrivalState() { }
 
-    DefaultStopArrivalState(DefaultStopArrivalState<T> other) {
-        this.bestArrivalTime = other.bestArrivalTime;
-        this.onBoardArrivalTime = other.onBoardArrivalTime;
-        this.trip = other.trip;
-        this.boardTime = other.boardTime;
-        this.boardStop = other.boardStop;
-        this.transferFromStop = other.transferFromStop;
-        this.transferPath = other.transferPath;
-    }
 
     @Override
     public final int time() {
         return bestArrivalTime;
+    }
+
+    @Override
+    public final int onBoardArrivalTime() {
+        return onBoardArrivalTime;
     }
 
     @Override
@@ -84,18 +80,9 @@ class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArriv
 
     /* Transit */
 
-
-    /**
-     * A transit arrival exist, but it might be a better transfer arrival as well.
-     */
     @Override
     public final boolean arrivedByTransit() {
         return onBoardArrivalTime != NOT_SET;
-    }
-
-    @Override
-    public final int onBoardArrivalTime() {
-        return onBoardArrivalTime;
     }
 
     @Override
