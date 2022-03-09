@@ -46,26 +46,32 @@ public class StopsCursor<T extends RaptorTripSchedule> {
         return stops.get(round, stop).arrivedByTransit();
     }
 
-    /**
-     * Return a fictive Transfer arrival for the rejected transfer stop arrival.
-     */
+    /** Return a fictive access stop arrival. */
     public Access<T> fictiveAccess(int round, RaptorTransfer accessPath, int arrivalTime) {
         return new Access<>(round, arrivalTime, accessPath);
     }
 
     /**
-     * Return a fictive Transfer arrival for the rejected transfer stop arrival.
+     * Return a fictive Transfer stop arrival view. The arrival do not exist in the state, but it is
+     * linked with the previous arrival witch is a "reel" arrival pressent in the state. This
+     * enables path generation.
      */
-    public Transfer<T> fictiveTransfer(int round, int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
+    public Transfer<T> fictiveTransfer(
+            int round, int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime
+    ) {
         StopArrivalState<T> arrival = StopArrivalState.create();
         arrival.transferToStop(fromStop, arrivalTime, transfer);
         return new Transfer<>(round, toStop, arrival, this);
     }
 
     /**
-     * Return a fictive Transit arrival for the rejected transit stop arrival.
+     * Return a fictive Transit stop arrival view. The arrival do not exist in the state, but it is
+     * linked with the previous arrival witch is a "reel" arrival present in the state. This
+     * enables path generation.
      */
-    public Transit<T> fictiveTransit(int round, int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
+    public Transit<T> fictiveTransit(
+            int round, int alightStop, int alightTime, T trip, int boardStop, int boardTime
+    ) {
             StopArrivalState<T> arrival = StopArrivalState.create();
             arrival.arriveByTransit(alightTime, boardStop, boardTime, trip);
             return new Transit<>(round, alightStop, arrival, this);
@@ -87,6 +93,9 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     /**
      * Return the stop-arrival for the given round, stop and method of arrival(stopReachedOnBoard).
      * The returned arrival can be access(including flex), transfer or transit.
+     *
+     * @param stopReachedOnBoard if {@code true} the arrival returned must arrive onboard a vehicle,
+     *                           if {@code false} the BEST arrival is returned on-street or on-board.
      */
     public ArrivalView<T> stop(int round, int stop, boolean stopReachedOnBoard) {
         return stopReachedOnBoard
@@ -137,7 +146,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
         var arrival = stops.get(round, stop);
 
         if(arrival.arrivedByAccess()) {
-            return newAccessView(round, arrival, nextTransitLeg);
+            return newAccessView(round, arrival.accessPath(), nextTransitLeg);
         }
         else {
             return newTransitOrTransfer(round, stop, arrival);
@@ -152,19 +161,20 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      * time-shifted departure. This is used for logging and debugging, not for returned paths.
      */
     private ArrivalView<T> newAccessView(
-        int round,
-        StopArrivalState<T> arrival,
-        Transit<T> transit
+            int round,
+            RaptorTransfer accessPath,
+            Transit<T> transit
     ) {
         int transitDepartureTime = transit.boardTime();
         int boardSlack = boardSlackProvider.applyAsInt(transit.trip().pattern());
 
         // Preferred time-shifted access departure
-        int preferredDepartureTime = transitCalculator.minusDuration(transitDepartureTime,
-            boardSlack + arrival.transferDuration()
+        int preferredDepartureTime = transitCalculator.minusDuration(
+                transitDepartureTime,
+                boardSlack + accessPath.durationInSeconds()
         );
 
-        return newAccessView(round, preferredDepartureTime, arrival);
+        return newAccessView(round, preferredDepartureTime, accessPath);
     }
 
     /**
@@ -174,16 +184,18 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     private ArrivalView<T> newAccessView(
             int round,
             int preferredDepartureTime,
-            StopArrivalState<T> arrival
+            RaptorTransfer accessPath
     ) {
         // Get the real 'departureTime' honoring the time-shift restriction in the access
-        int departureTime = transitCalculator.departureTime(arrival.accessPath(),
+        int departureTime = transitCalculator.departureTime(
+                accessPath,
                 preferredDepartureTime
         );
-        int arrivalTime = transitCalculator.plusDuration(departureTime,
-                arrival.accessPath().durationInSeconds()
+        int arrivalTime = transitCalculator.plusDuration(
+                departureTime,
+                accessPath.durationInSeconds()
         );
-        return new Access<>(round, arrivalTime, arrival.accessPath());
+        return new Access<>(round, arrivalTime, accessPath);
     }
 
     /**

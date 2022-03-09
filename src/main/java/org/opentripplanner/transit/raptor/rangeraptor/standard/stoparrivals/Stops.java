@@ -25,7 +25,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     ) {
         this.roundProvider = roundProvider;
         //noinspection unchecked
-        this.stops = (DefaultStopArrivalState<T>[][]) new DefaultStopArrivalState[nRounds][nStops];
+        this.stops = (StopArrivalState<T>[][]) new StopArrivalState[nRounds][nStops];
     }
 
     /**
@@ -126,6 +126,6 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         }
         if(state.arrivedByAccess()) { return null; }
         
-        return TransitArrival.create(state.trip(), stopIndex, state.transitArrivalTime());
+        return TransitArrival.create(state.trip(), stopIndex, state.onBoardArrivalTime());
     }
 }

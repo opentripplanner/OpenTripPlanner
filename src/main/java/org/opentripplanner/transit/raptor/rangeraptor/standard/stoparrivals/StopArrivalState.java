@@ -5,20 +5,31 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public interface StopArrivalState<T extends RaptorTripSchedule> {
 
+    /** The overall best time to reach this stop */
     int time();
 
+    /**
+     * The best time to reach this stop on board a vehicle, it may be by
+     * transit or by flex access.
+     */
+    int onBoardArrivalTime();
+
     boolean reached();
+
+
+    /* Access */
 
     boolean arrivedByAccess();
 
     RaptorTransfer accessPath();
 
+
+    /* Transit */
+
     /**
      * A transit arrival exist, but it might be a better transfer arrival as well.
      */
     boolean arrivedByTransit();
-
-    int transitArrivalTime();
 
     T trip();
 
@@ -26,22 +37,21 @@ public interface StopArrivalState<T extends RaptorTripSchedule> {
 
     int boardStop();
 
-    int transferFromStop();
+    void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip);
 
-    int transferDuration();
+    void setBestTimeTransit(int time);
 
+
+    /* Transfer */
 
     /**
      * The best arrival is by transfer.
      */
     boolean arrivedByTransfer();
 
+    int transferFromStop();
+
     RaptorTransfer transferPath();
-
-
-    void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip);
-
-    void setBestTimeTransit(int time);
 
     /**
      * Set the time at a transit index iff it is optimal. This sets both the best time and the

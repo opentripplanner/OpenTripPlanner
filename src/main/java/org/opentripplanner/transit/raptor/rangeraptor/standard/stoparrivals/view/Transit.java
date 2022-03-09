@@ -20,7 +20,7 @@ final class Transit<T extends RaptorTripSchedule>
 
     @Override
     public int arrivalTime() {
-        return arrival.transitArrivalTime();
+        return arrival.onBoardArrivalTime();
     }
 
     @Override
