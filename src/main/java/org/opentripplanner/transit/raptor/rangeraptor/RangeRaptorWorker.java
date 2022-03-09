@@ -54,7 +54,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleE
 @SuppressWarnings("Duplicates")
 public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Worker<T> {
 
-    private static final int ACCESS_ROUND_ZERO = 0;
     private final RoutingStrategy<T> transitWorker;
 
     /**
@@ -162,22 +161,22 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
      * Perform one minute of a RAPTOR search.
      */
     private void runRaptorForMinute() {
-        addAccessPaths(accessPaths.arrivedOnStreetByNunOfRides().get(ACCESS_ROUND_ZERO));
+        findAccessOnStreetForRound();
 
         while (hasMoreRounds()) {
             lifeCycle.prepareForNextRound(roundTracker.nextRound());
 
             // NB since we have transfer limiting not bothering to cut off search when there are no
             // more transfers as that will be rare and complicates the code
-            findAllTransitForRound();
+            findTransitForRound();
 
-            addAccessPaths(accessPaths.arrivedOnBoardByNunOfRides().get(round()));
+            findAccessOnBoardForRound();
 
-            transfersForRound();
+            findTransfersForRound();
 
             lifeCycle.roundComplete(state.isDestinationReachedInCurrentRound());
 
-            addAccessPaths(accessPaths.arrivedOnStreetByNunOfRides().get(round()));
+            findAccessOnStreetForRound();
         }
 
         // This state is repeatedly modified as the outer loop progresses over departure minutes.
@@ -197,7 +196,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     /**
      * Perform a scheduled search
      */
-    private void findAllTransitForRound() {
+    private void findTransitForRound() {
         timerByMinuteScheduleSearch().record(() -> {
             IntIterator stops = state.stopsTouchedPreviousRound();
             Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
@@ -332,7 +331,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         return true;
     }
 
-    private void transfersForRound() {
+    private void findTransfersForRound() {
         timerByMinuteTransfers().record(() -> {
             IntIterator it = state.stopsTouchedByTransitCurrentRound();
 
@@ -368,6 +367,15 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
         // Default: create a standard trip search
         return calculator.createTripSearch(timeTable);
+    }
+
+
+    private void findAccessOnStreetForRound() {
+        addAccessPaths(accessPaths.arrivedOnStreetByNunOfRides().get(round()));
+    }
+
+    private void findAccessOnBoardForRound() {
+        addAccessPaths(accessPaths.arrivedOnBoardByNunOfRides().get(round()));
     }
 
     /**
