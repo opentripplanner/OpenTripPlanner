@@ -90,7 +90,8 @@ public class PathStringBuilder {
     }
 
     public PathStringBuilder timeAndCostCentiSec(int fromTime, int toTime, int generalizedCost) {
-        return space().time(fromTime, toTime).generalizedCostSentiSec(generalizedCost);
+        if(buf.length() != 0) { space(); }
+        return time(fromTime, toTime).generalizedCostSentiSec(generalizedCost);
     }
 
     /** Add generalizedCostCentiSec {@link #costCentiSec(int, int, String)} */
