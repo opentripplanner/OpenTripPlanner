@@ -4,7 +4,6 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
-
 /**
  * This class is responsible for adding access functionality, witch the
  * {@link DefaultStopArrivalState} ignore. It is injected into the state matrix when new accesses
@@ -14,19 +13,25 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * as well as the default state. There are relatively few access states, so the memory and
  * performance overhead is small.
  */
-class AccessStopArrivalState<T extends RaptorTripSchedule> implements StopArrivalState<T> {
+public class AccessStopArrivalState<T extends RaptorTripSchedule> implements StopArrivalState<T> {
 
   private final DefaultStopArrivalState<T> delegate;
+  private RaptorTransfer accessArriveOnStreet;
+  private RaptorTransfer accessArriveOnBoard;
 
-  AccessStopArrivalState(int time, RaptorTransfer accessPath, DefaultStopArrivalState<T> other) {
+
+  public AccessStopArrivalState(
+          int time,
+          RaptorTransfer accessPath,
+          boolean isOverallBestTime,
+          DefaultStopArrivalState<T> other
+  ) {
     this.delegate = other;
-    setAccessTime(time, accessPath);
+    setAccessTime(time, accessPath, isOverallBestTime);
   }
 
-  @Override
-  public final boolean arrivedByAccess() {
-    return true;
-  }
+
+  /* Implement StopArrivalState */
 
   @Override
   public int time() {
@@ -39,18 +44,38 @@ class AccessStopArrivalState<T extends RaptorTripSchedule> implements StopArriva
   }
 
   @Override
-  public boolean reached() {
-    return delegate.reached();
+  public boolean reachedOnBoard() {
+    return delegate.reachedOnBoard();
   }
 
   @Override
-  public RaptorTransfer accessPath() {
-    return delegate.accessPath();
+  public boolean reachedOnStreet() {
+    return arrivedByAccessOnStreet() || arrivedByTransfer();
   }
 
   @Override
-  public boolean arrivedByTransit() {
-    return false;
+  public boolean arrivedByAccessOnStreet() {
+    return accessArriveOnStreet != null;
+  }
+
+  @Override
+  public RaptorTransfer accessPathOnStreet() {
+    return accessArriveOnStreet;
+  }
+
+  @Override
+  public boolean arrivedByAccessOnBoard() {
+    return accessArriveOnBoard != null;
+  }
+
+  @Override
+  public RaptorTransfer accessPathOnBoard() {
+    return accessArriveOnBoard;
+  }
+
+  @Override
+  public final boolean arrivedByTransit() {
+    return delegate.arrivedByTransit();
   }
 
   @Override
@@ -70,6 +95,7 @@ class AccessStopArrivalState<T extends RaptorTripSchedule> implements StopArriva
 
   @Override
   public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
+    accessArriveOnBoard = null;
     delegate.arriveByTransit(arrivalTime, boardStop, boardTime, trip);
   }
 
@@ -97,6 +123,7 @@ class AccessStopArrivalState<T extends RaptorTripSchedule> implements StopArriva
   public void transferToStop(
           int fromStop, int arrivalTime, RaptorTransfer transferPath
   ) {
+    accessArriveOnStreet = null;
     delegate.transferToStop(fromStop, arrivalTime, transferPath);
   }
 
@@ -104,12 +131,28 @@ class AccessStopArrivalState<T extends RaptorTripSchedule> implements StopArriva
   public String toString() {
     var builder = ToStringBuilder.of(AccessStopArrivalState.class);
     delegate.toStringAddBody(builder);
+
+    if(arrivedByAccessOnBoard()) {
+      builder.addDurationSec("onBoard", accessArriveOnBoard.durationInSeconds());
+    }
+
+    if(arrivedByAccessOnStreet()) {
+      builder.addDurationSec("onStreet", accessArriveOnStreet.durationInSeconds());
+    }
+
     return builder.toString();
   }
 
   /* package local methods */
 
-  void setAccessTime(int time, RaptorTransfer access) {
-    this.delegate.setAccessTime(time, access);
+  void setAccessTime(int time, RaptorTransfer access, boolean isOverallBestTime) {
+    this.delegate.setAccessTime(time, isOverallBestTime, access.stopReachedOnBoard());
+
+    if(access.stopReachedOnBoard()) {
+      accessArriveOnBoard = access;
+    }
+    else {
+      accessArriveOnStreet = access;
+    }
   }
 }

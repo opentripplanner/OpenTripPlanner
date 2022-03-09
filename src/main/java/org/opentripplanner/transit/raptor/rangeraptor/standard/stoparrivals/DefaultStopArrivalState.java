@@ -59,30 +59,44 @@ class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArriv
     }
 
     @Override
-    public final boolean reached() {
-        return bestArrivalTime != NOT_SET;
+    public final boolean reachedOnBoard() {
+        return onBoardArrivalTime != NOT_SET;
     }
 
+    @Override
+    public final boolean reachedOnStreet() {
+        return arrivedByTransfer();
+    }
 
 
     /* Access */
 
     @Override
-    public boolean arrivedByAccess() {
-        return false;
+    public final boolean arrivedByAccessOnStreet() { return false; }
+
+    @Override
+    public final RaptorTransfer accessPathOnStreet() {
+        throw new IllegalStateException(
+                "This class do no handle access, see AccessStopArrivalState"
+        );
     }
 
     @Override
-    public RaptorTransfer accessPath() {
-        return transferPath;
+    public final boolean arrivedByAccessOnBoard() { return false; }
+
+    @Override
+    public final RaptorTransfer accessPathOnBoard() {
+        throw new IllegalStateException(
+                "This class do no handle access, see AccessStopArrivalState"
+        );
     }
 
 
     /* Transit */
 
     @Override
-    public final boolean arrivedByTransit() {
-        return onBoardArrivalTime != NOT_SET;
+    public boolean arrivedByTransit() {
+        return boardStop != NOT_SET;
     }
 
     @Override
@@ -165,9 +179,19 @@ class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArriv
         return builder;
     }
 
-    void setAccessTime(int time, RaptorTransfer accessPath) {
-        this.bestArrivalTime = time;
-        this.transferPath = accessPath;
+    void setAccessTime(int time, boolean isBestTimeOverall, boolean onBoard) {
+        if(isBestTimeOverall) {
+            this.bestArrivalTime = time;
+            // Clear transit to avoid mistakes
+            this.transferFromStop = NOT_SET;
+            this.transferPath = null;
+        }
+        if(onBoard) {
+            this.onBoardArrivalTime = time;
+            // Clear transit to avoid mistakes
+            this.trip = null;
+            this.boardTime = NOT_SET;
+            this.boardStop = NOT_SET;
+        }
     }
-
 }

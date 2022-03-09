@@ -14,14 +14,34 @@ public interface StopArrivalState<T extends RaptorTripSchedule> {
      */
     int onBoardArrivalTime();
 
-    boolean reached();
+    /** Stop arrival reached by transit or on-board access. */
+    boolean reachedOnBoard();
+
+    /** Stop arrival reached, at least one time (any round/iteration). */
+    boolean reachedOnStreet();
 
 
     /* Access */
 
-    boolean arrivedByAccess();
+    /**
+     * Return true is the best option is an access arrival.
+     */
+    boolean arrivedByAccessOnStreet();
 
-    RaptorTransfer accessPath();
+    /**
+     * Return the access path for the best stop arrival.
+     */
+    RaptorTransfer accessPathOnStreet();
+
+    /**
+     * Return true is the best option is an access arrival.
+     */
+    boolean arrivedByAccessOnBoard();
+
+    /**
+     * Return the access path for the best stop arrival.
+     */
+    RaptorTransfer accessPathOnBoard();
 
 
     /* Transit */

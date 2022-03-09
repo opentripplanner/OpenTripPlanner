@@ -38,12 +38,15 @@ public class StopsCursor<T extends RaptorTripSchedule> {
         this.boardSlackProvider = boardSlackProvider;
     }
 
-    public boolean exist(int round, int stop) {
-        return stops.exist(round, stop);
+    public boolean reachedOnBoard(int round, int stop) {
+        var a =  stops.get(round, stop);
+        return a != null && a.reachedOnBoard();
     }
 
-    public boolean transitExist(int round, int stop) {
-        return stops.get(round, stop).arrivedByTransit();
+    public boolean reachedOnStreet(int round, int stop) {
+        var a =  stops.get(round, stop);
+        if(a == null) { return false; }
+        return a.arrivedByAccessOnStreet() || a.arrivedByAccessOnStreet();
     }
 
     /** Return a fictive access stop arrival. */
@@ -66,7 +69,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
 
     /**
      * Return a fictive Transit stop arrival view. The arrival do not exist in the state, but it is
-     * linked with the previous arrival witch is a "reel" arrival present in the state. This
+     * linked with the previous arrival witch is a "reel" arrival pressent in the state. This
      * enables path generation.
      */
     public Transit<T> fictiveTransit(
@@ -78,16 +81,13 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Set cursor to the transit state at round and stop. Throws
-     * runtime exception if round is 0 or no state exist.
-     *
-     * @param round the round to use.
-     * @param stop the stop index to use.
-     * @return the current transit state, if found
+     * Return the stop-arrival for the given round, stop and given access. There is no
+     * check that the access exist.
      */
-    public Transit<T> transit(int round, int stop) {
-       StopArrivalState<T> arrival = stops.get(round, stop);
-        return new Transit<>(round, stop, arrival, this);
+    public ArrivalView<T> access(int round, int stop, RaptorTransfer access) {
+        var arrival = stops.get(round, stop);
+        int time = access.stopReachedOnBoard() ? arrival.onBoardArrivalTime() : arrival.time();
+        return new Access<>(round, time, access);
     }
 
     /**
@@ -98,44 +98,31 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      *                           if {@code false} the BEST arrival is returned on-street or on-board.
      */
     public ArrivalView<T> stop(int round, int stop, boolean stopReachedOnBoard) {
-        return stopReachedOnBoard
-                ? onBoardAccessOrTransit(round, stop)
-                : bestStopArrival(round, stop);
-    }
-
-    /**
-     * Return the earliest arrival for the round and stop. This method should
-     * only be used if the next leg is on-board - it is not allowed if the
-     * next leg is a transfer or on-street egress. The returned arrival is
-     * an access(including flex), transfer or transit. Consider using the
-     * "more specific" methods  {@link #stop(int, int, Transit)} or
-     * {@link #onBoardAccessOrTransit(int, int)}.
-     */
-    public ArrivalView<T> bestStopArrival(int round, int stop) {
-        //TODO OTP2 - If a access arrive on-board, then we should also allow
-        //          - a transfer to be accepted without dropping the access.
-        //          - This code need to be fixed when this problem is fixed.
         var arrival = stops.get(round, stop);
-        if(arrival.arrivedByAccess()) {
-            return new Access<>(round, arrival.time(), arrival.accessPath());
-        }
-        return newTransitOrTransfer(round, stop, arrival);
-    }
 
-    /**
-     * Return the on-board arrival for the round and stop. This method is
-     * gives the correct arrival if the next leg is on-street. The returned
-     * arrival is an access(including flex), transfer or transit.
-     */
-    public ArrivalView<T> onBoardAccessOrTransit(int round, int stop) {
-        var arrival = stops.get(round, stop);
-        if(
-                arrival.arrivedByAccess() &&
-                arrival.accessPath().stopReachedOnBoard()
-        ) {
-            return new Access<>(round, arrival.time(), arrival.accessPath());
+        // We chack for on-street arrivals first, since on-street is only available if it is better
+        // than on-board arrivals
+        if(!stopReachedOnBoard) {
+            if (arrival.arrivedByAccessOnStreet()) {
+                return newAccessView(round, arrival.time(), arrival.accessPathOnStreet());
+            }
+            else if (arrival.arrivedByTransfer()) {
+                return new Transfer<>(round, stop, arrival, this);
+            }
         }
-        return new Transit<>(round, stop, arrival, this);
+        // On on-board arrivals can always be used, we do not care what the *stopReachedOnBoard* is.
+        if(arrival.arrivedByAccessOnBoard()) {
+            return newAccessView(
+                    round,
+                    arrival.onBoardArrivalTime(),
+                    arrival.accessPathOnBoard()
+            );
+        }
+        else if(arrival.arrivedByTransit()) {
+            return new Transit<>(round, stop, arrival, this);
+        }
+        // Should never get here...
+        throw new IllegalStateException("Unknown arrival: " + arrival);
     }
 
     /**
@@ -145,13 +132,22 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     public ArrivalView<T> stop(int round, int stop, @NotNull Transit<T> nextTransitLeg) {
         var arrival = stops.get(round, stop);
 
-        if(arrival.arrivedByAccess()) {
-            return newAccessView(round, arrival.accessPath(), nextTransitLeg);
+        if(arrival.arrivedByAccessOnStreet()) {
+            return newAccessView(round, arrival.accessPathOnStreet(), nextTransitLeg);
         }
-        else {
-            return newTransitOrTransfer(round, stop, arrival);
+        else if(arrival.arrivedByTransfer()) {
+            return new Transfer<>(round, stop, arrival, this);
         }
+        else if(arrival.arrivedByAccessOnBoard()) {
+            return newAccessView(round, arrival.accessPathOnBoard(), nextTransitLeg);
+        }
+        else if(arrival.arrivedByTransit()) {
+            return new Transit<>(round, stop, arrival, this);
+        }
+        // Should never get here...
+        throw new IllegalStateException("Unknown arrival: " + arrival);
     }
+
 
     /**
      * A access stop arrival, time-shifted according to the first transit boarding/departure time
@@ -196,15 +192,5 @@ public class StopsCursor<T extends RaptorTripSchedule> {
                 accessPath.durationInSeconds()
         );
         return new Access<>(round, arrivalTime, accessPath);
-    }
-
-    /**
-     * A transfer is only present if it has the earliest arrival time. If, not the transit
-     * is the has the best arrival time and we return that.
-     */
-    private ArrivalView<T> newTransitOrTransfer(int round, int stop, StopArrivalState<T> arrival) {
-        return arrival.arrivedByTransfer()
-                ? new Transfer<>(round, stop, arrival, this)
-                : new Transit<>(round, stop, arrival, this);
     }
 }

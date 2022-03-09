@@ -39,7 +39,7 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     @Override
     public void setAccessTime(int arrivalTime, RaptorTransfer access, boolean bestTime) {
         delegate.setAccessTime(arrivalTime, access, bestTime);
-        debug.acceptAccessPath(access.stop(), access.stopReachedOnBoard());
+        debug.acceptAccessPath(access.stop(), access);
     }
 
     @Override

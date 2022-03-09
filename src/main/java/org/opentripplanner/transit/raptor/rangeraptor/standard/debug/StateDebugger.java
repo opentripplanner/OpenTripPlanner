@@ -28,9 +28,9 @@ class StateDebugger<T extends RaptorTripSchedule> {
         this.debugHandlerStopArrivals = dFactory.debugStopArrival();
     }
 
-    void acceptAccessPath(int stop, boolean stopReachedOnBoard) {
+    void acceptAccessPath(int stop, RaptorTransfer access) {
         if(isDebug(stop)) {
-            accept(stop, stopReachedOnBoard);
+            debugHandlerStopArrivals.accept(cursor.access(round(), stop, access));
         }
     }
 
@@ -42,7 +42,7 @@ class StateDebugger<T extends RaptorTripSchedule> {
 
     void dropOldStateAndAcceptNewOnBoardArrival(int stop, boolean newBestOverall, Runnable body) {
         if (isDebug(stop)) {
-            drop(stop, newBestOverall);
+            drop(stop, true, newBestOverall);
             body.run();
             accept(stop, true);
         } else {
@@ -52,7 +52,7 @@ class StateDebugger<T extends RaptorTripSchedule> {
 
     void dropOldStateAndAcceptNewOnStreetArrival(int stop, Runnable body) {
         if (isDebug(stop)) {
-            drop(stop, true);
+            drop(stop, false, true);
             body.run();
             accept(stop, false);
         } else {
@@ -83,25 +83,30 @@ class StateDebugger<T extends RaptorTripSchedule> {
         debugHandlerStopArrivals.accept(cursor.stop(round(), stop, stopReachedOnBoard));
     }
 
-    private void drop(int stop, boolean newBestOverall) {
-        if(!cursor.exist(round(), stop)) { return; }
+    private void drop(int stop, boolean onBoard, boolean newBestOverall) {
+        final int round = round();
 
-        ArrivalView<T> arrival = null;
-
-        if(newBestOverall) {
-            arrival = cursor.bestStopArrival(round(), stop);
+        if(onBoard) {
+            if(cursor.reachedOnBoard(round, stop)) {
+                dropExistingArrival(round, stop, onBoard);
+            }
+            if(newBestOverall) {
+                if(cursor.reachedOnStreet(round, stop)) {
+                    dropExistingArrival(round, stop, false);
+                }
+            }
         }
-        else if (cursor.transitExist(round(), stop)) {
-            arrival = cursor.transit(round(), stop);
-        }
-
-        if(arrival != null) {
-            debugHandlerStopArrivals.drop(arrival, null, null);
+        else if(cursor.reachedOnStreet(round, stop)) {
+            dropExistingArrival(round, stop, onBoard);
         }
     }
 
     private void reject(ArrivalView<T> arrival) {
         debugHandlerStopArrivals.reject(arrival, null, null);
+    }
+
+    private void dropExistingArrival(int round, int stop, boolean onBoard) {
+        debugHandlerStopArrivals.drop(cursor.stop(round, stop, onBoard), null, null);
     }
 
     private int round() {

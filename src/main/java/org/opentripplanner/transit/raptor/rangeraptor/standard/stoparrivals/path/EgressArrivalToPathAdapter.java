@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.path;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -29,12 +32,10 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
     private final DestinationArrivalPaths<T> paths;
     private final TransitCalculator<T> calculator;
     private final StopsCursor<T> cursor;
+    private final List<DestinationArrivalEvent> rejectedArrivals;
 
-    private boolean newElementSet;
     private int bestDestinationTime = -1;
-    private int bestRound = -1;
-    private boolean bestStopReachedOnBoard = false;
-    private RaptorTransfer bestEgressPath;
+    private DestinationArrivalEvent bestArrival = null;
 
     public EgressArrivalToPathAdapter(
             DestinationArrivalPaths<T> paths,
@@ -45,6 +46,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
         this.paths = paths;
         this.calculator = calculator;
         this.cursor = cursor;
+        this.rejectedArrivals = paths.isDebugOn() ? new ArrayList<>() : null;
         lifeCycle.onSetupIteration((ignore) -> setupIteration());
         lifeCycle.onRoundComplete((ignore) -> roundComplete());
     }
@@ -61,61 +63,89 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
         );
 
         if (calculator.isBefore(arrivalTime, bestDestinationTime)) {
-            debugRejectExisting(arrivalTime);
-            newElementSet = true;
+            debugRejectCurrentBestArrival();
             bestDestinationTime = arrivalTime;
-            bestEgressPath = egressPath;
-            bestRound = round;
-            bestStopReachedOnBoard = stopReachedOnBoard;
+            bestArrival = new DestinationArrivalEvent(round, stopReachedOnBoard, egressPath);
         } else {
             debugRejectNew(round, stopReachedOnBoard, egressPath);
         }
     }
 
+    private boolean newElementSet() { return bestArrival != null; }
+
     private void setupIteration() {
-        newElementSet = false;
+        bestArrival = null;
         bestDestinationTime = calculator.unreachedTime();
-        bestEgressPath = null;
-        bestRound = -1;
     }
 
     private void roundComplete() {
-        if (newElementSet) {
+        if (newElementSet()) {
             addNewElementToPath();
-            newElementSet = false;
+            logDebugRejectEvents();
+            bestArrival = null;
         }
     }
 
     @Override
     public boolean arrivedAtDestinationCurrentRound() {
-        return newElementSet;
+        return newElementSet();
     }
 
     private void addNewElementToPath() {
-        paths.add(arrivalState(bestRound, bestStopReachedOnBoard, bestEgressPath), bestEgressPath);
+        paths.add(bestArrival.toArrivalState(cursor), bestArrival.egressPath);
     }
 
     private void debugRejectNew(int round, boolean stopReachedOnBoard, RaptorTransfer egressPath) {
-        if(!paths.isDebugOn()) { return; }
-        var arrival = arrivalState(round, stopReachedOnBoard, egressPath);
-        debugRejectEvent(arrival, egressPath, bestDestinationTime);
+        if(paths.isDebugOn()) {
+            rejectedArrivals.add(
+                    new DestinationArrivalEvent(round, stopReachedOnBoard, egressPath)
+            );
+        }
     }
 
-    private void debugRejectExisting(int arrivalTime) {
-        if(!paths.isDebugOn() || !newElementSet) { return; }
-        var arrival = arrivalState(bestRound, bestStopReachedOnBoard, bestEgressPath);
-        debugRejectEvent(arrival, bestEgressPath, arrivalTime);
+    private void debugRejectCurrentBestArrival() {
+        if(paths.isDebugOn() && newElementSet()) {
+            rejectedArrivals.add(bestArrival);
+        }
     }
 
-    private void debugRejectEvent(ArrivalView<T> arrival, RaptorTransfer egress, int arrivalTime) {
-        String reason = String.format(
-                "Better arrival time exist: %s  [PathAdaptor]",
-                TimeUtils.timeToStrLong(arrivalTime)
-        );
-        paths.debugReject(arrival, egress, reason);
+    private void logDebugRejectEvents() {
+        if(paths.isDebugOn()) {
+            String reason = "Arrival time > " + TimeUtils.timeToStrCompact(bestDestinationTime);
+
+            for (DestinationArrivalEvent it : rejectedArrivals) {
+                paths.debugReject(it.toArrivalState(cursor), it.egressPath, reason);
+            }
+        }
     }
 
-    private ArrivalView<T> arrivalState(int round, boolean stopReachedOnBoard, RaptorTransfer egress) {
-        return cursor.stop(round, egress.stop(), stopReachedOnBoard);
+    /** Used internally in this class to cash a destination arrival */
+    private static class DestinationArrivalEvent {
+        final int round;
+        final boolean stopReachedOnBoard;
+        final RaptorTransfer egressPath;
+
+        private DestinationArrivalEvent(
+                int round,
+                boolean stopReachedOnBoard,
+                RaptorTransfer egressPath
+        ) {
+            this.round = round;
+            this.stopReachedOnBoard = stopReachedOnBoard;
+            this.egressPath = egressPath;
+        }
+
+        <T extends RaptorTripSchedule> ArrivalView<T> toArrivalState(StopsCursor<T> cursor) {
+            return cursor.stop(round, egressPath.stop(), stopReachedOnBoard);
+        }
+
+        @Override
+        public String toString() {
+            return ToStringBuilder.of(DestinationArrivalEvent.class)
+                    .addNum("round", round)
+                    .addBool("stopReachedOnBoard", stopReachedOnBoard)
+                    .addObj("egressPath", egressPath)
+                    .toString();
+        }
     }
 }
