@@ -145,7 +145,7 @@ public class HeuristicsAdapter implements Heuristics {
 
         egressPaths.forEachEntry((stop, list) -> {
             boolean stopReached = times.isStopReached(stop);
-            boolean stopReachedByTransit = times.isStopReachedByTransit(stop);
+            boolean stopReachedByTransit = times.isStopReachedOnBoard(stop);
 
             if(stopReached || stopReachedByTransit) {
                 for (RaptorTransfer it : list) {

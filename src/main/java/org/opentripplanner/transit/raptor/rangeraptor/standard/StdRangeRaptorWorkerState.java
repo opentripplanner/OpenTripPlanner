@@ -75,7 +75,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
     @Override
     public BitSetIterator stopsTouchedByTransitCurrentRound() {
-        return bestTimes.transitStopsReachedCurrentRound();
+        return bestTimes.onBoardStopArrivalsReachedCurrentRound();
     }
 
     @Override
@@ -167,7 +167,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
      */
     @Override
     public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
-        int arrivalTimeTransit = bestTimes.transitTime(fromStop);
+        int arrivalTimeTransit = bestTimes.onBoardTime(fromStop);
         while (transfers.hasNext()) {
             transferToStop(arrivalTimeTransit, fromStop, transfers.next());
         }
@@ -205,7 +205,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
     /* private methods */
 
     private boolean newTransitBestTime(int stop, int alightTime) {
-        return bestTimes.transitUpdateNewBestTime(stop, alightTime);
+        return bestTimes.updateOnBoardBestTime(stop, alightTime);
     }
 
     private boolean newOverallBestTime(int stop, int alightTime) {
