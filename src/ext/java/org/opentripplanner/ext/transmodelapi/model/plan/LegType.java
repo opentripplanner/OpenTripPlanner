@@ -221,7 +221,7 @@ public class LegType {
             .type(serviceJourneyType)
             .dataFetcher(env -> leg(env).getTrip())
             .build())
-            .field(GraphQLFieldDefinition
+        .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("datedServiceJourney")
             .description("The dated service journey used for this leg.")

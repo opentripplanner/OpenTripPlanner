@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping.calendar;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.rutebanken.netex.model.DatedServiceJourney;
@@ -22,10 +23,10 @@ import static org.opentripplanner.netex.mapping.support.ServiceAlterationFilter.
  */
 public class DatedServiceJourneyMapper {
 
-  public static ArrayListMultimap<String, DatedServiceJourney> indexDSJBySJId(
+  public static Multimap<String, DatedServiceJourney> indexDSJBySJId(
       ReadOnlyHierarchicalMapById<DatedServiceJourney> datedServiceJourneys
   ) {
-    ArrayListMultimap<String, DatedServiceJourney> dsjBySJId = ArrayListMultimap.create();
+    Multimap<String, DatedServiceJourney> dsjBySJId = ArrayListMultimap.create();
     for (DatedServiceJourney dsj : datedServiceJourneys.localValues()) {
       dsjBySJId.put(dsj.getJourneyRef().get(0).getValue().getRef(), dsj);
     }

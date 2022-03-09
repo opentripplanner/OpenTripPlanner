@@ -20,7 +20,7 @@ public class DatedServiceJourneyQuery {
                 .type(datedServiceJourneyType)
                 .description("Get a single dated service journey based on its id")
                 .argument(GraphQLArgument.newArgument()
-                        .name("datedServiceJourneyId")
+                        .name("id")
                         .type(Scalars.GraphQLString))
                 .dataFetcher(environment -> {
                     FeedScopedId id =

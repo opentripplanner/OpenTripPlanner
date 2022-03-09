@@ -83,7 +83,7 @@ public class NetexMapper {
      */
     private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
 
-    private final ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneysBySjId = ArrayListMultimap.create();
+    private final Multimap<String, DatedServiceJourney> datedServiceJourneysBySjId = ArrayListMultimap.create();
 
 
     public NetexMapper(
@@ -361,7 +361,7 @@ public class NetexMapper {
         ));
         tripCalendarBuilder.addDatedServiceJourneys(
             currentNetexIndex.getOperatingDayById(),
-                datedServiceJourneysBySjId
+            datedServiceJourneysBySjId
         );
     }
 

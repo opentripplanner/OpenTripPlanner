@@ -56,7 +56,7 @@ class TripPatternMapper {
     private final Multimap<String, ServiceJourney> serviceJourniesByPatternId = ArrayListMultimap.create();
 
     private ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById;
-    private final ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneys;
+    private final Multimap<String, DatedServiceJourney> datedServiceJourneys;
 
     private final TripMapper tripMapper;
 
@@ -83,7 +83,7 @@ class TripPatternMapper {
             ReadOnlyHierarchicalMap<String, ServiceJourney> serviceJourneyById,
             ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
             ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById,
-            ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneys,
+            Multimap<String, DatedServiceJourney> datedServiceJourneys,
             Map<String, FeedScopedId> serviceIds,
             Deduplicator deduplicator
     ) {
@@ -148,7 +148,8 @@ class TripPatternMapper {
                         serviceJourney.getId())
                 ) {
                     var opDay = operatingDayById.lookup(
-                            datedServiceJourney.getOperatingDayRef().getRef());
+                            datedServiceJourney.getOperatingDayRef().getRef()
+                    );
                     if (opDay == null) {
                         continue;
                     }
