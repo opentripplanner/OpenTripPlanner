@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri;
 
+import static org.opentripplanner.ext.siri.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
 import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
@@ -27,10 +28,10 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
@@ -53,9 +54,6 @@ import uk.org.siri.siri20.VehicleActivityCancellationStructure;
 import uk.org.siri.siri20.VehicleActivityStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
-
-import static org.opentripplanner.ext.siri.SiriTransportModeMapper.mapTransitMainMode;
-import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -312,7 +310,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                                 }
                             }
                         }
-                        LOG.debug("Processed EstimatedVehicleJourneys: updated {}, added {}, skipped {}, not monitored {}.", handledCounter, addedCounter, skippedCounter, notMonitoredCounter);
+                        LOG.info(
+                                "Processed EstimatedVehicleJourneys: updated {}, added {}, skipped {}, not monitored {}.",
+                                handledCounter, addedCounter, skippedCounter, notMonitoredCounter
+                        );
                     }
                 }
             }
