@@ -156,10 +156,12 @@ public class TestTransfer implements RaptorTransfer {
         if (!hasOpeningHours()) {
             return requestedDepartureTime;
         }
+        if(isClosed()) { return -1; }
 
         int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_DAY);
         int specificOpening = days * SECONDS_IN_DAY + opening;
         int specificClosing = days * SECONDS_IN_DAY + closing;
+
         if (requestedDepartureTime < specificOpening) {
             return specificOpening;
         } else if (requestedDepartureTime > specificClosing) {
@@ -174,6 +176,7 @@ public class TestTransfer implements RaptorTransfer {
         if (!hasOpeningHours()) {
             return requestedArrivalTime;
         }
+        if(isClosed()) { return -1; }
 
         // opening & closing is relative to the departure
         int requestedDepartureTime = requestedArrivalTime - durationInSeconds();
@@ -200,6 +203,11 @@ public class TestTransfer implements RaptorTransfer {
     @Override
     public String toString() {
         return asString();
+    }
+
+    /** To specify that the transit is closed use an opening AFTER closing */
+    public boolean isClosed() {
+        return opening > closing;
     }
 
     /**

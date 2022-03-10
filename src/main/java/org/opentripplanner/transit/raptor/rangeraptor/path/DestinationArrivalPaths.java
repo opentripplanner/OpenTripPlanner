@@ -13,6 +13,7 @@ import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.AccessEgressFunctions;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
@@ -154,16 +155,15 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
             ArrivalView<T> stopArrival,
             RaptorTransfer egressPath
     ) {
-        int departureTime = transitCalculator.departureTime(egressPath, stopArrival.arrivalTime());
+        int departureTime = AccessEgressFunctions.calculateEgressDepartureTime(
+                stopArrival.arrivalTime(),
+                egressPath,
+                slackProvider,
+                transitCalculator
+        );
 
+        // TODO OTP2 - Use a constant not -1
         if (departureTime == -1) { return null; }
-
-        if(egressPath.hasRides()) {
-            departureTime = transitCalculator.plusDuration(
-                    departureTime,
-                    slackProvider.accessEgressWithRidesTransferSlack()
-            );
-        }
 
         int arrivalTime = transitCalculator.plusDuration(
                 departureTime,

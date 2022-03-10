@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 
@@ -53,6 +54,33 @@ public final class AccessEgressFunctions {
 
     /** private constructor to prevent instantiation of utils class. */
     private AccessEgressFunctions() { }
+
+
+    /**
+     * This method help with calculating the egress departure time. It will add
+     * transit slack (egress leaves on-board) and then time-shift the egress.
+     */
+    public static int calculateEgressDepartureTime(
+            int arrivalTime,
+            RaptorTransfer egressPath,
+            SlackProvider slackProvider,
+            TimeCalculator timeCalculator
+    ) {
+        int departureTime = arrivalTime;
+
+        if(egressPath.stopReachedOnBoard()) {
+            departureTime = timeCalculator.plusDuration(
+                    departureTime,
+                    slackProvider.accessEgressWithRidesTransferSlack()
+            );
+        }
+        if(timeCalculator.searchForward()) {
+            return egressPath.earliestDepartureTime(departureTime);
+        }
+        else {
+            return egressPath.latestArrivalTime(departureTime);
+        }
+    }
 
     static Collection<RaptorTransfer> removeNoneOptimalPathsForStandardRaptor(
             Collection<RaptorTransfer> paths
