@@ -25,6 +25,7 @@ public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
         // Preconditions
         Objects.requireNonNull(updates);
         Objects.requireNonNull(feedId);
+        Objects.requireNonNull(matcher);
 
         // Set fields
         this.updates = updates;

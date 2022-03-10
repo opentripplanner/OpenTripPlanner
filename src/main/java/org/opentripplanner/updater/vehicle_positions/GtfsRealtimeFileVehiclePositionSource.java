@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_positions;
 
+import com.google.common.base.MoreObjects;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,5 +48,13 @@ public class GtfsRealtimeFileVehiclePositionSource implements VehiclePositionSou
     @Override
     public String getFeedId() {
         return this.feedId;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("feedId", feedId)
+                .add("file", file)
+                .toString();
     }
 }

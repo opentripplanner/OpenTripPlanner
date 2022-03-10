@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,6 +61,7 @@ public class VehiclePositionPatternMatcher {
      * @param feedId           Feed id of vehicle positions to assist in pattern-matching
      */
     public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions, String feedId) {
+        int numberOfMatches = 0;
         for (VehiclePosition vehiclePosition : vehiclePositions) {
             if (!vehiclePosition.hasTrip()) {
                 LOG.warn("Realtime vehicle positions without trip IDs are not yet supported.");
@@ -71,7 +71,7 @@ public class VehiclePositionPatternMatcher {
             String tripId = vehiclePosition.getTrip().getTripId();
             Trip trip = graphIndex.getTripForId().get(new FeedScopedId(feedId, tripId));
             if (trip == null) {
-                LOG.warn("Unable to find OTP trip ID for vehicle position with trip ID {}", tripId);
+                LOG.warn("Unable to find trip ID in feed '{}' for vehicle position with trip ID {}", feedId, tripId);
                 continue;
             }
 
@@ -95,6 +95,14 @@ public class VehiclePositionPatternMatcher {
             newPosition.patternId = pattern.getId().toString();
 
             pattern.addVehiclePosition(tripId, newPosition);
+            numberOfMatches++;
+        }
+
+        if (numberOfMatches == 0) {
+            LOG.error(
+                    "Could not match any vehicle positions for feedId '{}'. Are you sure that the updater using the correct feedId?",
+                    feedId
+            );
         }
     }
 
