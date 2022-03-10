@@ -3,7 +3,6 @@ package org.opentripplanner.updater.vehicle_positions;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,17 +17,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Responsible for converting vehicle positions in memory to exportable ones, and associating each position
- * with a pattern.
+ * Responsible for converting vehicle positions in memory to exportable ones, and associating each
+ * position with a pattern.
  */
 public class VehiclePositionPatternMatcher {
+
     private static final Logger LOG =
             LoggerFactory.getLogger(VehiclePositionPatternMatcher.class);
 
     private final GraphIndex graphIndex;
 
     /**
-     * Set of trip IDs we've seen, so if we stop seeing them we know to remove them from the pattern
+     * Set of trip IDs we've seen, so if we stop seeing them we know to remove them from the
+     * pattern
      */
     private final Set<String> seenTripIds = new HashSet<>();
 
@@ -45,23 +46,20 @@ public class VehiclePositionPatternMatcher {
 
     /**
      * Iterates over a pattern's vehicle positions and removes all not seen in the seenTripIds set
-     * @param feedId           FeedId whose pattern's should be "cleaned"
+     *
+     * @param feedId FeedId whose pattern's should be "cleaned"
      */
     public void cleanPatternVehiclePositions(String feedId) {
         for (TripPattern pattern : graphIndex.getPatternsForFeedId().get(feedId)) {
-            for (Iterator<String> iterator = pattern.vehiclePositions.keySet().iterator(); iterator.hasNext();) {
-                String key = iterator.next();
-                if (!seenTripIds.contains(key)) {
-                    iterator.remove();
-                }
-            }
+            pattern.removeVehiclePositionIf(key -> !seenTripIds.contains(key));
         }
     }
 
     /**
      * Attempts to match each vehicle position to a pattern, then adds each to a pattern
-     * @param vehiclePositions  List of vehicle positions to match to patterns
-     * @param feedId            Feed id of vehicle positions to assist in pattern-matching
+     *
+     * @param vehiclePositions List of vehicle positions to match to patterns
+     * @param feedId           Feed id of vehicle positions to assist in pattern-matching
      */
     public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions, String feedId) {
         for (VehiclePosition vehiclePosition : vehiclePositions) {
@@ -79,7 +77,10 @@ public class VehiclePositionPatternMatcher {
 
             TripPattern pattern = graphIndex.getPatternForTrip().get(trip);
             if (pattern == null) {
-                LOG.warn("Unable to match OTP pattern ID for vehicle position with trip ID {}", tripId);
+                LOG.warn(
+                        "Unable to match OTP pattern ID for vehicle position with trip ID {}",
+                        tripId
+                );
                 continue;
             }
 
@@ -93,27 +94,30 @@ public class VehiclePositionPatternMatcher {
             );
             newPosition.patternId = pattern.getId().toString();
 
-            if (pattern.vehiclePositions == null) {
-                pattern.vehiclePositions = new HashMap<>();
-            }
-            pattern.vehiclePositions.put(tripId, newPosition);
+            pattern.addVehiclePosition(tripId, newPosition);
         }
     }
 
     /**
-     * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be
-     * used by the API.
-     * @param vehiclePosition       GtfsRealtime vehicle position
-     * @param stopsOnVehicleTrip    Collection of stops method will try to match next arriving stop ID to
-     * @return                      OTP RealtimeVehiclePosition
+     * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be used
+     * by the API.
+     *
+     * @param vehiclePosition    GtfsRealtime vehicle position
+     * @param stopsOnVehicleTrip Collection of stops method will try to match next arriving stop ID
+     *                           to
+     * @return OTP RealtimeVehiclePosition
      */
-    private RealtimeVehiclePosition parseVehiclePosition(VehiclePosition vehiclePosition, List<StopLocation> stopsOnVehicleTrip) {
+    private RealtimeVehiclePosition parseVehiclePosition(
+            VehiclePosition vehiclePosition,
+            List<StopLocation> stopsOnVehicleTrip
+    ) {
         RealtimeVehiclePosition newPosition = new RealtimeVehiclePosition();
         if (vehiclePosition.hasPosition()) {
-            newPosition.lat = vehiclePosition.getPosition().getLatitude();
-            newPosition.lon = vehiclePosition.getPosition().getLongitude();
-            newPosition.speed = vehiclePosition.getPosition().getSpeed();
-            newPosition.heading = vehiclePosition.getPosition().getBearing();
+            var position = vehiclePosition.getPosition();
+            newPosition.lat = position.getLatitude();
+            newPosition.lon = position.getLongitude();
+            newPosition.speed = position.getSpeed();
+            newPosition.heading = position.getBearing();
         }
 
         if (vehiclePosition.hasVehicle()) {

@@ -87,7 +87,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     /**
      * Map of trip IDs to current vehicle positions. If no vehicle positions are mapped, will be empty.
      */
-    public Map<String, RealtimeVehiclePosition> vehiclePositions = Map.of();
+    private Map<String, RealtimeVehiclePosition> vehiclePositions = Map.of();
 
     public TripPattern(FeedScopedId id, Route route, StopPattern stopPattern) {
         super(id);
@@ -683,5 +683,25 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
 
     private static Coordinate coordinate(StopLocation s) {
         return new Coordinate(s.getLon(), s.getLat());
+    }
+
+    public void removeVehiclePositionIf(Predicate<String> predicate) {
+        vehiclePositions.keySet().removeIf(predicate);
+        if(vehiclePositions.isEmpty()) {
+            // saves a bit of memory for patterns that no longer have positions
+            vehiclePositions = Map.of();
+        }
+    }
+
+    public Map<String, RealtimeVehiclePosition> getVehiclePositions() {
+        return Map.copyOf(vehiclePositions);
+    }
+
+    public void addVehiclePosition(String tripId, RealtimeVehiclePosition vehiclePositions) {
+        // the default value is Map.of() which saves memory but is immutable
+        if(this.vehiclePositions.isEmpty()) {
+            this.vehiclePositions = new HashMap<>();
+        }
+        this.vehiclePositions.put(tripId, vehiclePositions);
     }
 }

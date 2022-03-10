@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Add vehicle positions to OTP patterns via a realtime source *
  * <pre>
- * rt.type = vehicle-position-updater
+ * rt.type = vehicle-position
  * rt.frequencySec = 60
  * rt.sourceType = gtfs-http
  * rt.url = http://host.tld/path
