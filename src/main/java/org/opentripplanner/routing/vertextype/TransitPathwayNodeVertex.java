@@ -3,6 +3,7 @@ package org.opentripplanner.routing.vertextype;
 import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.NonLocalizedString;
@@ -28,7 +29,7 @@ public class TransitPathwayNodeVertex extends Vertex {
         node.getId().toString(),
         node.getCoordinate().longitude(),
         node.getCoordinate().latitude(),
-        NonLocalizedString.ofNullable(node.getName())
+        new NonLocalizedString(node.getName())
     );
     this.node = node;
     this.wheelchairEntrance = node.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

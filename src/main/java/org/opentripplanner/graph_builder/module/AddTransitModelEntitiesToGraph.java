@@ -178,9 +178,7 @@ public class AddTransitModelEntitiesToGraph {
 
                 var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
                 boolean wheelchair = boardingArea.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
-                var name = Optional.ofNullable(boardingArea.getName())
-                        .map(NonLocalizedString::new)
-                        .orElse(null);
+                var name = new NonLocalizedString(boardingArea.getName());
 
                 PathwayEdge.lowCost(
                         boardingAreaVertex,

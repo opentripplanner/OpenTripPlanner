@@ -26,7 +26,7 @@ public class NonLocalizedString implements I18NString, Serializable {
     @Nullable
     public static NonLocalizedString ofNullable(@Nullable String name){
         if(name == null) { return null; }
-        else return new NonLocalizedString(name);
+        return new NonLocalizedString(name);
     }
 
     @Override
