@@ -118,7 +118,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         return route.getMode();
     }
 
-    public final String getNetexSubmode() {
+    public String getNetexSubmode() {
         return route.getNetexSubmode();
     }
 

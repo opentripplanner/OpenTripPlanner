@@ -1395,6 +1395,11 @@ type PageInfo {
     endCursor: String
 }
 
+type VehiclePosition {
+    lat: Float
+    lon: Float
+}
+
 """
 Pattern is sequence of stops used by trips on a specific direction and variant
 of a route. Most routes have only two patterns: one for outbound trips and one
@@ -1463,6 +1468,8 @@ type Pattern implements Node {
         """
         types: [PatternAlertType]
     ): [Alert]
+
+    vehiclePositions: [VehiclePosition!]
 }
 
 """Entities, which are relevant for a pattern and can contain alerts"""

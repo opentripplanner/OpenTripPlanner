@@ -497,6 +497,8 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Iterable<Trip>> trips();
 
         public DataFetcher<Iterable<Trip>> tripsForDate();
+
+        public DataFetcher<Iterable<org.opentripplanner.routing.vehicle_positions.RealtimeVehiclePosition>> vehiclePositions();
     }
 
     public interface LegacyGraphQLPlace {
@@ -1014,6 +1016,13 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Integer> carSpaces();
 
         public DataFetcher<Integer> wheelchairAccessibleCarSpaces();
+    }
+
+    public interface LegacyGraphQLVehiclePosition {
+
+        public DataFetcher<Double> lat();
+
+        public DataFetcher<Double> lon();
     }
 
     /**
