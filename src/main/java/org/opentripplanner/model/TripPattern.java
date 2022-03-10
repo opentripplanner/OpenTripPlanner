@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vehicle_positions.RealtimeVehiclePosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +84,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     // TODO MOVE codes INTO Timetable or TripTimes
     private BitSet services;
 
+    /**
+     * Map of trip IDs to current vehicle positions. If no vehicle positions are mapped, will be empty.
+     */
+    public Map<String, RealtimeVehiclePosition> vehiclePositions = Map.of();
 
     public TripPattern(FeedScopedId id, Route route, StopPattern stopPattern) {
         super(id);
