@@ -26,6 +26,7 @@ import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdat
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
+import org.opentripplanner.updater.vehicle_positions.params.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
@@ -130,6 +131,11 @@ public class UpdatersConfig implements UpdatersParameters {
   @Override
   public List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters() {
     return getParameters(STOP_TIME_UPDATER);
+  }
+
+  @Override
+  public List<VehiclePositionsUpdaterParameters> getVehiclePositionsUpdaterParameters() {
+    return getParameters(VEHICLE_POSITIONS);
   }
 
   @Override
