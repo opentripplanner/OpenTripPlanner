@@ -16,6 +16,7 @@ import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.TripTimesPatch;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
@@ -231,6 +232,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 switch (tripScheduleRelationship) {
                     case SCHEDULED:
                         applied = handleScheduledTrip(
+                                graph,
                                 tripUpdate,
                                 tripDescriptor,
                                 feedId,
@@ -310,6 +312,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     private boolean handleScheduledTrip(
+            final Graph graph,
             final TripUpdate tripUpdate,
             final TripDescriptor tripDescriptor,
             final String feedId,
@@ -333,19 +336,47 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // changed, and is now changing back to the originally scheduled one) cancel that previously created trip.
         cancelPreviouslyAddedTrip(new FeedScopedId(feedId, tripId), serviceDate);
 
-        // Apply update on the *scheduled* time table and set the updated trip times in the buffer
-        final TripTimes updatedTripTimes = pattern.getScheduledTimetable().createUpdatedTripTimes(tripUpdate,
-                timeZone, serviceDate);
+        // Get new TripTimes based on scheduled timetable
+        final TripTimesPatch tripTimesPatch =
+                pattern.getScheduledTimetable().createUpdatedTripTimes(
+                        tripUpdate,
+                        timeZone,
+                        serviceDate
+                );
 
-        if (updatedTripTimes == null) {
+        if (tripTimesPatch == null) {
             return false;
         }
+
+        TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
+
+        List<Integer> skippedStopIndices = tripTimesPatch.getSkippedStopIndices();
 
         // Make sure that updated trip times have the correct real time state
         updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
 
-        final boolean success = buffer.update(pattern, updatedTripTimes, serviceDate);
-        return success;
+        // If there are skipped stops, we need to change the pattern from the scheduled one
+        if (skippedStopIndices.size() > 0) {
+            StopPattern newStopPattern = pattern.getStopPattern().clone();
+            skippedStopIndices.forEach(index -> newStopPattern.cancelStop(index));
+
+            final Trip trip = getTripForTripId(feedId, tripId);
+            // Get cached trip pattern or create one if it doesn't exist yet
+            final TripPattern newPattern =
+                    tripPatternCache.getOrCreateTripPattern(newStopPattern, trip, graph);
+
+            // Add service code to bitset of pattern if needed (using copy on write)
+            final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
+            newPattern.setServiceCode(serviceCode);
+
+            newPattern.setOriginalTripPattern(pattern);
+            cancelScheduledTrip(feedId, tripId, serviceDate);
+            return buffer.update(newPattern, updatedTripTimes, serviceDate);
+        }
+        else {
+            // Set the updated trip times in the buffer
+            return buffer.update(pattern, updatedTripTimes, serviceDate);
+        }
     }
 
     /**
@@ -674,11 +705,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Add service code to bitset of pattern if needed (using copy on write)
         final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
-        if (!pattern.getServices().get(serviceCode)) {
-            final BitSet services = (BitSet) pattern.getServices().clone();
-            services.set(serviceCode);
-            pattern.setServices(services);
-        }
+        pattern.setServiceCode(serviceCode);
 
         // Create new trip times
         final TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);

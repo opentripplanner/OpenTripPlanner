@@ -132,6 +132,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         }
     }
 
+    public StopPattern getStopPattern() {
+        return stopPattern;
+    }
+
     public void setHopGeometries(LineString[] hopGeometries) {
         this.hopGeometries = new byte[hopGeometries.length][];
 
@@ -580,6 +584,19 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
             }
         });
         scheduledTimetable.setServiceCodes (serviceCodes);
+    }
+
+    /**
+     * Sets service code for pattern if it's not already set
+     *
+     * @param serviceCode service code that needs to be set
+     */
+    public void setServiceCode(int serviceCode) {
+        if (!getServices().get(serviceCode)) {
+            final BitSet services = (BitSet) getServices().clone();
+            services.set(serviceCode);
+            setServices(services);
+        }
     }
 
     /**

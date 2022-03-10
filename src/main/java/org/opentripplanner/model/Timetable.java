@@ -6,6 +6,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -169,15 +170,20 @@ public class Timetable implements Serializable {
      * @param tripUpdate GTFS-RT trip update
      * @param timeZone time zone of trip update
      * @param updateServiceDate service date of trip update
-     * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-     *         with the id specified in the trip descriptor of the TripUpdate; null if something
-     *         went wrong
+     * @return {@link TripTimesPatch} that contains a new copy of updated TripTimes after TripUpdate
+     *         has been applied on TripTimes of trip with the id specified in the trip descriptor of
+     *         the TripUpdate and a list of stop indices that have been skipped with the realtime
+     *         update; null if something went wrong
      *
      * TODO OTP2 - This method depend on GTFS RealTime classes. Refactor this so GTFS RT can do
      *           - its job without sending in GTFS specific classes. A generic update would support
      *           - other RealTime updats, not just from GTFS.
      */
-    public TripTimes createUpdatedTripTimes(TripUpdate tripUpdate, TimeZone timeZone, ServiceDate updateServiceDate) {
+    public TripTimesPatch createUpdatedTripTimes(
+            TripUpdate tripUpdate,
+            TimeZone timeZone,
+            ServiceDate updateServiceDate
+    ) {
         if (tripUpdate == null) {
             LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
             return null;
@@ -206,6 +212,7 @@ public class Timetable implements Serializable {
         }
 
         TripTimes newTimes = new TripTimes(getTripTimes(tripIndex));
+        List<Integer> skippedStopIndices = new ArrayList<>();
 
         if (tripDescriptor.hasScheduleRelationship() && tripDescriptor.getScheduleRelationship()
                 == TripDescriptor.ScheduleRelationship.CANCELED) {
@@ -239,6 +246,7 @@ public class Timetable implements Serializable {
                             update.hasScheduleRelationship() ? update.getScheduleRelationship()
                             : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
                     if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
+                        skippedStopIndices.add(i);
                         newTimes.setCancelled(i);
                         int delayOrZero = delay != null ? delay : 0;
                         newTimes.updateArrivalDelay(i, delayOrZero);
@@ -328,7 +336,7 @@ public class Timetable implements Serializable {
         }
 
         LOG.debug("A valid TripUpdate object was applied to trip {} using the Timetable class update method.", tripId);
-        return newTimes;
+        return new TripTimesPatch(newTimes, skippedStopIndices);
     }
 
     /**

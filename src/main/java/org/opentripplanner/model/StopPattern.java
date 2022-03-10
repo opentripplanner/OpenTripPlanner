@@ -34,14 +34,14 @@ import java.util.function.Predicate;
  * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique
  * key for a TripPattern. Should the route be included in the StopPattern?
  */
-public final class StopPattern implements Serializable {
+public final class StopPattern implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 20140101L;
     public static final int NOT_FOUND = -1;
 
     private final StopLocation[] stops;
-    private final PickDrop[]  pickups;
-    private final PickDrop[]  dropoffs;
+    private PickDrop[]  pickups;
+    private PickDrop[]  dropoffs;
 
     private StopPattern (int size) {
         stops     = new StopLocation[size];
@@ -92,6 +92,35 @@ public final class StopPattern implements Serializable {
 
     int findAlightPosition(Station station) {
         return findStopPosition(1, stops.length, station::includes);
+    }
+
+    /**
+     * Sets pickup and dropoff at given stop index as CANCELLED.
+     *
+     * @return {@code true} if stop at index exists and can be cancelled, if not {@code false}
+     */
+    public boolean cancelStop(int index) {
+        if (index >= 0 && index < pickups.length) {
+            pickups[index] = PickDrop.CANCELLED;
+            dropoffs[index] = PickDrop.CANCELLED;
+            return true;
+        }
+        return false;
+    }
+
+    public StopPattern clone() {
+        try {
+            StopPattern stopPattern = (StopPattern) super.clone();
+            stopPattern.pickups = pickups.clone();
+            stopPattern.dropoffs = dropoffs.clone();
+            //TODO stops should also be cloned if needed
+            //stopPattern.stops = stops.clone();
+            return stopPattern;
+        }
+        catch (CloneNotSupportedException e) {
+            /* cannot happen */
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean equals(Object other) {

@@ -878,12 +878,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Add service code to bitset of pattern if needed (using copy on write)
         final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
-        if (!pattern.getServices().get(serviceCode)) {
-            final BitSet services = (BitSet) pattern.getServices().clone();
-            services.set(serviceCode);
-            pattern.setServices(services);
-        }
-
+        pattern.setServiceCode(serviceCode);
 
         /*
          * Update pattern with triptimes so get correct dwell times and lower bound on running times.
