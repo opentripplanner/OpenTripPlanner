@@ -64,7 +64,13 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup(Graph graph) {
-        vehiclePositionPatternMatcher = new VehiclePositionPatternMatcher(graph);
+        var index = graph.index;
+        vehiclePositionPatternMatcher =
+                new VehiclePositionPatternMatcher(
+                        index::getPatternsForFeedId,
+                        index::getTripForId,
+                        index::getPatternForTrip
+                );
     }
 
 
