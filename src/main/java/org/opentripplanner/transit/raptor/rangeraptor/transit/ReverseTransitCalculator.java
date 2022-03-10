@@ -18,7 +18,10 @@ import org.opentripplanner.util.time.TimeUtils;
  * A calculator that will take you back in time not forward, this is the
  * basic logic to implement a reveres search.
  */
-final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements TransitCalculator<T> {
+final class ReverseTransitCalculator<T extends RaptorTripSchedule>
+        extends ReverseTimeCalculator
+        implements TransitCalculator<T>
+{
     private final int tripSearchBinarySearchThreshold;
     private final int latestArrivalTime;
     private final int searchWindowInSeconds;
@@ -54,33 +57,6 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public boolean searchForward() { return false; }
-
-    @Override
-    public int plusDuration(final int time, final int duration) {
-        // It might seems strange to use minus int the add method, but
-        // the "positive" direction in this class is backwards in time;
-        // hence we need to subtract the board slack.
-        return time - duration;
-    }
-
-    @Override
-    public int minusDuration(final int time, final int duration) {
-        // It might seems strange to use plus int the subtract method, but
-        // the "positive" direction in this class is backwards in time;
-        // hence we need to add the board slack.
-        return time + duration;
-    }
-
-    @Override
-    public int duration(final int timeA, final int timeB) {
-        // When searching in reverse time A is > time B, so to
-        // calculate the duration we need to swap A and B
-        // compared with the normal forward search
-        return timeA - timeB;
-    }
-
-    @Override
     public int stopArrivalTime(
             T onTrip,
             int stopPositionInPattern,
@@ -98,21 +74,6 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule> implements Tr
     public String exceedsTimeLimitReason() {
         return "The departure time exceeds the time limit, depart to early: " +
                 TimeUtils.timeToStrLong(earliestAcceptableDepartureTime) + ".";
-    }
-
-    @Override
-    public boolean isBefore(final int subject, final int candidate) {
-        return subject > candidate;
-    }
-
-    @Override
-    public boolean isAfter(int subject, int candidate) {
-        return subject < candidate;
-    }
-
-    @Override
-    public int unreachedTime() {
-        return Integer.MIN_VALUE;
     }
 
     @Override
