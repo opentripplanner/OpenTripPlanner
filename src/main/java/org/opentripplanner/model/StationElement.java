@@ -1,6 +1,6 @@
 package org.opentripplanner.model;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 /**
  * Acts as the supertype for all entities, except stations, created from the GTFS stops table. Most
@@ -44,7 +44,7 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Name of the station element if provided.
    */
-  @Nullable
+  @Nonnull
   public String getName() {
     return name;
   }

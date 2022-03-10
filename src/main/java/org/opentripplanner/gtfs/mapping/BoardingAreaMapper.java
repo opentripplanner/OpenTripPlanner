@@ -9,8 +9,9 @@ import java.util.Map;
 
 /** Responsible for mapping GTFS Boarding areas into the OTP model. */
 class BoardingAreaMapper {
+  static final String DEFAULT_NAME = "Boarding area";
 
-  private Map<org.onebusaway.gtfs.model.Stop, BoardingArea> mappedBoardingAreas = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.Stop, BoardingArea> mappedBoardingAreas = new HashMap<>();
 
   Collection<BoardingArea> map(Collection<org.onebusaway.gtfs.model.Stop> allBoardingAreas) {
     return MapUtils.mapToList(allBoardingAreas, this::map);
@@ -32,7 +33,7 @@ class BoardingAreaMapper {
 
     return new BoardingArea(
         base.getId(),
-        base.getName(),
+        base.getName() == null ? DEFAULT_NAME : base.getName(),
         base.getCode(),
         base.getDescription(),
         base.getCoordinate(),
