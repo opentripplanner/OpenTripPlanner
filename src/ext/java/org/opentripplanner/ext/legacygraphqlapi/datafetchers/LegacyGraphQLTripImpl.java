@@ -214,14 +214,16 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
       try {
         RoutingService routingService = getRoutingService(environment);
         Trip trip = getSource(environment);
-        TripPattern tripPattern = getTripPattern(environment);
-        if (tripPattern == null) { return List.of(); }
-
         var args = new LegacyGraphQLTypes.LegacyGraphQLTripStoptimesForDateArgs(environment.getArguments());
 
-
         ServiceDate serviceDate = args.getLegacyGraphQLServiceDate() != null
-            ? ServiceDate.parseString(args.getLegacyGraphQLServiceDate()) : new ServiceDate();
+                ? ServiceDate.parseString(args.getLegacyGraphQLServiceDate()) : new ServiceDate();
+
+        TripPattern tripPattern = routingService.getTimetableSnapshot().getLastAddedTripPattern(trip.getId(), serviceDate);
+        if (tripPattern == null) {
+          tripPattern = getTripPattern(environment);
+        }
+        if (tripPattern == null) { return List.of(); }
 
         ServiceDay serviceDay = new ServiceDay(
             routingService.getServiceCodes(),
@@ -230,8 +232,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
             trip.getRoute().getAgency().getId()
         );
 
-        //TODO: Pass serviceDate
-        Timetable timetable = routingService.getTimetableForTripPattern(tripPattern);
+        Timetable timetable = routingService.getTimetableForTripPattern(tripPattern, serviceDate);
         return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDay);
       } catch (ParseException e) {
         return null; // Invalid date format
