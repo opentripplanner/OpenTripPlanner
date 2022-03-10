@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
+
 /**
  * Process a list of states into a list of walking/driving instructions for a street leg.
  */
@@ -360,10 +361,9 @@ public class StatesToWalkStepsMapper {
 
     private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
         return !(
-                (
-                        current.streetName != null && !current.streetNameNoParens()
-                                .equals(streetNameNoParens)
-                ) && (!current.bogusName || !edge.hasBogusName())
+            current.streetName.toString() != null
+                    && !(java.util.Objects.equals(current.streetNameNoParens(), streetNameNoParens))
+                    && (!current.bogusName || !edge.hasBogusName())
         );
     }
 
@@ -421,7 +421,10 @@ public class StatesToWalkStepsMapper {
         return step;
     }
 
-    private static String getNormalizedName(String streetName) {
+    public static String getNormalizedName(String streetName) {
+        if (streetName == null){
+            return null; //Avoid null reference exceptions with pathways which don't have names
+        }
         int idx = streetName.indexOf('(');
         if (idx > 0) {
             return streetName.substring(0, idx - 1);

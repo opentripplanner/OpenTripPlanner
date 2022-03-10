@@ -211,6 +211,8 @@ public class ApiLeg {
 
      /**
       * Is this leg walking with a bike?
+      *
+      * @deprecated This is always null or false, the information is now stored per walk step
       */
     public Boolean walkingBike;
 
@@ -219,15 +221,5 @@ public class ApiLeg {
      */
     public double getDuration() {
         return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
-    }
-
-    public void setTimeZone(TimeZone timeZone) {
-        Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTime(startTime.getTime());
-        startTime = calendar;
-        calendar = Calendar.getInstance(timeZone);
-        calendar.setTime(endTime.getTime());
-        endTime = calendar;
-        agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
     }
  }

@@ -3,6 +3,7 @@ package org.opentripplanner.util;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 
 /**
  * This is to support strings which can't be localized.
@@ -14,7 +15,10 @@ import java.util.Objects;
 public class NonLocalizedString implements I18NString, Serializable {
     private final String name;
 
-    public NonLocalizedString(String name) {
+    public NonLocalizedString(@Nonnull String name) {
+        if (name == null) {
+            throw new IllegalArgumentException();
+        }
         this.name = name;
     }
 

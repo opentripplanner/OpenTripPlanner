@@ -19,7 +19,7 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -181,9 +181,7 @@ public class TimetableHelper {
                     } else if (recordedCall.getAimedDepartureTime() != null) {
                         realtimeDepartureTime = DateMapper.secondsSinceStartOfService(departureDate, recordedCall.getAimedDepartureTime(), zoneId);
                     }
-                    if (realtimeDepartureTime < realtimeArrivalTime) {
-                        realtimeDepartureTime = realtimeArrivalTime;
-                    }
+
                     int departureDelay = realtimeDepartureTime - departureTime;
 
                     newTimes.updateDepartureDelay(callCounter, departureDelay);
@@ -260,9 +258,6 @@ public class TimetableHelper {
 
                         if (realtimeArrivalTime == -1) {
                             realtimeArrivalTime = realtimeDepartureTime;
-                        }
-                        if (realtimeDepartureTime < realtimeArrivalTime) {
-                            realtimeDepartureTime = realtimeArrivalTime;
                         }
 
                         int arrivalDelay = realtimeArrivalTime - arrivalTime;
@@ -452,13 +447,18 @@ public class TimetableHelper {
             return null;
         }
 
-        EstimatedVehicleJourney.EstimatedCalls journeyCalls = journey.getEstimatedCalls();
-
         List<EstimatedCall> estimatedCalls;
-        if (journeyCalls != null) {
-            estimatedCalls = journeyCalls.getEstimatedCalls();
+        List<RecordedCall> recordedCalls;
+        if (journey.getEstimatedCalls() != null) {
+            estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
         } else {
             estimatedCalls = EMPTY_LIST;
+        }
+
+        if (journey.getRecordedCalls() != null) {
+            recordedCalls = journey.getRecordedCalls().getRecordedCalls();
+        } else {
+            recordedCalls = EMPTY_LIST;
         }
 
         var stops = createModifiedStops(timetable, journey, routingService);
@@ -481,12 +481,46 @@ public class TimetableHelper {
             stopTime.setArrivalTime(oldTimes.getScheduledArrivalTime(i));
             stopTime.setDepartureTime(oldTimes.getScheduledDepartureTime(i));
             stopTime.setStopHeadsign(oldTimes.getHeadsign(i));
+            stopTime.setHeadsignVias(oldTimes.getHeadsignVias(i));
 
             // TODO: Do we need to set the StopTime.id?
             //stopTime.setId(oldTimes.getStopTimeIdByIndex(i));
 
             boolean foundMatch = false;
-            if (i >= numberOfRecordedCalls) {
+            if (i < numberOfRecordedCalls) {
+                for (RecordedCall recordedCall : recordedCalls) {
+                    if (alreadyVisited.contains(recordedCall)) {
+                        continue;
+                    }
+
+                    //Current stop is being updated
+                    var callStopRef = recordedCall.getStopPointRef().getValue();
+                    boolean stopsMatchById = stop.getId().getId().equals(callStopRef);
+
+                    if (!stopsMatchById && stop.isPartOfStation()) {
+                        var alternativeStop = routingService.getStopForId(
+                                new FeedScopedId(stop.getId().getFeedId(), callStopRef)
+                        );
+                        if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
+                            stopsMatchById = true;
+                            stopTime.setStop(alternativeStop);
+                        }
+
+                    }
+
+                    if (stopsMatchById) {
+                        foundMatch = true;
+
+                        if (recordedCall.isCancellation() != null && recordedCall.isCancellation()) {
+                            stopTime.cancel();
+                        }
+
+                        modifiedStops.add(stopTime);
+                        alreadyVisited.add(recordedCall);
+                        break;
+                    }
+                }
+            } else {
                 for (EstimatedCall estimatedCall : estimatedCalls) {
                     if (alreadyVisited.contains(estimatedCall)) {
                         continue;
@@ -533,6 +567,10 @@ public class TimetableHelper {
                         } else if (estimatedCall.getDepartureBoardingActivity() == null && i == (stops.size()-1)) {
                             //Last stop - default no pickup
                             stopTime.setPickupType(NONE);
+                        }
+
+                        if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
+                            stopTime.cancel();
                         }
 
                         if (estimatedCall.getDestinationDisplaies() != null && !estimatedCall.getDestinationDisplaies().isEmpty()) {

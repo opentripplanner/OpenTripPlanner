@@ -19,22 +19,14 @@ public class BannedInputType {
           "authorities",
           "Set of ids for authorities that should not be used"
       ))
-      // TODO trip ids (serviceJourneys) are expected on format AgencyId:trip-id[:stop ordinal:stop ordinal..]
-      //  and thus will not work with serviceJourney ids containing ':'.
-      // Need to subclass GraphQLPlanner if this field is to be supported
-      //  .field(GraphQLInputObjectField.newInputObjectField()
-      //     .name("serviceJourneys")
-      //     .description("Do not use certain named serviceJourneys")
-      //     .type(new GraphQLList(Scalars.GraphQLString))
-      //     .build())
       .field(GqlUtil.newIdListInputField(
           "quays",
-          "Set of ids of quays that should not be allowed for boarding or alighting. Trip patterns "
+          "NOT IMPLEMENTED. Set of ids of quays that should not be allowed for boarding or alighting. Trip patterns "
           + "that travel through the quay will still be permitted."
       ))
       .field(GqlUtil.newIdListInputField(
           "quaysHard",
-          "Set of ids of quays that should not be allowed for boarding, alighting or traveling "
+          "NOT IMPLEMENTED. Set of ids of quays that should not be allowed for boarding, alighting or traveling "
           + "thorugh."
       ))
       .field(GqlUtil.newIdListInputField(

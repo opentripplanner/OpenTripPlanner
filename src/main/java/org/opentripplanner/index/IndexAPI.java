@@ -26,7 +26,6 @@ import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
@@ -392,12 +391,11 @@ public class IndexAPI {
         RoutingService routingService = createRoutingService();
         Route route = getRoute(routingService, routeId);
 
-        List<Trip> trips = new ArrayList<>();
-        Collection<TripPattern> patterns = routingService.getPatternsForRoute().get(route);
-        for (TripPattern pattern : patterns) {
-            trips.addAll(pattern.getTrips());
-        }
-        return TripMapper.mapToApiShort(trips);
+        var patterns = routingService.getPatternsForRoute().get(route);
+        return patterns.stream()
+                .flatMap(TripPattern::scheduledTripsAsStream)
+                .map(TripMapper::mapToApiShort)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -486,7 +484,7 @@ public class IndexAPI {
     @GET
     @Path("/patterns/{patternId}/trips")
     public List<ApiTripShort> getTripsForPattern(@PathParam("patternId") String patternId) {
-        List<Trip> trips = getTripPattern(createRoutingService(), patternId).getTrips();
+        var trips = getTripPattern(createRoutingService(), patternId).scheduledTripsAsStream();
         return TripMapper.mapToApiShort(trips);
     }
 

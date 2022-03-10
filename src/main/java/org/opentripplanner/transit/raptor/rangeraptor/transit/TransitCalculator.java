@@ -13,6 +13,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating
@@ -106,13 +107,13 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
      * @param timeTable the trip time-table to search
      * @return The trip search strategy implementation.
      */
-    TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable);
+    RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable);
 
     /**
      * Same as {@link #createTripSearch(RaptorTimeTable)}, but create a
      * trip search that only accept exact trip timeLimit matches.
      */
-    TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
+    RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
 
     /**
      * Return a transfer provider for the given pattern. When searching forward the

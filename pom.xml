@@ -7,7 +7,7 @@
     <url>http://opentripplanner.org</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
+    <version>2.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>16</otp.serialization.version.id>
+        <otp.serialization.version.id>18</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>26.2</geotools.version>
         <jackson.version>2.13.1</jackson.version>
@@ -247,6 +247,7 @@
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
+                    <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
             <!-- code coverage report -->

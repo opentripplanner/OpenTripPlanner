@@ -37,11 +37,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
             return computeDrivingTraversalCost(v, from, to, request);
         }
         else if (mode.isCycling()) {
-            var c = computeCyclingTraversalCost(v, from, to, fromSpeed, toSpeed, request);
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Turning from {} to {} has a cost of {}", from, to, c);
-            }
-            return c;
+            return computeCyclingTraversalCost(v, from, to, fromSpeed, toSpeed, request);
         }
         else {
             return computeNonDrivingTraversalCost(v, from, to, fromSpeed, toSpeed);

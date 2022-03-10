@@ -394,4 +394,18 @@ public class Timetable implements Serializable {
     public ServiceDate getServiceDate() {
         return serviceDate;
     }
+
+
+    /**
+     * The direction for all the trips in this pattern.
+     */
+    public Direction getDirection() {
+        if (!tripTimes.isEmpty()) {
+            return tripTimes.get(0).getTrip().getDirection();
+        } else if (!frequencyEntries.isEmpty()) {
+            return frequencyEntries.get(0).tripTimes.getTrip().getDirection();
+        } else {
+            return Direction.UNKNOWN;
+        }
+    }
 }

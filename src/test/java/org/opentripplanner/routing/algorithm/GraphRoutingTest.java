@@ -7,8 +7,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Entrance;
@@ -22,7 +20,6 @@ import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
@@ -38,9 +35,6 @@ import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
@@ -49,6 +43,8 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
@@ -135,34 +131,6 @@ public abstract class GraphRoutingTest {
                             true
                     )
             );
-        }
-
-        public TurnRestriction turnRestriction(
-                Edge from,
-                Edge to,
-                TurnRestrictionType type,
-                TraverseModeSet modes
-        ) {
-            var turnRestriction = new TurnRestriction(from, to, type, modes);
-            graph.addTurnRestriction(from, turnRestriction);
-            return turnRestriction;
-        }
-
-        public TurnRestriction turnRestriction(Edge from, Edge to, TurnRestrictionType type) {
-            return turnRestriction(
-                    from, to, type, new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR));
-        }
-
-        public TurnRestriction bicycleTurnRestriction(
-                Edge from,
-                Edge to,
-                TurnRestrictionType type
-        ) {
-            return turnRestriction(from, to, type, new TraverseModeSet(TraverseMode.BICYCLE));
-        }
-
-        public TurnRestriction carTurnRestriction(Edge from, Edge to, TurnRestrictionType type) {
-            return turnRestriction(from, to, type, new TraverseModeSet(TraverseMode.CAR));
         }
 
         public List<ElevatorEdge> elevator(StreetTraversalPermission permission, Vertex ... vertices) {

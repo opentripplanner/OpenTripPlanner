@@ -171,7 +171,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
     /**
      * The min-transfer-time specify lower bound for the transfer time.
-     * {@link org.opentripplanner.routing.algorithm.raptor.transit.constrainedtransfer.ConstrainedBoardingSearch}
+     * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch}
      * uses this to make sure at least the amount of seconds specified is available to do the
      * transfer. If the path transfer takes more time than specified by the
      * {@code min-transfer-time} then the path transfer is used. Normal slack parameters are added

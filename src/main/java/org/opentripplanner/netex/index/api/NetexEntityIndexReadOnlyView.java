@@ -10,6 +10,7 @@ import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleStopPlace;
+import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
@@ -29,6 +30,7 @@ import org.rutebanken.netex.model.TariffZone;
 
 public interface NetexEntityIndexReadOnlyView {
     Network lookupNetworkForLine(String groupOfLineOrNetworkId);
+    ReadOnlyHierarchicalMapById<GroupOfLines> getGroupsOfLinesById();
     ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById();
     ReadOnlyHierarchicalMapById<DayType> getDayTypeById();
     ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> getDayTypeAssignmentByDayTypeId();

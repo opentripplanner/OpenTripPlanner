@@ -1076,13 +1076,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 }
                                 break;
                             }
-                            TurnRestriction restriction = new TurnRestriction();
-                            restriction.from = from;
-                            restriction.to = to;
-                            restriction.type = restrictionTag.type;
-                            restriction.modes = restrictionTag.modes;
-                            restriction.time = restrictionTag.time;
-                            graph.addTurnRestriction(from, restriction);
+                            TurnRestriction restriction =
+                                    new TurnRestriction(
+                                            from,
+                                            to,
+                                            restrictionTag.type,
+                                            restrictionTag.modes,
+                                            restrictionTag.time
+                                    );
+                            from.addTurnRestriction(restriction);
                         }
                     }
                 }

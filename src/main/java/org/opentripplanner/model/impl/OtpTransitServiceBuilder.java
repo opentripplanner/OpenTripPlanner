@@ -19,6 +19,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Frequency;
+import org.opentripplanner.model.GroupOfRoutes;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
@@ -109,6 +110,10 @@ public class OtpTransitServiceBuilder {
     private final EntityById<FlexTrip> flexTripsById = new EntityById<>();
 
     private final EntityById<Branding> brandingsById = new EntityById<>();
+
+    private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId = ArrayListMultimap.create();
+
+    private final EntityById<GroupOfRoutes> groupOfRouteById = new EntityById<>();
 
     public OtpTransitServiceBuilder() {
     }
@@ -229,6 +234,14 @@ public class OtpTransitServiceBuilder {
         return brandingsById;
     }
 
+    public Multimap<FeedScopedId, GroupOfRoutes> getGroupsOfRoutesByRouteId() {
+        return groupsOfRoutesByRouteId;
+    }
+
+    public EntityById<GroupOfRoutes> getGroupOfRouteById() {
+        return groupOfRouteById;
+    }
+
     /**
      * Find all serviceIds in both CalendarServices and CalendarServiceDates.
      */
@@ -325,7 +338,7 @@ public class OtpTransitServiceBuilder {
         for (Map.Entry<StopPattern, TripPattern> e : tripPatterns.entries()) {
             TripPattern ptn = e.getValue();
             ptn.removeTrips(t -> !tripsById.containsKey(t.getId()));
-            if(ptn.getTrips().isEmpty()) {
+            if(ptn.scheduledTripsAsStream().findAny().isEmpty()) {
                 removePatterns.add(e);
             }
         }

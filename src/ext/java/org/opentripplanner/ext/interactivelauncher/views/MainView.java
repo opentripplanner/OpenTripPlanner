@@ -103,6 +103,8 @@ public class MainView extends JFrame {
             statusBarTxt
     );
     model.subscribeCmdLineUpdates(statusBarTxt::setText);
+
+    statusBarTxt.setText(model.toCliString());
   }
 
   public void onRootDirChanged(String newRootDir) {

@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -11,6 +12,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -123,12 +125,16 @@ final class ReverseTransitCalculator<T extends RaptorTripSchedule>
     }
 
     @Override
-    public TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+    public RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+        if (timeTable.useCustomizedTripSearch()) {
+            return timeTable.createCustomizedTripSearch(SearchDirection.REVERSE);
+        }
+
         return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, timeTable);
     }
 
     @Override
-    public TripScheduleSearch<T> createExactTripSearch(
+    public RaptorTripScheduleSearch<T> createExactTripSearch(
             RaptorTimeTable<T> timeTable
     ) {
         return new TripScheduleExactMatchSearch<>(

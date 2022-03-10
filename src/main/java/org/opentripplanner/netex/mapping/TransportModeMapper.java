@@ -43,7 +43,7 @@ class TransportModeMapper {
             case WATER:
                 return TransitMode.FERRY;
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(mode.toString());
         }
     }
 

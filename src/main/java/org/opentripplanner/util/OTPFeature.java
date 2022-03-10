@@ -36,7 +36,8 @@ public enum OTPFeature {
     SandboxAPITransmodelApi(false),
     SandboxExampleAPIGraphStatistics(false),
     SandboxAPIParkAndRideApi(false),
-    TransferAnalyzer(false);
+    TransferAnalyzer(false),
+    VehicleToStopHeuristics(false);
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 

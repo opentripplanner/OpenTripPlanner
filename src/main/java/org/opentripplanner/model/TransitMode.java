@@ -1,9 +1,7 @@
 package org.opentripplanner.model;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Equivalent to GTFS route_type or to NeTEx TransportMode.
