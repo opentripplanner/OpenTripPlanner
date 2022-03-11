@@ -92,13 +92,14 @@ public class StopAndStationMapperTest {
     public void testMapWithNulls() {
         Stop input = new Stop();
         input.setId(AGENCY_AND_ID);
+        input.setName(NAME);
 
         org.opentripplanner.model.Stop result = subject.map(input);
 
         assertNotNull(result.getId());
         assertNull(result.getCode());
         assertNull(result.getDescription());
-        assertNull(result.getName().toString());
+        assertEquals(NAME, result.getName().toString());
         assertNull(result.getParentStation());
         assertNull(result.getCode());
         assertNull(result.getUrl());
@@ -112,6 +113,7 @@ public class StopAndStationMapperTest {
     public void verifyMissingCoordinateThrowsException() {
         Stop input = new Stop();
         input.setId(AGENCY_AND_ID);
+        input.setName(NAME);
 
         org.opentripplanner.model.Stop result = subject.map(input);
 

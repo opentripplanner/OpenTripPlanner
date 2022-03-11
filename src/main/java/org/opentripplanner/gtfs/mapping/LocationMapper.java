@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.util.Optional;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.UnsupportedGeometryException;
 import org.opentripplanner.model.FlexStopLocation;
@@ -18,7 +19,7 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 public class LocationMapper {
   private static Logger LOG = LoggerFactory.getLogger(LocationMapper.class);
 
-  private Map<org.onebusaway.gtfs.model.Location, FlexStopLocation> mappedLocations = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.Location, FlexStopLocation> mappedLocations = new HashMap<>();
 
   Collection<FlexStopLocation> map(Collection<org.onebusaway.gtfs.model.Location> allLocations) {
     return MapUtils.mapToList(allLocations, this::map);
@@ -32,8 +33,13 @@ public class LocationMapper {
   private FlexStopLocation doMap(org.onebusaway.gtfs.model.Location gtfsLocation) {
     FlexStopLocation otpLocation = new FlexStopLocation(mapAgencyAndId(gtfsLocation.getId()));
 
-    otpLocation.setName(new NonLocalizedString(gtfsLocation.getName()));
-    otpLocation.setUrl(new NonLocalizedString(gtfsLocation.getUrl()));
+    // according to the spec stop location names are optional for flex zones so, we return the id
+    // when it's null. *shrug*
+    otpLocation.setName(NonLocalizedString.ofNullableOrElse(
+            gtfsLocation.getName(),
+            otpLocation.getId().toString())
+    );
+    otpLocation.setUrl(NonLocalizedString.ofNullable(gtfsLocation.getUrl()));
     otpLocation.setDescription(gtfsLocation.getDescription());
     otpLocation.setZoneId(gtfsLocation.getZoneId());
     try {

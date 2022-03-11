@@ -86,13 +86,14 @@ public class EntranceMapperTest  {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
     input.setId(AGENCY_AND_ID);
+    input.setName(NAME);
 
     org.opentripplanner.model.Entrance result = subject.map(input);
 
     assertNotNull(result.getId());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertNull(result.getName().toString());
+    assertEquals(NAME, result.getName().toString());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
@@ -103,6 +104,7 @@ public class EntranceMapperTest  {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
     input.setId(AGENCY_AND_ID);
+    input.setName(NAME);
 
     org.opentripplanner.model.Entrance result = subject.map(input);
 

@@ -36,9 +36,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
    */
   @Override
   public I18NString getName() {
-    // according to the spec stop location names are optional for flex zones so, we return the id
-    // when it's null. *shrug*
-    return Optional.ofNullable(name).orElse(new NonLocalizedString(getId().toString()));
+    return name;
   }
 
   @Override

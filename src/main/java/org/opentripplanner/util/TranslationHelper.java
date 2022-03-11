@@ -123,7 +123,7 @@ public final class TranslationHelper {
             }
             return TranslatedString.getI18NString(hm);
         }
-        return new NonLocalizedString(defaultValue);
+        return NonLocalizedString.ofNullable(defaultValue);
     }
 
     private String getObjectFieldNameAsCSVFieldName(String fieldName,

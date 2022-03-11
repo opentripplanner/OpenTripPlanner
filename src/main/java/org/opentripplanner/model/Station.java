@@ -82,7 +82,7 @@ public class Station extends TransitEntity implements StopCollection {
             new WgsCoordinate(lat, lon),
             idAndName,
             "Station " + idAndName,
-            new NonLocalizedString(null),
+            null,
             null,
             StopTransferPriority.ALLOWED
     );

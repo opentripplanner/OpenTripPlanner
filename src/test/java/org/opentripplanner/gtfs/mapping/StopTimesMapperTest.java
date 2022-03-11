@@ -40,6 +40,8 @@ public class StopTimesMapperTest {
 
     private static final Stop STOP = new Stop();
 
+    private static final String STOP_NAME = "Stop";
+
     private static final String HEAD_SIGN = "Head Sign";
 
     private static final int STOP_SEQUENCE = 4;
@@ -53,6 +55,7 @@ public class StopTimesMapperTest {
     static {
         TRIP.setId(AGENCY_AND_ID);
         STOP.setId(AGENCY_AND_ID);
+        STOP.setName(STOP_NAME);
 
         STOP_TIME.setId(ID);
         STOP_TIME.setArrivalTime(ARRIVAL_TIME);
