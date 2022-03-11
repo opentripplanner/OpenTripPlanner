@@ -11,11 +11,15 @@ public class RealtimeVehiclePositionService {
 
     private final Multimap<TripPattern, RealtimeVehiclePosition> positions = HashMultimap.create();
 
-    public void setVehiclePositions(TripPattern pattern, List<RealtimeVehiclePosition> positions) {
-       this.positions.replaceValues(pattern, positions);
+    public void addVehiclePosition(TripPattern pattern, RealtimeVehiclePosition position) {
+       positions.put(pattern, position);
+    }
+
+    public void clearVehiclePositions(TripPattern pattern) {
+        positions.removeAll(pattern);
     }
 
     public Collection<RealtimeVehiclePosition> getVehiclePositions(TripPattern pattern) {
-        return positions.get(pattern);
+        return List.copyOf(positions.get(pattern));
     }
 }

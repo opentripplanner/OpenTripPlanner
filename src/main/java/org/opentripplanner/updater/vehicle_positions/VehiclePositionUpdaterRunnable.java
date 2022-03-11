@@ -22,26 +22,18 @@ public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
             final String feedId,
             final VehiclePositionPatternMatcher matcher
     ) {
-        // Preconditions
         Objects.requireNonNull(updates);
         Objects.requireNonNull(feedId);
         Objects.requireNonNull(matcher);
 
-        // Set fields
         this.updates = updates;
         this.feedId = feedId;
         this.matcher = matcher;
     }
 
-    /**
-     * This function is executed to modify patterns
-     *
-     * @param graph
-     */
     @Override
     public void run(Graph graph) {
         // Apply new vehicle positions
-        // This will update the internal seenTripIds
         matcher.applyVehiclePositionUpdates(updates, feedId);
     }
 }

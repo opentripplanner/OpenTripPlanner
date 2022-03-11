@@ -1,11 +1,13 @@
 package org.opentripplanner.updater.vehicle_positions;
 
-import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.FeedScopedId;
@@ -31,6 +33,8 @@ public class VehiclePositionPatternMatcher {
     private final Supplier<Map<FeedScopedId, Trip>> getTripForId;
     private final Supplier<Map<Trip, TripPattern>> getPatternForTrip;
 
+    private Set<TripPattern> patternsInPreviousUpdate = Set.of();
+
     public VehiclePositionPatternMatcher(
             Supplier<Map<FeedScopedId, Trip>> getTripForId,
             Supplier<Map<Trip, TripPattern>> getPatternForTrip,
@@ -49,6 +53,9 @@ public class VehiclePositionPatternMatcher {
      */
     public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions, String feedId) {
         int numberOfMatches = 0;
+
+        Set<TripPattern> patternsInCurrentUpdate = new HashSet<>();
+
         for (VehiclePosition vehiclePosition : vehiclePositions) {
             if (!vehiclePosition.hasTrip()) {
                 LOG.warn("Realtime vehicle positions without trip IDs are not yet supported.");
@@ -80,10 +87,16 @@ public class VehiclePositionPatternMatcher {
                     pattern.getStops()
             );
 
-            service.setVehiclePositions(pattern, List.of(newPosition));
+            service.addVehiclePosition(pattern, newPosition);
+            patternsInCurrentUpdate.add(pattern);
             numberOfMatches++;
         }
 
+        // if there was a position in the previous update but not in the current one, we assume
+        // that the vehicle has finished its trip and will be removed
+        var toDelete = Sets.difference(patternsInPreviousUpdate, patternsInCurrentUpdate);
+        toDelete.forEach(service::clearVehiclePositions);
+        patternsInPreviousUpdate = patternsInCurrentUpdate;
 
         if (!vehiclePositions.isEmpty() && numberOfMatches == 0) {
             LOG.error(

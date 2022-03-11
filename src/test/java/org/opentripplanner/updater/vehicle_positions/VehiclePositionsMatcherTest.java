@@ -61,6 +61,10 @@ public class VehiclePositionsMatcherTest {
 
         // ensure that gtfs-rt was matched to an OTP pattern correctly
         assertEquals(1, service.getVehiclePositions(pattern).size());
+
+        // if we have an empty list of updates then clear the positions from the previous update
+        matcher.applyVehiclePositionUpdates(List.of(), feedId);
+        assertEquals(0, service.getVehiclePositions(pattern).size());
     }
 
     private StopTime stopTime(Trip trip, int seq) {
