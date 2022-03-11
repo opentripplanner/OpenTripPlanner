@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 
 /**
- * The main purpose of this clas is to hold data for a given arrival at a stop and raptor round. It
+ * The main purpose of this class is to hold data for a given arrival at a stop and raptor round. It
  * should be as light-weight as possible to minimize memory consumption and cheap to create and
  * garbage collect.
  * <p/>
