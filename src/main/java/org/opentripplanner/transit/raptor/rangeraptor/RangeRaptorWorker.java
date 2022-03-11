@@ -3,15 +3,14 @@ package org.opentripplanner.transit.raptor.rangeraptor;
 
 import io.micrometer.core.instrument.Timer;
 import java.util.Collection;
-import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
@@ -19,7 +18,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleBoardSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 
 
@@ -199,10 +197,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
     private void findTransitForRound() {
         timerByMinuteScheduleSearch().record(() -> {
             IntIterator stops = state.stopsTouchedPreviousRound();
-            Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
+            IntIterator routeIndexIterator = transitData.routeIndexIterator(stops);
 
-            while (routeIterator.hasNext()) {
-                var route = routeIterator.next();
+            while (routeIndexIterator.hasNext()) {
+                var routeIndex = routeIndexIterator.next();
+                var route = transitData.getPatternForIndex(routeIndex);
                 var pattern = route.pattern();
                 var tripSearch = createTripSearch(route.timetable());
                 var txSearch = enableTransferConstraints

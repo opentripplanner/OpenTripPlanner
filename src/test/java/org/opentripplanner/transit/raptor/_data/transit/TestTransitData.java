@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.util.BitSetIterator;
 import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 
 @SuppressWarnings("UnusedReturnValue")
@@ -40,7 +42,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
 
   private final List<List<RaptorTransfer>> transfersFromStop = new ArrayList<>();
   private final List<List<RaptorTransfer>> transfersToStop = new ArrayList<>();
-  private final List<Set<TestRoute>> routesByStop = new ArrayList<>();
+  private final List<Set<Integer>> routesByStop = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<ConstrainedTransfer> constrainedTransfers = new ArrayList<>();
   private final McCostParamsBuilder costParamsBuilder = new McCostParamsBuilder();
@@ -56,13 +58,20 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   @Override
-  public Iterator<? extends RaptorRoute<TestTripSchedule>> routeIterator(IntIterator stops) {
-    Set<RaptorRoute<TestTripSchedule>> routes = new HashSet<>();
+  public IntIterator routeIndexIterator(IntIterator stops) {
+    BitSet routes = new BitSet();
     while (stops.hasNext()) {
       int stop = stops.next();
-      routes.addAll(routesByStop.get(stop));
+      for (int i : routesByStop.get(stop)) {
+        routes.set(i);
+      }
     }
-    return routes.iterator();
+    return new BitSetIterator(routes);
+  }
+
+  @Override
+  public RaptorRoute<TestTripSchedule> getPatternForIndex(int routeIndex) {
+    return this.routes.get(routeIndex);
   }
 
   @Override
@@ -152,11 +161,12 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
 
   public TestTransitData withRoute(TestRoute route) {
     this.routes.add(route);
+    int routeIndex = this.routes.indexOf(route);
     var pattern = route.pattern();
     for(int i=0; i< pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
       expandNumOfStops(stopIndex);
-      routesByStop.get(stopIndex).add(route);
+      routesByStop.get(stopIndex).add(routeIndex);
     }
     return this;
   }

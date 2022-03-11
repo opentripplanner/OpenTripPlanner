@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper.secondsSinceStartOfTime;
 
+import gnu.trove.list.array.TIntArrayList;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -36,7 +36,7 @@ class RaptorRoutingRequestTransitDataCreator {
     this.transitSearchTimeZero = transitSearchTimeZero;
   }
 
-  List<List<TripPatternForDates>> createTripPatternsPerStop(
+  List<TripPatternForDates> createTripPatterns(
       int additionalPastSearchDays,
       int additionalFutureSearchDays,
       TransitDataProviderFilter filter
@@ -48,9 +48,7 @@ class RaptorRoutingRequestTransitDataCreator {
         filter
     );
 
-    List<TripPatternForDates> tripPatternForDateList = merge(transitSearchTimeZero, tripPatternForDates);
-
-    return createTripPatternsPerStop(tripPatternForDateList, transitLayer.getStopCount());
+    return merge(transitSearchTimeZero, tripPatternForDates);
   }
 
   private List<TripPatternForDate> getTripPatternsForDateRange(
@@ -115,19 +113,29 @@ class RaptorRoutingRequestTransitDataCreator {
     return combinedList;
   }
 
-  private static List<List<TripPatternForDates>> createTripPatternsPerStop(
-      List<TripPatternForDates> tripPatternsForDate, int numberOfStops
-  ) {
-    List<List<TripPatternForDates>> result = Stream
-        .generate(ArrayList<TripPatternForDates>::new)
-        .limit(numberOfStops)
-        .collect(Collectors.toList());
+  public List<int[]> createTripPatternsPerStop(List<TripPatternForDates> tripPatternsForDate) {
+    // Create temporary array of TIntArrayLists
+    int stopCount = transitLayer.getStopCount();
+    TIntArrayList[] patternsForStop = new TIntArrayList[stopCount];
+    for (int i = 0; i < stopCount; i++) {
+      patternsForStop[i] = new TIntArrayList();
+    }
 
-    for (TripPatternForDates tripPatternForDateList : tripPatternsForDate) {
+    // Loop through all patterns, and mark all stops containing that pattern
+    int numPatterns = tripPatternsForDate.size();
+    for (int patternIndex = 0; patternIndex < numPatterns; patternIndex++) {
+      TripPatternForDates tripPatternForDateList = tripPatternsForDate.get(patternIndex);
       for (int i : tripPatternForDateList.getTripPattern().getStopIndexes()) {
-        result.get(i).add(tripPatternForDateList);
+        patternsForStop[i].add(patternIndex);
       }
     }
+
+    // Create the final list with raw int arrays, in order to get best iteration performance
+    List<int[]> result = new ArrayList<>();
+    for (var patterns : patternsForStop) {
+      result.add(patterns.toArray());
+    }
+
     return result;
   }
 
