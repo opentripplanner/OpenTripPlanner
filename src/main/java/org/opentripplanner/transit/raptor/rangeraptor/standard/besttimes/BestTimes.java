@@ -23,7 +23,7 @@ import org.opentripplanner.transit.raptor.util.BitSetIterator;
  * not only the overall bet times, to find all the best transfers. When arriving at a stop
  * on-board, we need to find all transfers to other stops, event if there is another transfer
  * arrival with a better arrival time. The reason is that after transfer to the next stop, the
- * new arrival may become the best time at that stop. Two transfers* are after each other is not
+ * new arrival may become the best time at that stop. Two transfers that are after each other are not
  * allowed.
  */
 public final class BestTimes {

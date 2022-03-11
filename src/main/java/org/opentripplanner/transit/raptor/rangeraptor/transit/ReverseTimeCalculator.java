@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 /**
  * A calculator that will take you back in time not forward, this is the
- * basic logic to implement a reveres search.
+ * basic logic to implement a reverse search.
  * <p>
  * This class is stateless, but need to be instantiatable to be injected as a
  * strategy.
