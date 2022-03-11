@@ -27,7 +27,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 public class A01_SingeRouteTest implements RaptorTestConstants {
 
   private static final String EXP_PATH = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s "
-          + "[0:00:30 0:05:20 4m50s";
+          + "[0:00:30 0:05:20 4m50s 0tx";
   private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
   private static final String EXP_PATH_WITH_COST = EXP_PATH + " $940]";
 

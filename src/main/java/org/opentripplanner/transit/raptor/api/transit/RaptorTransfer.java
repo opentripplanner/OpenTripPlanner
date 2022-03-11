@@ -68,6 +68,12 @@ public interface RaptorTransfer {
         return requestedArrivalTime;
     };
 
+    /**
+     * This method should return {@code true} if, and only if the instance have restricted
+     * opening-hours.
+     */
+     boolean hasOpeningHours();
+
     /*
        ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
 
@@ -133,7 +139,7 @@ public interface RaptorTransfer {
     default String asString() {
       String duration = DurationUtils.durationToStr(durationInSeconds());
         return hasRides()
-            ? String.format("Flex %s %dx ~ %d", duration, numberOfRides(), stop())
+            ? String.format("Flex%s %s %dx ~ %d", stopReachedOnBoard() ? "" : "+Walk",   duration, numberOfRides(), stop())
             : String.format("On-Street %s ~ %d", duration, stop());
     }
 }

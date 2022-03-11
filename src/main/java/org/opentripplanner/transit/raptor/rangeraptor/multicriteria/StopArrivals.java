@@ -1,19 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 
-import static java.util.Collections.emptyList;
-
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 
@@ -25,8 +20,8 @@ import org.opentripplanner.transit.raptor.util.BitSetIterator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class Stops<T extends RaptorTripSchedule> {
-    private final StopArrivalParetoSet<T>[] stops;
+public final class StopArrivals<T extends RaptorTripSchedule> {
+    private final StopArrivalParetoSet<T>[] arrivals;
     private final BitSet touchedStops;
     private final DebugHandlerFactory<T> debugHandlerFactory;
     private final DebugStopArrivalsStatistics debugStats;
@@ -34,26 +29,19 @@ public final class Stops<T extends RaptorTripSchedule> {
     /**
      * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
      */
-    public Stops(
+    public StopArrivals(
             int nStops,
-            Collection<RaptorTransfer> egressPath,
+            EgressPaths egressPaths,
             DestinationArrivalPaths<T> paths,
             DebugHandlerFactory<T> debugHandlerFactory
     ) {
         //noinspection unchecked
-        this.stops = (StopArrivalParetoSet<T>[]) new StopArrivalParetoSet[nStops];
+        this.arrivals = (StopArrivalParetoSet<T>[]) new StopArrivalParetoSet[nStops];
         this.touchedStops = new BitSet(nStops);
         this.debugHandlerFactory = debugHandlerFactory;
         this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
-        Collection<Map.Entry<Integer, List<RaptorTransfer>>> groupedEgressPaths = egressPath
-            .stream()
-            .collect(Collectors.groupingBy(RaptorTransfer::stop))
-            .entrySet();
-
-        for (Map.Entry<Integer, List<RaptorTransfer>> it : groupedEgressPaths) {
-            glueTogetherEgressStopWithDestinationArrivals(it, paths);
-        }
+        glueTogetherEgressStopWithDestinationArrivals(egressPaths, paths);
     }
 
     boolean updateExist() {
@@ -72,14 +60,14 @@ public final class Stops<T extends RaptorTripSchedule> {
     }
 
     void debugStateInfo() {
-        debugStats.debugStatInfo(stops);
+        debugStats.debugStatInfo(arrivals);
     }
 
     /** List all transits arrived this round. */
     Iterable<AbstractStopArrival<T>> listArrivalsAfterMarker(final int stop) {
-        StopArrivalParetoSet<T> it = stops[stop];
+        StopArrivalParetoSet<T> it = arrivals[stop];
         if(it==null) {
-            return emptyList();
+            return List.of();
         }
         return it.elementsAfterMarker();
     }
@@ -87,7 +75,7 @@ public final class Stops<T extends RaptorTripSchedule> {
     void clearTouchedStopsAndSetStopMarkers() {
         IntIterator it = stopsTouchedIterator();
         while (it.hasNext()) {
-            stops[it.next()].markAtEndOfSet();
+            arrivals[it.next()].markAtEndOfSet();
         }
         touchedStops.clear();
     }
@@ -96,10 +84,10 @@ public final class Stops<T extends RaptorTripSchedule> {
     /* private methods */
 
     private StopArrivalParetoSet<T> findOrCreateSet(final int stop) {
-        if(stops[stop] == null) {
-            stops[stop] = StopArrivalParetoSet.createStopArrivalSet(stop, debugHandlerFactory);
+        if(arrivals[stop] == null) {
+            arrivals[stop] = StopArrivalParetoSet.createStopArrivalSet(stop, debugHandlerFactory);
         }
-        return stops[stop];
+        return arrivals[stop];
     }
 
     /**
@@ -107,15 +95,15 @@ public final class Stops<T extends RaptorTripSchedule> {
      * stop, the "glue" make sure new destination arrivals is added to the destination arrivals.
      */
     private void glueTogetherEgressStopWithDestinationArrivals(
-            Map.Entry<Integer, List<RaptorTransfer>> egressPaths,
+            EgressPaths egressPaths,
             DestinationArrivalPaths<T> paths
     ) {
-        int stop = egressPaths.getKey();
-        // The factory is creating the actual "glue"
-        this.stops[stop] = StopArrivalParetoSet.createEgressStopArrivalSet(
-                egressPaths,
-                paths,
-                debugHandlerFactory
-        );
+        egressPaths.byStop().forEachEntry((stop, list) -> {
+            // The factory is creating the actual "glue"
+            this.arrivals[stop] = StopArrivalParetoSet.createEgressStopArrivalSet(
+                    stop, list, paths, debugHandlerFactory
+            );
+            return true;
+        });
     }
 }

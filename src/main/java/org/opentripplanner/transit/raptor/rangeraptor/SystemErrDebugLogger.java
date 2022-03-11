@@ -10,6 +10,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
@@ -41,7 +42,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     private boolean forwardSearch = true;
     private int lastIterationTime = NOT_SET;
     private int lastRound = NOT_SET;
-    private boolean pathHeader = true;
+    private boolean printPathHeader = true;
 
     private final TableFormatter arrivalTableFormatter = new TableFormatter(
         List.of(Center, Center, Right, Right, Right, Right, Left, Left),
@@ -94,10 +95,10 @@ public class SystemErrDebugLogger implements DebugLogger {
      * using a lambda to enable debugging paths put in the final result pareto-set.
      */
     public void pathFilteringListener(DebugEvent<Path<?>> e) {
-        if (pathHeader) {
+        if (printPathHeader) {
             System.err.println();
             System.err.println(pathTableFormatter.printHeader());
-            pathHeader = false;
+            printPathHeader = false;
         }
 
         Path<?> p = e.element();
@@ -143,14 +144,15 @@ public class SystemErrDebugLogger implements DebugLogger {
     /* private methods */
 
     private void printIterationHeader(int iterationTime) {
-        if (iterationTime == lastIterationTime) return;
+        if (iterationTime == lastIterationTime) { return; }
         lastIterationTime = iterationTime;
         lastRound = NOT_SET;
-        pathHeader = true;
+        printPathHeader = true;
         System.err.println("\n**  RUN RAPTOR FOR MINUTE: " + timeToStrCompact(iterationTime) + "  **");
     }
 
     private void print(ArrivalView<?> a, String action, String optReason) {
+        printPathHeader = true;
         String pattern = a.arrivedByTransit() ? a.transitPath().trip().pattern().debugInfo() : "";
         System.err.println(
             arrivalTableFormatter.printRow(
@@ -181,8 +183,11 @@ public class SystemErrDebugLogger implements DebugLogger {
         );
     }
 
-    private static String details(String action, String optReason, String element) {
-        return concat(optReason,  action + ", element: " + element);
+    private static String details(String action, String optReason, @Nullable String element) {
+        StringBuilder buf = new StringBuilder();
+        buf.append(action).append(": ").append(element);
+        if(isNotBlank(optReason)) { buf.append("  # ").append(optReason); }
+        return buf.toString();
     }
 
     private String path(ArrivalView<?> a) {
@@ -236,22 +241,15 @@ public class SystemErrDebugLogger implements DebugLogger {
         if(a.arrivedAtDestination()) {
             return a.egressPath().egress().durationInSeconds();
         }
-        throw new IllegalStateException("Unsuported type: " + a.getClass());
+        throw new IllegalStateException("Unsupported type: " + a.getClass());
     }
 
     private void printRoundHeader(int round) {
-        if (round == lastRound) return;
+        if (round == lastRound) { return; }
         lastRound = round;
 
         System.err.println();
         System.err.println(arrivalTableFormatter.printHeader());
-    }
-
-    private static String concat(String s, String t) {
-        if(s == null || s.isEmpty()) {
-            return t == null ? "" : t;
-        }
-        return s + ", " + (t == null ? "" : t);
     }
 
     private String legType(ArrivalView<?> a) {
@@ -261,5 +259,9 @@ public class SystemErrDebugLogger implements DebugLogger {
         if (a.arrivedByTransfer()) { return "Walk"; }
         if (a.arrivedAtDestination()) { return "Egress"; }
         throw new IllegalStateException("Unknown mode for: " + this);
+    }
+
+    private static boolean isNotBlank(String text) {
+        return text != null && !text.isBlank();
     }
 }
