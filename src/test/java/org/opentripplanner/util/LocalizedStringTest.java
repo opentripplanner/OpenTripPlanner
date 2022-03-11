@@ -30,4 +30,13 @@ class LocalizedStringTest {
                 new LocalizedString("corner", new String[] {"First", "Second"}).toString(Locale.CHINESE)
         );
     }
+
+    @Test
+    public void localeWithoutParams() {
+        assertEquals(
+                "Destination",
+                new LocalizedString("destination").toString()
+        );
+    }
+
 }
