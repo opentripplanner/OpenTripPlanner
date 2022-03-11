@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stops;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 
@@ -24,29 +24,29 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class StopsCursor<T extends RaptorTripSchedule> {
-    private final Stops<T> stops;
+    private final StopArrivals<T> arrivals;
     private final TransitCalculator<T> transitCalculator;
     private final ToIntFunction<RaptorTripPattern> boardSlackProvider;
 
     public StopsCursor(
-            Stops<T> stops,
+            StopArrivals<T> arrivals,
             TransitCalculator<T> transitCalculator,
             ToIntFunction<RaptorTripPattern> boardSlackProvider
     ) {
-        this.stops = stops;
+        this.arrivals = arrivals;
         this.transitCalculator = transitCalculator;
         this.boardSlackProvider = boardSlackProvider;
     }
 
     public boolean reachedOnBoard(int round, int stop) {
-        var a =  stops.get(round, stop);
+        var a =  arrivals.get(round, stop);
         return a != null && a.reachedOnBoard();
     }
 
     public boolean reachedOnStreet(int round, int stop) {
-        var a =  stops.get(round, stop);
+        var a =  arrivals.get(round, stop);
         if(a == null) { return false; }
-        return a.arrivedByAccessOnStreet() || a.arrivedByAccessOnStreet();
+        return a.arrivedByAccessOnStreet() || a.arrivedByTransfer();
     }
 
     /** Return a fictive access stop arrival. */
@@ -85,7 +85,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      * check that the access exist.
      */
     public ArrivalView<T> access(int round, int stop, RaptorTransfer access) {
-        var arrival = stops.get(round, stop);
+        var arrival = arrivals.get(round, stop);
         int time = access.stopReachedOnBoard() ? arrival.onBoardArrivalTime() : arrival.time();
         return new Access<>(round, time, access);
     }
@@ -98,7 +98,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      *                           if {@code false} the BEST arrival is returned on-street or on-board.
      */
     public ArrivalView<T> stop(int round, int stop, boolean stopReachedOnBoard) {
-        var arrival = stops.get(round, stop);
+        var arrival = arrivals.get(round, stop);
 
         // We chack for on-street arrivals first, since on-street is only available if it is better
         // than on-board arrivals
@@ -130,7 +130,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      * according to the next transit boarding/departure time.
      */
     public ArrivalView<T> stop(int round, int stop, @NotNull Transit<T> nextTransitLeg) {
-        var arrival = stops.get(round, stop);
+        var arrival = arrivals.get(round, stop);
 
         if(arrival.arrivedByAccessOnStreet()) {
             return newAccessView(round, arrival.accessPathOnStreet(), nextTransitLeg);

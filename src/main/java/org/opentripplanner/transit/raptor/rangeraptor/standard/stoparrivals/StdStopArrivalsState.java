@@ -19,13 +19,13 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState
  */
 public final class StdStopArrivalsState<T extends RaptorTripSchedule> implements StopArrivalsState<T> {
 
-    private final Stops<T> stops;
+    private final StopArrivals<T> stops;
     private final DestinationArrivalPaths<T> results;
 
     /**
      * Create a Standard Range Raptor state for the given stops and destination arrivals.
      */
-    public StdStopArrivalsState(Stops<T> stops, DestinationArrivalPaths<T> paths) {
+    public StdStopArrivalsState(StopArrivals<T> stops, DestinationArrivalPaths<T> paths) {
         this.stops = stops;
         this.results = paths;
     }

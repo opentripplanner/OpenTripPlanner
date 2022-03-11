@@ -5,6 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 
@@ -83,19 +84,32 @@ class StateDebugger<T extends RaptorTripSchedule> {
         debugHandlerStopArrivals.accept(cursor.stop(round(), stop, stopReachedOnBoard));
     }
 
+    /**
+     * This method mimic the logic in the worker/state. A better approach would be
+     * to do the logging where the changes happen as in the multi-criteria version,
+     * but that would lead to a much more complicated instrumentation. So, this
+     * method replicate the logic that is done in the worker and state classes combined.
+     * <p>
+     * Note! Arrivals in the state is not dropped by this method, this class only notify the
+     * debug handler about arrivals that are about to be dropped.
+     */
     private void drop(int stop, boolean onBoard, boolean newBestOverall) {
         final int round = round();
 
+        // if new arrival arrived on-board,
         if(onBoard) {
+            // and an existing on-board arrival exist
             if(cursor.reachedOnBoard(round, stop)) {
                 dropExistingArrival(round, stop, onBoard);
             }
+            // and an existing best-over-all arrival exist
             if(newBestOverall) {
                 if(cursor.reachedOnStreet(round, stop)) {
                     dropExistingArrival(round, stop, false);
                 }
             }
         }
+        // drop existing best over all arrival, but not existing on-board
         else if(cursor.reachedOnStreet(round, stop)) {
             dropExistingArrival(round, stop, onBoard);
         }
