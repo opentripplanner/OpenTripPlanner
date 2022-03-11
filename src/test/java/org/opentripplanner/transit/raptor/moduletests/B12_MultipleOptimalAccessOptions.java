@@ -28,21 +28,21 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * This test focus on selecting the correct start on the journey, where a trip L1 compeate with
- * a flex access to get to stop C. The Flex access arrive at C one minute after Trip L1 + walking,
- * but the flex arrive on-board. This should give the flex an advantage, the ability to transfer
+ * This test focus on selecting the correct start on the journey, where a trip L1 competes with
+ * a flex access to get to stop C. The Flex access arrives at C one minute after Trip L1 + walking,
+ * but the flex arrives on-board. This should give the flex an advantage, the ability to transfer
  * to a nearby stop. In this test we manipulate the EGRESS for make the two paths optional. If we
  * can get both paths (start with flex access or trip L1) as optimal results by changing the
  * egress, then we have proven that both these results are kept in stop arrival at stop C.
  * <p>
- * Further this test also make sure the path is constructed correct when we have a mix of
+ * Further this test also makes sure the path is constructed correctly when we have a mix of
  * access, transfer and transit at the same stop, in the same Raptor round. Two walking legs are
  * not allowed after each other.
  * <p>
  * <img src="images/B12.svg" width="548" height="206"/>
  * <p>
  * We use the same data and changes the egress walk leg to cover all cases. The egress walk leg
- * become optimal is it is 3 minutes, while the flex is optimal when we set the egress to 10
+ * becomes optimal is it is 3 minutes, while the flex is optimal when we set the egress to 10
  * minutes. Trip L2 is faster than trip L1, but must be using the FLEX egress - since it arrive
  * at the stop C by walking.
  * <p>

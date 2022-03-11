@@ -11,7 +11,7 @@ import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 /**
  * This class is responsible for keeping track of the overall best times and
- * the best "on-board"" times. In addition, it keeps track of times updated
+ * the best "on-board" times. In addition, it keeps track of times updated
  * in the current round and previous round. It is optimized for performance,
  * all information here is also in the state, but this class keeps things in
  * the fastest possible data structure.

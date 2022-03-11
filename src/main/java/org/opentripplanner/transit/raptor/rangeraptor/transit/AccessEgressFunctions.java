@@ -15,11 +15,11 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 
 
 /**
- * This class contain functions used by the {@link AccessPaths} and {@link EgressPaths}
- * class. The functions are all static utility functions are places in this class to be
+ * This class contains functions used by the {@link AccessPaths} and {@link EgressPaths}
+ * classes. The functions are all static utility functions, and are placed in this class to be
  * shared between the two classes.
  * <p>
- * The class also contain the ParetoSet comparator to filter Standard Raptor(not multi-criteria)
+ * The class also contains the ParetoSet comparator to filter Standard Raptor(not multi-criteria)
  * access and egress.
  * <p>
  */
@@ -57,7 +57,7 @@ public final class AccessEgressFunctions {
 
 
     /**
-     * This method help with calculating the egress departure time. It will add
+     * This method helps with calculating the egress departure time. It will add
      * transit slack (egress leaves on-board) and then time-shift the egress.
      */
     public static int calculateEgressDepartureTime(
@@ -89,7 +89,7 @@ public final class AccessEgressFunctions {
         // for each stop we filter it down to the optimal pareto set. We could do this
         // for multi-criteria as well, but it is likely not so important. The focus for
         // the mc-set should be that the list of access/egress created in OTP should not
-        // contain to many none optional paths.
+        // contain to many non-optimal paths.
         var mapByStop = groupByStop(paths);
         var set = new ParetoSet<>(STANDARD_COMPARATOR);
         Collection<RaptorTransfer> result = new ArrayList<>();
