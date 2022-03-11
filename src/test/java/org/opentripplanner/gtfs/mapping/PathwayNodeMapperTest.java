@@ -92,7 +92,7 @@ public class PathwayNodeMapperTest {
     assertNotNull(result.getId());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertNull(result.getName().toString());
+    assertEquals(PathwayNodeMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());

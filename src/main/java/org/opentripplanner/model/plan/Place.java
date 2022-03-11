@@ -103,9 +103,9 @@ public class Place {
                 .toString();
     }
 
-    public static Place normal(Double lat, Double lon, String name) {
+    public static Place normal(Double lat, Double lon, I18NString name) {
         return new Place(
-                new NonLocalizedString(name),
+                name,
                 WgsCoordinate.creatOptionalCoordinate(lat, lon),
                 VertexType.NORMAL,
                 null, null, null

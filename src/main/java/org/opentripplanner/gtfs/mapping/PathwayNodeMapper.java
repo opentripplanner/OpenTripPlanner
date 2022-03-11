@@ -10,6 +10,8 @@ import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Node into the OTP model. */
 class PathwayNodeMapper {
+    static final String DEFAULT_NAME = "Pathway node";
+
     private final Map<org.onebusaway.gtfs.model.Stop, PathwayNode> mappedNodes = new HashMap<>();
 
     private final TranslationHelper translationHelper;
@@ -41,7 +43,7 @@ class PathwayNodeMapper {
             "name",
             base.getId().getId(),
             null,
-            base.getName()
+            base.getName() == null ? DEFAULT_NAME : base.getName()
         );
 
 

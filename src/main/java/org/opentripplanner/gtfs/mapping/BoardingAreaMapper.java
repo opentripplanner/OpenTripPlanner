@@ -10,6 +10,7 @@ import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Boarding areas into the OTP model. */
 class BoardingAreaMapper {
+  static final String DEFAULT_NAME = "Boarding area";
 
   private final Map<org.onebusaway.gtfs.model.Stop, BoardingArea> mappedBoardingAreas = new HashMap<>();
 
@@ -42,7 +43,7 @@ class BoardingAreaMapper {
         "name",
         base.getId().getId(),
         null,
-        base.getName());
+        base.getName() == null ? DEFAULT_NAME : base.getName());
 
     return new BoardingArea(
             base.getId(),

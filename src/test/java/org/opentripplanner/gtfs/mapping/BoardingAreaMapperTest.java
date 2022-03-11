@@ -1,19 +1,18 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelChairBoarding;
-
-import java.util.Collection;
-import java.util.Collections;
-import org.opentripplanner.util.TranslationHelper;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+import java.util.Collections;
+import org.junit.Test;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.util.TranslationHelper;
 
 public class BoardingAreaMapperTest  {
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "B1");
@@ -91,7 +90,7 @@ public class BoardingAreaMapperTest  {
     assertNotNull(result.getId());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertNull(result.getName().toString());
+    assertEquals(BoardingAreaMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStop());
     assertNull(result.getCode());
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());

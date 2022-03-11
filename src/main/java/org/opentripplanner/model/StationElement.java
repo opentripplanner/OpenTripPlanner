@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import javax.annotation.Nonnull;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -44,6 +45,7 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Name of the station element if provided.
    */
+  @Nonnull
   public I18NString getName() {
     return name;
   }
