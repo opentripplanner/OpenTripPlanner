@@ -1,11 +1,12 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.PathwayNode;
-import org.opentripplanner.util.MapUtils;
+import static java.util.Objects.requireNonNullElse;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.model.PathwayNode;
+import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS Node into the OTP model. */
 class PathwayNodeMapper {
@@ -33,7 +34,7 @@ class PathwayNodeMapper {
 
         return new PathwayNode(
             base.getId(),
-            base.getName() == null ? DEFAULT_NAME : base.getName(),
+            requireNonNullElse(base.getName(), DEFAULT_NAME),
             base.getCode(),
             base.getDescription(),
             base.getCoordinate(),
