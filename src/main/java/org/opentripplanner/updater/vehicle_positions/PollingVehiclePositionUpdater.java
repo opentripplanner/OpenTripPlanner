@@ -3,7 +3,6 @@ package org.opentripplanner.updater.vehicle_positions;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.io.File;
 import java.util.List;
-import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -16,7 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Add vehicle positions to OTP patterns via a realtime source *
  * <pre>
- * rt.type = vehicle-position
+ * rt.type = vehicle-positions
  * rt.frequencySec = 60
  * rt.sourceType = gtfs-http
  * rt.url = http://host.tld/path

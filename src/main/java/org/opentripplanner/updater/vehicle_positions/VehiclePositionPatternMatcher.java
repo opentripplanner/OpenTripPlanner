@@ -2,9 +2,11 @@ package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.common.collect.Multimap;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -80,7 +82,10 @@ public class VehiclePositionPatternMatcher {
             String tripId = vehiclePosition.getTrip().getTripId();
             Trip trip = getTripForId.get().get(new FeedScopedId(feedId, tripId));
             if (trip == null) {
-                LOG.warn("Unable to find trip ID in feed '{}' for vehicle position with trip ID {}", feedId, tripId);
+                LOG.warn(
+                        "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
+                        feedId, tripId
+                );
                 continue;
             }
 
@@ -97,11 +102,10 @@ public class VehiclePositionPatternMatcher {
             seenTripIds.add(tripId);
 
             // Add position to pattern
-            RealtimeVehiclePosition newPosition = parseVehiclePosition(
+            var newPosition = parseVehiclePosition(
                     vehiclePosition,
                     pattern.getStops()
             );
-            newPosition.patternId = pattern.getId().toString();
 
             pattern.addVehiclePosition(tripId, newPosition);
             numberOfMatches++;
@@ -122,39 +126,38 @@ public class VehiclePositionPatternMatcher {
      * @param vehiclePosition    GtfsRealtime vehicle position
      * @param stopsOnVehicleTrip Collection of stops method will try to match next arriving stop ID
      *                           to
-     * @return OTP RealtimeVehiclePosition
      */
-    private RealtimeVehiclePosition parseVehiclePosition(
+    public static RealtimeVehiclePosition parseVehiclePosition(
             VehiclePosition vehiclePosition,
             List<StopLocation> stopsOnVehicleTrip
     ) {
-        RealtimeVehiclePosition newPosition = new RealtimeVehiclePosition();
+        var newPosition = RealtimeVehiclePosition.builder();
+
         if (vehiclePosition.hasPosition()) {
             var position = vehiclePosition.getPosition();
-            newPosition.lat = position.getLatitude();
-            newPosition.lon = position.getLongitude();
-            newPosition.speed = position.getSpeed();
-            newPosition.heading = position.getBearing();
+            newPosition.setLat(position.getLatitude())
+                    .setLon(position.getLongitude())
+                    .setSpeed(position.getSpeed())
+                    .setHeading(position.getBearing());
         }
 
         if (vehiclePosition.hasVehicle()) {
-            newPosition.label = vehiclePosition.getVehicle().getLabel();
-            if (newPosition.label == null) {
-                newPosition.label = vehiclePosition.getVehicle().getLicensePlate();
-            }
-            newPosition.vehicleId = vehiclePosition.getVehicle().getId();
+            var vehicle = vehiclePosition.getVehicle();
+            newPosition.setVehicleId(vehicle.getId())
+                    .setLabel(Optional.ofNullable(vehicle.getLabel())
+                            .orElse(vehicle.getLicensePlate()));
         }
 
         if (vehiclePosition.hasCurrentStatus()) {
-            newPosition.stopStatus = vehiclePosition.getCurrentStatus();
+            newPosition.setStopStatus(vehiclePosition.getCurrentStatus());
         }
 
         if (vehiclePosition.hasCongestionLevel()) {
-            newPosition.congestionLevel = vehiclePosition.getCongestionLevel();
+            newPosition.setCongestionLevel(vehiclePosition.getCongestionLevel());
         }
 
         if (vehiclePosition.hasTimestamp()) {
-            newPosition.seconds = vehiclePosition.getTimestamp();
+            newPosition.setTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
         }
 
         if (vehiclePosition.hasStopId()) {
@@ -163,14 +166,14 @@ public class VehiclePositionPatternMatcher {
                     .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
                     .collect(Collectors.toList());
             if (matchedStops.size() == 1) {
-                newPosition.nextStop = matchedStops.get(0);
+                newPosition.setNextStop(matchedStops.get(0));
             }
         }
 
         if (vehiclePosition.hasCurrentStopSequence()) {
-            newPosition.nextStopSequenceId = vehiclePosition.getCurrentStopSequence();
+            newPosition.setNextStopSequenceId(vehiclePosition.getCurrentStopSequence());
         }
 
-        return newPosition;
+        return newPosition.build();
     }
 }
