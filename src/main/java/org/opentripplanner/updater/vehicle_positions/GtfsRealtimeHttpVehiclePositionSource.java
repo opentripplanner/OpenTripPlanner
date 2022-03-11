@@ -20,17 +20,11 @@ public class GtfsRealtimeHttpVehiclePositionSource
             LoggerFactory.getLogger(GtfsRealtimeHttpVehiclePositionSource.class);
 
     /**
-     * FeedId the GTFS-RT feed is associated with
-     */
-    private final String feedId;
-
-    /**
      * URL to grab GTFS-RT feed from
      */
     private final String url;
 
-    public GtfsRealtimeHttpVehiclePositionSource(String feedId, String url) {
-        this.feedId = feedId;
+    public GtfsRealtimeHttpVehiclePositionSource(String url) {
         this.url = url;
     }
 
@@ -57,14 +51,8 @@ public class GtfsRealtimeHttpVehiclePositionSource
     }
 
     @Override
-    public String getFeedId() {
-        return this.feedId;
-    }
-
-    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("feedId", feedId)
                 .add("url", url)
                 .toString();
     }

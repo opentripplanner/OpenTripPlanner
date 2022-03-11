@@ -13,27 +13,22 @@ public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
      */
     private final List<VehiclePosition> updates;
 
-    private final String feedId;
-
     private final VehiclePositionPatternMatcher matcher;
 
     public VehiclePositionUpdaterRunnable(
             final List<VehiclePosition> updates,
-            final String feedId,
             final VehiclePositionPatternMatcher matcher
     ) {
         Objects.requireNonNull(updates);
-        Objects.requireNonNull(feedId);
         Objects.requireNonNull(matcher);
 
         this.updates = updates;
-        this.feedId = feedId;
         this.matcher = matcher;
     }
 
     @Override
     public void run(Graph graph) {
         // Apply new vehicle positions
-        matcher.applyVehiclePositionUpdates(updates, feedId);
+        matcher.applyVehiclePositionUpdates(updates);
     }
 }

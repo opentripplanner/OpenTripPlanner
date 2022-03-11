@@ -35,4 +35,9 @@ public class VehiclePositionsUpdaterHttpParameters implements VehiclePositionsUp
     public String getConfigRef() {
         return configRef;
     }
+
+    @Override
+    public String feedId() {
+        return feedId;
+    }
 }

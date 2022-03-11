@@ -33,7 +33,4 @@ public interface VehiclePositionSource {
         return positions;
     }
 
-    String getFeedId();
-
-
 }

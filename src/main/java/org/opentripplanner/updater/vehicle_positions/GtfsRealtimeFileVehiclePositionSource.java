@@ -22,14 +22,9 @@ public class GtfsRealtimeFileVehiclePositionSource implements VehiclePositionSou
      * File to read GTFS-RT data from
      */
     private final File file;
-    /**
-     * FeedId the GTFS-RT feed is associated with
-     */
-    private final String feedId;
 
-    public GtfsRealtimeFileVehiclePositionSource(String feedId, File file) {
+    public GtfsRealtimeFileVehiclePositionSource(File file) {
         this.file = file;
-        this.feedId = feedId;
     }
 
     /**
@@ -46,14 +41,8 @@ public class GtfsRealtimeFileVehiclePositionSource implements VehiclePositionSou
     }
 
     @Override
-    public String getFeedId() {
-        return this.feedId;
-    }
-
-    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("feedId", feedId)
                 .add("file", file)
                 .toString();
     }

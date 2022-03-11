@@ -3,13 +3,15 @@ package org.opentripplanner.updater.vehicle_positions;
 import com.google.common.collect.Sets;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
@@ -28,6 +30,7 @@ public class VehiclePositionPatternMatcher {
     private static final Logger LOG =
             LoggerFactory.getLogger(VehiclePositionPatternMatcher.class);
 
+    private final String feedId;
     private final RealtimeVehiclePositionService service;
 
     private final Supplier<Map<FeedScopedId, Trip>> getTripForId;
@@ -36,10 +39,12 @@ public class VehiclePositionPatternMatcher {
     private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
     public VehiclePositionPatternMatcher(
+            String feedId,
             Supplier<Map<FeedScopedId, Trip>> getTripForId,
             Supplier<Map<Trip, TripPattern>> getPatternForTrip,
             RealtimeVehiclePositionService service
     ) {
+        this.feedId = feedId;
         this.getTripForId = getTripForId;
         this.getPatternForTrip = getPatternForTrip;
         this.service = service;
@@ -49,61 +54,73 @@ public class VehiclePositionPatternMatcher {
      * Attempts to match each vehicle position to a pattern, then adds each to a pattern
      *
      * @param vehiclePositions List of vehicle positions to match to patterns
-     * @param feedId           Feed id of vehicle positions to assist in pattern-matching
      */
-    public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions, String feedId) {
-        int numberOfMatches = 0;
+    public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions) {
 
-        Set<TripPattern> patternsInCurrentUpdate = new HashSet<>();
+        var positions = vehiclePositions.stream()
+                .map(vehiclePosition -> toRealtimeVehiclePosition(feedId, vehiclePosition))
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(t -> t.first))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Entry::getKey,
+                        e -> e.getValue().stream().map(t -> t.second).collect(Collectors.toList())
+                ));
 
-        for (VehiclePosition vehiclePosition : vehiclePositions) {
-            if (!vehiclePosition.hasTrip()) {
-                LOG.warn("Realtime vehicle positions without trip IDs are not yet supported.");
-                continue;
-            }
-
-            String tripId = vehiclePosition.getTrip().getTripId();
-            Trip trip = getTripForId.get().get(new FeedScopedId(feedId, tripId));
-            if (trip == null) {
-                LOG.warn(
-                        "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
-                        feedId, tripId
-                );
-                continue;
-            }
-
-            TripPattern pattern = getPatternForTrip.get().get(trip);
-            if (pattern == null) {
-                LOG.warn(
-                        "Unable to match OTP pattern ID for vehicle position with trip ID {}",
-                        tripId
-                );
-                continue;
-            }
-
-            // Add position to pattern
-            var newPosition = parseVehiclePosition(
-                    vehiclePosition,
-                    pattern.getStops()
-            );
-
-            service.addVehiclePosition(pattern, newPosition);
-            patternsInCurrentUpdate.add(pattern);
-            numberOfMatches++;
-        }
+        positions.forEach(service::setVehiclePositions);
+        Set<TripPattern> patternsInCurrentUpdate = positions.keySet();
 
         // if there was a position in the previous update but not in the current one, we assume
-        // that the vehicle has finished its trip and will be removed
+        // that the pattern has no more vehicle positions.
         var toDelete = Sets.difference(patternsInPreviousUpdate, patternsInCurrentUpdate);
         toDelete.forEach(service::clearVehiclePositions);
         patternsInPreviousUpdate = patternsInCurrentUpdate;
 
-        if (!vehiclePositions.isEmpty() && numberOfMatches == 0) {
+        if (!vehiclePositions.isEmpty() && patternsInCurrentUpdate.isEmpty()) {
             LOG.error(
-                    "Could not match any vehicle positions for feedId '{}'. Are you sure that the updater using the correct feedId?",
+                    "Could not match any vehicle positions for feedId '{}'. Are you sure that the updater is using the correct feedId?",
                     feedId
             );
         }
+    }
+
+    private T2<TripPattern, RealtimeVehiclePosition> toRealtimeVehiclePosition(
+            String feedId,
+            VehiclePosition vehiclePosition
+    ) {
+        if (!vehiclePosition.hasTrip()) {
+            LOG.warn(
+                    "Realtime vehicle positions without trip IDs are not yet supported.");
+            return null;
+        }
+
+        String tripId = vehiclePosition.getTrip().getTripId();
+        Trip trip = getTripForId.get().get(new FeedScopedId(feedId, tripId));
+        if (trip == null) {
+            LOG.warn(
+                    "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
+                    feedId, tripId
+            );
+            return null;
+        }
+
+        TripPattern pattern = getPatternForTrip.get().get(trip);
+        if (pattern == null) {
+            LOG.warn(
+                    "Unable to match OTP pattern ID for vehicle position with trip ID {}",
+                    tripId
+            );
+            return null;
+        }
+
+        // Add position to pattern
+        var newPosition = parseVehiclePosition(
+                vehiclePosition,
+                pattern.getStops()
+        );
+
+        return new T2<>(pattern, newPosition);
     }
 
     /**

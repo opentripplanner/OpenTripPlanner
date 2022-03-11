@@ -34,7 +34,6 @@ public class VehiclePositionParsingTest {
 
     private GtfsRealtimeFileVehiclePositionSource getVehiclePositionSource(String filename) {
         return new GtfsRealtimeFileVehiclePositionSource(
-                "1",
                 new File("src/test/resources/vehicle-positions/" + filename)
         );
     }

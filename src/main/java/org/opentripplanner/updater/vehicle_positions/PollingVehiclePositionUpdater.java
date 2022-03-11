@@ -37,6 +37,8 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     private final VehiclePositionSource vehiclePositionSource;
     private VehiclePositionPatternMatcher vehiclePositionPatternMatcher;
 
+    private final String feedId;
+
     @Override
     public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
         this.saveResultOnGraph = saveResultOnGraph;
@@ -47,18 +49,18 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         // Create update streamer from params
         if (params instanceof VehiclePositionsUpdaterHttpParameters) {
             var p = (VehiclePositionsUpdaterHttpParameters) params;
-            vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(p.feedId, p.url);
+            vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(p.url);
         }
         else {
             var p = (VehiclePositionsUpdaterFileParameters) params;
-            vehiclePositionSource =
-                    new GtfsRealtimeFileVehiclePositionSource(p.feedId, new File(p.path));
+            vehiclePositionSource = new GtfsRealtimeFileVehiclePositionSource(new File(p.path));
         }
 
         LOG.info(
                 "Creating vehicle position updater running every {} seconds : {}",
                 pollingPeriodSeconds, vehiclePositionSource
         );
+        feedId = params.feedId();
     }
 
     @Override
@@ -66,6 +68,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         var index = graph.index;
         vehiclePositionPatternMatcher =
                 new VehiclePositionPatternMatcher(
+                        feedId,
                         index::getTripForId,
                         index::getPatternForTrip,
                         graph.getVehiclePositionService()
@@ -85,9 +88,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         if (updates != null) {
             // Handle updating trip positions via graph writer runnable
             var runnable =
-                    new VehiclePositionUpdaterRunnable(updates, vehiclePositionSource.getFeedId(),
-                            vehiclePositionPatternMatcher
-                    );
+                    new VehiclePositionUpdaterRunnable(updates, vehiclePositionPatternMatcher);
             saveResultOnGraph.execute(runnable);
         }
     }

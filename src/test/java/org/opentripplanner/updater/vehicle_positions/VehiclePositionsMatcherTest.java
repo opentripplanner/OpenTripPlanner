@@ -2,7 +2,6 @@ package org.opentripplanner.updater.vehicle_positions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.google.common.collect.ImmutableMultimap;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.List;
@@ -21,7 +20,7 @@ public class VehiclePositionsMatcherTest {
     String feedId = "feed1";
 
     @Test
-    public void shouldMatchRealtimePositionsToTrip() {
+    public void matchRealtimePositionsToTrip() {
 
         var service = new RealtimeVehiclePositionService();
 
@@ -44,6 +43,7 @@ public class VehiclePositionsMatcherTest {
         // Map positions to trips in feed
         VehiclePositionPatternMatcher matcher =
                 new VehiclePositionPatternMatcher(
+                        feedId,
                         () -> tripForId,
                         () -> patternForTrip,
                         service
@@ -57,13 +57,13 @@ public class VehiclePositionsMatcherTest {
         var positions = List.of(pos);
 
         // Execute the same match-to-pattern step as the runner
-        matcher.applyVehiclePositionUpdates(positions, feedId);
+        matcher.applyVehiclePositionUpdates(positions);
 
         // ensure that gtfs-rt was matched to an OTP pattern correctly
         assertEquals(1, service.getVehiclePositions(pattern).size());
 
         // if we have an empty list of updates then clear the positions from the previous update
-        matcher.applyVehiclePositionUpdates(List.of(), feedId);
+        matcher.applyVehiclePositionUpdates(List.of());
         assertEquals(0, service.getVehiclePositions(pattern).size());
     }
 

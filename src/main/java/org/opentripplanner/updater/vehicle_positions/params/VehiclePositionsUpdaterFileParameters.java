@@ -35,4 +35,9 @@ public class VehiclePositionsUpdaterFileParameters implements VehiclePositionsUp
     public String getConfigRef() {
         return null;
     }
+
+    @Override
+    public String feedId() {
+        return null;
+    }
 }
