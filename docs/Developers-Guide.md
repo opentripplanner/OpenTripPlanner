@@ -138,9 +138,9 @@ The OTP REST API documentation is available online in the format of:
 
 http://dev.opentripplanner.org/apidoc/x.x.x/index.html
 
-For example, for v2.0.0:
+For example, for v2.1.0:
 
-http://dev.opentripplanner.org/apidoc/2.0.0/index.html
+http://dev.opentripplanner.org/apidoc/2.1.0/index.html
 
 
 ### Debug layers
