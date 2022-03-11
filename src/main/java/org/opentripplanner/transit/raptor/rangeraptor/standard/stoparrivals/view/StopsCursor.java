@@ -55,8 +55,8 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Return a fictive Transfer stop arrival view. The arrival do not exist in the state, but it is
-     * linked with the previous arrival witch is a "reel" arrival pressent in the state. This
+     * Return a fictive Transfer stop arrival view. The arrival does not exist in the state, but is
+     * linked with the previous arrival witch is a "real" arrival present in the state. This
      * enables path generation.
      */
     public Transfer<T> fictiveTransfer(
@@ -68,8 +68,8 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Return a fictive Transit stop arrival view. The arrival do not exist in the state, but it is
-     * linked with the previous arrival witch is a "reel" arrival pressent in the state. This
+     * Return a fictive Transit stop arrival view. The arrival does not exist in the state, but is
+     * linked with the previous arrival witch is a "real" arrival present in the state. This
      * enables path generation.
      */
     public Transit<T> fictiveTransit(
