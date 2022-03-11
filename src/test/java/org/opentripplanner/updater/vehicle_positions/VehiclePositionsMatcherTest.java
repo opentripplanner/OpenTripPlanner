@@ -14,6 +14,7 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 
 public class VehiclePositionsMatcherTest {
 
@@ -21,6 +22,9 @@ public class VehiclePositionsMatcherTest {
 
     @Test
     public void shouldMatchRealtimePositionsToTrip() {
+
+        var service = new RealtimeVehiclePositionService();
+
         var tripId = "trip1";
         var scopedTripId = new FeedScopedId(feedId, tripId);
 
@@ -40,14 +44,15 @@ public class VehiclePositionsMatcherTest {
         var patternForTrip = Map.of(trip, pattern);
 
         // an untouched pattern has no vehicle positions
-        assertEquals(0, pattern.getVehiclePositions().size());
+        assertEquals(0, service.getVehiclePositions(pattern).size());
 
         // Map positions to trips in feed
         VehiclePositionPatternMatcher matcher =
                 new VehiclePositionPatternMatcher(
                         () -> patternsForFeedId,
                         () -> tripForId,
-                        () -> patternForTrip
+                        () -> patternForTrip,
+                        service
                 );
 
         var pos = VehiclePosition.newBuilder()
@@ -61,7 +66,7 @@ public class VehiclePositionsMatcherTest {
         matcher.applyVehiclePositionUpdates(positions, feedId);
 
         // ensure that gtfs-rt was matched to an OTP pattern correctly
-        assertEquals(1, pattern.getVehiclePositions().size());
+        assertEquals(1, service.getVehiclePositions(pattern).size());
 
         matcher.wipeSeenTripIds();
 
@@ -71,12 +76,7 @@ public class VehiclePositionsMatcherTest {
         // "clean" patterns
         matcher.cleanPatternVehiclePositions(feedId);
 
-        assertEquals(0, pattern.getVehiclePositions().size());
-
-        // Ensure that after cleaning it is correct, and that the number of vehicles matched to
-        // patterns equals the number of vehicles in the feed
-        //updatedRealtimeVehicleCount = getRealtimeVehicleCountForPatterns(patterns);
-        //Assert.assertEquals(updated_positions.size(), updatedRealtimeVehicleCount);
+        assertEquals(0, service.getVehiclePositions(pattern).size());
     }
 
     private StopTime stopTime(Trip trip, int seq) {

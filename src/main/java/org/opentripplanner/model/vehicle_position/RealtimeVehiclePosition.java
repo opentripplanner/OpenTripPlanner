@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vehicle_positions;
+package org.opentripplanner.model.vehicle_position;
 
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.CongestionLevel;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;

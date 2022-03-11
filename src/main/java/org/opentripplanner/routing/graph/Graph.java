@@ -80,6 +80,7 @@ import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTra
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -265,6 +266,8 @@ public class Graph implements Serializable {
     public transient TransitLayerUpdater transitLayerUpdater;
 
     private transient TransitAlertService transitAlertService;
+
+    private transient RealtimeVehiclePositionService vehiclePositionService;
 
     private DrivingDirection drivingDirection = DEFAULT_DRIVING_DIRECTION;
 
@@ -874,6 +877,13 @@ public class Graph implements Serializable {
             transitAlertService = new DelegatingTransitAlertServiceImpl(this);
         }
         return transitAlertService;
+    }
+
+    public RealtimeVehiclePositionService getVehiclePositionService() {
+        if (vehiclePositionService == null) {
+            vehiclePositionService = new RealtimeVehiclePositionService();
+        }
+        return vehiclePositionService;
     }
 
     private Collection<StopLocation> getStopsForId(FeedScopedId id) {

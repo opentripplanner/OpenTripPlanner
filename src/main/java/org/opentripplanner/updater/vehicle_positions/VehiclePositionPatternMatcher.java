@@ -3,18 +3,17 @@ package org.opentripplanner.updater.vehicle_positions;
 import com.google.common.collect.Multimap;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.vehicle_positions.RealtimeVehiclePosition;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
+import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +26,7 @@ public class VehiclePositionPatternMatcher {
     private static final Logger LOG =
             LoggerFactory.getLogger(VehiclePositionPatternMatcher.class);
 
-    /**
-     * Set of trip IDs we've seen, so if we stop seeing them we know to remove them from the
-     * pattern
-     */
-    private final Set<String> seenTripIds = new HashSet<>();
+    private final RealtimeVehiclePositionService service;
 
     private final Supplier<Multimap<String, TripPattern>> getPatternsForFeedId;
     private final Supplier<Map<FeedScopedId, Trip>> getTripForId;
@@ -40,18 +35,16 @@ public class VehiclePositionPatternMatcher {
     public VehiclePositionPatternMatcher(
             Supplier<Multimap<String, TripPattern>> getPatternsForFeedId,
             Supplier<Map<FeedScopedId, Trip>> getTripForId,
-            Supplier<Map<Trip, TripPattern>> getPatternForTrip
+            Supplier<Map<Trip, TripPattern>> getPatternForTrip,
+            RealtimeVehiclePositionService service
     ) {
         this.getPatternsForFeedId = getPatternsForFeedId;
         this.getTripForId = getTripForId;
         this.getPatternForTrip = getPatternForTrip;
+        this.service = service;
     }
 
-    /**
-     * Clear seen trip IDs
-     */
     public void wipeSeenTripIds() {
-        seenTripIds.clear();
     }
 
     /**
@@ -60,9 +53,6 @@ public class VehiclePositionPatternMatcher {
      * @param feedId FeedId whose pattern's should be "cleaned"
      */
     public void cleanPatternVehiclePositions(String feedId) {
-        for (TripPattern pattern : getPatternsForFeedId.get().get(feedId)) {
-            pattern.removeVehiclePositionIf(key -> !seenTripIds.contains(key));
-        }
     }
 
     /**
@@ -98,18 +88,16 @@ public class VehiclePositionPatternMatcher {
                 continue;
             }
 
-            // Add trip to seen trip set
-            seenTripIds.add(tripId);
-
             // Add position to pattern
             var newPosition = parseVehiclePosition(
                     vehiclePosition,
                     pattern.getStops()
             );
 
-            pattern.addVehiclePosition(tripId, newPosition);
+            service.setVehiclePositions(pattern, List.of(newPosition));
             numberOfMatches++;
         }
+
 
         if (!vehiclePositions.isEmpty() && numberOfMatches == 0) {
             LOG.error(

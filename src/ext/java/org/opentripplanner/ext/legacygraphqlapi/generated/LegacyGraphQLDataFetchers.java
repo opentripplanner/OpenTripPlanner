@@ -2,15 +2,12 @@
 package org.opentripplanner.ext.legacygraphqlapi.generated;
 
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
@@ -28,17 +25,10 @@ import graphql.relay.Edge;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import graphql.relay.Connection;
-import graphql.relay.Edge;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
-import java.util.Map;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.model.SystemNotice;
@@ -498,7 +488,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Iterable<Trip>> tripsForDate();
 
-        public DataFetcher<Iterable<org.opentripplanner.routing.vehicle_positions.RealtimeVehiclePosition>> vehiclePositions();
+        public DataFetcher<Iterable<org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition>> vehiclePositions();
     }
 
     public interface LegacyGraphQLPlace {
