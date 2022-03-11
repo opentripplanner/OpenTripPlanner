@@ -88,7 +88,7 @@ performs tests, and can then deploy the final "artifact" (the runnable JAR file)
 can be automatically included in other Java projects.
 
 This repository is machine-readable (by Maven or other build systems) and also provides human readable directory listings via HTTP. You can fetch an OTP JAR from this repository by constructing the proper URL for the release
-you want. For example, release 2.0.0 will be found at `https://repo1.maven.org/maven2/org/opentripplanner/otp/2.0.0/otp-2.0.0-shaded.jar`.
+you want. For example, release 2.1.0 will be found at `https://repo1.maven.org/maven2/org/opentripplanner/otp/2.1.0/otp-2.1.0-shaded.jar`.
 
 To make use of OTP in another Maven project, you must specify it as a dependency in that project's `pom.xml`:
 

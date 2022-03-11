@@ -182,7 +182,7 @@ Using the file `otp-config.json` you can enable or disable different APIs and ex
 sandbox features are disabled. So for most OTP2 use cases it is not necessary to create this file.
 Features that can be toggled in this file are generally only affect the routing phase of OTP2
 usage, but for consistency all such "feature flags", even those that would affect graph building,
-are managed in this one file. See the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/util/OTPFeature.java) 
+are managed in this one file. See the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.1.0/src/main/java/org/opentripplanner/util/OTPFeature.java) 
 Java class for an enumeration of all available features and their default settings. Here is an 
 example:
 
