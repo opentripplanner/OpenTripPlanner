@@ -105,7 +105,8 @@ public final class ConstrainedBoardingSearch
             int stopIndex
     ) {
         final Trip trip = tripSchedule.getOriginalTripTimes().getTrip();
-        // for performance reasons we use a for loop here as streams are much slower
+        // for performance reasons we use a for loop here as streams are much slower.
+        // I experimented with LinkedList and ArrayList and LinkedList was faster.
         var result = new LinkedList<TransferForPattern>();
         for (var t : currentTransfers) {
             if (t.matchesSourcePoint(stopIndex, trip)) {
