@@ -366,10 +366,14 @@ class StopTimesMapper {
             int arrivalTime = stopTimes.get(1).getArrivalTime();
 
             for (StopTime stopTime : stopTimes) {
-                stopTime.clearArrivalTime();
-                stopTime.clearDepartureTime();
-                stopTime.setFlexWindowStart(departureTime);
-                stopTime.setFlexWindowEnd(arrivalTime);
+                if (stopTime.getFlexWindowStart() == StopTime.MISSING_VALUE) {
+                    stopTime.clearDepartureTime();
+                    stopTime.setFlexWindowStart(departureTime);
+                }
+                if (stopTime.getFlexWindowEnd() == StopTime.MISSING_VALUE) {
+                    stopTime.clearArrivalTime();
+                    stopTime.setFlexWindowEnd(arrivalTime);
+                }
             }
         }
     }
