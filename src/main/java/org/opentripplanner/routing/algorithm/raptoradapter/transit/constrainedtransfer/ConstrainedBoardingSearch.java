@@ -75,7 +75,7 @@ public final class ConstrainedBoardingSearch
     ) {
         var transfers = findMatchingTransfers(sourceTripSchedule, sourceStopIndex);
 
-        if(transfers.isEmpty()) { return null; }
+        if(!transfers.iterator().hasNext()) { return null; }
 
         boolean found = findTimetableTripInfo(
                 timetable,
@@ -100,13 +100,12 @@ public final class ConstrainedBoardingSearch
         );
     }
 
-    private List<TransferForPattern> findMatchingTransfers(
+    private Iterable<TransferForPattern> findMatchingTransfers(
             TripSchedule tripSchedule,
             int stopIndex
     ) {
         final Trip trip = tripSchedule.getOriginalTripTimes().getTrip();
-        // for performance reasons we use a for loop here as streams are much slower.
-        // i experimented with LinkedList and ArrayList and LinkedList was faster.
+        // for performance reasons we use a for loop here as streams are much slower
         var result = new LinkedList<TransferForPattern>();
         for (var t : currentTransfers) {
             if (t.matchesSourcePoint(stopIndex, trip)) {
@@ -130,7 +129,7 @@ public final class ConstrainedBoardingSearch
      */
     public boolean findTimetableTripInfo(
             RaptorTimeTable<TripSchedule> timetable,
-            List<TransferForPattern> transfers,
+            Iterable<TransferForPattern> transfers,
             int stopPos,
             int sourceTransitArrivalTime,
             int earliestBoardTime
