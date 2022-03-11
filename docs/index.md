@@ -10,7 +10,8 @@ You are currently reading the documentation for **OpenTripPlanner 2**, the secon
 
 Several versions of this documentation are built and published automatically for different branches of OTP. Each of these has a different stable URL, and you may switch between these versions using the selector in the lower right of the published documentation.
 
- - [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.0 (the git master branch)
+ - [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.1 (the git master branch)
+ - [v2.0.0](http://docs.opentripplanner.org/en/v2.0.0) - Version 2.0
  - [v1.5.0](http://docs.opentripplanner.org/en/v1.5.0) - Stable 1.x release
  - [dev-2.x](http://docs.opentripplanner.org/en/dev-2.x) - OTP 2 active development
  - [dev-1.x](http://docs.opentripplanner.org/en/dev-1.x) - OTP 1 active development 
@@ -19,7 +20,8 @@ Several versions of this documentation are built and published automatically for
 
 The end users of OTP are the millions of people who rely on it to help plan their daily travel, often without even knowing they are using OTP. As an infrastructure component, installation and configuration of OTP tends to be somewhat technical and essentially invisible to those end users. This documentation is indended for people who wish to perform such deployments of OTP without necessarily diving into the internal details of the software.
 
-For members of the OTP community interested in software development, additional documentation detailing algorithms, data structures etc. is available as markdown files within the source code packages. It can be read in your IDE or when browsing the source tree on Github. For example, `https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/transit/raptor/README.md`. 
+For members of the OTP community interested in software development, additional documentation detailing algorithms, data structures etc. is available as markdown files within the source code packages. It can be read in your IDE or when browsing the source tree on Github. See 
+[OTP Architecture](https://github.com/opentripplanner/OpenTripPlanner/blob/2.1.0/ARCHITECTURE.md). 
  
 # Quick Start
 We encourage you to read the introductory sections of this documentation to familiarize yourself with OpenTripPlanner use cases and configuration. But if you want to get started right away running your own OTP instance, the best place to start is the [Basic Tutorial](Basic-Tutorial.md) page.

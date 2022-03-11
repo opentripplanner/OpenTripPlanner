@@ -1,4 +1,4 @@
-# OpenTripPlanner 2 Basic Tutorial
+# OpenTripPlanner Basic Tutorial
 
 This page should allow you to set up and test your own OTP2 server. If all goes well it should only take a few minutes!
 

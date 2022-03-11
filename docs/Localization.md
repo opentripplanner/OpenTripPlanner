@@ -1,5 +1,8 @@
 # Localization
 
+THE BUILD IN OTP CLIENT IS PROVIDED FOR TEST AND DEBUGGING PURPOSES. IT IS NOT MEANT FOR 
+PRODUCTION USE.
+
 This page contains instructions for both developers and translators on how to make the OTP interface usable by people who speak different languages. Developers will need to take certain steps to mark translatable strings within the source code. Translators will need to edit specific files within the project to create or revise the translation for their language.
 
 In OTP we use gettext for localization, for the following reasons:

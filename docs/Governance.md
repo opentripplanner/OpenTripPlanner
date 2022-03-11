@@ -12,7 +12,7 @@ The current members of this committee are (in alphabetical order):
 | Thomas Craig      | [CALACT ITS4US](https://calact.org/programs/its4us/) |
 | Drew Dara-Abrams  | [Interline](http://www.interline.io) |
 | David Emory       | [IBI Group](https://www.ibigroup.com/) |
-| Thomas Gran       | [Ruter](https://ruter.no/en/) & [Entur](https://entur.no/) (Norway) |
+| Thomas Gran       | [Entur](https://entur.no/) (Norway) |
 | Tuukka Hastrup    | [Transpordiamet](https://www.transpordiamet.ee/en) (Estonia) |
 | Joel Lappalainan  | [Digitransit](https://digitransit.fi/) (Finland) |
 | Frank Purcell     | [TriMet](https:/trimet.org/) (Portland, Oregon) |
