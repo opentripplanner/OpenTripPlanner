@@ -66,7 +66,6 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         var index = graph.index;
         vehiclePositionPatternMatcher =
                 new VehiclePositionPatternMatcher(
-                        index::getPatternsForFeedId,
                         index::getTripForId,
                         index::getPatternForTrip,
                         graph.getVehiclePositionService()

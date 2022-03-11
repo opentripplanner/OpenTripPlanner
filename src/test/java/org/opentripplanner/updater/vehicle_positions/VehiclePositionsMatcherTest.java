@@ -35,11 +35,6 @@ public class VehiclePositionsMatcherTest {
 
         var pattern = new TripPattern(new FeedScopedId(feedId, tripId), null, stopPattern);
 
-        var patternsForFeedId = ImmutableMultimap.of(
-                feedId,
-                pattern
-        );
-
         var tripForId = Map.of(scopedTripId, trip);
         var patternForTrip = Map.of(trip, pattern);
 
@@ -49,7 +44,6 @@ public class VehiclePositionsMatcherTest {
         // Map positions to trips in feed
         VehiclePositionPatternMatcher matcher =
                 new VehiclePositionPatternMatcher(
-                        () -> patternsForFeedId,
                         () -> tripForId,
                         () -> patternForTrip,
                         service
@@ -67,16 +61,6 @@ public class VehiclePositionsMatcherTest {
 
         // ensure that gtfs-rt was matched to an OTP pattern correctly
         assertEquals(1, service.getVehiclePositions(pattern).size());
-
-        matcher.wipeSeenTripIds();
-
-        // apply empty vehicle positions
-        matcher.applyVehiclePositionUpdates(List.of(), feedId);
-
-        // "clean" patterns
-        matcher.cleanPatternVehiclePositions(feedId);
-
-        assertEquals(0, service.getVehiclePositions(pattern).size());
     }
 
     private StopTime stopTime(Trip trip, int seq) {

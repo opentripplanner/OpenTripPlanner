@@ -40,15 +40,8 @@ public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
      */
     @Override
     public void run(Graph graph) {
-        // Reset seen trip IDs before populating the set again
-        matcher.wipeSeenTripIds();
-
         // Apply new vehicle positions
         // This will update the internal seenTripIds
         matcher.applyVehiclePositionUpdates(updates, feedId);
-
-        // "clean" all patterns, removing all vehicles not "seen" in the
-        // previous step (stored in the seen trip IDs)
-        matcher.cleanPatternVehiclePositions(feedId);
     }
 }

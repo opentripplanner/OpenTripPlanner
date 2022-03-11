@@ -28,31 +28,17 @@ public class VehiclePositionPatternMatcher {
 
     private final RealtimeVehiclePositionService service;
 
-    private final Supplier<Multimap<String, TripPattern>> getPatternsForFeedId;
     private final Supplier<Map<FeedScopedId, Trip>> getTripForId;
     private final Supplier<Map<Trip, TripPattern>> getPatternForTrip;
 
     public VehiclePositionPatternMatcher(
-            Supplier<Multimap<String, TripPattern>> getPatternsForFeedId,
             Supplier<Map<FeedScopedId, Trip>> getTripForId,
             Supplier<Map<Trip, TripPattern>> getPatternForTrip,
             RealtimeVehiclePositionService service
     ) {
-        this.getPatternsForFeedId = getPatternsForFeedId;
         this.getTripForId = getTripForId;
         this.getPatternForTrip = getPatternForTrip;
         this.service = service;
-    }
-
-    public void wipeSeenTripIds() {
-    }
-
-    /**
-     * Iterates over a pattern's vehicle positions and removes all not seen in the seenTripIds set
-     *
-     * @param feedId FeedId whose pattern's should be "cleaned"
-     */
-    public void cleanPatternVehiclePositions(String feedId) {
     }
 
     /**

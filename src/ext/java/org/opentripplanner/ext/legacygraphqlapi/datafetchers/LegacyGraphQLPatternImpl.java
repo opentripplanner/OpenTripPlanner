@@ -89,7 +89,8 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
   @Override
   public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions() {
-    return environment -> getSource(environment).getVehiclePositions().values();
+    return environment -> getRoutingService(environment).getVehiclePositionService()
+            .getVehiclePositions(this.getSource(environment));
   }
 
   @Override
