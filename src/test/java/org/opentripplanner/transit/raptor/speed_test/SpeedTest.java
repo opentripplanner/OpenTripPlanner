@@ -455,6 +455,7 @@ public class SpeedTest {
                 false,
                 false,
                 request.getTransitModes(),
+                Set.of(),
                 Set.of()
         );
 

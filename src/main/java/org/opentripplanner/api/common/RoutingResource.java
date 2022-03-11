@@ -342,16 +342,12 @@ public abstract class RoutingResource {
 
     /**
      * The comma-separated list of banned agencies.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("bannedAgencies")
     protected String bannedAgencies;
 
     /**
      * Functions the same as banned agencies, except only the listed agencies are allowed.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("whiteListedAgencies")
     protected String whiteListedAgencies;
@@ -422,8 +418,6 @@ public abstract class RoutingResource {
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
      * TriMet_100 (100 is route short name) or Trimet__42 (two underscores, 42 is the route
      * internal ID).
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @Deprecated
     @QueryParam("bannedRoutes")
@@ -431,8 +425,6 @@ public abstract class RoutingResource {
 
     /**
      * Functions the same as bannnedRoutes, except only the listed routes are allowed.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("whiteListedRoutes")
     @Deprecated
@@ -469,12 +461,8 @@ public abstract class RoutingResource {
     protected Integer otherThanPreferredRoutesPenalty;
 
     /**
-     * The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
-     * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The comma-separated list of banned trips.  The format is feedId:tripId
      */
-    @Deprecated
     @QueryParam("bannedTrips")
     protected String bannedTrips;
 

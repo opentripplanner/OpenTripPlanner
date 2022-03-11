@@ -20,7 +20,10 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * Used to calculate times in a forward trip search.
  */
-final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements TransitCalculator<T> {
+final class ForwardTransitCalculator<T extends RaptorTripSchedule>
+        extends ForwardTimeCalculator
+        implements TransitCalculator<T>
+{
     private final int tripSearchBinarySearchThreshold;
     private final int earliestDepartureTime;
     private final int searchWindowInSeconds;
@@ -54,24 +57,6 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public boolean searchForward() { return true; }
-
-    @Override
-    public int plusDuration(final int time, final int delta) {
-        return time + delta;
-    }
-
-    @Override
-    public int minusDuration(final int time, final int delta) {
-        return time - delta;
-    }
-
-    @Override
-    public int duration(final int timeA, final int timeB) {
-        return timeB - timeA;
-    }
-
-    @Override
     public int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {
         return onTrip.arrival(stopPositionInPattern) + alightSlack;
     }
@@ -85,21 +70,6 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     public String exceedsTimeLimitReason() {
         return "The arrival time exceeds the time limit, arrive to late: " +
                 TimeUtils.timeToStrLong(latestAcceptableArrivalTime) + ".";
-    }
-
-    @Override
-    public boolean isBefore(final int subject, final int candidate) {
-        return subject < candidate;
-    }
-
-    @Override
-    public boolean isAfter(int subject, int candidate) {
-        return subject > candidate;
-    }
-
-    @Override
-    public int unreachedTime() {
-        return Integer.MAX_VALUE;
     }
 
     @Override

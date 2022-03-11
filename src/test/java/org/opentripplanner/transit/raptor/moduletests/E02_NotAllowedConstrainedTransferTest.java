@@ -33,7 +33,7 @@ public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstant
             new RaptorService<>(RaptorConfig.defaultConfigForTest());
 
     private static final String EXP_PATH = "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B "
-            + "~ BUS R3 0:15 0:20 ~ C ~ Walk 30s [0:01:30 0:20:30 19m";
+            + "~ BUS R3 0:15 0:20 ~ C ~ Walk 30s [0:01:30 0:20:30 19m 1tx";
     private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
     private static final String EXP_PATH_WITH_COST = EXP_PATH + " $2500]";
 

@@ -34,24 +34,6 @@ public class ForwardTransitCalculatorTest {
     }
 
     @Test
-    public void isBefore() {
-        var subject = create();
-
-        assertTrue(subject.isBefore(10, 11));
-        assertFalse(subject.isBefore(11, 10));
-        assertFalse(subject.isBefore(10, 10));
-    }
-
-    @Test
-    public void isAfter() {
-        var subject = create();
-
-        assertTrue(subject.isAfter(11, 10));
-        assertFalse(subject.isAfter(10, 11));
-        assertFalse(subject.isAfter(10, 10));
-    }
-
-    @Test
     public void exceedsTimeLimit() {
         latestAcceptableArrivalTime = 1200;
         var subject = create();
@@ -84,19 +66,6 @@ public class ForwardTransitCalculatorTest {
 
         assertTrue(subject.oneIterationOnly());
     }
-
-    @Test
-    public void duration() {
-        assertEquals(600, create().plusDuration(500, 100));
-        assertEquals(400, create().minusDuration(500, 100));
-        assertEquals(400, create().duration(100, 500));
-    }
-
-    @Test
-    public void unreachedTime() {
-        assertEquals(Integer.MAX_VALUE, create().unreachedTime());
-    }
-
 
     @Test
     public void latestArrivalTime() {
