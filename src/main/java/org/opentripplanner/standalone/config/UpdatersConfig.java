@@ -26,7 +26,7 @@ import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdat
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
-import org.opentripplanner.updater.vehicle_positions.params.VehiclePositionsUpdaterParameters;
+import org.opentripplanner.updater.vehicle_positions.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;

@@ -1,21 +1,23 @@
-package org.opentripplanner.updater.vehicle_positions.params;
+package org.opentripplanner.updater.vehicle_positions;
 
+import java.net.URI;
 import java.util.Objects;
+import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
-public class VehiclePositionsUpdaterHttpParameters implements VehiclePositionsUpdaterParameters {
+public class VehiclePositionsUpdaterParameters implements PollingGraphUpdaterParameters {
 
     /**
      * Feed id that is used for the trip ids in the TripUpdates
      */
     final public String feedId;
-    final public String url;
+    final public URI url;
     final public int frequencySec;
     final String configRef;
 
-    public VehiclePositionsUpdaterHttpParameters(
+    public VehiclePositionsUpdaterParameters(
             String configRef,
             String feedId,
-            String url,
+            URI url,
             int frequencySec
     ) {
         Objects.requireNonNull(feedId, "feedId is required");
@@ -36,7 +38,6 @@ public class VehiclePositionsUpdaterHttpParameters implements VehiclePositionsUp
         return configRef;
     }
 
-    @Override
     public String feedId() {
         return feedId;
     }

@@ -2,8 +2,9 @@ package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.common.base.MoreObjects;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.util.HttpUtils;
@@ -22,9 +23,14 @@ public class GtfsRealtimeHttpVehiclePositionSource
     /**
      * URL to grab GTFS-RT feed from
      */
-    private final String url;
+    private final URI url;
 
-    public GtfsRealtimeHttpVehiclePositionSource(String url) {
+    private final Map<String, String> defaultHeaders = Map.of(
+            "Accept",
+            "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
+    );
+
+    public GtfsRealtimeHttpVehiclePositionSource(URI url) {
         this.url = url;
     }
 
@@ -32,22 +38,17 @@ public class GtfsRealtimeHttpVehiclePositionSource
      * Parses raw GTFS-RT data into vehicle positions
      */
     public List<VehiclePosition> getPositions() {
-        try (
-                InputStream is = HttpUtils.getData(
-                        url,
-                        Map.of(
-                                "Accept",
-                                "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*"
-                        )
-                )
-        ) {
-
+        try (InputStream is = HttpUtils.openInputStream(url.toString(), defaultHeaders)) {
+            if (is == null) {
+                LOG.warn("Failed to get data from url " + url);
+                return List.of();
+            }
             return this.getPositions(is);
         }
-        catch (Exception e) {
-            LOG.warn("Failed to parse gtfs-rt feed from {}:", url, e);
+        catch (IOException e) {
+            LOG.warn("Error reading bike rental feed from " + url, e);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

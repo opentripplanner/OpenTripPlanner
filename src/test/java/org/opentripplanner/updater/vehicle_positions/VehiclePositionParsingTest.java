@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.vehicle_positions;
 
-import java.io.File;
+import java.net.URI;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +32,9 @@ public class VehiclePositionParsingTest {
         Assertions.assertEquals("49195157", first.getTrip().getTripId());
     }
 
-    private GtfsRealtimeFileVehiclePositionSource getVehiclePositionSource(String filename) {
-        return new GtfsRealtimeFileVehiclePositionSource(
-                new File("src/test/resources/vehicle-positions/" + filename)
+    private GtfsRealtimeHttpVehiclePositionSource getVehiclePositionSource(String filename) {
+        return new GtfsRealtimeHttpVehiclePositionSource(
+                URI.create("file:src/test/resources/vehicle-positions/" + filename)
         );
     }
 }

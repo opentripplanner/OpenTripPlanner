@@ -35,6 +35,7 @@ public class RealtimeVehiclePositionService {
      * Get the vehicle positions for a certain trip.
      */
     public Collection<RealtimeVehiclePosition> getVehiclePositions(TripPattern pattern) {
+        // the list is made immutable during insertion, so we can safely return them
         return positions.getOrDefault(pattern, List.of());
     }
 }

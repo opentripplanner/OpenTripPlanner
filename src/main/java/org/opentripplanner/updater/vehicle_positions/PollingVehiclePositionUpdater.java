@@ -1,14 +1,10 @@
 package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
-import java.io.File;
 import java.util.List;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
-import org.opentripplanner.updater.vehicle_positions.params.VehiclePositionsUpdaterFileParameters;
-import org.opentripplanner.updater.vehicle_positions.params.VehiclePositionsUpdaterHttpParameters;
-import org.opentripplanner.updater.vehicle_positions.params.VehiclePositionsUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,15 +42,8 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
 
     public PollingVehiclePositionUpdater(VehiclePositionsUpdaterParameters params) {
         super(params);
-        // Create update streamer from params
-        if (params instanceof VehiclePositionsUpdaterHttpParameters) {
-            var p = (VehiclePositionsUpdaterHttpParameters) params;
-            vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(p.url);
-        }
-        else {
-            var p = (VehiclePositionsUpdaterFileParameters) params;
-            vehiclePositionSource = new GtfsRealtimeFileVehiclePositionSource(new File(p.path));
-        }
+        var p = (VehiclePositionsUpdaterParameters) params;
+        vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(p.url);
 
         LOG.info(
                 "Creating vehicle position updater running every {} seconds : {}",
