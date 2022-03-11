@@ -17,8 +17,8 @@ public class AccessPaths {
     private final TIntObjectMap<List<RaptorTransfer>> arrivedOnBoardByNumOfRides;
 
     private AccessPaths(
-            TIntObjectMap<List<RaptorTransfer>> arrivedOnStreetByNunOfRides,
-            TIntObjectMap<List<RaptorTransfer>> arrivedOnBoardByNunOfRides
+            TIntObjectMap<List<RaptorTransfer>> arrivedOnStreetByNumOfRides,
+            TIntObjectMap<List<RaptorTransfer>> arrivedOnBoardByNumOfRides
     ) {
         this.arrivedOnStreetByNumOfRides = arrivedOnStreetByNumOfRides;
         this.arrivedOnBoardByNumOfRides = arrivedOnBoardByNumOfRides;

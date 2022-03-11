@@ -371,11 +371,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
 
     private void findAccessOnStreetForRound() {
-        addAccessPaths(accessPaths.arrivedOnStreetByNunOfRides().get(round()));
+        addAccessPaths(accessPaths.arrivedOnStreetByNumOfRides().get(round()));
     }
 
     private void findAccessOnBoardForRound() {
-        addAccessPaths(accessPaths.arrivedOnBoardByNunOfRides().get(round()));
+        addAccessPaths(accessPaths.arrivedOnBoardByNumOfRides().get(round()));
     }
 
     /**

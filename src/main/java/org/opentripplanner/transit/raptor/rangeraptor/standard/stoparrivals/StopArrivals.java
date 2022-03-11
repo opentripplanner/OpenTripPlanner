@@ -13,19 +13,15 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTransfers {
+public final class StopArrivals<T extends RaptorTripSchedule> implements BestNumberOfTransfers {
 
-    private final StopArrivalState<T>[][] stops;
+    private final StopArrivalState<T>[][] arrivals;
     private final RoundProvider roundProvider;
 
-    public Stops(
-            int nRounds,
-            int nStops,
-            RoundProvider roundProvider
-    ) {
+    public StopArrivals(int nRounds, int nStops, RoundProvider roundProvider) {
         this.roundProvider = roundProvider;
         //noinspection unchecked
-        this.stops = (StopArrivalState<T>[][]) new StopArrivalState[nRounds][nStops];
+        this.arrivals = (StopArrivalState<T>[][]) new StopArrivalState[nRounds][nStops];
     }
 
     /**
@@ -35,10 +31,10 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
             EgressPaths egressPaths,
             DestinationArrivalListener destinationArrivalListener
     ) {
-        for (int i = 1; i < stops.length; i++) {
+        for (int i = 1; i < arrivals.length; i++) {
             final int round = i;
             egressPaths.byStop().forEachEntry((stop, list) -> {
-                stops[round][stop] = new EgressStopArrivalState<>(
+                arrivals[round][stop] = new EgressStopArrivalState<>(
                         stop, round, list, destinationArrivalListener
                 );
                 return true;
@@ -47,13 +43,13 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     }
 
     public StopArrivalState<T> get(int round, int stop) {
-        return stops[round][stop];
+        return arrivals[round][stop];
     }
 
     @Override
     public int calculateMinNumberOfTransfers(int stop) {
-        for (int i = 0; i < stops.length; i++) {
-            if(stops[i][stop] != null) {
+        for (int i = 0; i < arrivals.length; i++) {
+            if(arrivals[i][stop] != null) {
                 return i - 1;
             }
         }
@@ -62,14 +58,14 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
 
     void setAccessTime(int time, RaptorTransfer access, boolean bestTime) {
         final int stop = access.stop();
-        var other = getOrCreateStopIndex(round(), stop);
+        var existingArrival = getOrCreateStopIndex(round(), stop);
 
-        if(other instanceof AccessStopArrivalState) {
-            ((AccessStopArrivalState<?>)other).setAccessTime(time, access, bestTime);
+        if(existingArrival instanceof AccessStopArrivalState) {
+            ((AccessStopArrivalState<?>)existingArrival).setAccessTime(time, access, bestTime);
         }
         else {
-            stops[round()][stop] = new AccessStopArrivalState<>(
-                    time, access, bestTime, (DefaultStopArrivalState<T>) other
+            arrivals[round()][stop] = new AccessStopArrivalState<>(
+                    time, access, bestTime, (DefaultStopArrivalState<T>) existingArrival
             );
         }
     }
@@ -114,7 +110,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
         // can be followed by a transfer
         if(state.arrivedByTransfer()) {
             stopIndex = state.transferFromStop();
-            state = stops[prevRound][stopIndex];
+            state = arrivals[prevRound][stopIndex];
         }
         return state.arrivedByTransit()
                 ? TransitArrival.create(state.trip(), stopIndex, state.onBoardArrivalTime())
@@ -122,8 +118,8 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     }
 
     private StopArrivalState<T> getOrCreateStopIndex(final int round, final int stop) {
-        if (stops[round][stop] == null) {
-            stops[round][stop] = StopArrivalState.create();
+        if (arrivals[round][stop] == null) {
+            arrivals[round][stop] = StopArrivalState.create();
         }
         return get(round, stop);
     }
