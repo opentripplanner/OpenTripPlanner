@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -339,9 +340,18 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
                             getTimeSinceStartupString());
                 }
 
-                saveResultOnGraph.execute(graph -> {
-                    snapshotSource.applyEstimatedTimetable(graph, feedId, false, estimatedTimetableDeliveries);
-                });
+                var f = saveResultOnGraph.execute(graph ->
+                    snapshotSource.applyEstimatedTimetable(graph, feedId, false, estimatedTimetableDeliveries)
+                );
+
+                if (!isPrimed()) {
+                    try {
+                        f.get();
+                    }
+                    catch (InterruptedException | ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
 
             // Ack only after all work for the message is complete.
