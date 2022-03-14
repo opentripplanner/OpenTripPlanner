@@ -376,6 +376,15 @@ connect to a network resource is the `url` field.
             "feedId": "TriMet"
         },
 
+        // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL APIs 
+        {
+            "type": "vehicle-positions",
+            "sourceType": "gtfs-http",
+            "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
+            "feedId": "1",
+            "frequencySec": 60
+        },
+
         // Streaming differential GTFS-RT TripUpdates over websockets
         {
             "type": "websocket-gtfs-rt-updater"
