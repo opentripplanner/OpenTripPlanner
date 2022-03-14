@@ -357,8 +357,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // If there are skipped stops, we need to change the pattern from the scheduled one
         if (skippedStopIndices.size() > 0) {
-            StopPattern newStopPattern = pattern.getStopPattern().clone();
-            skippedStopIndices.forEach(index -> newStopPattern.cancelStop(index));
+            StopPattern newStopPattern =
+                    pattern.getStopPattern().mutate().cancelStops(skippedStopIndices).build();
 
             final Trip trip = getTripForTripId(feedId, tripId);
             // Get cached trip pattern or create one if it doesn't exist yet

@@ -34,19 +34,25 @@ import java.util.function.Predicate;
  * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique
  * key for a TripPattern. Should the route be included in the StopPattern?
  */
-public final class StopPattern implements Cloneable, Serializable {
+public final class StopPattern implements Serializable {
 
     private static final long serialVersionUID = 20140101L;
     public static final int NOT_FOUND = -1;
 
     private final StopLocation[] stops;
-    private PickDrop[]  pickups;
-    private PickDrop[]  dropoffs;
+    private final PickDrop[]  pickups;
+    private final PickDrop[]  dropoffs;
 
     private StopPattern (int size) {
         stops     = new StopLocation[size];
         pickups   = new PickDrop[size];
         dropoffs  = new PickDrop[size];
+    }
+
+    private StopPattern(StopLocation[] stops, PickDrop[] pickups, PickDrop[] dropoffs) {
+        this.stops = stops;
+        this.pickups = pickups;
+        this.dropoffs = dropoffs;
     }
 
     /** Assumes that stopTimes are already sorted by time. */
@@ -63,6 +69,47 @@ public final class StopPattern implements Cloneable, Serializable {
             // pick/drop messages could be stored in individual trips
             pickups[i] = computePickDrop(stopTime.getStop(), stopTime.getPickupType());
             dropoffs[i] = computePickDrop(stopTime.getStop(), stopTime.getDropOffType());
+        }
+    }
+
+    public StopPatternBuilder mutate() {
+        return new StopPatternBuilder(this);
+    }
+
+    /**
+     * For creating StopTimes without StopTime, for example for unit testing.
+     */
+    public static StopPatternBuilder create(int length) {
+        return new StopPatternBuilder(new StopPattern(length));
+    }
+
+    public static class StopPatternBuilder {
+
+        public final StopLocation[] stops;
+        public final PickDrop[] pickups;
+        public final PickDrop[] dropoffs;
+
+        public StopPatternBuilder(StopPattern original) {
+            stops = Arrays.copyOf(original.stops, original.stops.length);
+            pickups = Arrays.copyOf(original.pickups, original.pickups.length);
+            dropoffs = Arrays.copyOf(original.dropoffs, original.dropoffs.length);
+        }
+
+        /**
+         * Sets pickup and dropoff at given stop indices as CANCELLED.
+         *
+         * @return StopPatternBuilder
+         */
+        public StopPatternBuilder cancelStops(List<Integer> cancelledStopIndices) {
+            cancelledStopIndices.forEach(index -> {
+                pickups[index] = PickDrop.CANCELLED;
+                dropoffs[index] = PickDrop.CANCELLED;
+            });
+            return this;
+        }
+
+        public StopPattern build() {
+            return new StopPattern(stops, pickups, dropoffs);
         }
     }
 
@@ -92,35 +139,6 @@ public final class StopPattern implements Cloneable, Serializable {
 
     int findAlightPosition(Station station) {
         return findStopPosition(1, stops.length, station::includes);
-    }
-
-    /**
-     * Sets pickup and dropoff at given stop index as CANCELLED.
-     *
-     * @return {@code true} if stop at index exists and can be cancelled, if not {@code false}
-     */
-    public boolean cancelStop(int index) {
-        if (index >= 0 && index < pickups.length) {
-            pickups[index] = PickDrop.CANCELLED;
-            dropoffs[index] = PickDrop.CANCELLED;
-            return true;
-        }
-        return false;
-    }
-
-    public StopPattern clone() {
-        try {
-            StopPattern stopPattern = (StopPattern) super.clone();
-            stopPattern.pickups = pickups.clone();
-            stopPattern.dropoffs = dropoffs.clone();
-            //TODO stops should also be cloned if needed
-            //stopPattern.stops = stops.clone();
-            return stopPattern;
-        }
-        catch (CloneNotSupportedException e) {
-            /* cannot happen */
-            throw new RuntimeException(e);
-        }
     }
 
     public boolean equals(Object other) {
