@@ -2,6 +2,7 @@ package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.common.collect.Sets;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +117,7 @@ public class VehiclePositionPatternMatcher {
         }
 
         // Add position to pattern
-        var newPosition = parseVehiclePosition(
+        var newPosition = mapVehiclePosition(
                 vehiclePosition,
                 pattern.getStops()
         );
@@ -131,7 +133,7 @@ public class VehiclePositionPatternMatcher {
      * @param stopsOnVehicleTrip Collection of stops method will try to match next arriving stop ID
      *                           to
      */
-    public static RealtimeVehiclePosition parseVehiclePosition(
+    public static RealtimeVehiclePosition mapVehiclePosition(
             VehiclePosition vehiclePosition,
             List<StopLocation> stopsOnVehicleTrip
     ) {
@@ -153,11 +155,7 @@ public class VehiclePositionPatternMatcher {
         }
 
         if (vehiclePosition.hasCurrentStatus()) {
-            newPosition.setStopStatus(vehiclePosition.getCurrentStatus());
-        }
-
-        if (vehiclePosition.hasCongestionLevel()) {
-            newPosition.setCongestionLevel(vehiclePosition.getCongestionLevel());
+            newPosition.setStopStatus(toModel(vehiclePosition.getCurrentStatus()));
         }
 
         if (vehiclePosition.hasTimestamp()) {
@@ -174,10 +172,19 @@ public class VehiclePositionPatternMatcher {
             }
         }
 
-        if (vehiclePosition.hasCurrentStopSequence()) {
-            newPosition.setNextStopSequenceId(vehiclePosition.getCurrentStopSequence());
-        }
-
         return newPosition.build();
+    }
+
+    private static StopStatus toModel(VehicleStopStatus currentStatus) {
+        switch (currentStatus) {
+            case IN_TRANSIT_TO:
+                return StopStatus.IN_TRANSIT_TO;
+            case INCOMING_AT:
+                return StopStatus.INCOMING_AT;
+            case STOPPED_AT:
+                return StopStatus.STOPPED_AT;
+            default:
+                return null;
+        }
     }
 }

@@ -1,30 +1,41 @@
 package org.opentripplanner.model.vehicle_position;
 
-import com.google.transit.realtime.GtfsRealtime.VehiclePosition.CongestionLevel;
-import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
 import java.time.Instant;
 import org.opentripplanner.model.StopLocation;
 
 /**
- * A simplified vehicle position class that supports being output to HTTP.
- * Compatible with https://github.com/opentripplanner/otp-ui/blob/master/packages/core-utils/src/types.js#L86
+ * A simplified vehicle position class that supports being output to HTTP. Compatible with
+ * https://github.com/opentripplanner/otp-ui/blob/master/packages/core-utils/src/types.js#L86
  */
 public class RealtimeVehiclePosition {
+
     public final String vehicleId;
     public final String label;
     public final double lat;
     public final double lon;
+
+    /**
+     * Speed in meters per second
+     */
     public final double speed;
+
+    /**
+     * Bearing, in degrees, clockwise from North, i.e., 0 is North and 90 is East. This can be the
+     * compass bearing, or the direction towards the next stop or intermediate location.
+     */
     public final double heading;
 
-    /** Unix timestamp of when the realtime position was recorded */
+    /**
+     * When the realtime position was recorded
+     */
     public final Instant time;
 
-    public final VehicleStopStatus stopStatus;
-    public final StopLocation nextStop;
-    public final int nextStopSequenceId;
+    /**
+     * Status of the vehicle, ie. if approaching the next stop or if it is there already.
+     */
+    public final StopStatus stopStatus;
 
-    public final CongestionLevel congestionLevel;
+    public final StopLocation nextStop;
 
     public RealtimeVehiclePosition(
             String vehicleId,
@@ -34,10 +45,8 @@ public class RealtimeVehiclePosition {
             double speed,
             double heading,
             Instant time,
-            VehicleStopStatus stopStatus,
-            StopLocation nextStop,
-            int nextStopSequenceId,
-            CongestionLevel congestionLevel
+            StopStatus stopStatus,
+            StopLocation nextStop
     ) {
         this.vehicleId = vehicleId;
         this.label = label;
@@ -48,11 +57,15 @@ public class RealtimeVehiclePosition {
         this.time = time;
         this.stopStatus = stopStatus;
         this.nextStop = nextStop;
-        this.nextStopSequenceId = nextStopSequenceId;
-        this.congestionLevel = congestionLevel;
     }
 
     public static RealtimeVehiclePositionBuilder builder() {
         return new RealtimeVehiclePositionBuilder();
+    }
+
+    public enum StopStatus {
+        INCOMING_AT,
+        STOPPED_AT,
+        IN_TRANSIT_TO
     }
 }

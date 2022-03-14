@@ -1,9 +1,8 @@
 package org.opentripplanner.model.vehicle_position;
 
-import com.google.transit.realtime.GtfsRealtime.VehiclePosition.CongestionLevel;
-import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
 import java.time.Instant;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 
 public class RealtimeVehiclePositionBuilder {
 
@@ -14,10 +13,8 @@ public class RealtimeVehiclePositionBuilder {
     private double speed;
     private double heading;
     private Instant time;
-    private VehicleStopStatus stopStatus;
+    private StopStatus stopStatus;
     private StopLocation nextStop;
-    private int nextStopSequenceId;
-    private CongestionLevel congestionLevel;
 
     public RealtimeVehiclePositionBuilder setVehicleId(String vehicleId) {
         this.vehicleId = vehicleId;
@@ -54,7 +51,7 @@ public class RealtimeVehiclePositionBuilder {
         return this;
     }
 
-    public RealtimeVehiclePositionBuilder setStopStatus(VehicleStopStatus stopStatus) {
+    public RealtimeVehiclePositionBuilder setStopStatus(StopStatus stopStatus) {
         this.stopStatus = stopStatus;
         return this;
     }
@@ -64,20 +61,9 @@ public class RealtimeVehiclePositionBuilder {
         return this;
     }
 
-    public RealtimeVehiclePositionBuilder setNextStopSequenceId(int nextStopSequenceId) {
-        this.nextStopSequenceId = nextStopSequenceId;
-        return this;
-    }
-
-    public RealtimeVehiclePositionBuilder setCongestionLevel(CongestionLevel congestionLevel) {
-        this.congestionLevel = congestionLevel;
-        return this;
-    }
-
     public RealtimeVehiclePosition build() {
         return new RealtimeVehiclePosition(
-                vehicleId, label, lat, lon, speed, heading, time, stopStatus, nextStop,
-                nextStopSequenceId, congestionLevel
+                vehicleId, label, lat, lon, speed, heading, time, stopStatus, nextStop
         );
     }
 }
