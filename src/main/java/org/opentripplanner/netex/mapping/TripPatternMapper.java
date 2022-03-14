@@ -8,16 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.FlexStopLocation;
-import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
@@ -56,7 +47,8 @@ class TripPatternMapper {
     private final Multimap<String, ServiceJourney> serviceJourniesByPatternId = ArrayListMultimap.create();
 
     private ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById;
-    private final Multimap<String, DatedServiceJourney> datedServiceJourneys;
+
+    private final Multimap<String, DatedServiceJourney> datedServiceJourneysBySJId;
 
     private final TripMapper tripMapper;
 
@@ -83,7 +75,7 @@ class TripPatternMapper {
             ReadOnlyHierarchicalMap<String, ServiceJourney> serviceJourneyById,
             ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
             ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById,
-            Multimap<String, DatedServiceJourney> datedServiceJourneys,
+            Multimap<String, DatedServiceJourney> datedServiceJourneysBySJId,
             Map<String, FeedScopedId> serviceIds,
             Deduplicator deduplicator
     ) {
@@ -92,7 +84,7 @@ class TripPatternMapper {
         this.routeById = routeById;
         this.otpRouteById = otpRouteById;
         this.operatingDayById = operatingDayById;
-        this.datedServiceJourneys = datedServiceJourneys;
+        this.datedServiceJourneysBySJId = datedServiceJourneysBySJId;
         this.tripMapper = new TripMapper(
             idFactory,
             issueStore,
@@ -138,33 +130,13 @@ class TripPatternMapper {
         }
 
         List<Trip> trips = new ArrayList<>();
-        List<TripOnServiceDate> tripOnServiceDates = new ArrayList<>();
 
         for (ServiceJourney serviceJourney : serviceJourneys) {
             Trip trip = tripMapper.mapServiceJourney(serviceJourney);
 
-            if(datedServiceJourneys.containsKey(serviceJourney.getId())) {
-                for (DatedServiceJourney datedServiceJourney : datedServiceJourneys.get(
-                        serviceJourney.getId())
-                ) {
-                    var opDay = operatingDayById.lookup(
-                            datedServiceJourney.getOperatingDayRef().getRef()
-                    );
-                    if (opDay == null) {
-                        continue;
-                    }
-                    ServiceDate serviceDate =
-                            new ServiceDate(opDay.getCalendarDate().toLocalDate());
+            // Add the dated service journey to the model for this trip [if it exists]
+            mapDatedServiceJourney(serviceJourney, trip);
 
-                    tripOnServiceDates.add(
-                            new TripOnServiceDate(idFactory.createId(datedServiceJourney.getId()),
-                                    trip, serviceDate,
-                                    TripServiceAlterationMapper.mapAlteration(
-                                            datedServiceJourney.getServiceAlteration())
-                            )
-                    );
-                }
-            }
             // Unable to map ServiceJourney, problem logged by the mapper above
             if(trip == null) { continue; }
 
@@ -191,8 +163,6 @@ class TripPatternMapper {
 
         // No trips successfully mapped
         if(trips.isEmpty()) { return result; }
-
-        result.tripOnServiceDates.addAll(tripOnServiceDates);
 
         // TODO OTP2 Trips containing FlexStopLocations are not added to StopPatterns until support
         //           for this is added.
@@ -228,6 +198,25 @@ class TripPatternMapper {
         result.tripPatterns.put(stopPattern, tripPattern);
 
         return result;
+    }
+
+    private void mapDatedServiceJourney(ServiceJourney serviceJourney, Trip trip) {
+
+        if(datedServiceJourneysBySJId.containsKey(serviceJourney.getId())) {
+
+            for (DatedServiceJourney datedServiceJourney : datedServiceJourneysBySJId.get(serviceJourney.getId())) {
+
+                var opDay = operatingDayById.lookup(datedServiceJourney.getOperatingDayRef().getRef());
+
+                if (opDay == null) { continue; }
+
+                var serviceDate = new ServiceDate(opDay.getCalendarDate().toLocalDate());
+                var id = idFactory.createId(datedServiceJourney.getId());
+                var alteration = TripServiceAlterationMapper.mapAlteration(datedServiceJourney.getServiceAlteration());
+
+                result.tripOnServiceDates.add(new TripOnServiceDate(id, trip, serviceDate, alteration));
+            }
+        }
     }
 
     private org.opentripplanner.model.Route lookupRoute(

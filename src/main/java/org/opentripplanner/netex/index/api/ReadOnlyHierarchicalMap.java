@@ -38,4 +38,9 @@ public interface ReadOnlyHierarchicalMap<K,V> {
      * parents are excluded from the collection.
      */
     Collection<V> localValues();
+
+    /**
+     * @return {@code true} if no local elements exist.
+     */
+    boolean localIsEmpty();
 }
