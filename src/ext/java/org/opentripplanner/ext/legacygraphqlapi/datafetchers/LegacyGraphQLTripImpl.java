@@ -19,6 +19,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -219,8 +220,15 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         ServiceDate serviceDate = args.getLegacyGraphQLServiceDate() != null
                 ? ServiceDate.parseString(args.getLegacyGraphQLServiceDate()) : new ServiceDate();
 
-        TripPattern tripPattern = routingService.getTimetableSnapshot().getLastAddedTripPattern(trip.getId(), serviceDate);
-        if (tripPattern == null) {
+        TripPattern tripPattern;
+        TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+        if (timetableSnapshot != null) {
+          tripPattern = routingService.getTimetableSnapshot()
+                  .getLastAddedTripPattern(trip.getId(), serviceDate);
+          if (tripPattern == null) {
+            tripPattern = getTripPattern(environment);
+          }
+        } else {
           tripPattern = getTripPattern(environment);
         }
         if (tripPattern == null) { return List.of(); }
