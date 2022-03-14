@@ -142,9 +142,14 @@ public class VehiclePositionPatternMatcher {
         if (vehiclePosition.hasPosition()) {
             var position = vehiclePosition.getPosition();
             newPosition.setLat(position.getLatitude())
-                    .setLon(position.getLongitude())
-                    .setSpeed(position.getSpeed())
-                    .setHeading(position.getBearing());
+                    .setLon(position.getLongitude());
+
+            if (position.hasSpeed()) {
+                newPosition.setSpeed(position.getSpeed());
+            }
+            if (position.hasBearing()) {
+                newPosition.setHeading(position.getBearing());
+            }
         }
 
         if (vehiclePosition.hasVehicle()) {

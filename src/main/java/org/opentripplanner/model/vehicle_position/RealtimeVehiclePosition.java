@@ -17,13 +17,13 @@ public class RealtimeVehiclePosition {
     /**
      * Speed in meters per second
      */
-    public final double speed;
+    public final Double speed;
 
     /**
      * Bearing, in degrees, clockwise from North, i.e., 0 is North and 90 is East. This can be the
      * compass bearing, or the direction towards the next stop or intermediate location.
      */
-    public final double heading;
+    public final Double heading;
 
     /**
      * When the realtime position was recorded
@@ -42,8 +42,8 @@ public class RealtimeVehiclePosition {
             String label,
             double lat,
             double lon,
-            double speed,
-            double heading,
+            Double speed,
+            Double heading,
             Instant time,
             StopStatus stopStatus,
             StopLocation nextStop

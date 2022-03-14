@@ -10,8 +10,8 @@ public class RealtimeVehiclePositionBuilder {
     private String label;
     private double lat;
     private double lon;
-    private double speed;
-    private double heading;
+    private Double speed = null;
+    private Double heading = null;
     private Instant time;
     private StopStatus stopStatus;
     private StopLocation nextStop;

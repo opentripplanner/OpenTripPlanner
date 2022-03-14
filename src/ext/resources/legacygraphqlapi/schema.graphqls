@@ -1396,8 +1396,31 @@ type PageInfo {
 }
 
 type VehiclePosition {
+    """ID that uniquely identifies the vehicle"""
+    vehicleId: String
+    """Human-readable label of the vehicle, eg. a publicly visible number or a license plate"""
+    label: String
+    """Latitude of the vehicle"""
     lat: Float
+    """Longitude of the vehicle"""
     lon: Float
+    """How close the vehicle is to `nextStop`"""
+    stopStatus: VehicleStopStatus
+    """The next stop where the vehicle will or is currently arriving."""
+    nextStop: Stop
+    """Speed of the vehicle in meters/second"""
+    speed: Float
+    """
+    Bearing, in degrees, clockwise from North, i.e., 0 is North and 90 is East. This can be the
+    compass bearing, or the direction towards the next stop or intermediate location.
+    """
+    heading: Float
+    """When the position of the vehicle was recorded in seconds since the UNIX epoch."""
+    time: Long
+}
+
+enum VehicleStopStatus {
+    STOPPED_AT, INCOMING_AT, IN_TRANSIT_TO
 }
 
 """
