@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.common.model.T2;
@@ -35,14 +36,14 @@ public class VehiclePositionPatternMatcher {
     private final RealtimeVehiclePositionService service;
 
     private final Function<FeedScopedId, Trip> getTripForId;
-    private final Function<Trip, TripPattern> getPatternForTrip;
+    private final BiFunction<Trip, Instant, TripPattern> getPatternForTrip;
 
     private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
     public VehiclePositionPatternMatcher(
             String feedId,
             Function<FeedScopedId, Trip> getTripForId,
-            Function<Trip, TripPattern> getPatternForTrip,
+            BiFunction<Trip, Instant, TripPattern> getPatternForTrip,
             RealtimeVehiclePositionService service
     ) {
         this.feedId = feedId;
@@ -106,7 +107,11 @@ public class VehiclePositionPatternMatcher {
             return null;
         }
 
-        TripPattern pattern = getPatternForTrip.apply(trip);
+        var instant = Optional.of(vehiclePosition.getTimestamp())
+                .filter(t -> t > 0)
+                .map(Instant::ofEpochSecond)
+                .orElse(Instant.now());
+        TripPattern pattern = getPatternForTrip.apply(trip, instant);
         if (pattern == null) {
             LOG.warn(
                     "Unable to match OTP pattern ID for vehicle position with trip ID {}",

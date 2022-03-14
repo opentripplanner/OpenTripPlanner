@@ -1,7 +1,12 @@
 package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -59,11 +64,21 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
                 new VehiclePositionPatternMatcher(
                         feedId,
                         tripId -> index.getTripForId().get(tripId),
-                        patternId -> index.getPatternForTrip().get(patternId),
+                        (trip, time) -> getPatternIncludingRealtime(graph, trip, time),
                         graph.getVehiclePositionService()
                 );
     }
 
+    private static TripPattern getPatternIncludingRealtime(Graph graph, Trip trip, Instant time) {
+        return Optional.ofNullable(graph.getTimetableSnapshot())
+                .map(snapshot -> {
+                    var ld = time.atZone(graph.getTimeZone().toZoneId()).toLocalDate();
+                    var serviceDate =
+                            new ServiceDate(ld.getYear(), ld.getMonthValue(), ld.getDayOfMonth());
+                    return snapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
+                })
+                .orElse(graph.index.getPatternForTrip().get(trip));
+    }
 
     /**
      * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and

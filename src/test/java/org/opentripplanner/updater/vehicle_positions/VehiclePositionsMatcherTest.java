@@ -45,7 +45,7 @@ public class VehiclePositionsMatcherTest {
                 new VehiclePositionPatternMatcher(
                         feedId,
                         tripForId::get,
-                        patternForTrip::get,
+                        (id, time) -> patternForTrip.get(id),
                         service
                 );
 
@@ -107,7 +107,7 @@ public class VehiclePositionsMatcherTest {
                 new VehiclePositionPatternMatcher(
                         feedId,
                         tripForId::get,
-                        patternForTrip::get,
+                        (id, time) -> patternForTrip.get(id),
                         service
                 );
 
