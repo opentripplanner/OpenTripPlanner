@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.model.Trip;
@@ -69,10 +69,9 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
                 );
     }
 
-    private static TripPattern getPatternIncludingRealtime(Graph graph, Trip trip, Instant time) {
+    private static TripPattern getPatternIncludingRealtime(Graph graph, Trip trip, LocalDate ld) {
         return Optional.ofNullable(graph.getTimetableSnapshot())
                 .map(snapshot -> {
-                    var ld = time.atZone(graph.getTimeZone().toZoneId()).toLocalDate();
                     var serviceDate =
                             new ServiceDate(ld.getYear(), ld.getMonthValue(), ld.getDayOfMonth());
                     return snapshot.getLastAddedTripPattern(trip.getId(), serviceDate);

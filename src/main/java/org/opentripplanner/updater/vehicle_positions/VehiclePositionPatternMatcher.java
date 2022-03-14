@@ -1,9 +1,13 @@
 package org.opentripplanner.updater.vehicle_positions;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -36,14 +40,14 @@ public class VehiclePositionPatternMatcher {
     private final RealtimeVehiclePositionService service;
 
     private final Function<FeedScopedId, Trip> getTripForId;
-    private final BiFunction<Trip, Instant, TripPattern> getPatternForTrip;
+    private final BiFunction<Trip, LocalDate, TripPattern> getPatternForTrip;
 
     private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
     public VehiclePositionPatternMatcher(
             String feedId,
             Function<FeedScopedId, Trip> getTripForId,
-            BiFunction<Trip, Instant, TripPattern> getPatternForTrip,
+            BiFunction<Trip, LocalDate, TripPattern> getPatternForTrip,
             RealtimeVehiclePositionService service
     ) {
         this.feedId = feedId;
@@ -92,8 +96,7 @@ public class VehiclePositionPatternMatcher {
             VehiclePosition vehiclePosition
     ) {
         if (!vehiclePosition.hasTrip()) {
-            LOG.warn(
-                    "Realtime vehicle positions without trip IDs are not yet supported.");
+            LOG.warn("Realtime vehicle positions {} has no trip ID. Ignoring.", vehiclePosition);
             return null;
         }
 
@@ -107,11 +110,14 @@ public class VehiclePositionPatternMatcher {
             return null;
         }
 
-        var instant = Optional.of(vehiclePosition.getTimestamp())
-                .filter(t -> t > 0)
-                .map(Instant::ofEpochSecond)
-                .orElse(Instant.now());
-        TripPattern pattern = getPatternForTrip.apply(trip, instant);
+        var localDate =
+                Optional.ofNullable(vehiclePosition.getTrip())
+                        .map(TripDescriptor::getStartDate)
+                        .map(Strings::emptyToNull)
+                        .map(t -> LocalDate.parse(t, DateTimeFormatter.BASIC_ISO_DATE))
+                        .orElse(LocalDate.now());
+
+        TripPattern pattern = getPatternForTrip.apply(trip, localDate);
         if (pattern == null) {
             LOG.warn(
                     "Unable to match OTP pattern ID for vehicle position with trip ID {}",
