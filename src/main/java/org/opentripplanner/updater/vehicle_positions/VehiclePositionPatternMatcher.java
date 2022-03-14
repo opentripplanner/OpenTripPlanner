@@ -5,12 +5,11 @@ import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.FeedScopedId;
@@ -35,15 +34,15 @@ public class VehiclePositionPatternMatcher {
     private final String feedId;
     private final RealtimeVehiclePositionService service;
 
-    private final Supplier<Map<FeedScopedId, Trip>> getTripForId;
-    private final Supplier<Map<Trip, TripPattern>> getPatternForTrip;
+    private final Function<FeedScopedId, Trip> getTripForId;
+    private final Function<Trip, TripPattern> getPatternForTrip;
 
     private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
     public VehiclePositionPatternMatcher(
             String feedId,
-            Supplier<Map<FeedScopedId, Trip>> getTripForId,
-            Supplier<Map<Trip, TripPattern>> getPatternForTrip,
+            Function<FeedScopedId, Trip> getTripForId,
+            Function<Trip, TripPattern> getPatternForTrip,
             RealtimeVehiclePositionService service
     ) {
         this.feedId = feedId;
@@ -98,7 +97,7 @@ public class VehiclePositionPatternMatcher {
         }
 
         String tripId = vehiclePosition.getTrip().getTripId();
-        Trip trip = getTripForId.get().get(new FeedScopedId(feedId, tripId));
+        Trip trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
         if (trip == null) {
             LOG.warn(
                     "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
@@ -107,7 +106,7 @@ public class VehiclePositionPatternMatcher {
             return null;
         }
 
-        TripPattern pattern = getPatternForTrip.get().get(trip);
+        TripPattern pattern = getPatternForTrip.apply(trip);
         if (pattern == null) {
             LOG.warn(
                     "Unable to match OTP pattern ID for vehicle position with trip ID {}",

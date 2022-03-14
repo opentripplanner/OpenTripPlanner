@@ -4,8 +4,7 @@ import java.time.Instant;
 import org.opentripplanner.model.StopLocation;
 
 /**
- * A simplified vehicle position class that supports being output to HTTP. Compatible with
- * https://github.com/opentripplanner/otp-ui/blob/master/packages/core-utils/src/types.js#L86
+ * Internal model of a realtime vehicle position.
  */
 public class RealtimeVehiclePosition {
 
