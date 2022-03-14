@@ -26,7 +26,7 @@ public interface VehiclePositionSource {
             // Create List of TripUpdates
             positions = new ArrayList<>(feedEntityList.size());
             for (GtfsRealtime.FeedEntity feedEntity : feedEntityList) {
-                if (feedEntity.hasVehicle()) positions.add(feedEntity.getVehicle());
+                if (feedEntity.hasVehicle()) { positions.add(feedEntity.getVehicle()); }
             }
         }
 
