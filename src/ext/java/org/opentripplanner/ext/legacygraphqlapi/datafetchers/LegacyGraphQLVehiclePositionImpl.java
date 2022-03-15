@@ -8,7 +8,6 @@ import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 
 public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePosition {
 
-
     @Override
     public DataFetcher<Double> heading() {
         return env -> getSource(env).heading;

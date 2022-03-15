@@ -117,7 +117,6 @@ public class VehiclePositionPatternMatcher {
                         .orElse(null);
 
         if (localDate == null) {
-
             LOG.warn(
                     "Trip with id {} doesn't contain a start_data which is required. Ignoring.",
                     vehiclePosition.getTrip().getTripId()

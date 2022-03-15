@@ -429,7 +429,9 @@ public class RoutingService {
     /** {@link Graph#getTransitAlertService()} */
     public TransitAlertService getTransitAlertService() {return this.graph.getTransitAlertService();}
 
-    public RealtimeVehiclePositionService getVehiclePositionService() { return this.graph.getVehiclePositionService(); }
+    public RealtimeVehiclePositionService getVehiclePositionService() {
+        return this.graph.getVehiclePositionService();
+    }
 
     /** {@link Graph#getStopVerticesById(FeedScopedId)} */
     public Set<Vertex> getStopVerticesById(FeedScopedId id) {
