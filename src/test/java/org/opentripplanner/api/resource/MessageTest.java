@@ -1,15 +1,17 @@
 package org.opentripplanner.api.resource;
 
-import org.junit.jupiter.api.Test;
-import org.opentripplanner.api.common.Message;
-
-import java.util.Locale;
-
-import static java.util.Locale.*;
+import static java.util.Locale.ENGLISH;
+import static java.util.Locale.FRENCH;
+import static java.util.Locale.GERMANY;
+import static java.util.Locale.forLanguageTag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class TestMessages {
+import java.util.Locale;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.api.common.Message;
+
+public class MessageTest {
 
     @Test
     public void testLanguages() {
