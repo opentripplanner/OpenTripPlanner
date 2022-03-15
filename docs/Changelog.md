@@ -11,6 +11,7 @@
 - OTP support for NeTEx GroupOfLines [#3928](https://github.com/opentripplanner/OpenTripPlanner/pull/3928)
 - Implement trip banning [#3953](https://github.com/opentripplanner/OpenTripPlanner/pull/3953)
 - Improve performance of Park+Ride, Bike+Ride and Bike+Transit [#3906](https://github.com/opentripplanner/OpenTripPlanner/pull/3906)
+- Re-add GraphCoherencyCheckerModule [#3985](https://github.com/opentripplanner/OpenTripPlanner/pull/3985)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
