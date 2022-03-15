@@ -50,7 +50,6 @@ class StopMapper {
       org.onebusaway.gtfs.model.Stop.class,
       "name",
       base.getId().getId(),
-      null,
       base.getName());
 
     I18NString url = null;
@@ -60,7 +59,6 @@ class StopMapper {
               org.onebusaway.gtfs.model.Stop.class,
               "url",
               base.getId().getId(),
-              null,
               gtfsStop.getUrl());
     }
 

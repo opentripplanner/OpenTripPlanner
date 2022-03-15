@@ -63,6 +63,14 @@ public final class TranslationHelper {
             }
         }
     }
+    public I18NString getTranslation(
+            Class<?> clazz,
+            String fieldName,
+            String recordId,
+            String defaultValue
+    ) {
+        return getTranslation(clazz, fieldName, recordId, null, defaultValue);
+    }
 
     public I18NString getTranslation(
             Class<?> clazz,

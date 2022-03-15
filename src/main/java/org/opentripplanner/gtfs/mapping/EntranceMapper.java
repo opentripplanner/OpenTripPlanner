@@ -44,7 +44,6 @@ class EntranceMapper {
                 org.onebusaway.gtfs.model.Stop.class,
                 "name",
                 base.getId().getId(),
-                null,
                 base.getName());
 
         return new Entrance(

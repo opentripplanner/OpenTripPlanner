@@ -46,7 +46,6 @@ class BoardingAreaMapper {
         org.onebusaway.gtfs.model.Stop.class,
         "name",
         base.getId().getId(),
-        null,
         Optional.ofNullable(base.getName()).orElse(DEFAULT_NAME)
     );
 

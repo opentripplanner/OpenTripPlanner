@@ -96,7 +96,6 @@ public class TranslationHelperTest {
                             org.onebusaway.gtfs.model.Stop.class,
                             "name",
                             stop.getId().getId(),
-                            null,
                             stop.getName()
                     );
 
@@ -105,7 +104,6 @@ public class TranslationHelperTest {
                             org.onebusaway.gtfs.model.Stop.class,
                             "url",
                             stop.getId().getId(),
-                            null,
                             stop.getUrl()
                     );
 
@@ -161,7 +159,6 @@ public class TranslationHelperTest {
                         org.onebusaway.gtfs.model.FeedInfo.class,
                         "publisherName",
                         feed.getId(),
-                        null,
                         feed.getPublisherName()
                 );
 
@@ -170,7 +167,6 @@ public class TranslationHelperTest {
                         org.onebusaway.gtfs.model.FeedInfo.class,
                         "publisherUrl",
                         feed.getId(),
-                        null,
                         feed.getPublisherUrl()
                 );
         assertEquals("Feed name", nameTranslation.toString());
@@ -219,7 +215,6 @@ public class TranslationHelperTest {
                             org.onebusaway.gtfs.model.StopTime.class,
                             "stopHeadsign",
                             id,
-                            null,
                             stopTime.getStopHeadsign()
                     );
 
