@@ -123,6 +123,7 @@ public final class TranslationHelper {
         }
         if (translationList != null) {
             HashMap<String, String> hm = new HashMap<>();
+            hm.put(null, defaultValue);
             hm.put(feedLanguage, defaultValue);
             for (Translation translation : translationList) {
                 if (translationFieldName.equals(translation.getFieldName())) {
