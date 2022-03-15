@@ -152,7 +152,7 @@ Parameters that have changed:
     OTP2.
   - `preferredAgencies`, `unpreferredAgencies`, `bannedAgencies` and `whiteListedAgencies` use
     feed-scoped ids. If you are using the ids directly from the Index API, no changes are needed.
-
+  - `bannedTrips` no longer allows specifying stop indices, but onlt allows banning complete trips.
     
  New parameters in OTP2:   
 
