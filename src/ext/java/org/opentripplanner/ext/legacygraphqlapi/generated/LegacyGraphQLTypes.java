@@ -1949,15 +1949,17 @@ public class LegacyGraphQLTypes {
 
     public static class LegacyGraphQLStopNameArgs {
 
-        private String _lang;
+        private String language;
 
         public LegacyGraphQLStopNameArgs(Map<String, Object> args) {
             if (args != null) {
-                this._lang = (String) args.get("lang");
+                this.language = (String) args.get("language");
             }
         }
 
-        public String getLegacyGraphQLLang() {return this._lang;}
+        public String getLegacyGraphQLLanguage() {return this.language;}
+
+        public void setLegacyGraphQLLanguage(String language) {this.language = language;}
     }
 
     public static class LegacyGraphQLStopStopTimesForPatternArgs {
@@ -2149,6 +2151,21 @@ public class LegacyGraphQLTypes {
         }
     }
 
+    public static class LegacyGraphQLStopUrlArgs {
+
+        private String language;
+
+        public LegacyGraphQLStopUrlArgs(Map<String, Object> args) {
+            if (args != null) {
+                this.language = (String) args.get("language");
+            }
+        }
+
+        public String getLegacyGraphQLLanguage() {return this.language;}
+
+        public void setLegacyGraphQLLanguage(String language) {this.language = language;}
+    }
+
     /**
      * Entities, which are relevant for a stop and can contain alerts
      */
@@ -2161,19 +2178,6 @@ public class LegacyGraphQLTypes {
         STOP_ON_TRIPS,
         TRIPS
 
-    }
-
-    public static class LegacyGraphQLStopUrlArgs {
-
-        private String _lang;
-
-        public LegacyGraphQLStopUrlArgs(Map<String, Object> args) {
-            if (args != null) {
-                this._lang = (String) args.get("lang");
-            }
-        }
-
-        public String getLegacyGraphQLLang() {return this._lang;}
     }
 
 

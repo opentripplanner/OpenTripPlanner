@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
@@ -84,19 +84,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> {
-      String lang = new LegacyGraphQLTypes.LegacyGraphQLStopNameArgs(
-              environment.getArguments()).getLegacyGraphQLLang();
-      return getValue(
-              environment,
-              stop -> {
-                return stop.getName().toString(lang == null ? environment.getLocale() : new Locale(lang));
-              },
-              station -> {
-                return station.getName().toString(lang == null ? environment.getLocale() : new Locale(lang));
-              }
-      );
-    };
+    return environment -> getValue(
+          environment,
+          stop -> stop.getName().toString(LegacyGraphQLUtils.getLocale(environment)),
+          station -> station.getName().toString(LegacyGraphQLUtils.getLocale(environment))
+    );
   }
 
   @Override
@@ -126,19 +118,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> url() {
-    return environment -> {
-      String lang = new LegacyGraphQLTypes.LegacyGraphQLStopUrlArgs(
-              environment.getArguments()).getLegacyGraphQLLang();
-      return getValue(
-              environment,
-              stop -> {
-                return stop.getUrl().toString(lang == null ? environment.getLocale() : new Locale(lang));
-              },
-              station -> {
-                return station.getUrl().toString(lang == null ? environment.getLocale() : new Locale(lang));
-              }
-      );
-    };
+    return environment -> getValue(
+          environment,
+          stop -> stop.getUrl().toString(LegacyGraphQLUtils.getLocale(environment)),
+          station -> station.getUrl().toString(LegacyGraphQLUtils.getLocale(environment))
+    );
   }
 
   @Override
