@@ -111,11 +111,19 @@ public class VehiclePositionPatternMatcher {
         }
 
         var localDate =
-                Optional.ofNullable(vehiclePosition.getTrip())
-                        .map(TripDescriptor::getStartDate)
+                Optional.of(vehiclePosition.getTrip().getStartDate())
                         .map(Strings::emptyToNull)
                         .map(t -> LocalDate.parse(t, DateTimeFormatter.BASIC_ISO_DATE))
-                        .orElse(LocalDate.now());
+                        .orElse(null);
+
+        if (localDate == null) {
+
+            LOG.warn(
+                    "Trip with id {} doesn't contain a start_data which is required. Ignoring.",
+                    vehiclePosition.getTrip().getTripId()
+            );
+            return null;
+        }
 
         TripPattern pattern = getPatternForTrip.apply(trip, localDate);
         if (pattern == null) {

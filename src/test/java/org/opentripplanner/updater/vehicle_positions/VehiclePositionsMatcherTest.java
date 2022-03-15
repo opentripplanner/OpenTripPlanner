@@ -49,10 +49,7 @@ public class VehiclePositionsMatcherTest {
                         service
                 );
 
-        var pos = VehiclePosition.newBuilder()
-                .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
-                .setStopId("stop-1")
-                .build();
+        var pos = vehiclePosition(tripId);
 
         var positions = List.of(pos);
 
@@ -81,10 +78,12 @@ public class VehiclePositionsMatcherTest {
         var trip2 = new Trip(scopedTripId2);
 
         var stopPattern1 =
-                new StopPattern(List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip1, 2)));
+                new StopPattern(
+                        List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip1, 2)));
 
         var stopPattern2 =
-                new StopPattern(List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip2, 2)));
+                new StopPattern(
+                        List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip2, 2)));
 
         var pattern1 = new TripPattern(new FeedScopedId(feedId, tripId1), null, stopPattern1);
         var pattern2 = new TripPattern(new FeedScopedId(feedId, tripId2), null, stopPattern2);
@@ -111,15 +110,9 @@ public class VehiclePositionsMatcherTest {
                         service
                 );
 
-        var pos1 = VehiclePosition.newBuilder()
-                .setTrip(TripDescriptor.newBuilder().setTripId(tripId1).build())
-                .setStopId("stop-1")
-                .build();
+        var pos1 = vehiclePosition(tripId1);
 
-        var pos2 = VehiclePosition.newBuilder()
-                .setTrip(TripDescriptor.newBuilder().setTripId(tripId2).build())
-                .setStopId("stop-1")
-                .build();
+        var pos2 = vehiclePosition(tripId2);
 
         var positions = List.of(pos1, pos2);
 
@@ -134,6 +127,16 @@ public class VehiclePositionsMatcherTest {
         assertEquals(1, service.getVehiclePositions(pattern1).size());
         // because there are no more updates for pattern2 we remove all positions
         assertEquals(0, service.getVehiclePositions(pattern2).size());
+    }
+
+    private VehiclePosition vehiclePosition(String tripId1) {
+        return VehiclePosition.newBuilder()
+                .setTrip(TripDescriptor.newBuilder()
+                        .setTripId(tripId1)
+                        .setStartDate("20220314")
+                        .build())
+                .setStopId("stop-1")
+                .build();
     }
 
 
