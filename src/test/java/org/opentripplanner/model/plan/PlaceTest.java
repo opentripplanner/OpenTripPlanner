@@ -8,20 +8,21 @@ import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class PlaceTest {
 
     @Test
     public void sameLocationBasedOnInstance() {
-        Place aPlace = Place.normal(60.0, 10.0, "A Place");
+        Place aPlace = Place.normal(60.0, 10.0, new NonLocalizedString("A Place"));
         assertTrue("same instance", aPlace.sameLocation(aPlace));
     }
 
     @Test
     public void sameLocationBasedOnCoordinates() {
-        Place aPlace = Place.normal(60.0, 10.0, "A Place");
-        Place samePlace = Place.normal(60.000000000001, 10.0000000000001, "Same Place");
-        Place otherPlace = Place.normal(65.0, 14.0, "Other Place");
+        Place aPlace = Place.normal(60.0, 10.0, new NonLocalizedString("A Place"));
+        Place samePlace = Place.normal(60.000000000001, 10.0000000000001, new NonLocalizedString("Same Place"));
+        Place otherPlace = Place.normal(65.0, 14.0, new NonLocalizedString("Other Place"));
 
         assertTrue("same place", aPlace.sameLocation(samePlace));
         assertTrue("same place(symmetric)", samePlace.sameLocation(aPlace));
@@ -46,7 +47,7 @@ public class PlaceTest {
 
     @Test
     public void acceptsNullCoordinates() {
-        var p = Place.normal(null, null, "Test");
+        var p = Place.normal(null, null, new NonLocalizedString("Test"));
         assertNull(p.coordinate);
     }
 

@@ -1,16 +1,18 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.BoardingArea;
-import org.opentripplanner.util.MapUtils;
+import static java.util.Objects.requireNonNullElse;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.model.BoardingArea;
+import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS Boarding areas into the OTP model. */
 class BoardingAreaMapper {
+  static final String DEFAULT_NAME = "Boarding area";
 
-  private Map<org.onebusaway.gtfs.model.Stop, BoardingArea> mappedBoardingAreas = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.Stop, BoardingArea> mappedBoardingAreas = new HashMap<>();
 
   Collection<BoardingArea> map(Collection<org.onebusaway.gtfs.model.Stop> allBoardingAreas) {
     return MapUtils.mapToList(allBoardingAreas, this::map);
@@ -32,7 +34,7 @@ class BoardingAreaMapper {
 
     return new BoardingArea(
         base.getId(),
-        base.getName(),
+        requireNonNullElse(base.getName(), DEFAULT_NAME),
         base.getCode(),
         base.getDescription(),
         base.getCoordinate(),

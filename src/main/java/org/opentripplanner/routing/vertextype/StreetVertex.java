@@ -63,7 +63,7 @@ public abstract class StreetVertex extends Vertex {
         } else if (uniqueNames.size() == 1) {
             calculatedName = uniqueNames.get(0);
         } else {
-            calculatedName = new LocalizedString("unnamedStreet", (String[]) null);
+            calculatedName = new LocalizedString("unnamedStreet");
         }
         return calculatedName;
     }
