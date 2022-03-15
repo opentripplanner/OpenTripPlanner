@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
+import java.util.Comparator;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
@@ -61,14 +62,14 @@ public class GroupByTripIdAndDistance implements GroupId<GroupByTripIdAndDistanc
 
     /** package local to be unit-testable */
     static double calculateTotalDistance(List<Leg> transitLegs) {
-        return transitLegs.stream().mapToDouble(it -> it.getDistanceMeters()).sum();
+        return transitLegs.stream().mapToDouble(Leg::getDistanceMeters).sum();
     }
 
     /** package local to be unit-testable */
     static List<Leg> getKeySetOfLegsByLimit(List<Leg> legs, double distanceLimitMeters) {
         // Sort legs descending on distance
         legs = legs.stream()
-                .sorted((l,r) -> r.getDistanceMeters().compareTo(l.getDistanceMeters()))
+                .sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed())
                 .collect(Collectors.toList());
         double sum = 0.0;
         int i=0;
