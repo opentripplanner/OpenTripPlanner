@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.MapUtils;
@@ -43,7 +44,7 @@ class PathwayNodeMapper {
             "name",
             base.getId().getId(),
             null,
-            base.getName() == null ? DEFAULT_NAME : base.getName()
+            Optional.ofNullable(base.getName()).orElse(DEFAULT_NAME)
         );
 
 

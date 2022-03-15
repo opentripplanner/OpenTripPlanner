@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 
 /**
  * This is used to filter out bike rental itineraries that contain mostly walking. The value
@@ -32,7 +33,7 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryDeletio
             double bikeRentalDistance = itinerary.legs
                     .stream()
                     .filter(l -> l.getRentedVehicle() != null && l.getRentedVehicle())
-                    .mapToDouble(l -> l.getDistanceMeters())
+                    .mapToDouble(Leg::getDistanceMeters)
                     .sum();
             double totalDistance = itinerary.distanceMeters();
 

@@ -34,7 +34,7 @@ public class FlexibleTransitLeg implements Leg {
 
     private final Calendar endTime;
 
-    private final Double distanceMeters;
+    private final double distanceMeters;
 
     private final ServiceDate serviceDate;
 
@@ -144,7 +144,7 @@ public class FlexibleTransitLeg implements Leg {
     }
 
     @Override
-    public Double getDistanceMeters() {
+    public double getDistanceMeters() {
         return distanceMeters;
     }
 

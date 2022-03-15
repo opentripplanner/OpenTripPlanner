@@ -239,7 +239,7 @@ public class RaptorPathToItineraryMapper {
                     createCalendar(pathLeg.toTime()),
                     from,
                     to,
-                    (double) transfer.getDistanceMeters(),
+                    transfer.getDistanceMeters(),
                     toOtpDomainCost(pathLeg.generalizedCost()),
                     GeometryUtils.makeLineString(transfer.getCoordinates()),
                     List.of()

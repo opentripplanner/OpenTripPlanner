@@ -10,7 +10,6 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -74,10 +73,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
         request.includePlannedCancellations,
         request.modes.transitModes,
         request.getBannedRoutes(graphIndex.getAllRoutes()),
-        request.bannedTrips.entrySet().stream()
-                .filter(e -> e.getValue().equals(BannedStopSet.ALL))
-                .map(Entry::getKey)
-                .collect(Collectors.toSet())
+        request.bannedTrips
     );
   }
 
