@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.DoubleFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
@@ -32,7 +32,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
-import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -173,7 +172,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("whiteListed.lines", (List<String> lines) -> request.setWhiteListedRoutes(mapIDsToDomain(lines)));
         callWith.argument("banned.lines", (List<String> lines) -> request.setBannedRoutes(mapIDsToDomain(lines)));
 
-        callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) -> request.bannedTrips = toBannedTrips(serviceJourneys));
+        callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) -> request.setBannedTrips(mapIDsToDomain(serviceJourneys)));
 
 //        callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
 //        callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
@@ -277,14 +276,6 @@ public class TransmodelGraphQLPlanner {
             );
         }
         return null;
-    }
-
-    private HashMap<FeedScopedId, BannedStopSet> toBannedTrips(Collection<String> serviceJourneyIds) {
-        Map<FeedScopedId, BannedStopSet> bannedTrips = serviceJourneyIds
-            .stream()
-            .map(TransitIdMapper::mapIDToDomain)
-            .collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));
-        return new HashMap<>(bannedTrips);
     }
 
     /**
