@@ -2756,7 +2756,7 @@ type Stop implements Node & PlaceInterface {
     url(
         """If translated url is found from gtfs translation.txt and wanted language is not same as
         feed's language then returns wanted translation. Otherwise uses url from stops.txt."""
-        lang: String): String!
+        lang: String): String
 
     """Identifies whether this stop represents a stop or station."""
     locationType: LocationType
