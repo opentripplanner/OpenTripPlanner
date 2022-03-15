@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.WheelChairBoarding;
 
 import java.util.Collection;
@@ -90,7 +91,7 @@ public class BoardingAreaMapperTest  {
     assertNotNull(result.getId());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertNull(result.getName());
+    assertEquals(BoardingAreaMapper.DEFAULT_NAME, result.getName());
     assertNull(result.getParentStop());
     assertNull(result.getCode());
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());

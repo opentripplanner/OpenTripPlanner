@@ -179,9 +179,7 @@ public class AddTransitModelEntitiesToGraph {
 
                 var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
                 boolean wheelchair = boardingArea.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
-                var name = Optional.ofNullable(boardingArea.getName())
-                        .map(NonLocalizedString::new)
-                        .orElse(null);
+                var name = new NonLocalizedString(boardingArea.getName());
 
                 PathwayEdge.lowCost(
                         boardingAreaVertex,
@@ -225,7 +223,7 @@ public class AddTransitModelEntitiesToGraph {
                         fromVertex,
                         toVertex,
                         pathway.getId(),
-                        Optional.ofNullable(pathway.getName()).map(NonLocalizedString::new).orElse((NonLocalizedString)PathwayEdge.DEFAULT_NAME),
+                        NonLocalizedString.ofNullable(pathway.getName()),
                         pathway.getTraversalTime(),
                         distance,
                         pathway.getStairCount(),
@@ -237,7 +235,7 @@ public class AddTransitModelEntitiesToGraph {
                             toVertex,
                             fromVertex,
                             pathway.getId(),
-                            Optional.ofNullable(pathway.getReversedName()).map(NonLocalizedString::new).orElse(null),
+                            NonLocalizedString.ofNullable(pathway.getReversedName()),
                             pathway.getTraversalTime(),
                             distance,
                             -1 * pathway.getStairCount(),
