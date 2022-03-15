@@ -42,7 +42,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
 
   private final List<List<RaptorTransfer>> transfersFromStop = new ArrayList<>();
   private final List<List<RaptorTransfer>> transfersToStop = new ArrayList<>();
-  private final List<Set<Integer>> routesByStop = new ArrayList<>();
+  private final List<Set<Integer>> routeIndexesByStopIndex = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<ConstrainedTransfer> constrainedTransfers = new ArrayList<>();
   private final McCostParamsBuilder costParamsBuilder = new McCostParamsBuilder();
@@ -62,7 +62,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     BitSet routes = new BitSet();
     while (stops.hasNext()) {
       int stop = stops.next();
-      for (int i : routesByStop.get(stop)) {
+      for (int i : routeIndexesByStopIndex.get(stop)) {
         routes.set(i);
       }
     }
@@ -70,13 +70,13 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   }
 
   @Override
-  public RaptorRoute<TestTripSchedule> getPatternForIndex(int routeIndex) {
+  public RaptorRoute<TestTripSchedule> getRouteForIndex(int routeIndex) {
     return this.routes.get(routeIndex);
   }
 
   @Override
   public int numberOfStops() {
-    return routesByStop.size();
+    return routeIndexesByStopIndex.size();
   }
 
   @Override
@@ -166,7 +166,7 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     for(int i=0; i< pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
       expandNumOfStops(stopIndex);
-      routesByStop.get(stopIndex).add(routeIndex);
+      routeIndexesByStopIndex.get(stopIndex).add(routeIndex);
     }
     return this;
   }
@@ -264,14 +264,14 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
     for (int i=numberOfStops(); i<=stopIndex; ++i) {
       transfersFromStop.add(new ArrayList<>());
       transfersToStop.add(new ArrayList<>());
-      routesByStop.add(new HashSet<>());
+      routeIndexesByStopIndex.add(new HashSet<>());
     }
   }
 
   private List<Integer> stopsVisited() {
     final List<Integer> stops = new ArrayList<>();
-    for (int i = 0; i < routesByStop.size(); i++) {
-       if(!routesByStop.get(i).isEmpty()) {
+    for (int i = 0; i < routeIndexesByStopIndex.size(); i++) {
+       if(!routeIndexesByStopIndex.get(i).isEmpty()) {
          stops.add(i);
        }
     }

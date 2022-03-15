@@ -37,12 +37,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   private final TransferService transferService;
 
   /**
-   * Active trip pattern indices by stop index
+   * Active route indices by stop index
    */
   private final List<int[]> activeTripPatternsPerStop;
 
   /**
-   * Trip patterns by trip pattern index
+   * Trip patterns by route index
    */
   private final List<TripPatternForDates> patternIndex;
 
@@ -126,7 +126,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
-  public RaptorRoute<TripSchedule> getPatternForIndex(int routeIndex) {
+  public RaptorRoute<TripSchedule> getRouteForIndex(int routeIndex) {
     return patternIndex.get(routeIndex);
   }
 

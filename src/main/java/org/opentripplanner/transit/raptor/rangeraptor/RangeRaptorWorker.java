@@ -201,7 +201,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
 
             while (routeIndexIterator.hasNext()) {
                 var routeIndex = routeIndexIterator.next();
-                var route = transitData.getPatternForIndex(routeIndex);
+                var route = transitData.getRouteForIndex(routeIndex);
                 var pattern = route.pattern();
                 var tripSearch = createTripSearch(route.timetable());
                 var txSearch = enableTransferConstraints
