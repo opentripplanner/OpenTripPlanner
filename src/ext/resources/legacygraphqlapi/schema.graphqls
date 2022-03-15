@@ -1420,7 +1420,7 @@ type VehiclePosition {
 }
 
 enum VehicleStopStatus {
-    STOPPED_AT, INCOMING_AT, IN_TRANSIT_TO
+    STOPPED_AT, IN_TRANSIT_TO, INCOMING_AT
 }
 
 """
