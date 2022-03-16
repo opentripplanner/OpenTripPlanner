@@ -44,13 +44,6 @@ If you have extracted a smaller PBF file from a larger region, be sure to put on
 A typical command to start OTP looks like `java -Xmx2G -jar otp.shaded.jar <options>`. The 
  `-Xmx` parameter sets the limit on how much memory OTP is allowed to consume. GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory when working with the Portland TriMet data set, and several gigabytes for larger inputs. If you have
  sufficient memory in your computer, set this to a couple of gigabytes (e.g. `-Xmx2G`). Java uses a [garbage collection](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)) approach to memory management, which requires some "breathing room" to efficiently operate. Without sufficient free memory OTP can grind to a halt. [VisualVM](https://visualvm.github.io) is a good way to inspect Java memory usage, especially with the [VisualGC plugin](https://visualvm.github.io/plugins.html).
- 
- Java 11 has tighter security restrictions than previous versions, so when running OTP under Java 11 you will see warnings like this:
- ```
- WARNING: An illegal reflective access operation has occurred
- WARNING: Please consider reporting this to the maintainers of com.esotericsoftware.kryo.util.UnsafeUtil
- ```
- These warnings are expected to remain for a while, until all libraries OTP2 depends on have fully migrated to Java 11 and we have upgraded them all.
 
 ## Building Graphs
 
