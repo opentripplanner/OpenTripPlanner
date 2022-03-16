@@ -87,7 +87,7 @@ public abstract class SnapshotTestBase {
     protected RoutingRequest createTestRequest(int year, int month, int day, int hour, int minute, int second) {
         Router router = getRouter();
 
-        RoutingRequest request = router.defaultRoutingRequest.clone();
+        RoutingRequest request = router.copyDefaultRoutingRequest();
         request.setDateTime(TestUtils.dateInstant(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second));
         request.maxTransfers = 6;
         request.numItineraries = 6;
