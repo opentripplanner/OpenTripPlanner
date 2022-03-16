@@ -86,8 +86,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   public DataFetcher<String> name() {
     return environment -> getValue(
           environment,
-          stop -> stop.getName().toString(LegacyGraphQLUtils.getLocale(environment)),
-          station -> station.getName().toString(LegacyGraphQLUtils.getLocale(environment))
+          stop -> LegacyGraphQLUtils.getTranslation(stop.getName(), environment),
+          station -> LegacyGraphQLUtils.getTranslation(station.getName(), environment)
     );
   }
 
@@ -120,8 +120,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   public DataFetcher<String> url() {
     return environment -> getValue(
           environment,
-          stop -> stop.getUrl().toString(LegacyGraphQLUtils.getLocale(environment)),
-          station -> station.getUrl().toString(LegacyGraphQLUtils.getLocale(environment))
+          stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
+          station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
     );
   }
 
