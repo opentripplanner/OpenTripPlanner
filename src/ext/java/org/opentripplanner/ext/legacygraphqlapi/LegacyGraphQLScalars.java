@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
+import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.language.StringValue;
@@ -10,12 +11,12 @@ import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.geometry.GeoJsonModule;
+import org.opentripplanner.common.geometry.GeometryUtils;
 
 public class LegacyGraphQLScalars {
 
     private static final ObjectMapper geoJsonMapper = new ObjectMapper()
-            .registerModule(new GeoJsonModule());
+            .registerModule(new JtsModule(GeometryUtils.getGeometryFactory()));
 
     public static GraphQLScalarType polylineScalar = GraphQLScalarType
       .newScalar()
