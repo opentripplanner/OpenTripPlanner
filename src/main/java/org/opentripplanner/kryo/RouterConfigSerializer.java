@@ -26,7 +26,7 @@ public class RouterConfigSerializer extends Serializer<RouterConfig> {
         output.writeString(object.toJson());
     }
     @Override
-    public RouterConfig read(Kryo kryo, Input input, Class<RouterConfig> type) {
+    public RouterConfig read(Kryo kryo, Input input, Class<? extends RouterConfig> type) {
         return new RouterConfig(
                 ConfigLoader.nodeFromString(input.readString(), SOURCE),
                 SOURCE,

@@ -15,7 +15,7 @@ class JavaImmutableSetSerializer extends Serializer<Set> {
     }
 
     @Override
-    public Set read(Kryo kryo, Input input, Class<Set> type) {
+    public Set read(Kryo kryo, Input input, Class<? extends Set> type) {
         return kryo.readObject(input, ImmSerList.class).toSet();
     }
 

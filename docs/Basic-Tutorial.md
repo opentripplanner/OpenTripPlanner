@@ -4,7 +4,7 @@ This page should allow you to set up and test your own OTP2 server. If all goes 
 
 ## Get Java
 
-As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of the Java runtime (JRE) or Java development kit (JDK). OTP2 is compatible with Java 11 or later. We recommend running on Java 11 rather than a later version, as it is a long-term support release. Run `java -version` to check that you have version 11 or newer of the JVM installed. If you do not, you will need to install a recent OpenJDK or Oracle Java package for your operating system.
+As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of the Java runtime (JRE) or Java development kit (JDK). OTP2 is compatible with Java 17 or later. We recommend running on Java 17 rather than a later version, as it is a long-term support release. Run `java -version` to check that you have version 17 or newer of the JVM installed. If you do not, you will need to install a recent OpenJDK or Oracle Java package for your operating system.
 
 ## Get OTP
 
