@@ -234,7 +234,6 @@
                         @{argLine}
                         -Xmx2G
                         -Dfile.encoding=UTF-8
-                        --illegal-access=permit
                         --add-opens java.base/java.io=ALL-UNNAMED
                         --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-opens java.base/java.lang.module=ALL-UNNAMED
