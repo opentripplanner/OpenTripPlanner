@@ -51,11 +51,9 @@ public class TransmodelGraphQLPlanner {
         PlanResponse response = new PlanResponse();
         TransmodelRequestContext ctx = environment.getContext();
         Router router = ctx.getRouter();
-        Locale locale = router.defaultRoutingRequest.locale;
         RoutingRequest request = null;
         try {
             request = createRequest(environment);
-            locale = request.locale;
 
             RoutingResponse res = ctx.getRoutingService().route(request, router);
 
@@ -75,6 +73,7 @@ public class TransmodelGraphQLPlanner {
             response.plan = TripPlanMapper.mapTripPlan(request, List.of());
             response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
         }
+        Locale locale = request == null ? router.getDefaultLocale() : request.locale;
         return DataFetcherResult.<PlanResponse>newResult()
                 .data(response)
                 .localContext(Map.of("locale", locale))
@@ -99,10 +98,11 @@ public class TransmodelGraphQLPlanner {
     }
 
     private RoutingRequest createRequest(DataFetchingEnvironment environment)
-    throws ParameterException {
+            throws ParameterException
+    {
         TransmodelRequestContext context = environment.getContext();
         Router router = context.getRouter();
-        RoutingRequest request = router.defaultRoutingRequest.clone();
+        RoutingRequest request = router.copyDefaultRoutingRequest();
 
         DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
