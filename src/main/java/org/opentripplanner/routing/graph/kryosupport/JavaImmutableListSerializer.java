@@ -15,7 +15,7 @@ class JavaImmutableListSerializer extends Serializer<List> {
     }
 
     @Override
-    public List read(Kryo kryo, Input input, Class<List> type) {
+    public List read(Kryo kryo, Input input, Class<? extends List> type) {
         return kryo.readObject(input, ImmSerList.class).toList();
     }
 
