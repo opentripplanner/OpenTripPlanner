@@ -32,7 +32,7 @@ When in doubt, new users are advised to try out OTP2 and switch to OTP1 if they 
 | Feature | OTP1 | OTP2 |
 |---------|------|------|
 | OSM street data | yes | yes |
-| GTFS transit data | yes | yes ([_frequency.txt_ not jet supported](https://github.com/opentripplanner/OpenTripPlanner/issues/3243)) |
+| GTFS transit data | yes | yes |
 | Netex transit data | no | yes<br>(Nordic profile) |
 | GTFS-Realtime | yes<br>(streaming, polling, incremental) | yes<br>(streaming, polling, incremental) |
 | SIRI Realtime | no | yes |
@@ -51,8 +51,8 @@ When in doubt, new users are advised to try out OTP2 and switch to OTP1 if they 
 | Timetable View | no | yes |
 | Plugin Sandbox Extensions | no | yes ([See extensions](SandboxExtension.md)) |
 | Data storage | local, S3 (elevation only) | extensible with local, ZIP,<br>and Google Cloud plugins, S3 available |
-| Transfer Priority | yes (route, trip, stop level) | no (planned) |
-/ REST API format | XML, JSON | JSON only |
+| Transfer Priority | yes | yes |
+| REST API format | XML, JSON | JSON only |
 
 
 ## Commentary on OTP1 features removed from OTP2
