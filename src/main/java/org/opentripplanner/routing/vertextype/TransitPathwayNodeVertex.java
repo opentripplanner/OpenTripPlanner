@@ -16,9 +16,9 @@ public class TransitPathwayNodeVertex extends Vertex {
 
   private static final long serialVersionUID = 1L;
 
-  private boolean wheelchairEntrance;
+  private final boolean wheelchairEntrance;
 
-  private PathwayNode node;
+  private final PathwayNode node;
 
   /**
    * @param node The transit model pathway node reference.
@@ -29,7 +29,7 @@ public class TransitPathwayNodeVertex extends Vertex {
         node.getId().toString(),
         node.getCoordinate().longitude(),
         node.getCoordinate().latitude(),
-        new NonLocalizedString(node.getName())
+        node.getName()
     );
     this.node = node;
     this.wheelchairEntrance = node.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

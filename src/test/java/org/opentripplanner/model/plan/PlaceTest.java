@@ -54,7 +54,7 @@ public class PlaceTest {
     private static Stop stop(String stopId, double lat, double lon) {
        return new Stop(
                 new FeedScopedId("S", stopId),
-                stopId,
+                new NonLocalizedString(stopId),
                 null,
                 null,
                 WgsCoordinate.creatOptionalCoordinate(lat, lon),

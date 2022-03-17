@@ -7,18 +7,21 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.util.TranslationHelper;
 
 public class TransferMapperTest {
     private static final String FEED_ID = "FEED";
+
+    private static final TranslationHelper TRANSLATION_HELPER = new TranslationHelper();
 
     private static final RouteMapper ROUTE_MAPPER =
             new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false));
 
     private static final TripMapper TRIP_MAPPER = new TripMapper(ROUTE_MAPPER);
 
-    private static final StationMapper STATION_MAPPER = new StationMapper();
+    private static final StationMapper STATION_MAPPER = new StationMapper(TRANSLATION_HELPER);
 
-    private static final StopMapper STOP_MAPPER = new StopMapper();
+    private static final StopMapper STOP_MAPPER = new StopMapper(TRANSLATION_HELPER);
 
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 

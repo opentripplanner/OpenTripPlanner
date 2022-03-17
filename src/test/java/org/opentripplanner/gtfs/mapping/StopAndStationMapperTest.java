@@ -7,6 +7,7 @@ import org.opentripplanner.model.WheelChairBoarding;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.opentripplanner.util.TranslationHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -63,7 +64,7 @@ public class StopAndStationMapperTest {
         STOP.setZoneId(ZONE_ID);
     }
 
-    private StopMapper subject = new StopMapper();
+    private StopMapper subject = new StopMapper(new TranslationHelper());
 
     @Test
     public void testMapCollection() {
@@ -81,8 +82,8 @@ public class StopAndStationMapperTest {
         assertEquals(DESC, result.getDescription());
         assertEquals(LAT, result.getLat(), 0.0001d);
         assertEquals(LON, result.getLon(), 0.0001d);
-        assertEquals(NAME, result.getName());
-        assertEquals(URL, result.getUrl());
+        assertEquals(NAME, result.getName().toString());
+        assertEquals(URL, result.getUrl().toString());
         assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
         assertEquals(ZONE_ID, result.getFirstZoneAsString());
     }
@@ -91,13 +92,14 @@ public class StopAndStationMapperTest {
     public void testMapWithNulls() {
         Stop input = new Stop();
         input.setId(AGENCY_AND_ID);
+        input.setName(NAME);
 
         org.opentripplanner.model.Stop result = subject.map(input);
 
         assertNotNull(result.getId());
         assertNull(result.getCode());
         assertNull(result.getDescription());
-        assertNull(result.getName());
+        assertEquals(NAME, result.getName().toString());
         assertNull(result.getParentStation());
         assertNull(result.getCode());
         assertNull(result.getUrl());
@@ -111,6 +113,7 @@ public class StopAndStationMapperTest {
     public void verifyMissingCoordinateThrowsException() {
         Stop input = new Stop();
         input.setId(AGENCY_AND_ID);
+        input.setName(NAME);
 
         org.opentripplanner.model.Stop result = subject.map(input);
 

@@ -176,16 +176,14 @@ public class AddTransitModelEntitiesToGraph {
                     new TransitBoardingAreaVertex(graph, boardingArea);
             stationElementNodes.put(boardingArea, boardingAreaVertex);
             if (boardingArea.getParentStop() != null) {
-
                 var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
                 boolean wheelchair = boardingArea.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
-                var name = new NonLocalizedString(boardingArea.getName());
 
                 PathwayEdge.lowCost(
                         boardingAreaVertex,
                         platformVertex,
                         boardingArea.getId(),
-                        name,
+                        boardingArea.getName(),
                         wheelchair
                 );
 
@@ -193,7 +191,7 @@ public class AddTransitModelEntitiesToGraph {
                         platformVertex,
                         boardingAreaVertex,
                         boardingArea.getId(),
-                        name,
+                        boardingArea.getName(),
                         wheelchair
                 );
             }
