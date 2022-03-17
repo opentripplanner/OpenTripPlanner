@@ -6,6 +6,20 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.1.0 (2022-03-17)
 
+### Notable Changes
+- GBFS 2.2 is supported including "form factors" (bike, scooter, car) and floating vehicles (with no fixed station)
+- Constrained Transfers (Netex interchanges / GTFS `transfers.txt`)
+- Transfers for bicycle and wheelchair users distinct from walking paths
+- Support for GTFS-Flex v2
+- Support for frequency-based trips (GTFS `frequencies.txt`, does not exist in Netex)
+- Many 1.5 features not fully implemented in 2.0 have been reintroduced
+- Improved result quality relative to both 1.5 and 2.0: filtering of itineraries and selection of transfer points between routes
+- Car and bicycle parking has been combined into vehicle parking (enhanced with real-time details like remaining parking spaces)
+- New system for paging of routing results via cursor token
+- Response times should be roughly stable since 2.0. Performance much improved over OTP1 for long searches, may be somewhat slower for short searches. Extremely depdendent on data set used, so test on your specific data.
+- System integration tests for ongoing performance measurement 
+
+### Detailed changes by Pull Request
 - Fix NullPointerException when a RealTime update do not match an existing TripPattern [#3284](https://github.com/opentripplanner/OpenTripPlanner/issues/3284)
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
 - Prioritize "direct" routes over transfers in group-filters [#3309](https://github.com/opentripplanner/OpenTripPlanner/issues/3309)
@@ -57,9 +71,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Generalized graph connectivity pruning [#3426](https://github.com/opentripplanner/OpenTripPlanner/pull/3426)
 - Stop linking to area/platform edges obeys area boundaries and traverse modes [#3201](https://github.com/opentripplanner/OpenTripPlanner/issues/3201)
 - Add service day mapping to REST API [#3659](https://github.com/opentripplanner/OpenTripPlanner/pull/3659)
-- Cost on transfer in Raptor [#3629](https://github.com/opentripplanner/OpenTripPlanner/pull/3629)
+- Generalized cost on transfer in Raptor [#3629](https://github.com/opentripplanner/OpenTripPlanner/pull/3629)
 - Add two new filters for use within grouping filter [#3638](https://github.com/opentripplanner/OpenTripPlanner/pull/3638)
-- Use correct slack in transfer optimizer [#3668](https://github.com/opentripplanner/OpenTripPlanner/pull/3668)
 - Correct usage of boardSlackForMode / alightSlackForMode [#3693](https://github.com/opentripplanner/OpenTripPlanner/pull/3693)
 - Do not parse pass-through information in GBFS mappers [#3709](https://github.com/opentripplanner/OpenTripPlanner/pull/3709)
 - Vehicle rental updates [#3632](https://github.com/opentripplanner/OpenTripPlanner/pull/3632)
@@ -126,8 +139,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add support for creating constrained transfers from real-time generated patterns [#3878](https://github.com/opentripplanner/OpenTripPlanner/pull/3878)
 - Account for stay seated transfers when calculating the number of transfers [#3888](https://github.com/opentripplanner/OpenTripPlanner/pull/3888)
 - Add Hungarian translation [#3861](https://github.com/opentripplanner/OpenTripPlanner/pull/3861)
-- Add support for NeTEx VIA's [#3883](https://github.com/opentripplanner/OpenTripPlanner/pull/3883)
-- Make some list entries non-null in schema/docs [#3915](https://github.com/opentripplanner/OpenTripPlanner/pull/3915)
+- Add support for "via" in NeTEx headsigns [#3883](https://github.com/opentripplanner/OpenTripPlanner/pull/3883)
 - NeTEx mapping to StopTime.timepoint [#3898](https://github.com/opentripplanner/OpenTripPlanner/pull/3898)
 - Optimize RAPTOR trip search by pre-calculating arrival/departure time arrays [#3919](https://github.com/opentripplanner/OpenTripPlanner/pull/3919)
 - Make turn restrictions faster and thread-safe by moving them into StreetEdge [#3899](https://github.com/opentripplanner/OpenTripPlanner/pull/3899)
