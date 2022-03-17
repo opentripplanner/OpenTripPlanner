@@ -120,8 +120,7 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
  
 #### Parameters missing in OTP2 but intended to be reintroduced
 
-- `startingTransitTripId` The ability to plan a trip from on board a vehicle should be implemented 
-  by Q1 2021.
+- `startingTransitTripId` - ability to plan a trip from on board a vehicle 
 - `intermediatePlaces` - ability to specify intermediate destinations along the route. It is not 
   certain when this will be implemented. 
 - `nonpreferredTransferCost`, `(un)preferredRoutes`, `(un)preferredAgencies` - these help diversify
