@@ -13,7 +13,7 @@ public class InfoLinkType {
         .name("infoLink")
         .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("uri")
-                .type(new GraphQLNonNull(new GraphScalars.GraphQLString))
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .description("URI")
                 .dataFetcher(environment -> {
                     AlertUrl source = environment.getSource();
