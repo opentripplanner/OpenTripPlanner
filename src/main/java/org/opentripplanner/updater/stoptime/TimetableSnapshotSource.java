@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import java.util.Map;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -17,11 +18,14 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimesPatch;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -30,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
@@ -166,13 +169,24 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * However, multi-feed support is not completed and we currently assume there is only one static
      * feed when matching IDs.
      *
-     * @param graph graph to update (needed for adding/changing stop patterns)
+     * @param calendarService graph's calendar service
+     * @param deduplicator deduplicator for different types
+     * @param graphIndex graph's index
+     * @param serviceCodes graph's service codes
      * @param fullDataset true iff the list with updates represent all updates that are active right
      *        now, i.e. all previous updates should be disregarded
      * @param updates GTFS-RT TripUpdate's that should be applied atomically
      * @param feedId
      */
-    public void applyTripUpdates(final Graph graph, final boolean fullDataset, final List<TripUpdate> updates, final String feedId) {
+    public void applyTripUpdates(
+            final CalendarService calendarService,
+            final Deduplicator deduplicator,
+            final GraphIndex graphIndex,
+            final Map<FeedScopedId, Integer> serviceCodes,
+            final boolean fullDataset,
+            final List<TripUpdate> updates,
+            final String feedId
+    ) {
         if (updates == null) {
             LOG.warn("updates is null");
             return;
@@ -232,7 +246,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 switch (tripScheduleRelationship) {
                     case SCHEDULED:
                         applied = handleScheduledTrip(
-                                graph,
+                                serviceCodes,
                                 tripUpdate,
                                 tripDescriptor,
                                 feedId,
@@ -241,7 +255,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                         break;
                     case ADDED:
                         applied = validateAndHandleAddedTrip(
-                                graph,
+                                calendarService,
+                                deduplicator,
+                                graphIndex,
+                                serviceCodes,
                                 tripUpdate,
                                 tripDescriptor,
                                 feedId,
@@ -256,7 +273,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                         break;
                     case MODIFIED:
                         applied = validateAndHandleModifiedTrip(
-                                graph,
+                                calendarService,
+                                deduplicator,
+                                graphIndex,
+                                serviceCodes,
                                 tripUpdate,
                                 tripDescriptor,
                                 feedId,
@@ -312,7 +332,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     private boolean handleScheduledTrip(
-            final Graph graph,
+            final Map<FeedScopedId, Integer> serviceCodes,
             final TripUpdate tripUpdate,
             final TripDescriptor tripDescriptor,
             final String feedId,
@@ -363,13 +383,17 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             final Trip trip = getTripForTripId(feedId, tripId);
             // Get cached trip pattern or create one if it doesn't exist yet
             final TripPattern newPattern =
-                    tripPatternCache.getOrCreateTripPattern(newStopPattern, trip, graph);
+                    tripPatternCache.getOrCreateTripPattern(
+                            newStopPattern,
+                            trip,
+                            serviceCodes,
+                            pattern
+                    );
 
             // Add service code to bitset of pattern if needed (using copy on write)
-            final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
+            final int serviceCode = serviceCodes.get(trip.getServiceId());
             newPattern.setServiceCode(serviceCode);
 
-            newPattern.setOriginalTripPattern(pattern);
             cancelScheduledTrip(feedId, tripId, serviceDate);
             return buffer.update(newPattern, updatedTripTimes, serviceDate);
         }
@@ -382,7 +406,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     /**
      * Validate and handle GTFS-RT TripUpdate message containing an ADDED trip.
      *
-     * @param graph graph to update
+     * @param calendarService graph's calendar service
+     * @param deduplicator deduplicator for different types
+     * @param graphIndex graph's index
+     * @param serviceCodes graph's service codes
      * @param tripUpdate GTFS-RT TripUpdate message
      * @param tripDescriptor GTFS-RT TripDescriptor
      * @param feedId
@@ -390,11 +417,19 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return true iff successful
      */
     private boolean validateAndHandleAddedTrip(
-            final Graph graph, final TripUpdate tripUpdate, final TripDescriptor tripDescriptor,
-            final String feedId, final ServiceDate serviceDate
+            final CalendarService calendarService,
+            final Deduplicator deduplicator,
+            final GraphIndex graphIndex,
+            final Map<FeedScopedId, Integer> serviceCodes,
+            final TripUpdate tripUpdate,
+            final TripDescriptor tripDescriptor,
+            final String feedId,
+            final ServiceDate serviceDate
     ) {
         // Preconditions
-        Preconditions.checkNotNull(graph);
+        Preconditions.checkNotNull(calendarService);
+        Preconditions.checkNotNull(deduplicator);
+        Preconditions.checkNotNull(graphIndex);
         Preconditions.checkNotNull(tripUpdate);
         Preconditions.checkNotNull(serviceDate);
 
@@ -436,7 +471,17 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         //
 
         final boolean success =
-                handleAddedTrip(graph, tripUpdate, tripDescriptor, stops, feedId, serviceDate);
+                handleAddedTrip(
+                        calendarService,
+                        deduplicator,
+                        graphIndex,
+                        serviceCodes,
+                        tripUpdate,
+                        tripDescriptor,
+                        stops,
+                        feedId,
+                        serviceDate
+                );
         return success;
     }
 
@@ -539,7 +584,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     /**
      * Handle GTFS-RT TripUpdate message containing an ADDED trip.
      *
-     * @param graph graph to update
+     * @param calendarService graph's calendar service
+     * @param deduplicator deduplicator for different types
+     * @param graphIndex graph's index
+     * @param serviceCodes graph's service codes
      * @param tripUpdate GTFS-RT TripUpdate message
      * @param tripDescriptor GTFS-RT TripDescriptor
      * @param stops the stops of each StopTimeUpdate in the TripUpdate message
@@ -548,7 +596,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return true iff successful
      */
     private boolean handleAddedTrip(
-            final Graph graph,
+            final CalendarService calendarService,
+            final Deduplicator deduplicator,
+            final GraphIndex graphIndex,
+            final Map<FeedScopedId, Integer> serviceCodes,
             final TripUpdate tripUpdate,
             final TripDescriptor tripDescriptor,
             final List<StopLocation> stops,
@@ -605,7 +656,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         trip.setRoute(route);
 
         // Find service ID running on this service date
-        final Set<FeedScopedId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
+        final Set<FeedScopedId> serviceIds = calendarService.getServiceIdsOnDate(serviceDate);
         if (serviceIds.isEmpty()) {
             // No service id exists: return error for now
             LOG.warn("ADDED trip has service date for which no service id is available, skipping.");
@@ -615,14 +666,25 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             trip.setServiceId(serviceIds.iterator().next());
         }
 
-        final boolean success = addTripToGraphAndBuffer(graph, trip, tripUpdate, stops, serviceDate, RealTimeState.ADDED);
+        final boolean success = addTripToGraphAndBuffer(
+                deduplicator,
+                graphIndex,
+                serviceCodes,
+                trip,
+                tripUpdate,
+                stops,
+                serviceDate,
+                RealTimeState.ADDED
+        );
         return success;
     }
 
     /**
      * Add a (new) trip to the graph and the buffer
      *
-     * @param graph graph
+     * @param deduplicator deduplicator for different types
+     * @param graphIndex graph's index
+     * @param serviceCodes graph's service codes
      * @param trip trip
      * @param tripUpdate trip update containing stop time updates
      * @param stops list of stops corresponding to stop time updates
@@ -630,9 +692,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @param realTimeState real-time state of new trip
      * @return true iff successful
      */
-    private boolean addTripToGraphAndBuffer(final Graph graph, final Trip trip,
-            final TripUpdate tripUpdate, final List<StopLocation> stops, final ServiceDate serviceDate,
-            final RealTimeState realTimeState) {
+    private boolean addTripToGraphAndBuffer(
+            final Deduplicator deduplicator,
+            final GraphIndex graphIndex,
+            final Map<FeedScopedId, Integer> serviceCodes,
+            final Trip trip,
+            final TripUpdate tripUpdate,
+            final List<StopLocation> stops,
+            final ServiceDate serviceDate,
+            final RealTimeState realTimeState
+    ) {
 
         // Preconditions
         Preconditions.checkNotNull(stops);
@@ -700,15 +769,22 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Create StopPattern
         final StopPattern stopPattern = new StopPattern(stopTimes);
 
+        final TripPattern originalTripPattern = graphIndex.getPatternForTrip().get(trip);
         // Get cached trip pattern or create one if it doesn't exist yet
-        final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip, graph);
+        final TripPattern pattern =
+                tripPatternCache.getOrCreateTripPattern(
+                        stopPattern,
+                        trip,
+                        serviceCodes,
+                        originalTripPattern
+                );
 
         // Add service code to bitset of pattern if needed (using copy on write)
-        final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
+        final int serviceCode = serviceCodes.get(trip.getServiceId());
         pattern.setServiceCode(serviceCode);
 
         // Create new trip times
-        final TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
+        final TripTimes newTripTimes = new TripTimes(trip, stopTimes, deduplicator);
 
         // Update all times to mark trip times as realtime
         // TODO: should we incorporate the delay field if present?
@@ -798,7 +874,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     /**
      * Validate and handle GTFS-RT TripUpdate message containing a MODIFIED trip.
      *
-     * @param graph graph to update
+     * @param calendarService graph's calendar service
+     * @param deduplicator deduplicator for different types
+     * @param graphIndex graph's index
+     * @param serviceCodes graph's service codes
      * @param tripUpdate GTFS-RT TripUpdate message
      * @param tripDescriptor GTFS-RT TripDescriptor
      * @param feedId
@@ -806,14 +885,19 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return true if successful
      */
     private boolean validateAndHandleModifiedTrip(
-            final Graph graph,
+            final CalendarService calendarService,
+            final Deduplicator deduplicator,
+            final GraphIndex graphIndex,
+            final Map<FeedScopedId, Integer> serviceCodes,
             final TripUpdate tripUpdate,
             final TripDescriptor tripDescriptor,
             final String feedId,
             final ServiceDate serviceDate
     ) {
         // Preconditions
-        Preconditions.checkNotNull(graph);
+        Preconditions.checkNotNull(calendarService);
+        Preconditions.checkNotNull(deduplicator);
+        Preconditions.checkNotNull(graphIndex);
         Preconditions.checkNotNull(tripUpdate);
         Preconditions.checkNotNull(serviceDate);
 
@@ -837,7 +921,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             return false;
         } else {
             // Check whether service date is served by trip
-            final Set<FeedScopedId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
+            final Set<FeedScopedId> serviceIds = calendarService.getServiceIdsOnDate(serviceDate);
             if (!serviceIds.contains(trip.getServiceId())) {
                 // TODO: should we support this and change service id of trip?
                 LOG.warn("MODIFIED trip has a service date that is not served by trip, skipping.");
@@ -861,7 +945,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Handle modified trip
         //
 
-        final boolean success = handleModifiedTrip(graph, trip, tripUpdate, stops, feedId, serviceDate);
+        final boolean success = handleModifiedTrip(
+                deduplicator,
+                graphIndex,
+                serviceCodes,
+                trip,
+                tripUpdate,
+                stops,
+                feedId,
+                serviceDate
+        );
 
         return success;
     }
@@ -869,7 +962,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     /**
      * Handle GTFS-RT TripUpdate message containing a MODIFIED trip.
      *
-     * @param graph graph to update
+     * @param deduplicator deduplicator for different types
+     * @param graphIndex graph's index
+     * @param serviceCodes graph's service codes
      * @param trip trip that is modified
      * @param tripUpdate GTFS-RT TripUpdate message
      * @param stops the stops of each StopTimeUpdate in the TripUpdate message
@@ -877,8 +972,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @param serviceDate service date for modified trip
      * @return true iff successful
      */
-    private boolean handleModifiedTrip(final Graph graph, final Trip trip, final TripUpdate tripUpdate, final List<StopLocation> stops,
-            final String feedId, final ServiceDate serviceDate) {
+    private boolean handleModifiedTrip(
+            final Deduplicator deduplicator,
+            final GraphIndex graphIndex,
+            final Map<FeedScopedId, Integer> serviceCodes,
+            final Trip trip,
+            final TripUpdate tripUpdate,
+            final List<StopLocation> stops,
+            final String feedId,
+            final ServiceDate serviceDate
+    ) {
         // Preconditions
         Preconditions.checkNotNull(stops);
         Preconditions.checkArgument(tripUpdate.getStopTimeUpdateCount() == stops.size(),
@@ -895,7 +998,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Add new trip
         final boolean success =
-                addTripToGraphAndBuffer(graph, trip, tripUpdate, stops, serviceDate, RealTimeState.MODIFIED);
+                addTripToGraphAndBuffer(
+                        deduplicator,
+                        graphIndex,
+                        serviceCodes,
+                        trip,
+                        tripUpdate,
+                        stops,
+                        serviceDate,
+                        RealTimeState.MODIFIED
+                );
         return success;
     }
 
