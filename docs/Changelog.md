@@ -13,6 +13,7 @@
 - Improve performance of Park+Ride, Bike+Ride and Bike+Transit [#3906](https://github.com/opentripplanner/OpenTripPlanner/pull/3906)
 - Re-add GraphCoherencyCheckerModule [#3985](https://github.com/opentripplanner/OpenTripPlanner/pull/3985)
 - Modify TripPattern logic for updating stop-to-stop geometry [#3988](https://github.com/opentripplanner/OpenTripPlanner/pull/3988)
+- Read translations from GTFS and Netex sources for stop names [#3808](https://github.com/opentripplanner/OpenTripPlanner/pull/3808)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
