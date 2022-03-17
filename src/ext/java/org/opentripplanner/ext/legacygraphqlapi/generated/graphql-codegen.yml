@@ -83,4 +83,4 @@ config:
     VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParkingState#VehicleParkingState
     VertexType: String
     SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice
-    VehiclePosition: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition
+    VehiclePosition: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition#RealtimeVehiclePosition
