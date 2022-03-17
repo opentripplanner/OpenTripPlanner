@@ -85,60 +85,13 @@
                 <directory>src/ext-test/resources</directory>
             </testResource>
         </testResources>
-        <pluginManagement>
-            <plugins>
-                <!-- m2eclipse lifecycle mapping configuration. This controls which Maven build goals should
-                be performed during incremental builds within the Eclipse IDE. There are sensible defaults
-                for most plugins, but some others require manual configuration with <action><ignore /> or
-                <action><execute /> filters. This section only affects incremental builds within Eclipse,
-                not command-line Maven builds. That's why it's a pluginManagement without an accompanying plugin. -->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-dependency-plugin</artifactId>
-                                        <versionRange>[1.0,)</versionRange>
-                                        <goals>
-                                            <goal>copy-dependencies</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>io.github.git-commit-id</groupId>
-                                        <artifactId>git-commit-id-maven-plugin</artifactId>
-                                        <versionRange>5.0.0</versionRange>
-                                        <goals>
-                                            <goal>revision</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <execute />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <!-- Target Java versions -->
+                    <!-- Target Java version -->
                     <release>11</release>
                 </configuration>
             </plugin>
