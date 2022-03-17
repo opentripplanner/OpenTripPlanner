@@ -4,7 +4,7 @@ The changelog list most feature changes between each release. The list is automa
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues. 
 
 
-## 2.1.0 (2022-03-11)
+## 2.1.0 (2022-03-17)
 
 - Fix NullPointerException when a RealTime update do not match an existing TripPattern [#3284](https://github.com/opentripplanner/OpenTripPlanner/issues/3284)
 - Support for versioning the configuration files [#3282](https://github.com/opentripplanner/OpenTripPlanner/issues/3282)
