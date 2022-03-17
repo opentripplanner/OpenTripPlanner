@@ -223,7 +223,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         TripPattern tripPattern;
         TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
         if (timetableSnapshot != null) {
-          tripPattern = routingService.getTimetableSnapshot()
+          tripPattern = timetableSnapshot
                   .getLastAddedTripPattern(trip.getId(), serviceDate);
           if (tripPattern == null) {
             tripPattern = getTripPattern(environment);
