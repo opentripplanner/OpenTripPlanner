@@ -118,7 +118,7 @@ public class GtfsModule implements GraphBuilderModule {
 
                 OtpTransitServiceBuilder builder =  mapper.getBuilder();
 
-                builder.limitServiceDays(transitPeriodLimit);
+                builder.limitServiceDays(transitPeriodLimit, issueStore);
 
                 calendarServiceData.add(builder.buildCalendarServiceData());
 
