@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -129,8 +130,8 @@ public class GraphUpdaterManager implements WriteToGraphCallback {
     }
 
     @Override
-    public void execute(GraphWriterRunnable runnable) {
-        scheduler.submit(() -> {
+    public Future<?> execute(GraphWriterRunnable runnable) {
+        return scheduler.submit(() -> {
             try {
                 runnable.run(graph);
             } catch (Exception e) {

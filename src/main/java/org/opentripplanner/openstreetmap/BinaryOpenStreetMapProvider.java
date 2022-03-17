@@ -1,5 +1,10 @@
 package org.opentripplanner.openstreetmap;
 
+import com.google.common.base.MoreObjects;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -9,11 +14,6 @@ import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * Parser for the OpenStreetMap PBF format. Parses files in three passes:
  * First the relations, then the ways, then the nodes are also loaded.
@@ -22,18 +22,18 @@ public class BinaryOpenStreetMapProvider {
     private static final Logger LOG = LoggerFactory.getLogger(BinaryOpenStreetMapProvider.class);
 
     private final DataSource source;
-    private final boolean cacheDataImMem;
+    private final boolean cacheDataInMem;
     private byte[] cachedBytes = null;
 
 
     /** For tests */
-    public BinaryOpenStreetMapProvider(File file, boolean cacheDataImMem) {
-        this(new FileDataSource(file, FileType.OSM), cacheDataImMem);
+    public BinaryOpenStreetMapProvider(File file, boolean cacheDataInMem) {
+        this(new FileDataSource(file, FileType.OSM), cacheDataInMem);
     }
 
-    public BinaryOpenStreetMapProvider(DataSource source, boolean cacheDataImMem) {
+    public BinaryOpenStreetMapProvider(DataSource source, boolean cacheDataInMem) {
         this.source = source;
-        this.cacheDataImMem = cacheDataImMem;
+        this.cacheDataInMem = cacheDataInMem;
     }
 
     public void readOSM(OSMDatabase osmdb) {
@@ -69,7 +69,7 @@ public class BinaryOpenStreetMapProvider {
     }
 
     private InputStream createInputStream(OsmParserPhase phase) {
-        if(cacheDataImMem) {
+        if(cacheDataInMem) {
             if(cachedBytes == null) {
                 cachedBytes = source.asBytes();
             }
@@ -89,8 +89,13 @@ public class BinaryOpenStreetMapProvider {
         );
     }
 
+    @Override
     public String toString() {
-        return "BinaryFileBasedOpenStreetMapProviderImpl(" + source.path() + ")";
+        return MoreObjects.toStringHelper(this)
+                .add("source", source)
+                .add("cacheDataInMem", cacheDataInMem)
+                .add("cachedBytes", cachedBytes)
+                .toString();
     }
 
     public void checkInputs() {
