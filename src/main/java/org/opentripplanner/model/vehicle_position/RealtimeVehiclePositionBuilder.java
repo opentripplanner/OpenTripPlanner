@@ -2,14 +2,14 @@ package org.opentripplanner.model.vehicle_position;
 
 import java.time.Instant;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 
 public class RealtimeVehiclePositionBuilder {
 
     private String vehicleId;
     private String label;
-    private double lat;
-    private double lon;
+    private WgsCoordinate coordinates;
     private Double speed = null;
     private Double heading = null;
     private Instant time;
@@ -26,13 +26,8 @@ public class RealtimeVehiclePositionBuilder {
         return this;
     }
 
-    public RealtimeVehiclePositionBuilder setLat(double lat) {
-        this.lat = lat;
-        return this;
-    }
-
-    public RealtimeVehiclePositionBuilder setLon(double lon) {
-        this.lon = lon;
+    public RealtimeVehiclePositionBuilder setCoordinates(WgsCoordinate c) {
+        this.coordinates = c;
         return this;
     }
 
@@ -63,7 +58,6 @@ public class RealtimeVehiclePositionBuilder {
 
     public RealtimeVehiclePosition build() {
         return new RealtimeVehiclePosition(
-                vehicleId, label, lat, lon, speed, heading, time, stopStatus, nextStop
-        );
+                vehicleId, label, coordinates, speed, heading, time, stopStatus, nextStop);
     }
 }

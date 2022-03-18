@@ -2,7 +2,6 @@ package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
 import java.time.Instant;
@@ -21,6 +20,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
@@ -158,8 +158,8 @@ public class VehiclePositionPatternMatcher {
 
         if (vehiclePosition.hasPosition()) {
             var position = vehiclePosition.getPosition();
-            newPosition.setLat(position.getLatitude())
-                    .setLon(position.getLongitude());
+            newPosition.setCoordinates(
+                    new WgsCoordinate(position.getLatitude(), position.getLongitude()));
 
             if (position.hasSpeed()) {
                 newPosition.setSpeed(position.getSpeed());

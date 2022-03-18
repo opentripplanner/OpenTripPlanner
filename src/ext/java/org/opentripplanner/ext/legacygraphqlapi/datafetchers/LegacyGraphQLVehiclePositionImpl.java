@@ -20,12 +20,12 @@ public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePos
 
     @Override
     public DataFetcher<Double> lat() {
-        return env -> getSource(env).lat;
+        return env -> getSource(env).coordinates.latitude();
     }
 
     @Override
     public DataFetcher<Double> lon() {
-        return env -> getSource(env).lon;
+        return env -> getSource(env).coordinates.longitude();
     }
 
     @Override

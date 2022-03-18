@@ -2,6 +2,7 @@ package org.opentripplanner.model.vehicle_position;
 
 import java.time.Instant;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.WgsCoordinate;
 
 /**
  * Internal model of a realtime vehicle position.
@@ -10,8 +11,7 @@ public class RealtimeVehiclePosition {
 
     public final String vehicleId;
     public final String label;
-    public final double lat;
-    public final double lon;
+    public final WgsCoordinate coordinates;
 
     /**
      * Speed in meters per second
@@ -39,8 +39,7 @@ public class RealtimeVehiclePosition {
     public RealtimeVehiclePosition(
             String vehicleId,
             String label,
-            double lat,
-            double lon,
+            WgsCoordinate coordinates,
             Double speed,
             Double heading,
             Instant time,
@@ -49,8 +48,7 @@ public class RealtimeVehiclePosition {
     ) {
         this.vehicleId = vehicleId;
         this.label = label;
-        this.lat = lat;
-        this.lon = lon;
+        this.coordinates = coordinates;
         this.speed = speed;
         this.heading = heading;
         this.time = time;
