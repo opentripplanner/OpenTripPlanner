@@ -98,13 +98,10 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Object> wheelchairAccessible() {
-    return environment -> {
-      switch (getSource(environment).getWheelchairAccessible()) {
-        case 0: return "NO_INFORMATION";
-        case 1: return "POSSIBLE";
-        case 2: return "NOT_POSSIBLE";
-        default: return null;
-      }
+    return environment -> switch (getSource(environment).getWheelchairBoarding()) {
+      case NO_INFORMATION -> "NO_INFORMATION";
+      case POSSIBLE -> "POSSIBLE";
+      case NOT_POSSIBLE -> "NOT_POSSIBLE";
     };
   }
 

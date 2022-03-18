@@ -9,6 +9,7 @@ import org.opentripplanner.model.BikeAccess;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.opentripplanner.model.WheelChairBoarding;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -37,7 +38,7 @@ public class TripMapperTest {
 
     private static final String TRIP_SHORT_NAME = "Trip Short Name";
 
-    private static final int WHEELCHAIR_ACCESSIBLE = 2;
+    private static final WheelChairBoarding WHEELCHAIR_ACCESSIBLE = WheelChairBoarding.POSSIBLE;
 
     private static final Trip TRIP = new Trip();
 
@@ -55,7 +56,7 @@ public class TripMapperTest {
         TRIP.setShapeId(AGENCY_AND_ID);
         TRIP.setTripHeadsign(TRIP_HEADSIGN);
         TRIP.setTripShortName(TRIP_SHORT_NAME);
-        TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE);
+        TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE.gtfsCode);
     }
 
     private final TripMapper subject = new TripMapper(
@@ -82,7 +83,7 @@ public class TripMapperTest {
         assertEquals("A:1", result.getShapeId().toString());
         assertEquals(TRIP_HEADSIGN, result.getTripHeadsign());
         assertEquals(TRIP_SHORT_NAME, result.getTripShortName());
-        assertEquals(WHEELCHAIR_ACCESSIBLE, result.getWheelchairAccessible());
+        assertEquals(WHEELCHAIR_ACCESSIBLE, result.getWheelchairBoarding());
         assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
     }
 
@@ -103,7 +104,7 @@ public class TripMapperTest {
         assertNull(result.getTripHeadsign());
         assertNull(result.getTripShortName());
         assertEquals(-1, result.getDirection().gtfsCode);
-        assertEquals(0, result.getWheelchairAccessible());
+        assertEquals(0, result.getWheelchairBoarding());
         assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
     }
 
