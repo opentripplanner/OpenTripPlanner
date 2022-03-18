@@ -98,7 +98,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     }
 
     if (requireWheelchairAccessible) {
-      return trip.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
+      return trip.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
     }
 
     if (!includePlannedCancellations) {

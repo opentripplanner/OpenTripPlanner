@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 public final class Trip extends TransitEntity {
@@ -211,7 +212,8 @@ public final class Trip extends TransitEntity {
     }
 
     public void setWheelchairBoarding(WheelChairBoarding boarding) {
-        this.wheelchairBoarding = boarding;
+        this.wheelchairBoarding =
+                Objects.requireNonNullElse(boarding, WheelChairBoarding.NO_INFORMATION);
     }
 
     public WheelChairBoarding getWheelchairBoarding() {
