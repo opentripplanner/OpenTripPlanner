@@ -21,6 +21,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
@@ -40,14 +41,14 @@ public class VehiclePositionPatternMatcher {
     private final RealtimeVehiclePositionService service;
 
     private final Function<FeedScopedId, Trip> getTripForId;
-    private final BiFunction<Trip, LocalDate, TripPattern> getPatternForTrip;
+    private final BiFunction<Trip, ServiceDate, TripPattern> getPatternForTrip;
 
     private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
     public VehiclePositionPatternMatcher(
             String feedId,
             Function<FeedScopedId, Trip> getTripForId,
-            BiFunction<Trip, LocalDate, TripPattern> getPatternForTrip,
+            BiFunction<Trip, ServiceDate, TripPattern> getPatternForTrip,
             RealtimeVehiclePositionService service
     ) {
         this.feedId = feedId;
@@ -113,18 +114,17 @@ public class VehiclePositionPatternMatcher {
         var localDate =
                 Optional.of(vehiclePosition.getTrip().getStartDate())
                         .map(Strings::emptyToNull)
-                        .map(t -> LocalDate.parse(t, DateTimeFormatter.BASIC_ISO_DATE))
-                        .orElse(null);
+                        .flatMap(ServiceDate::parseStringToOptional);
 
-        if (localDate == null) {
+        if (localDate.isEmpty()) {
             LOG.warn(
-                    "Trip with id {} doesn't contain a start_data which is required. Ignoring.",
+                    "Trip with id {} doesn't contain a valid start_data which is required. Ignoring.",
                     vehiclePosition.getTrip().getTripId()
             );
             return null;
         }
 
-        TripPattern pattern = getPatternForTrip.apply(trip, localDate);
+        TripPattern pattern = getPatternForTrip.apply(trip, localDate.get());
         if (pattern == null) {
             LOG.warn(
                     "Unable to match OTP pattern ID for vehicle position with trip ID {}",
