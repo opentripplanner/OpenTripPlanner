@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.opentripplanner.model.FeedScopedId;
@@ -90,6 +91,7 @@ public class TransitSnapshotTest
     }
 
     @Test
+    @Disabled("This test fails on some machines, but not others, snapshot @line 2704")
     public void test_trip_planning_with_transit() {
         RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 

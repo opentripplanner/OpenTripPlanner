@@ -2701,7 +2701,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 18.806,
               "elevation": "",
               "lat": 45.53130187189895,
-              "lon": -122.69644484256082,
+              "lon": -122.69644484256081,
               "relativeDirection": "DEPART",
               "stayOn": false,
               "streetName": "Northwest Northrup Street",
