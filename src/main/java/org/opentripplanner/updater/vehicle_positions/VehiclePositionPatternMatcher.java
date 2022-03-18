@@ -5,8 +5,6 @@ import com.google.common.collect.Sets;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -136,7 +134,8 @@ public class VehiclePositionPatternMatcher {
         // Add position to pattern
         var newPosition = mapVehiclePosition(
                 vehiclePosition,
-                pattern.getStops()
+                pattern.getStops(),
+                trip
         );
 
         return new T2<>(pattern, newPosition);
@@ -145,14 +144,11 @@ public class VehiclePositionPatternMatcher {
     /**
      * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be used
      * by the API.
-     *
-     * @param vehiclePosition    GtfsRealtime vehicle position
-     * @param stopsOnVehicleTrip Collection of stops method will try to match next arriving stop ID
-     *                           to
      */
     public static RealtimeVehiclePosition mapVehiclePosition(
             VehiclePosition vehiclePosition,
-            List<StopLocation> stopsOnVehicleTrip
+            List<StopLocation> stopsOnVehicleTrip,
+            Trip trip
     ) {
         var newPosition = RealtimeVehiclePosition.builder();
 
@@ -188,25 +184,22 @@ public class VehiclePositionPatternMatcher {
             List<StopLocation> matchedStops = stopsOnVehicleTrip
                     .stream()
                     .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
-                    .collect(Collectors.toList());
+                    .toList();
             if (matchedStops.size() == 1) {
                 newPosition.setNextStop(matchedStops.get(0));
             }
         }
 
+        newPosition.setTrip(trip);
+
         return newPosition.build();
     }
 
     private static StopStatus toModel(VehicleStopStatus currentStatus) {
-        switch (currentStatus) {
-            case IN_TRANSIT_TO:
-                return StopStatus.IN_TRANSIT_TO;
-            case INCOMING_AT:
-                return StopStatus.INCOMING_AT;
-            case STOPPED_AT:
-                return StopStatus.STOPPED_AT;
-            default:
-                return null;
-        }
+        return switch (currentStatus) {
+            case IN_TRANSIT_TO -> StopStatus.IN_TRANSIT_TO;
+            case INCOMING_AT -> StopStatus.INCOMING_AT;
+            case STOPPED_AT -> StopStatus.STOPPED_AT;
+        };
     }
 }

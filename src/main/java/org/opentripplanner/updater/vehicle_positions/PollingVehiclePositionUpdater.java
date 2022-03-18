@@ -47,7 +47,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     public PollingVehiclePositionUpdater(VehiclePositionsUpdaterParameters params) {
         super(params);
         var p = (VehiclePositionsUpdaterParameters) params;
-        vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(p.url);
+        vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(p.url());
 
         LOG.info(
                 "Creating vehicle position updater running every {} seconds : {}",

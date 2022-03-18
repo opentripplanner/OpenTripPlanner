@@ -2,6 +2,7 @@ package org.opentripplanner.model.vehicle_position;
 
 import java.time.Instant;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 
@@ -15,6 +16,7 @@ public class RealtimeVehiclePositionBuilder {
     private Instant time;
     private StopStatus stopStatus;
     private StopLocation nextStop;
+    private Trip trip;
 
     public RealtimeVehiclePositionBuilder setVehicleId(String vehicleId) {
         this.vehicleId = vehicleId;
@@ -56,8 +58,13 @@ public class RealtimeVehiclePositionBuilder {
         return this;
     }
 
+    public RealtimeVehiclePositionBuilder setTrip(Trip trip) {
+        this.trip = trip;
+        return this;
+    }
+
     public RealtimeVehiclePosition build() {
         return new RealtimeVehiclePosition(
-                vehicleId, label, coordinates, speed, heading, time, stopStatus, nextStop);
+                vehicleId, label, coordinates, speed, heading, time, stopStatus, nextStop, trip);
     }
 }

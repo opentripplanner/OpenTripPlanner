@@ -6,24 +6,14 @@ import java.util.Objects;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphWriterRunnable;
 
-public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
+public record VehiclePositionUpdaterRunnable(
+        List<VehiclePosition> updates,
+        VehiclePositionPatternMatcher matcher)
+        implements GraphWriterRunnable {
 
-    /**
-     * The list with vehicle positions (not associated with patterns)
-     */
-    private final List<VehiclePosition> updates;
-
-    private final VehiclePositionPatternMatcher matcher;
-
-    public VehiclePositionUpdaterRunnable(
-            final List<VehiclePosition> updates,
-            final VehiclePositionPatternMatcher matcher
-    ) {
+    public VehiclePositionUpdaterRunnable {
         Objects.requireNonNull(updates);
         Objects.requireNonNull(matcher);
-
-        this.updates = updates;
-        this.matcher = matcher;
     }
 
     @Override
