@@ -4,7 +4,7 @@ This page should allow you to set up and test your own OTP2 server. If all goes 
 
 ## Get Java
 
-As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of the Java runtime (JRE) or Java development kit (JDK). OTP2 is compatible with Java 11 or later. We recommend running on Java 11 rather than a later version, as it is a long-term support release. Run `java -version` to check that you have version 11 or newer of the JVM installed. If you do not, you will need to install a recent OpenJDK or Oracle Java package for your operating system.
+As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of the Java runtime (JRE) or Java development kit (JDK). OTP2 is compatible with Java 17 or later. We recommend running on Java 17 rather than a later version, as it is a long-term support release. Run `java -version` to check that you have version 17 or newer of the JVM installed. If you do not, you will need to install a recent OpenJDK or Oracle Java package for your operating system.
 
 ## Get OTP
 
@@ -44,13 +44,6 @@ If you have extracted a smaller PBF file from a larger region, be sure to put on
 A typical command to start OTP looks like `java -Xmx2G -jar otp.shaded.jar <options>`. The 
  `-Xmx` parameter sets the limit on how much memory OTP is allowed to consume. GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory when working with the Portland TriMet data set, and several gigabytes for larger inputs. If you have
  sufficient memory in your computer, set this to a couple of gigabytes (e.g. `-Xmx2G`). Java uses a [garbage collection](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)) approach to memory management, which requires some "breathing room" to efficiently operate. Without sufficient free memory OTP can grind to a halt. [VisualVM](https://visualvm.github.io) is a good way to inspect Java memory usage, especially with the [VisualGC plugin](https://visualvm.github.io/plugins.html).
- 
- Java 11 has tighter security restrictions than previous versions, so when running OTP under Java 11 you will see warnings like this:
- ```
- WARNING: An illegal reflective access operation has occurred
- WARNING: Please consider reporting this to the maintainers of com.esotericsoftware.kryo.util.UnsafeUtil
- ```
- These warnings are expected to remain for a while, until all libraries OTP2 depends on have fully migrated to Java 11 and we have upgraded them all.
 
 ## Building Graphs
 

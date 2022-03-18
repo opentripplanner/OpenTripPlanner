@@ -15,9 +15,9 @@ public class TransitEntranceVertex extends Vertex {
 
   private static final long serialVersionUID = 1L;
 
-  private boolean wheelchairEntrance;
+  private final boolean wheelchairEntrance;
 
-  private Entrance entrance;
+  private final Entrance entrance;
 
   /**
    * @param entrance The transit model entrance reference.
@@ -28,7 +28,7 @@ public class TransitEntranceVertex extends Vertex {
         entrance.getId().toString(),
         entrance.getCoordinate().longitude(),
         entrance.getCoordinate().latitude(),
-        new NonLocalizedString(entrance.getName())
+        entrance.getName()
     );
     this.entrance = entrance;
     this.wheelchairEntrance = entrance.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

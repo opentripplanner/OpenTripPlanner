@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.opentripplanner.datastore.CompositeDataSource;
@@ -78,6 +79,8 @@ public class ConstantsForTests {
     public static final String HERRENBERG_BARRIER_GATES_OSM = "src/test/resources/germany/herrenberg-barrier-gates.osm.pbf";
     public static final String HERRENBERG_OSM = "src/test/resources/germany/herrenberg-minimal.osm.pbf";
     public static final String ISLAND_PRUNE_OSM = "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
+
+    public static final Locale DEFAULT_LOCALE = new Locale("en", "US");
 
     private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
             new File(NETEX_DIR, NETEX_FILENAME),

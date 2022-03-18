@@ -2,7 +2,6 @@ package org.opentripplanner.api.common;
 
 import java.time.Duration;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -17,7 +16,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
-import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -711,7 +709,7 @@ public abstract class RoutingResource {
      */
     protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) throws ParameterException {
         Router router = otpServer.getRouter();
-        RoutingRequest request = router.defaultRoutingRequest.clone();
+        RoutingRequest request = router.copyDefaultRoutingRequest();
 
         // The routing request should already contain defaults, which are set when it is initialized or in the JSON
         // router configuration and cloned. We check whether each parameter was supplied before overwriting the default.
@@ -873,10 +871,8 @@ public abstract class RoutingResource {
         if (whiteListedAgencies != null) {
             request.setWhiteListedAgenciesFromSting(whiteListedAgencies);
         }
-        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
-      
-        if (bannedTripMap != null) {
-            request.bannedTrips = bannedTripMap;
+        if (bannedTrips != null) {
+            request.setBannedTripsFromString(bannedTrips);
         }
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
@@ -971,38 +967,4 @@ public abstract class RoutingResource {
 
         return request;
     }
-
-    /**
-     * Take a string in the format agency:id or agency:id:1:2:3:4.
-     * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
-     * Convert to a Map from trip --> set of int.
-     */
-    public HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
-        if (banned == null) {
-            return null;
-        }
-        
-        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = new HashMap<FeedScopedId, BannedStopSet>();
-        String[] tripStrings = banned.split(",");
-        for (String tripString : tripStrings) {
-            // TODO this apparently allows banning stops within a trip with integers. Why?
-            String[] parts = tripString.split(":");
-            if (parts.length < 2) continue; // throw exception?
-            String agencyIdString = parts[0];
-            String tripIdString = parts[1];
-            FeedScopedId tripId = new FeedScopedId(agencyIdString, tripIdString);
-            BannedStopSet bannedStops;
-            if (parts.length == 2) {
-                bannedStops = BannedStopSet.ALL;
-            } else {
-                bannedStops = new BannedStopSet();
-                for (int i = 2; i < parts.length; ++i) {
-                    bannedStops.add(Integer.parseInt(parts[i]));
-                }
-            }
-            bannedTripMap.put(tripId, bannedStops);
-        }
-        return bannedTripMap;
-    }
-
 }

@@ -1,20 +1,27 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.FareZone;
-import org.opentripplanner.util.MapUtils;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import org.opentripplanner.model.FareZone;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
 
-  private Map<org.onebusaway.gtfs.model.Stop, Stop> mappedStops = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.Stop, Stop> mappedStops = new HashMap<>();
+
+  private final TranslationHelper translationHelper;
+
+  StopMapper(TranslationHelper translationHelper) {
+    this.translationHelper = translationHelper;
+  }
 
   Collection<Stop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
     return MapUtils.mapToList(allStops, this::map);
@@ -39,15 +46,31 @@ class StopMapper {
         gtfsStop.getId().getAgencyId()
     );
 
+    final I18NString name = translationHelper.getTranslation(
+      org.onebusaway.gtfs.model.Stop.class,
+      "name",
+      base.getId().getId(),
+      base.getName());
+
+    I18NString url = null;
+
+    if (gtfsStop.getUrl() != null) {
+        url = translationHelper.getTranslation(
+              org.onebusaway.gtfs.model.Stop.class,
+              "url",
+              base.getId().getId(),
+              gtfsStop.getUrl());
+    }
+
     return new Stop(base.getId(),
-        base.getName(),
+        name,
         base.getCode(),
         base.getDescription(),
         base.getCoordinate(),
         base.getWheelchairBoarding(),
         base.getLevel(),
         gtfsStop.getPlatformCode(), fareZones,
-        gtfsStop.getUrl(),
+        url,
         gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
         TransitModeMapper.mapMode(gtfsStop.getVehicleType()),
         null

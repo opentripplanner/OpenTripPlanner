@@ -18,6 +18,7 @@ import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.GraphCoherencyCheckerModule;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -227,6 +228,10 @@ public class GraphBuilder implements Runnable {
                     config.maxTransferDurationSeconds * new RoutingRequest().walkSpeed)
                 );
             }
+        }
+
+        if (loadStreetGraph || hasOsm) {
+            graphBuilder.addModule(new GraphCoherencyCheckerModule());
         }
 
         if (config.dataImportReport) {

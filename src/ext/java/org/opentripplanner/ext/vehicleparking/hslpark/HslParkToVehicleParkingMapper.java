@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.hslpark;
 
+import com.bedatadriven.jackson.datatype.jts.parsers.GenericGeometryParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.geometry.GeometryDeserializer;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -26,7 +27,10 @@ public class HslParkToVehicleParkingMapper {
 
     private static final Logger log = LoggerFactory.getLogger(HslParkToVehicleParkingMapper.class);
 
-    private String feedId;
+    private static final GenericGeometryParser GEOMETRY_PARSER =
+            new GenericGeometryParser(GeometryUtils.getGeometryFactory());
+
+    private final String feedId;
 
     public HslParkToVehicleParkingMapper(String feedId) {
         this.feedId = feedId;
@@ -49,7 +53,7 @@ public class HslParkToVehicleParkingMapper {
             I18NString name = translations.isEmpty()
                     ? new NonLocalizedString(vehicleParkId.getId())
                     : TranslatedString.getI18NString(translations);
-            Geometry geometry = GeometryDeserializer.parseGeometry(jsonNode.path("location"));
+            Geometry geometry = GEOMETRY_PARSER.geometryFromJson(jsonNode.path("location"));
             double x = geometry.getCentroid().getX();
             double y = geometry.getCentroid().getY();
 

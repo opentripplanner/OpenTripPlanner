@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.concurrent.Future;
+import com.google.common.util.concurrent.Futures;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -98,8 +100,9 @@ class VehicleParkingUpdaterTest {
       }
 
       @Override
-      public void execute(GraphWriterRunnable runnable) {
+      public Future<?> execute(GraphWriterRunnable runnable) {
         runnable.run(graph);
+        return Futures.immediateVoidFuture();
       }
     }
 

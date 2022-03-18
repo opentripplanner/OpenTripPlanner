@@ -276,7 +276,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         public Coordinate getCoordinateInternal(int i) {
             double x = coords[i * dimension];
             double y = coords[i * dimension + 1];
-            double z = dimension == 2 ? 0.0 : coords[i * dimension + 2];
+            double z = dimension == 2 ? java.lang.Double.NaN : coords[i * dimension + 2];
             return new Coordinate(x, y, z);
         }
 

@@ -181,7 +181,7 @@ public interface Leg {
     /**
      * The distance traveled while traversing the leg in meters.
      */
-    Double getDistanceMeters();
+    double getDistanceMeters();
 
     /**
      * The GTFS pathway id

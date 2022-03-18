@@ -28,9 +28,9 @@ public class TransitStopVertex extends Vertex {
 
     private static final long serialVersionUID = 1L;
 
-    private boolean wheelchairEntrance;
+    private final boolean wheelchairEntrance;
 
-    private Stop stop;
+    private final Stop stop;
 
     /**
      * For stops that are deep underground, there is a time cost to entering and exiting the stop;
@@ -50,7 +50,7 @@ public class TransitStopVertex extends Vertex {
                 stop.getId().toString(),
                 stop.getLon(),
                 stop.getLat(),
-                new NonLocalizedString(stop.getName())
+                stop.getName()
         );
         this.stop = stop;
         this.modes = modes != null ? modes : new HashSet<>();

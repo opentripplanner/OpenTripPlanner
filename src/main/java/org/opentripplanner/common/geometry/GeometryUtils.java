@@ -178,8 +178,11 @@ public class GeometryUtils {
         throws UnsupportedGeometryException {
         if (geoJsonGeom instanceof org.geojson.Point) {
             org.geojson.Point geoJsonPoint = (org.geojson.Point) geoJsonGeom;
-            return gf.createPoint(new Coordinate(geoJsonPoint.getCoordinates().getLongitude(), geoJsonPoint
-                .getCoordinates().getLatitude()));
+            return gf.createPoint(new Coordinate(
+                    geoJsonPoint.getCoordinates().getLongitude(),
+                    geoJsonPoint.getCoordinates().getLatitude(),
+                    geoJsonPoint.getCoordinates().getAltitude()
+            ));
 
         } else if (geoJsonGeom instanceof org.geojson.Polygon) {
             org.geojson.Polygon geoJsonPolygon = (org.geojson.Polygon) geoJsonGeom;
@@ -226,7 +229,12 @@ public class GeometryUtils {
         Coordinate[] coords = new Coordinate[path.size()];
         int i = 0;
         for (LngLatAlt p : path) {
-            coords[i++] = new Coordinate(p.getLongitude(), p.getLatitude());
+            // the serialization library does serialize a 0 but not a NaN
+            coords[i++] = new Coordinate(
+                    p.getLongitude(),
+                    p.getLatitude(),
+                    p.getAltitude()
+            );
         }
         return coords;
     }

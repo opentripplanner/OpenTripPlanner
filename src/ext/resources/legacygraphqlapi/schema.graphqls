@@ -2747,7 +2747,11 @@ type Stop implements Node & PlaceInterface {
     gtfsId: String!
 
     """Name of the stop, e.g. Pasilan asema"""
-    name: String!
+    name(
+        """If translated name is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses name from stops.txt.
+        E.g. Swedish name for Pasilan asema is Böle station."""
+        language: String): String!
 
     """Latitude of the stop (WGS 84)"""
     lat: Float
@@ -2778,7 +2782,11 @@ type Stop implements Node & PlaceInterface {
 
     """ID of the zone where this stop is located"""
     zoneId: String
-    url: String
+
+    url(
+        """If translated url is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses url from stops.txt."""
+        language: String): String
 
     """Identifies whether this stop represents a stop or station."""
     locationType: LocationType

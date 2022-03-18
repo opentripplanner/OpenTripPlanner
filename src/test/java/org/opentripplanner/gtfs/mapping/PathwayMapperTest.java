@@ -7,6 +7,7 @@ import org.onebusaway.gtfs.model.Stop;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.opentripplanner.util.TranslationHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,6 +21,8 @@ public class PathwayMapperTest {
     private static final int PATHWAY_MODE = 2;
 
     private static final int TRAVERSAL_TIME = 3000;
+
+    private static final TranslationHelper TRANSLATION_HELPER = new TranslationHelper();
 
     private static final Pathway PATHWAY = new Pathway();
 
@@ -39,10 +42,10 @@ public class PathwayMapperTest {
     }
 
     private PathwayMapper subject = new PathwayMapper(
-        new StopMapper(),
-        new EntranceMapper(),
-        new PathwayNodeMapper(),
-        new BoardingAreaMapper()
+        new StopMapper(TRANSLATION_HELPER),
+        new EntranceMapper(TRANSLATION_HELPER),
+        new PathwayNodeMapper(TRANSLATION_HELPER),
+        new BoardingAreaMapper(TRANSLATION_HELPER)
     );
 
     @Test
