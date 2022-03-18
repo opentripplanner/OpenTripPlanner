@@ -38,7 +38,7 @@ config key | description | value type | value default | notes
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 
-This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
+This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
 
 
 ## Storage
@@ -89,7 +89,7 @@ OTP2 will still scan the base directory for all other types such as DEM files. S
 array for a particular file type will ensure that no inputs of that type are loaded, including by
 local directory scanning.
 
-See the comments in the source code of class [StorageConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java)
+See the comments in the source code of class [StorageConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java)
 for an up-to-date detailed description of each config parameter.
 
 
@@ -242,7 +242,7 @@ OTP allows you to adjust the elevation values reported in API responses in two w
 The first way is to store ellipsoid (GPS) elevation values internally, but apply a single geoid
 difference value in the OTP client where appropriate to display elevations above sea level.
 This ellipsoid to geoid difference is returned in each trip plan response in the
-[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field.
+[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field.
 Using a single value can be sufficient for smaller OTP deployments, but might result in incorrect
 values at the edges of larger OTP deployments. If your OTP instance uses this, it is recommended
 to set a default request value in the `router-config.json` file as follows:

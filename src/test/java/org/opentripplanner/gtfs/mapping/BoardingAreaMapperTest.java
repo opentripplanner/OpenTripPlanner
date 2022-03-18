@@ -14,6 +14,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.util.TranslationHelper;
 
+
 public class BoardingAreaMapperTest  {
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "B1");
 

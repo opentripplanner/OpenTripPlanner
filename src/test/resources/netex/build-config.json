@@ -1,4 +1,6 @@
 {
+  "transitServiceStart": "2017-12-21",
+  "transitServiceEnd":  "2018-01-31",
   "netex" : {
     "moduleFilePattern" : "netex_.*\\.zip",
     "sharedFilePattern" : "_stops.xml",

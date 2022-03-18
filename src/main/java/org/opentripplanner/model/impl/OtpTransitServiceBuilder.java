@@ -44,6 +44,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -299,8 +300,22 @@ public class OtpTransitServiceBuilder {
             calendars.addAll(keepCal);
             logRemove("ServiceCalendar", orgSize, calendars.size(), "Outside time period.");
         }
+        final int originalNumOfTrips = numberOfTrips();
         removeEntitiesWithInvalidReferences();
+
+        // All trips are removed, then exit with error
+        if(originalNumOfTrips > 0 && numberOfTrips() == 0) {
+            throw new OtpAppException(
+                    "The provided transit date have no trips within the configured transit " +
+                    "service period. See build config 'transitServiceStart' and " +
+                    "'transitServiceEnd': " + periodLimit
+            );
+        }
         LOG.info("Limiting transit service days to time period complete.");
+    }
+
+    private int numberOfTrips() {
+        return tripsById.size() + flexTripsById.size();
     }
 
     /**
