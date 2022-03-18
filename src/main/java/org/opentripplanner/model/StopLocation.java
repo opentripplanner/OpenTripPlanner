@@ -56,7 +56,7 @@ public interface StopLocation {
     return List.of();
   }
 
-  default WheelChairBoarding getWheelchairBoarding() { return null; }
+  default WheelChairBoarding getWheelchairBoarding() { return WheelChairBoarding.NO_INFORMATION; }
 
   /**
    * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
