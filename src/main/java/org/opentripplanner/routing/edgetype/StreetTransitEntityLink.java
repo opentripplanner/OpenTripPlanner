@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
+import static org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode.PREFERRED;
+import static org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode.STRICTLY_REQUIRED;
+
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -77,14 +80,22 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         }
 
         RoutingRequest req = s0.getOptions();
-        if (s0.getOptions().wheelchairAccessible && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
-            return null;
-        }
+
+
+
 
         // Do not check here whether any transit modes are selected. A check for the presence of
         // transit modes will instead be done in the following PreBoard edge.
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
+
+        var accessibilityMode = s0.getOptions().accessibilityMode;
+        if (accessibilityMode == STRICTLY_REQUIRED && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
+            return null;
+        }
+        else if(accessibilityMode == PREFERRED && wheelchairBoarding != WheelChairBoarding.NO_INFORMATION) {
+            s1.incrementWeight(req.unknownStopAccessibilityPenalty);
+        }
 
         switch (s0.getNonTransitMode()) {
             case BICYCLE:

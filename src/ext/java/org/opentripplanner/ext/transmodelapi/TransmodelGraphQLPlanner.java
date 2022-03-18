@@ -106,7 +106,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
         callWith.argument("pageCursor", request::setPageCursor);
         callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
-        callWith.argument("wheelchairAccessible", request::setWheelchairAccessible);
+        callWith.argument("wheelchairAccessible", request::setAccessibilityMode);
         callWith.argument("numTripPatterns", request::setNumItineraries);
         callWith.argument("transitGeneralizedCostLimit", (DoubleFunction<Double> it) -> request.itineraryFilters.transitGeneralizedCostLimit = it);
 //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);

@@ -1,5 +1,24 @@
 package org.opentripplanner.routing.api.request;
 
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+
+import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.LocationStringParser;
@@ -31,26 +50,6 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
@@ -235,10 +234,25 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public boolean arriveBy = false;
 
+    public enum AccessibilityMode {
+        // accessibility information doesn't play a role in routing
+        NOT_REQUIRED,
+        // only routes and places which are known to be wheelchair accessibly should be used
+        STRICTLY_REQUIRED,
+        // trips/stops that are known to be wheelchair-accessible are preferred but those with unknown information
+        PREFERRED;
+
+        public boolean includesWheelchair() {
+            return this == STRICTLY_REQUIRED || this == PREFERRED;
+        }
+    }
+
     /**
      * Whether the trip must be wheelchair accessible.
      */
-    public boolean wheelchairAccessible = false;
+    public AccessibilityMode accessibilityMode = AccessibilityMode.NOT_REQUIRED;
+
+    public float unknownStopAccessibilityPenalty = 60 * 10;
 
     /**
      * The maximum number of itineraries to return. In OTP1 this parameter terminates the search,
@@ -806,8 +820,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.bicycleOptimizeType = bicycleOptimizeType;
     }
 
-    public void setWheelchairAccessible(boolean wheelchairAccessible) {
-        this.wheelchairAccessible = wheelchairAccessible;
+    public void setAccessibilityMode(boolean accessibilityMode) {
+        if(accessibilityMode) {
+            this.accessibilityMode = AccessibilityMode.STRICTLY_REQUIRED;
+        } else {
+            this.accessibilityMode = AccessibilityMode.NOT_REQUIRED;
+        }
     }
 
     public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {

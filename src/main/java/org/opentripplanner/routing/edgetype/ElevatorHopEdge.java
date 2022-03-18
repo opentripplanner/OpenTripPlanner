@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -43,7 +44,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
 
-        if (options.wheelchairAccessible && !wheelchairAccessible) {
+        if (options.accessibilityMode.includesWheelchair() && !wheelchairAccessible) {
             return null;
         }
 

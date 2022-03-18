@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
@@ -99,7 +100,13 @@ public class RoutingRequestMapper {
         request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
         request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
         request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
-        request.wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.wheelchairAccessible);
+        //request.accessibilityMode =
+        boolean wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.accessibilityMode.includesWheelchair());
+        if(wheelchairAccessible) {
+            request.accessibilityMode = AccessibilityMode.STRICTLY_REQUIRED;
+        } else {
+            request.accessibilityMode = AccessibilityMode.NOT_REQUIRED;
+        }
 
         mapTransferOptimization(
             (TransferOptimizationRequest)request.transferOptimization,

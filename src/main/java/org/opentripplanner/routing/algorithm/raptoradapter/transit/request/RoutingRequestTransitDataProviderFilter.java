@@ -13,6 +13,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -21,7 +22,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final boolean requireBikesAllowed;
 
-  private final boolean requireWheelchairAccessible;
+  private final AccessibilityMode accessibilityMode;
 
   private final boolean includePlannedCancellations;
 
@@ -33,14 +34,14 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   public RoutingRequestTransitDataProviderFilter(
       boolean requireBikesAllowed,
-      boolean requireWheelchairAccessible,
+      AccessibilityMode accessibilityMode,
       boolean includePlannedCancellations,
       Set<AllowedTransitMode> allowedTransitModes,
       Set<FeedScopedId> bannedRoutes,
       Set<FeedScopedId> bannedTrips
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
-    this.requireWheelchairAccessible = requireWheelchairAccessible;
+    this.accessibilityMode = accessibilityMode;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
@@ -69,7 +70,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   ) {
     this(
         request.modes.transferMode == StreetMode.BIKE,
-        request.wheelchairAccessible,
+        request.accessibilityMode,
         request.includePlannedCancellations,
         request.modes.transitModes,
         request.getBannedRoutes(graphIndex.getAllRoutes()),
@@ -99,6 +100,18 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
     if (requireWheelchairAccessible && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE) {
       return false;
+    if (requireBikesAllowed) {
+      return bikeAccessForTrip(trip) == BikeAccess.ALLOWED;
+    }
+
+    if (accessibilityMode == AccessibilityMode.STRICTLY_REQUIRED) {
+      // if the accessibility mode is STRICTLY_REQUIRED we only want trips of which we know that they
+      // are wheelchair accessible
+      return trip.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
+    } else if (accessibilityMode == AccessibilityMode.PREFERRED) {
+      // when it's PREFERRED we also allow trips with unknown accessibility, but remove
+      // those which are known to be inaccessible
+      return trip.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
     }
 
     //noinspection RedundantIfStatement
