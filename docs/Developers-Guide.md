@@ -220,18 +220,27 @@ fail at various points in the process leaving the repo in a confusing state. Tak
 manually is more tedious, but keeps eyes on each step and is less prone to failure. Releases are 
 performed off the master branch, and are tagged with git annotated tags.
 
-OpenTripPlanner is released as Maven artifacts to Maven Central. These include compiled and source code JARs as well as
-a "shaded" JAR containing all dependencies, allowing stand-alone usage. This release process is handled by the
-Sonatype Nexus Staging plugin, configured in the OpenTripPlanner POM.
+OpenTripPlanner is currently configured such that builds including releases upload JAR files to 
+GitHub Packages. This is not the most convenient place for end users to find and download the files.
+Therefore we also attach a stand-alone "shaded" JAR to the GitHub tag/release page, and have
+historically also uploaded Maven artifacts to Maven Central including compiled and source code JARs
+as well as the "shaded" JAR containing all dependencies, allowing stand-alone usage. This release 
+process is handled by the Sonatype Nexus Staging plugin, which is no longer configured in the 
+OpenTripPlanner POM. This step currently requires making a few significant manual modifications to 
+the POM.
 
-We no longer trigger deployment of artifacts to Maven Central or deployment of documentation to AWS automatically in build scripts. These steps are prone to failure and require storing a lot of infrequently used secret information in the repo and environment variables on GitHub. Our releases are currently not very frequent so we just carry out these steps manually by following the checklist.
+We no longer trigger deployment of artifacts to Maven Central or deployment of REST API 
+documentation to AWS automatically in our build scripts (GitHub Actions). These steps are prone to 
+failure and require  storing a lot of infrequently used secret information in the repo and 
+environment variables on GitHub. Our releases are currently not very frequent so we just carry out 
+these steps manually by following the checklist.
 
 * Check that your local copy of the dev branch is up to date with no uncommitted changes
     * `git status`
     * `git checkout dev-2.x`
     * `git clean -df`
     * `git pull`
-* Verify that all dependencies in the POM are non-SNAPSHOT versions
+* Verify that all dependencies in the POM are non-SNAPSHOT versions (e.g. with `grep`)
 * Update `docs/Changelog.md`
     * Lines should have been added or updated as each pull request was merged
     * If you suspect any changes are not reflected in the Changelog, review the commit log and add any missing items
@@ -265,16 +274,21 @@ We no longer trigger deployment of artifacts to Maven Central or deployment of d
 * Finally, if everything looks good, tag and push this release to make it official
     * `git tag -a vX.Y.Z -m "release X.Y.Z"`
     * `git push origin vX.Y.Z`
+    * `git push origin master`
     * Note that **only one** commit may have a particular non-snapshot version in the POM (this is the commit that 
       should be tagged as the release)
-    * Go to the [GitHub tags page](https://github.com/opentripplanner/OpenTripPlanner/tags) and use the `...` button to mark the new tag as a release.
+    * Go to the [GitHub tags page](https://github.com/opentripplanner/OpenTripPlanner/tags) and use 
+      the `...` button to mark the new tag as a release.
     * Give the release a name like `v2.1.0 (March 2022)`
-    * Optionally add a very condensed version of the changelog in the description box, with only the 5-10 most significant changes that might affect someone's choice to upgrade.
-    * Currently, pushing the tag does not trigger deployment of release Maven artifacts. This must be done manually. It can conceivably be configured to happen in the Actions scripts when any tag is pushed.
-* Deploy the build artifacts to Maven Central and GitHub
-    * While still on the tag commit, run `mvn deploy` after you have completed the local build as described above.
-    * This requires you to have the GPG keys and Maven repo credentials set up.
-    * Attach the JAR files produced in `/target` to the GitHub release page you just created. 
+    * Optionally add a very condensed version of the changelog in the description box, with only the
+      5-10 most significant changes that might affect someone's choice to upgrade.
+    * Attach the JAR files produced in `/target` to the GitHub release page you just created.
+* Check that the push triggered an Actions build and that it was uploaded to GHPR.
+    * Currently, pushing the tag does not trigger deployment of release Maven artifacts, only GHPR JARs.
+* Deploy the build artifacts to Maven Central and GitHub and Maven Central
+    * This step can get complicated and requires you to have the GPG keys and Maven repo credentials set up.
+    * Apply the changes recorded in https://github.com/opentripplanner/OpenTripPlanner/tree/signed-deploy-to-central 
+    * While still on the tag commit, run `mvn deploy`.
 * Set up next development iteration
     * Add a new section header to `docs/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
     * Edit minor version in `pom.xml` to `x.y+1.0-SNAPSHOT`
@@ -301,16 +315,17 @@ We no longer trigger deployment of artifacts to Maven Central or deployment of d
 
 ### Artifact Signing
 
-Maven release artifacts must be digitally signed to prove their origin. This is a safeguard against compromised code 
-from a malicious third party being disguised as a trusted library.
+Maven release artifacts must be digitally signed to prove their origin. This is a safeguard against 
+compromised code from a malicious third party being disguised as a trusted library.
 
-The OTP artifact signing key was created by Conveyal. We export only that signing subkey, with our company's main key 
-blanked out. Therefore, even if someone managed to acquire the decrypted key file and the associated GPG passphrase, 
-they would not have the main key. We could deactivate the signing key and create a new one, without the main key being 
-compromised.
+The OTP artifact signing key was created by Conveyal. We export only that signing subkey, with our 
+company's main key blanked out. Therefore, even if someone managed to acquire the decrypted key file
+and the associated GPG passphrase, they would not have the main key. We could deactivate the signing
+key and create a new one, without the main key being compromised.
 
-OpenTripPlanner's POM is set up to sign artifacts in the verify phase, which means signing will happen for the `install` 
-and `deploy` targets, but not the `package` target. When performing a local test build, if you do `mvn clean install site` it will test the signing process. 
-If you do not have the certificate installed, you can instead to `mvn clean package site` to bypass signing, but this 
-provides less certainty that everything is set up correctly for the CI-driven final release.
-
+When modified for Maven Central deployment, OpenTripPlanner's POM is set up to sign artifacts in the
+verify phase, which means signing will happen for the `install` and `deploy` targets, but not the 
+`package` target. When performing a local test build, if you do `mvn clean install site` it will 
+test the signing process. If you do not have the certificate installed, you can instead do 
+`mvn clean package site` to bypass signing, but this provides less certainty that everything is set
+up correctly for the CI-driven final release.
