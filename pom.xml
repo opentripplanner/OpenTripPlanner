@@ -7,7 +7,7 @@
     <url>http://opentripplanner.org</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -16,6 +16,30 @@
             <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
         </license>
     </licenses>
+
+    <!-- Developer entries are provided for only first three contributors on the Github stats page for to the 2.x branch.
+         This minimal information is only present to meet the Sonatype artifact upload requirements.
+         For other contributors, see https://github.com/opentripplanner/OpenTripPlanner/graphs/contributors -->
+    <developers>
+        <developer>
+            <name>Andrew Byrd</name>
+            <email>andrew@fastmail.net</email>
+            <organization>Conveyal</organization>
+            <organizationUrl>http://conveyal.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Thomas Gran</name>
+            <email>tgr@capraconsulting.no</email>
+            <organization>Ruter and Entur</organization>
+            <organizationUrl>http://entur.org/</organizationUrl>
+        </developer>
+        <developer>
+            <name>David Novalis Turner</name>
+            <email>novalis@novalis.org</email>
+            <organization>Ex-OpenPlans</organization>
+            <organizationUrl>http://openplans.org/</organizationUrl>
+        </developer>
+    </developers>
 
     <scm>
         <url>http://github.com/opentripplanner/OpenTripPlanner</url>
@@ -40,14 +64,6 @@
         <argLine></argLine>
     </properties>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>OpenTripPlanner Maven Repository on Github Packages</name>
-            <url>https://maven.pkg.github.com/${GITHUB_REPOSITORY}/</url>
-        </repository>
-    </distributionManagement>
-
     <build>
         <!--
         Filtering will perform substitution on otp-project-info.properties,
@@ -67,15 +83,6 @@
                 <targetPath>client</targetPath>
                 <filtering>false</filtering>
             </resource>
-            <resource>
-                <!-- Shell scripts to start up OTP, need to be filtered to insert the JAR file name. -->
-                <!-- These are treated as testResources rather than resources to keep them out of the JAR. -->
-                <!-- The staging repo will reject a JAR containing them as they use traversal paths (../..). -->
-                <directory>src/scripts</directory>
-                <filtering>true</filtering>
-                <!-- Copy the scripts up into the root of the repo, not /target/classes -->
-                <targetPath>../..</targetPath>
-            </resource>
         </resources>
         <testResources>
             <testResource>
@@ -86,6 +93,34 @@
             </testResource>
         </testResources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <!-- We sign in the verify phase, which means it will happen before install and deploy (the last two phases)
+                             but not before earlier phases like test or package. -->
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.12</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -109,6 +144,18 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <!-- OTP includes an empty javadoc.jar file. See docs/javadoc/README.md -->
+                        <id>package-javadoc</id>
+                        <phase>package</phase>
+                        <goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classesDirectory>${basedir}/docs/javadoc</classesDirectory>
+                            <classifier>javadoc</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
