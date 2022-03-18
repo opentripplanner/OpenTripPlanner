@@ -930,11 +930,6 @@ public class LegacyGraphQLQueryTypeImpl
           request.setTriangleNormalized(args[0], args[1], args[2]);
         }
 
-        if (optimize == BicycleOptimizeType.TRANSFERS) {
-          optimize = BicycleOptimizeType.QUICK;
-          request.transferCost += 1800;
-        }
-
         if (optimize != null) {
           request.bicycleOptimizeType = optimize;
         }

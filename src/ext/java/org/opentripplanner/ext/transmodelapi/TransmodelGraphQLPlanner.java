@@ -148,11 +148,6 @@ public class TransmodelGraphQLPlanner {
             request.setTriangleNormalized(args[0], args[1], args[2]);
         }
 
-        if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
-            bicycleOptimizeType = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
-        }
-
         if (bicycleOptimizeType != null) {
             request.bicycleOptimizeType = bicycleOptimizeType;
         }

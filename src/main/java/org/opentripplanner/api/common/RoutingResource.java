@@ -877,10 +877,6 @@ public abstract class RoutingResource {
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
         if (transferPenalty != null) { request.transferCost = transferPenalty; }
-        if (optimize == BicycleOptimizeType.TRANSFERS) {
-            optimize = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
-        }
 
         if (optimize != null) {
             request.setBicycleOptimizeType(optimize);
