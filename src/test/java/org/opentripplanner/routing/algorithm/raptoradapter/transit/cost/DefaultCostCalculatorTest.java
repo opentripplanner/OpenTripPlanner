@@ -1,8 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.WheelChairBoarding.NO_INFORMATION;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 
 public class DefaultCostCalculatorTest {
 
@@ -20,6 +23,8 @@ public class DefaultCostCalculatorTest {
             BOARD_COST_SEC,
             TRANSFER_COST_SEC,
             WAIT_RELUCTANCE_FACTOR,
+            600,
+            AccessibilityMode.NOT_REQUIRED,
             new double[] { TRANSIT_RELUCTANCE_FACTOR_1, TRANSIT_RELUCTANCE_FACTOR_2 },
             new int[] { 0, 25 }
     );
@@ -29,11 +34,13 @@ public class DefaultCostCalculatorTest {
         int time0 = 10;
         int oneSec = time0 + 1;
 
-        assertEquals(500, subject.boardingCostRegularTransfer(true, time0, STOP_A, time0));
-        assertEquals(525, subject.boardingCostRegularTransfer(true, time0, STOP_B, time0));
-        assertEquals(550, subject.boardingCostRegularTransfer(true, time0, STOP_A, oneSec));
-        assertEquals(700, subject.boardingCostRegularTransfer(false, time0, STOP_A, time0));
-        assertEquals(750, subject.boardingCostRegularTransfer(false, time0, STOP_A, oneSec));
+        assertEquals(500, subject.boardingCostRegularTransfer(true, time0, STOP_A, time0,
+                NO_INFORMATION
+        ));
+        assertEquals(525, subject.boardingCostRegularTransfer(true, time0, STOP_B, time0, NO_INFORMATION));
+        assertEquals(550, subject.boardingCostRegularTransfer(true, time0, STOP_A, oneSec, NO_INFORMATION));
+        assertEquals(700, subject.boardingCostRegularTransfer(false, time0, STOP_A, time0, NO_INFORMATION));
+        assertEquals(750, subject.boardingCostRegularTransfer(false, time0, STOP_A, oneSec, NO_INFORMATION));
     }
 
     @Test

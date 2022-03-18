@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.util.I18NString;
 
@@ -38,7 +39,8 @@ public abstract class StationElement extends TransitEntity {
     this.code = code;
     this.description = description;
     this.coordinate = coordinate;
-    this.wheelchairBoarding = wheelchairBoarding;
+    this.wheelchairBoarding =
+            Objects.requireNonNullElse(wheelchairBoarding, WheelChairBoarding.NO_INFORMATION);
     this.level = level;
   }
 
@@ -91,6 +93,7 @@ public abstract class StationElement extends TransitEntity {
   /**
    * Returns whether this station element is accessible for wheelchair users.
    */
+  @Nonnull
   public WheelChairBoarding getWheelchairBoarding() {
     return wheelchairBoarding;
   }

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.List;
 import java.util.function.IntUnaryOperator;
-
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -160,6 +160,10 @@ public class TripPatternForDates
         return tripPattern.getTransitMode().name() + " " + tripPattern.getPattern().getRoute().getShortName();
     }
 
+    @Override
+    public WheelChairBoarding wheelchairBoarding(int stopPositionInPattern) {
+        return tripPattern.getPattern().getStop(stopPositionInPattern).getWheelchairBoarding();
+    }
 
     // Implementing RaptorTimeTable
     @Override public TripSchedule getTripSchedule(int index) {

@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 
+import org.opentripplanner.model.WheelChairBoarding;
+
 /**
  * This interface represent a trip pattern. A trip-pattern in the raptor context is
  * just a list of stops visited by ALL trips in the pattern. The stops must be ordered
@@ -46,6 +48,8 @@ public interface RaptorTripPattern {
      * The recommended string to return is: {@code [MODE] [SHORT_ROUTE_DESCRIPTION]}.
      */
     String debugInfo();
+
+    WheelChairBoarding wheelchairBoarding(int stopPositionInPattern);
 
     /**
      * Return the first occurrence of the stop position for the given stop index after the given

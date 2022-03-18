@@ -27,6 +27,10 @@ public class McCostParamsMapper {
                 mapTransitReluctance(request.transitReluctanceForMode())
         );
 
+        builder.accessibilityMode(request.accessibilityMode);
+
+        builder.unknownAccessibilityCost(request.unknownTripAccessibilityPenalty);
+
         return builder.build();
     }
 

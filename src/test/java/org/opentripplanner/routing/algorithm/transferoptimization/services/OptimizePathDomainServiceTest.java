@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
+import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathUtils;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;
@@ -32,6 +33,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     private static final int BOARD_COST_SEC = 10;
     private static final int TRANSFER_COST_SEC = 20;
     private static final double WAIT_RELUCTANCE = 1.0;
+    private static final int UNKNOWN_ACCESSIBILITY_COST_SEC = 5 * 60;
 
     private static final RaptorSlackProvider SLACK_PROVIDER = RaptorSlackProvider
             .defaultSlackProvider(TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK);
@@ -40,6 +42,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
             BOARD_COST_SEC,
             TRANSFER_COST_SEC,
             WAIT_RELUCTANCE,
+            UNKNOWN_ACCESSIBILITY_COST_SEC,
+            AccessibilityMode.NOT_REQUIRED,
             null,
             null
     );

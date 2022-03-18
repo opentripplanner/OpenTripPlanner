@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
@@ -86,6 +87,11 @@ public class TestTripPattern implements RaptorTripPattern {
 
   @Override
   public String debugInfo() { return "BUS " + name; }
+
+  @Override
+  public WheelChairBoarding wheelchairBoarding(int stopPositionInPattern) {
+    return WheelChairBoarding.NO_INFORMATION;
+  }
 
   @Override
   public String toString() {

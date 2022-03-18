@@ -9,8 +9,10 @@ import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
+import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
@@ -47,9 +49,12 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     public static final double WAIT_RELUCTANCE = 0.8;
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;
+    public static final int UNKNOWN_ACCESSIBILITY_COST_SEC= 5 * 60;
+
     // The COST_CALCULATOR is not under test, so we use it to calculate correct cost values.
     public static final DefaultCostCalculator COST_CALCULATOR = new DefaultCostCalculator(
-            BOARD_COST_SEC, TRANSFER_COST_SEC, WAIT_RELUCTANCE, null, null
+            BOARD_COST_SEC, TRANSFER_COST_SEC, WAIT_RELUCTANCE, UNKNOWN_ACCESSIBILITY_COST_SEC,
+            AccessibilityMode.NOT_REQUIRED, null, null
     );
 
     public static final RaptorSlackProvider SLACK_PROVIDER =
@@ -85,7 +90,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     public static final int L1_TRANSIT_DURATION = L1_END - L1_START;
     public static final int L1_COST_EX_WAIT =
             COST_CALCULATOR.transitArrivalCost(
-                    COST_CALCULATOR.boardingCostRegularTransfer(false, L1_START, STOP_B, L1_START),
+                    COST_CALCULATOR.boardingCostRegularTransfer(false, L1_START, STOP_B, L1_START, WheelChairBoarding.POSSIBLE),
                     ZERO, L1_TRANSIT_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_C
     );
     // Transfers (C ~ Walk 2m ~ D) (Used in Case B only)

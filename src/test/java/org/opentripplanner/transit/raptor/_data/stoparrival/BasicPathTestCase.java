@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
+import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
@@ -165,10 +166,14 @@ public class BasicPathTestCase implements RaptorTestConstants {
         .build();
 
 
+    private static final int UNKNOWN_ACCESSIBILITY = 5 * 60;
+
     public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
             BOARD_COST_SEC,
             TRANSFER_COST_SEC,
             WAIT_RELUCTANCE,
+            UNKNOWN_ACCESSIBILITY,
+            AccessibilityMode.NOT_REQUIRED,
             TRANSIT_RELUCTANCE,
             STOP_COSTS
     );

@@ -252,7 +252,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public AccessibilityMode accessibilityMode = AccessibilityMode.NOT_REQUIRED;
 
-    public float unknownStopAccessibilityPenalty = 60 * 10;
+    public int unknownStopAccessibilityPenalty = 60 * 10;
+    public int unknownTripAccessibilityPenalty = 60 * 10;
 
     /**
      * The maximum number of itineraries to return. In OTP1 this parameter terminates the search,

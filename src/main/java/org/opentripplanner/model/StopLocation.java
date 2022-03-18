@@ -6,6 +6,7 @@ import org.opentripplanner.util.I18NString;
 
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nonnull;
 import java.util.TimeZone;
 
 /**
@@ -58,6 +59,7 @@ public interface StopLocation {
     return List.of();
   }
 
+  @Nonnull
   default WheelChairBoarding getWheelchairBoarding() { return WheelChairBoarding.NO_INFORMATION; }
 
   /**
