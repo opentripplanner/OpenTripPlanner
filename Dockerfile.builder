@@ -1,4 +1,4 @@
-FROM maven:3-jdk-17
+FROM maven:3-openjdk-17
 MAINTAINER Reittiopas version: 0.1
 
 RUN apt-get update && apt-get -y install curl
