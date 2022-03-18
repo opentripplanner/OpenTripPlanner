@@ -1,7 +1,7 @@
 FROM maven:3-openjdk-17
 MAINTAINER Reittiopas version: 0.1
 
-RUN apt-get update && apt-get -y install curl
+RUN microdnf install curl
 
 ENV OTP_ROOT="/opt/opentripplanner"
 

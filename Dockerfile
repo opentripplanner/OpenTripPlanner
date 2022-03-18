@@ -1,4 +1,4 @@
-FROM openjdk:11-jre
+FROM openjdk:17-jre
 MAINTAINER Reittiopas version: 0.1
 
 VOLUME /opt/opentripplanner/graphs
