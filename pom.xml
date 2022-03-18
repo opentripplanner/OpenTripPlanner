@@ -39,6 +39,8 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
+        <plugin.prettier.version>0.17</plugin.prettier.version>
+        <plugin.prettier.goal>write</plugin.prettier.goal>
     </properties>
 
     <distributionManagement>
@@ -335,7 +337,7 @@
             <plugin>
                 <groupId>com.hubspot.maven.plugins</groupId>
                 <artifactId>prettier-maven-plugin</artifactId>
-                <version>0.17</version>
+                <version>${plugin.prettier.version}</version>
                 <configuration>
                     <prettierJavaVersion>1.6.1</prettierJavaVersion>
                     <printWidth>90</printWidth>
@@ -354,7 +356,7 @@
                     <execution>
                         <phase>validate</phase>
                         <goals>
-                            <goal>write</goal>
+                            <goal>${plugin.prettier.goal}</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -744,6 +746,28 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>prettierCheck</id>
+            <properties>
+                <!-- In the CI environment we want to validate that code is formatted -->
+                <plugin.prettier.goal>check</plugin.prettier.goal>
+            </properties>
+        </profile>
+        <profile>
+            <id>prettierSkip</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.hubspot.maven.plugins</groupId>
+                        <artifactId>prettier-maven-plugin</artifactId>
+                        <version>${plugin.prettier.version}</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>clean-test-snapshots</id>
             <build>
