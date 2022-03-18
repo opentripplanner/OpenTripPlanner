@@ -5,12 +5,10 @@ import static java.util.Collections.emptySet;
 import au.com.origin.snapshots.junit5.SnapshotExtension;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -117,7 +115,8 @@ public class TransitSnapshotTest
         expectArriveByToMatchDepartAtAndSnapshot(request);
     }
 
-    @Ignore
+    @Test
+    @Disabled
     public void test_trip_planning_with_transit_stop_collection() {
         RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
