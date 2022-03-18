@@ -3,22 +3,23 @@
 We use the following code conventions for [Java](#Java) and [JavaScript](#JavaScript).
 
 ## Java
-The OpenTripPlanner Java code style is revised in OTP2. We use the Google Java style guide, with a 
-few modifications. Here is the original Google style guide: 
-https://google.github.io/styleguide/javaguide.html
+The OpenTripPlanner Java code style is revised in OTP v2.2. We use the
+[Prettier Java](https://github.com/jhipster/prettier-java) as is. 
 
 ### IntellJ Code Style formatter 
-If you use IntelliJ, import the provided [intellij-code-style.xml](https://github.com/opentripplanner/OpenTripPlanner/blob/2.1-rc/intellij-code-style.xml). 
-Open the `Preferences` from the menu and select _Editor > Code Style_. Then import the code-style
-xml document. Configure _Scheme_ using  _Import Scheme > IntelliJ IDEA code style XML_.
+If you use IntelliJ, the code-style is automatically imported when you first 
+import the project. If you have set a custom code-style in your settings (as we
+used in v2.1.0 of OTP), then you should need to change to the _Project_ Code
+Style. Open the `Preferences` from the menu and select _Editor > Code Style_. 
+Then select **Project** in the _Scheme drop down.
 
-Note that the IntelliJ formatter will not always format the code according to the coding standard.
-It struggle to do the line breaks properly. Hence, use it to format new code and to rearrange 
-members, then manually fix any mistakes.
+Note that the IntelliJ formatter will not always format the code according to
+the _Prettier Java_. Run `mvn validate` to format all code int the project.
+
 
 ### Other IDEs
-We do not have support for other IDEs at the moment. If you use another editor and make one please
-feel free to share it.  
+We do not have support for other IDEs at the moment. If you use another editor
+and make one please feel free to share it.  
 
 ### Code Style
 
