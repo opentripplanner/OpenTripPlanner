@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.util.I18NString;
 import java.util.TimeZone;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -17,11 +18,11 @@ public interface StopLocation {
   FeedScopedId getId();
 
   /** Name of the StopLocation, if provided */
-  String getName();
+  I18NString getName();
 
   String getDescription();
 
-  String getUrl();
+  I18NString getUrl();
 
   /**
    * Short text or a number that identifies the location for riders. These codes are often used in

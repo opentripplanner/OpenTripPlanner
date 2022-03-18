@@ -103,9 +103,9 @@ public class Place {
                 .toString();
     }
 
-    public static Place normal(Double lat, Double lon, String name) {
+    public static Place normal(Double lat, Double lon, I18NString name) {
         return new Place(
-                new NonLocalizedString(name),
+                name,
                 WgsCoordinate.creatOptionalCoordinate(lat, lon),
                 VertexType.NORMAL,
                 null, null, null
@@ -123,7 +123,7 @@ public class Place {
 
     public static Place forStop(StopLocation stop) {
         return new Place(
-                new NonLocalizedString(stop.getName()),
+                stop.getName(),
                 stop.getCoordinate(),
                 VertexType.TRANSIT,
                 stop,
@@ -136,7 +136,7 @@ public class Place {
         // The actual vertex is used because the StopLocation coordinates may not be equal to the vertex's
         // coordinates.
         return new Place(
-                new NonLocalizedString(stop.getName()),
+                stop.getName(),
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.TRANSIT,
                 stop,

@@ -147,7 +147,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
                 "Flex 5m15s 1x 10:01 10:06:15 %s ~ A 1m45s ~ "
                         + "BUS A 10:08 10:20 12m $996 ~ D 1m15s ~ "
                         + "Flex 6m 1x 10:21:15 10:27:15 %s "
-                        + "[10:01 10:27:15 26m15s %s]",
+                        + "[10:01 10:27:15 26m15s 2tx %s]",
                 RaptorCostConverter.toString(ACCESS_COST),
                 RaptorCostConverter.toString(EGRESS_COST_W_1M_SLACK),
                 RaptorCostConverter.toString(TOT_COST_A)
@@ -165,7 +165,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
                         + "BUS B 10:08 10:20 12m $996 ~ C 15s ~ "
                         + "Walk 2m 10:20:15 10:22:15 $240 ~ D 1m ~ "
                         + "Flex 6m 1x 10:23:15 10:29:15 %s"
-                        + " [10:00 10:29:15 29m15s %s]",
+                        + " [10:00 10:29:15 29m15s 2tx %s]",
                 RaptorCostConverter.toString(ACCESS_COST),
                 RaptorCostConverter.toString(EGRESS_COST_W_1M_SLACK),
                 RaptorCostConverter.toString(TOT_COST_B)
@@ -181,7 +181,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
                 "Flex 5m15s 1x 9:50 9:55:15 %s ~ A 12m45s ~ "
                         + "BUS A 10:08 10:20 12m %s ~ D 10m ~ "
                         + "Flex 6m 1x 10:30 10:36 %s "
-                        + "[9:50 10:36 46m %s]",
+                        + "[9:50 10:36 46m 2tx %s]",
                 RaptorCostConverter.toString(ACCESS_COST),
                 RaptorCostConverter.toString(L1_COST_INC_WAIT_W_OPENING_HOURS_A),
                 RaptorCostConverter.toString(EGRESS_COST_W_9M45S_SLACK),
@@ -200,7 +200,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
                         + "BUS B 10:08 10:20 12m %s ~ C 15s ~ "
                         + "Walk 2m 10:20:15 10:22:15 $240 ~ D 7m45s ~ "
                         + "Flex 6m 1x 10:30 10:36 %s"
-                        + " [9:50 10:36 46m %s]",
+                        + " [9:50 10:36 46m 2tx %s]",
                 RaptorCostConverter.toString(ACCESS_COST),
                 RaptorCostConverter.toString(L1_COST_INC_WAIT_W_OPENING_HOURS_B),
                 RaptorCostConverter.toString(EGRESS_COST_W_7M45S_SLACK),

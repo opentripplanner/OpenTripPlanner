@@ -189,7 +189,7 @@ public class Itinerary {
      * Total distance in meters.
      */
     public double distanceMeters() {
-        return legs.stream().mapToDouble(it -> it.getDistanceMeters()).sum();
+        return legs.stream().mapToDouble(Leg::getDistanceMeters).sum();
     }
 
     /**

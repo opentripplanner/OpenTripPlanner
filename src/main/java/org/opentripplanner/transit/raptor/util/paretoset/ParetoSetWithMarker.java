@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.util.paretoset;
 
 /**
- * {@link ParetoSet} with the possibility to set a index marker, which
+ * {@link ParetoSet} with the possibility to set an index marker, which
  * can be used to list all elements added after the marker is set.
  *
  *

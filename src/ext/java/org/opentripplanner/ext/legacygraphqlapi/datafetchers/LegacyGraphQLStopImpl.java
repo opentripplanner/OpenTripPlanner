@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
@@ -83,7 +84,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> getValue(environment, StopLocation::getName, Station::getName);
+    return environment -> getValue(
+          environment,
+          stop -> LegacyGraphQLUtils.getTranslation(stop.getName(), environment),
+          station -> LegacyGraphQLUtils.getTranslation(station.getName(), environment)
+    );
   }
 
   @Override
@@ -113,7 +118,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> url() {
-    return environment -> getValue(environment, StopLocation::getUrl, Station::getUrl);
+    return environment -> getValue(
+          environment,
+          stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
+          station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
+    );
   }
 
   @Override

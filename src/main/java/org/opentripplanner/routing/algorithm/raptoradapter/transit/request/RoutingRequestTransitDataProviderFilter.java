@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.EnumSet;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.BikeAccess;
@@ -28,17 +29,21 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final Set<FeedScopedId> bannedRoutes;
 
+  private final Set<FeedScopedId> bannedTrips;
+
   public RoutingRequestTransitDataProviderFilter(
       boolean requireBikesAllowed,
       boolean requireWheelchairAccessible,
       boolean includePlannedCancellations,
       Set<AllowedTransitMode> allowedTransitModes,
-      Set<FeedScopedId> bannedRoutes
+      Set<FeedScopedId> bannedRoutes,
+      Set<FeedScopedId> bannedTrips
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
     this.requireWheelchairAccessible = requireWheelchairAccessible;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
+    this.bannedTrips = bannedTrips;
     boolean hasOnlyMainModeFilters = allowedTransitModes.stream()
             .noneMatch(AllowedTransitMode::hasSubMode);
 
@@ -67,7 +72,8 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
         request.wheelchairAccessible,
         request.includePlannedCancellations,
         request.modes.transitModes,
-        request.getBannedRoutes(graphIndex.getAllRoutes())
+        request.getBannedRoutes(graphIndex.getAllRoutes()),
+        request.bannedTrips
     );
   }
 
@@ -78,20 +84,25 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   @Override
   public boolean tripTimesPredicate(TripTimes tripTimes) {
-    if (!transitModeIsAllowed.test(tripTimes.getTrip())) {
+    final Trip trip = tripTimes.getTrip();
+    if (!transitModeIsAllowed.test(trip)) {
+      return false;
+    }
+
+    if (bannedTrips.contains(trip.getId()) ) {
       return false;
     }
 
     if (requireBikesAllowed) {
-      return bikeAccessForTrip(tripTimes.getTrip()) == BikeAccess.ALLOWED;
+      return bikeAccessForTrip(trip) == BikeAccess.ALLOWED;
     }
 
     if (requireWheelchairAccessible) {
-      return tripTimes.getTrip().getWheelchairAccessible() == 1;
+      return trip.getWheelchairAccessible() == 1;
     }
 
     if (!includePlannedCancellations) {
-      return !tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced();
+      return !trip.getTripAlteration().isCanceledOrReplaced();
     }
 
     return true;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import org.opentripplanner.util.I18NString;
 
 
 /**
@@ -17,7 +18,7 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
 
     private final Collection<Station> childStations;
 
-    private String name;
+    private I18NString name;
 
     private WgsCoordinate coordinate;
 
@@ -25,7 +26,7 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
 
     private String description;
 
-    private String url;
+    private I18NString url;
 
     /**
      * Create a new multi modal station with the given list of child stations.
@@ -35,11 +36,11 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
         this.childStations = Collections.unmodifiableCollection(new ArrayList<>(children));
     }
 
-    public String getName() {
+    public I18NString getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(I18NString name) {
         this.name = name;
     }
 
@@ -80,11 +81,11 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
     /**
      * URL to a web page containing information about this particular station
      */
-    public String getUrl() {
+    public I18NString getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(I18NString url) {
         this.url = url;
     }
 

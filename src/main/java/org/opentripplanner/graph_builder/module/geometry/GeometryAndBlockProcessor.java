@@ -261,13 +261,6 @@ public class GeometryAndBlockProcessor {
             }
         }
 
-        // Copy all interline relationships into the field holding them in the graph.
-        // TODO: verify whether we need to be keeping track of patterns at all here, or could just accumulate trip-trip relationships.
-        for (P2<TripPattern> patterns : interlines.keySet()) {
-            for (P2<Trip> trips : interlines.get(patterns)) {
-                graph.interlinedTrips.put(trips.first, trips.second);
-            }
-        }
         LOG.info("Done finding interlining trips.");
     }
 

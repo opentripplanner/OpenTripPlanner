@@ -125,6 +125,7 @@ public class AccessStopArrivalTest {
             @Override public int generalizedCost() { return 0; }
             @Override public int durationInSeconds() { return 0; }
             @Override public int earliestDepartureTime(int t) { return t; }
+            @Override public boolean hasOpeningHours() { return true; }
 
             @Override
             public int latestArrivalTime(int requestedArrivalTime) {

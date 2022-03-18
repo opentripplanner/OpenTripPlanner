@@ -69,27 +69,27 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
     @Test
     public void standard() {
         requestBuilder.profile(RaptorProfile.STANDARD);
+        requestBuilder.searchParams().searchOneIterationOnly();
 
         var response = raptorService.route(requestBuilder.build(), data);
 
         assertEquals(
-                "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m]",
+                "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]",
                 pathsToString(response)
         );
     }
 
-    //TODO: Enable after #3725 is fixed
     @Test
-    @Disabled
     public void standardReverse() {
         requestBuilder
                 .profile(RaptorProfile.STANDARD)
                 .searchDirection(SearchDirection.REVERSE);
+        requestBuilder.searchParams().searchOneIterationOnly();
 
         var response = raptorService.route(requestBuilder.build(), data);
 
         assertEquals(
-                "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m]",
+                "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx]",
                 pathsToString(response)
         );
     }
@@ -101,7 +101,7 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
         var response = raptorService.route(requestBuilder.build(), data);
 
         assertEquals(
-                "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m $3820]",
+                "Flex 3m 1x ~ A ~ Walk 10m ~ B ~ BUS R1 0:30 0:45 ~ C ~ BUS R2 0:45 0:55 ~ D ~ Walk 1m [0:16 0:56 40m 2tx $3820]",
                 pathsToString(response)
         );
     }

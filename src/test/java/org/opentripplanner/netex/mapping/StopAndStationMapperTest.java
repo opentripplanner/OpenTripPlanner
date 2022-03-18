@@ -92,8 +92,7 @@ public class StopAndStationMapperTest {
                 MappingSupport.ID_FACTORY,
                 new HierarchicalVersionMapById<>(),
                 null,
-                new DataImportIssueStore(false),
-                stopPlaceById
+                new DataImportIssueStore(false)
         );
 
         stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
@@ -218,16 +217,11 @@ public class StopAndStationMapperTest {
         quaysById.add(quay2);
         quaysById.add(quay3);
 
-        var stopPlaceById = new HierarchicalVersionMapById<StopPlace>();
-        stopPlaceById.add(stopPlaceNew);
-        stopPlaceById.add(stopPlaceOld);
-
         StopAndStationMapper stopMapper = new StopAndStationMapper(
                 MappingSupport.ID_FACTORY,
                 quaysById,
                 null,
-                new DataImportIssueStore(false),
-                stopPlaceById
+                new DataImportIssueStore(false)
         );
 
         stopMapper.mapParentAndChildStops(stopPlaces);

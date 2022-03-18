@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -65,7 +63,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.CalendarService;
@@ -240,9 +237,6 @@ public class Graph implements Serializable {
      */
     public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
 
-    /** Interlining relationships between trips. */
-    public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
-
     /** Pre-generated transfers between all stops. */
     public final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
@@ -348,9 +342,11 @@ public class Graph implements Serializable {
         if (e != null) {
             streetNotesService.removeStaticNotes(e);
 
-            if (e.fromv != null) {
-                e.fromv.removeOutgoing(e);
+            if (e instanceof StreetEdge) {
+                ((StreetEdge) e).removeAllTurnRestrictions();
+            }
 
+            if (e.fromv != null) {
                 e.fromv.getIncoming()
                         .stream()
                         .filter(StreetEdge.class::isInstance)
@@ -363,6 +359,7 @@ public class Graph implements Serializable {
                             }
                         });
 
+                e.fromv.removeOutgoing(e);
                 e.fromv = null;
             }
 

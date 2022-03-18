@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.ZonedDateTime;
+import java.util.BitSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
@@ -22,6 +21,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
+import org.opentripplanner.transit.raptor.util.BitSetIterator;
 import org.opentripplanner.util.OTPFeature;
 
 
@@ -37,9 +37,14 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   private final TransferService transferService;
 
   /**
-   * Active trip patterns by stop index
+   * Active route indices by stop index
    */
-  private final List<List<TripPatternForDates>> activeTripPatternsPerStop;
+  private final List<int[]> activeTripPatternsPerStop;
+
+  /**
+   * Trip patterns by route index
+   */
+  private final List<TripPatternForDates> patternIndex;
 
   /**
    * Transfers by stop index
@@ -74,11 +79,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     var transitDataCreator = new RaptorRoutingRequestTransitDataCreator(
             transitLayer, transitSearchTimeZero
     );
-    this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(
+    this.patternIndex = transitDataCreator.createTripPatterns(
         additionalPastSearchDays,
         additionalFutureSearchDays,
         filter
     );
+    this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(patternIndex);
     this.transfers = transitLayer.getRaptorTransfersForRequest(routingRequest);
     this.generalizedCostCalculator = new DefaultCostCalculator(
             McCostParamsMapper.map(routingRequest),
@@ -106,13 +112,22 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
-  public Iterator<? extends RaptorRoute<TripSchedule>> routeIterator(IntIterator stops) {
-    // A LinkedHashSet is used so that the iteration order is deterministic.
-    Set<TripPatternForDates> activeTripPatternsForGivenStops = new LinkedHashSet<>();
+  public IntIterator routeIndexIterator(IntIterator stops) {
+    BitSet activeTripPatternsForGivenStops = new BitSet(patternIndex.size());
+
     while (stops.hasNext()) {
-      activeTripPatternsForGivenStops.addAll(activeTripPatternsPerStop.get(stops.next()));
+      int[] patterns = activeTripPatternsPerStop.get(stops.next());
+      for (int i : patterns) {
+        activeTripPatternsForGivenStops.set(i);
+      }
     }
-    return activeTripPatternsForGivenStops.iterator();
+
+    return new BitSetIterator(activeTripPatternsForGivenStops);
+  }
+
+  @Override
+  public RaptorRoute<TripSchedule> getRouteForIndex(int routeIndex) {
+    return patternIndex.get(routeIndex);
   }
 
   @Override

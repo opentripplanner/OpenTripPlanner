@@ -20,7 +20,7 @@ public class Place {
     public final int rrStopIndex;
 
     public Place(org.opentripplanner.model.StopLocation stop, int rrStopIndex) {
-        this(stop.getName(), stop.getId(), stop.getCoordinate(), rrStopIndex);
+        this(stop.getName().toString(), stop.getId(), stop.getCoordinate(), rrStopIndex);
     }
 
     public Place(String name, String feedId, String stopId, Double lat, Double lon) {

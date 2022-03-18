@@ -40,7 +40,7 @@ public class ShortestPathTree {
     }
 
     /** @return a list of GraphPaths, sometimes empty but never null. */
-    public List<GraphPath> getPaths(Vertex dest, boolean optimize) {
+    public List<GraphPath> getPaths(Vertex dest) {
         List<? extends State> stateList = getStates(dest);
         if (stateList == null) {
             return Collections.emptyList();
@@ -58,7 +58,7 @@ public class ShortestPathTree {
     public List<GraphPath> getPaths() {
         List<GraphPath> graphPaths = new ArrayList<>();
         for (Vertex vertex : options.getRoutingContext().toVertices) {
-            graphPaths.addAll(getPaths(vertex, true));
+            graphPaths.addAll(getPaths(vertex));
         }
         return graphPaths;
     }

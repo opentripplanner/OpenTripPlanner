@@ -25,6 +25,7 @@ import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.ProgressTracker;
 import org.opentripplanner.util.ResourceBundleSingleton;
@@ -227,23 +228,23 @@ public class StreetVertexIndex {
       LOG.debug("Finding start vertex for {}", location);
     }
 
-    String name;
+    I18NString name;
     if (location.label == null || location.label.isEmpty()) {
       if (endVertex) {
-        name = ResourceBundleSingleton.INSTANCE.localize("destination", options.locale);
+        name = new LocalizedString("destination");
       }
       else {
-        name = ResourceBundleSingleton.INSTANCE.localize("origin", options.locale);
+        name = new LocalizedString("origin");
       }
     }
     else {
-      name = location.label;
+      name = new NonLocalizedString(location.label);
     }
 
     TemporaryStreetLocation temporaryStreetLocation = new TemporaryStreetLocation(
         UUID.randomUUID().toString(),
         location.getCoordinate(),
-        new NonLocalizedString(name),
+        name,
         endVertex
     );
 

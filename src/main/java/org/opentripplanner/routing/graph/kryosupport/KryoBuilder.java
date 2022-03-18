@@ -4,25 +4,21 @@ import com.conveyal.kryo.TIntArrayListSerializer;
 import com.conveyal.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
+import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
-import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 import de.javakaffee.kryoserializers.guava.ArrayListMultimapSerializer;
 import de.javakaffee.kryoserializers.guava.HashMultimapSerializer;
-import de.javakaffee.kryoserializers.guava.ImmutableSetSerializer;
 import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.kryo.BuildConfigSerializer;
-import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.kryo.RouterConfigSerializer;
+import org.opentripplanner.kryo.UnmodifiableCollectionsSerializer;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 
@@ -52,24 +48,15 @@ public final class KryoBuilder {
         kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
 
         // Add support for the package local java.util.ImmutableCollections.
-        // Not supported in the current com.conveyal:kryo-tools:1.3.0.
+        // Not supported properly in the current com.conveyal:kryo-tools:1.4.0.
         // This provide support for List.of, Set.of, Map.of and Collectors.toUnmodifiable(Set|List|Map)
         kryo.register(List.of().getClass(), new JavaImmutableListSerializer());
         kryo.register(List.of(1).getClass(), new JavaImmutableListSerializer());
         kryo.register(Set.of().getClass(), new JavaImmutableSetSerializer());
         kryo.register(Set.of(1).getClass(), new JavaImmutableSetSerializer());
-        kryo.register(Map.of().getClass(), new JavaSerializer());
-        kryo.register(Map.of(1, 1).getClass(), new JavaSerializer());
+        kryo.register(Map.of().getClass(), new JavaImmutableMapSerializer());
+        kryo.register(Map.of(1, 1).getClass(), new JavaImmutableMapSerializer());
 
-        // Kryo's default instantiation and deserialization of BitSets leaves them empty.
-        // The Kryo BitSet serializer in magro/kryo-serializers naively writes out a dense stream of booleans.
-        // BitSet's built-in Java serializer saves the internal bitfields, which is efficient. We use that one.
-        kryo.register(BitSet.class, new JavaSerializer());
-
-        // BiMap has a constructor that uses its putAll method, which just puts each item in turn.
-        // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
-        // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
-        kryo.register(HashBiMap.class, new HashBiMapSerializer());
         kryo.register(HashMultimap.class, new HashMultimapSerializer());
         kryo.register(ArrayListMultimap.class, new ArrayListMultimapSerializer());
 
@@ -77,19 +64,12 @@ public final class KryoBuilder {
         kryo.register(RouterConfig.class, new RouterConfigSerializer());
         kryo.register(BuildConfig.class, new BuildConfigSerializer());
 
-        // OBA uses unmodifiable collections, but those classes have package-private visibility. Workaround.
-        // FIXME we're importing all the contributed kryo-serializers just for this one serializer
-        try {
-            Class<?> unmodifiableCollection = Class.forName("java.util.Collections$UnmodifiableCollection");
-            kryo.addDefaultSerializer(unmodifiableCollection , UnmodifiableCollectionsSerializer.class);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        UnmodifiableCollectionsSerializer.registerSerializers(kryo);
         // Instantiation strategy: how should Kryo make new instances of objects when they are deserialized?
         // The default strategy requires every class you serialize, even in your dependencies, to have a zero-arg
         // constructor (which can be private). The setInstantiatorStrategy method completely replaces that default
         // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
-        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
+        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
         return kryo;
     }
 }

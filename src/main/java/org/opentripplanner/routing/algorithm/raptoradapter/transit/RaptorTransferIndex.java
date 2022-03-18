@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
@@ -19,8 +20,14 @@ public class RaptorTransferIndex {
             List<List<RaptorTransfer>> forwardTransfers,
             List<List<RaptorTransfer>> reversedTransfers
     ) {
-        this.forwardTransfers = forwardTransfers;
-        this.reversedTransfers = reversedTransfers;
+        // Create immutable copies of the lists for each stop to make them immutable and faster to iterate
+        this.forwardTransfers = forwardTransfers.stream()
+                .map(List::copyOf)
+                .collect(Collectors.toList());
+
+        this.reversedTransfers = reversedTransfers.stream()
+                .map(List::copyOf)
+                .collect(Collectors.toList());
     }
 
     public List<List<RaptorTransfer>> getForwardTransfers() {

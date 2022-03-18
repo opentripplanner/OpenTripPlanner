@@ -10,9 +10,9 @@ import org.opentripplanner.util.NonLocalizedString;
 public class TransitBoardingAreaVertex extends Vertex {
   private static final long serialVersionUID = 1L;
 
-  private boolean wheelchairAccessible;
+  private final boolean wheelchairAccessible;
 
-  private BoardingArea boardingArea;
+  private final BoardingArea boardingArea;
 
   /**
    * @param boardingArea The transit model boarding area reference.
@@ -23,7 +23,7 @@ public class TransitBoardingAreaVertex extends Vertex {
         boardingArea.getId().toString(),
         boardingArea.getCoordinate().longitude(),
         boardingArea.getCoordinate().latitude(),
-        new NonLocalizedString(boardingArea.getName())
+        boardingArea.getName()
     );
     this.boardingArea = boardingArea;
     this.wheelchairAccessible = boardingArea.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

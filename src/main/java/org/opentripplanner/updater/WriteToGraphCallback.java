@@ -1,5 +1,7 @@
 package org.opentripplanner.updater;
 
+import java.util.concurrent.Future;
+
 public interface WriteToGraphCallback {
 
     /**
@@ -11,5 +13,5 @@ public interface WriteToGraphCallback {
      *
      * @param runnable is a graph writer runnable
      */
-    void execute(GraphWriterRunnable runnable);
+    Future<?> execute(GraphWriterRunnable runnable);
 }

@@ -20,8 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
@@ -542,11 +544,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     /**
      * Do not use certain trips
-     *
-     * @deprecated TODO OTP2: Needs to be implemented
      */
-    @Deprecated
-    public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
+    public Set<FeedScopedId> bannedTrips = Set.of();
 
     /**
      * A global minimum transfer time (in seconds) that specifies the minimum amount of time that
@@ -972,6 +971,17 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         whiteListedRoutes = RouteMatcher.idMatcher(routeIds);
     }
 
+    public void setBannedTrips(List<FeedScopedId> ids) {
+        if (ids != null) {
+            bannedTrips = Set.copyOf(ids);
+        }
+    }
+
+    public void setBannedTripsFromString(String ids) {
+        if (!ids.isEmpty()) {
+            bannedTrips = FeedScopedId.parseListOfIds(ids);
+        }
+    }
 
     public void setFromString(String from) {
         this.from = LocationStringParser.fromOldStyleString(from);
@@ -1219,7 +1229,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             clone.preferredRoutes = preferredRoutes.clone();
             clone.unpreferredRoutes = unpreferredRoutes.clone();
 
-            clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
+            clone.bannedTrips = Set.copyOf(bannedTrips);
 
             clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
 

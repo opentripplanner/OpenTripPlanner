@@ -52,8 +52,8 @@ public class AStar {
         public int nVisited;
         public List<State> targetAcceptedStates;
         public RunStatus status;
-        private RoutingRequest options;
-        private SearchTerminationStrategy terminationStrategy;
+        private final RoutingRequest options;
+        private final SearchTerminationStrategy terminationStrategy;
         public Vertex u_vertex;
 
         public RunState(RoutingRequest options, SearchTerminationStrategy terminationStrategy) {
@@ -164,7 +164,8 @@ public class AStar {
                         runState.rctx.fromVertices,
                         runState.rctx.toVertices,
                         runState.u,
-                        edge,runState.spt,
+                        edge,
+                        runState.spt,
                         runState.options
                     )
             ) {

@@ -10,6 +10,7 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.util.NonLocalizedString;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -135,7 +136,7 @@ public class FlexStopLocationMapperTest {
   private Stop getStop(String id, double latitude, double longitude) {
     return new Stop(
         ID_FACTORY.createId(id),
-        id,
+        new NonLocalizedString(id),
         id,
         null,
         WgsCoordinate.creatOptionalCoordinate(latitude, longitude),

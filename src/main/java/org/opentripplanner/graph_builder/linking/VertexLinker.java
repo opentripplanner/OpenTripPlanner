@@ -435,7 +435,7 @@ public class VertexLinker {
       v = tsv;
     }
     else {
-      v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y, originalEdge);
+      v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y);
     }
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
@@ -454,14 +454,13 @@ public class VertexLinker {
       }
 
       if (scope == Scope.PERMANENT) {
-        // remove original edge from the graph
-        originalEdge.getToVertex().removeIncoming(originalEdge);
-        originalEdge.getFromVertex().removeOutgoing(originalEdge);
         // remove original edges from the spatial index
         // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
         // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
         // insert logic is not trivial and would require additional testing of the spatial index.
         removeEdgeFromIndex(originalEdge, scope);
+        // remove original edge from the graph
+        graph.removeEdge(originalEdge);
       }
     }
 

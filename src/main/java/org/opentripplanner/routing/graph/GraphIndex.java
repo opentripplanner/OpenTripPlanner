@@ -7,6 +7,14 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
@@ -29,12 +37,6 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class GraphIndex {
 
@@ -185,6 +187,12 @@ public class GraphIndex {
 
     public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
         return patternsForStopId.get(stop);
+    }
+
+    public Collection<Trip> getTripsForStop(StopLocation stop) {
+        return getPatternsForStop(stop).stream()
+                .flatMap(TripPattern::scheduledTripsAsStream)
+                .collect(Collectors.toList());
     }
 
     /**
