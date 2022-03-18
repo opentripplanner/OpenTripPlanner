@@ -71,7 +71,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     private static TripPattern getPatternIncludingRealtime(Graph graph, Trip trip, ServiceDate sd) {
         return Optional.ofNullable(graph.getTimetableSnapshot())
                 .map(snapshot -> snapshot.getLastAddedTripPattern(trip.getId(), sd))
-                .orElse(graph.index.getPatternForTrip().get(trip));
+                .orElseGet(() -> graph.index.getPatternForTrip().get(trip));
     }
 
     /**
