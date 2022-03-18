@@ -1,4 +1,4 @@
-name: 'Close Stale issues'
+name: 'Close stale issues'
 
 on:
   schedule:
@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   stale:
+    if: github.repository_owner == 'opentripplanner'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/stale@v5.0.0
