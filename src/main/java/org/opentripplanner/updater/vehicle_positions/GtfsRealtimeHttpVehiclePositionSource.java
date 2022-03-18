@@ -46,7 +46,7 @@ public class GtfsRealtimeHttpVehiclePositionSource
             return this.getPositions(is);
         }
         catch (IOException e) {
-            LOG.warn("Error reading bike rental feed from " + url, e);
+            LOG.warn("Error reading vehicle positions from " + url, e);
         }
         return List.of();
     }
