@@ -1417,6 +1417,9 @@ type VehiclePosition {
     heading: Float
     """When the position of the vehicle was recorded in seconds since the UNIX epoch."""
     time: Long
+
+    """Which trip this vehicles runs on."""
+    trip: Trip!
 }
 
 enum VehicleStopStatus {

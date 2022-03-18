@@ -4,6 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLVehiclePosition;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVehicleStopStatus;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 
 public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePosition {
@@ -50,6 +51,11 @@ public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePos
     @Override
     public DataFetcher<Long> time() {
         return env -> getSource(env).time().getEpochSecond();
+    }
+
+    @Override
+    public DataFetcher<Trip> trip() {
+        return env -> getSource(env).trip();
     }
 
     @Override

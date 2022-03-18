@@ -1027,6 +1027,8 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Long> time();
 
+        public DataFetcher<Trip> trip();
+
         public DataFetcher<String> vehicleId();
     }
 
