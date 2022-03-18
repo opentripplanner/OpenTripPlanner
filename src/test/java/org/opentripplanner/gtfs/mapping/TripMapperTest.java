@@ -104,7 +104,7 @@ public class TripMapperTest {
         assertNull(result.getTripHeadsign());
         assertNull(result.getTripShortName());
         assertEquals(-1, result.getDirection().gtfsCode);
-        assertEquals(0, result.getWheelchairBoarding());
+        assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
         assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
     }
 
