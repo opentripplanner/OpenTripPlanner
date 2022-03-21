@@ -4,7 +4,7 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.csvreader.CsvReader;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -25,7 +25,7 @@ public class Namer {
     }
     static {
         try {
-            CsvReader reader = new CsvReader("/usr/share/dict/british-english", '\'', Charset.forName("UTF8"));
+            CsvReader reader = new CsvReader("/usr/share/dict/british-english", '\'', StandardCharsets.UTF_8);
             while (reader.readRecord()) {
                 if (reader.getColumnCount() > 1) continue;
                 words.add(reader.get(0));

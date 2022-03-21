@@ -7,9 +7,9 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -25,11 +25,8 @@ import org.opentripplanner.util.LocalizedString;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
@@ -48,7 +45,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-        File file = new File(URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8));
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
 
         loader.setProvider(provider);
@@ -105,7 +102,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-        File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.pbf").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.pbf").getFile(), StandardCharsets.UTF_8));
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
 
         loader.setProvider(provider);
@@ -159,7 +156,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.skipVisibility = skipVisibility;
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-        File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.pbf").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.pbf").getFile(), StandardCharsets.UTF_8));
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
 
         loader.setProvider(provider);

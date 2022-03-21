@@ -24,12 +24,8 @@ import org.slf4j.LoggerFactory;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class GraphStats {
 
@@ -98,13 +94,13 @@ public class GraphStats {
         /* open output stream (same for all commands) */
         if (outPath != null) {
             try {
-                writer = new CsvWriter(outPath, ',', Charset.forName("UTF8"));
+                writer = new CsvWriter(outPath, ',', StandardCharsets.UTF_8);
             } catch (Exception e) {
                 LOG.error("Exception while opening output file " + outPath);
                 return;
             }
         } else {
-            writer = new CsvWriter(System.out, ',', Charset.forName("UTF8"));
+            writer = new CsvWriter(System.out, ',', StandardCharsets.UTF_8);
         }
         LOG.info("done loading graph.");
         

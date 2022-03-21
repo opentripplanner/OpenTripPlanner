@@ -16,6 +16,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 /**
@@ -34,7 +35,7 @@ public class TestUnroutable extends TestCase {
         OpenStreetMapModule osmBuilder = new OpenStreetMapModule();
         osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
-        File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), "UTF-8"));
+        File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(osmDataFile, true);
         osmBuilder.setProvider(provider);
         HashMap<Class<?>, Object> extra = Maps.newHashMap();
