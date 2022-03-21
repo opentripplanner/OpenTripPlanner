@@ -58,17 +58,17 @@ public enum StreetMode {
    */
   FLEXIBLE(true, false, true, true, false, true);
 
-  boolean access;
+  final boolean access;
 
-  boolean transfer;
+  final boolean transfer;
 
-  boolean egress;
+  final boolean egress;
 
-  boolean includesWalking;
+  final boolean includesWalking;
 
-  boolean includesBiking;
+  final boolean includesBiking;
 
-  boolean includesDriving;
+  final boolean includesDriving;
 
   StreetMode(
       boolean access,
