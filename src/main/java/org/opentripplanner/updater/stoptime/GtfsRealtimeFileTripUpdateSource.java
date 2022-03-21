@@ -58,7 +58,7 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
             }
 
             // Create List of TripUpdates
-            updates = new ArrayList<TripUpdate>(feedEntityList.size());
+            updates = new ArrayList<>(feedEntityList.size());
             for (FeedEntity feedEntity : feedEntityList) {
                 if (feedEntity.hasTripUpdate()) {
                     updates.add(feedEntity.getTripUpdate());

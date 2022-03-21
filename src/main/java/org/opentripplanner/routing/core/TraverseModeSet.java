@@ -294,7 +294,7 @@ public class TraverseModeSet implements Cloneable, Serializable {
     }
 
     public List<TraverseMode> getModes() {
-        ArrayList<TraverseMode> modeList = new ArrayList<TraverseMode>();
+        ArrayList<TraverseMode> modeList = new ArrayList<>();
         for (TraverseMode mode : TraverseMode.values()) {
             if ((modes & getMaskForMode(mode)) != 0) {
                 modeList.add(mode);

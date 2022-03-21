@@ -19,7 +19,7 @@ public class FareComponent {
     public FareComponent(FeedScopedId fareId, Money amount) {
         this.fareId = fareId;
         price = amount;
-        routes = new ArrayList<FeedScopedId>();
+        routes = new ArrayList<>();
     }
 
     public void addRoute(FeedScopedId routeId) {

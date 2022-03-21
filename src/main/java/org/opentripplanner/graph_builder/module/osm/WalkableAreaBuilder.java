@@ -1,6 +1,13 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -18,7 +25,11 @@ import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWe
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.NamedArea;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -31,7 +42,14 @@ import org.opentripplanner.util.I18NString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,7 +93,7 @@ public class WalkableAreaBuilder {
     // This is an awful hack, but this class (WalkableAreaBuilder) ought to be rewritten.
     private final Handler handler;
 
-    private final HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
+    private final HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<>();
 
     private final boolean platformEntriesLinking;
 
@@ -107,7 +125,7 @@ public class WalkableAreaBuilder {
      * @param group
      */
     public void buildWithoutVisibility(AreaGroup group) {
-        Set<Edge> edges = new HashSet<Edge>();
+        Set<Edge> edges = new HashSet<>();
 
         // create polygon and accumulate nodes for area
         for (Ring ring : group.outermostRings) {
@@ -115,7 +133,7 @@ public class WalkableAreaBuilder {
             AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon);
             // the points corresponding to concave or hole vertices
             // or those linked to ways
-            HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
+            HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
 
             // we also want to fill in the edges of this area anyway, because we can,
             // and to avoid the numerical problems that they tend to cause
@@ -144,11 +162,11 @@ public class WalkableAreaBuilder {
     public void buildWithVisibility(AreaGroup group) {
         // These sets contain the nodes/vertices which can be used to traverse from the rest of the
         // street network onto the walkable area
-        Set<OSMNode> startingNodes = new HashSet<OSMNode>();
-        Set<Vertex> startingVertices = new HashSet<Vertex>();
+        Set<OSMNode> startingNodes = new HashSet<>();
+        Set<Vertex> startingVertices = new HashSet<>();
 
         // List of edges belonging to the walkable area
-        Set<Edge> edges = new HashSet<Edge>();
+        Set<Edge> edges = new HashSet<>();
 
         // Edges which are part of the rings. We want to keep there for linking even tough they
         // might not be part of the visibility edges.
@@ -171,8 +189,8 @@ public class WalkableAreaBuilder {
 
             // the points corresponding to concave or hole vertices
             // or those linked to ways
-            HashSet<OSMNode> visibilityNodes = new HashSet<OSMNode>();
-            HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
+            HashSet<OSMNode> visibilityNodes = new HashSet<>();
+            HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
             HashSet<OsmVertex> platformLinkingVertices = new HashSet<>();
             // we need to accumulate visibility points from all contained areas
             // inside this ring, but only for shared nodes; we don't care about
@@ -288,7 +306,7 @@ public class WalkableAreaBuilder {
                 }
 
                 for (OSMNode nodeJ : visibilityNodes) {
-                    P2<OSMNode> nodePair = new P2<OSMNode>(nodeI, nodeJ);
+                    P2<OSMNode> nodePair = new P2<>(nodeI, nodeJ);
                     if (alreadyAddedEdges.contains(nodePair))
                         continue;
 
@@ -366,7 +384,7 @@ public class WalkableAreaBuilder {
         options.setDummyRoutingContext(graph);
         AStar search = new AStar();
         search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
-        Set<Edge> usedEdges = new HashSet<Edge>();
+        Set<Edge> usedEdges = new HashSet<>();
         for (Vertex vertex : startingVertices) {
             options.setRoutingContext(graph, vertex, null);
             options.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
@@ -397,7 +415,7 @@ public class WalkableAreaBuilder {
             Ring ring, int i, HashSet<P2<OSMNode>> alreadyAddedEdges) {
         OSMNode node = ring.nodes.get(i);
         OSMNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
-        P2<OSMNode> nodePair = new P2<OSMNode>(node, nextNode);
+        P2<OSMNode> nodePair = new P2<>(node, nextNode);
         if (alreadyAddedEdges.contains(nodePair)) {
             return Set.of();
         }
@@ -411,7 +429,7 @@ public class WalkableAreaBuilder {
     private Set<AreaEdge> createSegments(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
             Collection<Area> areas, AreaEdgeList edgeList
     ) {
-        List<Area> intersects = new ArrayList<Area>();
+        List<Area> intersects = new ArrayList<>();
 
         Coordinate[] coordinates = new Coordinate[] { startEndpoint.getCoordinate(),
                 endEndpoint.getCoordinate() };

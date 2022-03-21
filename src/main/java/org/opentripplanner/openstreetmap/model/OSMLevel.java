@@ -138,7 +138,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
             DataImportIssueStore issueStore
     ) {
 
-        List<String> levelSpecs = new ArrayList<String>();
+        List<String> levelSpecs = new ArrayList<>();
 
         Matcher m;
         for (String level : specList.split(";")) {
@@ -155,7 +155,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         }
 
         /* build an OSMLevel for each level spec in the list */
-        List<OSMLevel> levels = new ArrayList<OSMLevel>();
+        List<OSMLevel> levels = new ArrayList<>();
         for (String spec : levelSpecs) {
             levels.add(fromString(spec, source, incrementNonNegative, issueStore));
         }
@@ -168,7 +168,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
             boolean incrementNonNegative,
             DataImportIssueStore issueStore
     ) {
-        Map<String, OSMLevel> map = new HashMap<String, OSMLevel>();
+        Map<String, OSMLevel> map = new HashMap<>();
         for (OSMLevel level :
                 fromSpecList(specList, source, incrementNonNegative, issueStore)) {
             map.put(level.shortName, level);

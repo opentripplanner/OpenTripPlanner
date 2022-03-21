@@ -131,7 +131,7 @@ public class TestHalfEdges {
 
         RoutingRequest options = new RoutingRequest();
 
-        HashSet<Edge> turns = new HashSet<Edge>();
+        HashSet<Edge> turns = new HashSet<>();
         turns.add(left);
         turns.add(leftBack);
 
@@ -140,7 +140,7 @@ public class TestHalfEdges {
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), false, tempEdges);
 
-        HashSet<Edge> endTurns = new HashSet<Edge>();
+        HashSet<Edge> endTurns = new HashSet<>();
         endTurns.add(right);
         endTurns.add(rightBack);
 
@@ -269,7 +269,7 @@ public class TestHalfEdges {
         RoutingRequest options = new RoutingRequest();
         DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
-        HashSet<Edge> turns = new HashSet<Edge>();
+        HashSet<Edge> turns = new HashSet<>();
         turns.add(left);
         turns.add(leftBack);
 
@@ -308,7 +308,7 @@ public class TestHalfEdges {
         DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
         // Sits only on the leftmost edge, not on its reverse.
-        HashSet<Edge> turns = new HashSet<Edge>();
+        HashSet<Edge> turns = new HashSet<>();
         turns.add(left);
 
         TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
@@ -347,7 +347,7 @@ public class TestHalfEdges {
     public void testStreetSplittingAlerts() {
         DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
-        HashSet<Edge> turns = new HashSet<Edge>();
+        HashSet<Edge> turns = new HashSet<>();
         turns.add(left);
         turns.add(leftBack);
 
@@ -469,7 +469,7 @@ public class TestHalfEdges {
     public void testNetworkLinker() {
         int numVerticesBefore = graph.getVertices().size();
         StreetLinkerModule ttsnm = new StreetLinkerModule();
-        ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
+        ttsnm.buildGraph(graph, new HashMap<>());
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();

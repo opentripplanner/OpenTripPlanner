@@ -97,7 +97,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     private UnitsFareZone getUnitsByZones(FeedScopedId agencyId, String startZone, String endZone, Collection<FareRuleSet> fareRules) {
-        P2<String> od = new P2<String>(startZone, endZone);
+        P2<String> od = new P2<>(startZone, endZone);
 
         LOG.trace("Search " + startZone + " and " + endZone);
 

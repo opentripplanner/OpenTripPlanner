@@ -23,7 +23,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     private final OSMDatabase osmdb;
     private OsmParserPhase parsePhase;
-    private final Map<String, String> stringTable = new HashMap<String, String>();
+    private final Map<String, String> stringTable = new HashMap<>();
 
     public BinaryOpenStreetMapParser(OSMDatabase osmdb) {
         this.osmdb = osmdb;

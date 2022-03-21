@@ -85,21 +85,21 @@ public class ParetoSetEventListenerTest {
     }
 
     private ParetoSetEventListener<Vector> eventListener() {
-        return new ParetoSetEventListener<Vector>() {
-            @Override
-            public void notifyElementAccepted(Vector newElement) {
-                accepted.add(newElement);
-            }
+        return new ParetoSetEventListener<>() {
+          @Override
+          public void notifyElementAccepted(Vector newElement) {
+            accepted.add(newElement);
+          }
 
-            @Override
-            public void notifyElementDropped(Vector element, Vector droppedByElement) {
-                dropped.add(element);
-            }
+          @Override
+          public void notifyElementDropped(Vector element, Vector droppedByElement) {
+            dropped.add(element);
+          }
 
-            @Override
-            public void notifyElementRejected(Vector element, Vector rejectedByElement) {
-                rejected.add(element);
-            }
+          @Override
+          public void notifyElementRejected(Vector element, Vector rejectedByElement) {
+            rejected.add(element);
+          }
         };
     }
 }

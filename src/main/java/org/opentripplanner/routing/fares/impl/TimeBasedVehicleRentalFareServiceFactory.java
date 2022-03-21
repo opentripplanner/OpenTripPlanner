@@ -1,5 +1,13 @@
 package org.opentripplanner.routing.fares.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,15 +15,6 @@ import java.util.Currency;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class TimeBasedVehicleRentalFareServiceFactory implements FareServiceFactory {
 
@@ -60,11 +59,11 @@ public class TimeBasedVehicleRentalFareServiceFactory implements FareServiceFact
         if (pricingBySecond.isEmpty())
             throw new IllegalArgumentException("Missing or empty mandatory 'prices' array.");
         // Sort on increasing time
-        Collections.sort(pricingBySecond, new Comparator<P2<Integer>>() {
-            @Override
-            public int compare(P2<Integer> o1, P2<Integer> o2) {
-                return o1.first - o2.first;
-            }
+        Collections.sort(pricingBySecond, new Comparator<>() {
+          @Override
+          public int compare(P2<Integer> o1, P2<Integer> o2) {
+            return o1.first - o2.first;
+          }
         });
         // Check if price is increasing
         int seconds = -1;

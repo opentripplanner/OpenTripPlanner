@@ -1,7 +1,5 @@
 package org.opentripplanner.common.geometry;
 
-import java.util.Arrays;
-import java.util.List;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.geotools.referencing.CRS;
@@ -20,6 +18,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class GeometryUtils {
     private static final Logger LOG = LoggerFactory.getLogger(GeometryUtils.class);
@@ -98,7 +99,7 @@ public class GeometryUtils {
         LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
         LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
 
-        return new P2<LineString>(beginning, ending);
+        return new P2<>(beginning, ending);
     }
     
     /**
@@ -124,7 +125,7 @@ public class GeometryUtils {
         LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
         LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
 
-        return new P2<LineString>(beginning, ending);
+        return new P2<>(beginning, ending);
     }
 
     /**

@@ -10,7 +10,7 @@ public class TestDisjointSet  extends TestCase{
 
     @Test
     public void testSimple() {
-        DisjointSet<String> set = new DisjointSet<String>();
+        DisjointSet<String> set = new DisjointSet<>();
         set.union("cats", "dogs");
         assertEquals(set.size(set.find("cats")), 2);
         
@@ -34,13 +34,13 @@ public class TestDisjointSet  extends TestCase{
     }
     
     public void testRandom() {
-        DisjointSet<Integer> set = new DisjointSet<Integer>();
+        DisjointSet<Integer> set = new DisjointSet<>();
         Random random = new Random(1);
         for (int i = 0; i < 150; ++i) {
             set.union(Math.abs(random.nextInt() % 700), Math.abs(random.nextInt() % 700));
         }
 
-        HashMap<Integer, Integer> seen = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> seen = new HashMap<>();
         int sizeSum = 0;
         for (int i = 0; i < 700; ++i) {
             int key = set.find(i);

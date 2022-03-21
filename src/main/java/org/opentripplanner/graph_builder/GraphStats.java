@@ -25,7 +25,11 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class GraphStats {
 
@@ -133,7 +137,7 @@ public class GraphStats {
         public void run() {
             LOG.info(String.format("Producing %d random endpoints within radius %2.2fm around %s.",
                     n, radius, useStops ? "stops" : "streets"));
-            List<Vertex> vertices = new ArrayList<Vertex>();
+            List<Vertex> vertices = new ArrayList<>();
             GeodeticCalculator gc = new GeodeticCalculator();
             Class<?> klasse = useStops ? TransitStopVertex.class : StreetVertex.class;
             for (Vertex v : graph.getVertices())

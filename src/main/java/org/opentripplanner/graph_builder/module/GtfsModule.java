@@ -3,7 +3,16 @@ package org.opentripplanner.graph_builder.module;
 import com.google.common.collect.Sets;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.model.*;
+import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.IdentityBean;
+import org.onebusaway.gtfs.model.Pathway;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway.gtfs.model.ServiceCalendarDate;
+import org.onebusaway.gtfs.model.ShapePoint;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
@@ -31,8 +40,13 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
 public class GtfsModule implements GraphBuilderModule {
 
@@ -62,7 +76,7 @@ public class GtfsModule implements GraphBuilderModule {
     }
 
     public List<String> provides() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         result.add("transit");
         return result;
     }
@@ -367,7 +381,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     private static class EntityCounter implements EntityHandler {
 
-        private final Map<Class<?>, Integer> count = new HashMap<Class<?>, Integer>();
+        private final Map<Class<?>, Integer> count = new HashMap<>();
 
         @Override
         public void handleEntity(Object bean) {

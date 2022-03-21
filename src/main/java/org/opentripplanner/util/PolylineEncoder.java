@@ -97,7 +97,7 @@ public class PolylineEncoder {
         double lon = 0;
 
         int strIndex = 0;
-        List<Coordinate> points = new ArrayList<Coordinate>();
+        List<Coordinate> points = new ArrayList<>();
 
         while (strIndex < pointString.length()) {
 

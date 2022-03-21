@@ -77,21 +77,21 @@ public class OSMDatabase {
     private final TLongObjectMap<OSMRelation> relationsById = new TLongObjectHashMap<>();
 
     /* All walkable areas */
-    private final List<Area> walkableAreas = new ArrayList<Area>();
+    private final List<Area> walkableAreas = new ArrayList<>();
 
     /* All P+R areas */
-    private final List<Area> parkAndRideAreas = new ArrayList<Area>();
+    private final List<Area> parkAndRideAreas = new ArrayList<>();
 
     /* All bike parking areas */
-    private final List<Area> bikeParkingAreas = new ArrayList<Area>();
+    private final List<Area> bikeParkingAreas = new ArrayList<>();
 
     /* Map of all area OSMWay for a given node */
     private final TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
 
     /* Map of all area OSMWay for a given node */
-    private final List<OSMWay> singleWayAreas = new ArrayList<OSMWay>();
+    private final List<OSMWay> singleWayAreas = new ArrayList<>();
 
-    private final Set<OSMWithTags> processedAreas = new HashSet<OSMWithTags>();
+    private final Set<OSMWithTags> processedAreas = new HashSet<>();
 
     /* Set of area way IDs */
     private final TLongSet areaWayIds = new TLongHashSet();
@@ -103,7 +103,7 @@ public class OSMDatabase {
     private final TLongSet areaNodeIds = new TLongHashSet();
 
     /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-    private final Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<OSMWithTags, OSMLevel>();
+    private final Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<>();
 
     /* Set of turn restrictions for each turn "from" way ID */
     private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
@@ -116,7 +116,7 @@ public class OSMDatabase {
      * Map of all transit stop nodes that lie within an area and which are connected to the area by
      * a relation. Keyed by the area's OSM way.
      */
-    private final Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
+    private final Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<>();
 
     /*
      * ID of the next virtual node we create during building phase. Negative to prevent conflicts
@@ -715,8 +715,8 @@ public class OSMDatabase {
                 continue;
             }
             // Area multipolygons -- pedestrian plazas
-            ArrayList<OSMWay> innerWays = new ArrayList<OSMWay>();
-            ArrayList<OSMWay> outerWays = new ArrayList<OSMWay>();
+            ArrayList<OSMWay> innerWays = new ArrayList<>();
+            ArrayList<OSMWay> outerWays = new ArrayList<>();
             for (OSMRelationMember member : relation.getMembers()) {
                 String role = member.getRole();
                 OSMWay way = areaWaysById.get(member.getRef());

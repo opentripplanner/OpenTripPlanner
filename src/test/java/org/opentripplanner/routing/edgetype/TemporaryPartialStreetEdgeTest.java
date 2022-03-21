@@ -21,7 +21,9 @@ import org.opentripplanner.util.NonLocalizedString;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TemporaryPartialStreetEdgeTest {
     
@@ -97,7 +99,7 @@ public class TemporaryPartialStreetEdgeTest {
     public void testTraversalOfSubdividedEdge() {
         DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
         Coordinate nearestPoint = new Coordinate(0.5, 2.0);
-        List<StreetEdge> edges = new ArrayList<StreetEdge>();
+        List<StreetEdge> edges = new ArrayList<>();
         edges.add(e2);
         TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocationForTest("middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true, tempEdges);
         TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(

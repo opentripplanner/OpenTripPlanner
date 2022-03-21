@@ -3,8 +3,8 @@ package org.opentripplanner.inspector;
 import org.geotools.geometry.Envelope2D;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
-import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
+import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.inspector.TileRenderer.TileRenderContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class TileRendererManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(TileRendererManager.class);
 
-    private final Map<String, TileRenderer> renderers = new HashMap<String, TileRenderer>();
+    private final Map<String, TileRenderer> renderers = new HashMap<>();
 
     private final Graph graph;
 

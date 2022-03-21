@@ -96,20 +96,20 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     private List<Vertex> visibleVertices;
 
-    private final List<Edge> visibleStreetEdges = new ArrayList<Edge>(1000);
+    private final List<Edge> visibleStreetEdges = new ArrayList<>(1000);
 
-    private final List<Edge> visibleLinkEdges = new ArrayList<Edge>(1000);
+    private final List<Edge> visibleLinkEdges = new ArrayList<>(1000);
 
-    private final List<Edge> visibleTransitEdges = new ArrayList<Edge>(1000);
+    private final List<Edge> visibleTransitEdges = new ArrayList<>(1000);
 
-    private List<Vertex> highlightedVertices = new ArrayList<Vertex>(1000);
+    private List<Vertex> highlightedVertices = new ArrayList<>(1000);
 
-    private List<Edge> highlightedEdges = new ArrayList<Edge>(1000);
+    private List<Edge> highlightedEdges = new ArrayList<>(1000);
 
     // these queues are filled by a search in another thread, so must be threadsafe
-    private final Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<Vertex>();
+    private final Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<>();
 
-    private final Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<Edge>();
+    private final Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<>();
 
     private Coordinate highlightedCoordinate;
 
@@ -166,7 +166,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private int drawOffset = 0;
     private boolean drawHighlighted = true;
     public SimpleSPT simpleSPT = new SimpleSPT();
-	private final LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<State>();
+	private final LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<>();
 	private final boolean drawEdges = true;
 	private LinkedBlockingQueue<SPTNode> sptEdgeQueue;
 	private boolean sptVisible = true;
@@ -190,7 +190,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		SPTNode root;
 
 		SimpleSPT(){
-			nodes = new HashMap<State,SPTNode>();
+			nodes = new HashMap<>();
 		}
 
 		public void add(State state) {
@@ -218,13 +218,13 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 				return;
 			}
 			
-			HashMap<Vertex,Integer> vertexHeight = new HashMap<Vertex,Integer>();
+			HashMap<Vertex,Integer> vertexHeight = new HashMap<>();
 			
 			root.drawRecursive(0, vertexHeight);
 		}
 		
 		public LinkedBlockingQueue<SPTNode> getEdgeQueue() {
-			LinkedBlockingQueue<SPTNode> ret = new LinkedBlockingQueue<SPTNode>();
+			LinkedBlockingQueue<SPTNode> ret = new LinkedBlockingQueue<>();
 			if(root!=null){
 				root.addToEdgeQueue(ret);
 			}
@@ -246,7 +246,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		SPTNode(State state){
 			this.state = state;
 			this.height = null;
-			this.children = new ArrayList<SPTNode>();
+			this.children = new ArrayList<>();
 		}
 		
 		public void addToEdgeQueue(LinkedBlockingQueue<SPTNode> ret) {
@@ -343,7 +343,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         this.graph = graph;
         this.spt = null;
         this.selector = selector;
-        this.selectors = new ArrayList<VertexSelectionListener>();        
+        this.selectors = new ArrayList<>();
     }
 
     /*
@@ -684,7 +684,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	}
 
 	private void colorOverlappingBranches(LinkedBlockingQueue<SPTNode> queue) {
-    	HashMap<Vertex,Integer> stateHeight = new HashMap<Vertex,Integer>();
+    	HashMap<Vertex,Integer> stateHeight = new HashMap<>();
 
     for (SPTNode node : queue) {
       Integer height = stateHeight.get(node.state.getVertex());
@@ -1076,7 +1076,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
 
     public void setHighlightedVertices(Set<Vertex> vertices) {
-        highlightedVertices = new ArrayList<Vertex>(vertices);
+        highlightedVertices = new ArrayList<>(vertices);
         drawLevel = DRAW_ALL;
     }
 
@@ -1100,7 +1100,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             env.expandToInclude(e.getToVertex().getCoordinate());
         }
 
-        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+        ArrayList<Vertex> vertices = new ArrayList<>();
         Vertex v = anno.getReferencedVertex();
         if (v != null) {
             env.expandToInclude(v.getCoordinate());

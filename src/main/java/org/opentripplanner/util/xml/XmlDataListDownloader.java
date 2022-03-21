@@ -3,13 +3,22 @@ package org.opentripplanner.util.xml;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -93,7 +102,7 @@ public class XmlDataListDownloader<T> {
 
     private List<T> parseXML(InputStream data) throws ParserConfigurationException, SAXException,
             IOException {
-        List<T> out = new ArrayList<T>();
+        List<T> out = new ArrayList<>();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true); // never forget this!
@@ -113,7 +122,7 @@ public class XmlDataListDownloader<T> {
             if (!(node instanceof Element)) {
                 continue;
             }
-            HashMap<String, String> attributes = new HashMap<String, String>();
+            HashMap<String, String> attributes = new HashMap<>();
             Node child = node.getFirstChild();
 
             if (readAttributes) {

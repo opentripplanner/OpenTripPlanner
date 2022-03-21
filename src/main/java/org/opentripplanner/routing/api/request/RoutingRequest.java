@@ -17,7 +17,12 @@ import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
-import org.opentripplanner.routing.core.*;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.RouteMatcher;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -39,7 +44,19 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
@@ -72,7 +89,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
     /** The complete list of incoming query parameters. */
-    public final HashMap<String, String> parameters = new HashMap<String, String>();
+    public final HashMap<String, String> parameters = new HashMap<>();
 
     /** The start location */
     public GenericLocation from;
@@ -1093,7 +1110,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * Sets intermediatePlaces by parsing GenericLocations from a list of string.
      */
     public void setIntermediatePlacesFromStrings(List<String> intermediates) {
-        this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
+        this.intermediatePlaces = new ArrayList<>(intermediates.size());
         for (String place : intermediates) {
             intermediatePlaces.add(LocationStringParser.fromOldStyleString(place));
         }
@@ -1118,7 +1135,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     public void addIntermediatePlace(GenericLocation location) {
         if (this.intermediatePlaces == null) {
-            this.intermediatePlaces = new ArrayList<GenericLocation>();
+            this.intermediatePlaces = new ArrayList<>();
         }
         this.intermediatePlaces.add(location);
     }

@@ -17,7 +17,7 @@ public class CompactLineStringTest extends TestCase {
 
         GeometryFactory gf = new GeometryFactory();
 
-        List<Coordinate> c = new ArrayList<Coordinate>();
+        List<Coordinate> c = new ArrayList<>();
         double x0 = 1.111111111;
         double y0 = 0.123456789;
         double x1 = 2.0;

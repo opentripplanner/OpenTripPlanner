@@ -28,7 +28,13 @@ import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -300,7 +306,7 @@ public class ElevationModule implements GraphBuilderModule {
 
         LOG.debug("Assigning missing elevations");
 
-        BinHeap<ElevationRepairState> pq = new BinHeap<ElevationRepairState>();
+        BinHeap<ElevationRepairState> pq = new BinHeap<>();
 
         // elevation for each vertex (known or interpolated)
         // knownElevations will be null if there are no ElevationPoints in the data
@@ -309,7 +315,7 @@ public class ElevationModule implements GraphBuilderModule {
         if (knownElevations != null)
             elevations = (HashMap<Vertex, Double>) knownElevations.clone();
         else
-            elevations = new HashMap<Vertex, Double>();
+            elevations = new HashMap<>();
 
         // If including the EllipsoidToGeoidDifference, subtract these from the known elevations found in OpenStreetMap
         // data.
@@ -329,7 +335,7 @@ public class ElevationModule implements GraphBuilderModule {
             });
         }
 
-        HashSet<Vertex> closed = new HashSet<Vertex>();
+        HashSet<Vertex> closed = new HashSet<>();
 
         // initialize queue with all vertices which already have known elevation
         for (StreetEdge e : edgesWithElevation) {
@@ -550,7 +556,7 @@ public class ElevationModule implements GraphBuilderModule {
         try {
             Coordinate[] coords = edgeGeometry.getCoordinates();
 
-            List<Coordinate> coordList = new LinkedList<Coordinate>();
+            List<Coordinate> coordList = new LinkedList<>();
 
             // initial sample (x = 0)
             coordList.add(new Coordinate(0, getElevation(coverage, coords[0])));

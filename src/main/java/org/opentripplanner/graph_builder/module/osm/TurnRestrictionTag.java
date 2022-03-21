@@ -28,9 +28,9 @@ class TurnRestrictionTag {
 
     RepeatingTimePeriod time;
 
-    public List<StreetEdge> possibleFrom = new ArrayList<StreetEdge>();
+    public List<StreetEdge> possibleFrom = new ArrayList<>();
 
-    public List<StreetEdge> possibleTo = new ArrayList<StreetEdge>();
+    public List<StreetEdge> possibleTo = new ArrayList<>();
 
     public TraverseModeSet modes;
 

@@ -1,13 +1,13 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
@@ -17,14 +17,13 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryCollection;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Polygon;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A group of possibly-contiguous areas sharing the same level
@@ -41,7 +40,7 @@ class AreaGroup {
     /**
      * The joined outermost rings of the areas (with inner rings for holes as necessary).
      */
-    List<Ring> outermostRings = new ArrayList<Ring>();
+    List<Ring> outermostRings = new ArrayList<>();
 
     public AreaGroup(Collection<Area> areas) {
         this.areas = areas;
@@ -49,10 +48,10 @@ class AreaGroup {
         // Merging non-convex polygons is complicated, so we need to convert to JTS, let JTS do the
         // hard work,
         // then convert back.
-        List<Polygon> allRings = new ArrayList<Polygon>();
+        List<Polygon> allRings = new ArrayList<>();
 
         // However, JTS will lose the coord<->osmnode mapping, and we will have to reconstruct it.
-        HashMap<Coordinate, OSMNode> nodeMap = new HashMap<Coordinate, OSMNode>();
+        HashMap<Coordinate, OSMNode> nodeMap = new HashMap<>();
         for (Area area : areas) {
             for (Ring ring : area.outermostRings) {
                 allRings.add(ring.jtsPolygon);
@@ -89,7 +88,7 @@ class AreaGroup {
     }
 
     public static List<AreaGroup> groupAreas(Map<Area, OSMLevel> areasLevels) {
-        DisjointSet<Area> groups = new DisjointSet<Area>();
+        DisjointSet<Area> groups = new DisjointSet<>();
         Multimap<OSMNode, Area> areasForNode = LinkedListMultimap.create();
         for (Area area : areasLevels.keySet()) {
             for (Ring ring : area.outermostRings) {
@@ -118,7 +117,7 @@ class AreaGroup {
             }
         }
 
-        List<AreaGroup> out = new ArrayList<AreaGroup>();
+        List<AreaGroup> out = new ArrayList<>();
         for (Set<Area> areaSet : groups.sets()) {
             try {
                 out.add(new AreaGroup(areaSet));
@@ -135,7 +134,7 @@ class AreaGroup {
     }
 
     private Ring toRing(Polygon polygon, HashMap<Coordinate, OSMNode> nodeMap) {
-        List<OSMNode> shell = new ArrayList<OSMNode>();
+        List<OSMNode> shell = new ArrayList<>();
         for (Coordinate coord : polygon.getExteriorRing().getCoordinates()) {
             OSMNode node = nodeMap.get(coord);
             if (node == null) {
@@ -147,7 +146,7 @@ class AreaGroup {
         // now the holes
         for (int i = 0; i < polygon.getNumInteriorRing(); ++i) {
             LineString interior = polygon.getInteriorRingN(i);
-            List<OSMNode> hole = new ArrayList<OSMNode>();
+            List<OSMNode> hole = new ArrayList<>();
             for (Coordinate coord : interior.getCoordinates()) {
                 OSMNode node = nodeMap.get(coord);
                 if (node == null) {

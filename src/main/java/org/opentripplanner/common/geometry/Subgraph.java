@@ -1,17 +1,16 @@
 package org.opentripplanner.common.geometry;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.opentripplanner.routing.graph.Vertex;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPoint;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class Subgraph {
 
@@ -22,9 +21,9 @@ public class Subgraph {
     private boolean newVertexAdded = true;
 
     public Subgraph(){
-        streetVertexSet = new HashSet<Vertex>();
-        stopsVertexSet = new HashSet<Vertex>();
-        vertexCoords = new ArrayList<Coordinate>();
+        streetVertexSet = new HashSet<>();
+        stopsVertexSet = new HashSet<>();
+        vertexCoords = new ArrayList<>();
     }
 
     public void addVertex(Vertex vertex){

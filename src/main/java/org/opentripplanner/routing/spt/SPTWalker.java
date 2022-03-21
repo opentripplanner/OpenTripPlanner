@@ -60,11 +60,11 @@ public class SPTWalker {
     public void walk(SPTVisitor visitor, double d0) {
         int nTotal = 0, nSkippedDupEdge = 0, nSkippedNoGeometry = 0;
         Collection<? extends State> allStates = spt.getAllStates();
-        Set<Vertex> allVertices = new HashSet<Vertex>(spt.getVertexCount());
+        Set<Vertex> allVertices = new HashSet<>(spt.getVertexCount());
         for (State s : allStates) {
             allVertices.add(s.getVertex());
         }
-        Set<Edge> processedEdges = new HashSet<Edge>(allVertices.size());
+        Set<Edge> processedEdges = new HashSet<>(allVertices.size());
         for (Vertex v : allVertices) {
             State s0 = spt.getState(v);
             if (s0 == null || !s0.isFinal())

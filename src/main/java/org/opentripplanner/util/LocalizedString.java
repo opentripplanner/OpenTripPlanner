@@ -74,7 +74,7 @@ public class LocalizedString implements I18NString, Serializable {
      */
     public LocalizedString(String key, OSMWithTags way) {
         this.key = key;
-        List<String> lparams = new ArrayList<String>(4);
+        List<String> lparams = new ArrayList<>(4);
         //Which tags do we want from way
         List<String> tag_names = getTagNames();
         if (tag_names != null) {
@@ -108,7 +108,7 @@ public class LocalizedString implements I18NString, Serializable {
         if( key_tag_names.containsKey(key)) {
             return key_tag_names.get(key);
         }
-        List<String> tag_names = new ArrayList<String>(4);
+        List<String> tag_names = new ArrayList<>(4);
         String english_trans = ResourceBundleSingleton.INSTANCE.localize(this.key, Locale.ENGLISH);
 
         Matcher matcher = patternMatcher.matcher(english_trans);

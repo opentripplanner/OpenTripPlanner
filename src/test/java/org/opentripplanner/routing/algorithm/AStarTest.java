@@ -7,7 +7,11 @@ import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.*;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.SimpleConcreteEdge;
+import org.opentripplanner.routing.graph.SimpleConcreteVertex;
+import org.opentripplanner.routing.graph.TemporaryConcreteEdge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -17,7 +21,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AStarTest {
 
@@ -208,7 +214,7 @@ public class AStarTest {
         options.walkSpeed = 1.0;
         options.setRoutingContext(graph, graph.getVertex("56th_24th"), graph.getVertex("leary_20th"));
 
-        Set<Vertex> targets = new HashSet<Vertex>();
+        Set<Vertex> targets = new HashSet<>();
         targets.add(graph.getVertex("shilshole_22nd"));
         targets.add(graph.getVertex("market_russell"));
         targets.add(graph.getVertex("56th_20th"));

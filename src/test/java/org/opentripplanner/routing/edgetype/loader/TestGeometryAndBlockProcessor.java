@@ -91,7 +91,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         //Linkers aren't run otherwise
         graph.hasStreets = true;
         graph.hasTransit = true;
-        ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
+        ttsnm.buildGraph(graph, new HashMap<>());
     }
 
     public void testIssue() {

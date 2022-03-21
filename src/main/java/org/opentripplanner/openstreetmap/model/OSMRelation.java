@@ -5,7 +5,7 @@ import java.util.List;
 
 public class OSMRelation extends OSMWithTags {
 
-  private final List<OSMRelationMember> members = new ArrayList<OSMRelationMember>();
+  private final List<OSMRelationMember> members = new ArrayList<>();
 
   public void addMember(OSMRelationMember member) {
     members.add(member);

@@ -88,7 +88,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
      */
     private void loadVerticalDatum () {
         if (datums == null) {
-            datums = new ArrayList<VerticalDatum>();
+            datums = new ArrayList<>();
             try {
                 for (String filename : DATUM_FILENAMES) {
                     File datumFile = new File(cacheDirectory, filename);

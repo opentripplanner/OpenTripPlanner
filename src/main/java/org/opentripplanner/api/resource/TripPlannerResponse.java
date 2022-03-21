@@ -32,7 +32,7 @@ public class TripPlannerResponse {
 
   /** Construct an new response initialized with all the incoming query parameters. */
     public TripPlannerResponse(UriInfo info) {
-        this.requestParameters = new HashMap<String, String>();
+        this.requestParameters = new HashMap<>();
         if (info == null) { 
             // in tests where there is no HTTP request, just leave the map empty
             return;

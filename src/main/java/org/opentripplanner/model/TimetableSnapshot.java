@@ -9,8 +9,17 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 // this is only currently in edgetype because that's where Trippattern is.
 // move these classes elsewhere.
@@ -364,7 +373,7 @@ public class TimetableSnapshot {
             TripPattern pattern = it.next();
             SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
             SortedSet<Timetable> toKeepTimetables =
-                    new TreeSet<Timetable>(new SortedTimetableComparator());
+              new TreeSet<>(new SortedTimetableComparator());
             for(Timetable timetable : sortedTimetables) {
                 if(serviceDate.compareTo(timetable.getServiceDate()) < 0) {
                     toKeepTimetables.add(timetable);

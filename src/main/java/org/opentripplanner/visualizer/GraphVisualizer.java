@@ -87,7 +87,7 @@ class EdgeListModel extends AbstractListModel<Edge> {
     private final ArrayList<Edge> edges;
 
     EdgeListModel(Iterable<Edge> edges) {
-        this.edges = new ArrayList<Edge>();
+        this.edges = new ArrayList<>();
         for (Edge e : edges) {
             this.edges.add(e);
         }
@@ -148,7 +148,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				return;
 			}
 			
-			DefaultListModel<String> stateListModel = new DefaultListModel<String>();
+			DefaultListModel<String> stateListModel = new DefaultListModel<>();
 			stateListModel.addElement( "weight:"+st.getWeight() );
 			stateListModel.addElement( "weightdelta:"+st.getWeightDelta() );
 			stateListModel.addElement( "rentingVehicle:"+st.isRentingVehicle() );
@@ -237,14 +237,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 			secondComparePath = path;
 			
 			if(firstComparePath != null) {
-				DefaultListModel<State> pathModel = new DefaultListModel<State>();
+				DefaultListModel<State> pathModel = new DefaultListModel<>();
 				for( State st : firstComparePath.states ){
 					pathModel.addElement( st );
 				}
 				firstComparePathStates.setModel( pathModel );
 			}
 			if(secondComparePath != null){
-				DefaultListModel<State> pathModel = new DefaultListModel<State>();
+				DefaultListModel<State> pathModel = new DefaultListModel<>();
 				for( State st : secondComparePath.states ){
 					pathModel.addElement( st );
 				}
@@ -463,18 +463,18 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JPanel pane = new JPanel();
         pane.setLayout(new GridLayout(0, 2));
         
-        firstStateData = new JList<String>();
-        secondStateData = new JList<String>();
+        firstStateData = new JList<>();
+        secondStateData = new JList<>();
         
         // a place to list the states of the first path
-        firstComparePathStates = new JList<State>();        
+        firstComparePathStates = new JList<>();
         JScrollPane stScrollPane = new JScrollPane(firstComparePathStates);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         pane.add(stScrollPane);
         firstComparePathStates.addListSelectionListener(new ComparePathStatesClickListener(firstStateData));
         
         // a place to list the states of the second path
-        secondComparePathStates = new JList<State>();
+        secondComparePathStates = new JList<>();
         stScrollPane = new JScrollPane(secondComparePathStates);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         pane.add(stScrollPane);
@@ -751,7 +751,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         rightPanel.add(rightPanelTabs, BorderLayout.LINE_END);
         
         // a place to print out the details of a path
-        pathStates = new JList<State>();
+        pathStates = new JList<>();
         JScrollPane stScrollPane = new JScrollPane(pathStates);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("path states", stScrollPane);
@@ -772,8 +772,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         });
          
 
-        metadataList = new JList<String>();
-        metadataModel = new DefaultListModel<String>();
+        metadataList = new JList<>();
+        metadataModel = new DefaultListModel<>();
         metadataList.setModel(metadataModel);
         JScrollPane mdScrollPane = new JScrollPane(metadataList);
         mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -792,7 +792,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             showGraph.drawIssue(issue);
         });
 
-        issueMatchesModel = new DefaultListModel<DataImportIssue>();
+        issueMatchesModel = new DefaultListModel<>();
         issueMatches.setModel(issueMatchesModel);
         JScrollPane imScrollPane = new JScrollPane(issueMatches);
         imScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -890,7 +890,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                     System.out.println("no such node " + nodeName);
                 } else {
                     showGraph.highlightVertex(v);
-                    ArrayList<Vertex> l = new ArrayList<Vertex>();
+                    ArrayList<Vertex> l = new ArrayList<>();
                     l.add(v);
                     verticesSelected(l);
                 }
@@ -907,7 +907,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                     for (Edge edge : gv.getOutgoing()) {
                         if (edge.getDefaultName() != null && edge.getDefaultName().contains(edgeName)) {
                             showGraph.highlightVertex(gv);
-                            ArrayList<Vertex> l = new ArrayList<Vertex>();
+                            ArrayList<Vertex> l = new ArrayList<>();
                             l.add(gv);
                             verticesSelected(l);
                         }
@@ -985,8 +985,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
 	        /* for turns, highlight the outgoing street's ends */
 	        if (selected instanceof StreetEdge) {
-	            List<Vertex> vertices = new ArrayList<Vertex>();
-	            List<Edge> edges = new ArrayList<Edge>();
+	            List<Vertex> vertices = new ArrayList<>();
+	            List<Edge> edges = new ArrayList<>();
 	            Vertex tov = selected.getToVertex();
 	            for (Edge og : tov.getOutgoing()) {
 	                if (og instanceof StreetEdge) {
@@ -1048,7 +1048,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // nearby vertices
         JLabel nvLabel = new JLabel("Vertices");
         vertexDataPanel.add(nvLabel);
-        nearbyVertices = new JList<DisplayVertex>();
+        nearbyVertices = new JList<>();
         nearbyVertices.setVisibleRowCount(4);
         JScrollPane nvScrollPane = new JScrollPane(nearbyVertices);
         vertexDataPanel.add(nvScrollPane);
@@ -1085,7 +1085,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // outgoing edges
         JLabel ogeLabel = new JLabel("Outgoing edges");
         vertexDataPanel.add(ogeLabel);
-        outgoingEdges = new JList<Edge>();
+        outgoingEdges = new JList<>();
         outgoingEdges.setVisibleRowCount(4);
         JScrollPane ogeScrollPane = new JScrollPane(outgoingEdges);
         vertexDataPanel.add(ogeScrollPane);
@@ -1094,7 +1094,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // incoming edges
         JLabel iceLabel = new JLabel("Incoming edges");
         vertexDataPanel.add(iceLabel);
-        incomingEdges = new JList<Edge>();
+        incomingEdges = new JList<>();
         JScrollPane iceScrollPane = new JScrollPane(incomingEdges);
         vertexDataPanel.add(iceScrollPane);
         incomingEdges.addListSelectionListener(edgeChanged);
@@ -1102,7 +1102,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // paths list
         JLabel pathsLabel = new JLabel("Paths");
         vertexDataPanel.add(pathsLabel);
-        pathsList = new JList<PathPrinter>();
+        pathsList = new JList<>();
         
         popup = new JPopupMenu();
         JMenuItem compareMenuItem = new JMenuItem("compare");
@@ -1145,7 +1145,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				}
 				GraphPath path = pp.gp;
 				
-				DefaultListModel<State> pathModel = new DefaultListModel<State>();
+				DefaultListModel<State> pathModel = new DefaultListModel<>();
 				for( State st : path.states ){
 					pathModel.addElement( st );
 				}
@@ -1252,12 +1252,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
         if (tracingVertex != v) {
             tracingVertex = v;
-            closed = new HashSet<Vertex>();
-            open = new HashSet<Vertex>();
+            closed = new HashSet<>();
+            open = new HashSet<>();
             open.add(v);
-            seen = new HashSet<Vertex>();
+            seen = new HashSet<>();
         }
-        HashSet<Vertex> newOpen = new HashSet<Vertex>();
+        HashSet<Vertex> newOpen = new HashSet<>();
         for (Vertex v2 : open) {
             closed.add(v2);
             for (Edge e : v2.getOutgoing()) {
@@ -1274,7 +1274,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     }
 
     protected void traceOld() {
-        HashSet<Vertex> seenVertices = new HashSet<Vertex>();
+        HashSet<Vertex> seenVertices = new HashSet<>();
         DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
         if (selected == null) {
             System.out.println("no vertex selected");
@@ -1282,7 +1282,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         }
         Vertex v = selected.vertex;
         System.out.println("initial vertex: " + v);
-        Queue<Vertex> toExplore = new LinkedList<Vertex>();
+        Queue<Vertex> toExplore = new LinkedList<>();
         toExplore.add(v);
         seenVertices.add(v);
         while (!toExplore.isEmpty()) {
@@ -1300,11 +1300,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     protected void checkGraph() {
 
-        HashSet<Vertex> seenVertices = new HashSet<Vertex>();
+        HashSet<Vertex> seenVertices = new HashSet<>();
         Collection<Vertex> allVertices = getGraph().getVertices();
         Vertex v = allVertices.iterator().next();
         System.out.println("initial vertex: " + v);
-        Queue<Vertex> toExplore = new LinkedList<Vertex>();
+        Queue<Vertex> toExplore = new LinkedList<>();
         toExplore.add(v);
         seenVertices.add(v);
         while (!toExplore.isEmpty()) {
@@ -1417,7 +1417,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     
 	private void showPathsInPanel(List<GraphPath> paths) {
 		// show paths in a list panel
-		DefaultListModel<PathPrinter> data = new DefaultListModel<PathPrinter>();
+		DefaultListModel<PathPrinter> data = new DefaultListModel<>();
 		for(GraphPath gp : paths ){
 			data.addElement(new PathPrinter(gp));
 		}
@@ -1426,11 +1426,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     public void verticesSelected(final List<Vertex> selected) {
         // sort vertices by name
-        Collections.sort(selected, new Comparator<Vertex>() {
-            @Override
-            public int compare(Vertex arg0, Vertex arg1) {
-                return arg0.getLabel().compareTo(arg1.getLabel());
-            }
+        Collections.sort(selected, new Comparator<>() {
+          @Override
+          public int compare(Vertex arg0, Vertex arg1) {
+            return arg0.getLabel().compareTo(arg1.getLabel());
+          }
 
         });
         ListModel<DisplayVertex> data = new VertexList(selected);

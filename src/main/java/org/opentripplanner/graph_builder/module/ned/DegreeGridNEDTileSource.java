@@ -1,12 +1,12 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import org.locationtech.jts.geom.Coordinate;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
@@ -53,14 +53,14 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         this.graph = graph;
         this.cacheDirectory = cacheDirectory;
 
-        HashSet<P2<Integer>> tiles = new HashSet<P2<Integer>>();
+        HashSet<P2<Integer>> tiles = new HashSet<>();
 
         for (Vertex v : graph.getVertices()) {
             Coordinate coord = v.getCoordinate();
-            tiles.add(new P2<Integer>((int) coord.x, (int) coord.y));
+            tiles.add(new P2<>((int) coord.x, (int) coord.y));
         }
 
-        List<File> paths = new ArrayList<File>();
+        List<File> paths = new ArrayList<>();
         for (P2<Integer> tile : tiles) {
             int x = tile.first - 1;
             int y = tile.second + 1;

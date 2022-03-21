@@ -245,7 +245,7 @@ public class OSMFilter {
         if (way.isOpposableCycleway()) {
             permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
         }
-        return new P2<StreetTraversalPermission>(permissionsFront, permissionsBack);
+        return new P2<>(permissionsFront, permissionsBack);
     }
 
     public static int getStreetClasses(OSMWithTags way) {

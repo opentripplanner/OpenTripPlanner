@@ -1,18 +1,17 @@
 package org.opentripplanner.graph_builder.module.map;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.util.AssertionFailedException;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class MidblockMatchState extends MatchState {
 
@@ -44,7 +43,7 @@ public class MidblockMatchState extends MatchState {
 
     @Override
     public List<MatchState> getNextStates() {
-        ArrayList<MatchState> nextStates = new ArrayList<MatchState>();
+        ArrayList<MatchState> nextStates = new ArrayList<>();
         if (routeIndex.getSegmentIndex() == routeGeometry.getNumPoints() - 1) {
             // this has either hit the end, or gone off the end. It's not real clear which.
             // for now, let's assume it means that the ending is somewhere along this edge,

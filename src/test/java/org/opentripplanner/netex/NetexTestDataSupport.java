@@ -32,7 +32,7 @@ public final class NetexTestDataSupport {
   /* XML TYPES */
 
   public static <T> JAXBElement<T> jaxbElement(T e, Class<T> clazz) {
-    return new JAXBElement<T>(new QName("x"), clazz, e);
+    return new JAXBElement<>(new QName("x"), clazz, e);
   }
 
 

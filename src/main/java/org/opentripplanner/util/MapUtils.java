@@ -16,7 +16,7 @@ public class MapUtils {
     public static <U> void addToMapSet(TLongObjectMap<Set<U>> mapSet, long key, U value) {
         Set<U> set = mapSet.get(key);
         if (set == null) {
-            set = new HashSet<U>();
+            set = new HashSet<>();
             mapSet.put(key, set);
         }
         set.add(value);
@@ -25,7 +25,7 @@ public class MapUtils {
     public static <T, U> void addToMapList(Map<T, List<U>> mapList, T key, U value) {
         List<U> list = mapList.get(key);
         if (list == null) {
-            list = new ArrayList<U>();
+            list = new ArrayList<>();
             mapList.put(key, list);
         }
         list.add(value);
@@ -44,7 +44,7 @@ public class MapUtils {
             T key, List<U> values) {
         List<U> list = mapList.get(key);
         if (list == null) {
-            list = new ArrayList<U>(values.size());
+            list = new ArrayList<>(values.size());
             mapList.put(key, list);
         }
         for (U value : values) {
@@ -61,7 +61,7 @@ public class MapUtils {
             V value = entry.getValue();
             V originalValue = mapList.get(key);
             if (originalValue != null) {
-                HashSet<U> originalSet = new HashSet<U>(originalValue);
+                HashSet<U> originalSet = new HashSet<>(originalValue);
                 for (U item : value) {
                     if (!originalSet.contains(item))
                         originalValue.add(item);

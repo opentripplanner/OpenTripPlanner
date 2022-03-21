@@ -1,15 +1,14 @@
 package org.opentripplanner.routing.util;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.util.elevation.ToblersHikingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ElevationUtils {
     private static final Logger log = LoggerFactory.getLogger(ElevationUtils.class);
@@ -271,7 +270,7 @@ public class ElevationUtils {
         if (elevationProfile == null) {
             return null;
         }
-        List<Coordinate> coordList = new LinkedList<Coordinate>();
+        List<Coordinate> coordList = new LinkedList<>();
 
         if (start < 0)
             start = 0;
