@@ -1,11 +1,10 @@
 package org.opentripplanner.inspector;
 
-import java.awt.Graphics2D;
-
-import org.opentripplanner.routing.graph.Graph;
-
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
+import org.opentripplanner.routing.graph.Graph;
+
+import java.awt.*;
 
 /**
  * Interface for a slippy map tile renderer.
@@ -18,7 +17,7 @@ public interface TileRenderer {
      * Context used for rendering a tile.
      * 
      */
-    public abstract class TileRenderContext {
+    abstract class TileRenderContext {
 
         /** Graphics where to paint tile to, in pixel CRS (no transform set) */
         public Graphics2D graphics;
@@ -43,12 +42,12 @@ public interface TileRenderer {
     }
 
     /** Return the BufferedImage color model the renderer would like to use */
-    public abstract int getColorModel();
+    int getColorModel();
 
     /** Implementation of the tile rendering */
-    public abstract void renderTile(TileRenderContext context);
+    void renderTile(TileRenderContext context);
 
     /** Gets descriptive name of this Tile Render */
-    public abstract String getName();
+    String getName();
 
 }

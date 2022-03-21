@@ -13,5 +13,5 @@ public interface UniqueIdGenerator<T> {
      * @param elem
      * @return
      */
-    public int getId(T elem);
+    int getId(T elem);
 }

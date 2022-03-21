@@ -1,11 +1,10 @@
 package org.opentripplanner.graph_builder.services.osm;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.graph_builder.module.osm.PortlandCustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * For when CreativeNamePicker/WayPropertySet is just not powerful enough.
@@ -15,15 +14,15 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public interface CustomNamer {
 
-    public String name(OSMWithTags way, String defaultName);
+    String name(OSMWithTags way, String defaultName);
 
-    public void nameWithEdge(OSMWithTags way, StreetEdge edge);
+    void nameWithEdge(OSMWithTags way, StreetEdge edge);
 
-    public void postprocess(Graph graph);
+    void postprocess(Graph graph);
 
-    public void configure(JsonNode config);
+    void configure(JsonNode config);
 
-    public class CustomNamerFactory {
+    class CustomNamerFactory {
 
         /**
          * Create a custom namer if needed, return null if not found / by default.

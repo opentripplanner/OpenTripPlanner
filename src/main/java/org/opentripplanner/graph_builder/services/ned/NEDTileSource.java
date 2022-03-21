@@ -17,11 +17,11 @@ public interface NEDTileSource {
      * somewhere permanent with plenty of disk space.  Don't use /tmp -- the downloading process takes a long time
      * and you don't want to repeat it if at all possible.
      */
-    public abstract void fetchData(Graph graph, File cacheDirectory);
+    void fetchData(Graph graph, File cacheDirectory);
 
     /**
      * Download all the NED tiles into the cache.
      */
-    public abstract List<File> getNEDTiles();
+    List<File> getNEDTiles();
 
 }

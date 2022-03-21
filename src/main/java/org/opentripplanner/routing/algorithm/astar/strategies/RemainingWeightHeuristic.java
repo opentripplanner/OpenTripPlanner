@@ -18,18 +18,18 @@ public interface RemainingWeightHeuristic extends Serializable {
      * @param abortTime time since the Epoch in milliseconds at which we should bail out of initialization,
      *                  or Long.MAX_VALUE for no limit.
      */
-    public void initialize (RoutingRequest options, long abortTime);
+    void initialize(RoutingRequest options, long abortTime);
 
-    public double estimateRemainingWeight (State s);
+    double estimateRemainingWeight(State s);
 
     /** Reset any cached data in the heuristic, before reuse in a search with the same destination. */
-    public void reset();
+    void reset();
     
     /** 
      * Call to cause the heuristic to perform some predetermined amount of work improving its 
      * estimate. Avoids thread synchronization evil by interleaving forward and backward searches. 
      */
-    public void doSomeWork();
+    void doSomeWork();
     
 }
 

@@ -1,12 +1,11 @@
 package org.opentripplanner.graph_builder.services;
 
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.util.I18NString;
 
 /**
@@ -18,12 +17,12 @@ import org.opentripplanner.util.I18NString;
  */
 public interface StreetEdgeFactory {
 
-    public StreetEdge createEdge(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
-            LineString geometry, I18NString name, double length, StreetTraversalPermission permissions,
-            boolean back);
+    StreetEdge createEdge(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
+                          LineString geometry, I18NString name, double length, StreetTraversalPermission permissions,
+                          boolean back);
 
-    public AreaEdge createAreaEdge(IntersectionVertex startEndpoint,
-            IntersectionVertex endEndpoint, LineString geometry, I18NString name, double length,
-            StreetTraversalPermission permissions, boolean back, AreaEdgeList area);
+    AreaEdge createAreaEdge(IntersectionVertex startEndpoint,
+                            IntersectionVertex endEndpoint, LineString geometry, I18NString name, double length,
+                            StreetTraversalPermission permissions, boolean back, AreaEdgeList area);
 
 }

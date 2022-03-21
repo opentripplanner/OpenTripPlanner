@@ -26,13 +26,13 @@ public class SPTWalker {
 
     private static final Logger LOG = LoggerFactory.getLogger(SPTWalker.class);
 
-    public static interface SPTVisitor {
+    public interface SPTVisitor {
 
         /**
          * @param e The edge to filter.
          * @return True to visit this edge, false to skip it.
          */
-        public boolean accept(Edge e);
+        boolean accept(Edge e);
 
         /**
          * Note: The same state can be visited several times (from different edges).
@@ -45,7 +45,7 @@ public class SPTWalker {
          * @param d1 Curvilinear coordinate of c on [s1-s0], in meters
          * @param speed The assumed speed on the edge
          */
-        public void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1, double speed);
+        void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1, double speed);
     }
 
     private final ShortestPathTree spt;
