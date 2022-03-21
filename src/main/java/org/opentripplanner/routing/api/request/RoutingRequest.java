@@ -610,7 +610,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * old limit, but that have side-effects that you might not find any trips on a day where a
      * critical part of the trip is not available, because of some real-time disruption.
      *
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     public Integer maxTransfers = 12;
 
