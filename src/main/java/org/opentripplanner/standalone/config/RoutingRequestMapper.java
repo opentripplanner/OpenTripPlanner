@@ -103,7 +103,7 @@ public class RoutingRequestMapper {
         //request.accessibilityMode =
         boolean wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.accessibilityMode.requestsWheelchair());
         if(wheelchairAccessible) {
-            request.accessibilityMode = AccessibilityMode.STRICTLY_REQUIRED;
+            request.accessibilityMode = AccessibilityMode.PREFERRED;
         } else {
             request.accessibilityMode = AccessibilityMode.NOT_REQUIRED;
         }
