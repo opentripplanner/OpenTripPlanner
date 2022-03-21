@@ -254,6 +254,11 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public int unknownStopAccessibilityPenalty = 60 * 10;
     public int unknownTripAccessibilityPenalty = 60 * 10;
+    /**
+     * If planning a route for a wheelchair user, how bad should it be to board a trip which
+     * is known to be inaccessible.
+     */
+    public int inaccessibleTripPenalty = 60 * 60 * 10;
 
     /**
      * The maximum number of itineraries to return. In OTP1 this parameter terminates the search,

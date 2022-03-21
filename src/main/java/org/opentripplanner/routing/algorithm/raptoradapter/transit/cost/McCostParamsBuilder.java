@@ -10,7 +10,8 @@ import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 public class McCostParamsBuilder {
     private int boardCost;
     private int transferCost;
-    private int unknownAccessibilityCost;
+    private int unknownTripAccessibilityCost;
+    private int inaccessibleTripCost;
     private double[] transitReluctanceFactors;
     private double waitReluctanceFactor;
     private AccessibilityMode accessibilityMode;
@@ -25,6 +26,8 @@ public class McCostParamsBuilder {
         this.transitReluctanceFactors = other.transitReluctanceFactors();
         this.waitReluctanceFactor = other.waitReluctanceFactor();
         this.accessibilityMode = other.accessibilityMode();
+        this.unknownTripAccessibilityCost = other.unknownTripAccessibilityCost();
+        this.inaccessibleTripCost = other.inaccessibleTripCost();
     }
 
     public int boardCost() {
@@ -73,11 +76,19 @@ public class McCostParamsBuilder {
     }
 
     public int unknownAccessibilityCost() {
-        return unknownAccessibilityCost;
+        return unknownTripAccessibilityCost;
     }
 
     public void unknownAccessibilityCost(int unknownAccessibilityCost) {
-        this.unknownAccessibilityCost = unknownAccessibilityCost;
+        this.unknownTripAccessibilityCost = unknownAccessibilityCost;
+    }
+
+    public int inaccessibleTripCost() {
+        return inaccessibleTripCost;
+    }
+
+    public void inaccessibleTripCost(int inaccessibleTripCost) {
+        this.inaccessibleTripCost = inaccessibleTripCost;
     }
 
     public McCostParams build() {

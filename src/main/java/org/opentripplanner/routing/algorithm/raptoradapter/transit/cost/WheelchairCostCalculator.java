@@ -4,7 +4,6 @@ import static org.opentripplanner.model.WheelChairBoarding.NOT_POSSIBLE;
 import static org.opentripplanner.model.WheelChairBoarding.NO_INFORMATION;
 import static org.opentripplanner.model.WheelChairBoarding.POSSIBLE;
 
-import java.time.Duration;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,13 +20,13 @@ public class WheelchairCostCalculator implements CostCalculator {
 
     public WheelchairCostCalculator(
             CostCalculator delegate,
-            int unknownTripAccessibilityCost
+            McCostParams costParams
     ) {
         // assign the costs for boarding a trip with the following accessibility values
         wheelchairBoardingCost = Map.of(
-                        NO_INFORMATION, unknownTripAccessibilityCost * 100,
+                        NO_INFORMATION, costParams.unknownTripAccessibilityCost() * 100,
                         POSSIBLE, 0,
-                        NOT_POSSIBLE, (int) Duration.ofHours(1).toSeconds() * 100
+                        NOT_POSSIBLE, costParams.inaccessibleTripCost() * 100
                 )
                 .entrySet()
                 .stream()

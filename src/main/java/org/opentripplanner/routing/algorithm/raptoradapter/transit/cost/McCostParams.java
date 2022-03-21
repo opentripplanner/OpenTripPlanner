@@ -21,7 +21,8 @@ public class McCostParams {
     private final double[] transitReluctanceFactors;
     private final double waitReluctanceFactor;
     private final AccessibilityMode accessibilityMode;
-    private final int unknownAccessibilityCost;
+    private final int unknownTripAccessibilityCost;
+    private final int inaccessibleTripCost;
 
     /**
      * Default constructor defines default values. These defaults are
@@ -33,7 +34,8 @@ public class McCostParams {
         this.transitReluctanceFactors = null;
         this.waitReluctanceFactor = 1.0;
         this.accessibilityMode = AccessibilityMode.NOT_REQUIRED;
-        this.unknownAccessibilityCost = 60 * 5;
+        this.unknownTripAccessibilityCost = 60 * 5;
+        this.inaccessibleTripCost = 60 * 60;
     }
 
     McCostParams(McCostParamsBuilder builder) {
@@ -42,7 +44,8 @@ public class McCostParams {
         this.transitReluctanceFactors = builder.transitReluctanceFactors();
         this.waitReluctanceFactor = builder.waitReluctanceFactor();
         this.accessibilityMode = builder.accessibilityMode();
-        this.unknownAccessibilityCost = builder.unknownAccessibilityCost();
+        this.unknownTripAccessibilityCost = builder.unknownAccessibilityCost();
+        this.inaccessibleTripCost = builder.inaccessibleTripCost();
     }
 
     public int boardCost() {
@@ -73,8 +76,20 @@ public class McCostParams {
         return waitReluctanceFactor;
     }
 
-    public int unknownAccessibilityCost() {
-        return unknownAccessibilityCost;
+    /**
+     * If you are planning a trip for a wheelchair user, how much should the extra cost be for
+     * boarding a trip which has unknown accessibility.
+     */
+    public int unknownTripAccessibilityCost() {
+        return unknownTripAccessibilityCost;
+    }
+
+    /**
+     * If you are planning a trip for a wheelchair user, how much should the extra cost be for
+     * boarding a trip which we know to be inaccessible.
+     */
+    public int inaccessibleTripCost() {
+        return inaccessibleTripCost;
     }
 
     public AccessibilityMode accessibilityMode() {
@@ -100,7 +115,7 @@ public class McCostParams {
         return boardCost == that.boardCost &&
                 transferCost == that.transferCost &&
                 accessibilityMode == that.accessibilityMode &&
-                unknownAccessibilityCost == that.unknownAccessibilityCost &&
+                unknownTripAccessibilityCost == that.unknownTripAccessibilityCost &&
                 Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0;
     }
 
