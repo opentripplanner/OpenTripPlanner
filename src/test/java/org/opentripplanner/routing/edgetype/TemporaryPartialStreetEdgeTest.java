@@ -1,30 +1,27 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class TemporaryPartialStreetEdgeTest {
     
@@ -199,8 +196,7 @@ public class TemporaryPartialStreetEdgeTest {
     }
 
     private IntersectionVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
-        return v;
+        return new IntersectionVertex(graph, label, lat, lon);
     }
 
     /**

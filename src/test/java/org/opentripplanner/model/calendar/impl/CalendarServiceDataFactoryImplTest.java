@@ -6,14 +6,10 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
-import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
@@ -26,9 +22,7 @@ import java.util.TimeZone;
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
 import static org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl.merge;
@@ -155,8 +149,7 @@ public class CalendarServiceDataFactoryImplTest {
     }
 
     private static FareAttribute createFareAttribute(Agency agency) {
-        FareAttribute fa = new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
-        return fa;
+        return new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
     }
 
     private static ServiceCalendarDate removeMondayFromAlldays() {

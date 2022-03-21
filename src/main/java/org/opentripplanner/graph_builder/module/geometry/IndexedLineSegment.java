@@ -69,10 +69,9 @@ class IndexedLineSegment {
 
     private double inverseAlongTrackDistance(Coordinate coord, double inverseCrossTrackError) {
         double distanceFromEnd = SphericalDistanceLibrary.fastDistance(end, coord);
-        double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromEnd / RADIUS)
+        return FastMath.acos(FastMath.cos(distanceFromEnd / RADIUS)
             / FastMath.cos(inverseCrossTrackError / RADIUS))
             * RADIUS;
-        return alongTrackDistance;
     }
 
     public double fraction(Coordinate coord) {
@@ -94,9 +93,8 @@ class IndexedLineSegment {
 
     private double alongTrackDistance(Coordinate coord, double crossTrackError) {
         double distanceFromStart = SphericalDistanceLibrary.fastDistance(start, coord);
-        double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromStart / RADIUS)
+        return FastMath.acos(FastMath.cos(distanceFromStart / RADIUS)
             / FastMath.cos(crossTrackError / RADIUS))
             * RADIUS;
-        return alongTrackDistance;
     }
 }

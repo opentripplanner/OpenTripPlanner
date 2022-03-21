@@ -502,8 +502,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -1853,8 +1852,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -3100,8 +3098,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -5087,8 +5084,7 @@ public final class GtfsRealtime {
       @java.lang.Override
       protected Builder newBuilderForType(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        Builder builder = new Builder(parent);
-        return builder;
+          return new Builder(parent);
       }
       /**
        * <pre>
@@ -6411,8 +6407,7 @@ public final class GtfsRealtime {
         @java.lang.Override
         protected Builder newBuilderForType(
             com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-          Builder builder = new Builder(parent);
-          return builder;
+            return new Builder(parent);
         }
         /**
          * <pre>
@@ -7316,8 +7311,7 @@ public final class GtfsRealtime {
       @java.lang.Override
       protected Builder newBuilderForType(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        Builder builder = new Builder(parent);
-        return builder;
+          return new Builder(parent);
       }
       /**
        * <pre>
@@ -9106,8 +9100,7 @@ public final class GtfsRealtime {
       @java.lang.Override
       protected Builder newBuilderForType(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        Builder builder = new Builder(parent);
-        return builder;
+          return new Builder(parent);
       }
       /**
        * <pre>
@@ -10522,8 +10515,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -13851,8 +13843,7 @@ public final class GtfsRealtime {
       @java.lang.Override
       protected Builder newBuilderForType(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        Builder builder = new Builder(parent);
-        return builder;
+          return new Builder(parent);
       }
       /**
        * <pre>
@@ -15324,8 +15315,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -18784,8 +18774,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -21183,8 +21172,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -22125,8 +22113,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -23823,8 +23810,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -25346,8 +25332,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -26640,8 +26625,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -28037,8 +28021,7 @@ public final class GtfsRealtime {
       @java.lang.Override
       protected Builder newBuilderForType(
           com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        Builder builder = new Builder(parent);
-        return builder;
+          return new Builder(parent);
       }
       /**
        * Protobuf type {@code transit_realtime.TranslatedString.Translation}
@@ -28734,8 +28717,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>
@@ -29823,8 +29805,7 @@ public final class GtfsRealtime {
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
+        return new Builder(parent);
     }
     /**
      * <pre>

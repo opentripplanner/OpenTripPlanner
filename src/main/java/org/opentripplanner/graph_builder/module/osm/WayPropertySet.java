@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.Collections;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
@@ -11,12 +10,8 @@ import org.opentripplanner.util.I18NString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -348,15 +343,13 @@ public class WayPropertySet {
     }
     
 	public void createNames(String spec, String patternKey) {
-		String pattern = patternKey;
-		CreativeNamer namer = new CreativeNamer(pattern);
+        CreativeNamer namer = new CreativeNamer(patternKey);
 		addCreativeNamer(new OSMSpecifier(spec), namer);
 	}
 
 	public  void createNotes(String spec, String patternKey, NoteMatcher matcher) {
-		String pattern = patternKey;
-		// TODO: notes aren't localized
-		NoteProperties properties = new NoteProperties(pattern, matcher);
+        // TODO: notes aren't localized
+		NoteProperties properties = new NoteProperties(patternKey, matcher);
 		addNote(new OSMSpecifier(spec), properties);
 	}
 

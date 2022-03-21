@@ -21,12 +21,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -118,8 +113,7 @@ public class FlexRouter {
           if (itinerary != null) {
             var fareService = graph.getService(FareService.class);
             if(fareService != null) {
-              var fare = fareService.getCost(itinerary);
-              itinerary.fare = fare;
+              itinerary.fare = fareService.getCost(itinerary);
             }
             itineraries.add(itinerary);
           }

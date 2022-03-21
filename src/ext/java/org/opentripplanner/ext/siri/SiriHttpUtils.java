@@ -54,11 +54,10 @@ public class SiriHttpUtils extends HttpUtils {
     }
 
     private static HttpClient getClient(int socketTimeout, int connectionTimeout) {
-        HttpClient httpClient = HttpClientBuilder.create()
+
+        return HttpClientBuilder.create()
                 .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(socketTimeout).build())
                 .setConnectionTimeToLive(connectionTimeout, TimeUnit.MILLISECONDS)
                 .build();
-
-        return httpClient;
     }
 }

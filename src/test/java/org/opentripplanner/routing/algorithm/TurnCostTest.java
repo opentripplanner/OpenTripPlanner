@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -25,6 +21,11 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TurnCostTest {
 
@@ -206,8 +207,7 @@ public class TurnCostTest {
      ****/
 
     private StreetVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
-        return v;
+        return new IntersectionVertex(graph, label, lat, lon);
     }
 
     /**
