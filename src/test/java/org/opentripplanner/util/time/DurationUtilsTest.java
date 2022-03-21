@@ -1,10 +1,8 @@
 package org.opentripplanner.util.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.Duration;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;

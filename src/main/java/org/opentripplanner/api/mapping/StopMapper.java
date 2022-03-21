@@ -3,7 +3,7 @@ package org.opentripplanner.api.mapping;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.util.NonLocalizedString;
+
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopShort;
 import org.opentripplanner.model.Stop;

@@ -8,7 +8,6 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.RaptorService;

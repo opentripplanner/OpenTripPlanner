@@ -3,7 +3,7 @@ package org.opentripplanner.ext.vehicleparking.kml;
 import static java.util.Locale.ROOT;
 
 import java.util.List;
-import java.util.Locale;
+
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.updater.DataSource;

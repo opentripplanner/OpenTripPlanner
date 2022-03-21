@@ -10,12 +10,8 @@ import org.opentripplanner.routing.graph.Vertex;
 
 import java.io.File;
 import java.net.URLDecoder;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 

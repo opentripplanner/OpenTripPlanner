@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.fares.impl;
 
 import java.time.Duration;
-import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;

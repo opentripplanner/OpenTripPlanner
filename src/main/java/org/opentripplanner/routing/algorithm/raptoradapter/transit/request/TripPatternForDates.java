@@ -1,9 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
-import org.opentripplanner.model.TripPattern;
+
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;

@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import java.util.Iterator;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
+
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;

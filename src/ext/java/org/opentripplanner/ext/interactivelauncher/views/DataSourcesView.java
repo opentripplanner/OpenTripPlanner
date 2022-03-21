@@ -5,7 +5,6 @@ import org.opentripplanner.ext.interactivelauncher.Model;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;

@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;

@@ -23,7 +23,6 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import javax.annotation.Nonnull;
 
 /**
  * Using this instrumentation we can precisely measure how queries and data fetchers are executed

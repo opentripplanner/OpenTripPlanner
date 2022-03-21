@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A vertex in the graph. Each vertex has a longitude/latitude location, as well as a set of

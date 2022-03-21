@@ -14,7 +14,6 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graph.Graph;
 
 public class FlexIndex {

@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static java.util.Objects.requireNonNullElse;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
@@ -13,7 +12,6 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
 import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
-import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

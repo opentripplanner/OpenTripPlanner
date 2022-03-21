@@ -6,7 +6,6 @@ import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
-import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;

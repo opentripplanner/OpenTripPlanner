@@ -3,9 +3,6 @@ package org.opentripplanner.openstreetmap.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 
 public class OSMWithTagsTest {
 

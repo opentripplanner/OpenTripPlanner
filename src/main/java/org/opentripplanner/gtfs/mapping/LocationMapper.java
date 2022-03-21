@@ -1,6 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import java.util.Optional;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.UnsupportedGeometryException;
 import org.opentripplanner.model.FlexStopLocation;
