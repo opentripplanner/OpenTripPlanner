@@ -823,7 +823,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setAccessibilityMode(boolean accessibilityMode) {
         if(accessibilityMode) {
-            this.accessibilityMode = AccessibilityMode.STRICTLY_REQUIRED;
+            this.accessibilityMode = AccessibilityMode.PREFERRED;
         } else {
             this.accessibilityMode = AccessibilityMode.NOT_REQUIRED;
         }

@@ -1,5 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import static org.opentripplanner.model.WheelChairBoarding.NOT_POSSIBLE;
+import static org.opentripplanner.model.WheelChairBoarding.NO_INFORMATION;
+import static org.opentripplanner.model.WheelChairBoarding.POSSIBLE;
+
+import java.time.Duration;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -9,9 +17,24 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 public class WheelchairCostCalculator implements CostCalculator {
 
     private final CostCalculator delegate;
-    private final int[] wheelchairBoardingCost = new int[]{600, 0, 3600};
+    private final int[] wheelchairBoardingCost;
 
-    public WheelchairCostCalculator(CostCalculator delegate) {
+    public WheelchairCostCalculator(
+            CostCalculator delegate,
+            int unknownTripAccessibilityCost
+    ) {
+        // assign the costs for boarding a trip with the following accessibility values
+        wheelchairBoardingCost = Map.of(
+                        NO_INFORMATION, unknownTripAccessibilityCost * 100,
+                        POSSIBLE, 0,
+                        NOT_POSSIBLE, (int) Duration.ofHours(1).toSeconds() * 100
+                )
+                .entrySet()
+                .stream()
+                .sorted(Comparator.comparingInt(k -> k.getKey().ordinal()))
+                .mapToInt(Entry::getValue)
+                .toArray();
+
         this.delegate = delegate;
     }
 
@@ -24,14 +47,15 @@ public class WheelchairCostCalculator implements CostCalculator {
             RaptorTripSchedule trip,
             RaptorTransferConstraint transferConstraints
     ) {
-        int cost = delegate.boardingCost(firstBoarding, prevArrivalTime, boardStop, boardTime, trip,
-                transferConstraints
-        );
+        int defaultCost =
+                delegate.boardingCost(firstBoarding, prevArrivalTime, boardStop, boardTime, trip,
+                        transferConstraints
+                );
         var tripSchedule = (TripSchedule) trip;
         int index = tripSchedule.getOriginalTripTimes().getTrip().getWheelchairBoarding().ordinal();
         int wheelchairCost = wheelchairBoardingCost[index];
 
-        return cost + wheelchairCost;
+        return defaultCost + wheelchairCost;
     }
 
     @Override
