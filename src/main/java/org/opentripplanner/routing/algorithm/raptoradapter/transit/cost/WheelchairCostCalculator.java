@@ -7,6 +7,7 @@ import static org.opentripplanner.model.WheelChairBoarding.POSSIBLE;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.annotation.Nonnull;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -19,14 +20,15 @@ public class WheelchairCostCalculator implements CostCalculator {
     private final int[] wheelchairBoardingCost;
 
     public WheelchairCostCalculator(
-            CostCalculator delegate,
-            McCostParams costParams
+            @Nonnull CostCalculator delegate,
+            int unknownTripAccessibilityCost,
+            int inaccessibleTripCost
     ) {
         // assign the costs for boarding a trip with the following accessibility values
         wheelchairBoardingCost = Map.of(
-                        NO_INFORMATION, costParams.unknownTripAccessibilityCost() * 100,
+                        NO_INFORMATION, unknownTripAccessibilityCost * 100,
                         POSSIBLE, 0,
-                        NOT_POSSIBLE, costParams.inaccessibleTripCost() * 100
+                        NOT_POSSIBLE, inaccessibleTripCost * 100
                 )
                 .entrySet()
                 .stream()
@@ -35,6 +37,17 @@ public class WheelchairCostCalculator implements CostCalculator {
                 .toArray();
 
         this.delegate = delegate;
+    }
+
+    public WheelchairCostCalculator(
+            @Nonnull CostCalculator delegate,
+            @Nonnull McCostParams costParams
+    ) {
+        this(
+                delegate,
+                costParams.unknownTripAccessibilityCost(),
+                costParams.inaccessibleTripCost()
+        );
     }
 
     @Override
