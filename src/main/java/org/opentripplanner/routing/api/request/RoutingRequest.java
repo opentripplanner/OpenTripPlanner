@@ -869,7 +869,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setPreferredAgenciesFromString(String s) {
         if (!s.isEmpty()) {
-            preferredAgencies = FeedScopedId.parseListOfIds(s);
+            preferredAgencies = FeedScopedId.parseSetOfIds(s);
         }
     }
 
@@ -881,7 +881,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setUnpreferredAgenciesFromString(String s) {
         if (!s.isEmpty()) {
-            unpreferredAgencies = FeedScopedId.parseListOfIds(s);
+            unpreferredAgencies = FeedScopedId.parseSetOfIds(s);
         }
     }
 
@@ -893,7 +893,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setBannedAgenciesFromSting(String s) {
         if (!s.isEmpty()) {
-            bannedAgencies = FeedScopedId.parseListOfIds(s);
+            bannedAgencies = FeedScopedId.parseSetOfIds(s);
         }
     }
 
@@ -905,7 +905,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setWhiteListedAgenciesFromSting(String s) {
         if (!s.isEmpty()) {
-            whiteListedAgencies = FeedScopedId.parseListOfIds(s);
+            whiteListedAgencies = FeedScopedId.parseSetOfIds(s);
         }
     }
 
@@ -974,7 +974,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public void setBannedTripsFromString(String ids) {
         if (!ids.isEmpty()) {
-            bannedTrips = FeedScopedId.parseListOfIds(ids);
+            bannedTrips = FeedScopedId.parseSetOfIds(ids);
         }
     }
 
