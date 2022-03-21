@@ -63,7 +63,7 @@ public final class DefaultCostCalculator implements CostCalculator {
     public int boardingCost(
             boolean firstBoarding,
             int prevArrivalTime,
-            int boardStopIndex,
+            int boardStop,
             int boardTime,
             RaptorTripSchedule trip,
             RaptorTransferConstraint transferConstraints
@@ -72,14 +72,14 @@ public final class DefaultCostCalculator implements CostCalculator {
             return boardingCostRegularTransfer(
                     firstBoarding,
                     prevArrivalTime,
-                    boardStopIndex,
+                    boardStop,
                     boardTime
             );
         }
         else {
             return boardingCostConstrainedTransfer(
                     prevArrivalTime,
-                    boardStopIndex,
+                    boardStop,
                     boardTime,
                     trip.transitReluctanceFactorIndex(),
                     firstBoarding,
