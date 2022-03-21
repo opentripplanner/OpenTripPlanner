@@ -242,7 +242,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         // trips/stops that are known to be wheelchair-accessible are preferred but those with unknown information
         PREFERRED;
 
-        public boolean includesWheelchair() {
+        public boolean requestsWheelchair() {
             return this == STRICTLY_REQUIRED || this == PREFERRED;
         }
     }

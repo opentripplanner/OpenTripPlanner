@@ -1,12 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
@@ -24,8 +20,6 @@ public final class DefaultCostCalculator implements CostCalculator {
     private final int waitFactor;
     private final FactorStrategy transitFactors;
     private final int[] stopVisitCost;
-    private final AccessibilityMode accessibilityMode;
-    private final int unknownAccessibilityCost;
 
 
     /**
@@ -35,21 +29,16 @@ public final class DefaultCostCalculator implements CostCalculator {
      * @param stopVisitCost Unit centi-seconds. This parameter is used "as-is" and not transformed
      *                      into the Raptor cast unit to avoid the transformation for each request.
      *                      Use {@code null} to ignore stop cost.
-     * @param accessibilityMode
      */
     public DefaultCostCalculator(
             int boardCost,
             int transferCost,
             double waitReluctanceFactor,
-            int unknownAccessibilityCost,
-            @Nonnull AccessibilityMode accessibilityMode,
             @Nullable double[] transitReluctanceFactors,
             @Nullable int[] stopVisitCost
     ) {
         this.boardCostOnly = RaptorCostConverter.toRaptorCost(boardCost);
         this.transferCostOnly = RaptorCostConverter.toRaptorCost(transferCost);
-        this.accessibilityMode = accessibilityMode;
-        this.unknownAccessibilityCost = unknownAccessibilityCost;
         this.boardAndTransferCost = transferCostOnly + boardCostOnly;
         this.waitFactor = RaptorCostConverter.toRaptorCost(waitReluctanceFactor);
 
@@ -65,8 +54,6 @@ public final class DefaultCostCalculator implements CostCalculator {
                 params.boardCost(),
                 params.transferCost(),
                 params.waitReluctanceFactor(),
-                params.unknownAccessibilityCost(),
-                params.accessibilityMode(),
                 params.transitReluctanceFactors(),
                 stopVisitCost
         );
@@ -81,16 +68,12 @@ public final class DefaultCostCalculator implements CostCalculator {
             RaptorTripSchedule trip,
             RaptorTransferConstraint transferConstraints
     ) {
-        var t = (TripSchedule) trip;
-        var tripAccessibility = t.getOriginalTripTimes().getTrip().getWheelchairBoarding();
-
         if(transferConstraints.isRegularTransfer()) {
             return boardingCostRegularTransfer(
                     firstBoarding,
                     prevArrivalTime,
                     boardStopIndex,
-                    boardTime,
-                    tripAccessibility
+                    boardTime
             );
         }
         else {
@@ -98,7 +81,6 @@ public final class DefaultCostCalculator implements CostCalculator {
                     prevArrivalTime,
                     boardStopIndex,
                     boardTime,
-                    tripAccessibility,
                     trip.transitReluctanceFactorIndex(),
                     firstBoarding,
                     transferConstraints
@@ -161,8 +143,7 @@ public final class DefaultCostCalculator implements CostCalculator {
             boolean firstBoarding,
             int prevArrivalTime,
             int boardStop,
-            int boardTime,
-            WheelChairBoarding tripWheelchairAccessibility
+            int boardTime
     ) {
         // Calculate the wait-time before the boarding which should be accounted for in the cost
         // calculation. Any slack at the end of the last leg is not part of this, because it is
@@ -173,12 +154,6 @@ public final class DefaultCostCalculator implements CostCalculator {
         int cost = waitFactor * boardWaitTime;
 
         cost += firstBoarding ? boardCostOnly : boardAndTransferCost;
-
-        // if you set accessibility mode to STRICTLY_REQUIRED then this line is never executed as the trips are filtered out
-        // beforehand
-        if(accessibilityMode.includesWheelchair() && tripWheelchairAccessibility == WheelChairBoarding.NO_INFORMATION) {
-            cost += unknownAccessibilityCost;
-        }
 
         if(stopVisitCost != null) {
             cost += stopVisitCost[boardStop];
@@ -193,7 +168,6 @@ public final class DefaultCostCalculator implements CostCalculator {
             int prevArrivalTime,
             int boardStop,
             int boardTime,
-            WheelChairBoarding wheelchairBoarding,
             int transitReluctanceIndex,
             boolean firstBoarding,
             RaptorTransferConstraint txConstraints
@@ -230,6 +204,6 @@ public final class DefaultCostCalculator implements CostCalculator {
             return cost;
         }
         // fallback to regular transfer
-        return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStop, boardTime, wheelchairBoarding);
+        return boardingCostRegularTransfer(firstBoarding, prevArrivalTime, boardStop, boardTime);
     }
 }

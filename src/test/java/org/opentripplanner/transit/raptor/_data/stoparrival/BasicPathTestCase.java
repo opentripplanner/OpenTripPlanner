@@ -165,15 +165,10 @@ public class BasicPathTestCase implements RaptorTestConstants {
         .departures(L31_START, VERY_LATE)
         .build();
 
-
-    private static final int UNKNOWN_ACCESSIBILITY = 5 * 60;
-
     public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
             BOARD_COST_SEC,
             TRANSFER_COST_SEC,
             WAIT_RELUCTANCE,
-            UNKNOWN_ACCESSIBILITY,
-            AccessibilityMode.NOT_REQUIRED,
             TRANSIT_RELUCTANCE,
             STOP_COSTS
     );

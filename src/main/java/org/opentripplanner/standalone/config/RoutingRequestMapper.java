@@ -101,7 +101,7 @@ public class RoutingRequestMapper {
         request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
         request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
         //request.accessibilityMode =
-        boolean wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.accessibilityMode.includesWheelchair());
+        boolean wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.accessibilityMode.requestsWheelchair());
         if(wheelchairAccessible) {
             request.accessibilityMode = AccessibilityMode.STRICTLY_REQUIRED;
         } else {

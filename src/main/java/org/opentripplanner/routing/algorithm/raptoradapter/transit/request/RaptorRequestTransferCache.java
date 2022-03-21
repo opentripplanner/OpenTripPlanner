@@ -125,7 +125,7 @@ public class RaptorRequestTransferCache {
             this.bikeSwitchCost = routingRequest.bikeSwitchCost;
             this.bikeSwitchTime = routingRequest.bikeSwitchTime;
 
-            this.wheelchairAccessible = routingRequest.accessibilityMode.includesWheelchair();
+            this.wheelchairAccessible = routingRequest.accessibilityMode.requestsWheelchair();
             this.maxWheelchairSlope = routingRequest.maxWheelchairSlope;
 
             this.walkSpeed = routingRequest.walkSpeed;

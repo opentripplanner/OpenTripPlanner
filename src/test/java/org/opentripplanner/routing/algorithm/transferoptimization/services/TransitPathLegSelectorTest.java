@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
@@ -33,7 +32,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     );
 
     private static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
-            20, 60, 1.0, 5 * 60, AccessibilityMode.NOT_REQUIRED, null, null
+            20, 60, 1.0, null, null
     );
 
     public static final MinCostFilterChain<OptimizedPathTail<TestTripSchedule>>
