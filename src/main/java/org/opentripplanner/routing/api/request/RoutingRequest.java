@@ -1,26 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import javax.annotation.Nonnull;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -38,12 +17,7 @@ import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.RouteMatcher;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -58,6 +32,16 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
@@ -1250,11 +1234,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         } else {
             if (rctx.graph == graph) {
                 LOG.debug("keeping existing routing context");
-                return;
             } else {
                 LOG.error("attempted to reset routing context using a different graph");
-                return;
             }
+            return;
         }
     }
 
