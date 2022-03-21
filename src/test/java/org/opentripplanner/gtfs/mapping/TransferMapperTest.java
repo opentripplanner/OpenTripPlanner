@@ -118,16 +118,14 @@ public class TransferMapperTest {
     }
      */
 
-    /** Mapping the same object twice, should return the the same instance. */
+    // /** Mapping the same object twice, should return the the same instance. */
     // TODO Fix this
-    /*
-    @Test
-    public void testMapCache() throws Exception {
-        org.opentripplanner.model.transfer.Transfer result1 = subject.map(TRANSFER);
-        org.opentripplanner.model.transfer.Transfer result2 = subject.map(TRANSFER);
-
-        assertTrue(result1 == result2);
-    }
-
-     */
+    //
+    // @Test
+    // public void testMapCache() throws Exception {
+    //    org.opentripplanner.model.transfer.Transfer result1 = subject.map(TRANSFER);
+    //    org.opentripplanner.model.transfer.Transfer result2 = subject.map(TRANSFER);
+    //
+    //    assertTrue(result1 == result2);
+    // }
 }

@@ -332,8 +332,8 @@ public class RoutingService {
     /** {@link Graph#getTransitModes()} */
     public HashSet<TransitMode> getTransitModes() {return this.graph.getTransitModes();}
 
-    /** {@link Graph#index()} */
-    //public void index() {this.graph.index();}
+    // /** {@link Graph#index()} */
+    // public void index() {this.graph.index();}
 
     /** {@link Graph#getCalendarService()} */
     public CalendarService getCalendarService() {return this.graph.getCalendarService();}

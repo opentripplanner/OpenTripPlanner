@@ -356,12 +356,11 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     }
 
     public void testRunForTrain() {
-        /** This is the notorious Byrd bug: we're going from Q to T at 8:30.  
-         *  There's a trip from S to T at 8:50 and a second one at 9:50.  
-         *  To get to S by 8:50, we need to take trip 12.1 from Q to R, and 13.1
-         *  from R to S.  If we take the direct-but-slower 11.1, we'll miss
-         *  the 8:50 and have to catch the 9:50.
-         */
+        // This is the notorious Byrd bug: we're going from Q to T at 8:30.
+        // There's a trip from S to T at 8:50 and a second one at 9:50.
+        // To get to S by 8:50, we need to take trip 12.1 from Q to R, and 13.1
+        // from R to S.  If we take the direct-but-slower 11.1, we'll miss
+        // the 8:50 and have to catch the 9:50.
         Vertex destination = graph.getVertex(feedId + ":T");
         RoutingRequest options = new RoutingRequest();
         // test is designed such that transfers must be instantaneous

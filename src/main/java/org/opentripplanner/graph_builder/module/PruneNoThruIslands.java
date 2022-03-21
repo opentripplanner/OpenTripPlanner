@@ -77,11 +77,10 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     }
 
     public List<String> getPrerequisites() {
-        /**this module can run after the street module only but if
-         * the street linker did not run then it couldn't identifies island with stops.
-         * so if the need is to distinguish between island with stops or without stops
-         * as explained before this module should run after the streets and the linker modules.
-         */
+        // this module can run after the street module only but if
+        //  the street linker did not run then it couldn't identifies island with stops.
+        //  so if the need is to distinguish between island with stops or without stops
+        //  as explained before this module should run after the streets and the linker modules.
         return Arrays.asList("streets");
     }
 

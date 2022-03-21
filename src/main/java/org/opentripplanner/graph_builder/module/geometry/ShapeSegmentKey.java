@@ -1,8 +1,3 @@
-
-
-/**
- * 
- */
 package org.opentripplanner.graph_builder.module.geometry;
 
 import org.opentripplanner.model.FeedScopedId;
