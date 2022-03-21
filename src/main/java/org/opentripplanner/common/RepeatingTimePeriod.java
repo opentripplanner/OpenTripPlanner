@@ -112,11 +112,13 @@ public class RepeatingTimePeriod implements Serializable {
         // TODO: Timezone/locale
         Calendar cal;
         // TODO offsets
-        if (this.timeZone != null)
+        if (this.timeZone != null) {
             cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        else
+        }
+        else {
             // FIXME hardwired time zone
             cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        }
         
         cal.setTimeInMillis(time * 1000);
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
