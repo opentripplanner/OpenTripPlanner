@@ -49,7 +49,7 @@ public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePos
     }
 
     @Override
-    public DataFetcher<Long> time() {
+    public DataFetcher<Long> lastUpdated() {
         return env -> getSource(env).time().getEpochSecond();
     }
 
@@ -60,7 +60,7 @@ public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePos
 
     @Override
     public DataFetcher<String> vehicleId() {
-        return env -> getSource(env).vehicleId();
+        return env -> getSource(env).vehicleId().toString();
     }
 
     private RealtimeVehiclePosition getSource(DataFetchingEnvironment environment) {

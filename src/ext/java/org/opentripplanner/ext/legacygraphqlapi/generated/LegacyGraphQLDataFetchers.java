@@ -1015,6 +1015,8 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<String> label();
 
+        public DataFetcher<Long> lastUpdated();
+
         public DataFetcher<Double> lat();
 
         public DataFetcher<Double> lon();
@@ -1024,8 +1026,6 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<Double> speed();
 
         public DataFetcher<Object> stopStatus();
-
-        public DataFetcher<Long> time();
 
         public DataFetcher<Trip> trip();
 

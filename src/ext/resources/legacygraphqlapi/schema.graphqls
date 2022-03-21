@@ -1396,8 +1396,8 @@ type PageInfo {
 }
 
 type VehiclePosition {
-    """ID that uniquely identifies the vehicle"""
-    vehicleId: String
+    """Feed-scoped ID that uniquely identifies the vehicle in the format FeedId:VehicleId"""
+    vehicleId: String,
     """Human-readable label of the vehicle, eg. a publicly visible number or a license plate"""
     label: String
     """Latitude of the vehicle"""
@@ -1416,14 +1416,24 @@ type VehiclePosition {
     """
     heading: Float
     """When the position of the vehicle was recorded in seconds since the UNIX epoch."""
-    time: Long
-
+    lastUpdated: Long
     """Which trip this vehicles runs on."""
     trip: Trip!
 }
 
 enum VehicleStopStatus {
-    STOPPED_AT, IN_TRANSIT_TO, INCOMING_AT
+    """
+    The vehicle is standing at the stop.
+    """
+    STOPPED_AT,
+    """
+    The vehicle has departed the previous stop and is in transit.
+    """
+    IN_TRANSIT_TO,
+    """
+    The vehicle is just about to arrive at the stop (on a stop display, the vehicle symbol typically flashes).
+    """
+    INCOMING_AT
 }
 
 """
@@ -1495,6 +1505,9 @@ type Pattern implements Node {
         types: [PatternAlertType]
     ): [Alert]
 
+    """
+    Realtime-updated position of vehicles that are serving this pattern.
+    """
     vehiclePositions: [VehiclePosition!]
 }
 

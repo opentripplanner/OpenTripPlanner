@@ -62,6 +62,10 @@ public class VehiclePositionPatternMatcher {
      */
     public void applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions) {
 
+        // we take the list of positions and out of them create a Map<TripPattern, List<VehiclePosition>>
+        // that map makes it very easy to update the positions in the service
+        // it also enables the bookkeeping about which pattern previously had positions but no longer do
+        // these need to be removed from the service as we assume that the vehicle has stopped
         var positions = vehiclePositions.stream()
                 .map(vehiclePosition -> toRealtimeVehiclePosition(feedId, vehiclePosition))
                 .filter(Objects::nonNull)
@@ -145,7 +149,7 @@ public class VehiclePositionPatternMatcher {
      * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be used
      * by the API.
      */
-    public static RealtimeVehiclePosition mapVehiclePosition(
+    private static RealtimeVehiclePosition mapVehiclePosition(
             VehiclePosition vehiclePosition,
             List<StopLocation> stopsOnVehicleTrip,
             Trip trip
@@ -167,7 +171,8 @@ public class VehiclePositionPatternMatcher {
 
         if (vehiclePosition.hasVehicle()) {
             var vehicle = vehiclePosition.getVehicle();
-            newPosition.setVehicleId(vehicle.getId())
+            var id = new FeedScopedId(trip.getId().getFeedId(), vehicle.getId());
+            newPosition.setVehicleId(id)
                     .setLabel(Optional.ofNullable(vehicle.getLabel())
                             .orElse(vehicle.getLicensePlate()));
         }
