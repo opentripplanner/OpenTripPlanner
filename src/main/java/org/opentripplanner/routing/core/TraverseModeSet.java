@@ -61,8 +61,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
     
     /**
      * Returns a mode set containing all modes.
-     * 
-     * @return
      */
     public static TraverseModeSet allModes() {
     	TraverseModeSet modes = new TraverseModeSet();
@@ -70,40 +68,25 @@ public class TraverseModeSet implements Cloneable, Serializable {
     	return modes;
     }
 
-    private final int getMaskForMode(TraverseMode mode) {
-        switch (mode) {
-        case BICYCLE:
-            return MODE_BICYCLE;
-        case WALK:
-            return MODE_WALK;
-        case CAR:
-            return MODE_CAR;
-        case BUS:
-            return MODE_BUS;
-        case TRAM:
-            return MODE_TRAM;
-        case CABLE_CAR:
-            return MODE_CABLE_CAR;
-        case GONDOLA:
-            return MODE_GONDOLA;
-        case FERRY:
-            return MODE_FERRY;
-        case FUNICULAR:
-            return MODE_FUNICULAR;
-        case SUBWAY:
-            return MODE_SUBWAY;
-        case RAIL:
-            return MODE_RAIL;
-        case TROLLEYBUS:
-            return MODE_TROLLEYBUS;
-        case MONORAIL:
-            return MODE_MONORAIL;
-        case AIRPLANE:
-            return MODE_AIRPLANE;
-        case TRANSIT:
-            return MODE_TRANSIT;
-        }
-        return 0;
+    private int getMaskForMode(TraverseMode mode) {
+        return switch (mode) {
+            case BICYCLE -> MODE_BICYCLE;
+            case WALK -> MODE_WALK;
+            case CAR -> MODE_CAR;
+            case BUS -> MODE_BUS;
+            case TRAM -> MODE_TRAM;
+            case CABLE_CAR -> MODE_CABLE_CAR;
+            case GONDOLA -> MODE_GONDOLA;
+            case FERRY -> MODE_FERRY;
+            case FUNICULAR -> MODE_FUNICULAR;
+            case SUBWAY -> MODE_SUBWAY;
+            case RAIL -> MODE_RAIL;
+            case TROLLEYBUS -> MODE_TROLLEYBUS;
+            case MONORAIL -> MODE_MONORAIL;
+            case AIRPLANE -> MODE_AIRPLANE;
+            case TRANSIT -> MODE_TRANSIT;
+            default -> 0;
+        };
     }
 
     public TraverseModeSet(Collection<TraverseMode> modeList) {
