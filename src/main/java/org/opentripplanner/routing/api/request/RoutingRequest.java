@@ -918,7 +918,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         preferredRoutes = RouteMatcher.idMatcher(routeIds);
     }
 
-    public void setPreferredRoutesFromSting(String s) {
+    public void setPreferredRoutesFromString(String s) {
         if (!s.isEmpty()) {
             preferredRoutes = RouteMatcher.parse(s);
         }
@@ -931,7 +931,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         unpreferredRoutes = RouteMatcher.idMatcher(routeIds);
     }
 
-    public void setUnpreferredRoutesFromSting(String s) {
+    public void setUnpreferredRoutesFromString(String s) {
         if (!s.isEmpty()) {
             unpreferredRoutes = RouteMatcher.parse(s);
         }
@@ -944,7 +944,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         bannedRoutes = RouteMatcher.idMatcher(routeIds);
     }
 
-    public void setBannedRoutesFromSting(String s) {
+    public void setBannedRoutesFromString(String s) {
         if (!s.isEmpty()) {
             bannedRoutes = RouteMatcher.parse(s);
         }
@@ -953,7 +953,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         }
     }
 
-    public void setWhiteListedRoutesFromSting(String s) {
+    public void setWhiteListedRoutesFromString(String s) {
         if (!s.isEmpty()) {
             whiteListedRoutes = RouteMatcher.parse(s);
         }

@@ -22,7 +22,7 @@ public class TestBanning {
 
         RoutingRequest routingRequest = new RoutingRequest();
 
-        routingRequest.setBannedRoutesFromSting("RB__RUT:Route:1");
+        routingRequest.setBannedRoutesFromString("RB__RUT:Route:1");
         routingRequest.setBannedAgenciesFromSting("RB:RUT:Agency:2");
 
         Collection<FeedScopedId> bannedRoutes =
@@ -39,7 +39,7 @@ public class TestBanning {
 
         RoutingRequest routingRequest = new RoutingRequest();
 
-        routingRequest.setWhiteListedRoutesFromSting("RB__RUT:Route:1");
+        routingRequest.setWhiteListedRoutesFromString("RB__RUT:Route:1");
         routingRequest.setWhiteListedAgenciesFromSting("RB:RUT:Agency:2");
 
         Collection<FeedScopedId> bannedRoutes =
