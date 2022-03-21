@@ -1,11 +1,13 @@
 package org.opentripplanner.model.vehicle_position;
 
 import java.time.Instant;
+import java.util.Optional;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.VehicleStop;
 
 public class RealtimeVehiclePositionBuilder {
 
@@ -15,7 +17,7 @@ public class RealtimeVehiclePositionBuilder {
     private Double speed = null;
     private Double heading = null;
     private Instant time;
-    private StopStatus stopStatus;
+    private StopStatus stopStatus = StopStatus.IN_TRANSIT_TO;
     private StopLocation nextStop;
     private Trip trip;
 
@@ -65,7 +67,12 @@ public class RealtimeVehiclePositionBuilder {
     }
 
     public RealtimeVehiclePosition build() {
+        var stop = Optional.ofNullable(nextStop)
+                .map(s -> new VehicleStop(s, stopStatus))
+                .orElse(null);
         return new RealtimeVehiclePosition(
-                vehicleId, label, coordinates, speed, heading, time, stopStatus, nextStop, trip);
+                vehicleId, label, coordinates, speed, heading, time,
+                stop, trip
+        );
     }
 }

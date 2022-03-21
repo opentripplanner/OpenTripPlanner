@@ -3,9 +3,9 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLVehiclePosition;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVehicleStopStatus;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.VehicleStop;
 
 public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePosition {
 
@@ -30,22 +30,13 @@ public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePos
     }
 
     @Override
-    public DataFetcher<Object> nextStop() {
-        return env -> getSource(env).nextStop();
+    public DataFetcher<VehicleStop> stop() {
+        return env -> getSource(env).stop();
     }
 
     @Override
     public DataFetcher<Double> speed() {
         return env -> getSource(env).speed();
-    }
-
-    @Override
-    public DataFetcher<Object> stopStatus() {
-        return env -> switch (getSource(env).stopStatus()) {
-            case INCOMING_AT -> LegacyGraphQLVehicleStopStatus.INCOMING_AT;
-            case IN_TRANSIT_TO -> LegacyGraphQLVehicleStopStatus.IN_TRANSIT_TO;
-            case STOPPED_AT -> LegacyGraphQLVehicleStopStatus.STOPPED_AT;
-        };
     }
 
     @Override

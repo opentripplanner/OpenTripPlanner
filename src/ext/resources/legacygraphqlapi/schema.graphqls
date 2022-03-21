@@ -1404,10 +1404,8 @@ type VehiclePosition {
     lat: Float
     """Longitude of the vehicle"""
     lon: Float
-    """How close the vehicle is to `nextStop`"""
-    stopStatus: VehicleStopStatus
-    """The next stop where the vehicle will or is currently arriving."""
-    nextStop: Stop
+    """The current stop where the vehicle will or is currently arriving."""
+    stop: VehicleStop!
     """Speed of the vehicle in meters/second"""
     speed: Float
     """
@@ -1419,6 +1417,12 @@ type VehiclePosition {
     lastUpdated: Long
     """Which trip this vehicles runs on."""
     trip: Trip!
+}
+
+type VehicleStop {
+    """How close the vehicle is to `nextStop`"""
+    status: VehicleStopStatus!
+    stop: Stop!
 }
 
 enum VehicleStopStatus {

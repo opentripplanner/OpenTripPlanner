@@ -22,6 +22,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.VehicleStop;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -1021,11 +1022,9 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Double> lon();
 
-        public DataFetcher<Object> nextStop();
-
         public DataFetcher<Double> speed();
 
-        public DataFetcher<Object> stopStatus();
+        public DataFetcher<VehicleStop> stop();
 
         public DataFetcher<Trip> trip();
 
@@ -1079,6 +1078,13 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<String> ios();
 
         public DataFetcher<String> web();
+    }
+
+    public interface LegacyGraphQLVehicleStop {
+
+        public DataFetcher<Object> status();
+
+        public DataFetcher<Object> stop();
     }
 
     public interface LegacyGraphQLDebugOutput {
