@@ -1404,7 +1404,7 @@ type VehiclePosition {
     lat: Float
     """Longitude of the vehicle"""
     lon: Float
-    """The current stop where the vehicle will or is currently arriving."""
+    """The current stop where the vehicle will be or is currently arriving."""
     stop: VehicleStop!
     """Speed of the vehicle in meters/second"""
     speed: Float
