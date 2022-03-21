@@ -1,10 +1,6 @@
 package org.opentripplanner.routing.algorithm.astar;
 
 import com.beust.jcommander.internal.Lists;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
@@ -19,6 +15,11 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Find the shortest path between graph vertices using A*.
@@ -42,7 +43,7 @@ public class AStar {
     private SkipEdgeStrategy skipEdgeStrategy;
 
     /* TODO instead of having a separate class for search state, we should just make one GenericAStar per request. */
-    class RunState {
+    static class RunState {
 
         public State u;
         public ShortestPathTree spt;
@@ -89,7 +90,7 @@ public class AStar {
     private void startSearch(RoutingRequest options,
             SearchTerminationStrategy terminationStrategy, long abortTime, boolean addToQueue) {
 
-        runState = new RunState( options, terminationStrategy );
+        runState = new RunState(options, terminationStrategy);
         runState.rctx = options.getRoutingContext();
         runState.spt = options.getNewShortestPathTree();
 

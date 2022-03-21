@@ -113,7 +113,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         return regions.get(0).getSampleDimension(index);
     }
 
-    public class DatumRegion {
+    public static class DatumRegion {
         public final VerticalDatum datum;
         public final Coverage region;
 

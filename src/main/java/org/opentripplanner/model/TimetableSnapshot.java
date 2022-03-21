@@ -41,7 +41,7 @@ public class TimetableSnapshot {
      * Class to use as key in HashMap containing feed id, trip id and service date
      * TODO shouldn't this be a static class?
      */
-    protected class TripIdAndServiceDate {
+    protected static class TripIdAndServiceDate {
         private final FeedScopedId tripId;
         private final ServiceDate serviceDate;
         

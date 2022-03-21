@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.module.ned;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.geotools.geometry.DirectPosition2D;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
@@ -28,13 +28,7 @@ import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
-import static org.opentripplanner.util.logging.ThrottleLogger.*;
+import static org.opentripplanner.util.logging.ThrottleLogger.throttle;
 
 /**
  * THIS CLASS IS MULTI-THREADED
@@ -694,7 +688,7 @@ public class ElevationModule implements GraphBuilderModule {
     /**
      * A custom exception wrapper for all known elevation lookup exceptions
      */
-    class ElevationLookupException extends Exception {
+    static class ElevationLookupException extends Exception {
         public ElevationLookupException(Exception e) {
             super(e);
         }

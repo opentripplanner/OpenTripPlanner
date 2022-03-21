@@ -248,7 +248,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		}
 	}
 
-	class PathPrinter{
+	static class PathPrinter{
 		GraphPath gp;
 		PathPrinter(GraphPath gp){
 			this.gp=gp;
@@ -1407,7 +1407,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		// show paths in a list panel
 		DefaultListModel<PathPrinter> data = new DefaultListModel<PathPrinter>();
 		for(GraphPath gp : paths ){
-			data.addElement( new PathPrinter(gp) );
+			data.addElement(new PathPrinter(gp));
 		}
 		pathsList.setModel(data);
 	}
