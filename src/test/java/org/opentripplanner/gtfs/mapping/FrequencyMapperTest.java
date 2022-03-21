@@ -4,14 +4,15 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class FrequencyMapperTest {
@@ -88,7 +89,7 @@ public class FrequencyMapperTest {
         org.opentripplanner.model.Frequency result1 = subject.map(FREQUENCY);
         org.opentripplanner.model.Frequency result2 = subject.map(FREQUENCY);
 
-        assertTrue(result1 == result2);
+      assertSame(result1, result2);
     }
 
 }

@@ -10,6 +10,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class FeedInfoMapperTest {
@@ -80,7 +81,7 @@ public class FeedInfoMapperTest {
         org.opentripplanner.model.FeedInfo result1 = subject.map(FEED_INFO);
         org.opentripplanner.model.FeedInfo result2 = subject.map(FEED_INFO);
 
-        assertTrue(result1 == result2);
+      assertSame(result1, result2);
     }
 
 }

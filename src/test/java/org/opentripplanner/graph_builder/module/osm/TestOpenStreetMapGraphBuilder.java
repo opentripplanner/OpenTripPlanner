@@ -26,7 +26,11 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
@@ -134,7 +138,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
             P2<Vertex> endpoints = new P2<>(se.getFromVertex(), se.getToVertex());
             // Check that we don't get any duplicate edges on this small graph.
             if (edgeEndpoints.contains(endpoints)) {
-                assertFalse(true);
+              fail();
             }
             edgeEndpoints.add(endpoints);
         }

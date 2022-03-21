@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
-
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -38,22 +37,22 @@ public class TestOverlayGraph extends TestCase {
                 assertTrue(og.getOutgoing(e.getFromVertex()).contains(e));
             }
         }
-        assertTrue(og.getIncoming(a).size() == 0);
-        assertTrue(og.getOutgoing(d).size() == 0);
+      assertEquals(0, og.getIncoming(a).size());
+      assertEquals(0, og.getOutgoing(d).size());
         
         // add an edge that is not in the overlay
         Edge ad = new FreeEdge(a, d);
-        assertTrue(d.getIncoming().size() == 4);
-        assertTrue(og.getIncoming(d).size() == 3);
-        assertTrue(a.getOutgoing().size() == 2);
-        assertTrue(og.getOutgoing(a).size() == 1);
+      assertEquals(4, d.getIncoming().size());
+      assertEquals(3, og.getIncoming(d).size());
+      assertEquals(2, a.getOutgoing().size());
+      assertEquals(1, og.getOutgoing(a).size());
         
         // remove edges from overlaygraph
         og.removeEdge(bc1);
         og.removeEdge(bc2);
 
         assertEquals(og.countEdges(), g.countEdges() - 3);
-        assertTrue(og.getOutgoing(b).size() == 1);
-        assertTrue(og.getIncoming(c).size() == 1);
+      assertEquals(1, og.getOutgoing(b).size());
+      assertEquals(1, og.getIncoming(c).size());
     }
 }

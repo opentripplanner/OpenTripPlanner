@@ -61,8 +61,7 @@ public class TestUnroutable extends TestCase {
         // is filtered out, thus the null check.
         if (path != null) {
             for (Edge edge : path.edges) {
-                assertFalse("Path should not use the as-yet unbuilt Tilikum Crossing bridge.",
-                        "Tilikum Crossing".equals(edge.getDefaultName()));
+              assertNotEquals("Path should not use the as-yet unbuilt Tilikum Crossing bridge.", "Tilikum Crossing", edge.getDefaultName());
             }
         }
     }

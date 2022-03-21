@@ -1,9 +1,10 @@
 package org.opentripplanner.common.pqueue;
 
+import junit.framework.TestCase;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
-import junit.framework.TestCase;
 
 /*
  * Test correctness and relative speed of various
@@ -42,7 +43,7 @@ public class TestPQueues extends TestCase {
         while (!q.empty())
             sum += q.extract_min();
         // keep compiler from optimizing out extract
-        assertTrue(sum == expectedSum);
+      assertEquals(sum, expectedSum);
     }
     
     public void fillQueue(BinHeap<Integer> q, List<Integer> input) {

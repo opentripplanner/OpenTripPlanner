@@ -1,9 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
 import com.google.common.collect.Lists;
-import java.util.List;
 import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
@@ -19,6 +16,10 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.TestUtils;
+
+import java.util.List;
+
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
@@ -66,9 +67,9 @@ public class TestGraphPath extends TestCase {
                 stopvs.add(state.getVertex());
             }
         }
-        assertTrue(stopvs.get(0) == stop_a);
-        assertTrue(stopvs.get(1) == stop_c);
-        assertTrue(stopvs.get(2) == stop_e);
+      assertSame(stopvs.get(0), stop_a);
+      assertSame(stopvs.get(1), stop_c);
+      assertSame(stopvs.get(2), stop_e);
 
         long bestStart = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 20, 0);
         assertNotSame(bestStart, path.getStartTime());

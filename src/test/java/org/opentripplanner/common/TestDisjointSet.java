@@ -1,12 +1,10 @@
 package org.opentripplanner.common;
 
+import junit.framework.TestCase;
+import org.junit.Test;
+
 import java.util.HashMap;
 import java.util.Random;
-
-import org.junit.Test;
-import org.opentripplanner.common.DisjointSet;
-
-import junit.framework.TestCase;
 
 public class TestDisjointSet  extends TestCase{
 
@@ -23,7 +21,7 @@ public class TestDisjointSet  extends TestCase{
         set.union("sparrows", "robins");
         assertEquals(set.size(set.find("robins")), 2);
 
-        assertTrue(set.sets().size() == 2);
+      assertEquals(2, set.sets().size());
         
         assertTrue(set.find("dogs") != set.find("robins"));
         assertEquals(set.find("sparrows"), set.find("robins"));
@@ -32,7 +30,7 @@ public class TestDisjointSet  extends TestCase{
         assertEquals(set.find("dogs"), set.find("robins"));
         assertEquals(set.size(set.find("cats")), 4);
 
-        assertTrue(set.sets().size() == 1);
+      assertEquals(1, set.sets().size());
     }
     
     public void testRandom() {

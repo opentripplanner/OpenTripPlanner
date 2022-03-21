@@ -4,14 +4,15 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.util.TranslationHelper;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.opentripplanner.util.TranslationHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class PathwayNodeMapperTest {
@@ -115,6 +116,6 @@ public class PathwayNodeMapperTest {
     org.opentripplanner.model.PathwayNode result1 = subject.map(STOP);
     org.opentripplanner.model.PathwayNode result2 = subject.map(STOP);
 
-    assertTrue(result1 == result2);
+    assertSame(result1, result2);
   }
 }
