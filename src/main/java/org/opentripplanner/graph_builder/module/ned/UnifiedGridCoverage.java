@@ -31,7 +31,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
 
     private static final long serialVersionUID = -7798801307087575896L;
 
-    private static Logger log = LoggerFactory.getLogger(UnifiedGridCoverage.class);
+    private static final Logger log = LoggerFactory.getLogger(UnifiedGridCoverage.class);
 
     /**
      * A spatial index of the intersection of all regions and datums. For smaller-scale deployments, this spatial index

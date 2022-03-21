@@ -41,7 +41,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     private VehicleRentalStationVertex B1, B2;
     private StreetEdge SE1, SE2, SE3;
 
-    private String NON_NETWORK = "non network";
+    private final String NON_NETWORK = "non network";
 
     @BeforeEach
     public void setUp() {

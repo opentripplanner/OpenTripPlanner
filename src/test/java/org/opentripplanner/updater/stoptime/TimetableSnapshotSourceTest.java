@@ -42,10 +42,10 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 public class TimetableSnapshotSourceTest {
 
     private static byte cancellation[];
-    private static Graph graph = new Graph();
-    private static boolean fullDataset = false;
+    private static final Graph graph = new Graph();
+    private static final boolean fullDataset = false;
     private static GtfsContext context;
-    private static ServiceDate serviceDate = new ServiceDate();
+    private static final ServiceDate serviceDate = new ServiceDate();
     private static String feedId;
 
     private TimetableSnapshotSource updater;

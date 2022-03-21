@@ -27,15 +27,15 @@ import org.apache.commons.math3.util.FastMath;
  * 
  */
 public class TextStroke implements Stroke {
-    private String text;
+    private final String text;
 
-    private Font font;
+    private final Font font;
 
     private boolean stretchToFit = false;
 
     private boolean repeat = false;
 
-    private AffineTransform t = new AffineTransform();
+    private final AffineTransform t = new AffineTransform();
 
     private static final float FLATNESS = 1;
 

@@ -9,7 +9,7 @@ import java.util.Map;
 
 /** Responsible for mapping GTFS ServiceCalendarDate into the OTP model. */
 class ServiceCalendarDateMapper {
-    private Map<org.onebusaway.gtfs.model.ServiceCalendarDate, ServiceCalendarDate> mappedServiceDates = new HashMap<>();
+    private final Map<org.onebusaway.gtfs.model.ServiceCalendarDate, ServiceCalendarDate> mappedServiceDates = new HashMap<>();
 
     Collection<ServiceCalendarDate> map(
             Collection<org.onebusaway.gtfs.model.ServiceCalendarDate> allServiceDates) {

@@ -20,9 +20,9 @@ public class ParetoSetTest {
     private static final ParetoComparator<Vector> LESS_DIFFERENT_THEN = (l, r) -> l.v1 < r.v1 || l.v2 != r.v2;
 
     // Used to stored dropped vectors (callback from set)
-    private List<Vector> dropped = new ArrayList<>();
+    private final List<Vector> dropped = new ArrayList<>();
 
-    private ParetoSetEventListener<Vector> listener = new ParetoSetEventListener<Vector>() {
+    private final ParetoSetEventListener<Vector> listener = new ParetoSetEventListener<Vector>() {
         @Override public void notifyElementAccepted(Vector newElement) { /* NOOP */ }
         @Override public void notifyElementDropped(Vector element, Vector droppedByElement) {
             dropped.add(element);

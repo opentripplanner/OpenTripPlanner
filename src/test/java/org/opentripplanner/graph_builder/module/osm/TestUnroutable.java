@@ -26,9 +26,9 @@ import java.util.HashMap;
  */
 public class TestUnroutable extends TestCase {
 
-    private Graph graph = new Graph();
+    private final Graph graph = new Graph();
 
-    private AStar aStar = new AStar();
+    private final AStar aStar = new AStar();
 
     public void setUp() throws Exception {
         OpenStreetMapModule osmBuilder = new OpenStreetMapModule();

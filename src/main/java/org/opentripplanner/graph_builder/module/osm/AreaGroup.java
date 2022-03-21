@@ -31,7 +31,7 @@ import org.locationtech.jts.geom.Polygon;
  */
 class AreaGroup {
 
-    private static Logger LOG = LoggerFactory.getLogger(AreaGroup.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AreaGroup.class);
 
     /*
      * The list of underlying areas, used when generating edges out of the visibility graph

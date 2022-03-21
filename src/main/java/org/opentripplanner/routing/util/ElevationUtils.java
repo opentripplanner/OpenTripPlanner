@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 
 public class ElevationUtils {
-    private static Logger log = LoggerFactory.getLogger(ElevationUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(ElevationUtils.class);
 
     /*
      * These numbers disagree with everything else I (David Turner) have read about the energy cost

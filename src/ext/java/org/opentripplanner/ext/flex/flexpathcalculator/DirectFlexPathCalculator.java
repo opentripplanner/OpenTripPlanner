@@ -15,7 +15,7 @@ public class DirectFlexPathCalculator implements FlexPathCalculator {
 
   private static final int DIRECT_EXTRA_TIME = 5 * 60;
 
-  private double flexSpeed;
+  private final double flexSpeed;
 
   public DirectFlexPathCalculator(Graph graph) {
     this.flexSpeed = FLEX_SPEED;

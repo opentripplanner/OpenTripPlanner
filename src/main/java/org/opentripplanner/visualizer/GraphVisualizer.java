@@ -109,7 +109,7 @@ class EdgeListModel extends AbstractListModel<Edge> {
 
     private static final long serialVersionUID = 1L;
 
-    private ArrayList<Edge> edges;
+    private final ArrayList<Edge> edges;
 
     EdgeListModel(Iterable<Edge> edges) {
         this.edges = new ArrayList<Edge>();
@@ -158,7 +158,7 @@ class VertexList extends AbstractListModel<DisplayVertex> {
 public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
 	private final class ComparePathStatesClickListener implements ListSelectionListener {
-		private JList<String> outputList;
+		private final JList<String> outputList;
 
 		ComparePathStatesClickListener(JList<String> outputList){
 			this.outputList = outputList;
@@ -339,7 +339,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JTextField searchDate;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 
     private JTextField boardingPenaltyField;
 

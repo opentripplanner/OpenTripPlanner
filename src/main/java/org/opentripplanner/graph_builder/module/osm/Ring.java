@@ -28,9 +28,9 @@ public class Ring {
 
     public List<OSMNode> nodes;
 
-    private Coordinate[] geometry;
+    private final Coordinate[] geometry;
 
-    private List<Ring> holes = new ArrayList<Ring>();
+    private final List<Ring> holes = new ArrayList<Ring>();
 
     // equivalent to the ring representation, but used for JTS operations
     public Polygon jtsPolygon;

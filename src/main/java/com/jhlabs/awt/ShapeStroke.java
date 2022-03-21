@@ -22,13 +22,13 @@ import java.awt.geom.Rectangle2D;
  *
  */
 public class ShapeStroke implements Stroke {
-    private Shape theShape;
+    private final Shape theShape;
 
-    private float advance;
+    private final float advance;
 
-    private float phase;
+    private final float phase;
 
-    private AffineTransform t = new AffineTransform();
+    private final AffineTransform t = new AffineTransform();
 
     private static final float FLATNESS = 1;
 

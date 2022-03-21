@@ -17,7 +17,7 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 /** Responsible for mapping GTFS Location into the OTP model. */
 public class LocationMapper {
-  private static Logger LOG = LoggerFactory.getLogger(LocationMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LocationMapper.class);
 
   private final Map<org.onebusaway.gtfs.model.Location, FlexStopLocation> mappedLocations = new HashMap<>();
 

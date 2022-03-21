@@ -22,7 +22,7 @@ public class UpdaterStatusResource {
     private static final Logger LOG = LoggerFactory.getLogger(UpdaterStatusResource.class);
 
     /** Choose short or long form of results. */
-    @QueryParam("detail") private boolean detail = false;
+    @QueryParam("detail") private final boolean detail = false;
 
     /**
      * @deprecated The support for multiple routers are removed from OTP2.

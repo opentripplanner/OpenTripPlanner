@@ -45,7 +45,7 @@ import org.opentripplanner.util.TestUtils;
 public class TestGeometryAndBlockProcessor extends TestCase {
 
     private Graph graph;
-    private AStar aStar = new AStar();
+    private final AStar aStar = new AStar();
     private GtfsContext context;
     private String feedId;
     private DataImportIssueStore issueStore;

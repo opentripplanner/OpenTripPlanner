@@ -40,12 +40,12 @@ import org.opentripplanner.util.TestUtils;
 public class TimetableTest {
     
     private static Graph graph;
-    private AStar aStar = new AStar();
+    private final AStar aStar = new AStar();
     private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TripPattern pattern;
     private static Timetable timetable;
-    private static TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
-    private static ServiceDate serviceDate = new ServiceDate(2009, 8, 7);
+    private static final TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
+    private static final ServiceDate serviceDate = new ServiceDate(2009, 8, 7);
     
     @BeforeClass
     public static void setUp() throws Exception {

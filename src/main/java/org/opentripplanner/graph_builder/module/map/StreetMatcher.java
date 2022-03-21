@@ -32,7 +32,7 @@ public class StreetMatcher {
 
     Graph graph;
 
-    private STRtree index;
+    private final STRtree index;
 
     STRtree createIndex() {
         STRtree edgeIndex = new STRtree();

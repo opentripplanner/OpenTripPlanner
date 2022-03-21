@@ -3,11 +3,11 @@ package org.opentripplanner.graph_builder.module.geometry;
 import org.opentripplanner.model.FeedScopedId;
 
 class ShapeSegmentKey {
-    private FeedScopedId shapeId;
+    private final FeedScopedId shapeId;
 
-    private double shapeDistanceFrom;
+    private final double shapeDistanceFrom;
 
-    private double shapeDistanceTo;
+    private final double shapeDistanceTo;
 
     public ShapeSegmentKey(FeedScopedId shapeId, double shapeDistanceFrom, double shapeDistanceTo) {
         this.shapeId = shapeId;

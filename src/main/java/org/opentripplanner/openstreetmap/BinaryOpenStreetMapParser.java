@@ -21,9 +21,9 @@ import java.util.Map;
  */
 public class BinaryOpenStreetMapParser extends BinaryParser {
 
-    private OSMDatabase osmdb;
+    private final OSMDatabase osmdb;
     private OsmParserPhase parsePhase;
-    private Map<String, String> stringTable = new HashMap<String, String>();
+    private final Map<String, String> stringTable = new HashMap<String, String>();
 
     public BinaryOpenStreetMapParser(OSMDatabase osmdb) {
         this.osmdb = osmdb;

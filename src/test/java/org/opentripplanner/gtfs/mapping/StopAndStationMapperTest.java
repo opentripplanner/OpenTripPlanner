@@ -64,7 +64,7 @@ public class StopAndStationMapperTest {
         STOP.setZoneId(ZONE_ID);
     }
 
-    private StopMapper subject = new StopMapper(new TranslationHelper());
+    private final StopMapper subject = new StopMapper(new TranslationHelper());
 
     @Test
     public void testMapCollection() {

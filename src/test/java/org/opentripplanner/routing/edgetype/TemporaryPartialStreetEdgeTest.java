@@ -228,7 +228,7 @@ public class TemporaryPartialStreetEdgeTest {
      */
     private static class DummyCostModel implements IntersectionTraversalCostModel {
 
-        private double turnCostSecs;
+        private final double turnCostSecs;
         
         public DummyCostModel(double turnCostSecs) {
             this.turnCostSecs = turnCostSecs;

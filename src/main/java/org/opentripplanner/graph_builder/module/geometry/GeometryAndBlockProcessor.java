@@ -63,18 +63,18 @@ public class GeometryAndBlockProcessor {
 
     private DataImportIssueStore issueStore;
 
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-    private OtpTransitService transitService;
-
-    // this is threadsafe implementation
-    private Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
+    private final OtpTransitService transitService;
 
     // this is threadsafe implementation
-    private Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
+    private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
 
     // this is threadsafe implementation
-    private Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
+    private final Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
+
+    // this is threadsafe implementation
+    private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
 
     private FareServiceFactory fareServiceFactory;
 

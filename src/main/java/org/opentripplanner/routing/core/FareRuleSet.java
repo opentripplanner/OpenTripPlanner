@@ -12,11 +12,11 @@ public class FareRuleSet implements Serializable {
 
     private static final long serialVersionUID = 7218355718876553028L;
 
-    private Set<FeedScopedId> routes;
-    private Set<P2<String>> originDestinations;
-    private Set<String> contains;
-    private FareAttribute fareAttribute;
-    private Set<FeedScopedId> trips;
+    private final Set<FeedScopedId> routes;
+    private final Set<P2<String>> originDestinations;
+    private final Set<String> contains;
+    private final FareAttribute fareAttribute;
+    private final Set<FeedScopedId> trips;
     
     public FareRuleSet(FareAttribute fareAttribute) {
         this.fareAttribute = fareAttribute;

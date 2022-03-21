@@ -29,9 +29,9 @@ public class TileRendererManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(TileRendererManager.class);
 
-    private Map<String, TileRenderer> renderers = new HashMap<String, TileRenderer>();
+    private final Map<String, TileRenderer> renderers = new HashMap<String, TileRenderer>();
 
-    private Graph graph;
+    private final Graph graph;
 
     public TileRendererManager(Graph graph) {
         this.graph = graph;

@@ -75,30 +75,30 @@ import java.util.Set;
  */
 public class WalkableAreaBuilder {
 
-    private static Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
-    private DataImportIssueStore issueStore;
+    private final DataImportIssueStore issueStore;
 
     private final int maxAreaNodes;
 
-    private Graph graph;
+    private final Graph graph;
 
-    private OSMDatabase osmdb;
+    private final OSMDatabase osmdb;
 
-    private WayPropertySet wayPropertySet;
+    private final WayPropertySet wayPropertySet;
 
-    private Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
+    private final Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
-    private StreetEdgeFactory edgeFactory;
+    private final StreetEdgeFactory edgeFactory;
 
     // This is an awful hack, but this class (WalkableAreaBuilder) ought to be rewritten.
-    private Handler handler;
+    private final Handler handler;
 
-    private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
+    private final HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
 
-    private boolean platformEntriesLinking;
+    private final boolean platformEntriesLinking;
 
-    private List<OsmVertex> platformLinkingEndpoints;
+    private final List<OsmVertex> platformLinkingEndpoints;
 
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
             StreetEdgeFactory edgeFactory, Handler handler, DataImportIssueStore issueStore,
@@ -341,7 +341,7 @@ public class WalkableAreaBuilder {
     }
 
     class ListedEdgesOnly implements SkipEdgeStrategy {
-        private Set<Edge> edges;
+        private final Set<Edge> edges;
 
         public ListedEdgesOnly(Set<Edge> edges) {
             this.edges = edges;

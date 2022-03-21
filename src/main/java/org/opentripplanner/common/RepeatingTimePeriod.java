@@ -35,7 +35,7 @@ public class RepeatingTimePeriod implements Serializable {
     /**
      * The timezone this is represented in.
      */
-    private TimeZone timeZone;
+    private final TimeZone timeZone;
    
     /**
      * Parse the time specification from an OSM turn restriction

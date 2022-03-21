@@ -59,7 +59,7 @@ public class EntranceMapperTest  {
     STOP.setZoneId(ZONE_ID);
   }
 
-  private EntranceMapper subject = new EntranceMapper(new TranslationHelper());
+  private final EntranceMapper subject = new EntranceMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() throws Exception {

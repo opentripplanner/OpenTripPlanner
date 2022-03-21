@@ -17,9 +17,9 @@ public class MatcherAndStreetNote implements Serializable {
         this.note = note;
     }
 
-    private NoteMatcher matcher;
+    private final NoteMatcher matcher;
 
-    private StreetNote note;
+    private final StreetNote note;
 
     public NoteMatcher getMatcher() {
         return matcher;

@@ -31,7 +31,7 @@ public class ShortestPathTree {
 
     public final DominanceFunction dominanceFunction;
 
-    private Map<Vertex, List<State>> stateSets;
+    private final Map<Vertex, List<State>> stateSets;
 
     public ShortestPathTree (RoutingRequest options, DominanceFunction dominanceFunction) {
         this.options = options;

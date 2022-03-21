@@ -10,14 +10,14 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 
 public class ParetoSetEventListenerTest {
-    private List<Vector> accepted = new ArrayList<>();
-    private List<Vector> rejected = new ArrayList<>();
-    private List<Vector> dropped = new ArrayList<>();
+    private final List<Vector> accepted = new ArrayList<>();
+    private final List<Vector> rejected = new ArrayList<>();
+    private final List<Vector> dropped = new ArrayList<>();
 
     // Given a set and function
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private ParetoSet<Vector> subject = new ParetoSet<>((l, r) -> l.v1 < r.v1 || l.v2 < r.v2, eventListener());
+    private final ParetoSet<Vector> subject = new ParetoSet<>((l, r) -> l.v1 < r.v1 || l.v2 < r.v2, eventListener());
 
     @Before
     public void setup() {

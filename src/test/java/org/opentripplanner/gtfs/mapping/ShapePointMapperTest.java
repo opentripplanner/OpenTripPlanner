@@ -37,7 +37,7 @@ public class ShapePointMapperTest {
         SHAPE_POINT.setShapeId(AGENCY_AND_ID);
     }
 
-    private ShapePointMapper subject = new ShapePointMapper();
+    private final ShapePointMapper subject = new ShapePointMapper();
 
     @Test
     public void testMapCollection() throws Exception {

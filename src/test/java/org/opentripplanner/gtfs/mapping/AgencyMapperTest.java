@@ -44,7 +44,7 @@ public class AgencyMapperTest {
         AGENCY.setBrandingUrl(BRANDING_URL);
     }
 
-    private AgencyMapper subject = new AgencyMapper(FEED_ID);
+    private final AgencyMapper subject = new AgencyMapper(FEED_ID);
 
     @Test
     public void testMapCollection() throws Exception {

@@ -140,7 +140,7 @@ public class TimetableSnapshot {
      * A set of all timetables which have been modified and are waiting to be indexed. When
      * <code>dirty</code> is <code>null</code>, it indicates that the snapshot is read-only.
      */
-    private Set<Timetable> dirtyTimetables = new HashSet<>();
+    private final Set<Timetable> dirtyTimetables = new HashSet<>();
 
     /**
      * Returns an updated timetable for the specified pattern if one is available in this snapshot,

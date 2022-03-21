@@ -29,24 +29,24 @@ import java.util.regex.Pattern;
  * number of exact, partial, and wildcard tag matches. See OSMSpecifier for more details on the matching process.
  */
 public class WayPropertySet {
-    private static Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
-    private List<WayPropertyPicker> wayProperties;
+    private final List<WayPropertyPicker> wayProperties;
 
     /** Assign names to ways that do not have them based on OSM tags. */
-    private List<CreativeNamerPicker> creativeNamers;
+    private final List<CreativeNamerPicker> creativeNamers;
 
-    private List<SlopeOverridePicker> slopeOverrides;
+    private final List<SlopeOverridePicker> slopeOverrides;
     
     /** Assign automobile speeds based on OSM tags. */
-    private List<SpeedPicker> speedPickers;
+    private final List<SpeedPicker> speedPickers;
     
     /** The automobile speed for street segments that do not match any SpeedPicker. */
     public Float defaultSpeed;
 
-    private List<NotePicker> notes;
+    private final List<NotePicker> notes;
     
-    private Pattern maxSpeedPattern;
+    private final Pattern maxSpeedPattern;
 
     /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
     public WayProperties defaultProperties;

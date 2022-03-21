@@ -48,7 +48,7 @@ public class SPTWalker {
         public void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1, double speed);
     }
 
-    private ShortestPathTree spt;
+    private final ShortestPathTree spt;
 
     public SPTWalker(ShortestPathTree spt) {
         this.spt = spt;

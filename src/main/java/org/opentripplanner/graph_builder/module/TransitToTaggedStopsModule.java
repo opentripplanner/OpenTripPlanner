@@ -37,8 +37,8 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
 
     StreetVertexIndex index;
-    private double searchRadiusM = 250;
-    private double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
+    private final double searchRadiusM = 250;
+    private final double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
 
     public List<String> provides() {
         return Arrays.asList("street to transit", "linking");

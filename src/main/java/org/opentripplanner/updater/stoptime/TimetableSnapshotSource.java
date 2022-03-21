@@ -105,9 +105,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    private TransitLayer realtimeTransitLayer;
+    private final TransitLayer realtimeTransitLayer;
 
-    private TransitLayerUpdater transitLayerUpdater;
+    private final TransitLayerUpdater transitLayerUpdater;
 
     public TimetableSnapshotSource(final Graph graph) {
         timeZone = graph.getTimeZone();

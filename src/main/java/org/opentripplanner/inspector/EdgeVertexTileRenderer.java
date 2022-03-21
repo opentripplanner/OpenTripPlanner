@@ -98,7 +98,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         return BufferedImage.TYPE_INT_ARGB;
     }
 
-    private EdgeVertexRenderer evRenderer;
+    private final EdgeVertexRenderer evRenderer;
 
     public EdgeVertexTileRenderer(EdgeVertexRenderer evRenderer) {
         this.evRenderer = evRenderer;

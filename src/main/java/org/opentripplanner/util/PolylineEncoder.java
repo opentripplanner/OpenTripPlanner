@@ -188,10 +188,10 @@ public class PolylineEncoder {
 
     private static class PointAdapterList extends AbstractList<Coordinate> {
 
-        private double[] lat;
-        private double[] lon;
-        private int offset;
-        private int length;
+        private final double[] lat;
+        private final double[] lon;
+        private final int offset;
+        private final int length;
 
         public PointAdapterList(double[] lat, double[] lon) {
             this(lat, lon, 0, lat.length);
@@ -217,7 +217,7 @@ public class PolylineEncoder {
 
     private static class CoordinateList extends AbstractList<Coordinate> {
 
-        private Coordinate[] coordinates;
+        private final Coordinate[] coordinates;
 
         public CoordinateList(Coordinate[] coordinates) {
             this.coordinates = coordinates;

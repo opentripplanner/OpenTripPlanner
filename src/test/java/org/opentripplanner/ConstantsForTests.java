@@ -91,7 +91,7 @@ public class ConstantsForTests {
 
     private Graph portlandGraph = null;
 
-    private Graph minNetexGraph = null;
+    private final Graph minNetexGraph = null;
 
     private ConstantsForTests() {
 

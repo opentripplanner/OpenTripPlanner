@@ -66,7 +66,7 @@ public class TransferMapperTest {
         TRANSFER.setTransferType(TRANSFER_TYPE);
     }
 
-    private TransferMapper subject = new TransferMapper(
+    private final TransferMapper subject = new TransferMapper(
             ROUTE_MAPPER,
             STATION_MAPPER,
             STOP_MAPPER,

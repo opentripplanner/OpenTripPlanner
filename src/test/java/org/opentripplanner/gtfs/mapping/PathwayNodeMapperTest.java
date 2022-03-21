@@ -59,7 +59,7 @@ public class PathwayNodeMapperTest {
     STOP.setZoneId(ZONE_ID);
   }
 
-  private PathwayNodeMapper subject = new PathwayNodeMapper(new TranslationHelper());
+  private final PathwayNodeMapper subject = new PathwayNodeMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() throws Exception {

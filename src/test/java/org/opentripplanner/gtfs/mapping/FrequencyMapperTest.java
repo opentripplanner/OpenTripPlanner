@@ -47,7 +47,7 @@ public class FrequencyMapperTest {
         FREQUENCY.setTrip(TRIP);
     }
 
-    private FrequencyMapper subject = new FrequencyMapper(
+    private final FrequencyMapper subject = new FrequencyMapper(
             new TripMapper(
                     new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))));
 

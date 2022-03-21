@@ -54,11 +54,11 @@ public class GtfsModule implements GraphBuilderModule {
 
     private DataImportIssueStore issueStore;
 
-    private EntityHandler counter = new EntityCounter();
+    private final EntityHandler counter = new EntityCounter();
 
     private FareServiceFactory fareServiceFactory;
 
-    private Set<String> agencyIdsSeen = Sets.newHashSet();
+    private final Set<String> agencyIdsSeen = Sets.newHashSet();
 
     private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
@@ -68,7 +68,7 @@ public class GtfsModule implements GraphBuilderModule {
      */
     private final ServiceDateInterval transitPeriodLimit;
 
-    private List<GtfsBundle> gtfsBundles;
+    private final List<GtfsBundle> gtfsBundles;
 
     public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
         this.gtfsBundles = bundles;
@@ -322,7 +322,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     private class StoreImpl implements GenericMutableDao {
 
-        private GtfsMutableRelationalDao dao;
+        private final GtfsMutableRelationalDao dao;
 
         StoreImpl(GtfsMutableRelationalDao dao) {
             this.dao = dao;
@@ -381,7 +381,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     private static class EntityCounter implements EntityHandler {
 
-        private Map<Class<?>, Integer> _count = new HashMap<Class<?>, Integer>();
+        private final Map<Class<?>, Integer> _count = new HashMap<Class<?>, Integer>();
 
         @Override
         public void handleEntity(Object bean) {

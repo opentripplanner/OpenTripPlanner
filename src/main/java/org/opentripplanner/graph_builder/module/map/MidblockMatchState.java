@@ -18,15 +18,15 @@ public class MidblockMatchState extends MatchState {
 
     private static final double MAX_ERROR = 1000;
 
-    private LinearLocation edgeIndex;
+    private final LinearLocation edgeIndex;
 
     public LinearLocation routeIndex;
 
     Geometry routeGeometry;
 
-    private Geometry edgeGeometry;
+    private final Geometry edgeGeometry;
 
-    private LocationIndexedLine indexedEdge;
+    private final LocationIndexedLine indexedEdge;
 
     public MidblockMatchState(MatchState parent, Geometry routeGeometry, Edge edge,
             LinearLocation routeIndex, LinearLocation edgeIndex, double error,

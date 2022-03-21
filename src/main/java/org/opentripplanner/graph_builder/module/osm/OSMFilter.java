@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OSMFilter {
 
-    private static Logger LOG = LoggerFactory.getLogger(OSMFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OSMFilter.class);
 
     /**
      * Determine whether any mode can or should ever traverse the given way. If not, we leave the

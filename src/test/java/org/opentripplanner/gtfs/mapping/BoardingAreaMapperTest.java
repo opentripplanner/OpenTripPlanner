@@ -58,7 +58,7 @@ public class BoardingAreaMapperTest  {
     STOP.setZoneId(ZONE_ID);
   }
 
-  private BoardingAreaMapper subject = new BoardingAreaMapper(new TranslationHelper());
+  private final BoardingAreaMapper subject = new BoardingAreaMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() {

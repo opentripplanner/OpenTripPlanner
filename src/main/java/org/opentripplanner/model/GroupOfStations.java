@@ -20,7 +20,7 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
 
     private WgsCoordinate coordinate;
 
-    private Set<StopCollection> childStations = new HashSet<>();
+    private final Set<StopCollection> childStations = new HashSet<>();
 
 
     public GroupOfStations(FeedScopedId id) {

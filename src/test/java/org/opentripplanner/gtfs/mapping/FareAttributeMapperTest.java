@@ -47,7 +47,7 @@ public class FareAttributeMapperTest {
         FARE_ATTRIBUTE.setTransfers(TRANSFERS);
     }
 
-    private FareAttributeMapper subject = new FareAttributeMapper();
+    private final FareAttributeMapper subject = new FareAttributeMapper();
 
     @Test
     public void testMapCollection() throws Exception {

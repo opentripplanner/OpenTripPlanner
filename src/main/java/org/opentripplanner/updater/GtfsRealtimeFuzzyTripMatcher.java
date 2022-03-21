@@ -22,7 +22,7 @@ import java.util.BitSet;
  */
 public class GtfsRealtimeFuzzyTripMatcher {
 
-    private RoutingService routingService;
+    private final RoutingService routingService;
     private BitSet servicesRunningForDate;
     private ServiceDate date;
 

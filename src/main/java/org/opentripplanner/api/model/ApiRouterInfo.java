@@ -27,7 +27,7 @@ public class ApiRouterInfo {
 
     public List<String> transitModes;
 
-    private WorldEnvelope envelope;
+    private final WorldEnvelope envelope;
 
     public double centerLatitude;
 

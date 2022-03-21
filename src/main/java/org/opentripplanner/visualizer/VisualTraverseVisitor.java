@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public class VisualTraverseVisitor implements TraverseVisitor {
     private static final Logger LOG = LoggerFactory.getLogger(VisualTraverseVisitor.class);
 
-    private ShowGraph gui;
+    private final ShowGraph gui;
 
     private final int SLEEP_AFTER = 50;
     private final int SLEEP_LEN = 2;

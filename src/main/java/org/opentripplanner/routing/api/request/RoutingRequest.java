@@ -333,7 +333,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * This is a scalar multiplied with the time in second on board the transit vehicle. Default
      * value is not-set(empty map).
      */
-    private Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
+    private final Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept

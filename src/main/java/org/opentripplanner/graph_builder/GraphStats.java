@@ -36,10 +36,10 @@ public class GraphStats {
     private static final Logger LOG = LoggerFactory.getLogger(GraphStats.class);
 
     @Parameter(names = { "-v", "--verbose" }, description = "Verbose output")
-    private boolean verbose = false;
+    private final boolean verbose = false;
    
     @Parameter(names = { "-d", "--debug"}, description = "Debug mode")
-    private boolean debug = false;
+    private final boolean debug = false;
 
     @Parameter(names = { "-h", "--help"}, description = "Print this help message and exit", help = true)
     private boolean help;
@@ -50,11 +50,11 @@ public class GraphStats {
     @Parameter(names = { "-o", "--out"}, description = "output file")
     private String outPath;
 
-    private CommandEndpoints commandEndpoints = new CommandEndpoints(); 
+    private final CommandEndpoints commandEndpoints = new CommandEndpoints();
     
-    private CommandPatternStats commandPatternStats = new CommandPatternStats();
+    private final CommandPatternStats commandPatternStats = new CommandPatternStats();
 
-    private JCommander jc;
+    private final JCommander jc;
     
     private Graph graph;
     
@@ -122,16 +122,16 @@ public class GraphStats {
     class CommandEndpoints {
 
         @Parameter(names = { "-r", "--radius"}, description = "perturbation radius in meters")
-        private double radius = 100;
+        private final double radius = 100;
 
         @Parameter(names = { "-n", "--number"}, description = "number of endpoints to generate")
-        private int n = 20;
+        private final int n = 20;
 
         @Parameter(names = { "-s", "--stops"}, description = "choose endpoints near stops not street vertices")
-        private boolean useStops = false;
+        private final boolean useStops = false;
 
         @Parameter(names = { "-rs", "--seed"}, description = "random seed, allows reproducible results")
-        private Long seed = null;
+        private final Long seed = null;
 
         // go along road then random
         public void run() {

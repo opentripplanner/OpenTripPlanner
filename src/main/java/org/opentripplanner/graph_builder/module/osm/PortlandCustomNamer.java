@@ -28,9 +28,9 @@ public class PortlandCustomNamer implements CustomNamer {
     public static String[] PATH_WORDS = { "Trail", "Trails", "Greenway", "Esplanade", "Spur",
             "Loop" };
 
-    private HashSet<StreetEdge> nameByOrigin = new HashSet<StreetEdge>();
+    private final HashSet<StreetEdge> nameByOrigin = new HashSet<StreetEdge>();
 
-    private HashSet<StreetEdge> nameByDestination = new HashSet<StreetEdge>();
+    private final HashSet<StreetEdge> nameByDestination = new HashSet<StreetEdge>();
 
     @Override
     public String name(OSMWithTags way, String defaultName) {

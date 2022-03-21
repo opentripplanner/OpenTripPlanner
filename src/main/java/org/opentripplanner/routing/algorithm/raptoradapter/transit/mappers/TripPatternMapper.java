@@ -9,7 +9,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWi
 
 public class TripPatternMapper {
 
-    private Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = new HashMap<>();
+    private final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = new HashMap<>();
 
     /**
      * Convert all old TripPatterns into new ones, keeping a Map between the two. Do this conversion

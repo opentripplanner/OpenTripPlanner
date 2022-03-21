@@ -10,7 +10,7 @@ class IndexedLineSegment {
     int index;
     Coordinate start;
     Coordinate end;
-    private double lineLength;
+    private final double lineLength;
 
     public IndexedLineSegment(int index, Coordinate start, Coordinate end) {
         this.index = index;

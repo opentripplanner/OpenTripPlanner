@@ -15,10 +15,10 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 public class Subgraph {
 
-    private Set<Vertex> streetVertexSet;
-    private Set<Vertex> stopsVertexSet;
-    private ArrayList<Coordinate> vertexCoords;
-    private Geometry convexHullAsGeom = null;
+    private final Set<Vertex> streetVertexSet;
+    private final Set<Vertex> stopsVertexSet;
+    private final ArrayList<Coordinate> vertexCoords;
+    private final Geometry convexHullAsGeom = null;
     private boolean newVertexAdded = true;
 
     public Subgraph(){
@@ -66,7 +66,7 @@ public class Subgraph {
         return stopsVertexSet.iterator();
     }
 
-    private static GeometryFactory gf = new GeometryFactory();
+    private static final GeometryFactory gf = new GeometryFactory();
     public Geometry getConvexHull() {
         if (newVertexAdded) {
             MultiPoint mp = gf.createMultiPoint(vertexCoords.toArray(new Coordinate[0]));

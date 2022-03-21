@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 public class GeometryUtils {
     private static final Logger LOG = LoggerFactory.getLogger(GeometryUtils.class);
 
-    private static CoordinateSequenceFactory csf = new Serializable2DPackedCoordinateSequenceFactory();
-    private static GeometryFactory gf = new GeometryFactory(csf);
+    private static final CoordinateSequenceFactory csf = new Serializable2DPackedCoordinateSequenceFactory();
+    private static final GeometryFactory gf = new GeometryFactory(csf);
 
     /** A shared copy of the WGS84 CRS with longitude-first axis order. */
     public static final CoordinateReferenceSystem WGS84_XY;

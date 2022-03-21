@@ -41,7 +41,7 @@ public class PathwayMapperTest {
         PATHWAY.setTraversalTime(TRAVERSAL_TIME);
     }
 
-    private PathwayMapper subject = new PathwayMapper(
+    private final PathwayMapper subject = new PathwayMapper(
         new StopMapper(TRANSLATION_HELPER),
         new EntranceMapper(TRANSLATION_HELPER),
         new PathwayNodeMapper(TRANSLATION_HELPER),

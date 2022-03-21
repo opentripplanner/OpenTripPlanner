@@ -29,7 +29,7 @@ public class LocalizedString implements I18NString, Serializable {
     /**
      * Map which key has which tagNames. Used only when building graph.
      */
-    private transient static ListMultimap<String, String> key_tag_names;
+    private final transient static ListMultimap<String, String> key_tag_names;
     
     static {
         key_tag_names = ArrayListMultimap.create();

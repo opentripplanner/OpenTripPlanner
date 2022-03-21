@@ -31,7 +31,7 @@ public class AStar {
 
     private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
-    private boolean verbose = false;
+    private final boolean verbose = false;
 
     private TraverseVisitor traverseVisitor;
 

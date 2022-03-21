@@ -23,7 +23,7 @@ import org.opentripplanner.util.TestUtils;
 @Ignore
 public class TestAStar extends TestCase {
     
-    private AStar aStar = new AStar();
+    private final AStar aStar = new AStar();
 
     public void testBasic() throws Exception {
 

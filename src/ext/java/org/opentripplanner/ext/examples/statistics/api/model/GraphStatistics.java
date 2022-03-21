@@ -6,7 +6,7 @@ import org.opentripplanner.routing.RoutingService;
  * Simple POJO to define the returned 'key numbers'.
  */
 public class GraphStatistics {
-    private int stops;
+    private final int stops;
 
 
     GraphStatistics(RoutingService index) {

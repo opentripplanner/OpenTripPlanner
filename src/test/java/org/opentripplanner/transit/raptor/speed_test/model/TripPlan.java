@@ -26,7 +26,7 @@ public class TripPlan {
     public RaptorResponse<?> response = null;
 
     /** A list of possible itineraries */
-    private List<Itinerary> itineraries = new ArrayList<Itinerary>();
+    private final List<Itinerary> itineraries = new ArrayList<Itinerary>();
 
     public TripPlan(
             Date date,

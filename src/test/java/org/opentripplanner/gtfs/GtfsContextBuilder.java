@@ -31,7 +31,7 @@ public class GtfsContextBuilder {
 
     private Deduplicator deduplicator;
 
-    private boolean repairStopTimesAndGenerateTripPatterns = true;
+    private final boolean repairStopTimesAndGenerateTripPatterns = true;
 
     public static GtfsContextBuilder contextBuilder(String path) throws IOException {
         return contextBuilder(null, path);

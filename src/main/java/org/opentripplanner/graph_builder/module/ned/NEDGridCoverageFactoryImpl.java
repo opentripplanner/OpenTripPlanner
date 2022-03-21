@@ -33,7 +33,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     private List<VerticalDatum> datums;
 
-    private List<GridCoverage2D> regionCoverages = new ArrayList<>();
+    private final List<GridCoverage2D> regionCoverages = new ArrayList<>();
 
     public NEDGridCoverageFactoryImpl(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;

@@ -52,7 +52,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(PruneNoThruIslands.class);
 
-    private static int islandCounter = 0;
+    private static final int islandCounter = 0;
 
     /**
      * this field indicate the maximum size for island without stops

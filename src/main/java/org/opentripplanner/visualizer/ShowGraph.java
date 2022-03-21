@@ -92,24 +92,24 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     VertexSelectionListener selector;
 
-    private ArrayList<VertexSelectionListener> selectors;
+    private final ArrayList<VertexSelectionListener> selectors;
 
     private List<Vertex> visibleVertices;
 
-    private List<Edge> visibleStreetEdges = new ArrayList<Edge>(1000);
+    private final List<Edge> visibleStreetEdges = new ArrayList<Edge>(1000);
 
-    private List<Edge> visibleLinkEdges = new ArrayList<Edge>(1000);
+    private final List<Edge> visibleLinkEdges = new ArrayList<Edge>(1000);
 
-    private List<Edge> visibleTransitEdges = new ArrayList<Edge>(1000);
+    private final List<Edge> visibleTransitEdges = new ArrayList<Edge>(1000);
 
     private List<Vertex> highlightedVertices = new ArrayList<Vertex>(1000);
 
     private List<Edge> highlightedEdges = new ArrayList<Edge>(1000);
 
     // these queues are filled by a search in another thread, so must be threadsafe
-    private Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<Vertex>();
+    private final Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<Vertex>();
 
-    private Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<Edge>();
+    private final Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<Edge>();
 
     private Coordinate highlightedCoordinate;
 
@@ -166,8 +166,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private int drawOffset = 0;
     private boolean drawHighlighted = true;
     public SimpleSPT simpleSPT = new SimpleSPT();
-	private LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<State>();
-	private boolean drawEdges = true;
+	private final LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<State>();
+	private final boolean drawEdges = true;
 	private LinkedBlockingQueue<SPTNode> sptEdgeQueue;
 	private boolean sptVisible = true;
 	private float sptFlattening = 0.3f;
@@ -186,7 +186,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	}
 	
 	class SimpleSPT{
-		private HashMap<State, SPTNode> nodes;
+		private final HashMap<State, SPTNode> nodes;
 		SPTNode root;
 
 		SimpleSPT(){

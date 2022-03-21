@@ -27,9 +27,9 @@ public class OverlayGraph implements Serializable {
 
     private static final int INITIAL_EDGELIST_CAPACITY = 5;
 
-    private IdentityHashMap<Vertex, List<Edge>> outgoing;
+    private final IdentityHashMap<Vertex, List<Edge>> outgoing;
 
-    private IdentityHashMap<Vertex, List<Edge>> incoming;
+    private final IdentityHashMap<Vertex, List<Edge>> incoming;
 
     /**
      * Create an empty OverlayGraph.

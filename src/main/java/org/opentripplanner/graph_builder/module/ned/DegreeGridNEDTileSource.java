@@ -30,7 +30,7 @@ import java.util.List;
  *
  */
 public class DegreeGridNEDTileSource implements NEDTileSource {
-    private static Logger log = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
+    private static final Logger log = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
 
     private Graph graph;
 

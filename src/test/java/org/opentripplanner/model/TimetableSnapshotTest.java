@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 public class TimetableSnapshotTest {
     private static Map<FeedScopedId, TripPattern> patternIndex;
-    private static TimeZone timeZone = TimeZone.getTimeZone("GMT");
+    private static final TimeZone timeZone = TimeZone.getTimeZone("GMT");
 
     @BeforeClass
     public static void setUp() throws Exception {

@@ -57,7 +57,7 @@ public class TripMapperTest {
         TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE);
     }
 
-    private TripMapper subject = new TripMapper(
+    private final TripMapper subject = new TripMapper(
             new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)));
 
     @Test
