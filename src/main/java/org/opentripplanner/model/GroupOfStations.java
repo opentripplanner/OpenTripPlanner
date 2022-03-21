@@ -90,6 +90,6 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
          * Stop places in proximity to each other which have a natural geospatial- or
          * public transport related relationship.
          */
-        CLUSTER;
+        CLUSTER
     }
 }

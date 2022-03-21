@@ -5,10 +5,10 @@ import com.wdtinc.mapbox_vector_tile.VectorTile;
 import org.geotools.geometry.Envelope2D;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.WebMercatorTile;
-import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.VectorTileConfig;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -100,7 +100,7 @@ public class VectorTilesResource {
     }
     byte[] bytes = mvtBuilder.build().toByteArray();
     return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(bytes).build();
-  };
+  }
 
   @GET
   @Path("/{layers}/tilejson.json")

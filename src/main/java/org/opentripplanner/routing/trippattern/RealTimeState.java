@@ -30,5 +30,5 @@ public enum RealTimeState {
      * The trip information has been updated and resulted in a different trip pattern compared to
      * the trip pattern of the scheduled trip.
      */
-    MODIFIED;
+    MODIFIED
 }

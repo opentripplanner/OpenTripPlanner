@@ -38,5 +38,5 @@ public enum AlertSeverity {
     /**
      * Situation has a very severe impact on trips.
      */
-    VERY_SEVERE;
+    VERY_SEVERE
 }

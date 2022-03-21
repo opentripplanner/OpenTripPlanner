@@ -14,7 +14,7 @@ import java.util.List;
 class TurnRestrictionTag {
 
     enum Direction {
-        LEFT, RIGHT, U, STRAIGHT;
+        LEFT, RIGHT, U, STRAIGHT
     }
 
     long via;
