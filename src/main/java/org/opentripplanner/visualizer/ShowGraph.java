@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -686,21 +685,18 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
 	private void colorOverlappingBranches(LinkedBlockingQueue<SPTNode> queue) {
     	HashMap<Vertex,Integer> stateHeight = new HashMap<Vertex,Integer>();
-    	
-		Iterator<SPTNode> nodes = queue.iterator();
-		while(nodes.hasNext()){
-			SPTNode node = nodes.next();
-			
-			Integer height = stateHeight.get(node.state.getVertex());
-			if(height==null){
-				height = 0;
-			} else{
-				height += 1;
-			}
-			stateHeight.put(node.state.getVertex(),height);
-			
-			node.setHeight(height);
-		}
+
+    for (SPTNode node : queue) {
+      Integer height = stateHeight.get(node.state.getVertex());
+      if (height == null) {
+        height = 0;
+      } else {
+        height += 1;
+      }
+      stateHeight.put(node.state.getVertex(), height);
+
+      node.setHeight(height);
+    }
 	}
 
 	private void drawNewEdges() {
