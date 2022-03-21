@@ -46,6 +46,8 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.util.NonLocalizedString;
 
+import javax.annotation.Nullable;
+
 public class ConstantsForTests {
 
     public static final String CALTRAIN_GTFS = "src/test/resources/gtfs/caltrain_gtfs.zip";
@@ -139,7 +141,7 @@ public class ConstantsForTests {
             }
             // Add transit data from GTFS
             {
-                addGtfsToGraph(graph, PORTLAND_GTFS, new DefaultFareServiceFactory(), Optional.of("prt"));
+                addGtfsToGraph(graph, PORTLAND_GTFS, new DefaultFareServiceFactory(), "prt");
             }
             // Link transit stops to streets
             {
@@ -159,18 +161,17 @@ public class ConstantsForTests {
         }
     }
 
-    private static void addGtfsToGraph(Graph graph, String file, FareServiceFactory fareServiceFactory, Optional<String> feedId) {
+    private static void addGtfsToGraph(
+            Graph graph,
+            String file,
+            FareServiceFactory fareServiceFactory,
+            @Nullable String feedId
+    ) {
         try {
-            var context = feedId.map(id -> {
-                        try {
-                            return contextBuilder(id, file);
-                        }
-                        catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).orElse(contextBuilder(file))
+            var context = contextBuilder(feedId, file)
                     .withIssueStoreAndDeduplicator(graph)
                     .build();
+
             AddTransitModelEntitiesToGraph.addToGraph(context, graph);
             GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
             factory.setFareServiceFactory(fareServiceFactory);
@@ -213,7 +214,7 @@ public class ConstantsForTests {
     public static Graph buildOsmAndGtfsGraph(String osmPath, String gtfsPath) {
         var graph = buildOsmGraph(osmPath);
 
-        addGtfsToGraph(graph, gtfsPath, new DefaultFareServiceFactory(), Optional.empty());
+        addGtfsToGraph(graph, gtfsPath, new DefaultFareServiceFactory(), null);
 
         // Link transit stops to streets
         GraphBuilderModule streetTransitLinker = new StreetLinkerModule();
@@ -227,7 +228,7 @@ public class ConstantsForTests {
 
     public static Graph buildGtfsGraph(String gtfsPath, FareServiceFactory fareServiceFactory) {
         var graph = new Graph();
-        addGtfsToGraph(graph, gtfsPath, fareServiceFactory, Optional.empty());
+        addGtfsToGraph(graph, gtfsPath, fareServiceFactory, null);
         return graph;
     }
 
