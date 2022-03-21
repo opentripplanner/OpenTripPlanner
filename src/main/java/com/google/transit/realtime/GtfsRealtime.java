@@ -1538,7 +1538,7 @@ public final class GtfsRealtime {
 
       private final int value;
 
-      private Incrementality(int value) {
+      Incrementality(int value) {
         this.value = value;
       }
 
@@ -5989,7 +5989,7 @@ public final class GtfsRealtime {
 
         private final int value;
 
-        private ScheduleRelationship(int value) {
+        ScheduleRelationship(int value) {
           this.value = value;
         }
 
@@ -12749,7 +12749,7 @@ public final class GtfsRealtime {
 
       private final int value;
 
-      private VehicleStopStatus(int value) {
+      VehicleStopStatus(int value) {
         this.value = value;
       }
 
@@ -12878,7 +12878,7 @@ public final class GtfsRealtime {
 
       private final int value;
 
-      private CongestionLevel(int value) {
+      CongestionLevel(int value) {
         this.value = value;
       }
 
@@ -13134,7 +13134,7 @@ public final class GtfsRealtime {
 
       private final int value;
 
-      private OccupancyStatus(int value) {
+      OccupancyStatus(int value) {
         this.value = value;
       }
 
@@ -17781,7 +17781,7 @@ public final class GtfsRealtime {
 
       private final int value;
 
-      private Cause(int value) {
+      Cause(int value) {
         this.value = value;
       }
 
@@ -17968,7 +17968,7 @@ public final class GtfsRealtime {
 
       private final int value;
 
-      private Effect(int value) {
+      Effect(int value) {
         this.value = value;
       }
 
@@ -18080,7 +18080,7 @@ public final class GtfsRealtime {
 
       private final int value;
 
-      private SeverityLevel(int value) {
+      SeverityLevel(int value) {
         this.value = value;
       }
 
@@ -23215,7 +23215,7 @@ public final class GtfsRealtime {
 
       private final int value;
 
-      private ScheduleRelationship(int value) {
+      ScheduleRelationship(int value) {
         this.value = value;
       }
 

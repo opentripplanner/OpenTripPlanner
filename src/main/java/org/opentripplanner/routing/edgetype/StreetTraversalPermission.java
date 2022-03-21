@@ -27,7 +27,7 @@ public enum StreetTraversalPermission {
 
     public final int code;
 
-    private StreetTraversalPermission(int code) {
+    StreetTraversalPermission(int code) {
         this.code = code;
     }
 
