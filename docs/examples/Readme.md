@@ -4,10 +4,9 @@ When setting up OTP it is often useful to have some examples to look at. If you 
 
 
 ## Examples
-Name | Organisation   | Description 
----- | -------------- | ------------
-entur | Entur, Norway | Deployment Configuration with NeTEX input data 
-
+| Name  | Organisation  | Description                                    |
+|-------|---------------|------------------------------------------------|
+| entur | Entur, Norway | Deployment Configuration with NeTEX input data |
 
 ## Support 
 The examples are provided "as is" - they may get outdated over time or miss information, and it is left to the provider, not the PLC, to include whatever the provider find useful. 

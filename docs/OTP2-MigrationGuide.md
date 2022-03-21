@@ -81,7 +81,7 @@ of this type:
  
 ## Router Config
 
-See the [Router Configuration](Configuration.md#router-configuration) for a description of the 
+See the [Router Configuration](RouterConfiguration) for a description of the 
 new and existing routing parameters.
 
 #### New parameters
