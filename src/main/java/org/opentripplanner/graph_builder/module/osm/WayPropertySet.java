@@ -10,8 +10,13 @@ import org.opentripplanner.util.I18NString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,7 +64,7 @@ public class WayPropertySet {
         notes = new ArrayList<NotePicker>();
         // regex courtesy http://wiki.openstreetmap.org/wiki/Key:maxspeed
         // and edited
-        maxSpeedPattern = Pattern.compile("^([0-9][\\.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$");
+        maxSpeedPattern = Pattern.compile("^([0-9][.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$");
     }
 
     /**

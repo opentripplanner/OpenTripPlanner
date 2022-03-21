@@ -2,6 +2,8 @@ package org.opentripplanner.util;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +12,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
  * This is used to localize strings for which localization are known beforehand.
@@ -24,7 +25,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * @author mabu
  */
 public class LocalizedString implements I18NString, Serializable {
-    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
+    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)}");
     
     /**
      * Map which key has which tagNames. Used only when building graph.

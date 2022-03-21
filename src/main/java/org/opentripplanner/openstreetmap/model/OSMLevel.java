@@ -1,18 +1,19 @@
 package org.opentripplanner.openstreetmap.model;
 
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.FloorNumberUnknownAssumedGroundLevel;
+import org.opentripplanner.graph_builder.issues.FloorNumberUnknownGuessedFromAltitude;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.FloorNumberUnknownAssumedGroundLevel;
-import org.opentripplanner.graph_builder.issues.FloorNumberUnknownGuessedFromAltitude;
 
 public class OSMLevel implements Comparable<OSMLevel> {
 
-    public static final Pattern RANGE_PATTERN = Pattern.compile("^[0-9]+\\-[0-9]+$");
+    public static final Pattern RANGE_PATTERN = Pattern.compile("^[0-9]+-[0-9]+$");
     public static final double METERS_PER_FLOOR = 3;
     public static final OSMLevel DEFAULT = 
         new OSMLevel(0, 0.0, "default level", "default level", Source.NONE, true);
