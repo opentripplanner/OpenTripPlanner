@@ -173,7 +173,7 @@ public final class GtfsRealtime {
               break;
             }
             case 18: {
-              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+              if ((mutable_bitField0_ & 0x00000002) == 0) {
                 entity_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.FeedEntity>();
                 mutable_bitField0_ |= 0x00000002;
               }
@@ -922,7 +922,7 @@ public final class GtfsRealtime {
       private java.util.List<com.google.transit.realtime.GtfsRealtime.FeedEntity> entity_ =
         java.util.Collections.emptyList();
       private void ensureEntityIsMutable() {
-        if (!((bitField0_ & 0x00000002) != 0)) {
+        if ((bitField0_ & 0x00000002) == 0) {
           entity_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.FeedEntity>(entity_);
           bitField0_ |= 0x00000002;
          }
@@ -4547,7 +4547,7 @@ public final class GtfsRealtime {
               break;
             }
             case 18: {
-              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
+              if ((mutable_bitField0_ & 0x00000004) == 0) {
                 stopTimeUpdate_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate>();
                 mutable_bitField0_ |= 0x00000004;
               }
@@ -11202,7 +11202,7 @@ public final class GtfsRealtime {
       private java.util.List<com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate> stopTimeUpdate_ =
         java.util.Collections.emptyList();
       private void ensureStopTimeUpdateIsMutable() {
-        if (!((bitField0_ & 0x00000004) != 0)) {
+        if ((bitField0_ & 0x00000004) == 0) {
           stopTimeUpdate_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate>(stopTimeUpdate_);
           bitField0_ |= 0x00000004;
          }
@@ -12596,7 +12596,7 @@ public final class GtfsRealtime {
               break;
             }
             case 90: {
-              if (!((mutable_bitField0_ & 0x00000400) != 0)) {
+              if ((mutable_bitField0_ & 0x00000400) == 0) {
                 multiCarriageDetails_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.VehiclePosition.CarriageDetails>();
                 mutable_bitField0_ |= 0x00000400;
               }
@@ -16621,7 +16621,7 @@ public final class GtfsRealtime {
       private java.util.List<com.google.transit.realtime.GtfsRealtime.VehiclePosition.CarriageDetails> multiCarriageDetails_ =
         java.util.Collections.emptyList();
       private void ensureMultiCarriageDetailsIsMutable() {
-        if (!((bitField0_ & 0x00000400) != 0)) {
+        if ((bitField0_ & 0x00000400) == 0) {
           multiCarriageDetails_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.VehiclePosition.CarriageDetails>(multiCarriageDetails_);
           bitField0_ |= 0x00000400;
          }
@@ -17434,7 +17434,7 @@ public final class GtfsRealtime {
               done = true;
               break;
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+              if ((mutable_bitField0_ & 0x00000001) == 0) {
                 activePeriod_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.TimeRange>();
                 mutable_bitField0_ |= 0x00000001;
               }
@@ -17443,7 +17443,7 @@ public final class GtfsRealtime {
               break;
             }
             case 42: {
-              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+              if ((mutable_bitField0_ & 0x00000002) == 0) {
                 informedEntity_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.EntitySelector>();
                 mutable_bitField0_ |= 0x00000002;
               }
@@ -19207,7 +19207,7 @@ public final class GtfsRealtime {
       private java.util.List<com.google.transit.realtime.GtfsRealtime.TimeRange> activePeriod_ =
         java.util.Collections.emptyList();
       private void ensureActivePeriodIsMutable() {
-        if (!((bitField0_ & 0x00000001) != 0)) {
+        if ((bitField0_ & 0x00000001) == 0) {
           activePeriod_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.TimeRange>(activePeriod_);
           bitField0_ |= 0x00000001;
          }
@@ -19555,7 +19555,7 @@ public final class GtfsRealtime {
       private java.util.List<com.google.transit.realtime.GtfsRealtime.EntitySelector> informedEntity_ =
         java.util.Collections.emptyList();
       private void ensureInformedEntityIsMutable() {
-        if (!((bitField0_ & 0x00000002) != 0)) {
+        if ((bitField0_ & 0x00000002) == 0) {
           informedEntity_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.EntitySelector>(informedEntity_);
           bitField0_ |= 0x00000002;
          }
@@ -27542,7 +27542,7 @@ public final class GtfsRealtime {
               done = true;
               break;
             case 10: {
-              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+              if ((mutable_bitField0_ & 0x00000001) == 0) {
                 translation_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation>();
                 mutable_bitField0_ |= 0x00000001;
               }
@@ -28975,7 +28975,7 @@ public final class GtfsRealtime {
       private java.util.List<com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation> translation_ =
         java.util.Collections.emptyList();
       private void ensureTranslationIsMutable() {
-        if (!((bitField0_ & 0x00000001) != 0)) {
+        if ((bitField0_ & 0x00000001) == 0) {
           translation_ = new java.util.ArrayList<com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation>(translation_);
           bitField0_ |= 0x00000001;
          }
