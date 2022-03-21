@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -80,11 +81,9 @@ public final class DefaultCostCalculator implements CostCalculator {
             RaptorTripSchedule trip,
             RaptorTransferConstraint transferConstraints
     ) {
+        var t = (TripSchedule) trip;
+        var tripAccessibility = t.getOriginalTripTimes().getTrip().getWheelchairBoarding();
 
-        // TODO: this doesn't work becuase boardStopIndex is the raptor index but we want
-        // the position in the pattern
-        var stopPos = trip.pattern().stopIndex(boardStopIndex);
-        var tripAccessibility = trip.pattern().wheelchairBoarding(stopPos);
         if(transferConstraints.isRegularTransfer()) {
             return boardingCostRegularTransfer(
                     firstBoarding,

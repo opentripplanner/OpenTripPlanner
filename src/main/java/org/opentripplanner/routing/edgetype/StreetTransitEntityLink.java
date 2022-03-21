@@ -81,9 +81,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
 
         RoutingRequest req = s0.getOptions();
 
-
-
-
         // Do not check here whether any transit modes are selected. A check for the presence of
         // transit modes will instead be done in the following PreBoard edge.
         // This allows searching for nearby transit stops using walk-only options.
