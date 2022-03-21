@@ -607,7 +607,7 @@ public class ElevationModule implements GraphBuilderModule {
             coordList.add(new Coordinate(edgeLenM, getElevation(coverage, coords[coords.length - 1])));
 
             // construct the PCS
-            Coordinate coordArr[] = new Coordinate[coordList.size()];
+            Coordinate[] coordArr = new Coordinate[coordList.size()];
             PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
                     coordList.toArray(coordArr));
 
@@ -709,7 +709,7 @@ public class ElevationModule implements GraphBuilderModule {
      * @return elevation in meters
      */
     private double getElevation(Coverage coverage, double x, double y) throws PointOutsideCoverageException, TransformException {
-        double values[] = new double[1];
+        double[] values = new double[1];
         try {
             // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's native CRS.
             // That assumption is fine when the coverage happens to be in longitude-first WGS84 but we want to support
