@@ -1420,7 +1420,7 @@ type VehiclePosition {
 }
 
 type VehicleStop {
-    """How close the vehicle is to `nextStop`"""
+    """How close the vehicle is to `stop`"""
     status: VehicleStopStatus!
     stop: Stop!
 }
