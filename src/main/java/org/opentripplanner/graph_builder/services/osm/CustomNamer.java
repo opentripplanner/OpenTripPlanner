@@ -20,7 +20,7 @@ public interface CustomNamer {
 
     void postprocess(Graph graph);
 
-    void configure(JsonNode config);
+    void configure();
 
     class CustomNamerFactory {
 
@@ -53,7 +53,7 @@ public interface CustomNamer {
                         type));
             }
             // Configure the namer
-            retval.configure(config);
+            retval.configure();
             return retval;
         }
     }

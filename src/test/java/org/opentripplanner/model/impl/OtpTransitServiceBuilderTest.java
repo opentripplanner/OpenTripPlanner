@@ -3,7 +3,14 @@ package org.opentripplanner.model.impl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FareRule;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Frequency;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -83,7 +90,7 @@ public class OtpTransitServiceBuilderTest {
 
         // Supplement test data with at least one entity in all collections
         builder.getCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
-        builder.getFareAttributes().add(createFareAttribute(agency));
+        builder.getFareAttributes().add(createFareAttribute());
         builder.getFareRules().add(new FareRule());
         builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
 
@@ -94,7 +101,7 @@ public class OtpTransitServiceBuilderTest {
         return first(builder.getAgenciesById().values());
     }
 
-    private static FareAttribute createFareAttribute(Agency agency) {
+    private static FareAttribute createFareAttribute() {
         return new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
     }
 

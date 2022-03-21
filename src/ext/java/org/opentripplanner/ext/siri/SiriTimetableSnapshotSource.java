@@ -1,20 +1,6 @@
 package org.opentripplanner.ext.siri;
 
-import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
-import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.SCHEDULED;
-
 import com.google.common.base.Preconditions;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.concurrent.locks.ReentrantLock;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
@@ -26,10 +12,10 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
@@ -53,8 +39,22 @@ import uk.org.siri.siri20.VehicleActivityStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantLock;
+
 import static org.opentripplanner.ext.siri.SiriTransportModeMapper.mapTransitMainMode;
+import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
+import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
 import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
@@ -207,7 +207,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                     int handledCounter = 0;
                     int skippedCounter = 0;
                     for (VehicleActivityStructure activity : activities) {
-                        boolean handled = handleModifiedTrip(graph, feedId, activity, serviceDate);
+                        boolean handled = handleModifiedTrip(graph, activity, serviceDate);
                         if (handled) {
                             handledCounter++;
                         } else {
@@ -334,7 +334,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
     }
 
-    private boolean handleModifiedTrip(Graph graph, String feedId, VehicleActivityStructure activity, ServiceDate serviceDate) {
+    private boolean handleModifiedTrip(Graph graph, VehicleActivityStructure activity, ServiceDate serviceDate) {
         if (activity.getValidUntilTime().isBefore(ZonedDateTime.now())) {
             //Activity has expired
             return false;
@@ -396,7 +396,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Apply update on the *scheduled* time table and set the updated trip times in the buffer
         Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
-        final TripTimes updatedTripTimes = createUpdatedTripTimes(currentTimetable, graph, activity, timeZone, trip.getId());
+        final TripTimes updatedTripTimes = createUpdatedTripTimes(currentTimetable, graph, activity, trip.getId());
         if (updatedTripTimes == null) {
             return false;
         }
@@ -656,7 +656,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         Preconditions.checkState(tripTimes.timesIncreasing(), "Non-increasing triptimes for added trip");
 
-        return addTripToGraphAndBuffer(feedId, graph, trip, aimedStopTimes, addedStops, tripTimes, serviceDate);
+        return addTripToGraphAndBuffer(graph, trip, aimedStopTimes, addedStops, tripTimes, serviceDate);
     }
 
     /**
@@ -733,7 +733,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
             if (exactPattern != null) {
                 Timetable currentTimetable = getCurrentTimetable(exactPattern, serviceDate);
-                TripTimes exactUpdatedTripTimes = createUpdatedTripTimes(graph, currentTimetable, estimatedVehicleJourney, timeZone, tripMatchedByServiceJourneyId.getId());
+                TripTimes exactUpdatedTripTimes = createUpdatedTripTimes(graph, currentTimetable, estimatedVehicleJourney, tripMatchedByServiceJourneyId.getId());
                 if (exactUpdatedTripTimes != null) {
                     times.add(exactUpdatedTripTimes);
                     patterns.add(exactPattern);
@@ -765,7 +765,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 TripPattern pattern = getPatternForTrip(matchingTrip, estimatedVehicleJourney);
                 if (pattern != null) {
                     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
-                    TripTimes updatedTripTimes = createUpdatedTripTimes(graph, currentTimetable, estimatedVehicleJourney, timeZone, matchingTrip.getId());
+                    TripTimes updatedTripTimes = createUpdatedTripTimes(graph, currentTimetable, estimatedVehicleJourney, matchingTrip.getId());
                     if (updatedTripTimes != null) {
                         patterns.add(pattern);
                         times.add(updatedTripTimes);
@@ -813,7 +813,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                             tripTimes.cancelTrip();
                         } else {
                             // Add new trip
-                            result = result | addTripToGraphAndBuffer(feedId, graph, trip, modifiedStopTimes, modifiedStops, tripTimes, serviceDate);
+                            result = result | addTripToGraphAndBuffer(graph, trip, modifiedStopTimes, modifiedStops, tripTimes, serviceDate);
                         }
                     } else {
                         result = result | buffer.update(pattern, tripTimes, serviceDate);
@@ -860,7 +860,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
      *
      * @return true if successful
      */
-    private boolean addTripToGraphAndBuffer(final String feedId, final Graph graph, final Trip trip,
+    private boolean addTripToGraphAndBuffer(final Graph graph, final Trip trip,
                                             final List<StopTime> stopTimes, final List<StopLocation> stops, TripTimes updatedTripTimes,
                                             final ServiceDate serviceDate) {
 

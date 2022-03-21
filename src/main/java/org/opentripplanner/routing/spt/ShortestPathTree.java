@@ -72,7 +72,7 @@ public class ShortestPathTree {
     }
 
     /** @return a single optimal, optionally back-optimized path to the given vertex. */
-    public GraphPath getPath(Vertex dest, boolean optimize) {
+    public GraphPath getPath(Vertex dest) {
         State s = getState(dest);
         if (s == null) {
             return null;

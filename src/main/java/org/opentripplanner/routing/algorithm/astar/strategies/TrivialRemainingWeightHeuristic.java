@@ -12,7 +12,7 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void initialize(RoutingRequest options, long abortTime) {}
+    public void initialize(RoutingRequest options) {}
 
     @Override
     public double estimateRemainingWeight (State s) {

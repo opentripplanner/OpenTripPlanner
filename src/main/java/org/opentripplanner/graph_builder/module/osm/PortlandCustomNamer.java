@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -129,7 +128,7 @@ public class PortlandCustomNamer implements CustomNamer {
     }
 
     @Override
-    public void configure(JsonNode config) {
+    public void configure() {
         // No configuration needed.
     }
 

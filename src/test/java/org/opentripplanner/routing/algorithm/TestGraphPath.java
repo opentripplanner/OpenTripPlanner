@@ -57,7 +57,7 @@ public class TestGraphPath extends TestCase {
         options.setRoutingContext(graph, stop_a.getLabel(), stop_e.getLabel());
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_e, false); /* do not optimize yet, since we are testing optimization */
+        path = spt.getPath(stop_e); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);
 
         // Check that the resulting path visits the stops in the right order.
@@ -74,7 +74,7 @@ public class TestGraphPath extends TestCase {
         long bestStart = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 20, 0);
         assertNotSame(bestStart, path.getStartTime());
 
-        path = spt.getPath(stop_e, true); /* optimize */
+        path = spt.getPath(stop_e); /* optimize */
         assertEquals(bestStart, path.getStartTime());
     }
 }

@@ -1,10 +1,8 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,8 +30,7 @@ public class MultiTargetTerminationStrategy implements SearchTerminationStrategy
      * targets have been reached.
      */
     @Override
-    public boolean shouldSearchTerminate(Set<Vertex> origin, Set<Vertex> target, State current,
-        ShortestPathTree spt, RoutingRequest traverseOptions) {
+    public boolean shouldSearchTerminate(State current) {
         Vertex currentVertex = current.getVertex();
 
         // TODO(flamholz): update this to handle vertices that are not in the graph

@@ -1,7 +1,6 @@
 package org.opentripplanner.common.geometry;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -10,7 +9,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CompactLineStringTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class CompactLineStringTest {
 
     @Test
     public final void testCompactString() {

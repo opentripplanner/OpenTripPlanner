@@ -7,7 +7,6 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,9 +135,13 @@ public class OSMFilter {
      * @param def
      * @return
      */
-    public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
-            StreetTraversalPermission def, Graph graph, boolean banDiscouragedWalking, boolean banDiscouragedBiking,
-            DataImportIssueStore issueStore) {
+    public static StreetTraversalPermission getPermissionsForWay(
+      OSMWay way,
+      StreetTraversalPermission def,
+      boolean banDiscouragedWalking,
+      boolean banDiscouragedBiking,
+      DataImportIssueStore issueStore
+    ) {
         StreetTraversalPermission permissions = getPermissionsForEntity(way, def);
 
         /*
@@ -189,10 +192,8 @@ public class OSMFilter {
         return permissions;
     }
 
-    public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
-            StreetTraversalPermission def, Graph graph) {
-        return getPermissionsForWay(way, def, graph, false, false,
-                new DataImportIssueStore(false));
+    public static StreetTraversalPermission getPermissionsForWay(OSMWay way, StreetTraversalPermission def) {
+        return getPermissionsForWay(way, def, false, false, new DataImportIssueStore(false));
     }
 
     /**
@@ -200,7 +201,9 @@ public class OSMFilter {
      * for travel along and against the way.
      */
     public static P2<StreetTraversalPermission> getPermissions(
-            StreetTraversalPermission permissions, OSMWay way) {
+            StreetTraversalPermission permissions,
+            OSMWay way
+    ) {
 
         StreetTraversalPermission permissionsFront = permissions;
         StreetTraversalPermission permissionsBack = permissions;

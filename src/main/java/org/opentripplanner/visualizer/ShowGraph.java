@@ -639,7 +639,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         } else if (drawLevel == DRAW_VERTICES) {
             drawVertices();
         } else if (drawLevel == DRAW_SPT){
-        	boolean finished = drawSPT(startMillis);
+        	boolean finished = drawSPT();
         	if(!finished){
         		return;
         	}
@@ -656,7 +656,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             drawLevel -= 1; // move to next layer
     }
     
-	private boolean drawSPT(int startMillis) {
+	private boolean drawSPT() {
 		if(!sptVisible){
 			return true;
 		}

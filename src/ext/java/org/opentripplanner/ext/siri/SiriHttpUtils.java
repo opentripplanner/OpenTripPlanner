@@ -12,17 +12,15 @@ import org.opentripplanner.util.HttpUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SiriHttpUtils extends HttpUtils {
 
     public static InputStream postData(
-        String url,
-        String xmlData,
-        int timeout,
-        Map<String, String> headers
+      String url,
+      String xmlData,
+      int timeout
     ) throws IOException {
 
         HttpPost httppost = new HttpPost(url);

@@ -1,15 +1,18 @@
 package org.opentripplanner.common.geometry;
 
-import junit.framework.TestCase;
 import org.geotools.referencing.GeodeticCalculator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class DirectionUtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class DirectionUtilsTest {
+
 
     @Test
     public final void testAzimuth() {

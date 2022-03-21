@@ -1,17 +1,5 @@
 package org.opentripplanner.ext.siri;
 
-import static java.util.Collections.EMPTY_LIST;
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.SCHEDULED;
-
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-import javax.xml.datatype.Duration;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
@@ -36,6 +24,18 @@ import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityStructure;
 
+import javax.xml.datatype.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.Collections.EMPTY_LIST;
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.SCHEDULED;
+
 public class TimetableHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(TimetableHelper.class);
@@ -50,12 +50,11 @@ public class TimetableHelper {
      * case.
      *
      * @param journey  SIRI-ET EstimatedVehicleJourney
-     * @param timeZone time zone of trip update
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
      */
-    public static TripTimes createUpdatedTripTimes(final Graph graph, Timetable timetable, EstimatedVehicleJourney journey, TimeZone timeZone, FeedScopedId tripId) {
+    public static TripTimes createUpdatedTripTimes(final Graph graph, Timetable timetable, EstimatedVehicleJourney journey, FeedScopedId tripId) {
         if (journey == null) {
             return null;
         }
@@ -603,12 +602,11 @@ public class TimetableHelper {
      * case.
      *
      * @param activity SIRI-VM VehicleActivity
-     * @param timeZone time zone of trip update
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
      */
-    public static TripTimes createUpdatedTripTimes(Timetable timetable, Graph graph, VehicleActivityStructure activity, TimeZone timeZone, FeedScopedId tripId) {
+    public static TripTimes createUpdatedTripTimes(Timetable timetable, Graph graph, VehicleActivityStructure activity, FeedScopedId tripId) {
         if (activity == null) {
             return null;
         }

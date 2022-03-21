@@ -7,7 +7,7 @@ import org.rutebanken.netex.model.ServiceJourney;
 class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, ServiceJourney> {
 
   @Override
-  public Status validate(String key, ServiceJourney sj) {
+  public Status validate(ServiceJourney sj) {
     JourneyPattern journeyPattern = index.getJourneyPatternsById().lookup(getPatternId(sj));
 
     int nStopPointsInJourneyPattern = journeyPattern

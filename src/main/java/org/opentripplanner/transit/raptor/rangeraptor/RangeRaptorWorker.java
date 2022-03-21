@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.rangeraptor;
 
 
 import io.micrometer.core.instrument.Timer;
-import java.util.Collection;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -19,6 +18,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleBoardSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
+
+import java.util.Collection;
 
 
 /**
@@ -210,7 +211,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                 int alightSlack = slackProvider.alightSlack(pattern);
                 int boardSlack = slackProvider.boardSlack(pattern);
 
-                transitWorker.prepareForTransitWith(pattern);
+                transitWorker.prepareForTransitWith();
 
                 IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
 

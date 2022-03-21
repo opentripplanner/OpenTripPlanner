@@ -87,7 +87,7 @@ public class AStarTest {
         options.setRoutingContext(graph, graph.getVertex("56th_24th"), graph.getVertex("leary_20th"));
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(graph.getVertex("leary_20th"), false);
+        GraphPath path = tree.getPath(graph.getVertex("leary_20th"));
 
         List<State> states = path.states;
 
@@ -112,7 +112,7 @@ public class AStarTest {
                 graph.getVertex("leary_20th"));
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(graph.getVertex("56th_24th"), false);
+        GraphPath path = tree.getPath(graph.getVertex("56th_24th"));
 
         List<State> states = path.states;
 
@@ -155,7 +155,7 @@ public class AStarTest {
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
         options.cleanup();
 
-        GraphPath path = tree.getPath(to, false);
+        GraphPath path = tree.getPath(to);
 
         List<State> states = path.states;
 
@@ -191,7 +191,7 @@ public class AStarTest {
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
         options.cleanup();
 
-        GraphPath path = tree.getPath(from, false);
+        GraphPath path = tree.getPath(from);
 
         List<State> states = path.states;
 
@@ -224,7 +224,7 @@ public class AStarTest {
         ShortestPathTree tree = new AStar().getShortestPathTree(options, -1, strategy);
 
         for (Vertex v : targets) {
-            GraphPath path = tree.getPath(v, false);
+            GraphPath path = tree.getPath(v);
             assertNotNull("No path found for target " + v.getLabel(), path);
         }
     }

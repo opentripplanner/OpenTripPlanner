@@ -4,7 +4,18 @@ import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
@@ -17,7 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.opentripplanner.model.PickDrop.NONE;
@@ -215,7 +231,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                         applied = validateAndHandleAddedTrip(graph, tripUpdate, feedId, serviceDate);
                         break;
                     case UNSCHEDULED:
-                        applied = handleUnscheduledTrip(tripUpdate, feedId, serviceDate);
+                        applied = handleUnscheduledTrip();
                         break;
                     case CANCELED:
                         applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
@@ -768,7 +784,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         return success;
     }
 
-    private boolean handleUnscheduledTrip(final TripUpdate tripUpdate, final String feedId, final ServiceDate serviceDate) {
+    private boolean handleUnscheduledTrip() {
         // TODO: Handle unscheduled trip
         LOG.warn("Unscheduled trips are currently unsupported. Skipping TripUpdate.");
         return false;

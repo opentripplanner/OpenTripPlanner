@@ -22,16 +22,9 @@ package com.google.transit.realtime;
  * </p>
  */
 public final class GtfsRealtime {
-  private GtfsRealtime() {}
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistryLite registry) {
-  }
 
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
-    registerAllExtensions(
-        (com.google.protobuf.ExtensionRegistryLite) registry);
-  }
+  private GtfsRealtime() {}
+
   public interface FeedMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:transit_realtime.FeedMessage)
       com.google.protobuf.GeneratedMessageV3.

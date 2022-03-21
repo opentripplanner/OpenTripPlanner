@@ -10,8 +10,7 @@ public interface UniqueIdGenerator<T> {
     /**
      * Generates the identifier. May consider the element.
      * 
-     * @param elem
      * @return
      */
-    int getId(T elem);
+    int getId();
 }

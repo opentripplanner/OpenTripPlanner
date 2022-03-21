@@ -6,7 +6,11 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FareRule;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
@@ -22,7 +26,9 @@ import java.util.TimeZone;
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
 import static org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl.merge;
@@ -137,7 +143,7 @@ public class CalendarServiceDataFactoryImplTest {
 
         // Supplement test data with at least one entity in all collections
         builder.getCalendarDates().add(removeMondayFromAlldays());
-        builder.getFareAttributes().add(createFareAttribute(agency));
+        builder.getFareAttributes().add(createFareAttribute());
         builder.getFareRules().add(new FareRule());
         builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
 
@@ -148,7 +154,7 @@ public class CalendarServiceDataFactoryImplTest {
         return first(builder.getAgenciesById().values());
     }
 
-    private static FareAttribute createFareAttribute(Agency agency) {
+    private static FareAttribute createFareAttribute() {
         return new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
     }
 

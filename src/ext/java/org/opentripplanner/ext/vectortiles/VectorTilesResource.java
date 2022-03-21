@@ -113,7 +113,7 @@ public class VectorTilesResource {
     return new TileJson(otpServer.getRouter().graph, uri, headers, requestedLayers);
   }
 
-  private String getBaseAddress(UriInfo uri, HttpHeaders headers, String layers) {
+  private String getBaseAddress(UriInfo uri, HttpHeaders headers) {
     String protocol;
     if (headers.getRequestHeader("X-Forwarded-Proto") != null) {
       protocol = headers.getRequestHeader("X-Forwarded-Proto").get(0);
@@ -160,7 +160,7 @@ public class VectorTilesResource {
           .collect(Collectors.joining(", "));
 
       tiles = new String[]{
-              getBaseAddress(uri, headers, layers)
+              getBaseAddress(uri, headers)
                       + "/otp/routers/"
                       + ignoreRouterId
                       + "/vectorTiles/"

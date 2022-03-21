@@ -390,7 +390,7 @@ public class WalkableAreaBuilder {
             options.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
             ShortestPathTree spt = search.getShortestPathTree(options);
             for (Vertex endVertex : startingVertices) {
-                GraphPath path = spt.getPath(endVertex, false);
+                GraphPath path = spt.getPath(endVertex);
                 if (path != null) {
                     usedEdges.addAll(path.edges);
                 }

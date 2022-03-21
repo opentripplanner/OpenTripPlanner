@@ -411,6 +411,6 @@ public abstract class GraphRoutingTest {
 
         AStar aStar = new AStar();
         ShortestPathTree tree = aStar.getShortestPathTree(request);
-        return tree.getPath(to, false);
+        return tree.getPath(to);
     }
 }

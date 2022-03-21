@@ -138,7 +138,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setRoutingContext(graph, stop_a, stop_b);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_b, false);
+        path = spt.getPath(stop_b);
         assertNotNull(path);
         assertEquals(6, path.states.size());
 
@@ -146,7 +146,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setRoutingContext(graph, stop_a, stop_c);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_c, false);
+        path = spt.getPath(stop_c);
         assertNotNull(path);
         assertEquals(8, path.states.size());
 
@@ -154,7 +154,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setRoutingContext(graph, stop_a, stop_d);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_d, false);
+        path = spt.getPath(stop_d);
         assertNotNull(path);
         // there are two paths of different lengths 
         // both arrive at 40 minutes after midnight
@@ -167,7 +167,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         //A to E (change at C)
         options.setRoutingContext(graph, stop_a, stop_e);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_e, false);
+        path = spt.getPath(stop_e);
         assertNotNull(path);
         stops = extractStopVertices(path);
         assertEquals(stops.size(), 3);
@@ -190,7 +190,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setRoutingContext(graph, stop_g, stop_h);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_h, false);
+        path = spt.getPath(stop_h);
         assertNotNull(path);
         assertEquals(4, path.states.size());
 
@@ -200,7 +200,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setRoutingContext(graph, stop_g.getLabel(), stop_h.getLabel());
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_h, false);
+        path = spt.getPath(stop_h);
         assertNotNull(path);
         assertEquals(4, path.states.size());
         long endTime = path.getEndTime();
@@ -216,7 +216,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 19, 12, 0, 0));
         options.setRoutingContext(graph, stop_o, stop_p);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
-        GraphPath path = spt.getPath(stop_p, false);
+        GraphPath path = spt.getPath(stop_p);
         assertNotNull(path);
         long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 10, 0);
         assertEquals(endTime, path.getEndTime());
@@ -224,7 +224,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 19, 12, 0, 1));
         options.setRoutingContext(graph, stop_o, stop_p);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_p, false);
+        path = spt.getPath(stop_p);
         assertNotNull(path);
         endTime =  TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 15, 10, 0);
         assertEquals(endTime, path.getEndTime());
@@ -243,12 +243,12 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         spt = aStar.getShortestPathTree(options );
 
         //a to b is bus only
-        assertNull(spt.getPath(stop_b, false));
+        assertNull(spt.getPath(stop_b));
         
         options.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.TRAM,TraverseMode.RAIL,TraverseMode.SUBWAY,TraverseMode.FUNICULAR,TraverseMode.GONDOLA,TraverseMode.CABLE_CAR,TraverseMode.BUS));
         spt = aStar.getShortestPathTree(options);
 
-        assertNotNull(spt.getPath(stop_b, false));
+        assertNotNull(spt.getPath(stop_b));
     }
     
     public void testTimelessStops() throws Exception {
@@ -259,7 +259,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setRoutingContext(graph, stop_d, stop_c);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
-        GraphPath path = spt.getPath(stop_c, false);
+        GraphPath path = spt.getPath(stop_c);
         assertNotNull(path);
         assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 11, 0, 0), path.getEndTime());
     }
@@ -283,21 +283,21 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         // route: bikes allowed, trip: no value
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_b, false);
+        path = spt.getPath(stop_b);
         assertNotNull(path);
 
         // route: bikes allowed, trip: bikes not allowed
         options.setRoutingContext(graph, stop_d, stop_c);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_c, false);
+        path = spt.getPath(stop_c);
         assertNull(path);
 
         // route: bikes not allowed, trip: bikes allowed
         options.setRoutingContext(graph, stop_c, stop_d);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_d, false);
+        path = spt.getPath(stop_d);
         assertNotNull(path);
     }
 
@@ -324,21 +324,21 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setRoutingContext(graph, near_a, near_b);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(near_b, false);
+        path = spt.getPath(near_b);
         assertNotNull(path);
 
         // stop C is not accessible, so there should be no path.
         options.setRoutingContext(graph, near_a, near_c);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(near_c, false);
+        path = spt.getPath(near_c);
         assertNull(path);
         
         // stop E has no accessibility information, but we should still be able to route to it.
         options.setRoutingContext(graph, near_a, near_e);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(near_e, false);
+        path = spt.getPath(near_e);
         assertNotNull(path);
 
         // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
@@ -351,7 +351,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         
         time.add(Calendar.HOUR, 1);
         time.add(Calendar.SECOND, 1); //for the StreetTransitLink
-        path = spt.getPath(split_d, false);
+        path = spt.getPath(split_d);
         assertNotNull(path);
         assertEquals(TestUtils.toSeconds(time), path.getEndTime());
     }
@@ -371,7 +371,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setDateTime(startTime.toInstant());
         options.setRoutingContext(graph, feedId + ":Q", destination.getLabel());
         ShortestPathTree spt = aStar.getShortestPathTree(options);
-        GraphPath path = spt.getPath(destination, false);
+        GraphPath path = spt.getPath(destination);
 
         long endTime = path.getEndTime();
         Calendar c = new GregorianCalendar();
@@ -393,7 +393,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         
         // U to V - original stop times - shouldn't be used
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_v, false);
+        path = spt.getPath(stop_v);
         assertNotNull(path);
         assertEquals(4, path.states.size());
         long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 6, 40, 0);
@@ -403,7 +403,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 7, 0, 0));
         options.setRoutingContext(graph, stop_u, stop_v);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_v, false);
+        path = spt.getPath(stop_v);
         assertNotNull(path);
         assertEquals(4, path.states.size());
         endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 40, 0);
@@ -413,7 +413,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 14, 0, 0));
         options.setRoutingContext(graph, stop_u, stop_v);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_v, false);
+        path = spt.getPath(stop_v);
         assertNotNull(path);
         assertEquals(4, path.states.size());
         endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 14, 40, 0);
@@ -434,7 +434,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
         //when optimizing for speed, take the fast two-bus path
-        GraphPath path = spt.getPath(stop_d, false);
+        GraphPath path = spt.getPath(stop_d);
         assertNotNull(path);
         assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 20, 0), path.getEndTime());
         
@@ -442,7 +442,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.transferCost = 1800;
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_d, false);
+        path = spt.getPath(stop_d);
         assertNotNull(path);
         assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 50, 0), path.getEndTime());
 
@@ -460,7 +460,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         options.setRoutingContext(graph, entrance, stop);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
         
-        GraphPath path = spt.getPath(stop, false);
+        GraphPath path = spt.getPath(stop);
         assertNotNull(path);
         assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 34), path.getEndTime());
     }

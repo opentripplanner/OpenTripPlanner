@@ -15,10 +15,8 @@ public interface RemainingWeightHeuristic extends Serializable {
      * Perform any one-time setup and pre-computation that will be needed by later calls to
      * computeForwardWeight/computeReverseWeight. We may want to start from multiple origin states, so initialization
      * cannot depend on the origin vertex or state.
-     * @param abortTime time since the Epoch in milliseconds at which we should bail out of initialization,
-     *                  or Long.MAX_VALUE for no limit.
      */
-    void initialize(RoutingRequest options, long abortTime);
+    void initialize(RoutingRequest options);
 
     double estimateRemainingWeight(State s);
 

@@ -58,7 +58,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       cache.put(originVertex, shortestPathTree);
     }
 
-    GraphPath path = shortestPathTree.getPath(destinationVertex, false);
+    GraphPath path = shortestPathTree.getPath(destinationVertex);
     if (path == null) {
       return null;
     }

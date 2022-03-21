@@ -4,16 +4,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -48,6 +38,17 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
@@ -181,7 +182,7 @@ public class GeometryAndBlockProcessor {
         }
 
         /* Identify interlined trips and create the necessary edges. */
-        interline(tripPatterns, graph);
+        interline(tripPatterns);
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
@@ -196,7 +197,7 @@ public class GeometryAndBlockProcessor {
      * Identify interlined trips (where a physical vehicle continues on to another logical trip)
      * and update the TripPatterns accordingly.
      */
-    private void interline(Collection<TripPattern> tripPatterns, Graph graph) {
+    private void interline(Collection<TripPattern> tripPatterns) {
 
         /* Record which Pattern each interlined TripTimes belongs to. */
         Map<TripTimes, TripPattern> patternForTripTimes = new HashMap<>();

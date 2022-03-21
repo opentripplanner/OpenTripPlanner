@@ -161,13 +161,13 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, br, end);
         ShortestPathTree spt1 = aStar.getShortestPathTree(options);
 
-        GraphPath pathBr = spt1.getPath(end, false);
+        GraphPath pathBr = spt1.getPath(end);
         assertNotNull("There must be a path from br to end", pathBr);
 
         options.setRoutingContext(graph, tr, end);
         ShortestPathTree spt2 = aStar.getShortestPathTree(options);
 
-        GraphPath pathTr = spt2.getPath(end, false);
+        GraphPath pathTr = spt2.getPath(end);
         assertNotNull("There must be a path from tr to end", pathTr);
         assertTrue("path from bottom to end must be longer than path from top to end",
                 pathBr.getWeight() > pathTr.getWeight());
@@ -175,7 +175,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
-        GraphPath path = spt.getPath(end, false);
+        GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);
 
         // the bottom is not part of the shortest path
@@ -188,7 +188,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(start, false);
+        path = spt.getPath(start);
         assertNotNull("There must be a path from start to end (looking back)", path);
 
         // the bottom edge is not part of the shortest path
@@ -221,7 +221,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(start, false);
+        path = spt.getPath(start);
         assertNotNull("There must be a path from top to bottom along the right", path);
 
         // the left edge is not part of the shortest path (even though the bike must be walked along the right)
@@ -248,7 +248,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(start, false);
+        path = spt.getPath(start);
         assertNotNull("There must be a path from top to bottom", path);
 
         // the right edge is not part of the shortest path, e
@@ -295,7 +295,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
-        GraphPath path = spt.getPath(end, false);
+        GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);        
         assertEquals(1, path.edges.size());
         options.cleanup();
@@ -332,7 +332,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
-        GraphPath path = spt.getPath(end, false);
+        GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);        
         assertTrue(path.edges.size() > 1);
         options.cleanup();
@@ -457,7 +457,7 @@ public class TestHalfEdges {
         // The visibility for temp edges for start and end is set in the setRoutingContext call
         walking.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(walking);
-        GraphPath path = spt.getPath(end, false);
+        GraphPath path = spt.getPath(end);
         for (State s : path.states) {
           assertNotSame(s.getBackEdge(), top);
         }

@@ -103,7 +103,7 @@ public class TurnCostTest {
     
     private GraphPath checkForwardRouteDuration(RoutingRequest options, int expectedDuration) {
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
-        GraphPath path = tree.getPath(bottomLeft, false);
+        GraphPath path = tree.getPath(bottomLeft);
         assertNotNull(path);
         
         // Without turn costs, this path costs 2x100 + 2x50 = 300.

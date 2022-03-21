@@ -100,7 +100,7 @@ public class AStar {
         // Since initial states can be multiple, heuristic cannot depend on the initial state.
         // Initializing the bidirectional heuristic is a pretty complicated operation that involves searching through
         // the streets around the origin and destination.
-        runState.heuristic.initialize(runState.options, abortTime);
+        runState.heuristic.initialize(runState.options);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of goal direction heuristic.");
             runState = null; // Search timed out
@@ -179,7 +179,7 @@ public class AStar {
                 // Could be: for (State v : traverseEdge...)
 
                 if (traverseVisitor != null) {
-                    traverseVisitor.visitEdge(edge, v);
+                    traverseVisitor.visitEdge(edge);
                 }
 
                 double remaining_w = runState.heuristic.estimateRemainingWeight(v);
@@ -202,7 +202,7 @@ public class AStar {
                 if (runState.spt.add(v)) {
                     // report to the visitor if there is one
                     if (traverseVisitor != null)
-                        traverseVisitor.visitEnqueue(v);
+                        traverseVisitor.visitEnqueue();
                     //LOG.info("u.w={} v.w={} h={}", runState.u.weight, v.weight, remaining_w);
                     runState.pq.insert(v, estimate);
                 } 
@@ -243,7 +243,7 @@ public class AStar {
             
             if (runState.terminationStrategy != null) {
                 if (runState.terminationStrategy.shouldSearchTerminate(
-                    runState.rctx.fromVertices, runState.rctx.toVertices, runState.u, runState.spt, runState.options)) {
+                  runState.u)) {
                     break;
                 }
             }

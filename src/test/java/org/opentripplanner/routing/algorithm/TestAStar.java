@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
-import java.time.Instant;
 import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
@@ -16,6 +13,10 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
+
+import java.time.Instant;
+
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
@@ -44,7 +45,7 @@ public class TestAStar extends TestCase {
         options.setDateTime(TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0));
         options.setRoutingContext(gg, feedId + ":Millbrae Caltrain", feedId + ":Mountain View Caltrain");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":Mountain View Caltrain"), true);
+        path = spt.getPath(gg.getVertex(feedId + ":Mountain View Caltrain"));
 
         long endTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 13, 29, 0);
 
@@ -55,7 +56,7 @@ public class TestAStar extends TestCase {
         options.setDateTime(Instant.ofEpochSecond(endTime));
         options.setRoutingContext(gg, feedId + ":Millbrae Caltrain", feedId + ":Mountain View Caltrain");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":Millbrae Caltrain"), true);
+        path = spt.getPath(gg.getVertex(feedId + ":Millbrae Caltrain"));
 
         long expectedStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 39, 0);
 
@@ -77,12 +78,12 @@ public class TestAStar extends TestCase {
         options.setRoutingContext(graph, start, end);
 
         ShortestPathTree spt = aStar.getShortestPathTree(options);
-        GraphPath path = spt.getPath(end, true);
+        GraphPath path = spt.getPath(end);
         assertNotNull(path);
         
         // but one minute is not enough
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(end, true);
+        path = spt.getPath(end);
         assertNull(path);        
     }
 

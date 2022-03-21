@@ -1,11 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -33,6 +27,13 @@ import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This represents a street segment.
@@ -530,7 +531,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * Calculate the average automobile traversal speed of this segment, given
      * the RoutingRequest, and return it in meters per second.
      */
-    private double calculateCarSpeed(RoutingRequest options) {
+    private double calculateCarSpeed() {
         return getCarSpeed();
     }
     
@@ -546,7 +547,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
-            return calculateCarSpeed(options);
+            return calculateCarSpeed();
         }
         final double speed = options.getSpeed(traverseMode, walkingBike);
         return isStairs() ? (speed / options.stairsTimeFactor) : speed;
