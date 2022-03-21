@@ -18,14 +18,13 @@ To enable this turn on the feature `GoogleCloudStorage`. OTP can load or store a
 Example (build-config.json):
 ```json
 {
-    :
-    storage : {
-        gcsCredentials: "/Users/alf/secret/otp-test-1234567890.json",
-        osm : [ "gs://otp-test-bucket/a/b/northpole.pbf" ], 
-        dem : [ "gs://otp-test-bucket/a/b/northpole.dem.tif" ],
-        gtfs: [ "gs://otp-test-bucket/a/b/gtfs.zip" ],
-        graph: "gs://otp-test-bucket/a/b/graph.obj"
-        buildReportDir: "gs://otp-test-bucket/a/b/np-report"
+    "storage" : {
+        "gcsCredentials": "/Users/alf/secret/otp-test-1234567890.json",
+        "osm" : [ "gs://otp-test-bucket/a/b/northpole.pbf" ], 
+        "dem" : [ "gs://otp-test-bucket/a/b/northpole.dem.tif" ],
+        "gtfs": [ "gs://otp-test-bucket/a/b/gtfs.zip" ],
+        "graph": "gs://otp-test-bucket/a/b/graph.obj"
+        "buildReportDir": "gs://otp-test-bucket/a/b/np-report"
     }
 }
 ```

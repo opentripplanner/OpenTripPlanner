@@ -357,8 +357,13 @@ vehicle-rental) by defining a `combinationStrategy` parameter, and a list of sub
 // build-config.json
 {
   // Select the custom fare "seattle"
-  "fares": "seattle",
-  // OR this alternative form that could allow additional configuration
+  "fares": "seattle"
+}
+```
+Or this alternative form that could allow additional configuration
+```JSON
+// build-config.json
+{
   "fares": {
 	"type": "seattle"
   }

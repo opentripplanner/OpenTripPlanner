@@ -105,8 +105,7 @@
       "projectName": "entur-ror",
       "topicName": "estimated_timetables",
       "dataInitializationUrl": "{{ url }}"
-    }
-    {{- else -}}
+    },
     // SIRI ET updater
     {
       "type": "siri-et-updater",
