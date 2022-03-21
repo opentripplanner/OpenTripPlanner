@@ -18,7 +18,7 @@ public class RealtimeVehiclePositionBuilder {
     private Double heading = null;
     private Instant time;
     private StopStatus stopStatus = StopStatus.IN_TRANSIT_TO;
-    private StopLocation nextStop;
+    private StopLocation stop;
     private Trip trip;
 
     public RealtimeVehiclePositionBuilder setVehicleId(FeedScopedId vehicleId) {
@@ -56,8 +56,8 @@ public class RealtimeVehiclePositionBuilder {
         return this;
     }
 
-    public RealtimeVehiclePositionBuilder setNextStop(StopLocation nextStop) {
-        this.nextStop = nextStop;
+    public RealtimeVehiclePositionBuilder setStop(StopLocation stop) {
+        this.stop = stop;
         return this;
     }
 
@@ -67,7 +67,7 @@ public class RealtimeVehiclePositionBuilder {
     }
 
     public RealtimeVehiclePosition build() {
-        var stop = Optional.ofNullable(nextStop)
+        var stop = Optional.ofNullable(this.stop)
                 .map(s -> new VehicleStop(s, stopStatus))
                 .orElse(null);
         return new RealtimeVehiclePosition(

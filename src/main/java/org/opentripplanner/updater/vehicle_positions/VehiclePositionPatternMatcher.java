@@ -177,22 +177,28 @@ public class VehiclePositionPatternMatcher {
                             .orElse(vehicle.getLicensePlate()));
         }
 
-        if (vehiclePosition.hasCurrentStatus()) {
-            newPosition.setStopStatus(toModel(vehiclePosition.getCurrentStatus()));
-        }
-
         if (vehiclePosition.hasTimestamp()) {
             newPosition.setTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
         }
 
+        if (vehiclePosition.hasCurrentStatus()) {
+            newPosition.setStopStatus(toModel(vehiclePosition.getCurrentStatus()));
+        }
+
+        // we prefer the to get the current stop from the stop_id
         if (vehiclePosition.hasStopId()) {
             List<StopLocation> matchedStops = stopsOnVehicleTrip
                     .stream()
                     .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
                     .toList();
             if (matchedStops.size() == 1) {
-                newPosition.setNextStop(matchedStops.get(0));
+                newPosition.setStop(matchedStops.get(0));
             }
+        }
+        // but if stop_id isn't there we try current_stop_sequence
+        else if (vehiclePosition.hasCurrentStopSequence()) {
+            var stop = stopsOnVehicleTrip.get(vehiclePosition.getCurrentStopSequence());
+            newPosition.setStop(stop);
         }
 
         newPosition.setTrip(trip);
