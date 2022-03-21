@@ -15,7 +15,7 @@ public class TemplateLibrary {
         if (pattern == null) {
             return null;
         }
-        StringBuffer gen_name = new StringBuffer();
+        StringBuilder gen_name = new StringBuilder();
 
         Matcher matcher = patternMatcher.matcher(pattern);
 

@@ -1,17 +1,16 @@
 package org.opentripplanner.util;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.util.model.EncodedPolylineBean;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.opentripplanner.util.model.EncodedPolylineBean;
+
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PolylineEncoder {
 
@@ -149,7 +148,7 @@ public class PolylineEncoder {
 
     public static String encodeNumber(int num) {
 
-        StringBuffer encodeString = new StringBuffer();
+        StringBuilder encodeString = new StringBuilder();
 
         while (num >= 0x20) {
             int nextValue = (0x20 | (num & 0x1f)) + 63;

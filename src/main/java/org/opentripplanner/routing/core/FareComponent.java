@@ -27,7 +27,7 @@ public class FareComponent {
     }
 
     public String toString() {
-        StringBuffer buffer = new StringBuffer("FareComponent(");
+        StringBuilder buffer = new StringBuilder("FareComponent(");
         buffer.append(fareId.toString());
         buffer.append(", ");
         buffer.append(price.toString());
