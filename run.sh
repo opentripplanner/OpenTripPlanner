@@ -82,4 +82,4 @@ echo ROUTER $ROUTER_NAME
 download_graph $ROUTER_NAME $VERSION || process $ROUTER_NAME
 
 echo "graphString is: $ROUTER_NAME"
-java -Dsentry.release=$VERSION $JAVA_OPTS -Duser.timezone=Europe/Helsinki -jar $JAR --serve --port $PORT --load ./graphs/$ROUTER_NAME
+java -Dsentry.release=$VERSION $JAVA_OPTS -Duser.timezone=Europe/Helsinki -Djava.awt.headless=true --add-exports java.desktop/sun.font=ALL-UNNAMED -jar $JAR --serve --port $PORT --load ./graphs/$ROUTER_NAME

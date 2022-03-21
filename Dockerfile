@@ -1,7 +1,12 @@
-FROM openjdk:17-jdk
+FROM openjdk:17-slim
 MAINTAINER Reittiopas version: 0.1
 
 VOLUME /opt/opentripplanner/graphs
+
+RUN apt-get update \
+    && apt-get install -y curl bash fonts-dejavu fontconfig unzip tzdata \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV OTP_ROOT="/opt/opentripplanner"
 ENV ROUTER_DATA_CONTAINER_URL="https://api.digitransit.fi/routing-data/v2/finland"
