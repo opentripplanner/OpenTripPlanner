@@ -120,7 +120,7 @@ public class PolylineEncoder {
      * Private Methods
      ****************************************************************************/
 
-    private static final int floor1e5(double coordinate) {
+    private static int floor1e5(double coordinate) {
         return (int) Math.floor(coordinate * 1e5);
     }
 

@@ -203,7 +203,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_FeedMessage_descriptor;
     }
@@ -525,7 +525,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.FeedMessage, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.FeedMessage)
         com.google.transit.realtime.GtfsRealtime.FeedMessageOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_FeedMessage_descriptor;
       }
@@ -1435,7 +1435,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_FeedHeader_descriptor;
     }
@@ -1521,7 +1521,7 @@ public final class GtfsRealtime {
           getDescriptorForType() {
         return getDescriptor();
       }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      public static com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.FeedHeader.getDescriptor().getEnumTypes().get(0);
       }
@@ -1868,7 +1868,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.FeedHeader, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.FeedHeader)
         com.google.transit.realtime.GtfsRealtime.FeedHeaderOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_FeedHeader_descriptor;
       }
@@ -2597,7 +2597,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_FeedEntity_descriptor;
     }
@@ -3115,7 +3115,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.FeedEntity, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.FeedEntity)
         com.google.transit.realtime.GtfsRealtime.FeedEntityOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_FeedEntity_descriptor;
       }
@@ -4613,7 +4613,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_descriptor;
     }
@@ -4787,7 +4787,7 @@ public final class GtfsRealtime {
           makeExtensionsImmutable();
         }
       }
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_StopTimeEvent_descriptor;
       }
@@ -5115,7 +5115,7 @@ public final class GtfsRealtime {
             com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent, Builder> implements
           // @@protoc_insertion_point(builder_implements:transit_realtime.TripUpdate.StopTimeEvent)
           com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEventOrBuilder {
-        public static final com.google.protobuf.Descriptors.Descriptor
+        public static com.google.protobuf.Descriptors.Descriptor
             getDescriptor() {
           return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_StopTimeEvent_descriptor;
         }
@@ -5811,7 +5811,7 @@ public final class GtfsRealtime {
           makeExtensionsImmutable();
         }
       }
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_StopTimeUpdate_descriptor;
       }
@@ -5975,7 +5975,7 @@ public final class GtfsRealtime {
             getDescriptorForType() {
           return getDescriptor();
         }
-        public static final com.google.protobuf.Descriptors.EnumDescriptor
+        public static com.google.protobuf.Descriptors.EnumDescriptor
             getDescriptor() {
           return com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.getDescriptor().getEnumTypes().get(0);
         }
@@ -6138,7 +6138,7 @@ public final class GtfsRealtime {
             makeExtensionsImmutable();
           }
         }
-        public static final com.google.protobuf.Descriptors.Descriptor
+        public static com.google.protobuf.Descriptors.Descriptor
             getDescriptor() {
           return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_StopTimeUpdate_StopTimeProperties_descriptor;
         }
@@ -6427,7 +6427,7 @@ public final class GtfsRealtime {
               com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties, Builder> implements
             // @@protoc_insertion_point(builder_implements:transit_realtime.TripUpdate.StopTimeUpdate.StopTimeProperties)
             com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimePropertiesOrBuilder {
-          public static final com.google.protobuf.Descriptors.Descriptor
+          public static com.google.protobuf.Descriptors.Descriptor
               getDescriptor() {
             return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_StopTimeUpdate_StopTimeProperties_descriptor;
           }
@@ -7333,7 +7333,7 @@ public final class GtfsRealtime {
             com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate, Builder> implements
           // @@protoc_insertion_point(builder_implements:transit_realtime.TripUpdate.StopTimeUpdate)
           com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdateOrBuilder {
-        public static final com.google.protobuf.Descriptors.Descriptor
+        public static com.google.protobuf.Descriptors.Descriptor
             getDescriptor() {
           return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_StopTimeUpdate_descriptor;
         }
@@ -8587,7 +8587,7 @@ public final class GtfsRealtime {
           makeExtensionsImmutable();
         }
       }
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_TripProperties_descriptor;
       }
@@ -9123,7 +9123,7 @@ public final class GtfsRealtime {
             com.google.transit.realtime.GtfsRealtime.TripUpdate.TripProperties, Builder> implements
           // @@protoc_insertion_point(builder_implements:transit_realtime.TripUpdate.TripProperties)
           com.google.transit.realtime.GtfsRealtime.TripUpdate.TripPropertiesOrBuilder {
-        public static final com.google.protobuf.Descriptors.Descriptor
+        public static com.google.protobuf.Descriptors.Descriptor
             getDescriptor() {
           return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_TripProperties_descriptor;
         }
@@ -10560,7 +10560,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.TripUpdate, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.TripUpdate)
         com.google.transit.realtime.GtfsRealtime.TripUpdateOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripUpdate_descriptor;
       }
@@ -12626,7 +12626,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_VehiclePosition_descriptor;
     }
@@ -12739,7 +12739,7 @@ public final class GtfsRealtime {
           getDescriptorForType() {
         return getDescriptor();
       }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      public static com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.VehiclePosition.getDescriptor().getEnumTypes().get(0);
       }
@@ -12868,7 +12868,7 @@ public final class GtfsRealtime {
           getDescriptorForType() {
         return getDescriptor();
       }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      public static com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.VehiclePosition.getDescriptor().getEnumTypes().get(1);
       }
@@ -13124,7 +13124,7 @@ public final class GtfsRealtime {
           getDescriptorForType() {
         return getDescriptor();
       }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      public static com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.VehiclePosition.getDescriptor().getEnumTypes().get(2);
       }
@@ -13393,7 +13393,7 @@ public final class GtfsRealtime {
           makeExtensionsImmutable();
         }
       }
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_VehiclePosition_CarriageDetails_descriptor;
       }
@@ -13867,7 +13867,7 @@ public final class GtfsRealtime {
             com.google.transit.realtime.GtfsRealtime.VehiclePosition.CarriageDetails, Builder> implements
           // @@protoc_insertion_point(builder_implements:transit_realtime.VehiclePosition.CarriageDetails)
           com.google.transit.realtime.GtfsRealtime.VehiclePosition.CarriageDetailsOrBuilder {
-        public static final com.google.protobuf.Descriptors.Descriptor
+        public static com.google.protobuf.Descriptors.Descriptor
             getDescriptor() {
           return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_VehiclePosition_CarriageDetails_descriptor;
         }
@@ -15339,7 +15339,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.VehiclePosition, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.VehiclePosition)
         com.google.transit.realtime.GtfsRealtime.VehiclePositionOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_VehiclePosition_descriptor;
       }
@@ -17577,7 +17577,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_Alert_descriptor;
     }
@@ -17773,7 +17773,7 @@ public final class GtfsRealtime {
           getDescriptorForType() {
         return getDescriptor();
       }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      public static com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.Alert.getDescriptor().getEnumTypes().get(0);
       }
@@ -17960,7 +17960,7 @@ public final class GtfsRealtime {
           getDescriptorForType() {
         return getDescriptor();
       }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      public static com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.Alert.getDescriptor().getEnumTypes().get(1);
       }
@@ -18072,7 +18072,7 @@ public final class GtfsRealtime {
           getDescriptorForType() {
         return getDescriptor();
       }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      public static com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.Alert.getDescriptor().getEnumTypes().get(2);
       }
@@ -18799,7 +18799,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.Alert, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.Alert)
         com.google.transit.realtime.GtfsRealtime.AlertOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_Alert_descriptor;
       }
@@ -20927,7 +20927,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TimeRange_descriptor;
     }
@@ -21199,7 +21199,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.TimeRange, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.TimeRange)
         com.google.transit.realtime.GtfsRealtime.TimeRangeOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TimeRange_descriptor;
       }
@@ -21736,7 +21736,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_Position_descriptor;
     }
@@ -22140,7 +22140,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.Position, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.Position)
         com.google.transit.realtime.GtfsRealtime.PositionOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_Position_descriptor;
       }
@@ -23006,7 +23006,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripDescriptor_descriptor;
     }
@@ -23210,7 +23210,7 @@ public final class GtfsRealtime {
           getDescriptorForType() {
         return getDescriptor();
       }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
+      public static com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.TripDescriptor.getDescriptor().getEnumTypes().get(0);
       }
@@ -23846,7 +23846,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.TripDescriptor, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.TripDescriptor)
         com.google.transit.realtime.GtfsRealtime.TripDescriptorOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TripDescriptor_descriptor;
       }
@@ -24962,7 +24962,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_VehicleDescriptor_descriptor;
     }
@@ -25361,7 +25361,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.VehicleDescriptor, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.VehicleDescriptor)
         com.google.transit.realtime.GtfsRealtime.VehicleDescriptorOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_VehicleDescriptor_descriptor;
       }
@@ -26157,7 +26157,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_EntitySelector_descriptor;
     }
@@ -26655,7 +26655,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.EntitySelector, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.EntitySelector)
         com.google.transit.realtime.GtfsRealtime.EntitySelectorOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_EntitySelector_descriptor;
       }
@@ -27572,7 +27572,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TranslatedString_descriptor;
     }
@@ -27721,7 +27721,7 @@ public final class GtfsRealtime {
           makeExtensionsImmutable();
         }
       }
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TranslatedString_Translation_descriptor;
       }
@@ -28048,7 +28048,7 @@ public final class GtfsRealtime {
             com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation, Builder> implements
           // @@protoc_insertion_point(builder_implements:transit_realtime.TranslatedString.Translation)
           com.google.transit.realtime.GtfsRealtime.TranslatedString.TranslationOrBuilder {
-        public static final com.google.protobuf.Descriptors.Descriptor
+        public static com.google.protobuf.Descriptors.Descriptor
             getDescriptor() {
           return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TranslatedString_Translation_descriptor;
         }
@@ -28758,7 +28758,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.TranslatedString, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.TranslatedString)
         com.google.transit.realtime.GtfsRealtime.TranslatedStringOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_TranslatedString_descriptor;
       }
@@ -29496,7 +29496,7 @@ public final class GtfsRealtime {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_Shape_descriptor;
     }
@@ -29843,7 +29843,7 @@ public final class GtfsRealtime {
           com.google.transit.realtime.GtfsRealtime.Shape, Builder> implements
         // @@protoc_insertion_point(builder_implements:transit_realtime.Shape)
         com.google.transit.realtime.GtfsRealtime.ShapeOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_Shape_descriptor;
       }

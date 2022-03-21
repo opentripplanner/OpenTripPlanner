@@ -28,15 +28,15 @@ public abstract class SphericalDistanceLibrary {
     // for delta lat/lon in given range
     public static final double MAX_ERR_INV = 0.999462;  
 
-    public static final double distance(Coordinate from, Coordinate to) {
+    public static double distance(Coordinate from, Coordinate to) {
         return distance(from.y, from.x, to.y, to.x);
     }
 
-    public static final double fastDistance(Coordinate from, Coordinate to) {
+    public static double fastDistance(Coordinate from, Coordinate to) {
         return fastDistance(from.y, from.x, to.y, to.x);
     }
 
-    public static final double fastDistance(Coordinate from, Coordinate to, double cosLat) {
+    public static double fastDistance(Coordinate from, Coordinate to, double cosLat) {
         double dLat = toRadians(from.y - to.y);
         double dLon = toRadians(from.x - to.x) * cosLat;
         return RADIUS_OF_EARTH_IN_M * sqrt(dLat * dLat + dLon * dLon);
@@ -49,7 +49,7 @@ public abstract class SphericalDistanceLibrary {
      * @param lineString The set of points representing the polyline, in the same coordinate system.
      * @return The (approximated) distance, in meters, between the point and the linestring.
      */
-    public static final double fastDistance(Coordinate point, LineString lineString) {
+    public static double fastDistance(Coordinate point, LineString lineString) {
         // Transform in equirectangular projection on sphere of radius 1,
         // centered at point
         double lat = Math.toRadians(point.y);
@@ -80,7 +80,7 @@ public abstract class SphericalDistanceLibrary {
      * @param lineString The polyline in (longitude, latitude degrees).
      * @return The (approximated) length, in meters, of the linestring.
      */
-    public static final double fastLength(LineString lineString) {
+    public static double fastLength(LineString lineString) {
         // Warn: do not use LineString.getCentroid() as it is broken
         // for degenerated geometry (same first/last point).
         Coordinate[] coordinates = lineString.getCoordinates();
@@ -94,7 +94,7 @@ public abstract class SphericalDistanceLibrary {
      * @param lineString The polyline in (longitude, latitude degrees).
      * @return The (approximated) length, in meters, of the linestring.
      */
-    public static final double fastLength(LineString lineString, double cosLat) {
+    public static double fastLength(LineString lineString, double cosLat) {
         return equirectangularProject(lineString, cosLat).getLength() * RADIUS_OF_EARTH_IN_M;
     }
 
@@ -114,7 +114,7 @@ public abstract class SphericalDistanceLibrary {
         return GeometryUtils.getGeometryFactory().createLineString(coords2);
     }
     
-    public static final double distance(double lat1, double lon1, double lat2, double lon2) {
+    public static double distance(double lat1, double lon1, double lat2, double lon2) {
         return distance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
     }
 
@@ -122,12 +122,12 @@ public abstract class SphericalDistanceLibrary {
      * Compute an (approximated) distance between two points, with a known cos(lat).
      * Be careful, this is approximated and never check for the validity of input cos(lat).
      */
-    public static final double fastDistance(double lat1, double lon1, double lat2, double lon2) {
+    public static double fastDistance(double lat1, double lon1, double lat2, double lon2) {
         return fastDistance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
     }
     
-    public static final double distance(double lat1, double lon1, double lat2, double lon2,
-            double radius) {
+    public static double distance(double lat1, double lon1, double lat2, double lon2,
+                                  double radius) {
         // http://en.wikipedia.org/wiki/Great-circle_distance
         lat1 = toRadians(lat1); // Theta-s
         lon1 = toRadians(lon1); // Lambda-s
@@ -149,7 +149,7 @@ public abstract class SphericalDistanceLibrary {
      * Works only for small delta lat/lon, fall-back on exact distance if not the case.
      * See: http://www.movable-type.co.uk/scripts/latlong.html
      */
-    public static final double fastDistance(double lat1, double lon1, double lat2, double lon2, double radius) {
+    public static double fastDistance(double lat1, double lon1, double lat2, double lon2, double radius) {
         if (abs(lat1 - lat2) > MAX_LAT_DELTA_DEG || abs(lon1 - lon2) > MAX_LON_DELTA_DEG) {
             return distance(lat1, lon1, lat2, lon2, radius);
         }
@@ -158,7 +158,7 @@ public abstract class SphericalDistanceLibrary {
         return radius * sqrt(dLat * dLat + dLon * dLon) * MAX_ERR_INV;
     }
 
-    private static final double p2(double a) {
+    private static double p2(double a) {
         return a * a;
     }
 
@@ -201,7 +201,7 @@ public abstract class SphericalDistanceLibrary {
         return dLatDeg / minCosLat;
     }
 
-    public static final Envelope bounds(double lat, double lon, double latDistance, double lonDistance) {
+    public static Envelope bounds(double lat, double lon, double latDistance, double lonDistance) {
 
         double radiusOfEarth = RADIUS_OF_EARTH_IN_M;
 
