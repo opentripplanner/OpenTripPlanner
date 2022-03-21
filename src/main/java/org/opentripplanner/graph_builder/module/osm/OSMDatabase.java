@@ -9,17 +9,32 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.*;
+import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
+import org.opentripplanner.graph_builder.issues.PublicTransportRelationSkipped;
+import org.opentripplanner.graph_builder.issues.TooManyAreasInRelation;
+import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
+import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
+import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
-import org.opentripplanner.openstreetmap.model.*;
+import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
+import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OSMRelation;
+import org.opentripplanner.openstreetmap.model.OSMRelationMember;
+import org.opentripplanner.openstreetmap.model.OSMTag;
+import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -27,7 +42,15 @@ import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class OSMDatabase {
 
@@ -637,14 +660,13 @@ public class OSMDatabase {
     }
 
     private void markNodesForKeeping(Collection<OSMWay> osmWays, TLongSet nodeSet) {
-        for (Iterator<OSMWay> it = osmWays.iterator(); it.hasNext();) {
-            OSMWay way = it.next();
-            // Since the way is kept, update nodes-with-neighbors
-            TLongList nodes = way.getNodeRefs();
-            if (nodes.size() > 1) {
-                nodeSet.addAll(nodes);
-            }
+      for (OSMWay way : osmWays) {
+        // Since the way is kept, update nodes-with-neighbors
+        TLongList nodes = way.getNodeRefs();
+        if (nodes.size() > 1) {
+          nodeSet.addAll(nodes);
         }
+      }
     }
 
     /**

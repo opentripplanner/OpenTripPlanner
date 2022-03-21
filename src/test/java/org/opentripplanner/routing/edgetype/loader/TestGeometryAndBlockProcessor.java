@@ -1,15 +1,7 @@
 package org.opentripplanner.routing.edgetype.loader;
 
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import java.time.Instant;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
 import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
@@ -37,6 +29,15 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.TestUtils;
+
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
+
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
@@ -76,15 +77,15 @@ public class TestGeometryAndBlockProcessor extends TestCase {
                 feedId + ":entrance_a",
                 feedId + ":entrance_b"
         };
-        for (int i = 0; i < stops.length; ++i) {
-            TransitStopVertex stop = (TransitStopVertex) (graph.getVertex(stops[i]));
-            
-            IntersectionVertex front = new IntersectionVertex(graph, "near_1_" + stop.getStop().getId(), stop.getX() + 0.0001, stop.getY() + 0.0001);
-            IntersectionVertex back =  new IntersectionVertex(graph, "near_2_" + stop.getStop().getId(), stop.getX() - 0.0001, stop.getY() - 0.0001);
-            
-            StreetEdge street1 = new StreetEdge(front, back, GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "street", 100, StreetTraversalPermission.ALL, false);
-            StreetEdge street2 = new StreetEdge(back, front, GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "street", 100, StreetTraversalPermission.ALL, true);
-        }
+      for (String s : stops) {
+        TransitStopVertex stop = (TransitStopVertex) (graph.getVertex(s));
+
+        IntersectionVertex front = new IntersectionVertex(graph, "near_1_" + stop.getStop().getId(), stop.getX() + 0.0001, stop.getY() + 0.0001);
+        IntersectionVertex back = new IntersectionVertex(graph, "near_2_" + stop.getStop().getId(), stop.getX() - 0.0001, stop.getY() - 0.0001);
+
+        StreetEdge street1 = new StreetEdge(front, back, GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "street", 100, StreetTraversalPermission.ALL, false);
+        StreetEdge street2 = new StreetEdge(back, front, GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "street", 100, StreetTraversalPermission.ALL, true);
+      }
 
         StreetLinkerModule ttsnm = new StreetLinkerModule();
         //Linkers aren't run otherwise

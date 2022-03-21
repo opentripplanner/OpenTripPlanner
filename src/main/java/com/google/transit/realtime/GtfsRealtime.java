@@ -343,8 +343,8 @@ public final class GtfsRealtime {
       if (((bitField0_ & 0x00000001) != 0)) {
         output.writeMessage(1, getHeader());
       }
-      for (int i = 0; i < entity_.size(); i++) {
-        output.writeMessage(2, entity_.get(i));
+      for (FeedEntity feedEntity : entity_) {
+        output.writeMessage(2, feedEntity);
       }
       extensionWriter.writeUntil(2000, output);
       extensionWriter.writeUntil(10000, output);
@@ -361,9 +361,9 @@ public final class GtfsRealtime {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getHeader());
       }
-      for (int i = 0; i < entity_.size(); i++) {
+      for (FeedEntity feedEntity : entity_) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, entity_.get(i));
+          .computeMessageSize(2, feedEntity);
       }
       size += extensionsSerializedSize();
       size += unknownFields.getSerializedSize();
@@ -10291,8 +10291,8 @@ public final class GtfsRealtime {
       if (((bitField0_ & 0x00000001) != 0)) {
         output.writeMessage(1, getTrip());
       }
-      for (int i = 0; i < stopTimeUpdate_.size(); i++) {
-        output.writeMessage(2, stopTimeUpdate_.get(i));
+      for (StopTimeUpdate stopTimeUpdate : stopTimeUpdate_) {
+        output.writeMessage(2, stopTimeUpdate);
       }
       if (((bitField0_ & 0x00000002) != 0)) {
         output.writeMessage(3, getVehicle());
@@ -10321,9 +10321,9 @@ public final class GtfsRealtime {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getTrip());
       }
-      for (int i = 0; i < stopTimeUpdate_.size(); i++) {
+      for (StopTimeUpdate stopTimeUpdate : stopTimeUpdate_) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, stopTimeUpdate_.get(i));
+          .computeMessageSize(2, stopTimeUpdate);
       }
       if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.CodedOutputStream
@@ -15042,8 +15042,8 @@ public final class GtfsRealtime {
       if (((bitField0_ & 0x00000200) != 0)) {
         output.writeUInt32(10, occupancyPercentage_);
       }
-      for (int i = 0; i < multiCarriageDetails_.size(); i++) {
-        output.writeMessage(11, multiCarriageDetails_.get(i));
+      for (CarriageDetails carriageDetails : multiCarriageDetails_) {
+        output.writeMessage(11, carriageDetails);
       }
       extensionWriter.writeUntil(2000, output);
       extensionWriter.writeUntil(10000, output);
@@ -15095,9 +15095,9 @@ public final class GtfsRealtime {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(10, occupancyPercentage_);
       }
-      for (int i = 0; i < multiCarriageDetails_.size(); i++) {
+      for (CarriageDetails carriageDetails : multiCarriageDetails_) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(11, multiCarriageDetails_.get(i));
+          .computeMessageSize(11, carriageDetails);
       }
       size += extensionsSerializedSize();
       size += unknownFields.getSerializedSize();
@@ -18490,11 +18490,11 @@ public final class GtfsRealtime {
       com.google.protobuf.GeneratedMessageV3
         .ExtendableMessage<com.google.transit.realtime.GtfsRealtime.Alert>.ExtensionWriter
           extensionWriter = newExtensionWriter();
-      for (int i = 0; i < activePeriod_.size(); i++) {
-        output.writeMessage(1, activePeriod_.get(i));
+      for (TimeRange timeRange : activePeriod_) {
+        output.writeMessage(1, timeRange);
       }
-      for (int i = 0; i < informedEntity_.size(); i++) {
-        output.writeMessage(5, informedEntity_.get(i));
+      for (EntitySelector entitySelector : informedEntity_) {
+        output.writeMessage(5, entitySelector);
       }
       if (((bitField0_ & 0x00000001) != 0)) {
         output.writeEnum(6, cause_);
@@ -18531,13 +18531,13 @@ public final class GtfsRealtime {
       if (size != -1) return size;
 
       size = 0;
-      for (int i = 0; i < activePeriod_.size(); i++) {
+      for (TimeRange timeRange : activePeriod_) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, activePeriod_.get(i));
+          .computeMessageSize(1, timeRange);
       }
-      for (int i = 0; i < informedEntity_.size(); i++) {
+      for (EntitySelector entitySelector : informedEntity_) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, informedEntity_.get(i));
+          .computeMessageSize(5, entitySelector);
       }
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
@@ -28571,8 +28571,8 @@ public final class GtfsRealtime {
       com.google.protobuf.GeneratedMessageV3
         .ExtendableMessage<com.google.transit.realtime.GtfsRealtime.TranslatedString>.ExtensionWriter
           extensionWriter = newExtensionWriter();
-      for (int i = 0; i < translation_.size(); i++) {
-        output.writeMessage(1, translation_.get(i));
+      for (Translation translation : translation_) {
+        output.writeMessage(1, translation);
       }
       extensionWriter.writeUntil(2000, output);
       extensionWriter.writeUntil(10000, output);
@@ -28585,9 +28585,9 @@ public final class GtfsRealtime {
       if (size != -1) return size;
 
       size = 0;
-      for (int i = 0; i < translation_.size(); i++) {
+      for (Translation translation : translation_) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, translation_.get(i));
+          .computeMessageSize(1, translation);
       }
       size += extensionsSerializedSize();
       size += unknownFields.getSerializedSize();

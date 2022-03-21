@@ -955,25 +955,24 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	        while (c != null && c != Object.class) {
 	            metadataModel.addElement("Class:" + c);
 	            fields = c.getDeclaredFields();
-	            for (int i = 0; i < fields.length; i++) {
-	                Field field = fields[i];
-	                int modifiers = field.getModifiers();
-	                if ((modifiers & Modifier.STATIC) != 0) {
-	                    continue;
-	                }
-	                field.setAccessible(true);
-	                String name = field.getName();
-	
-	                String value = "(unknown -- see console for stack trace)";
-	                try {
-	                    value = "" + field.get(selected);
-	                } catch (IllegalArgumentException e1) {
-						LOG.error("IllegalArgumentException", e1);
-	                } catch (IllegalAccessException e1) {
-	                    LOG.error("IllegalAccessException", e1);
-	                }
-	                metadataModel.addElement(name + ": " + value);
-	            }
+            for (Field field : fields) {
+              int modifiers = field.getModifiers();
+              if ((modifiers & Modifier.STATIC) != 0) {
+                continue;
+              }
+              field.setAccessible(true);
+              String name = field.getName();
+
+              String value = "(unknown -- see console for stack trace)";
+              try {
+                value = "" + field.get(selected);
+              } catch (IllegalArgumentException e1) {
+                LOG.error("IllegalArgumentException", e1);
+              } catch (IllegalAccessException e1) {
+                LOG.error("IllegalAccessException", e1);
+              }
+              metadataModel.addElement(name + ": " + value);
+            }
 	            c = c.getSuperclass();
 	        }
 	    }
