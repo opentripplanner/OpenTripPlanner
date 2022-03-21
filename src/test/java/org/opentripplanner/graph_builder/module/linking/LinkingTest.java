@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.linking;
 
 import com.google.common.collect.Iterables;
+import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -15,8 +15,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.net.URISyntaxException;
 import java.util.Comparator;
@@ -108,12 +108,11 @@ public class LinkingTest {
     }
 
     private static List<StreetTransitStopLink> outgoingStls (final TransitStopVertex tsv) {
-        List<StreetTransitStopLink> stls = tsv.getOutgoing().stream()
+        return tsv.getOutgoing().stream()
                 .filter(StreetTransitStopLink.class::isInstance)
                 .map(StreetTransitStopLink.class::cast)
+                .sorted(Comparator.comparing(e -> e.getGeometry().getLength()))
                 .collect(Collectors.toList());
-        stls.sort(Comparator.comparing(e -> e.getGeometry().getLength()));
-        return stls;
     }
 
 }
