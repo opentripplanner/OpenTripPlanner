@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Sets;
 import java.awt.Color;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -381,7 +380,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     private static class EntityCounter implements EntityHandler {
 
-        private final Map<Class<?>, Integer> _count = new HashMap<Class<?>, Integer>();
+        private final Map<Class<?>, Integer> count = new HashMap<Class<?>, Integer>();
 
         @Override
         public void handleEntity(Object bean) {
@@ -397,12 +396,12 @@ public class GtfsModule implements GraphBuilderModule {
         }
 
         private int incrementCount(Class<?> entityType) {
-            Integer value = _count.get(entityType);
+            Integer value = count.get(entityType);
             if (value == null) {
                 value = 0;
             }
             value++;
-            _count.put(entityType, value);
+            count.put(entityType, value);
             return value;
         }
 

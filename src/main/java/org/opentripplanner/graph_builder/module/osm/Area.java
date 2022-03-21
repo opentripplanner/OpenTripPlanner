@@ -37,7 +37,7 @@ class Area {
     public MultiPolygon jtsMultiPolygon;
 
     Area(OSMWithTags parent, List<OSMWay> outerRingWays, List<OSMWay> innerRingWays,
-         TLongObjectMap<OSMNode> _nodes) {
+         TLongObjectMap<OSMNode> nodes) {
         this.parent = parent;
         // ring assignment
         List<TLongList> innerRingNodes = constructRings(innerRingWays);
@@ -51,10 +51,10 @@ class Area {
         List<Ring> innerRings = new ArrayList<Ring>();
         List<Ring> outerRings = new ArrayList<Ring>();
         for (TLongList ring : innerRingNodes) {
-            innerRings.add(new Ring(ring, _nodes));
+            innerRings.add(new Ring(ring, nodes));
         }
         for (TLongList ring : outerRingNodes) {
-            outerRings.add(new Ring(ring, _nodes));
+            outerRings.add(new Ring(ring, nodes));
         }
 
         List<Ring> outermostRings = new ArrayList<>();
