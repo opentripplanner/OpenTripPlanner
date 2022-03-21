@@ -171,7 +171,7 @@ public class DateUtils implements DateConstants {
 
     public static int getIntegerFromString(String input) {
         try {
-            return new Integer(input);
+            return Integer.parseInt(input);
         } catch (Exception e) {
             return 0;
         }

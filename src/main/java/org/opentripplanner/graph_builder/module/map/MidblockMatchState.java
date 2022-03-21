@@ -220,7 +220,7 @@ public class MidblockMatchState extends MatchState {
 
     private int hashCode(LinearLocation location) {
         return location.getComponentIndex() * 1000000 + location.getSegmentIndex() * 37
-                + new Double(location.getSegmentFraction()).hashCode();
+                + Double.valueOf(location.getSegmentFraction()).hashCode();
     }
 
     public boolean equals(Object o) {
