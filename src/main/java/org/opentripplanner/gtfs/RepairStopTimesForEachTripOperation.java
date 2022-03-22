@@ -11,6 +11,7 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.HopSpeedFast;
 import org.opentripplanner.graph_builder.issues.HopSpeedSlow;
+import org.opentripplanner.graph_builder.issues.HopZeroDistance;
 import org.opentripplanner.graph_builder.issues.HopZeroTime;
 import org.opentripplanner.graph_builder.issues.NegativeDwellTime;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
@@ -203,15 +204,14 @@ public class RepairStopTimesForEachTripOperation {
                     .fastDistance(st0.getStop().getCoordinate().asJtsCoordinate(),
                         st1.getStop().getCoordinate().asJtsCoordinate());
             double hopSpeed = hopDistance / runningTime;
-            /* zero-distance hops are probably not harmful, though they could be better
-             * represented as dwell times
+
             if (hopDistance == 0) {
-                LOG.warn(GraphBuilderAnnotation.register(graph,
-                        Variety.HOP_ZERO_DISTANCE, runningTime,
-                        st1.getTrip().getId(),
-                        st1.getStopSequence()));
+                issueStore.add(new HopZeroDistance(
+                        runningTime,
+                        st1.getTrip(),
+                        st1.getStopSequence()
+                ));
             }
-            */
             // sanity-check the hop
             if (st0.getArrivalTime() == st1.getArrivalTime() || st0.getDepartureTime() == st1
                     .getDepartureTime()) {
