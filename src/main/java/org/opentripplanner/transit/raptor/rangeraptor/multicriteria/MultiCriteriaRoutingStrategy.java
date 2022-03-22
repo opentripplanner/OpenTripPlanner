@@ -83,7 +83,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
     @Override
     public TransitArrival<T> previousTransit(int boardStopIndex) {
-        return prevArrival.mostResentTransitArrival();
+        return prevArrival.mostRecentTransitArrival();
     }
 
     @Override

@@ -53,7 +53,7 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
     }
 
     @Override
-    public TransitArrival<T> mostResentTransitArrival() {
+    public TransitArrival<T> mostRecentTransitArrival() {
         return this;
     }
 }
