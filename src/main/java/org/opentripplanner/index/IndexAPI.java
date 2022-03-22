@@ -62,8 +62,8 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@SuppressWarnings("FieldMayBeFinal")   // FasterJackson can not set final fields
-@Path("/routers/{routerId}/index")  // It would be nice to get rid of the final /index.
+@SuppressWarnings("FieldMayBeFinal")
+@Path("/routers/{ignoreRouterId}/index")  // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON)  // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
@@ -79,7 +79,15 @@ public class IndexAPI {
 
     private final OTPServer otpServer;
 
-    public IndexAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
+    public IndexAPI(
+            @Context
+            OTPServer otpServer,
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @PathParam("ignoreRouterId") String ignoreRouterId
+    ) {
         this.otpServer = otpServer;
     }
 

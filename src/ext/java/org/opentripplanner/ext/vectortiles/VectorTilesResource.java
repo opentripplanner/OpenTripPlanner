@@ -2,6 +2,25 @@ package org.opentripplanner.ext.vectortiles;
 
 
 import com.wdtinc.mapbox_vector_tile.VectorTile;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import org.geotools.geometry.Envelope2D;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.WebMercatorTile;
@@ -15,31 +34,11 @@ import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.WorldEnvelope;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
   enum LayerType {Stop, Station, VehicleRental, VehicleParking}
 
-  static Map<LayerType, BiFunction<Graph, LayerParameters, LayerBuilder>> layers = new HashMap<>();
+  private static final Map<LayerType, BiFunction<Graph, LayerParameters, LayerBuilder>> layers = new HashMap<>();
 
   static {
     layers.put(LayerType.Stop, StopsLayerBuilder::new);
@@ -48,15 +47,23 @@ public class VectorTilesResource {
     layers.put(LayerType.VehicleParking, VehicleParkingsLayerBuilder::new);
   }
 
-  @Context
-  private OTPServer otpServer;
+  private final OTPServer otpServer;
+  private final String ignoreRouterId;
 
-  /**
-   * @deprecated The support for multiple routers are removed from OTP2.
-   * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-   */
-  @Deprecated @PathParam("ignoreRouterId")
-  private String ignoreRouterId;
+
+  public VectorTilesResource(
+          @Context
+          OTPServer otpServer,
+          /**
+           * @deprecated The support for multiple routers are removed from OTP2.
+           * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+           */
+          @Deprecated @PathParam("ignoreRouterId")
+          String ignoreRouterId
+  ) {
+    this.otpServer = otpServer;
+    this.ignoreRouterId = ignoreRouterId;
+  }
 
   @GET
   @Path("/{layers}/{z}/{x}/{y}.pbf")

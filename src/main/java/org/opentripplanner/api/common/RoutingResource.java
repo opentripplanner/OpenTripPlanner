@@ -39,7 +39,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author abyrd
  */
-public abstract class RoutingResource { 
+@SuppressWarnings("FieldMayBeFinal")
+public abstract class RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
 
