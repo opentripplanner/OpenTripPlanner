@@ -29,6 +29,7 @@ public class LegacyGraphQLUtils {
     }
 
     public static LegacyGraphQLWheelchairBoarding toGraphQL(WheelChairBoarding boarding) {
+        if(boarding == null) return null;
         return switch (boarding) {
             case NO_INFORMATION -> LegacyGraphQLWheelchairBoarding.NO_INFORMATION;
             case POSSIBLE -> LegacyGraphQLWheelchairBoarding.POSSIBLE;
