@@ -246,7 +246,6 @@ public class EnumTypes {
             .value("flat", BicycleOptimizeType.FLAT)
             .value("greenways", BicycleOptimizeType.GREENWAYS)
             .value("triangle", BicycleOptimizeType.TRIANGLE)
-            .value("transfers", BicycleOptimizeType.TRANSFERS)
             .build();
 
     public static GraphQLEnumType DIRECTION_TYPE = GraphQLEnumType.newEnum()
