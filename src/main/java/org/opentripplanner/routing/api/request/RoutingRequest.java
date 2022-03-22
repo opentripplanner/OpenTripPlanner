@@ -24,6 +24,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
+import org.opentripplanner.model.AccessibilityRequirements;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -234,23 +235,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public boolean arriveBy = false;
 
-    public enum AccessibilityMode {
-        // accessibility information doesn't play a role in routing
-        NOT_REQUIRED,
-        // only routes and places which are known to be wheelchair accessibly should be used
-        STRICTLY_REQUIRED,
-        // trips/stops that are known to be wheelchair-accessible are preferred but those with unknown information
-        PREFERRED;
-
-        public boolean requestsWheelchair() {
-            return this == STRICTLY_REQUIRED || this == PREFERRED;
-        }
-    }
-
     /**
-     * Whether the trip must be wheelchair accessible.
+     * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
      */
-    public AccessibilityMode accessibilityMode = AccessibilityMode.NOT_REQUIRED;
+    public AccessibilityRequirements accessibilityRequirements = AccessibilityRequirements.NOT_REQUIRED;
 
     public int unknownStopAccessibilityPenalty = 60 * 10;
     public int unknownTripAccessibilityPenalty = 60 * 10;
@@ -828,9 +816,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setAccessibilityMode(boolean accessibilityMode) {
         if(accessibilityMode) {
-            this.accessibilityMode = AccessibilityMode.PREFERRED;
+            this.accessibilityRequirements = AccessibilityRequirements.ALLOW_UNKNOWN_INFORMATION;
         } else {
-            this.accessibilityMode = AccessibilityMode.NOT_REQUIRED;
+            this.accessibilityRequirements = AccessibilityRequirements.NOT_REQUIRED;
         }
     }
 

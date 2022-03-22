@@ -1,24 +1,26 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.util.List;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 
 public class AccessibilityScore {
 
     public static float compute(ScheduledTransitLeg leg) {
-        var from = leg.getFrom().stop.getWheelchairBoarding();
-        var to = leg.getFrom().stop.getWheelchairBoarding();
+        var fromStop = leg.getFrom().stop.getWheelchairBoarding();
+        var toStop = leg.getFrom().stop.getWheelchairBoarding();
         var trip = leg.getTrip().getWheelchairBoarding();
 
-        var sum = accessibilityScore(trip) + accessibilityScore(from) + accessibilityScore(to);
-        return sum / 3;
+        var values = List.of(trip, fromStop, toStop);
+        var sum = (float) values.stream().mapToDouble(AccessibilityScore::accessibilityScore).sum();
+        return sum / values.size();
     }
 
-    public static float accessibilityScore(WheelChairBoarding wheelchair) {
+    public static double accessibilityScore(WheelChairBoarding wheelchair) {
         return switch (wheelchair) {
-            case NO_INFORMATION -> 0.5f;
-            case POSSIBLE -> 1f;
-            case NOT_POSSIBLE -> 0f;
+            case NO_INFORMATION -> 0.5;
+            case POSSIBLE -> 1;
+            case NOT_POSSIBLE -> 0;
         };
     }
 }

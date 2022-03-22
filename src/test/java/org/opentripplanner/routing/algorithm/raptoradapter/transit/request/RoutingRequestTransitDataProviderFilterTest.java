@@ -26,7 +26,7 @@ import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
+import org.opentripplanner.model.AccessibilityRequirements;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -38,7 +38,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   private static final Stop STOP_FOR_TEST = Stop.stopForTest("TEST:STOP", 0, 0);
 
-  private static final AccessibilityMode DEFAULT_ACCESSIBILITY_MODE = AccessibilityMode.NOT_REQUIRED;
+  private static final AccessibilityRequirements DEFAULT_ACCESSIBILITY_MODE = AccessibilityRequirements.NOT_REQUIRED;
 
   @Test
   public void notFilteringExpectedTripPatternForDateTest() {
@@ -177,7 +177,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
-        AccessibilityMode.STRICTLY_REQUIRED,
+        AccessibilityRequirements.KNOWN_INFORMATION_ONLY,
         false,
         AllowedTransitMode.getAllTransitModes(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
         Set.of(),
@@ -196,7 +196,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
             false,
-            AccessibilityMode.STRICTLY_REQUIRED,
+            AccessibilityRequirements.KNOWN_INFORMATION_ONLY,
             false,
             Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
             Set.of(),

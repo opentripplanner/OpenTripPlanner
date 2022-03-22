@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathUtils;
 import org.opentripplanner.transit.raptor._data.api.TestPathBuilder;

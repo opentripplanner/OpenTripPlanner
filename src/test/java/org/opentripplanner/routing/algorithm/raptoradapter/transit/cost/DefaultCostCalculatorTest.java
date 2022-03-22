@@ -1,11 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.WheelChairBoarding.NO_INFORMATION;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
 
 public class DefaultCostCalculatorTest {
 

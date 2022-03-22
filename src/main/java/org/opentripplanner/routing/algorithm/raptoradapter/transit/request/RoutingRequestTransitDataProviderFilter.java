@@ -13,7 +13,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
+import org.opentripplanner.model.AccessibilityRequirements;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -22,7 +22,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final boolean requireBikesAllowed;
 
-  private final AccessibilityMode accessibilityMode;
+  private final AccessibilityRequirements accessibilityRequirements;
 
   private final boolean includePlannedCancellations;
 
@@ -34,14 +34,14 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   public RoutingRequestTransitDataProviderFilter(
       boolean requireBikesAllowed,
-      AccessibilityMode accessibilityMode,
+      AccessibilityRequirements accessibilityRequirements,
       boolean includePlannedCancellations,
       Set<AllowedTransitMode> allowedTransitModes,
       Set<FeedScopedId> bannedRoutes,
       Set<FeedScopedId> bannedTrips
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
-    this.accessibilityMode = accessibilityMode;
+    this.accessibilityRequirements = accessibilityRequirements;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
@@ -70,7 +70,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   ) {
     this(
         request.modes.transferMode == StreetMode.BIKE,
-        request.accessibilityMode,
+        request.accessibilityRequirements,
         request.includePlannedCancellations,
         request.modes.transitModes,
         request.getBannedRoutes(graphIndex.getAllRoutes()),
@@ -104,11 +104,11 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return bikeAccessForTrip(trip) == BikeAccess.ALLOWED;
     }
 
-    if (accessibilityMode == AccessibilityMode.STRICTLY_REQUIRED) {
+    if (accessibilityRequirements == AccessibilityRequirements.KNOWN_INFORMATION_ONLY) {
       // if the accessibility mode is STRICTLY_REQUIRED we only want trips of which we know that they
       // are wheelchair accessible
       return trip.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
-    } else if (accessibilityMode == AccessibilityMode.PREFERRED) {
+    } else if (accessibilityRequirements == AccessibilityRequirements.ALLOW_UNKNOWN_INFORMATION) {
       // when it's PREFERRED we also allow trips with unknown accessibility, but remove
       // those which are known to be inaccessible
       return trip.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

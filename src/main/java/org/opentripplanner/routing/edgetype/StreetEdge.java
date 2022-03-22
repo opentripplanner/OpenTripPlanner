@@ -219,7 +219,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * @return
      */
     public boolean canTraverse(RoutingRequest options, TraverseMode mode) {
-        if (mode.isWalking() && options.accessibilityMode.requestsWheelchair()) {
+        if (mode.isWalking() && options.accessibilityRequirements.requestsWheelchair()) {
             if (!isWheelchairAccessible()) {
                 return false;
             }
@@ -400,7 +400,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                 }
                 break;
             case WALK:
-                if (options.accessibilityMode.requestsWheelchair()) {
+                if (options.accessibilityRequirements.requestsWheelchair()) {
                     time = getEffectiveWalkDistance() / speed;
                     weight = getEffectiveBikeDistance() / speed;
                 } else if (walkingBike) {

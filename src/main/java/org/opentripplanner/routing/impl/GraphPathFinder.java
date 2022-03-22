@@ -101,7 +101,7 @@ public class GraphPathFinder {
         List<GraphPath> paths;
         try {
             paths = getPaths(routingContext);
-            if (paths == null && routingContext.opt.accessibilityMode.requestsWheelchair()) {
+            if (paths == null && routingContext.opt.accessibilityRequirements.requestsWheelchair()) {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions, and warn the user in the response.
                 RoutingRequest relaxedRequest = request.clone();

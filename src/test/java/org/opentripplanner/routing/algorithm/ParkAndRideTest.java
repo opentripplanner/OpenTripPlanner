@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
+import org.opentripplanner.model.AccessibilityRequirements;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.graph.Graph;
@@ -110,9 +110,9 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
         options.carParkCost = 240;
         options.carParkTime = 180;
         if(requireWheelChairAccessible) {
-            options.accessibilityMode = AccessibilityMode.STRICTLY_REQUIRED;
+            options.accessibilityRequirements = AccessibilityRequirements.KNOWN_INFORMATION_ONLY;
         } else {
-            options.accessibilityMode = AccessibilityMode.NOT_REQUIRED;
+            options.accessibilityRequirements = AccessibilityRequirements.NOT_REQUIRED;
         }
         options.bannedVehicleParkingTags = bannedTags;
         options.requiredVehicleParkingTags = requiredTags;

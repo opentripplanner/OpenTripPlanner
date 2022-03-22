@@ -15,7 +15,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
+import org.opentripplanner.model.AccessibilityRequirements;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -331,7 +331,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         }
         
         RoutingRequest options = new RoutingRequest();
-        options.accessibilityMode = AccessibilityMode.STRICTLY_REQUIRED;
+        options.accessibilityRequirements = AccessibilityRequirements.KNOWN_INFORMATION_ONLY;
         options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
 
         ShortestPathTree spt;

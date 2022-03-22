@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode.PREFERRED;
-import static org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode.STRICTLY_REQUIRED;
+import static org.opentripplanner.model.AccessibilityRequirements.ALLOW_UNKNOWN_INFORMATION;
+import static org.opentripplanner.model.AccessibilityRequirements.KNOWN_INFORMATION_ONLY;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -86,11 +86,11 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
-        var accessibilityMode = s0.getOptions().accessibilityMode;
-        if (accessibilityMode == STRICTLY_REQUIRED && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
+        var accessibilityMode = s0.getOptions().accessibilityRequirements;
+        if (accessibilityMode == KNOWN_INFORMATION_ONLY && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
             return null;
         }
-        else if(accessibilityMode == PREFERRED && wheelchairBoarding != WheelChairBoarding.NO_INFORMATION) {
+        else if(accessibilityMode == ALLOW_UNKNOWN_INFORMATION && wheelchairBoarding != WheelChairBoarding.NO_INFORMATION) {
             s1.incrementWeight(req.unknownStopAccessibilityPenalty);
         }
 

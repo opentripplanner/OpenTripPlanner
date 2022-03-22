@@ -5,7 +5,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
+import org.opentripplanner.model.AccessibilityRequirements;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -20,7 +20,7 @@ public class McCostParams {
     private final int transferCost;
     private final double[] transitReluctanceFactors;
     private final double waitReluctanceFactor;
-    private final AccessibilityMode accessibilityMode;
+    private final AccessibilityRequirements accessibilityRequirements;
     private final int unknownTripAccessibilityCost;
     private final int inaccessibleTripCost;
 
@@ -33,7 +33,7 @@ public class McCostParams {
         this.transferCost = 0;
         this.transitReluctanceFactors = null;
         this.waitReluctanceFactor = 1.0;
-        this.accessibilityMode = AccessibilityMode.NOT_REQUIRED;
+        this.accessibilityRequirements = AccessibilityRequirements.NOT_REQUIRED;
         this.unknownTripAccessibilityCost = 60 * 5;
         this.inaccessibleTripCost = 60 * 60;
     }
@@ -43,7 +43,7 @@ public class McCostParams {
         this.transferCost = builder.transferCost();
         this.transitReluctanceFactors = builder.transitReluctanceFactors();
         this.waitReluctanceFactor = builder.waitReluctanceFactor();
-        this.accessibilityMode = builder.accessibilityMode();
+        this.accessibilityRequirements = builder.accessibilityMode();
         this.unknownTripAccessibilityCost = builder.unknownAccessibilityCost();
         this.inaccessibleTripCost = builder.inaccessibleTripCost();
     }
@@ -92,8 +92,8 @@ public class McCostParams {
         return inaccessibleTripCost;
     }
 
-    public AccessibilityMode accessibilityMode() {
-        return accessibilityMode;
+    public AccessibilityRequirements accessibilityMode() {
+        return accessibilityRequirements;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class McCostParams {
                 .addNum("transferCost", transferCost, 0)
                 .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
                 .addDoubles("transitReluctanceFactors",  transitReluctanceFactors, 1.0)
-                .addEnum("accessibilityMode",  accessibilityMode)
+                .addEnum("accessibilityMode", accessibilityRequirements)
                 .toString();
     }
 
@@ -114,13 +114,15 @@ public class McCostParams {
         McCostParams that = (McCostParams) o;
         return boardCost == that.boardCost &&
                 transferCost == that.transferCost &&
-                accessibilityMode == that.accessibilityMode &&
+                accessibilityRequirements == that.accessibilityRequirements &&
                 unknownTripAccessibilityCost == that.unknownTripAccessibilityCost &&
                 Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(boardCost, transferCost, waitReluctanceFactor, accessibilityMode);
+        return Objects.hash(boardCost, transferCost, waitReluctanceFactor,
+                accessibilityRequirements
+        );
     }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.RoutingRequest.AccessibilityMode;
+import org.opentripplanner.model.AccessibilityRequirements;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -125,7 +125,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         assertLinking((rr) -> {
             rr.from = new GenericLocation(47.5010, 19.03);
             rr.to = new GenericLocation(47.5010, 19.03);
-            rr.accessibilityMode = AccessibilityMode.STRICTLY_REQUIRED;
+            rr.accessibilityRequirements = AccessibilityRequirements.KNOWN_INFORMATION_ONLY;
         }, "C1C2 street", "C1C2 street", StreetMode.WALK);
     }
 
