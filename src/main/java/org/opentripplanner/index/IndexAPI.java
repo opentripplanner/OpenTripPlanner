@@ -1,5 +1,25 @@
 package org.opentripplanner.index;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.mapping.AgencyMapper;
 import org.opentripplanner.api.mapping.AlertMapper;
@@ -40,31 +60,11 @@ import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
-@Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
+@SuppressWarnings("FieldMayBeFinal")   // FasterJackson can not set final fields
+@Path("/routers/{routerId}/index")  // It would be nice to get rid of the final /index.
+@Produces(MediaType.APPLICATION_JSON)  // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
     private static final double MAX_STOP_SEARCH_RADIUS = 5000;
