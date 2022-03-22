@@ -7,7 +7,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.VehicleStop;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
 
 public class RealtimeVehiclePositionBuilder {
 
@@ -68,7 +68,7 @@ public class RealtimeVehiclePositionBuilder {
 
     public RealtimeVehiclePosition build() {
         var stop = Optional.ofNullable(this.stop)
-                .map(s -> new VehicleStop(s, stopStatus))
+                .map(s -> new StopRelationship(s, stopStatus))
                 .orElse(null);
         return new RealtimeVehiclePosition(
                 vehicleId, label, coordinates, speed, heading, time,

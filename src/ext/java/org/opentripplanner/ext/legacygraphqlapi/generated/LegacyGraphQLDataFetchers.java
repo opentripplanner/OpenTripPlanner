@@ -22,7 +22,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.VehicleStop;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -44,25 +44,25 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLAgency {
 
-        DataFetcher<Iterable<TransitAlert>> alerts();
+        public DataFetcher<Iterable<TransitAlert>> alerts();
 
-        DataFetcher<String> fareUrl();
+        public DataFetcher<String> fareUrl();
 
-        DataFetcher<String> gtfsId();
+        public DataFetcher<String> gtfsId();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<String> lang();
+        public DataFetcher<String> lang();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<String> phone();
+        public DataFetcher<String> phone();
 
-        DataFetcher<Iterable<Route>> routes();
+        public DataFetcher<Iterable<Route>> routes();
 
-        DataFetcher<String> timezone();
+        public DataFetcher<String> timezone();
 
-        DataFetcher<String> url();
+        public DataFetcher<String> url();
     }
 
     /**
@@ -70,45 +70,45 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLAlert {
 
-        DataFetcher<Agency> agency();
+        public DataFetcher<Agency> agency();
 
-        DataFetcher<String> alertCause();
+        public DataFetcher<String> alertCause();
 
-        DataFetcher<String> alertDescriptionText();
+        public DataFetcher<String> alertDescriptionText();
 
-        DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations();
+        public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations();
 
-        DataFetcher<String> alertEffect();
+        public DataFetcher<String> alertEffect();
 
-        DataFetcher<Integer> alertHash();
+        public DataFetcher<Integer> alertHash();
 
-        DataFetcher<String> alertHeaderText();
+        public DataFetcher<String> alertHeaderText();
 
-        DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations();
+        public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations();
 
-        DataFetcher<String> alertSeverityLevel();
+        public DataFetcher<String> alertSeverityLevel();
 
-        DataFetcher<String> alertUrl();
+        public DataFetcher<String> alertUrl();
 
-        DataFetcher<Iterable<Map.Entry<String, String>>> alertUrlTranslations();
+        public DataFetcher<Iterable<Map.Entry<String, String>>> alertUrlTranslations();
 
-        DataFetcher<Long> effectiveEndDate();
+        public DataFetcher<Long> effectiveEndDate();
 
-        DataFetcher<Long> effectiveStartDate();
+        public DataFetcher<Long> effectiveStartDate();
 
-        DataFetcher<Iterable<Object>> entities();
+        public DataFetcher<Iterable<Object>> entities();
 
-        DataFetcher<String> feed();
+        public DataFetcher<String> feed();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Iterable<TripPattern>> patterns();
+        public DataFetcher<Iterable<TripPattern>> patterns();
 
-        DataFetcher<Route> route();
+        public DataFetcher<Route> route();
 
-        DataFetcher<Object> stop();
+        public DataFetcher<Object> stop();
 
-        DataFetcher<Trip> trip();
+        public DataFetcher<Trip> trip();
     }
 
     /**
@@ -122,23 +122,23 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLBikePark {
 
-        DataFetcher<String> bikeParkId();
+        public DataFetcher<String> bikeParkId();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<Iterable<Object>> openingHours();
+        public DataFetcher<Iterable<Object>> openingHours();
 
-        DataFetcher<Boolean> realtime();
+        public DataFetcher<Boolean> realtime();
 
-        DataFetcher<Integer> spacesAvailable();
+        public DataFetcher<Integer> spacesAvailable();
 
-        DataFetcher<Iterable<String>> tags();
+        public DataFetcher<Iterable<String>> tags();
     }
 
     /**
@@ -146,76 +146,76 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLBikeRentalStation {
 
-        DataFetcher<Boolean> allowDropoff();
+        public DataFetcher<Boolean> allowDropoff();
 
-        DataFetcher<Boolean> allowDropoffNow();
+        public DataFetcher<Boolean> allowDropoffNow();
 
-        DataFetcher<Boolean> allowOverloading();
+        public DataFetcher<Boolean> allowOverloading();
 
-        DataFetcher<Boolean> allowPickup();
+        public DataFetcher<Boolean> allowPickup();
 
-        DataFetcher<Boolean> allowPickupNow();
+        public DataFetcher<Boolean> allowPickupNow();
 
-        DataFetcher<Integer> bikesAvailable();
+        public DataFetcher<Integer> bikesAvailable();
 
-        DataFetcher<Integer> capacity();
+        public DataFetcher<Integer> capacity();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<Iterable<String>> networks();
+        public DataFetcher<Iterable<String>> networks();
 
-        DataFetcher<Boolean> operative();
+        public DataFetcher<Boolean> operative();
 
-        DataFetcher<Boolean> realtime();
+        public DataFetcher<Boolean> realtime();
 
-        DataFetcher<VehicleRentalStationUris> rentalUris();
+        public DataFetcher<VehicleRentalStationUris> rentalUris();
 
-        DataFetcher<Integer> spacesAvailable();
+        public DataFetcher<Integer> spacesAvailable();
 
-        DataFetcher<String> state();
+        public DataFetcher<String> state();
 
-        DataFetcher<String> stationId();
+        public DataFetcher<String> stationId();
     }
 
     public interface LegacyGraphQLBikeRentalStationUris {
 
-        DataFetcher<String> android();
+        public DataFetcher<String> android();
 
-        DataFetcher<String> ios();
+        public DataFetcher<String> ios();
 
-        DataFetcher<String> web();
+        public DataFetcher<String> web();
     }
 
     public interface LegacyGraphQLBookingInfo {
 
-        DataFetcher<org.opentripplanner.model.ContactInfo> contactInfo();
+        public DataFetcher<org.opentripplanner.model.ContactInfo> contactInfo();
 
-        DataFetcher<String> dropOffMessage();
+        public DataFetcher<String> dropOffMessage();
 
-        DataFetcher<org.opentripplanner.model.BookingTime> earliestBookingTime();
+        public DataFetcher<org.opentripplanner.model.BookingTime> earliestBookingTime();
 
-        DataFetcher<org.opentripplanner.model.BookingTime> latestBookingTime();
+        public DataFetcher<org.opentripplanner.model.BookingTime> latestBookingTime();
 
-        DataFetcher<Long> maximumBookingNoticeSeconds();
+        public DataFetcher<Long> maximumBookingNoticeSeconds();
 
-        DataFetcher<String> message();
+        public DataFetcher<String> message();
 
-        DataFetcher<Long> minimumBookingNoticeSeconds();
+        public DataFetcher<Long> minimumBookingNoticeSeconds();
 
-        DataFetcher<String> pickupMessage();
+        public DataFetcher<String> pickupMessage();
     }
 
     public interface LegacyGraphQLBookingTime {
 
-        DataFetcher<Integer> daysPrior();
+        public DataFetcher<Integer> daysPrior();
 
-        DataFetcher<String> time();
+        public DataFetcher<String> time();
     }
 
     /**
@@ -223,25 +223,25 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLCarPark {
 
-        DataFetcher<String> carParkId();
+        public DataFetcher<String> carParkId();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<Integer> maxCapacity();
+        public DataFetcher<Integer> maxCapacity();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<Iterable<Object>> openingHours();
+        public DataFetcher<Iterable<Object>> openingHours();
 
-        DataFetcher<Boolean> realtime();
+        public DataFetcher<Boolean> realtime();
 
-        DataFetcher<Integer> spacesAvailable();
+        public DataFetcher<Integer> spacesAvailable();
 
-        DataFetcher<Iterable<String>> tags();
+        public DataFetcher<Iterable<String>> tags();
     }
 
     /**
@@ -249,41 +249,41 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLCluster {
 
-        DataFetcher<String> gtfsId();
+        public DataFetcher<String> gtfsId();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<Iterable<Object>> stops();
+        public DataFetcher<Iterable<Object>> stops();
     }
 
     public interface LegacyGraphQLContactInfo {
 
-        DataFetcher<String> additionalDetails();
+        public DataFetcher<String> additionalDetails();
 
-        DataFetcher<String> bookingUrl();
+        public DataFetcher<String> bookingUrl();
 
-        DataFetcher<String> contactPerson();
+        public DataFetcher<String> contactPerson();
 
-        DataFetcher<String> eMail();
+        public DataFetcher<String> eMail();
 
-        DataFetcher<String> faxNumber();
+        public DataFetcher<String> faxNumber();
 
-        DataFetcher<String> infoUrl();
+        public DataFetcher<String> infoUrl();
 
-        DataFetcher<String> phoneNumber();
+        public DataFetcher<String> phoneNumber();
     }
 
     public interface LegacyGraphQLCoordinates {
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
     }
 
     /**
@@ -293,17 +293,17 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLDepartureRow {
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<TripPattern> pattern();
+        public DataFetcher<TripPattern> pattern();
 
-        DataFetcher<Object> stop();
+        public DataFetcher<Object> stop();
 
-        DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
     }
 
     /**
@@ -312,108 +312,108 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLFeed {
 
-        DataFetcher<Iterable<Agency>> agencies();
+        public DataFetcher<Iterable<Agency>> agencies();
 
-        DataFetcher<Iterable<TransitAlert>> alerts();
+        public DataFetcher<Iterable<TransitAlert>> alerts();
 
-        DataFetcher<String> feedId();
+        public DataFetcher<String> feedId();
     }
 
     public interface LegacyGraphQLGeometry {
 
-        DataFetcher<Integer> length();
+        public DataFetcher<Integer> length();
 
-        DataFetcher<String> points();
+        public DataFetcher<String> points();
     }
 
     public interface LegacyGraphQLItinerary {
 
-        DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle();
+        public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle();
 
-        DataFetcher<Long> duration();
+        public DataFetcher<Long> duration();
 
-        DataFetcher<Double> elevationGained();
+        public DataFetcher<Double> elevationGained();
 
-        DataFetcher<Double> elevationLost();
+        public DataFetcher<Double> elevationLost();
 
-        DataFetcher<Long> endTime();
+        public DataFetcher<Long> endTime();
 
-        DataFetcher<Iterable<Map<String, Object>>> fares();
+        public DataFetcher<Iterable<Map<String, Object>>> fares();
 
-        DataFetcher<Integer> generalizedCost();
+        public DataFetcher<Integer> generalizedCost();
 
-        DataFetcher<Iterable<Leg>> legs();
+        public DataFetcher<Iterable<Leg>> legs();
 
-        DataFetcher<Long> startTime();
+        public DataFetcher<Long> startTime();
 
-        DataFetcher<Iterable<SystemNotice>> systemNotices();
+        public DataFetcher<Iterable<SystemNotice>> systemNotices();
 
-        DataFetcher<Long> waitingTime();
+        public DataFetcher<Long> waitingTime();
 
-        DataFetcher<Double> walkDistance();
+        public DataFetcher<Double> walkDistance();
 
-        DataFetcher<Long> walkTime();
+        public DataFetcher<Long> walkTime();
     }
 
     public interface LegacyGraphQLLeg {
 
-        DataFetcher<Agency> agency();
+        public DataFetcher<Agency> agency();
 
-        DataFetcher<Integer> arrivalDelay();
+        public DataFetcher<Integer> arrivalDelay();
 
-        DataFetcher<Integer> departureDelay();
+        public DataFetcher<Integer> departureDelay();
 
-        DataFetcher<Double> distance();
+        public DataFetcher<Double> distance();
 
-        DataFetcher<org.opentripplanner.model.BookingInfo> dropOffBookingInfo();
+        public DataFetcher<org.opentripplanner.model.BookingInfo> dropOffBookingInfo();
 
-        DataFetcher<String> dropoffType();
+        public DataFetcher<String> dropoffType();
 
-        DataFetcher<Double> duration();
+        public DataFetcher<Double> duration();
 
-        DataFetcher<Long> endTime();
+        public DataFetcher<Long> endTime();
 
-        DataFetcher<StopArrival> from();
+        public DataFetcher<StopArrival> from();
 
-        DataFetcher<Integer> generalizedCost();
+        public DataFetcher<Integer> generalizedCost();
 
-        DataFetcher<Boolean> interlineWithPreviousLeg();
+        public DataFetcher<Boolean> interlineWithPreviousLeg();
 
-        DataFetcher<Boolean> intermediatePlace();
+        public DataFetcher<Boolean> intermediatePlace();
 
-        DataFetcher<Iterable<StopArrival>> intermediatePlaces();
+        public DataFetcher<Iterable<StopArrival>> intermediatePlaces();
 
-        DataFetcher<Iterable<Object>> intermediateStops();
+        public DataFetcher<Iterable<Object>> intermediateStops();
 
-        DataFetcher<Geometry> legGeometry();
+        public DataFetcher<Geometry> legGeometry();
 
-        DataFetcher<String> mode();
+        public DataFetcher<String> mode();
 
-        DataFetcher<org.opentripplanner.model.BookingInfo> pickupBookingInfo();
+        public DataFetcher<org.opentripplanner.model.BookingInfo> pickupBookingInfo();
 
-        DataFetcher<String> pickupType();
+        public DataFetcher<String> pickupType();
 
-        DataFetcher<Boolean> realTime();
+        public DataFetcher<Boolean> realTime();
 
-        DataFetcher<String> realtimeState();
+        public DataFetcher<String> realtimeState();
 
-        DataFetcher<Boolean> rentedBike();
+        public DataFetcher<Boolean> rentedBike();
 
-        DataFetcher<Route> route();
+        public DataFetcher<Route> route();
 
-        DataFetcher<String> serviceDate();
+        public DataFetcher<String> serviceDate();
 
-        DataFetcher<Long> startTime();
+        public DataFetcher<Long> startTime();
 
-        DataFetcher<Iterable<WalkStep>> steps();
+        public DataFetcher<Iterable<WalkStep>> steps();
 
-        DataFetcher<StopArrival> to();
+        public DataFetcher<StopArrival> to();
 
-        DataFetcher<Boolean> transitLeg();
+        public DataFetcher<Boolean> transitLeg();
 
-        DataFetcher<Trip> trip();
+        public DataFetcher<Trip> trip();
 
-        DataFetcher<Boolean> walkingBike();
+        public DataFetcher<Boolean> walkingBike();
     }
 
     /**
@@ -421,9 +421,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLLocalTimeSpan {
 
-        DataFetcher<Integer> from();
+        public DataFetcher<Integer> from();
 
-        DataFetcher<Integer> to();
+        public DataFetcher<Integer> to();
     }
 
     /**
@@ -431,9 +431,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLLocalTimeSpanDate {
 
-        DataFetcher<String> date();
+        public DataFetcher<String> date();
 
-        DataFetcher<Iterable<Object>> timeSpans();
+        public DataFetcher<Iterable<Object>> timeSpans();
     }
 
     /**
@@ -441,7 +441,7 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLNode extends TypeResolver {
 
-        default DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id() {return null;}
+        default public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id() {return null;}
     }
 
     /**
@@ -449,13 +449,13 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLPageInfo {
 
-        DataFetcher<String> endCursor();
+        public DataFetcher<String> endCursor();
 
-        DataFetcher<Boolean> hasNextPage();
+        public DataFetcher<Boolean> hasNextPage();
 
-        DataFetcher<Boolean> hasPreviousPage();
+        public DataFetcher<Boolean> hasPreviousPage();
 
-        DataFetcher<String> startCursor();
+        public DataFetcher<String> startCursor();
     }
 
     /**
@@ -464,62 +464,62 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLPattern {
 
-        DataFetcher<Iterable<TransitAlert>> alerts();
+        public DataFetcher<Iterable<TransitAlert>> alerts();
 
-        DataFetcher<String> code();
+        public DataFetcher<String> code();
 
-        DataFetcher<Integer> directionId();
+        public DataFetcher<Integer> directionId();
 
-        DataFetcher<Iterable<Coordinate>> geometry();
+        public DataFetcher<Iterable<Coordinate>> geometry();
 
-        DataFetcher<String> headsign();
+        public DataFetcher<String> headsign();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<Geometry> patternGeometry();
+        public DataFetcher<Geometry> patternGeometry();
 
-        DataFetcher<Route> route();
+        public DataFetcher<Route> route();
 
-        DataFetcher<String> semanticHash();
+        public DataFetcher<String> semanticHash();
 
-        DataFetcher<Iterable<Object>> stops();
+        public DataFetcher<Iterable<Object>> stops();
 
-        DataFetcher<Iterable<Trip>> trips();
+        public DataFetcher<Iterable<Trip>> trips();
 
-        DataFetcher<Iterable<Trip>> tripsForDate();
+        public DataFetcher<Iterable<Trip>> tripsForDate();
 
         public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions();
     }
 
     public interface LegacyGraphQLPlace {
 
-        DataFetcher<Long> arrivalTime();
+        public DataFetcher<Long> arrivalTime();
 
-        DataFetcher<VehicleParking> bikePark();
+        public DataFetcher<VehicleParking> bikePark();
 
-        DataFetcher<VehicleRentalPlace> bikeRentalStation();
+        public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
-        DataFetcher<VehicleParking> carPark();
+        public DataFetcher<VehicleParking> carPark();
 
-        DataFetcher<Long> departureTime();
+        public DataFetcher<Long> departureTime();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<VehicleRentalVehicle> rentalVehicle();
+        public DataFetcher<VehicleRentalVehicle> rentalVehicle();
 
-        DataFetcher<Object> stop();
+        public DataFetcher<Object> stop();
 
-        DataFetcher<VehicleParking> vehicleParking();
+        public DataFetcher<VehicleParking> vehicleParking();
 
-        DataFetcher<VehicleRentalStation> vehicleRentalStation();
+        public DataFetcher<VehicleRentalStation> vehicleRentalStation();
 
-        DataFetcher<String> vertexType();
+        public DataFetcher<String> vertexType();
     }
 
     /**
@@ -527,119 +527,119 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLPlaceInterface extends TypeResolver {
 
-        default DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id() {return null;}
+        default public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id() {return null;}
 
-        default DataFetcher<Double> lat() {return null;}
+        default public DataFetcher<Double> lat() {return null;}
 
-        default DataFetcher<Double> lon() {return null;}
+        default public DataFetcher<Double> lon() {return null;}
     }
 
     public interface LegacyGraphQLPlan {
 
-        DataFetcher<Long> date();
+        public DataFetcher<Long> date();
 
-        DataFetcher<DebugOutput> debugOutput();
+        public DataFetcher<DebugOutput> debugOutput();
 
-        DataFetcher<StopArrival> from();
+        public DataFetcher<StopArrival> from();
 
-        DataFetcher<Iterable<Itinerary>> itineraries();
+        public DataFetcher<Iterable<Itinerary>> itineraries();
 
-        DataFetcher<Iterable<String>> messageEnums();
+        public DataFetcher<Iterable<String>> messageEnums();
 
-        DataFetcher<Iterable<String>> messageStrings();
+        public DataFetcher<Iterable<String>> messageStrings();
 
-        DataFetcher<Long> nextDateTime();
+        public DataFetcher<Long> nextDateTime();
 
-        DataFetcher<String> nextPageCursor();
+        public DataFetcher<String> nextPageCursor();
 
-        DataFetcher<Long> prevDateTime();
+        public DataFetcher<Long> prevDateTime();
 
-        DataFetcher<String> previousPageCursor();
+        public DataFetcher<String> previousPageCursor();
 
-        DataFetcher<Long> searchWindowUsed();
+        public DataFetcher<Long> searchWindowUsed();
 
-        DataFetcher<StopArrival> to();
+        public DataFetcher<StopArrival> to();
     }
 
     public interface LegacyGraphQLQueryType {
 
-        DataFetcher<Iterable<Agency>> agencies();
+        public DataFetcher<Iterable<Agency>> agencies();
 
-        DataFetcher<Agency> agency();
+        public DataFetcher<Agency> agency();
 
-        DataFetcher<Iterable<TransitAlert>> alerts();
+        public DataFetcher<Iterable<TransitAlert>> alerts();
 
-        DataFetcher<VehicleParking> bikePark();
+        public DataFetcher<VehicleParking> bikePark();
 
-        DataFetcher<Iterable<VehicleParking>> bikeParks();
+        public DataFetcher<Iterable<VehicleParking>> bikeParks();
 
-        DataFetcher<VehicleRentalPlace> bikeRentalStation();
+        public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
-        DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations();
+        public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations();
 
-        DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
+        public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
 
-        DataFetcher<VehicleParking> carPark();
+        public DataFetcher<VehicleParking> carPark();
 
-        DataFetcher<Iterable<VehicleParking>> carParks();
+        public DataFetcher<Iterable<VehicleParking>> carParks();
 
-        DataFetcher<Object> cluster();
+        public DataFetcher<Object> cluster();
 
-        DataFetcher<Iterable<Object>> clusters();
+        public DataFetcher<Iterable<Object>> clusters();
 
-        DataFetcher<PatternAtStop> departureRow();
+        public DataFetcher<PatternAtStop> departureRow();
 
-        DataFetcher<Iterable<String>> feeds();
+        public DataFetcher<Iterable<String>> feeds();
 
-        DataFetcher<Trip> fuzzyTrip();
+        public DataFetcher<Trip> fuzzyTrip();
 
-        DataFetcher<Connection<PlaceAtDistance>> nearest();
+        public DataFetcher<Connection<PlaceAtDistance>> nearest();
 
-        DataFetcher<Object> node();
+        public DataFetcher<Object> node();
 
-        DataFetcher<TripPattern> pattern();
+        public DataFetcher<TripPattern> pattern();
 
-        DataFetcher<Iterable<TripPattern>> patterns();
+        public DataFetcher<Iterable<TripPattern>> patterns();
 
-        DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> plan();
+        public DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> plan();
 
-        DataFetcher<VehicleRentalVehicle> rentalVehicle();
+        public DataFetcher<VehicleRentalVehicle> rentalVehicle();
 
-        DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles();
+        public DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles();
 
-        DataFetcher<Route> route();
+        public DataFetcher<Route> route();
 
-        DataFetcher<Iterable<Route>> routes();
+        public DataFetcher<Iterable<Route>> routes();
 
-        DataFetcher<Object> serviceTimeRange();
+        public DataFetcher<Object> serviceTimeRange();
 
-        DataFetcher<Object> station();
+        public DataFetcher<Object> station();
 
-        DataFetcher<Iterable<Object>> stations();
+        public DataFetcher<Iterable<Object>> stations();
 
-        DataFetcher<Object> stop();
+        public DataFetcher<Object> stop();
 
-        DataFetcher<Iterable<Object>> stops();
+        public DataFetcher<Iterable<Object>> stops();
 
-        DataFetcher<Iterable<Object>> stopsByBbox();
+        public DataFetcher<Iterable<Object>> stopsByBbox();
 
-        DataFetcher<Connection<NearbyStop>> stopsByRadius();
+        public DataFetcher<Connection<NearbyStop>> stopsByRadius();
 
-        DataFetcher<Iterable<FareRuleSet>> ticketTypes();
+        public DataFetcher<Iterable<FareRuleSet>> ticketTypes();
 
-        DataFetcher<Trip> trip();
+        public DataFetcher<Trip> trip();
 
-        DataFetcher<Iterable<Trip>> trips();
+        public DataFetcher<Iterable<Trip>> trips();
 
-        DataFetcher<VehicleParking> vehicleParking();
+        public DataFetcher<VehicleParking> vehicleParking();
 
-        DataFetcher<Iterable<VehicleParking>> vehicleParkings();
+        public DataFetcher<Iterable<VehicleParking>> vehicleParkings();
 
-        DataFetcher<VehicleRentalStation> vehicleRentalStation();
+        public DataFetcher<VehicleRentalStation> vehicleRentalStation();
 
-        DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations();
+        public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations();
 
-        DataFetcher<Object> viewer();
+        public DataFetcher<Object> viewer();
     }
 
     /**
@@ -647,23 +647,23 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLRentalVehicle {
 
-        DataFetcher<Boolean> allowPickupNow();
+        public DataFetcher<Boolean> allowPickupNow();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<String> network();
+        public DataFetcher<String> network();
 
-        DataFetcher<Boolean> operative();
+        public DataFetcher<Boolean> operative();
 
-        DataFetcher<VehicleRentalStationUris> rentalUris();
+        public DataFetcher<VehicleRentalStationUris> rentalUris();
 
-        DataFetcher<String> vehicleId();
+        public DataFetcher<String> vehicleId();
     }
 
     /**
@@ -674,37 +674,37 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLRoute {
 
-        DataFetcher<Agency> agency();
+        public DataFetcher<Agency> agency();
 
-        DataFetcher<Iterable<TransitAlert>> alerts();
+        public DataFetcher<Iterable<TransitAlert>> alerts();
 
-        DataFetcher<String> bikesAllowed();
+        public DataFetcher<String> bikesAllowed();
 
-        DataFetcher<String> color();
+        public DataFetcher<String> color();
 
-        DataFetcher<String> desc();
+        public DataFetcher<String> desc();
 
-        DataFetcher<String> gtfsId();
+        public DataFetcher<String> gtfsId();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<String> longName();
+        public DataFetcher<String> longName();
 
-        DataFetcher<String> mode();
+        public DataFetcher<String> mode();
 
-        DataFetcher<Iterable<TripPattern>> patterns();
+        public DataFetcher<Iterable<TripPattern>> patterns();
 
-        DataFetcher<String> shortName();
+        public DataFetcher<String> shortName();
 
-        DataFetcher<Iterable<Object>> stops();
+        public DataFetcher<Iterable<Object>> stops();
 
-        DataFetcher<String> textColor();
+        public DataFetcher<String> textColor();
 
-        DataFetcher<Iterable<Trip>> trips();
+        public DataFetcher<Iterable<Trip>> trips();
 
-        DataFetcher<Integer> type();
+        public DataFetcher<Integer> type();
 
-        DataFetcher<String> url();
+        public DataFetcher<String> url();
     }
 
     /**
@@ -713,11 +713,11 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLRouteType {
 
-        DataFetcher<Agency> agency();
+        public DataFetcher<Agency> agency();
 
-        DataFetcher<Integer> routeType();
+        public DataFetcher<Integer> routeType();
 
-        DataFetcher<Iterable<Route>> routes();
+        public DataFetcher<Iterable<Route>> routes();
     }
 
     /**
@@ -726,68 +726,68 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLStop {
 
-        DataFetcher<Iterable<TransitAlert>> alerts();
+        public DataFetcher<Iterable<TransitAlert>> alerts();
 
-        DataFetcher<Object> cluster();
+        public DataFetcher<Object> cluster();
 
-        DataFetcher<String> code();
+        public DataFetcher<String> code();
 
-        DataFetcher<String> desc();
+        public DataFetcher<String> desc();
 
-        DataFetcher<String> direction();
+        public DataFetcher<String> direction();
 
-        DataFetcher<Object> geometries();
+        public DataFetcher<Object> geometries();
 
-        DataFetcher<String> gtfsId();
+        public DataFetcher<String> gtfsId();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Object> locationType();
+        public DataFetcher<Object> locationType();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<Object> parentStation();
+        public DataFetcher<Object> parentStation();
 
-        DataFetcher<Iterable<TripPattern>> patterns();
+        public DataFetcher<Iterable<TripPattern>> patterns();
 
-        DataFetcher<String> platformCode();
+        public DataFetcher<String> platformCode();
 
-        DataFetcher<Iterable<Route>> routes();
+        public DataFetcher<Iterable<Route>> routes();
 
-        DataFetcher<Iterable<TripTimeOnDate>> stopTimesForPattern();
+        public DataFetcher<Iterable<TripTimeOnDate>> stopTimesForPattern();
 
-        DataFetcher<Iterable<Object>> stops();
+        public DataFetcher<Iterable<Object>> stops();
 
-        DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns();
+        public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns();
 
-        DataFetcher<Iterable<StopTimesInPattern>> stoptimesForServiceDate();
+        public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForServiceDate();
 
-        DataFetcher<Iterable<TripTimeOnDate>> stoptimesWithoutPatterns();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimesWithoutPatterns();
 
-        DataFetcher<String> timezone();
+        public DataFetcher<String> timezone();
 
-        DataFetcher<Iterable<NearbyStop>> transfers();
+        public DataFetcher<Iterable<NearbyStop>> transfers();
 
-        DataFetcher<String> url();
+        public DataFetcher<String> url();
 
-        DataFetcher<String> vehicleMode();
+        public DataFetcher<String> vehicleMode();
 
-        DataFetcher<Integer> vehicleType();
+        public DataFetcher<Integer> vehicleType();
 
-        DataFetcher<Object> wheelchairBoarding();
+        public DataFetcher<Object> wheelchairBoarding();
 
-        DataFetcher<String> zoneId();
+        public DataFetcher<String> zoneId();
     }
 
     public interface LegacyGraphQLStopGeometries {
 
-        DataFetcher<org.locationtech.jts.geom.Geometry> geoJson();
+        public DataFetcher<org.locationtech.jts.geom.Geometry> geoJson();
 
-        DataFetcher<Iterable<Geometry>> googleEncoded();
+        public DataFetcher<Iterable<Geometry>> googleEncoded();
     }
 
     /**
@@ -795,9 +795,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLStopOnRoute {
 
-        DataFetcher<Route> route();
+        public DataFetcher<Route> route();
 
-        DataFetcher<Object> stop();
+        public DataFetcher<Object> stop();
     }
 
     /**
@@ -805,9 +805,16 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLStopOnTrip {
 
-        DataFetcher<Object> stop();
+        public DataFetcher<Object> stop();
 
-        DataFetcher<Trip> trip();
+        public DataFetcher<Trip> trip();
+    }
+
+    public interface LegacyGraphQLStopRelationship {
+
+        public DataFetcher<Object> status();
+
+        public DataFetcher<Object> stop();
     }
 
     /**
@@ -816,35 +823,35 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLStoptime {
 
-        DataFetcher<Integer> arrivalDelay();
+        public DataFetcher<Integer> arrivalDelay();
 
-        DataFetcher<Integer> departureDelay();
+        public DataFetcher<Integer> departureDelay();
 
-        DataFetcher<String> dropoffType();
+        public DataFetcher<String> dropoffType();
 
-        DataFetcher<String> headsign();
+        public DataFetcher<String> headsign();
 
-        DataFetcher<String> pickupType();
+        public DataFetcher<String> pickupType();
 
-        DataFetcher<Boolean> realtime();
+        public DataFetcher<Boolean> realtime();
 
-        DataFetcher<Integer> realtimeArrival();
+        public DataFetcher<Integer> realtimeArrival();
 
-        DataFetcher<Integer> realtimeDeparture();
+        public DataFetcher<Integer> realtimeDeparture();
 
-        DataFetcher<String> realtimeState();
+        public DataFetcher<String> realtimeState();
 
-        DataFetcher<Integer> scheduledArrival();
+        public DataFetcher<Integer> scheduledArrival();
 
-        DataFetcher<Integer> scheduledDeparture();
+        public DataFetcher<Integer> scheduledDeparture();
 
-        DataFetcher<Long> serviceDay();
+        public DataFetcher<Long> serviceDay();
 
-        DataFetcher<Object> stop();
+        public DataFetcher<Object> stop();
 
-        DataFetcher<Boolean> timepoint();
+        public DataFetcher<Boolean> timepoint();
 
-        DataFetcher<Trip> trip();
+        public DataFetcher<Trip> trip();
     }
 
     /**
@@ -852,9 +859,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLStoptimesInPattern {
 
-        DataFetcher<TripPattern> pattern();
+        public DataFetcher<TripPattern> pattern();
 
-        DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
     }
 
     /**
@@ -866,9 +873,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLSystemNotice {
 
-        DataFetcher<String> tag();
+        public DataFetcher<String> tag();
 
-        DataFetcher<String> text();
+        public DataFetcher<String> text();
     }
 
     /**
@@ -876,15 +883,15 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLTicketType {
 
-        DataFetcher<String> currency();
+        public DataFetcher<String> currency();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> fareId();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> fareId();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Double> price();
+        public DataFetcher<Double> price();
 
-        DataFetcher<Iterable<String>> zones();
+        public DataFetcher<Iterable<String>> zones();
     }
 
     /**
@@ -892,9 +899,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLTranslatedString {
 
-        DataFetcher<String> language();
+        public DataFetcher<String> language();
 
-        DataFetcher<String> text();
+        public DataFetcher<String> text();
     }
 
     /**
@@ -903,51 +910,51 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLTrip {
 
-        DataFetcher<Iterable<String>> activeDates();
+        public DataFetcher<Iterable<String>> activeDates();
 
-        DataFetcher<Iterable<TransitAlert>> alerts();
+        public DataFetcher<Iterable<TransitAlert>> alerts();
 
-        DataFetcher<TripTimeOnDate> arrivalStoptime();
+        public DataFetcher<TripTimeOnDate> arrivalStoptime();
 
-        DataFetcher<String> bikesAllowed();
+        public DataFetcher<String> bikesAllowed();
 
-        DataFetcher<String> blockId();
+        public DataFetcher<String> blockId();
 
-        DataFetcher<TripTimeOnDate> departureStoptime();
+        public DataFetcher<TripTimeOnDate> departureStoptime();
 
-        DataFetcher<String> directionId();
+        public DataFetcher<String> directionId();
 
-        DataFetcher<Iterable<Iterable<Double>>> geometry();
+        public DataFetcher<Iterable<Iterable<Double>>> geometry();
 
-        DataFetcher<String> gtfsId();
+        public DataFetcher<String> gtfsId();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<TripPattern> pattern();
+        public DataFetcher<TripPattern> pattern();
 
-        DataFetcher<Route> route();
+        public DataFetcher<Route> route();
 
-        DataFetcher<String> routeShortName();
+        public DataFetcher<String> routeShortName();
 
-        DataFetcher<String> semanticHash();
+        public DataFetcher<String> semanticHash();
 
-        DataFetcher<String> serviceId();
+        public DataFetcher<String> serviceId();
 
-        DataFetcher<String> shapeId();
+        public DataFetcher<String> shapeId();
 
-        DataFetcher<Iterable<Object>> stops();
+        public DataFetcher<Iterable<Object>> stops();
 
-        DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
 
-        DataFetcher<Iterable<TripTimeOnDate>> stoptimesForDate();
+        public DataFetcher<Iterable<TripTimeOnDate>> stoptimesForDate();
 
-        DataFetcher<Geometry> tripGeometry();
+        public DataFetcher<Geometry> tripGeometry();
 
-        DataFetcher<String> tripHeadsign();
+        public DataFetcher<String> tripHeadsign();
 
-        DataFetcher<String> tripShortName();
+        public DataFetcher<String> tripShortName();
 
-        DataFetcher<Object> wheelchairAccessible();
+        public DataFetcher<Object> wheelchairAccessible();
     }
 
     /**
@@ -955,7 +962,7 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLUnknown {
 
-        DataFetcher<String> description();
+        public DataFetcher<String> description();
     }
 
     /**
@@ -963,39 +970,39 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLVehicleParking {
 
-        DataFetcher<Boolean> anyCarPlaces();
+        public DataFetcher<Boolean> anyCarPlaces();
 
-        DataFetcher<VehicleParkingSpaces> availability();
+        public DataFetcher<VehicleParkingSpaces> availability();
 
-        DataFetcher<Boolean> bicyclePlaces();
+        public DataFetcher<Boolean> bicyclePlaces();
 
-        DataFetcher<VehicleParkingSpaces> capacity();
+        public DataFetcher<VehicleParkingSpaces> capacity();
 
-        DataFetcher<Boolean> carPlaces();
+        public DataFetcher<Boolean> carPlaces();
 
-        DataFetcher<String> detailsUrl();
+        public DataFetcher<String> detailsUrl();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<String> imageUrl();
+        public DataFetcher<String> imageUrl();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<String> note();
+        public DataFetcher<String> note();
 
-        DataFetcher<Boolean> realtime();
+        public DataFetcher<Boolean> realtime();
 
-        DataFetcher<VehicleParkingState> state();
+        public DataFetcher<VehicleParkingState> state();
 
-        DataFetcher<Iterable<String>> tags();
+        public DataFetcher<Iterable<String>> tags();
 
-        DataFetcher<String> vehicleParkingId();
+        public DataFetcher<String> vehicleParkingId();
 
-        DataFetcher<Boolean> wheelchairAccessibleCarPlaces();
+        public DataFetcher<Boolean> wheelchairAccessibleCarPlaces();
     }
 
     /**
@@ -1003,11 +1010,11 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLVehicleParkingSpaces {
 
-        DataFetcher<Integer> bicycleSpaces();
+        public DataFetcher<Integer> bicycleSpaces();
 
-        DataFetcher<Integer> carSpaces();
+        public DataFetcher<Integer> carSpaces();
 
-        DataFetcher<Integer> wheelchairAccessibleCarSpaces();
+        public DataFetcher<Integer> wheelchairAccessibleCarSpaces();
     }
 
     public interface LegacyGraphQLVehiclePosition {
@@ -1024,7 +1031,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Double> speed();
 
-        public DataFetcher<VehicleStop> stop();
+        public DataFetcher<StopRelationship> stopRelationship();
 
         public DataFetcher<Trip> trip();
 
@@ -1036,86 +1043,79 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLVehicleRentalStation {
 
-        DataFetcher<Boolean> allowDropoff();
+        public DataFetcher<Boolean> allowDropoff();
 
-        DataFetcher<Boolean> allowDropoffNow();
+        public DataFetcher<Boolean> allowDropoffNow();
 
-        DataFetcher<Boolean> allowOverloading();
+        public DataFetcher<Boolean> allowOverloading();
 
-        DataFetcher<Boolean> allowPickup();
+        public DataFetcher<Boolean> allowPickup();
 
-        DataFetcher<Boolean> allowPickupNow();
+        public DataFetcher<Boolean> allowPickupNow();
 
-        DataFetcher<Integer> capacity();
+        public DataFetcher<Integer> capacity();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
 
-        DataFetcher<String> name();
+        public DataFetcher<String> name();
 
-        DataFetcher<String> network();
+        public DataFetcher<String> network();
 
-        DataFetcher<Boolean> operative();
+        public DataFetcher<Boolean> operative();
 
-        DataFetcher<Boolean> realtime();
+        public DataFetcher<Boolean> realtime();
 
-        DataFetcher<VehicleRentalStationUris> rentalUris();
+        public DataFetcher<VehicleRentalStationUris> rentalUris();
 
-        DataFetcher<Integer> spacesAvailable();
+        public DataFetcher<Integer> spacesAvailable();
 
-        DataFetcher<String> stationId();
+        public DataFetcher<String> stationId();
 
-        DataFetcher<Integer> vehiclesAvailable();
+        public DataFetcher<Integer> vehiclesAvailable();
     }
 
     public interface LegacyGraphQLVehicleRentalUris {
 
-        DataFetcher<String> android();
+        public DataFetcher<String> android();
 
-        DataFetcher<String> ios();
+        public DataFetcher<String> ios();
 
-        DataFetcher<String> web();
-    }
-
-    public interface LegacyGraphQLVehicleStop {
-
-        public DataFetcher<Object> status();
-
-        public DataFetcher<Object> stop();
+        public DataFetcher<String> web();
     }
 
     public interface LegacyGraphQLDebugOutput {
 
-        DataFetcher<Long> pathCalculationTime();
+        public DataFetcher<Long> pathCalculationTime();
 
-        DataFetcher<Long> precalculationTime();
+        public DataFetcher<Long> precalculationTime();
 
-        DataFetcher<Long> renderingTime();
+        public DataFetcher<Long> renderingTime();
 
-        DataFetcher<Boolean> timedOut();
+        public DataFetcher<Boolean> timedOut();
 
-        DataFetcher<Long> totalTime();
+        public DataFetcher<Long> totalTime();
     }
 
     public interface LegacyGraphQLElevationProfileComponent {
 
-        DataFetcher<Double> distance();
+        public DataFetcher<Double> distance();
 
-        DataFetcher<Double> elevation();
+        public DataFetcher<Double> elevation();
     }
 
     public interface LegacyGraphQLFare {
 
-        DataFetcher<Integer> cents();
+        public DataFetcher<Integer> cents();
 
-        DataFetcher<Iterable<FareComponent>> components();
+        public DataFetcher<Iterable<FareComponent>> components();
 
-        DataFetcher<String> currency();
+        public DataFetcher<String> currency();
 
-        DataFetcher<String> type();
+        public DataFetcher<String> type();
     }
 
     /**
@@ -1123,22 +1123,22 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLFareComponent {
 
-        DataFetcher<Integer> cents();
+        public DataFetcher<Integer> cents();
 
-        DataFetcher<String> currency();
+        public DataFetcher<String> currency();
 
-        DataFetcher<String> fareId();
+        public DataFetcher<String> fareId();
 
-        DataFetcher<Iterable<Route>> routes();
+        public DataFetcher<Iterable<Route>> routes();
     }
 
     public interface LegacyGraphQLPlaceAtDistance {
 
-        DataFetcher<Integer> distance();
+        public DataFetcher<Integer> distance();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Object> place();
+        public DataFetcher<Object> place();
     }
 
     /**
@@ -1146,9 +1146,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLPlaceAtDistanceConnection {
 
-        DataFetcher<Iterable<Edge<PlaceAtDistance>>> edges();
+        public DataFetcher<Iterable<Edge<PlaceAtDistance>>> edges();
 
-        DataFetcher<Object> pageInfo();
+        public DataFetcher<Object> pageInfo();
     }
 
     /**
@@ -1156,9 +1156,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLPlaceAtDistanceEdge {
 
-        DataFetcher<String> cursor();
+        public DataFetcher<String> cursor();
 
-        DataFetcher<PlaceAtDistance> node();
+        public DataFetcher<PlaceAtDistance> node();
     }
 
     /**
@@ -1166,29 +1166,29 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLServiceTimeRange {
 
-        DataFetcher<Long> end();
+        public DataFetcher<Long> end();
 
-        DataFetcher<Long> start();
+        public DataFetcher<Long> start();
     }
 
     public interface LegacyGraphQLStep {
 
-        DataFetcher<Double> distance();
+        public DataFetcher<Double> distance();
 
-        DataFetcher<Iterable<P2<Double>>> elevationProfile();
+        public DataFetcher<Iterable<P2<Double>>> elevationProfile();
 
-        DataFetcher<Double> lat();
+        public DataFetcher<Double> lat();
 
-        DataFetcher<Double> lon();
+        public DataFetcher<Double> lon();
     }
 
     public interface LegacyGraphQLStopAtDistance {
 
-        DataFetcher<Integer> distance();
+        public DataFetcher<Integer> distance();
 
-        DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+        public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-        DataFetcher<Object> stop();
+        public DataFetcher<Object> stop();
     }
 
     /**
@@ -1196,9 +1196,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLStopAtDistanceConnection {
 
-        DataFetcher<Iterable<Edge<NearbyStop>>> edges();
+        public DataFetcher<Iterable<Edge<NearbyStop>>> edges();
 
-        DataFetcher<Object> pageInfo();
+        public DataFetcher<Object> pageInfo();
     }
 
     /**
@@ -1206,9 +1206,9 @@ public class LegacyGraphQLDataFetchers {
      */
     public interface LegacyGraphQLStopAtDistanceEdge {
 
-        DataFetcher<String> cursor();
+        public DataFetcher<String> cursor();
 
-        DataFetcher<NearbyStop> node();
+        public DataFetcher<NearbyStop> node();
     }
 
 }

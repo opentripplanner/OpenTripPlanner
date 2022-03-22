@@ -84,4 +84,4 @@ config:
     VertexType: String
     SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice
     VehiclePosition: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition#RealtimeVehiclePosition
-    VehicleStop: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.VehicleStop#VehicleStop
+    StopRelationship: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship#StopRelationship

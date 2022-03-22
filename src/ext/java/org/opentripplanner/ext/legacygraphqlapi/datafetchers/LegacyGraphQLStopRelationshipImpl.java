@@ -2,11 +2,11 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLVehicleStop;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLStopRelationship;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVehicleStopStatus;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.VehicleStop;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
 
-public class LegacyGraphQLVehicleStopImpl implements LegacyGraphQLVehicleStop {
+public class LegacyGraphQLStopRelationshipImpl implements LegacyGraphQLStopRelationship {
 
     @Override
     public DataFetcher<Object> status() {
@@ -22,7 +22,7 @@ public class LegacyGraphQLVehicleStopImpl implements LegacyGraphQLVehicleStop {
         return env -> getSource(env).stop();
     }
 
-    private VehicleStop getSource(DataFetchingEnvironment environment) {
+    private StopRelationship getSource(DataFetchingEnvironment environment) {
         return environment.getSource();
     }
 }

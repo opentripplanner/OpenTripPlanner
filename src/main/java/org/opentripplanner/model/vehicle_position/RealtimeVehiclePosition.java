@@ -31,7 +31,7 @@ public record RealtimeVehiclePosition(
         /**
          * Status of the vehicle, ie. if approaching the next stop or if it is there already.
          */
-        VehicleStop stop,
+        StopRelationship stop,
         Trip trip
 ) {
 
@@ -45,5 +45,5 @@ public record RealtimeVehiclePosition(
         IN_TRANSIT_TO
     }
 
-    public record VehicleStop(StopLocation stop, StopStatus status){}
+    public record StopRelationship(StopLocation stop, StopStatus status){}
 }

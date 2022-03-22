@@ -5,7 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLVehiclePosition;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
-import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.VehicleStop;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship;
 
 public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePosition {
 
@@ -30,7 +30,7 @@ public class LegacyGraphQLVehiclePositionImpl implements LegacyGraphQLVehiclePos
     }
 
     @Override
-    public DataFetcher<VehicleStop> stop() {
+    public DataFetcher<StopRelationship> stopRelationship() {
         return env -> getSource(env).stop();
     }
 
