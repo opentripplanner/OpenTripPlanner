@@ -20,6 +20,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Read translations from GTFS and Netex sources for stop names [#3808](https://github.com/opentripplanner/OpenTripPlanner/pull/3808)
 - Update to Java 17 and Kryo 5 [#3994](https://github.com/opentripplanner/OpenTripPlanner/pull/3994)
 - Remove optimize=TRANSFERS [#4004](https://github.com/opentripplanner/OpenTripPlanner/pull/4004)
+- Consume GTFS-RT Vehicle Positions, introduce API [#3981](https://github.com/opentripplanner/OpenTripPlanner/pull/3981)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

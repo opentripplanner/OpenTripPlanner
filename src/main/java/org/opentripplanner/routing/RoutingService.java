@@ -53,6 +53,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
@@ -428,6 +429,10 @@ public class RoutingService {
 
     /** {@link Graph#getTransitAlertService()} */
     public TransitAlertService getTransitAlertService() {return this.graph.getTransitAlertService();}
+
+    public RealtimeVehiclePositionService getVehiclePositionService() {
+        return this.graph.getVehiclePositionService();
+    }
 
     /** {@link Graph#getStopVerticesById(FeedScopedId)} */
     public Set<Vertex> getStopVerticesById(FeedScopedId id) {

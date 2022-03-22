@@ -71,11 +71,11 @@ public class IndexAPI {
 
     /** Choose short or long form of results. */
     @QueryParam("detail")
-    private final boolean detail = false;
+    private boolean detail = false;
 
     /** Include GTFS entities referenced by ID in the result. */
     @QueryParam("refs")
-    private final boolean refs = false;
+    private boolean refs = false;
 
     private final OTPServer otpServer;
 

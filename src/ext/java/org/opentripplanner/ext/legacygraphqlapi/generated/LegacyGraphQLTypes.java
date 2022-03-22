@@ -2314,6 +2314,13 @@ public class LegacyGraphQLTypes {
     }
 
 
+    public enum LegacyGraphQLVehicleStopStatus {
+        INCOMING_AT,
+        IN_TRANSIT_TO,
+        STOPPED_AT
+
+    }
+
     public enum LegacyGraphQLVertexType {
         BIKEPARK,
         BIKESHARE,
