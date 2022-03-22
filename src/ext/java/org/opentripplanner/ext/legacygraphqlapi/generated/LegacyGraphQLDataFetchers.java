@@ -5,11 +5,18 @@ import graphql.relay.Connection;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
+import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
@@ -27,8 +34,6 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
-
-import java.util.Map;
 
 public class LegacyGraphQLDataFetchers {
 
@@ -769,7 +774,7 @@ public class LegacyGraphQLDataFetchers {
 
         DataFetcher<Integer> vehicleType();
 
-        DataFetcher<Object> wheelchairBoarding();
+        DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding> wheelchairBoarding();
 
         DataFetcher<String> zoneId();
     }
@@ -938,7 +943,7 @@ public class LegacyGraphQLDataFetchers {
 
         DataFetcher<String> tripShortName();
 
-        DataFetcher<Object> wheelchairAccessible();
+        DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding> wheelchairAccessible();
     }
 
     /**

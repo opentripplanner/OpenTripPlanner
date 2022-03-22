@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
+import graphql.GraphQL;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -12,8 +13,10 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -97,12 +100,8 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Object> wheelchairAccessible() {
-    return environment -> switch (getSource(environment).getWheelchairBoarding()) {
-      case NO_INFORMATION -> "NO_INFORMATION";
-      case POSSIBLE -> "POSSIBLE";
-      case NOT_POSSIBLE -> "NOT_POSSIBLE";
-    };
+  public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairAccessible() {
+    return environment -> LegacyGraphQLUtils.toGraphQL(getSource(environment).getWheelchairBoarding());
   }
 
   @Override
