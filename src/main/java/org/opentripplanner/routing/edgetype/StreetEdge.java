@@ -1,11 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -26,7 +20,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.BitSetUtils;
@@ -34,6 +27,13 @@ import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This represents a street segment.
@@ -95,9 +95,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     private I18NString name;
 
     private StreetTraversalPermission permission;
-
-    /** The OSM way ID from whence this came - needed to reference traffic data */
-    public long wayId;
 
     private int streetClass = CLASS_OTHERPATH;
     
@@ -534,7 +531,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * Calculate the average automobile traversal speed of this segment, given
      * the RoutingRequest, and return it in meters per second.
      */
-    private double calculateCarSpeed(RoutingRequest options) {
+    private double calculateCarSpeed() {
         return getCarSpeed();
     }
     
@@ -550,7 +547,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
-            return calculateCarSpeed(options);
+            return calculateCarSpeed();
         }
         final double speed = options.getSpeed(traverseMode, walkingBike);
         return isStairs() ? (speed / options.stairsTimeFactor) : speed;
@@ -782,10 +779,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, permission, this.isBack());
         StreetEdge e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, permission, this.isBack());
 
-        // copy the wayId to the split edges, so we can trace them back to their parent if need be
-        e1.wayId = this.wayId;
-        e2.wayId = this.wayId;
-
         // we have this code implemented in both directions, because splits are fudged half a millimeter
         // when the length of this is odd. We want to make sure the lengths of the split streets end up
         // exactly the same as their backStreets so that if they are split again the error does not accumulate
@@ -805,11 +798,11 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
         // TODO: better handle this temporary fix to handle bad edge distance calculation
         if (e1.length_mm <= 0) {
-            LOG.error("Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.", e1.wayId, v.getLat(), v.getLon(), e1.length_mm);
+            LOG.error("Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.", e1.getName(), v.getLat(), v.getLon(), e1.length_mm);
             e1.length_mm = 1;
         }
         if (e2.length_mm <= 0) {
-            LOG.error("Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.", e2.wayId, v.getLat(), v.getLon(), e2.length_mm);
+            LOG.error("Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.", e2.getName(), v.getLat(), v.getLon(), e2.length_mm);
             e2.length_mm = 1;
         }
 
@@ -971,41 +964,5 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
     public List<TurnRestriction> getTurnRestrictions() {
         // this can be safely returned as it's unmodifiable
         return turnRestrictions;
-    }
-
-    /**
-     * Get the starting OSM node ID of this edge. Note that this information is preserved when an
-     * edge is split, so both edges will have the same starting and ending nodes.
-     */
-    public long getStartOsmNodeId () {
-        if (fromv instanceof OsmVertex) {
-            return ((OsmVertex) fromv).nodeId;
-        }
-        // get information from the splitter vertex so this edge gets the same traffic information it got before
-        // it was split.
-        else if (fromv instanceof SplitterVertex) {
-            return ((SplitterVertex) fromv).previousNodeId;
-        }
-        else {
-            return -1;
-        }
-    }
-
-    /**
-     * Get the ending OSM node ID of this edge. Note that this information is preserved when an
-     * edge is split, so both edges will have the same starting and ending nodes.
-     */
-    public long getEndOsmNodeId () {
-        if (tov instanceof OsmVertex) {
-            return ((OsmVertex) tov).nodeId;
-        }
-            // get information from the splitter vertex so this edge gets the same traffic information it got before
-            // it was split.
-        else if (tov instanceof SplitterVertex) {
-            return ((SplitterVertex) tov).nextNodeId;
-        }
-        else {
-            return -1;
-        }
     }
 }

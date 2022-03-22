@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.moduletests;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
@@ -78,7 +79,7 @@ public class B11_FlexEgressTest implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m]",
+        "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx]",
             pathsToString(response)
     );
   }
@@ -92,7 +93,7 @@ public class B11_FlexEgressTest implements RaptorTestConstants {
     var response = raptorService.route(requestBuilder.build(), data);
 
     assertEquals(
-        "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m]",
+        "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx]",
             pathsToString(response)
     );
   }
@@ -103,12 +104,14 @@ public class B11_FlexEgressTest implements RaptorTestConstants {
 
     var response = raptorService.route(requestBuilder.build(), data);
 
-    assertEquals(""
-            + "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m $1380]\n"
-            + "Walk 1m ~ B ~ BUS R1 0:10 0:16 ~ E ~ Flex 1m59s 2x [0:09 0:18:59 9m59s $1378]\n"
-            + "Walk 1m ~ B ~ BUS R1 0:10 0:12 ~ C ~ Flex 7m 1x [0:09 0:20 11m $1740]\n"
-            + "Walk 1m ~ B ~ BUS R1 0:10 0:18 ~ F ~ Walk 10m [0:09 0:28 19m $2400]",
-            pathsToString(response)
+    assertEquals(
+         join(
+            "Walk 1m ~ B ~ BUS R1 0:10 0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m 2tx $1380]",
+            "Walk 1m ~ B ~ BUS R1 0:10 0:16 ~ E ~ Flex 1m59s 2x [0:09 0:18:59 9m59s 2tx $1378]",
+            "Walk 1m ~ B ~ BUS R1 0:10 0:12 ~ C ~ Flex 7m 1x [0:09 0:20 11m 1tx $1740]",
+            "Walk 1m ~ B ~ BUS R1 0:10 0:18 ~ F ~ Walk 10m [0:09 0:28 19m 0tx $2400]"
+         ),
+         pathsToString(response)
     );
   }
 }

@@ -8,13 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,7 +18,7 @@ import java.util.stream.Collectors;
  * This class is responsible for reading and writing test cases and test case results to CSV files.
  */
 public class CsvFileIO {
-    private static final Charset CHARSET_UTF_8 = Charset.forName("UTF-8");
+    private static final Charset CHARSET_UTF_8 = StandardCharsets.UTF_8;
     private static final char CSV_DELIMITER = ',';
     private static boolean printResultsForFirstStrategyRun = true;
 

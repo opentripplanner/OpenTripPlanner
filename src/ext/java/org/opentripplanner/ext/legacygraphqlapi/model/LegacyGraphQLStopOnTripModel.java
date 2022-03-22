@@ -4,7 +4,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 
 /**
- * Class that contains a {@link Stop} on a {@link Trip}.
+ * Class that contains a {@link StopLocation} on a {@link Trip}.
  */
 public class LegacyGraphQLStopOnTripModel {
 

@@ -16,8 +16,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class OTPFeatureTest {
-    private OTPFeature subject = OTPFeature.APIBikeRental;
-    private Map<OTPFeature, Boolean> backupValues = new HashMap<>();
+    private final OTPFeature subject = OTPFeature.APIBikeRental;
+    private final Map<OTPFeature, Boolean> backupValues = new HashMap<>();
 
     @Before
     public void setUp() {

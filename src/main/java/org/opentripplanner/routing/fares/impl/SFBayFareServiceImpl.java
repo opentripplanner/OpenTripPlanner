@@ -1,5 +1,12 @@
 package org.opentripplanner.routing.fares.impl;
 
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -7,13 +14,6 @@ import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.Fare.FareType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
@@ -31,8 +31,8 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     public static final float CABLE_CAR_FARE = 5.00f;
     public static final float AIRBART_FARE = 3.00f;
     public static final float SFMTA_BART_TRANSFER_FARE = 1.75f;
-    public static final Set<String> SFMTA_BART_TRANSFER_STOPS = new HashSet<String>(Arrays.asList(
-            "EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY"));
+    public static final Set<String> SFMTA_BART_TRANSFER_STOPS = new HashSet<>(Arrays.asList(
+      "EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY"));
     public static final String SFMTA_BART_FREE_TRANSFER_STOP = "DALY";
     
     @Override
@@ -59,7 +59,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
             agencyId = ride.route.getFeedId();
             if (agencyId.equals("BART")) {
                 if (bartBlock == null) {
-                    bartBlock = new ArrayList<Ride>();
+                    bartBlock = new ArrayList<>();
                 }
                 bartBlock.add(ride);
                 alightedBart = ride.endTime.toEpochSecond();

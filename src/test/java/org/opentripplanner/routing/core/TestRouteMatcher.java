@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
-
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 
@@ -55,13 +54,13 @@ public class TestRouteMatcher extends TestCase {
         assertTrue(matcherR3e.matches(r3));
 
         RouteMatcher nullList = RouteMatcher.parse(null);
-        assertTrue(nullList == RouteMatcher.emptyMatcher());
+      assertSame(nullList, RouteMatcher.emptyMatcher());
 
         RouteMatcher emptyList = RouteMatcher.parse("");
-        assertTrue(emptyList == RouteMatcher.emptyMatcher());
+      assertSame(emptyList, RouteMatcher.emptyMatcher());
 
         RouteMatcher degenerate = RouteMatcher.parse(",,,");
-        assertTrue(degenerate == RouteMatcher.emptyMatcher());
+      assertSame(degenerate, RouteMatcher.emptyMatcher());
 
         boolean thrown = false;
         try {

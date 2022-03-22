@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.core.intersection_model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -13,12 +9,15 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.Driving
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for SimpleIntersectionTraversalCostModel.
@@ -78,7 +77,7 @@ public class SimpleTraversalCostModelTest {
 
         // calculate the angle for driving on the right hand side
 
-        int rightHandDriveAngle = costModel.calculateTurnAngle(e1, e2, options);
+        int rightHandDriveAngle = costModel.calculateTurnAngle(e1, e2);
         assertEquals(270, rightHandDriveAngle);
         assertTrue(costModel.isTurnAcrossTraffic(rightHandDriveAngle));
         assertFalse(costModel.isSafeTurn(rightHandDriveAngle));
@@ -86,7 +85,7 @@ public class SimpleTraversalCostModelTest {
         // and on the left hand side
 
         var leftHandDriveCostModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.LEFT_HAND_TRAFFIC);
-        int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e2, options);
+        int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e2);
         assertEquals(270, leftHandDriveAngle);
 
         assertTrue(leftHandDriveCostModel.isSafeTurn(leftHandDriveAngle));
@@ -136,7 +135,7 @@ public class SimpleTraversalCostModelTest {
         StreetEdge fromEdge = edge(u, v, 1.0, false);
         StreetEdge toEdge = edge(v, w, 1.0, false);
         
-        int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
+        int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge);
         assertFalse(costModel.isSafeTurn(turnAngle));
         assertFalse(costModel.isTurnAcrossTraffic(turnAngle));
         
@@ -244,7 +243,7 @@ public class SimpleTraversalCostModelTest {
         // 3rd edge prevents inferral of free-flowingness
         StreetEdge extraEdge = edge(v, u, 1.0, false);
                 
-        int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
+        int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge);
         assertTrue(costModel.isSafeTurn(turnAngle));
         assertFalse(costModel.isTurnAcrossTraffic(turnAngle));
         
@@ -277,7 +276,7 @@ public class SimpleTraversalCostModelTest {
         // 3rd edge prevents inferral of free-flowingness
         StreetEdge extraEdge = edge(v, u, 1.0, false);
                 
-        int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
+        int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge);
         assertFalse(costModel.isSafeTurn(turnAngle));
         assertTrue(costModel.isTurnAcrossTraffic(turnAngle));
         

@@ -18,7 +18,7 @@ public class PathComparatorTest {
 
     GraphPath c = mockGraphPath(9, 12);
 
-    private List<GraphPath> paths = Arrays.asList(a, b, c);
+    private final List<GraphPath> paths = Arrays.asList(a, b, c);
 
     @Test
     public void testPathComparator() {

@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -65,7 +63,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.CalendarService;
@@ -80,6 +77,7 @@ import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTra
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -240,9 +238,6 @@ public class Graph implements Serializable {
      */
     public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
 
-    /** Interlining relationships between trips. */
-    public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
-
     /** Pre-generated transfers between all stops. */
     public final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
@@ -265,6 +260,8 @@ public class Graph implements Serializable {
     public transient TransitLayerUpdater transitLayerUpdater;
 
     private transient TransitAlertService transitAlertService;
+
+    private transient RealtimeVehiclePositionService vehiclePositionService;
 
     private DrivingDirection drivingDirection = DEFAULT_DRIVING_DIRECTION;
 
@@ -874,6 +871,13 @@ public class Graph implements Serializable {
             transitAlertService = new DelegatingTransitAlertServiceImpl(this);
         }
         return transitAlertService;
+    }
+
+    public RealtimeVehiclePositionService getVehiclePositionService() {
+        if (vehiclePositionService == null) {
+            vehiclePositionService = new RealtimeVehiclePositionService();
+        }
+        return vehiclePositionService;
     }
 
     private Collection<StopLocation> getStopsForId(FeedScopedId id) {

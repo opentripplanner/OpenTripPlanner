@@ -7,18 +7,21 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.util.TranslationHelper;
 
 public class TransferMapperTest {
     private static final String FEED_ID = "FEED";
+
+    private static final TranslationHelper TRANSLATION_HELPER = new TranslationHelper();
 
     private static final RouteMapper ROUTE_MAPPER =
             new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false));
 
     private static final TripMapper TRIP_MAPPER = new TripMapper(ROUTE_MAPPER);
 
-    private static final StationMapper STATION_MAPPER = new StationMapper();
+    private static final StationMapper STATION_MAPPER = new StationMapper(TRANSLATION_HELPER);
 
-    private static final StopMapper STOP_MAPPER = new StopMapper();
+    private static final StopMapper STOP_MAPPER = new StopMapper(TRANSLATION_HELPER);
 
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
@@ -63,7 +66,7 @@ public class TransferMapperTest {
         TRANSFER.setTransferType(TRANSFER_TYPE);
     }
 
-    private TransferMapper subject = new TransferMapper(
+    private final TransferMapper subject = new TransferMapper(
             ROUTE_MAPPER,
             STATION_MAPPER,
             STOP_MAPPER,
@@ -115,16 +118,14 @@ public class TransferMapperTest {
     }
      */
 
-    /** Mapping the same object twice, should return the the same instance. */
+    // /** Mapping the same object twice, should return the the same instance. */
     // TODO Fix this
-    /*
-    @Test
-    public void testMapCache() throws Exception {
-        org.opentripplanner.model.transfer.Transfer result1 = subject.map(TRANSFER);
-        org.opentripplanner.model.transfer.Transfer result2 = subject.map(TRANSFER);
-
-        assertTrue(result1 == result2);
-    }
-
-     */
+    //
+    // @Test
+    // public void testMapCache() throws Exception {
+    //    org.opentripplanner.model.transfer.Transfer result1 = subject.map(TRANSFER);
+    //    org.opentripplanner.model.transfer.Transfer result2 = subject.map(TRANSFER);
+    //
+    //    assertTrue(result1 == result2);
+    // }
 }

@@ -29,7 +29,7 @@ public class GraphFileHeader implements Serializable {
   private static final int HEADER_LENGTH = MAGIC_NUMBER.length() + ID_LENGTH + 2;
 
   private static final Pattern HEADER_PATTERN = Pattern.compile(
-      MAGIC_NUMBER + DELIMITER + "([-\\w/+:]{7})" + DELIMITER
+      MAGIC_NUMBER + DELIMITER + "([-\\w.:+/]{7})" + DELIMITER
   );
 
   public static final Charset CHARSET = StandardCharsets.ISO_8859_1;

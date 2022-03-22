@@ -1,24 +1,23 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import gnu.trove.list.TLongList;
 import gnu.trove.map.TLongObjectMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.algorithm.Orientation;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.openstreetmap.model.OSMNode;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public class Ring {
 
@@ -28,9 +27,9 @@ public class Ring {
 
     public List<OSMNode> nodes;
 
-    private Coordinate[] geometry;
+    private final Coordinate[] geometry;
 
-    private List<Ring> holes = new ArrayList<Ring>();
+    private final List<Ring> holes = new ArrayList<>();
 
     // equivalent to the ring representation, but used for JTS operations
     public Polygon jtsPolygon;
@@ -106,7 +105,7 @@ public class Ring {
         // holes that touch at multiple points (and, weirdly, does not have a method
         // to detect this other than this crazy DE-9IM stuff
 
-        List<Polygon> polygonHoles = new ArrayList<Polygon>();
+        List<Polygon> polygonHoles = new ArrayList<>();
         for (Ring ring : holes) {
             LinearRing linearRing = factory.createLinearRing(ring.geometry);
             Polygon polygon = factory.createPolygon(linearRing, new LinearRing[0]);
@@ -120,7 +119,7 @@ public class Ring {
             polygonHoles.add(polygon);
         }
 
-        ArrayList<LinearRing> lrholelist = new ArrayList<LinearRing>(polygonHoles.size());
+        ArrayList<LinearRing> lrholelist = new ArrayList<>(polygonHoles.size());
 
         for (Polygon hole : polygonHoles) {
             Geometry boundary = hole.getBoundary();

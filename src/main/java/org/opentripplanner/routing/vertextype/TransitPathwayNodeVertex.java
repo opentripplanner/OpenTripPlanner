@@ -5,7 +5,6 @@ import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,9 +14,9 @@ public class TransitPathwayNodeVertex extends Vertex {
 
   private static final long serialVersionUID = 1L;
 
-  private boolean wheelchairEntrance;
+  private final boolean wheelchairEntrance;
 
-  private PathwayNode node;
+  private final PathwayNode node;
 
   /**
    * @param node The transit model pathway node reference.
@@ -28,7 +27,7 @@ public class TransitPathwayNodeVertex extends Vertex {
         node.getId().toString(),
         node.getCoordinate().longitude(),
         node.getCoordinate().latitude(),
-        new NonLocalizedString(node.getName())
+        node.getName()
     );
     this.node = node;
     this.wheelchairEntrance = node.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

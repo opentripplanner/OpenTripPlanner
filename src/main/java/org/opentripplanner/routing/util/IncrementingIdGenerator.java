@@ -30,7 +30,7 @@ public class IncrementingIdGenerator<T> implements UniqueIdGenerator<T> {
      * 
      * @return 
      */
-    public int getId(T elem) {
+    public int getId() {
         return next++;
     }
 }

@@ -435,7 +435,7 @@ public class VertexLinker {
       v = tsv;
     }
     else {
-      v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y, originalEdge);
+      v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y);
     }
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the

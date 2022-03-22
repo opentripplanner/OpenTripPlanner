@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 
 /**
  * Report the status of the graph updaters via a web service.
@@ -22,7 +20,7 @@ public class UpdaterStatusResource {
     private static final Logger LOG = LoggerFactory.getLogger(UpdaterStatusResource.class);
 
     /** Choose short or long form of results. */
-    @QueryParam("detail") private boolean detail = false;
+    @QueryParam("detail") private final boolean detail = false;
 
     /**
      * @deprecated The support for multiple routers are removed from OTP2.

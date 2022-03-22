@@ -29,7 +29,7 @@ public class BuildConfigSerializer extends Serializer<BuildConfig> {
     }
 
     @Override
-    public BuildConfig read(Kryo kryo, Input input, Class<BuildConfig> type) {
+    public BuildConfig read(Kryo kryo, Input input, Class<? extends BuildConfig> type) {
         return new BuildConfig(
                 ConfigLoader.nodeFromString(input.readString(), SOURCE),
                 SOURCE,

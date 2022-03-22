@@ -176,18 +176,14 @@ public class AddTransitModelEntitiesToGraph {
                     new TransitBoardingAreaVertex(graph, boardingArea);
             stationElementNodes.put(boardingArea, boardingAreaVertex);
             if (boardingArea.getParentStop() != null) {
-
                 var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
                 boolean wheelchair = boardingArea.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
-                var name = Optional.ofNullable(boardingArea.getName())
-                        .map(NonLocalizedString::new)
-                        .orElse(null);
 
                 PathwayEdge.lowCost(
                         boardingAreaVertex,
                         platformVertex,
                         boardingArea.getId(),
-                        name,
+                        boardingArea.getName(),
                         wheelchair
                 );
 
@@ -195,7 +191,7 @@ public class AddTransitModelEntitiesToGraph {
                         platformVertex,
                         boardingAreaVertex,
                         boardingArea.getId(),
-                        name,
+                        boardingArea.getName(),
                         wheelchair
                 );
             }
@@ -225,7 +221,7 @@ public class AddTransitModelEntitiesToGraph {
                         fromVertex,
                         toVertex,
                         pathway.getId(),
-                        Optional.ofNullable(pathway.getName()).map(NonLocalizedString::new).orElse((NonLocalizedString)PathwayEdge.DEFAULT_NAME),
+                        NonLocalizedString.ofNullable(pathway.getName()),
                         pathway.getTraversalTime(),
                         distance,
                         pathway.getStairCount(),
@@ -237,7 +233,7 @@ public class AddTransitModelEntitiesToGraph {
                             toVertex,
                             fromVertex,
                             pathway.getId(),
-                            Optional.ofNullable(pathway.getReversedName()).map(NonLocalizedString::new).orElse(null),
+                            NonLocalizedString.ofNullable(pathway.getReversedName()),
                             pathway.getTraversalTime(),
                             distance,
                             -1 * pathway.getStairCount(),

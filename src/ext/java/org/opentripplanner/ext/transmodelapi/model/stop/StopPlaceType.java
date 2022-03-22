@@ -10,6 +10,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
@@ -17,7 +18,6 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -58,6 +58,17 @@ public class StopPlaceType {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("name")
             .type(new GraphQLNonNull(Scalars.GraphQLString))
+            .argument(GraphQLArgument
+                .newArgument()
+                .name("lang")
+                .description("Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned.")
+                .type(Scalars.GraphQLString)
+                .build())
+            .dataFetcher(environment -> {
+              String lang = environment.getArgument("lang");
+              Locale locale = lang != null ? new Locale(lang) : null;
+              return (((MonoOrMultiModalStation) environment.getSource()).getName().toString(locale));
+            })
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("latitude")

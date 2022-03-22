@@ -13,8 +13,8 @@ import java.util.stream.IntStream;
  */
 public class Histogram {
 
-    private String title;
-    private TIntIntMap bins = new TIntIntHashMap();
+    private final String title;
+    private final TIntIntMap bins = new TIntIntHashMap();
     private int maxBin = Integer.MIN_VALUE;
     private int minBin = Integer.MAX_VALUE;
     private long count = 0;

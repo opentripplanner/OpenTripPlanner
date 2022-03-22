@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class FareAttributeMapperTest {
@@ -47,7 +48,7 @@ public class FareAttributeMapperTest {
         FARE_ATTRIBUTE.setTransfers(TRANSFERS);
     }
 
-    private FareAttributeMapper subject = new FareAttributeMapper();
+    private final FareAttributeMapper subject = new FareAttributeMapper();
 
     @Test
     public void testMapCollection() throws Exception {
@@ -94,6 +95,6 @@ public class FareAttributeMapperTest {
         org.opentripplanner.model.FareAttribute result1 = subject.map(FARE_ATTRIBUTE);
         org.opentripplanner.model.FareAttribute result2 = subject.map(FARE_ATTRIBUTE);
 
-        assertTrue(result1 == result2);
+      assertSame(result1, result2);
     }
 }

@@ -36,9 +36,9 @@ class TripMapper {
     private final Map<String, FeedScopedId> serviceIds;
     private final Set<FeedScopedId> shapePointIds;
     private final EntityById<Operator> operatorsById;
-    private final TransportModeMapper transportModeMapper = new TransportModeMapper();;
+    private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
-    TripMapper(
+  TripMapper(
             FeedScopedIdFactory idFactory,
             EntityById<Operator> operatorsById,
             EntityById<org.opentripplanner.model.Route> otpRouteById,

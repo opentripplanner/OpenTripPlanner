@@ -3,6 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Locale;
 import java.util.Map;
+import org.opentripplanner.util.I18NString;
 
 public class LegacyGraphQLUtils {
 
@@ -18,5 +19,10 @@ public class LegacyGraphQLUtils {
       }
 
       return environment.getLocale();
+    }
+
+    public static String getTranslation(I18NString input, DataFetchingEnvironment environment) {
+      if (input == null) { return null; }
+      return input.toString(getLocale(environment));
     }
 }

@@ -10,10 +10,10 @@ import java.util.List;
  */
 public final class IntUtils {
     /** The constructor is private to protect this class from being instantiated. */
-    private IntUtils() {};
+    private IntUtils() {}
 
 
-    /**
+  /**
      * Convert an integer to a String, if the value equals the {@code notSetValue} parameter
      * an empty string is returned.
      */

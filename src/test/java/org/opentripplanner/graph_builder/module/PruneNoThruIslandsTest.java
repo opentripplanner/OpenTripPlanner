@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -27,13 +29,13 @@ public class PruneNoThruIslandsTest {
     public void bicycleNoThruIslandsBecomeNoThru() {
         Assertions.assertTrue(graph.getStreetEdges().stream()
                 .filter(StreetEdge::isBicycleNoThruTraffic)
-                .map(streetEdge -> streetEdge.wayId)
+                .map(streetEdge -> streetEdge.getName().toString())
                 .collect(Collectors.toSet()).containsAll(
                         Set.of(
-                                159830262L,
-                                55735898L,
-                                159830266L,
-                                159830254L
+                                "159830262",
+                                "55735898",
+                                "159830266",
+                                "159830254"
                         )
                 ));
     }
@@ -42,12 +44,12 @@ public class PruneNoThruIslandsTest {
     public void carNoThruIslandsBecomeNoThru() {
         Assertions.assertTrue(graph.getStreetEdges().stream()
                 .filter(StreetEdge::isMotorVehicleNoThruTraffic)
-                .map(streetEdge -> streetEdge.wayId)
+                .map(streetEdge -> streetEdge.getName().toString())
                 .collect(Collectors.toSet()).containsAll(
                         Set.of(
-                                159830262L,
-                                55735898L,
-                                55735911L
+                                "159830262",
+                                "55735898",
+                                "55735911"
                         )
                 ));
     }
@@ -55,8 +57,8 @@ public class PruneNoThruIslandsTest {
     @Test
     public void pruneFloatingBikeAndWalkIsland() {
         Assertions.assertFalse(graph.getStreetEdges().stream()
-                .map(streetEdge -> streetEdge.wayId)
-                .collect(Collectors.toSet()).contains(159830257L));
+                .map(streetEdge -> streetEdge.getName().toString())
+                .collect(Collectors.toSet()).contains("159830257"));
     }
 
     private static Graph buildOsmGraph(String osmPath) {
@@ -70,6 +72,21 @@ public class PruneNoThruIslandsTest {
             OpenStreetMapModule osmModule =
                     new OpenStreetMapModule(com.google.common.collect.Lists.newArrayList(osmProvider));
             osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+            osmModule.customNamer = new CustomNamer() {
+                @Override
+                public String name(OSMWithTags way, String defaultName) {
+                    return String.valueOf(way.getId());
+                }
+
+                @Override
+                public void nameWithEdge(OSMWithTags way, StreetEdge edge) {}
+
+                @Override
+                public void postprocess(Graph graph) {}
+
+                @Override
+                public void configure() {}
+            };
             osmModule.skipVisibility = true;
             osmModule.buildGraph(graph, new HashMap<>());
             // Prune floating islands and set noThru where necessary

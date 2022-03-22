@@ -2,7 +2,6 @@ package org.opentripplanner.util;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -36,7 +35,8 @@ public enum OTPFeature {
     SandboxAPITransmodelApi(false),
     SandboxExampleAPIGraphStatistics(false),
     SandboxAPIParkAndRideApi(false),
-    TransferAnalyzer(false);
+    TransferAnalyzer(false),
+    VehicleToStopHeuristics(false);
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 

@@ -26,7 +26,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTim
 */
 public interface StopArrivalsState<T extends RaptorTripSchedule> {
 
-    void setAccessTime(int arrivalTime, RaptorTransfer access);
+    void setAccessTime(int arrivalTime, RaptorTransfer access, boolean bestTime);
 
     default void rejectAccessTime(int arrivalTime, RaptorTransfer access) { }
 

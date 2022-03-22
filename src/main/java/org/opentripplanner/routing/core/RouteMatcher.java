@@ -18,13 +18,13 @@ public class RouteMatcher implements Cloneable, Serializable {
     private static final long serialVersionUID = 8066547338465440312L;
 
     /* Set of full matching route ids (agency ID + route ID) */
-    private final HashSet<FeedScopedId> agencyAndRouteIds = new HashSet<FeedScopedId>();
+    private final HashSet<FeedScopedId> agencyAndRouteIds = new HashSet<>();
 
     /* Set of full matching route code/names (agency ID + route code/name) */
-    private final HashSet<T2<String, String>> agencyIdAndRouteNames = new HashSet<T2<String, String>>();
+    private final HashSet<T2<String, String>> agencyIdAndRouteNames = new HashSet<>();
 
     /* Set of matching route names (without specifying an agency ID) */
-    private final HashSet<String> routeNames = new HashSet<String>();
+    private final HashSet<String> routeNames = new HashSet<>();
 
     private static final RouteMatcher EMPTY_MATCHER = new RouteMatcher();
 
@@ -96,7 +96,7 @@ public class RouteMatcher implements Cloneable, Serializable {
                 retval.agencyAndRouteIds.add(new FeedScopedId(agencyId, routeId));
             } else if (agencyId != null && routeName != null && routeId == null) {
                 // Case 2: specified agency ID and route name but no route ID
-                retval.agencyIdAndRouteNames.add(new T2<String, String>(agencyId, routeName));
+                retval.agencyIdAndRouteNames.add(new T2<>(agencyId, routeName));
             } else if (agencyId == null && routeName != null && routeId == null) {
                 // Case 3: specified route name only
                 retval.routeNames.add(routeName);
@@ -115,8 +115,8 @@ public class RouteMatcher implements Cloneable, Serializable {
         if (agencyAndRouteIds.contains(route.getId())) { return true; }
         if (route.getName() != null) {
             String routeName = route.getName().replace("_", " ");
-            if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getFeedId(),
-                routeName
+            if (agencyIdAndRouteNames.contains(new T2<>(route.getId().getFeedId(),
+              routeName
             ))) { return true; }
             if (routeNames.contains(routeName)) { return true; }
         }

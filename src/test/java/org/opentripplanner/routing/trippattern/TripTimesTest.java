@@ -33,7 +33,7 @@ public class TripTimesTest {
     static {
         Trip trip = new Trip(TRIP_ID);
 
-        List<StopTime> stopTimes = new LinkedList<StopTime>();
+        List<StopTime> stopTimes = new LinkedList<>();
 
         for(int i =  0; i < stops.length; ++i) {
             StopTime stopTime = new StopTime();

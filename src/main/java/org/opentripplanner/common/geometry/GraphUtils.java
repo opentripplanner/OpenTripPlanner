@@ -1,14 +1,13 @@
 package org.opentripplanner.common.geometry;
 
-import java.util.Collection;
-
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+
+import java.util.Collection;
 
 public class GraphUtils {
 
@@ -21,8 +20,7 @@ public class GraphUtils {
             points[i++] = gf.createPoint(v.getCoordinate());
         }
 
-        GeometryCollection geometries = new GeometryCollection(points, gf);
-        return geometries;
+        return new GeometryCollection(points, gf);
     }
 
     public static Geometry makeConvexHull(Graph graph) {

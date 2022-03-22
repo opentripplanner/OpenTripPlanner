@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.VehicleRentalState;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -19,14 +20,17 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     private double lat;
     private double lon;
     private double maxStreetSpeed;
+    private double walkingSpeed;
+    private boolean arriveBy;
 
     // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
     //      not work correctly.
     @Override
-    public void initialize(RoutingRequest options, long abortTime) {
-        RoutingRequest req = options;
+    public void initialize(RoutingRequest req) {
         Vertex target = req.rctx.toVertices.iterator().next();
         maxStreetSpeed = req.getStreetSpeedUpperBound();
+        walkingSpeed = req.walkSpeed;
+        arriveBy = req.arriveBy;
 
         if (target.getDegreeIn() == 1) {
             Edge edge = Iterables.getOnlyElement(target.getIncoming());
@@ -43,11 +47,23 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
      * On a non-transit trip, the remaining weight is simply distance / street speed.
      */
     @Override
-    public double estimateRemainingWeight (State s) {
+    public double estimateRemainingWeight(State s) {
         Vertex sv = s.getVertex();
-        double euclideanDistance = SphericalDistanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
-        // all travel is on-street, no transit involved
-        return euclideanDistance / maxStreetSpeed;
+        double euclideanDistance =
+                SphericalDistanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
+
+        // After parking or finishing the rental of a vehicle, you can't ever move faster than walking speed.
+        boolean useWalkSpeed;
+        if (arriveBy) {
+            useWalkSpeed = s.getVehicleRentalState() == VehicleRentalState.BEFORE_RENTING;
+        }
+        else {
+            useWalkSpeed = s.isVehicleParked()
+                    || s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED;
+        }
+
+        final double streetSpeed = useWalkSpeed ? walkingSpeed : maxStreetSpeed;
+        return euclideanDistance / streetSpeed;
     }
 
     @Override

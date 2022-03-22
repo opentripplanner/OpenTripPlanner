@@ -7,7 +7,7 @@ import java.util.Set;
 class ValidateParameters {
 
     /** This is set to avoid repeating the same error message twice. */
-    private Set<String> errors = new HashSet<>();
+    private final Set<String> errors = new HashSet<>();
 
     ValidateParameters positiveOrZero(String name, Double value) {
         return assertTrue(value >= 0, pad(name) + " is negative: " + value);

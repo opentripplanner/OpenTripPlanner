@@ -51,6 +51,6 @@ public class MappingSupport {
      */
     @SuppressWarnings("unchecked")
     public static <T> JAXBElement<T> createJaxbElement(@NotNull T value) {
-        return new JAXBElement<T>(new QName("x"), (Class<T>)value.getClass(), value);
+        return new JAXBElement<>(new QName("x"), (Class<T>) value.getClass(), value);
     }
 }

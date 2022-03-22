@@ -8,12 +8,10 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.opentripplanner.datastore.FileType.GRAPH;
 
 public class FileDataSourceTest {
@@ -68,13 +66,13 @@ public class FileDataSourceTest {
         assertTrue(subject.exists());
 
         // Verify the content by reading the file using the subject input stream
-        assertEquals("Hello!", IOUtils.toString(subject.asInputStream(), UTF_8));
+        assertEquals("Hello!", IOUtils.toString(subject.asInputStream(), StandardCharsets.UTF_8));
 
         // Then write something else - replacing the existing content
         IOUtils.write("Go, go, go!", subject.asOutputStream(), UTF_8);
 
         // Assert content can be read using the subject and file
-        assertEquals("Go, go, go!", IOUtils.toString(subject.asInputStream(), UTF_8));
+        assertEquals("Go, go, go!", IOUtils.toString(subject.asInputStream(), StandardCharsets.UTF_8));
     }
 
     @Test

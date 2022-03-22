@@ -3,6 +3,7 @@ package org.opentripplanner.api.mapping;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopShort;
 import org.opentripplanner.model.Stop;
@@ -27,11 +28,11 @@ public class StopMapper {
         api.lat = domain.getLat();
         api.lon = domain.getLon();
         api.code = domain.getCode();
-        api.name = domain.getName();
+        api.name = domain.getName().toString();
         if (extended) {
             api.desc = domain.getDescription();
             api.zoneId = domain.getFirstZoneAsString();
-            api.url = domain.getUrl();
+            api.url = domain.getUrl().toString();
             api.locationType = 0;
             api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
             api.parentStation = mapToParentStationOldId(domain);
@@ -50,10 +51,10 @@ public class StopMapper {
         ApiStopShort api = new ApiStopShort();
         api.id = FeedScopedIdMapper.mapToApi(domain.getId());
         api.code = domain.getCode();
-        api.name = domain.getName();
+        api.name = domain.getName().toString();
         api.lat = domain.getLat();
         api.lon = domain.getLon();
-        api.url = domain.getUrl();
+        api.url = domain.getUrl().toString();
         api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
         // parentStation may be missing on the stop returning null.
         // TODO harmonize these names, maybe use "station" everywhere

@@ -1,10 +1,10 @@
 package org.opentripplanner.graph_builder.module.linking;
 
 import com.google.common.collect.Iterables;
+import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -15,8 +15,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.net.URISyntaxException;
 import java.util.Comparator;
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
-import static org.opentripplanner.common.geometry.SphericalDistanceLibrary.fastDistance;
 import static org.opentripplanner.graph_builder.module.FakeGraph.*;
 
 public class LinkingTest {
@@ -51,8 +50,8 @@ public class LinkingTest {
             // split it but not too close to the end
             double splitVal = Math.random() * 0.95 + 0.025;
 
-            SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s0);
-            SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s1);
+            SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal);
+            SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal);
 
             var graph = new Graph();
             P2<StreetEdge> sp0 = s0.splitDestructively(sv0);
@@ -109,12 +108,11 @@ public class LinkingTest {
     }
 
     private static List<StreetTransitStopLink> outgoingStls (final TransitStopVertex tsv) {
-        List<StreetTransitStopLink> stls = tsv.getOutgoing().stream()
+        return tsv.getOutgoing().stream()
                 .filter(StreetTransitStopLink.class::isInstance)
                 .map(StreetTransitStopLink.class::cast)
+                .sorted(Comparator.comparing(e -> e.getGeometry().getLength()))
                 .collect(Collectors.toList());
-        stls.sort(Comparator.comparing(e -> e.getGeometry().getLength()));
-        return stls;
     }
 
 }

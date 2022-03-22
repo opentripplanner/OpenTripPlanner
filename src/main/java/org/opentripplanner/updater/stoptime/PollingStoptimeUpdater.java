@@ -35,7 +35,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     /**
      * Update streamer
      */
-    private TripUpdateSource updateSource;
+    private final TripUpdateSource updateSource;
 
     /**
      * Property to set on the RealtimeDataSnapshotSource

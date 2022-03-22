@@ -12,8 +12,8 @@ class StopPlaceTypeMapper {
 
     public T2<TransitMode, String> map(StopPlace stopPlace) {
         T2<TransitMode, String> submode = getSubmodeAsString(stopPlace);
-        if (submode != null) { return submode; };
-        TransitMode mode = mapVehicleMode(stopPlace);
+        if (submode != null) { return submode; }
+      TransitMode mode = mapVehicleMode(stopPlace);
         return new T2<>(mode, null);
     }
 

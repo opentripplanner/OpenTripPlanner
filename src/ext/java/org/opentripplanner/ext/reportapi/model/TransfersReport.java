@@ -140,7 +140,7 @@ public class TransfersReport {
             StopLocation stop = sp.getStop();
             r.type = "Stop";
             r.entityId = stop.getId().getId();
-            r.loc = stop.getName();
+            r.loc = stop.getName().toString();
             r.coordinate = stop.getCoordinate();
         }
         else if(p instanceof StationTransferPoint) {
@@ -148,7 +148,7 @@ public class TransfersReport {
             Station station = sp.getStation();
             r.type = "Station";
             r.entityId = station.getId().getId();
-            r.loc = station.getName();
+            r.loc = station.getName().toString();
             r.coordinate = station.getCoordinate();
         }
 

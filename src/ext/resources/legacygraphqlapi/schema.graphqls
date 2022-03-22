@@ -1395,6 +1395,51 @@ type PageInfo {
     endCursor: String
 }
 
+type VehiclePosition {
+    """Feed-scoped ID that uniquely identifies the vehicle in the format FeedId:VehicleId"""
+    vehicleId: String,
+    """Human-readable label of the vehicle, eg. a publicly visible number or a license plate"""
+    label: String
+    """Latitude of the vehicle"""
+    lat: Float
+    """Longitude of the vehicle"""
+    lon: Float
+    """The current stop where the vehicle will be or is currently arriving."""
+    stopRelationship: StopRelationship!
+    """Speed of the vehicle in meters/second"""
+    speed: Float
+    """
+    Bearing, in degrees, clockwise from North, i.e., 0 is North and 90 is East. This can be the
+    compass bearing, or the direction towards the next stop or intermediate location.
+    """
+    heading: Float
+    """When the position of the vehicle was recorded in seconds since the UNIX epoch."""
+    lastUpdated: Long
+    """Which trip this vehicles runs on."""
+    trip: Trip!
+}
+
+type StopRelationship {
+    """How close the vehicle is to `stop`"""
+    status: VehicleStopStatus!
+    stop: Stop!
+}
+
+enum VehicleStopStatus {
+    """
+    The vehicle is standing at the stop.
+    """
+    STOPPED_AT,
+    """
+    The vehicle has departed the previous stop and is in transit.
+    """
+    IN_TRANSIT_TO,
+    """
+    The vehicle is just about to arrive at the stop (on a stop display, the vehicle symbol typically flashes).
+    """
+    INCOMING_AT
+}
+
 """
 Pattern is sequence of stops used by trips on a specific direction and variant
 of a route. Most routes have only two patterns: one for outbound trips and one
@@ -1463,6 +1508,11 @@ type Pattern implements Node {
         """
         types: [PatternAlertType]
     ): [Alert]
+
+    """
+    Realtime-updated position of vehicles that are serving this pattern.
+    """
+    vehiclePositions: [VehiclePosition!]
 }
 
 """Entities, which are relevant for a pattern and can contain alerts"""
@@ -2717,7 +2767,11 @@ type Stop implements Node & PlaceInterface {
     gtfsId: String!
 
     """Name of the stop, e.g. Pasilan asema"""
-    name: String!
+    name(
+        """If translated name is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses name from stops.txt.
+        E.g. Swedish name for Pasilan asema is Böle station."""
+        language: String): String!
 
     """Latitude of the stop (WGS 84)"""
     lat: Float
@@ -2748,7 +2802,11 @@ type Stop implements Node & PlaceInterface {
 
     """ID of the zone where this stop is located"""
     zoneId: String
-    url: String
+
+    url(
+        """If translated url is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses url from stops.txt."""
+        language: String): String
 
     """Identifies whether this stop represents a stop or station."""
     locationType: LocationType

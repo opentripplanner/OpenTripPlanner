@@ -34,7 +34,7 @@ public class TranslatedStringTest extends TestCase {
         translations2.put("en", "Test");
         translations2.put("fi", "Testi");
         I18NString string4 = TranslatedString.getI18NString(translations2);
-        assertTrue(string3 == string4);
+      assertSame(string3, string4);
     }
 
 }

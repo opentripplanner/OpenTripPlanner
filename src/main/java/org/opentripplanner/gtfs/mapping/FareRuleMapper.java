@@ -14,7 +14,7 @@ class FareRuleMapper {
 
     private final FareAttributeMapper fareAttributeMapper;
 
-    private Map<org.onebusaway.gtfs.model.FareRule, FareRule> mappedFareRules = new HashMap<>();
+    private final Map<org.onebusaway.gtfs.model.FareRule, FareRule> mappedFareRules = new HashMap<>();
 
     FareRuleMapper(RouteMapper routeMapper, FareAttributeMapper fareAttributeMapper) {
         this.routeMapper = routeMapper;

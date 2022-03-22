@@ -62,7 +62,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
             creating =  System.currentTimeMillis()-t1;
             t1 = System.currentTimeMillis();
 
-            InputStream is = SiriHttpUtils.postData(url, etServiceRequest, timeout, requestHeaders);
+            InputStream is = SiriHttpUtils.postData(url, etServiceRequest, timeout);
             if (is != null) {
                 // Decode message
                 fetching = System.currentTimeMillis()-t1;

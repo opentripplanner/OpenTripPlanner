@@ -19,12 +19,12 @@ public class GraphPath {
     public LinkedList<Edge> edges;
 
     // needed to track repeat invocations of path-reversing methods
-    private boolean back;
+    private final boolean back;
 
     private double walkDistance = 0;
 
     // don't really need to save this (available through State) but why not
-    private RoutingContext rctx;
+    private final RoutingContext rctx;
 
     /**
      * Construct a GraphPath based on the given state by following back-edge fields all the way back

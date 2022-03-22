@@ -38,7 +38,7 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
      * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
      * are identical).
      */
-    private transient Map<T2<NoteMatcher, StreetNote>, MatcherAndStreetNote> uniqueMatchers = new HashMap<>();
+    private final transient Map<T2<NoteMatcher, StreetNote>, MatcherAndStreetNote> uniqueMatchers = new HashMap<>();
 
     StaticStreetNotesSource() {
     }

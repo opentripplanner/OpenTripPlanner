@@ -24,14 +24,14 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
     /**
      * This is the level of this elevator exit, used in narrative generation.
      */
-    private I18NString level;
+    private final I18NString level;
 
     /**
      * The polyline geometry of this edge.
      * It's generally a polyline with two coincident points, but some elevators have horizontal
      * dimension, e.g. the ones on the Eiffel Tower.
      */
-    private LineString the_geom;
+    private final LineString the_geom;
     
     /**
      * @param level It's a float for future expansion.

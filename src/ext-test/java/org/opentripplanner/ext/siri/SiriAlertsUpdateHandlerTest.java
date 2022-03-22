@@ -1,11 +1,5 @@
 package org.opentripplanner.ext.siri;
 
-import java.math.BigInteger;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.model.FeedScopedId;
@@ -40,6 +34,13 @@ import uk.org.siri.siri20.SituationNumber;
 import uk.org.siri.siri20.StopPointRef;
 import uk.org.siri.siri20.VehicleJourneyRef;
 import uk.org.siri.siri20.WorkflowStatusEnumeration;
+
+import java.math.BigInteger;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   private static final String FEED_ID = "FEED";
@@ -409,7 +410,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertTrue(containsOnlyEntitiesOfClass(transitAlert, EntitySelector.Stop.class));
     assertTrue(matchesEntity(transitAlert, stopId1));
-    ;
 
     assertTrue(
         "Alert does not contain default condition START_POINT",

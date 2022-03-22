@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  */
 public class S3BucketConfig {
 
-    private static Logger LOG = LoggerFactory.getLogger(S3BucketConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(S3BucketConfig.class);
 
     /** Credentials: the Amazon Web Services access key */
     public String accessKey;

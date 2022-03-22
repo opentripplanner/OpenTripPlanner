@@ -4,18 +4,22 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.Comparator;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
+import org.opentripplanner.ext.vehicletostopheuristics.VehicleToStopSkipEdgeStrategy;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.ComposingSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -30,11 +34,10 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.OTPFeature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -49,13 +52,12 @@ import java.util.Set;
  */
 public class NearbyStopFinder {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NearbyStopFinder.class);
-
     public  final boolean useStreets;
     private final Graph graph;
     private final double durationLimitInSeconds;
 
     private DirectGraphFinder directGraphFinder;
+
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
@@ -91,7 +93,7 @@ public class NearbyStopFinder {
     public Set<NearbyStop> findNearbyStopsConsideringPatterns(Vertex vertex, RoutingRequest routingRequest, boolean reverseDirection) {
 
         /* Track the closest stop on each pattern passing nearby. */
-        MinMap<TripPattern, NearbyStop> closestStopForPattern = new MinMap<TripPattern, NearbyStop>();
+        MinMap<TripPattern, NearbyStop> closestStopForPattern = new MinMap<>();
 
         /* Track the closest stop on each flex trip nearby. */
         MinMap<FlexTrip, NearbyStop> closestStopForFlexTrip = new MinMap<>();
@@ -188,7 +190,9 @@ public class NearbyStopFinder {
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
 
         var astar = new AStar();
-        astar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(durationLimitInSeconds));
+        var skipEdgeStrategy = getSkipEdgeStrategy(reverseDirection, routingRequest);
+        astar.setSkipEdgeStrategy(skipEdgeStrategy);
+
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
         // Only used if OTPFeature.FlexRouting.isOn()
@@ -241,18 +245,34 @@ public class NearbyStopFinder {
         return stopsFound;
     }
 
-    public List<NearbyStop> findNearbyStopsViaStreets (
-        Set<Vertex> originVertices,
-        boolean reverseDirection,
-        boolean removeTempEdges
+    private SkipEdgeStrategy getSkipEdgeStrategy(
+            boolean reverseDirection,
+            RoutingRequest routingRequest
     ) {
-        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-        return findNearbyStopsViaStreets(
-            originVertices,
-            reverseDirection,
-            removeTempEdges,
-            routingRequest
-        );
+        var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimitInSeconds);
+
+        // if we compute the accesses for Park+Ride, Bike+Ride and Bike+Transit we don't want to
+        // search the full durationLimit as this returns way too many stops.
+        // this is both slow and returns suboptimal results as it favours long drives with short
+        // transit legs.
+        // therefore, we use a heuristic based on the number of routes and their mode to determine
+        // what are "good" stops for those accesses. if we have reached a threshold of "good" stops
+        // we stop the access search.
+        if (!reverseDirection
+                && OTPFeature.VehicleToStopHeuristics.isOn()
+                && VehicleToStopSkipEdgeStrategy.applicableModes.contains(
+                routingRequest.modes.accessMode)) {
+            var strategy = new VehicleToStopSkipEdgeStrategy(graph.index::getRoutesForStop);
+            return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+        }
+        else if (OTPFeature.VehicleToStopHeuristics.isOn()
+                && routingRequest.modes.accessMode == StreetMode.BIKE) {
+            var strategy = new BikeToStopSkipEdgeStrategy(graph.index::getTripsForStop);
+            return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
+        }
+        else {
+            return durationSkipEdgeStrategy;
+        }
     }
 
     private boolean canBoardFlex(State state, boolean reverse) {
