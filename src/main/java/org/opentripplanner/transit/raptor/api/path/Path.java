@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -265,6 +264,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
             buf.append("[")
                     .time(startTime, endTime)
                     .duration(endTime - startTime)
+                    .space().append(numberOfTransfers + "tx")
                     .generalizedCostSentiSec(generalizedCost);
 
             if(appendToSummary != null) {

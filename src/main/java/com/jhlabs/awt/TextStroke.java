@@ -27,15 +27,15 @@ import org.apache.commons.math3.util.FastMath;
  * 
  */
 public class TextStroke implements Stroke {
-    private String text;
+    private final String text;
 
-    private Font font;
+    private final Font font;
 
     private boolean stretchToFit = false;
 
     private boolean repeat = false;
 
-    private AffineTransform t = new AffineTransform();
+    private final AffineTransform t = new AffineTransform();
 
     private static final float FLATNESS = 1;
 
@@ -56,7 +56,7 @@ public class TextStroke implements Stroke {
 
         GeneralPath result = new GeneralPath();
         PathIterator it = new FlatteningPathIterator(shape.getPathIterator(null), FLATNESS);
-        float points[] = new float[6];
+        float[] points = new float[6];
         float moveX = 0, moveY = 0;
         float lastX = 0, lastY = 0;
         float thisX = 0, thisY = 0;
@@ -131,7 +131,7 @@ public class TextStroke implements Stroke {
 
     public float measurePathLength(Shape shape) {
         PathIterator it = new FlatteningPathIterator(shape.getPathIterator(null), FLATNESS);
-        float points[] = new float[6];
+        float[] points = new float[6];
         float moveX = 0, moveY = 0;
         float lastX = 0, lastY = 0;
         float thisX = 0, thisY = 0;

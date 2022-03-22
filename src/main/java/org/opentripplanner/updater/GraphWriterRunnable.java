@@ -18,5 +18,5 @@ public interface GraphWriterRunnable {
     /**
      * This function is executed to modify the graph.
      */
-    public void run(Graph graph);
+    void run(Graph graph);
 }

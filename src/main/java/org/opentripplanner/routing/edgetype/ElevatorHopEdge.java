@@ -19,7 +19,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
-    private StreetTraversalPermission permission;
+    private final StreetTraversalPermission permission;
 
     public boolean wheelchairAccessible = true;
 

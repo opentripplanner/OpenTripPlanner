@@ -32,7 +32,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   private static final TripPattern TP = new TripPattern(
           new FeedScopedId("F", "P1"),
           new Route(new FeedScopedId("F", "L1")),
-          new StopPattern(List.of())
+          new StopPattern(List.of(new StopTime(), new StopTime()))
   );
 
   @BeforeEach

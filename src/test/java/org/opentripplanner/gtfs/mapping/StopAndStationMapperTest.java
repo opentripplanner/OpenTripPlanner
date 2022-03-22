@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.util.TranslationHelper;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class StopAndStationMapperTest {
@@ -63,7 +65,7 @@ public class StopAndStationMapperTest {
         STOP.setZoneId(ZONE_ID);
     }
 
-    private StopMapper subject = new StopMapper();
+    private final StopMapper subject = new StopMapper(new TranslationHelper());
 
     @Test
     public void testMapCollection() {
@@ -81,8 +83,8 @@ public class StopAndStationMapperTest {
         assertEquals(DESC, result.getDescription());
         assertEquals(LAT, result.getLat(), 0.0001d);
         assertEquals(LON, result.getLon(), 0.0001d);
-        assertEquals(NAME, result.getName());
-        assertEquals(URL, result.getUrl());
+        assertEquals(NAME, result.getName().toString());
+        assertEquals(URL, result.getUrl().toString());
         assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
         assertEquals(ZONE_ID, result.getFirstZoneAsString());
     }
@@ -91,13 +93,14 @@ public class StopAndStationMapperTest {
     public void testMapWithNulls() {
         Stop input = new Stop();
         input.setId(AGENCY_AND_ID);
+        input.setName(NAME);
 
         org.opentripplanner.model.Stop result = subject.map(input);
 
         assertNotNull(result.getId());
         assertNull(result.getCode());
         assertNull(result.getDescription());
-        assertNull(result.getName());
+        assertEquals(NAME, result.getName().toString());
         assertNull(result.getParentStation());
         assertNull(result.getCode());
         assertNull(result.getUrl());
@@ -111,6 +114,7 @@ public class StopAndStationMapperTest {
     public void verifyMissingCoordinateThrowsException() {
         Stop input = new Stop();
         input.setId(AGENCY_AND_ID);
+        input.setName(NAME);
 
         org.opentripplanner.model.Stop result = subject.map(input);
 
@@ -125,6 +129,6 @@ public class StopAndStationMapperTest {
         org.opentripplanner.model.Stop result1 = subject.map(STOP);
         org.opentripplanner.model.Stop result2 = subject.map(STOP);
 
-        assertTrue(result1 == result2);
+      assertSame(result1, result2);
     }
 }

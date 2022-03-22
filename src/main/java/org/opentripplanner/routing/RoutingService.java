@@ -2,18 +2,6 @@ package org.opentripplanner.routing;
 
 import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.function.Function;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -65,6 +53,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
@@ -73,6 +62,19 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.WorldEnvelope;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.function.Function;
 
 /**
  * This is the entry point of all API requests towards the OTP graph. A new instance of this class
@@ -332,8 +334,8 @@ public class RoutingService {
     /** {@link Graph#getTransitModes()} */
     public HashSet<TransitMode> getTransitModes() {return this.graph.getTransitModes();}
 
-    /** {@link Graph#index()} */
-    //public void index() {this.graph.index();}
+    // /** {@link Graph#index()} */
+    // public void index() {this.graph.index();}
 
     /** {@link Graph#getCalendarService()} */
     public CalendarService getCalendarService() {return this.graph.getCalendarService();}
@@ -427,6 +429,10 @@ public class RoutingService {
 
     /** {@link Graph#getTransitAlertService()} */
     public TransitAlertService getTransitAlertService() {return this.graph.getTransitAlertService();}
+
+    public RealtimeVehiclePositionService getVehiclePositionService() {
+        return this.graph.getVehiclePositionService();
+    }
 
     /** {@link Graph#getStopVerticesById(FeedScopedId)} */
     public Set<Vertex> getStopVerticesById(FeedScopedId id) {
@@ -591,7 +597,7 @@ public class RoutingService {
             double radiusMeters
     ) {return this.graphFinder.findClosestStops(lat, lon, radiusMeters);}
 
-    /** {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List, List, List, RoutingService)} */
+    /** {@link GraphFinder#findClosestPlaces(double, double, double, int, List, List, List, List, List, RoutingService)} */
     public List<PlaceAtDistance> findClosestPlaces(
             double lat,
             double lon,
@@ -608,7 +614,7 @@ public class RoutingService {
     ) {
         return this.graphFinder.findClosestPlaces(lat, lon, radiusMeters, maxResults, filterByModes,
                 filterByPlaceTypes, filterByStops, filterByRoutes, filterByBikeRentalStations,
-                filterByBikeParks, filterByCarParks, routingService
+          routingService
         );
     }
 

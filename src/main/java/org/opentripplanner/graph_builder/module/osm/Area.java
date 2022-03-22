@@ -1,22 +1,21 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
+import com.google.common.collect.ArrayListMultimap;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.TLongObjectMap;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-import com.google.common.collect.ArrayListMultimap;
-import org.locationtech.jts.geom.MultiPolygon;
-import org.locationtech.jts.geom.Polygon;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Stores information about an OSM area needed for visibility graph construction. Algorithm based on
@@ -37,7 +36,7 @@ class Area {
     public MultiPolygon jtsMultiPolygon;
 
     Area(OSMWithTags parent, List<OSMWay> outerRingWays, List<OSMWay> innerRingWays,
-         TLongObjectMap<OSMNode> _nodes) {
+         TLongObjectMap<OSMNode> nodes) {
         this.parent = parent;
         // ring assignment
         List<TLongList> innerRingNodes = constructRings(innerRingWays);
@@ -48,13 +47,13 @@ class Area {
         ArrayList<TLongList> allRings = new ArrayList<>(innerRingNodes);
         allRings.addAll(outerRingNodes);
 
-        List<Ring> innerRings = new ArrayList<Ring>();
-        List<Ring> outerRings = new ArrayList<Ring>();
+        List<Ring> innerRings = new ArrayList<>();
+        List<Ring> outerRings = new ArrayList<>();
         for (TLongList ring : innerRingNodes) {
-            innerRings.add(new Ring(ring, _nodes));
+            innerRings.add(new Ring(ring, nodes));
         }
         for (TLongList ring : outerRingNodes) {
-            outerRings.add(new Ring(ring, _nodes));
+            outerRings.add(new Ring(ring, nodes));
         }
 
         List<Ring> outermostRings = new ArrayList<>();
@@ -90,7 +89,7 @@ class Area {
     }
 
     private MultiPolygon calculateJTSMultiPolygon() {
-        List<Polygon> polygons = new ArrayList<Polygon>();
+        List<Polygon> polygons = new ArrayList<>();
         for (Ring ring : outermostRings) {
             polygons.add(ring.jtsPolygon);
         }
@@ -167,7 +166,7 @@ class Area {
     private boolean constructRingsRecursive(ArrayListMultimap<Long, OSMWay> waysByEndpoint,
                                             TLongList ring, List<TLongList> closedRings, long endpoint) {
 
-        List<OSMWay> ways = new ArrayList<OSMWay>(waysByEndpoint.get(endpoint));
+        List<OSMWay> ways = new ArrayList<>(waysByEndpoint.get(endpoint));
 
         for (OSMWay way : ways) {
             // remove this way from the map

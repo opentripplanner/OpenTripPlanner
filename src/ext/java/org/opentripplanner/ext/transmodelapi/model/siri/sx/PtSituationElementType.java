@@ -166,7 +166,7 @@ public class PtSituationElementType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("infoLinks")
-                    .type(new GraphQLList(infoLinkType))
+                    .type(new GraphQLList(new GraphQLNonNull(infoLinkType)))
                     .description("Optional links to more information.")
                     .dataFetcher(environment -> {
                         TransitAlert alert = environment.getSource();

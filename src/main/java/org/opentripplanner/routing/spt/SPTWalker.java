@@ -26,13 +26,13 @@ public class SPTWalker {
 
     private static final Logger LOG = LoggerFactory.getLogger(SPTWalker.class);
 
-    public static interface SPTVisitor {
+    public interface SPTVisitor {
 
         /**
          * @param e The edge to filter.
          * @return True to visit this edge, false to skip it.
          */
-        public boolean accept(Edge e);
+        boolean accept(Edge e);
 
         /**
          * Note: The same state can be visited several times (from different edges).
@@ -45,10 +45,10 @@ public class SPTWalker {
          * @param d1 Curvilinear coordinate of c on [s1-s0], in meters
          * @param speed The assumed speed on the edge
          */
-        public void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1, double speed);
+        void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1, double speed);
     }
 
-    private ShortestPathTree spt;
+    private final ShortestPathTree spt;
 
     public SPTWalker(ShortestPathTree spt) {
         this.spt = spt;
@@ -60,11 +60,11 @@ public class SPTWalker {
     public void walk(SPTVisitor visitor, double d0) {
         int nTotal = 0, nSkippedDupEdge = 0, nSkippedNoGeometry = 0;
         Collection<? extends State> allStates = spt.getAllStates();
-        Set<Vertex> allVertices = new HashSet<Vertex>(spt.getVertexCount());
+        Set<Vertex> allVertices = new HashSet<>(spt.getVertexCount());
         for (State s : allStates) {
             allVertices.add(s.getVertex());
         }
-        Set<Edge> processedEdges = new HashSet<Edge>(allVertices.size());
+        Set<Edge> processedEdges = new HashSet<>(allVertices.size());
         for (Vertex v : allVertices) {
             State s0 = spt.getState(v);
             if (s0 == null || !s0.isFinal())

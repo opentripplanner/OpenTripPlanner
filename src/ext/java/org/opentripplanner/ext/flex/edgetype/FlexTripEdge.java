@@ -24,7 +24,7 @@ public class FlexTripEdge extends Edge {
 
   public StopLocation s1;
   public StopLocation s2;
-  private FlexTrip trip;
+  private final FlexTrip trip;
   public FlexAccessEgressTemplate flexTemplate;
   public FlexPath flexPath;
 

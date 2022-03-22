@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.util.TranslationHelper;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class PathwayMapperTest {
@@ -20,6 +22,8 @@ public class PathwayMapperTest {
     private static final int PATHWAY_MODE = 2;
 
     private static final int TRAVERSAL_TIME = 3000;
+
+    private static final TranslationHelper TRANSLATION_HELPER = new TranslationHelper();
 
     private static final Pathway PATHWAY = new Pathway();
 
@@ -38,11 +42,11 @@ public class PathwayMapperTest {
         PATHWAY.setTraversalTime(TRAVERSAL_TIME);
     }
 
-    private PathwayMapper subject = new PathwayMapper(
-        new StopMapper(),
-        new EntranceMapper(),
-        new PathwayNodeMapper(),
-        new BoardingAreaMapper()
+    private final PathwayMapper subject = new PathwayMapper(
+        new StopMapper(TRANSLATION_HELPER),
+        new EntranceMapper(TRANSLATION_HELPER),
+        new PathwayNodeMapper(TRANSLATION_HELPER),
+        new BoardingAreaMapper(TRANSLATION_HELPER)
     );
 
     @Test
@@ -83,6 +87,6 @@ public class PathwayMapperTest {
         org.opentripplanner.model.Pathway result1 = subject.map(PATHWAY);
         org.opentripplanner.model.Pathway result2 = subject.map(PATHWAY);
 
-        assertTrue(result1 == result2);
+      assertSame(result1, result2);
     }
 }

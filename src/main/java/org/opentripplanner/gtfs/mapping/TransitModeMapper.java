@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 
 public class TransitModeMapper {

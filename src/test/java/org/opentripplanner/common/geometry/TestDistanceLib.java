@@ -1,10 +1,9 @@
 package org.opentripplanner.common.geometry;
 
+import junit.framework.TestCase;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-
-import junit.framework.TestCase;
 
 public class TestDistanceLib extends TestCase {
 
@@ -98,7 +97,7 @@ public class TestDistanceLib extends TestCase {
     }
 
     private LineString makeLineString(double... latlon) {
-        assertTrue(latlon.length % 2 == 0);
+      assertEquals(0, latlon.length % 2);
         Coordinate[] coords = new Coordinate[latlon.length / 2];
         for (int i = 0; i < coords.length; i++) {
             coords[i] = new Coordinate(latlon[i * 2 + 1], latlon[i * 2]);

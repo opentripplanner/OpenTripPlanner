@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.graphfinder;
 
-import static java.lang.Integer.min;
-
-import java.util.Comparator;
-import java.util.List;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TransitMode;
@@ -16,6 +12,11 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.DominanceFunction;
+
+import java.util.Comparator;
+import java.util.List;
+
+import static java.lang.Integer.min;
 
 /**
  * A GraphFinder which uses the street network to traverse the graph in order to find the nearest
@@ -38,10 +39,10 @@ public class StreetGraphFinder implements GraphFinder {
 
   @Override
   public List<PlaceAtDistance> findClosestPlaces(
-      double lat, double lon, double radiusMeters, int maxResults, List<TransitMode> filterByModes,
-      List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
-      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
-      List<String> filterByBikeParks, List<String> filterByCarParks, RoutingService routingService
+    double lat, double lon, double radiusMeters, int maxResults, List<TransitMode> filterByModes,
+    List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
+    RoutingService routingService
   ) {
       PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(
           routingService,

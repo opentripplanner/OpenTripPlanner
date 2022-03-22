@@ -10,7 +10,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
-import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.*;
 
@@ -63,7 +62,7 @@ public abstract class StreetVertex extends Vertex {
         } else if (uniqueNames.size() == 1) {
             calculatedName = uniqueNames.get(0);
         } else {
-            calculatedName = new LocalizedString("unnamedStreet", (String[]) null);
+            calculatedName = new LocalizedString("unnamedStreet");
         }
         return calculatedName;
     }

@@ -1,12 +1,13 @@
 package org.opentripplanner.api.resource;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import javax.ws.rs.core.UriInfo;
 import org.opentripplanner.api.model.ApiTripPlan;
 import org.opentripplanner.api.model.ApiTripSearchMetadata;
 import org.opentripplanner.api.model.error.PlannerError;
+
+import javax.ws.rs.core.UriInfo;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 /** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
 public class TripPlannerResponse {
@@ -27,11 +28,11 @@ public class TripPlannerResponse {
 
     /** This no-arg constructor exists to make JAX-RS happy. */ 
     @SuppressWarnings("unused")
-    private TripPlannerResponse() {};
+    private TripPlannerResponse() {}
 
-    /** Construct an new response initialized with all the incoming query parameters. */
+  /** Construct an new response initialized with all the incoming query parameters. */
     public TripPlannerResponse(UriInfo info) {
-        this.requestParameters = new HashMap<String, String>();
+        this.requestParameters = new HashMap<>();
         if (info == null) { 
             // in tests where there is no HTTP request, just leave the map empty
             return;

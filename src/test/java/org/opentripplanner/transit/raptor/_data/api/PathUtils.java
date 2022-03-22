@@ -30,6 +30,10 @@ public class PathUtils {
     return pathsToString(response.paths(), p -> p.toStringDetailed(TRANSLATOR::stopIndexToName));
   }
 
+  public static String join(String ... paths) {
+    return String.join("\n", paths);
+  }
+
 
   /* private methods */
 

@@ -4,8 +4,8 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.BookingRule;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.ContactInfo;
 import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.ContactInfo;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -28,7 +28,7 @@ class BookingRuleMapper {
 
         return cachedBookingInfos.computeIfAbsent(rule.getId(), k -> new BookingInfo(
                 contactInfo(rule),
-                bookingMethods(rule),
+                bookingMethods(),
                 earliestBookingTime(rule),
                 latestBookingTime(rule),
                 minimumBookingNotice(rule),
@@ -50,7 +50,7 @@ class BookingRuleMapper {
                 null);
     }
 
-    private EnumSet<BookingMethod> bookingMethods(BookingRule rule) {
+    private EnumSet<BookingMethod> bookingMethods() {
         return null;
     }
 

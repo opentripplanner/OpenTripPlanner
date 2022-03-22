@@ -21,7 +21,8 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
     enum MapperType { Digitransit }
 
     static Map<VehicleParkingsLayerBuilder.MapperType, Function<Graph, PropertyMapper<VehicleParking>>> mappers = Map.of(
-            VehicleParkingsLayerBuilder.MapperType.Digitransit, DigitransitVehicleParkingPropertyMapper::create
+      VehicleParkingsLayerBuilder.MapperType.Digitransit,
+      g -> DigitransitVehicleParkingPropertyMapper.create()
     );
 
     private final Graph graph;

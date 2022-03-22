@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.core.intersection_model;
 
-import java.io.Serializable;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -8,6 +7,8 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel
         implements Serializable {
@@ -37,14 +38,10 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
             return computeDrivingTraversalCost(v, from, to, request);
         }
         else if (mode.isCycling()) {
-            var c = computeCyclingTraversalCost(v, from, to, fromSpeed, toSpeed, request);
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Turning from {} to {} has a cost of {}", from, to, c);
-            }
-            return c;
+            return computeCyclingTraversalCost(v, from, to, fromSpeed, toSpeed, request);
         }
         else {
-            return computeNonDrivingTraversalCost(v, from, to, fromSpeed, toSpeed);
+            return computeNonDrivingTraversalCost(from, to, toSpeed);
         }
     }
 
@@ -91,7 +88,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     ) {
         double turnCost = 0;
 
-        int turnAngle = calculateTurnAngle(from, to, request);
+        int turnAngle = calculateTurnAngle(from, to);
         if (v.trafficLight) {
             // Use constants that apply when there are stop lights.
             if (isSafeTurn(turnAngle)) {
@@ -130,8 +127,8 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
             IntersectionVertex v, StreetEdge from,
             StreetEdge to, float fromSpeed, float toSpeed, RoutingRequest request
     ) {
-        var turnAngle = calculateTurnAngle(from, to, request);
-        final var baseCost = computeNonDrivingTraversalCost(v, from, to, fromSpeed, toSpeed);
+        var turnAngle = calculateTurnAngle(from, to);
+        final var baseCost = computeNonDrivingTraversalCost(from, to, toSpeed);
 
         if (isTurnAcrossTraffic(turnAngle)) {
             return baseCost * getAcrossTrafficBicyleTurnMultiplier();

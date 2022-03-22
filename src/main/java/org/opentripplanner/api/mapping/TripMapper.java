@@ -6,7 +6,6 @@ import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 

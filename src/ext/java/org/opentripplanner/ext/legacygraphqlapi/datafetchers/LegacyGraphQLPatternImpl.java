@@ -3,8 +3,13 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -21,12 +26,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 
 public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPattern {
 
@@ -85,6 +85,12 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
         return null; // Invalid date format
       }
     };
+  }
+
+  @Override
+  public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions() {
+    return environment -> getRoutingService(environment).getVehiclePositionService()
+            .getVehiclePositions(this.getSource(environment));
   }
 
   @Override

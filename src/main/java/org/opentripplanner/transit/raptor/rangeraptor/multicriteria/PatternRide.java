@@ -22,8 +22,8 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
  * {@link org.opentripplanner.transit.raptor.util.paretoset.ParetoSet}.
  * <p>
  * We do not do this the same way as described in the original Raptor paper. The original McRaptor
- * algorithm keep a bag of labels(stop-arrivals) while traversing the pattern. We keep a "bag"
- * ({@link MultiCriteriaRoutingStrategy#patternRides}) of {@link PatternRide}s for the given pattern. The main
+ * algorithm keep a bag of labels(stop-arrivals) while traversing the pattern. We keep a "bag" of
+ * {@code patternRides} in {@link MultiCriteriaRoutingStrategy} for the given pattern. The main
  * differences are:
  * <ul>
  *  <li>

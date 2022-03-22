@@ -22,7 +22,7 @@ public class StreetLeg implements Leg {
 
     private final Calendar endTime;
 
-    private final Double distanceMeters;
+    private final double distanceMeters;
 
     private final Place from;
 
@@ -50,7 +50,7 @@ public class StreetLeg implements Leg {
             Calendar endTime,
             Place from,
             Place to,
-            Double distanceMeters,
+            double distanceMeters,
             int generalizedCost,
             LineString geometry,
             List<WalkStep> walkSteps
@@ -110,7 +110,7 @@ public class StreetLeg implements Leg {
     }
 
     @Override
-    public Double getDistanceMeters() {
+    public double getDistanceMeters() {
         return distanceMeters;
     }
 

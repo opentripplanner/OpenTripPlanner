@@ -5,14 +5,15 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.FareRule;
 import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class FareRuleMapperTest {
@@ -46,7 +47,7 @@ public class FareRuleMapperTest {
         FARE_RULE.setRoute(ROUTE);
     }
 
-    private FareRuleMapper subject = new FareRuleMapper(
+    private final FareRuleMapper subject = new FareRuleMapper(
             new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)),
             new FareAttributeMapper()
     );
@@ -86,6 +87,6 @@ public class FareRuleMapperTest {
         org.opentripplanner.model.FareRule result1 = subject.map(FARE_RULE);
         org.opentripplanner.model.FareRule result2 = subject.map(FARE_RULE);
 
-        assertTrue(result1 == result2);
+      assertSame(result1, result2);
     }
 }

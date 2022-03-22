@@ -83,6 +83,11 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
     return pathHandler == null ? null : new ParetoSetDebugHandlerAdapter<>(pathHandler);
   }
 
+  @Nullable
+  public DebugHandler<Path<?>> debugPathArrival() {
+    return pathHandler;
+  }
+
   /* logger */
 
   public DebugLogger debugLogger() { return logger;}

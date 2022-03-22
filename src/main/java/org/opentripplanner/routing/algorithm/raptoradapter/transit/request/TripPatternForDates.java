@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
+
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
@@ -143,12 +143,12 @@ public class TripPatternForDates
 
     @Override
     public boolean boardingPossibleAt(int stopPositionInPattern) {
-        return tripPattern.getPattern().canBoard(stopPositionInPattern);
+        return tripPattern.boardingPossibleAt(stopPositionInPattern);
     }
 
     @Override
     public boolean alightingPossibleAt(int stopPositionInPattern) {
-        return tripPattern.getPattern().canAlight(stopPositionInPattern);
+        return tripPattern.alightingPossibleAt(stopPositionInPattern);
     }
 
     @Override public int numberOfStopsInPattern() {

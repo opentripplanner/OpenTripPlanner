@@ -1,5 +1,7 @@
 package org.opentripplanner.api.model;
 
+import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare;
 
 import java.util.ArrayList;
@@ -91,10 +93,9 @@ public class ApiItinerary {
      * response if explicit asked for in the request.
      * <p>
      * For example when tuning or manually testing the itinerary-filter-chain it you can enable
-     * the {@link org.opentripplanner.routing.core.RoutingRequest#debugItineraryFilter} and instead
-     * of removing itineraries from the result the itineraries would be tagged by the filters
-     * instead. This enable investigating, why an expected itinerary is missing from the result
-     * set.
+     * the {@link ItineraryFilterParameters#debug} and instead of removing itineraries from the
+     * result the itineraries would be tagged by the filters instead. This enable investigating,
+     * why an expected itinerary is missing from the result set.
      */
     public List<ApiSystemNotice> systemNotices = null;
 

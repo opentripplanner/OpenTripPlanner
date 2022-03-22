@@ -1,11 +1,11 @@
 package org.opentripplanner.common.geometry;
 
-import java.io.Serializable;
-import java.lang.ref.SoftReference;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
+
+import java.io.Serializable;
+import java.lang.ref.SoftReference;
 
 /**
  * A {@link CoordinateSequence} implementation based on a packed arrays. In this implementation,
@@ -84,7 +84,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         for (int i = 0; i < coords.length; i++) {
             coords[i] = getCoordinateInternal(i);
         }
-        coordRef = new SoftReference<Coordinate[]>(coords);
+        coordRef = new SoftReference<>(coords);
 
         return coords;
     }
@@ -276,7 +276,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
         public Coordinate getCoordinateInternal(int i) {
             double x = coords[i * dimension];
             double y = coords[i * dimension + 1];
-            double z = dimension == 2 ? 0.0 : coords[i * dimension + 2];
+            double z = dimension == 2 ? java.lang.Double.NaN : coords[i * dimension + 2];
             return new Coordinate(x, y, z);
         }
 

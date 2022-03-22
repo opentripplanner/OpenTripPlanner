@@ -40,7 +40,7 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
    */
   private final Map<String, String> headers;
 
-  private String language;
+  private final String language;
 
   public VehicleRentalServiceDirectoryFetcherParameters(
       URI url,

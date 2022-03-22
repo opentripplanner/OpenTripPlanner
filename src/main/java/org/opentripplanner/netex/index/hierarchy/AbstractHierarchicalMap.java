@@ -55,7 +55,7 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
         for (K key : localKeys()) {
             V value = localGet(key);
 
-            HMapValidationRule.Status status = rule.validate(key, value);
+            HMapValidationRule.Status status = rule.validate(value);
 
             if(status == HMapValidationRule.Status.DISCARD) {
                 discardKeys.add(key);

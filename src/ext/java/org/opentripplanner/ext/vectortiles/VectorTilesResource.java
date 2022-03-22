@@ -5,10 +5,10 @@ import com.wdtinc.mapbox_vector_tile.VectorTile;
 import org.geotools.geometry.Envelope2D;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.WebMercatorTile;
-import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.VectorTileConfig;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -100,7 +100,7 @@ public class VectorTilesResource {
     }
     byte[] bytes = mvtBuilder.build().toByteArray();
     return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(bytes).build();
-  };
+  }
 
   @GET
   @Path("/{layers}/tilejson.json")
@@ -113,7 +113,7 @@ public class VectorTilesResource {
     return new TileJson(otpServer.getRouter().graph, uri, headers, requestedLayers);
   }
 
-  private String getBaseAddress(UriInfo uri, HttpHeaders headers, String layers) {
+  private String getBaseAddress(UriInfo uri, HttpHeaders headers) {
     String protocol;
     if (headers.getRequestHeader("X-Forwarded-Proto") != null) {
       protocol = headers.getRequestHeader("X-Forwarded-Proto").get(0);
@@ -160,7 +160,7 @@ public class VectorTilesResource {
           .collect(Collectors.joining(", "));
 
       tiles = new String[]{
-              getBaseAddress(uri, headers, layers)
+              getBaseAddress(uri, headers)
                       + "/otp/routers/"
                       + ignoreRouterId
                       + "/vectorTiles/"

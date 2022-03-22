@@ -1,18 +1,19 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelChairBoarding;
-
-import java.util.Collection;
-import java.util.Collections;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+import java.util.Collections;
+import org.junit.Test;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.util.TranslationHelper;
+
 
 public class BoardingAreaMapperTest  {
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "B1");
@@ -57,7 +58,7 @@ public class BoardingAreaMapperTest  {
     STOP.setZoneId(ZONE_ID);
   }
 
-  private BoardingAreaMapper subject = new BoardingAreaMapper();
+  private final BoardingAreaMapper subject = new BoardingAreaMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() {
@@ -75,7 +76,7 @@ public class BoardingAreaMapperTest  {
     assertEquals(DESC, result.getDescription());
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
-    assertEquals(NAME, result.getName());
+    assertEquals(NAME, result.getName().toString());
     assertEquals(WHEELCHAIR_BOARDING, result.getWheelchairBoarding());
   }
 
@@ -90,7 +91,7 @@ public class BoardingAreaMapperTest  {
     assertNotNull(result.getId());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertNull(result.getName());
+    assertEquals(BoardingAreaMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStop());
     assertNull(result.getCode());
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());

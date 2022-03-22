@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
+import java.util.BitSet;
 import java.util.Objects;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
@@ -14,6 +15,10 @@ public class TripPatternWithRaptorStopIndexes {
 
     private final TripPattern pattern;
     private final int[] stopIndexes;
+
+    private final BitSet boardingPossible;
+
+    private final BitSet alightingPossible;
 
     /**
      * List of transfers TO this pattern for each stop position in pattern used by Raptor during the
@@ -43,6 +48,15 @@ public class TripPatternWithRaptorStopIndexes {
     ) {
         this.pattern = pattern;
         this.stopIndexes = stopIndexes;
+
+        final int nStops = stopIndexes.length;
+        boardingPossible = new BitSet(nStops);
+        alightingPossible = new BitSet(nStops);
+
+        for (int s = 0; s < nStops; s++) {
+            boardingPossible.set(s, pattern.canBoard(s));
+            alightingPossible.set(s, pattern.canAlight(s));
+        }
     }
 
     public FeedScopedId getId() {return pattern.getId();}
@@ -76,6 +90,14 @@ public class TripPatternWithRaptorStopIndexes {
 
     public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> constrainedTransferReverseSearch() {
         return new ConstrainedBoardingSearch(false, constrainedTransfersReverseSearch);
+    }
+
+    public boolean boardingPossibleAt(int stopPositionInPattern) {
+        return boardingPossible.get(stopPositionInPattern);
+    }
+
+    public boolean alightingPossibleAt(int stopPositionInPattern) {
+        return alightingPossible.get(stopPositionInPattern);
     }
 
     @Override

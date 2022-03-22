@@ -1,17 +1,18 @@
 package org.opentripplanner.common.geometry;
 
+import org.geotools.referencing.GeodeticCalculator;
+import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.geotools.referencing.GeodeticCalculator;
-import org.junit.Test;
+public class DirectionUtilsTest {
 
-import org.locationtech.jts.geom.Coordinate;
-
-public class DirectionUtilsTest extends TestCase {
 
     @Test
     public final void testAzimuth() {
@@ -27,23 +28,23 @@ public class DirectionUtilsTest extends TestCase {
         // Add fixed points
         from.add(new Coordinate(0, 45));
         to.add(new Coordinate(0, 45)); // Undefined: 180 deg
-        assertTrue(DirectionUtils.getAzimuth(from.get(0), to.get(0)) == 180);
+        assertEquals(180, DirectionUtils.getAzimuth(from.get(0), to.get(0)));
 
         from.add(new Coordinate(0, 45));
         to.add(new Coordinate(0.1, 45)); // East: 90 deg
-        assertTrue(DirectionUtils.getAzimuth(from.get(1), to.get(1)) == 90);
+        assertEquals(90, DirectionUtils.getAzimuth(from.get(1), to.get(1)));
 
         from.add(new Coordinate(0, 45));
         to.add(new Coordinate(0, 45.1)); // North: 0 deg
-        assertTrue(DirectionUtils.getAzimuth(from.get(2), to.get(2)) == 0);
+        assertEquals(0, DirectionUtils.getAzimuth(from.get(2), to.get(2)));
 
         from.add(new Coordinate(0, 45));
         to.add(new Coordinate(-0.1, 45)); // West: -90 deg
-        assertTrue(DirectionUtils.getAzimuth(from.get(3), to.get(3)) == -90);
+        assertEquals(-90, DirectionUtils.getAzimuth(from.get(3), to.get(3)));
 
         from.add(new Coordinate(0, 45));
         to.add(new Coordinate(0, 44.9)); // South: 180 deg
-        assertTrue(DirectionUtils.getAzimuth(from.get(4), to.get(4)) == 180);
+        assertEquals(180, DirectionUtils.getAzimuth(from.get(4), to.get(4)));
 
         for (int i = 0; i < N_RUN; i++) {
             Coordinate a = new Coordinate(rand.nextDouble() * 0.1, 45 + rand.nextDouble() * 0.1);

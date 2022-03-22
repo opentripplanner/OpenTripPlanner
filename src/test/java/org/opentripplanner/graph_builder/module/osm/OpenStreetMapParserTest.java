@@ -1,11 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URLDecoder;
-
 import gnu.trove.list.TLongList;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -13,13 +7,20 @@ import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 
+import java.io.File;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class OpenStreetMapParserTest {
 
     @Test
     public void testBinaryParser() throws Exception {
         File osmFile = new File(URLDecoder.decode(
                 getClass().getResource("map.osm.pbf").getPath(),
-                "UTF-8"
+                StandardCharsets.UTF_8
         ));
         BinaryOpenStreetMapProvider pr = new BinaryOpenStreetMapProvider(osmFile, true);
         OSMDatabase osmdb = new OSMDatabase(new DataImportIssueStore(false));

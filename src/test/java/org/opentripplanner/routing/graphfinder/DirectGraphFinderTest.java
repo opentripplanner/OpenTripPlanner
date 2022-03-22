@@ -13,7 +13,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 class DirectGraphFinderTest extends GraphRoutingTest {
 
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
     private Graph graph;
 

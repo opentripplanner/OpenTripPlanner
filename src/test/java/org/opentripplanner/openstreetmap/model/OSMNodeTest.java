@@ -1,8 +1,11 @@
 package org.opentripplanner.openstreetmap.model;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class OSMNodeTest {
 
@@ -29,7 +32,7 @@ public class OSMNodeTest {
             node.getCapacity();
             
             // Above should fail.
-            assertFalse(true);
+          fail();
         } catch (NumberFormatException e) {}
         
         node.addTag("capacity", "10");

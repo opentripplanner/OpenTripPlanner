@@ -1,10 +1,11 @@
 package org.opentripplanner.model;
 
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.util.I18NString;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.TimeZone;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryCollection;
 
 /**
  * A StopLocation describes a place where a vehicle can be boarded or alighted, which is not
@@ -17,11 +18,11 @@ public interface StopLocation {
   FeedScopedId getId();
 
   /** Name of the StopLocation, if provided */
-  String getName();
+  I18NString getName();
 
   String getDescription();
 
-  String getUrl();
+  I18NString getUrl();
 
   /**
    * Short text or a number that identifies the location for riders. These codes are often used in
@@ -55,7 +56,7 @@ public interface StopLocation {
     return List.of();
   }
 
-  default WheelChairBoarding getWheelchairBoarding() { return null; };
+  default WheelChairBoarding getWheelchairBoarding() { return null; }
 
   /**
    * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
