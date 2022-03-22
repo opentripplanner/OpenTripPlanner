@@ -46,7 +46,7 @@ public class BicycleRoutingTest {
     }
 
     /**
-     * Tests that that https://www.openstreetmap.org/way/35097400 is allowed for cars due to
+     * Tests that https://www.openstreetmap.org/way/35097400 is allowed for cars due to
      * motor_vehicle=destination being meant for cars only.
      */
     @Test

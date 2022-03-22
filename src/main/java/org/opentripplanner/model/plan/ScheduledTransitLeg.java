@@ -26,6 +26,7 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.algorithm.mapping.AccessibilityScore;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -318,6 +319,11 @@ public class ScheduledTransitLeg implements Leg {
     @Override
     public int getGeneralizedCost() {
         return generalizedCost;
+    }
+
+    @Override
+    public Float accessibilityScore() {
+        return AccessibilityScore.compute(this);
     }
 
     /**

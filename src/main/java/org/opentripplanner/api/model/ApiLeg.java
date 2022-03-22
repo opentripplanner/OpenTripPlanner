@@ -221,6 +221,8 @@ public class ApiLeg {
       */
     public Boolean walkingBike;
 
+    public Float accessibilityScore;
+
      /**
      * The leg's duration in seconds
      */
