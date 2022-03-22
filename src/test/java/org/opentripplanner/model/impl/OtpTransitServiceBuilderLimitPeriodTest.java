@@ -2,6 +2,7 @@ package org.opentripplanner.model.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
@@ -124,7 +125,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
         // Limit service to last half of month
-        subject.limitServiceDays(new ServiceDateInterval(D2, D3));
+        subject.limitServiceDays(new ServiceDateInterval(D2, D3), new DataImportIssueStore(false));
 
         // Verify calendar
         List<ServiceCalendar> calendars = subject.getCalendars();
