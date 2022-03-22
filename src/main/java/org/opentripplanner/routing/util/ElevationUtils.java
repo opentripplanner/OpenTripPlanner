@@ -1,18 +1,17 @@
 package org.opentripplanner.routing.util;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.util.elevation.ToblersHikingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ElevationUtils {
-    private static Logger log = LoggerFactory.getLogger(ElevationUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(ElevationUtils.class);
 
     /*
      * These numbers disagree with everything else I (David Turner) have read about the energy cost
@@ -121,14 +120,14 @@ public class ElevationUtils {
     }
 
     /** constants for slope computation */
-    final static double tx[] = { 0.0000000000000000E+00, 0.0000000000000000E+00, 0.0000000000000000E+00,
+    final static double[] tx = { 0.0000000000000000E+00, 0.0000000000000000E+00, 0.0000000000000000E+00,
             2.7987785324442748E+03, 5.0000000000000000E+03, 5.0000000000000000E+03,
             5.0000000000000000E+03 };
-    final static double ty[] = { -3.4999999999999998E-01, -3.4999999999999998E-01, -3.4999999999999998E-01,
+    final static double[] ty = { -3.4999999999999998E-01, -3.4999999999999998E-01, -3.4999999999999998E-01,
             -7.2695627831828688E-02, -2.4945814335295903E-03, 5.3500304527448035E-02,
             1.2191105175593375E-01, 3.4999999999999998E-01, 3.4999999999999998E-01,
             3.4999999999999998E-01 };
-    final static double coeff[] = { 4.3843513168660255E+00, 3.6904323727375652E+00, 1.6791850199667697E+00,
+    final static double[] coeff = { 4.3843513168660255E+00, 3.6904323727375652E+00, 1.6791850199667697E+00,
             5.5077866957024113E-01, 1.7977766419113900E-01, 8.0906832222762959E-02,
             6.0239305785343762E-02, 4.6782343053423814E+00, 3.9250580214736304E+00,
             1.7924585866601270E+00, 5.3426170441723031E-01, 1.8787442260720733E-01,
@@ -151,13 +150,13 @@ public class ElevationUtils {
         int kx = 2;
         int ky = 2;
 
-        double h[] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        double[] h = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-        double hh[] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        double[] hh = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-        double w_x[] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        double[] w_x = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-        double w_y[] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        double[] w_y = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
         int i, j, li, lj, lx, ky1, nky1, ly, i1, j1, l2;
@@ -271,7 +270,7 @@ public class ElevationUtils {
         if (elevationProfile == null) {
             return null;
         }
-        List<Coordinate> coordList = new LinkedList<Coordinate>();
+        List<Coordinate> coordList = new LinkedList<>();
 
         if (start < 0)
             start = 0;
@@ -320,7 +319,7 @@ public class ElevationUtils {
             lastCoord = coord;
         }
 
-        Coordinate coordArr[] = new Coordinate[coordList.size()];
+        Coordinate[] coordArr = new Coordinate[coordList.size()];
         return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
     }
     

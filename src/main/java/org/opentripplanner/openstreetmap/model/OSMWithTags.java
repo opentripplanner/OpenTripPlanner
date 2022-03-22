@@ -1,16 +1,14 @@
 package org.opentripplanner.openstreetmap.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.function.Consumer;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.function.Consumer;
 
 /**
  * A base class for OSM entities containing common methods.
@@ -44,7 +42,7 @@ public class OSMWithTags {
      */
     public void addTag(OSMTag tag) {
         if (tags == null)
-            tags = new HashMap<String, String>();
+            tags = new HashMap<>();
 
         tags.put(tag.getK().toLowerCase(), tag.getV());
     }
@@ -57,7 +55,7 @@ public class OSMWithTags {
             return;
 
         if (tags == null)
-            tags = new HashMap<String, String>();
+            tags = new HashMap<>();
 
         tags.put(key.toLowerCase(), value);
     }
@@ -180,7 +178,7 @@ public class OSMWithTags {
     }
 
     public Map<String, String> getTagsByPrefix(String prefix) {
-        Map<String, String> out = new HashMap<String, String>();
+        Map<String, String> out = new HashMap<>();
         for (Map.Entry<String, String> entry : tags.entrySet()) {
             String k = entry.getKey();
             if (k.equals(prefix) || k.startsWith(prefix + ":")) {

@@ -37,5 +37,5 @@ public enum StopTransferPriority {
      * <p>
      * NeTEx equivalent is PREFERRED_INTERCHANGE.
      */
-    PREFERRED;
+    PREFERRED
 }

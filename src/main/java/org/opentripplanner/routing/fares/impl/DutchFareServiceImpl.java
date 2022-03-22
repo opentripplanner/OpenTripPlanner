@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.fares.impl;
 
-import java.util.Collection;
-import java.util.Currency;
-import java.util.List;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.Itinerary;
@@ -12,6 +9,10 @@ import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Currency;
+import java.util.List;
 
 public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
@@ -85,7 +86,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
      *     (DutchRailwaysPrice(0 + 100) - DutchRailwaysPrice(0)) + (ArrivaPrice(100 + 10) - ArrivaPrice(100))
      */
 
-    private class UnitsFareZone {
+    private static class UnitsFareZone {
         public int units;
         public String fareZone;
 
@@ -96,7 +97,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     private UnitsFareZone getUnitsByZones(FeedScopedId agencyId, String startZone, String endZone, Collection<FareRuleSet> fareRules) {
-        P2<String> od = new P2<String>(startZone, endZone);
+        P2<String> od = new P2<>(startZone, endZone);
 
         LOG.trace("Search " + startZone + " and " + endZone);
 

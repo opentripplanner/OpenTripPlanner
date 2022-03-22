@@ -11,12 +11,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.common.ParameterException;
@@ -146,11 +144,6 @@ public class TransmodelGraphQLPlanner {
             callWith.argument("triangleFactors.time", (Double v) -> args[2] = v);
 
             request.setTriangleNormalized(args[0], args[1], args[2]);
-        }
-
-        if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
-            bicycleOptimizeType = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
         }
 
         if (bicycleOptimizeType != null) {

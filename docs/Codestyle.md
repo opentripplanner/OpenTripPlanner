@@ -8,7 +8,7 @@ few modifications. Here is the original Google style guide:
 https://google.github.io/styleguide/javaguide.html
 
 ### IntellJ Code Style formatter 
-If you use IntelliJ, import the provided [intellij-code-style.xml](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/intellij-code-style.xml). 
+If you use IntelliJ, import the provided [intellij-code-style.xml](https://github.com/opentripplanner/OpenTripPlanner/blob/2.1-rc/intellij-code-style.xml). 
 Open the `Preferences` from the menu and select _Editor > Code Style_. Then import the code-style
 xml document. Configure _Scheme_ using  _Import Scheme > IntelliJ IDEA code style XML_.
 

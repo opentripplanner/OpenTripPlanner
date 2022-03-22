@@ -26,7 +26,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
     //      not work correctly.
     @Override
-    public void initialize(RoutingRequest req, long abortTime) {
+    public void initialize(RoutingRequest req) {
         Vertex target = req.rctx.toVertices.iterator().next();
         maxStreetSpeed = req.getStreetSpeedUpperBound();
         walkingSpeed = req.walkSpeed;

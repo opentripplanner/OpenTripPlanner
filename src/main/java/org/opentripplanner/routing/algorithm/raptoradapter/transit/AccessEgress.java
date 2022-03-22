@@ -10,7 +10,7 @@ public class AccessEgress implements RaptorTransfer {
   /**
    * "To stop" in the case of access, "from stop" in the case of egress.
    */
-  private int toFromStop;
+  private final int toFromStop;
 
   private final int durationInSeconds;
 

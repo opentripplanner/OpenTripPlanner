@@ -9,9 +9,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class IntersectionVertexTest {
 
@@ -106,8 +104,7 @@ public class IntersectionVertexTest {
      ****/
 
     private StreetVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
-        return v;
+        return new IntersectionVertex(graph, label, lat, lon);
     }
 
     /**

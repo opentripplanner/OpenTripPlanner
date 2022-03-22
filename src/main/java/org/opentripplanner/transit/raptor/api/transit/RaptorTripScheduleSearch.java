@@ -1,8 +1,6 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 
 
 /**
@@ -36,9 +34,9 @@ public interface RaptorTripScheduleSearch<T extends RaptorTripSchedule> {
     @Nullable
     default RaptorTripScheduleBoardOrAlightEvent<T> search(int earliestBoardTime, int stopPositionInPattern) {
         return search(earliestBoardTime, stopPositionInPattern, UNBOUNDED_TRIP_INDEX);
-    };
+    }
 
-    /**
+  /**
      * Find the best trip matching the given {@code timeLimit} and {@code tripIndexLimit}. This
      * method returns {@code null} if no trip is found.
      * <p>

@@ -8,7 +8,15 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class keeps track which graph vertices have been visited and their associated states,
@@ -31,12 +39,12 @@ public class ShortestPathTree {
 
     public final DominanceFunction dominanceFunction;
 
-    private Map<Vertex, List<State>> stateSets;
+    private final Map<Vertex, List<State>> stateSets;
 
     public ShortestPathTree (RoutingRequest options, DominanceFunction dominanceFunction) {
         this.options = options;
         this.dominanceFunction = dominanceFunction;
-        stateSets = new IdentityHashMap<Vertex, List<State>>();
+        stateSets = new IdentityHashMap<>();
     }
 
     /** @return a list of GraphPaths, sometimes empty but never null. */
@@ -64,7 +72,7 @@ public class ShortestPathTree {
     }
 
     /** @return a single optimal, optionally back-optimized path to the given vertex. */
-    public GraphPath getPath(Vertex dest, boolean optimize) {
+    public GraphPath getPath(Vertex dest) {
         State s = getState(dest);
         if (s == null) {
             return null;
@@ -95,7 +103,7 @@ public class ShortestPathTree {
         LOG.info("SPT: vertices: " + stateSets.size() + " states: total: "
                 + statesCount + " per vertex max: " + maxSize + " avg: "
                 + (statesCount * 1.0 / stateSets.size()));
-        List<Integer> nStates = new ArrayList<Integer>(histogram.elementSet());
+        List<Integer> nStates = new ArrayList<>(histogram.elementSet());
         Collections.sort(nStates);
         for (Integer nState : nStates) {
             LOG.info(nState + " states: " + histogram.count(nState) + " vertices.");
@@ -223,7 +231,7 @@ public class ShortestPathTree {
 
     /** @return every state in this tree */
     public Collection<State> getAllStates() {
-        ArrayList<State> allStates = new ArrayList<State>();
+        ArrayList<State> allStates = new ArrayList<>();
         for (List<State> stateSet : stateSets.values()) {
             allStates.addAll(stateSet);
         }

@@ -16,6 +16,11 @@
  */
 package org.opentripplanner.kryo;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,11 +36,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.Serializer;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-
 /**
  * A kryo {@link Serializer} for unmodifiable {@link Collection}s and {@link Map}s created via
  * {@link Collections}.
@@ -45,7 +45,7 @@ import com.esotericsoftware.kryo.io.Output;
 public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
 
     @Override
-    public Object read(Kryo kryo, Input input, Class<? extends Object> clazz) {
+    public Object read(Kryo kryo, Input input, Class<?> clazz) {
         int ordinal = input.readInt(true);
         UnmodifiableCollection unmodifiableCollection = UnmodifiableCollection.values()[ordinal];
         Object sourceCollection = kryo.readClassAndObject(input);

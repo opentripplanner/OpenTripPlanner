@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 //Currently unused since notes are disabled in DefaultWayPropertySetSource
 public class NoteProperties {
 
-    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
+    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)}");
 
     public String notePattern;
 

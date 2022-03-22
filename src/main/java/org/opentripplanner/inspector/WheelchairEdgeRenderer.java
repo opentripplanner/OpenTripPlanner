@@ -18,7 +18,7 @@ import java.awt.Color;
 public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
 
 
-    private ScalarColorPalette slopePalette = new DefaultScalarColorPalette(0.0, 0.08, 1.0);
+    private final ScalarColorPalette slopePalette = new DefaultScalarColorPalette(0.0, 0.08, 1.0);
 
 
     private static final Color NO_WHEELCHAIR_COLOR = Color.RED;

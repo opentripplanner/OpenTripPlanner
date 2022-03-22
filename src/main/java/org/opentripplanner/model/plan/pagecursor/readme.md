@@ -38,7 +38,7 @@ The next 4 cases are all **depart after** trip routing requests. A _sort-by-arri
 must have a _search-window(sw)_ and a _earliest-arrival-time_, but no _latest-arrival-time_.
 
 
-### Case: sort-by-arrival
+### sort-by-arrival
 
 This is the most common case, where itineraries returned are sorted by the arrival time with the 
 earliest arrival first. The regular depart after search with all itineraries departing inside the 
@@ -53,7 +53,7 @@ _previous-page_ must reverse the itinerary-filtering: `crop itineraries at START
 
 ![sort-by-arrival-crop-sw](images/sort-by-arrival-crop-sw.svg)
 
-  - In this case the `<< Previous page` is the same as in [depart-after](#depart-after) and not 
+  - In this case the `<< Previous page` is the same as in [sort-by-arrival](#sort-by-arrival) and not 
     shown.
   - For the `Next page >>` we must adjust the `edt'`. 
   - In rare cases we get duplicate itineraries. This happens if the `removed itinerary` depart
@@ -65,8 +65,7 @@ _previous-page_ must reverse the itinerary-filtering: `crop itineraries at START
 ![sort-by-arrival-time-crop-sw-prev-page](images/sort-by-arrival-crop-sw-prev-page.svg)
 
 This is the most complicated case of the _sort-by-arrival_ search. It combines all cases above.
-  - The `Next page >>` is not shown since it is the same as in
-    [depart-after-prev-page](#depart-after-prev-page).
+  - The `Next page >>` is not shown since it is the same as in [sort-by-arrival](#sort-by-arrival).
   - For `<< Previous page` we need to adjust the `edt'` and the `lat'` using the first removed 
     itinerary.
 

@@ -13,13 +13,13 @@ import org.opentripplanner.routing.RoutingService;
 
 public class StatisticsGraphQLSchemaFactory {
 
-    private GraphQLSchema schema;
+    private final GraphQLSchema schema;
 
     private GraphQLNamedOutputType graphStatisticsType = new GraphQLTypeReference("GraphStatistics");
 
-    private Relay relay = new Relay();
+    private final Relay relay = new Relay();
 
-    private GraphQLInterfaceType nodeInterface = relay.nodeInterface(
+    private final GraphQLInterfaceType nodeInterface = relay.nodeInterface(
             e -> (e.getObject() instanceof GraphStatistics)
                     ? (GraphQLObjectType) graphStatisticsType
                     : null

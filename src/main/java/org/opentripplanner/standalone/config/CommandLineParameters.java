@@ -25,7 +25,7 @@ import java.util.List;
  * 
  * @author abyrd
  */
-public class CommandLineParameters implements Cloneable {
+public class CommandLineParameters {
     private static final String TIP = " Use --help to see available options.";
     private static final int    DEFAULT_PORT         = 8080;
     private static final int    DEFAULT_SECURE_PORT  = 8081;

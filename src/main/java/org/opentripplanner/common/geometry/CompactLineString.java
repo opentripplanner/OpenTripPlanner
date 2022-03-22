@@ -45,7 +45,7 @@ public final class CompactLineString {
     /**
      * Geometry factory. TODO - Do we need to make this parametrable?
      */
-    private static GeometryFactory geometryFactory = new GeometryFactory();
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     /**
      * Public factory to create a compact line string. Optimize for straight-line only line string

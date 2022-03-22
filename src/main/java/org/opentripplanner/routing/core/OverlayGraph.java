@@ -1,5 +1,9 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -9,10 +13,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
-
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 
 
 /**
@@ -27,16 +27,16 @@ public class OverlayGraph implements Serializable {
 
     private static final int INITIAL_EDGELIST_CAPACITY = 5;
 
-    private IdentityHashMap<Vertex, List<Edge>> outgoing;
+    private final IdentityHashMap<Vertex, List<Edge>> outgoing;
 
-    private IdentityHashMap<Vertex, List<Edge>> incoming;
+    private final IdentityHashMap<Vertex, List<Edge>> incoming;
 
     /**
      * Create an empty OverlayGraph.
      */
     public OverlayGraph() {
-        outgoing = new IdentityHashMap<Vertex, List<Edge>>();
-        incoming = new IdentityHashMap<Vertex, List<Edge>>();
+        outgoing = new IdentityHashMap<>();
+        incoming = new IdentityHashMap<>();
     }
 
     /**
@@ -55,7 +55,7 @@ public class OverlayGraph implements Serializable {
     public void addOutgoing(Vertex fromv, Edge e) {
         List<Edge> fromOutgoing = outgoing.get(fromv);
         if (fromOutgoing == null) {
-            fromOutgoing = new ArrayList<Edge>(INITIAL_EDGELIST_CAPACITY);
+            fromOutgoing = new ArrayList<>(INITIAL_EDGELIST_CAPACITY);
             outgoing.put(fromv, fromOutgoing);
         }
         if (!fromOutgoing.contains(e))
@@ -65,7 +65,7 @@ public class OverlayGraph implements Serializable {
     public void addIncoming(Vertex tov, Edge e) {
         List<Edge> toIncoming = incoming.get(tov);
         if (toIncoming == null) {
-            toIncoming = new ArrayList<Edge>(INITIAL_EDGELIST_CAPACITY);
+            toIncoming = new ArrayList<>(INITIAL_EDGELIST_CAPACITY);
             incoming.put(tov, toIncoming);
         }
         if (!toIncoming.contains(e))
@@ -121,7 +121,7 @@ public class OverlayGraph implements Serializable {
      * edges.) Avoid double-counting.
      */
     public int countEdges() {
-        HashSet<Edge> eset = new HashSet<Edge>(1000);
+        HashSet<Edge> eset = new HashSet<>(1000);
         for (List<Edge> l : outgoing.values())
             for (Edge e : l)
                 eset.add(e);
@@ -138,7 +138,7 @@ public class OverlayGraph implements Serializable {
      * incoming edges.) Avoid double-counting.
      */
     public Collection<Vertex> getVertices() {
-        HashSet<Vertex> sv = new HashSet<Vertex>();
+        HashSet<Vertex> sv = new HashSet<>();
         sv.addAll(outgoing.keySet());
         sv.addAll(incoming.keySet());
         return sv;

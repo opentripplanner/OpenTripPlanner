@@ -27,7 +27,7 @@ public class ApiRouterInfo {
 
     public List<String> transitModes;
 
-    private WorldEnvelope envelope;
+    private final WorldEnvelope envelope;
 
     public double centerLatitude;
 
@@ -68,7 +68,7 @@ public class ApiRouterInfo {
         this.hasCarPark = mapHasCarPark(vehicleParkingService);
         this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
         this.travelOptions = TravelOptionsMaker.makeOptions(graph);
-        addCenter(graph.getCenter());
+        graph.getCenter().ifPresentOrElse(this::setCenter, this::calculateCenter);
     }
 
     public boolean mapHasBikeSharing(VehicleRentalStationService service) {
@@ -102,22 +102,25 @@ public class ApiRouterInfo {
     }
 
     /**
-     * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used
-     * or as mean coordinate if not
+     * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used.
      *
      * It is first called when OSM is loaded. Then after transit data is loaded.
      * So that center is set in all combinations of street and transit loading.
      */
-    public void addCenter(Optional<Coordinate> center) {
+    public void setCenter(Coordinate center) {
         //Transit data was loaded and center was calculated with calculateTransitCenter
-        if(center.isPresent()) {
-            centerLongitude = center.get().x;
-            centerLatitude = center.get().y;
-        } else {
-            // Does not work around 180th parallel.
-            centerLatitude = (getUpperRightLatitude() + getLowerLeftLatitude()) / 2;
-            centerLongitude = (getUpperRightLongitude() + getLowerLeftLongitude()) / 2;
-        }
+        centerLongitude = center.x;
+        centerLatitude = center.y;
+    }
+
+    /**
+     * Set center coordinate from mean coordinates of bounding box.
+     * @see #setCenter(Coordinate)
+     */
+    public void calculateCenter() {
+        // Does not work around 180th parallel.
+        centerLatitude = (getUpperRightLatitude() + getLowerLeftLatitude()) / 2;
+        centerLongitude = (getUpperRightLongitude() + getLowerLeftLongitude()) / 2;
     }
 
     public double getLowerLeftLatitude() {

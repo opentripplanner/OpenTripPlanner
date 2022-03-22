@@ -101,5 +101,3 @@ These updaters can handle differential updates, but they use a polling approach 
 Note that between these SIRI updaters and the GTFS-RT Websocket updater, we now have both polling and streaming examples of GTFS-RT "incrementality" semantics, so should be able to finalize that part of the specification.
 
 The final updater regularly performs a copy of the realtime data into a format suitable for use by OTP2's new Raptor router. Without this updater the realtime data will be received and cataloged, but not visible to the router.
-
-TODO explain on `blockReadinessUntilInitialized` for load balancers.

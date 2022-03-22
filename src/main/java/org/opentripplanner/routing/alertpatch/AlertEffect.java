@@ -47,5 +47,5 @@ public enum AlertEffect {
     /**
      * Accessibility issue.
      */
-    ACCESSIBILITY_ISSUE;
+    ACCESSIBILITY_ISSUE
 }

@@ -1,21 +1,21 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
-
 public class TemplateLibrary {
-    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
+    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)}");
 
     public static String generate(String pattern, OSMWithTags way) {
 
         if (pattern == null) {
             return null;
         }
-        StringBuffer gen_name = new StringBuffer();
+        StringBuilder gen_name = new StringBuilder();
 
         Matcher matcher = patternMatcher.matcher(pattern);
 
@@ -52,7 +52,7 @@ public class TemplateLibrary {
             return null;
         }
 
-        Map<String, StringBuffer> i18n = new HashMap<String, StringBuffer>();
+        Map<String, StringBuffer> i18n = new HashMap<>();
         i18n.put(null, new StringBuffer());
         Matcher matcher = patternMatcher.matcher(pattern);
 
@@ -88,7 +88,7 @@ public class TemplateLibrary {
         }
         for (StringBuffer sb : i18n.values())
             sb.append(pattern, lastEnd, pattern.length());
-        Map<String, String> out = new HashMap<String, String>(i18n.size());
+        Map<String, String> out = new HashMap<>(i18n.size());
         for (Map.Entry<String, StringBuffer> kv : i18n.entrySet())
             out.put(kv.getKey(), kv.getValue().toString());
         return out;

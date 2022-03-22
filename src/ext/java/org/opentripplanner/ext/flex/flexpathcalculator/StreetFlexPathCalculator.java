@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
@@ -59,7 +58,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       cache.put(originVertex, shortestPathTree);
     }
 
-    GraphPath path = shortestPathTree.getPath(destinationVertex, false);
+    GraphPath path = shortestPathTree.getPath(destinationVertex);
     if (path == null) {
       return null;
     }

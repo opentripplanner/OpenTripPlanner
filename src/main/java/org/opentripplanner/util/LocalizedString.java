@@ -2,6 +2,8 @@ package org.opentripplanner.util;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +12,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
  * This is used to localize strings for which localization are known beforehand.
@@ -24,12 +25,12 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * @author mabu
  */
 public class LocalizedString implements I18NString, Serializable {
-    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
+    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)}");
     
     /**
      * Map which key has which tagNames. Used only when building graph.
      */
-    private transient static ListMultimap<String, String> key_tag_names;
+    private final transient static ListMultimap<String, String> key_tag_names;
     
     static {
         key_tag_names = ArrayListMultimap.create();
@@ -73,7 +74,7 @@ public class LocalizedString implements I18NString, Serializable {
      */
     public LocalizedString(String key, OSMWithTags way) {
         this.key = key;
-        List<String> lparams = new ArrayList<String>(4);
+        List<String> lparams = new ArrayList<>(4);
         //Which tags do we want from way
         List<String> tag_names = getTagNames();
         if (tag_names != null) {
@@ -107,7 +108,7 @@ public class LocalizedString implements I18NString, Serializable {
         if( key_tag_names.containsKey(key)) {
             return key_tag_names.get(key);
         }
-        List<String> tag_names = new ArrayList<String>(4);
+        List<String> tag_names = new ArrayList<>(4);
         String english_trans = ResourceBundleSingleton.INSTANCE.localize(this.key, Locale.ENGLISH);
 
         Matcher matcher = patternMatcher.matcher(english_trans);

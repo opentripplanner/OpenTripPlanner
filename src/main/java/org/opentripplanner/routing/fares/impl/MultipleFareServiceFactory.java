@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public abstract class MultipleFareServiceFactory implements FareServiceFactory {
 
-    private static Logger log = LoggerFactory
+    private static final Logger log = LoggerFactory
             .getLogger(MultipleFareServiceFactory.class);
 
     private List<FareServiceFactory> subFactories;

@@ -18,7 +18,6 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;

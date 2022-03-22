@@ -33,7 +33,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     private List<VerticalDatum> datums;
 
-    private List<GridCoverage2D> regionCoverages = new ArrayList<>();
+    private final List<GridCoverage2D> regionCoverages = new ArrayList<>();
 
     public NEDGridCoverageFactoryImpl(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
@@ -88,7 +88,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
      */
     private void loadVerticalDatum () {
         if (datums == null) {
-            datums = new ArrayList<VerticalDatum>();
+            datums = new ArrayList<>();
             try {
                 for (String filename : DATUM_FILENAMES) {
                     File datumFile = new File(cacheDirectory, filename);

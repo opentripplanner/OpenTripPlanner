@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static java.util.Objects.requireNonNullElse;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +8,11 @@ import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.util.TranslationHelper;
-import org.opentripplanner.util.MapUtils;
 
-/** Responsible for mapping GTFS Boarding areas into the OTP model. */
+
+/**
+ * Responsible for mapping GTFS Boarding areas into the OTP model.
+ */
 class BoardingAreaMapper {
   static final String DEFAULT_NAME = "Boarding area";
 

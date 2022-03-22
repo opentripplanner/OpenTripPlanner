@@ -10,16 +10,12 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
     private static final Logger LOG = LoggerFactory.getLogger(SiriVMHttpTripUpdateSource.class);
 
     private final static long RETRY_INTERVAL_MILLIS = 5000;
-
-    private static final Map<String, String> requestHeaders = new HashMap<>();
 
     /**
      * True iff the last list with updates represent all updates that are active right now, i.e. all
@@ -47,7 +43,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
         this.url = parameters.getUrl();
         this.requestorRef = parameters.getRequestorRef();
         if (requestorRef == null || requestorRef.isEmpty()) {
-            requestorRef = "otp-" + UUID.randomUUID().toString();
+            requestorRef = "otp-" + UUID.randomUUID();
         }
 
         originalRequestorRef = this.requestorRef;
@@ -58,8 +54,6 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
         if (timeoutSec > 0) {
             this.timeout = 1000 * timeoutSec;
         }
-
-        requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-VM"));
     }
 
     @Override
@@ -75,7 +69,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
             creating = System.currentTimeMillis()-t1;
             t1 = System.currentTimeMillis();
 
-            InputStream is = SiriHttpUtils.postData(url, vmServiceRequest, timeout, requestHeaders);
+            InputStream is = SiriHttpUtils.postData(url, vmServiceRequest, timeout);
             if (is != null) {
                 // Decode message
                 fetching = System.currentTimeMillis()-t1;

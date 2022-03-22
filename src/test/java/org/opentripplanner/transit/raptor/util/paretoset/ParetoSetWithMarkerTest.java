@@ -10,7 +10,7 @@ import java.util.stream.StreamSupport;
 import static org.junit.Assert.assertEquals;
 
 public class ParetoSetWithMarkerTest {
-    private ParetoSetWithMarker<Vector> subject = new ParetoSetWithMarker<>((l, r) -> l.u < r.u || l.v < r.v);
+    private final ParetoSetWithMarker<Vector> subject = new ParetoSetWithMarker<>((l, r) -> l.u < r.u || l.v < r.v);
 
     @Test
     public void verifyMarkerIsInitializedToZero() {

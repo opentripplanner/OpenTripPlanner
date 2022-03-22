@@ -22,13 +22,13 @@ import java.awt.geom.Rectangle2D;
  *
  */
 public class ShapeStroke implements Stroke {
-    private Shape theShape;
+    private final Shape theShape;
 
-    private float advance;
+    private final float advance;
 
-    private float phase;
+    private final float phase;
 
-    private AffineTransform t = new AffineTransform();
+    private final AffineTransform t = new AffineTransform();
 
     private static final float FLATNESS = 1;
 
@@ -45,7 +45,7 @@ public class ShapeStroke implements Stroke {
     public Shape createStrokedShape(Shape shape) {
         GeneralPath result = new GeneralPath();
         PathIterator it = new FlatteningPathIterator(shape.getPathIterator(null), FLATNESS);
-        float points[] = new float[6];
+        float[] points = new float[6];
         float moveX = 0, moveY = 0;
         float lastX = 0, lastY = 0;
         float thisX = 0, thisY = 0;

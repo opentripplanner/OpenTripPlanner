@@ -1,7 +1,13 @@
 {
-  "otpFeatures" : {
-    "GoogleCloudStorage" : true,
+  "otpFeatures": {
     "ActuatorAPI": true,
-    "SandboxAPITransmodelApi": true
+    "SandboxAPITransmodelApi": true,
+    "FlexRouting": true,
+    "FloatingBike": true,
+    "OptimizeTransfers": true,
+    "TransferConstraints": true,
+    "ParallelRouting": false,
+    "ReportApi" : true,
+    "VehicleToStopHeuristics": true
   }
 }

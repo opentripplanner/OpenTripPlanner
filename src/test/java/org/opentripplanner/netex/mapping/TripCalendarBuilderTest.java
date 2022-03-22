@@ -85,10 +85,10 @@ public class TripCalendarBuilderTest {
         List.of(
             new ServiceJourney()
                 .withId(SJ_1)
-                .withDayTypes(createDayTypeRefList("REF-1",  DAY_TYPE_1)),
+                .withDayTypes(createDayTypeRefList(DAY_TYPE_1)),
             new ServiceJourney()
                 .withId(SJ_2)
-                .withDayTypes(createDayTypeRefList("REF-2",  DAY_TYPE_1)),
+                .withDayTypes(createDayTypeRefList(DAY_TYPE_1)),
             new ServiceJourney().withId(SJ_3)
         )
     );

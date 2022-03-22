@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public class VisualTraverseVisitor implements TraverseVisitor {
     private static final Logger LOG = LoggerFactory.getLogger(VisualTraverseVisitor.class);
 
-    private ShowGraph gui;
+    private final ShowGraph gui;
 
     private final int SLEEP_AFTER = 50;
     private final int SLEEP_LEN = 2;
@@ -21,7 +21,7 @@ public class VisualTraverseVisitor implements TraverseVisitor {
     }
 
     @Override
-    public void visitEdge(Edge edge, State state) {
+    public void visitEdge(Edge edge) {
         gui.enqueueHighlightedEdge(edge);
         //gui.highlightVertex(state.getVertex());
     }
@@ -42,7 +42,7 @@ public class VisualTraverseVisitor implements TraverseVisitor {
     }
 
     @Override
-    public void visitEnqueue(State state) {
+    public void visitEnqueue() {
 //        Edge e = state.getBackEdge();
 //        if (e instanceof Edge) {
 //            gui.enqueueHighlightedEdge((Edge) e);

@@ -41,16 +41,16 @@ import uk.org.siri.siri20.VehicleModesEnumeration;
 public class SiriFuzzyTripMatcher {
     private static final Logger LOG = LoggerFactory.getLogger(SiriFuzzyTripMatcher.class);
 
-    private RoutingService routingService;
+    private final RoutingService routingService;
 
-    private static Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
-    private static Map<String, Set<Trip>> mappedVehicleRefCache = new HashMap<>();
-    private static Map<String, Set<Route>> mappedRoutesCache = new HashMap<>();
-    private static Map<String, Set<Trip>> start_stop_tripCache = new HashMap<>();
+    private static final Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
+    private static final Map<String, Set<Trip>> mappedVehicleRefCache = new HashMap<>();
+    private static final Map<String, Set<Route>> mappedRoutesCache = new HashMap<>();
+    private static final Map<String, Set<Trip>> start_stop_tripCache = new HashMap<>();
 
-    private static Map<String, Trip> vehicleJourneyTripCache = new HashMap<>();
+    private static final Map<String, Trip> vehicleJourneyTripCache = new HashMap<>();
 
-    private static Set<String> nonExistingStops = new HashSet<>();
+    private static final Set<String> nonExistingStops = new HashSet<>();
 
     public SiriFuzzyTripMatcher(RoutingService routingService) {
         this.routingService = routingService;

@@ -1,9 +1,5 @@
 package org.opentripplanner.updater.alerts;
 
-import static org.opentripplanner.updater.alerts.GtfsRealtimeCauseMapper.getAlertCauseForGtfsRtCause;
-import static org.opentripplanner.updater.alerts.GtfsRealtimeEffectMapper.getAlertEffectForGtfsRtEffect;
-import static org.opentripplanner.updater.alerts.GtfsRealtimeSeverityMapper.getAlertSeverityForGtfsRtSeverity;
-
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -22,6 +18,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.opentripplanner.updater.alerts.GtfsRealtimeCauseMapper.getAlertCauseForGtfsRtCause;
+import static org.opentripplanner.updater.alerts.GtfsRealtimeEffectMapper.getAlertEffectForGtfsRtEffect;
+import static org.opentripplanner.updater.alerts.GtfsRealtimeSeverityMapper.getAlertSeverityForGtfsRtSeverity;
 
 /**
  * This updater only includes GTFS-Realtime Service Alert feeds.
@@ -60,7 +60,7 @@ public class AlertsUpdateHandler {
         alertText.alertDescriptionText = deBuffer(alert.getDescriptionText());
         alertText.alertHeaderText = deBuffer(alert.getHeaderText());
         alertText.alertUrl = deBuffer(alert.getUrl());
-        ArrayList<TimePeriod> periods = new ArrayList<TimePeriod>();
+        ArrayList<TimePeriod> periods = new ArrayList<>();
         if(alert.getActivePeriodCount() > 0) {
             for (TimeRange activePeriod : alert.getActivePeriodList()) {
                 final long realStart = activePeriod.hasStart() ? activePeriod.getStart() : 0;

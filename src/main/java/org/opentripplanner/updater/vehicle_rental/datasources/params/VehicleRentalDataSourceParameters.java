@@ -2,7 +2,6 @@ package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
 import org.opentripplanner.updater.DataSourceType;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 

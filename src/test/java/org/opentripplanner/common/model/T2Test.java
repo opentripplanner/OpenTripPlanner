@@ -1,9 +1,9 @@
 package org.opentripplanner.common.model;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
-import org.junit.jupiter.api.Test;
 
 class T2Test {
 
@@ -21,6 +21,7 @@ class T2Test {
         assertNotEquals(new T2<>("Alf", 2), subject);
 
         // Different types, should not fail with exception
+        //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(new T2<>(1, "Alf"), subject);
     }
 

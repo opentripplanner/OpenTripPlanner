@@ -1,11 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.Agency;
@@ -56,6 +50,13 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class GraphRoutingTest {
 
@@ -167,9 +168,9 @@ public abstract class GraphRoutingTest {
             }
 
             return edges;
-        };
+        }
 
-        // -- Transit network (pathways, linking)
+      // -- Transit network (pathways, linking)
         public Entrance entranceEntity(String id, double latitude, double longitude) {
             return new Entrance(
                     new FeedScopedId(TEST_FEED_ID, id),
@@ -410,6 +411,6 @@ public abstract class GraphRoutingTest {
 
         AStar aStar = new AStar();
         ShortestPathTree tree = aStar.getShortestPathTree(request);
-        return tree.getPath(to, false);
+        return tree.getPath(to);
     }
 }

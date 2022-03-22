@@ -2,43 +2,43 @@
 
 This table lists all the JSON properties that can be defined in a `build-config.json` file. These will be stored in the graph itself, and affect any server that subsequently loads that graph. Sections follow that describe particular settings in more depth.
 
-config key | description | value type | value default | notes
----------- | ----------- | ---------- | ------------- | -----
-`areaVisibility` | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming). | boolean | false |
-`banDiscouragedWalking` | should walking should be allowed on OSM ways tagged with `foot=discouraged"` | boolean | false |
-`banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false |
-`dataImportReport` |  Generate nice HTML report of Graph errors/warnings | boolean | false |
-`distanceBetweenElevationSamples` | TODO OTP2 | double | 10 |
-`elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
-`elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
-`embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
-`extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false |
-`fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
-`islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 |
-`islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 |
-`matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
-`maxAreaNodes` | Visibility calculations for an area will not be done if there are more nodes than this limit | integer | 500 |
-`maxDataImportIssuesPerFile` | If number of data import issues is larger then specified maximum number of issues the report will be split in multiple files | int | 1,000 |
-`maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
-`maxStopToShapeSnapDistance` | This field is used for mapping route's geometry shapes. It determines max distance between shape points and their stop sequence. If the mapper can not find any stops within this radius it will default to simple stop-to-stop geometry instead. | double | 150 | units: meters
-`maxTransferDurationSeconds` | Transfers up to this duration in seconds will be pre-calculated and included in the Graph | double | 1800 | units: seconds
-`multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
-`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`, `germany`
-`platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
-`readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false |
-`staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true |
-`streets` | Include street input files (OSM/PBF) | boolean | true |
-`storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null |
-`subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
-`transferRequests` | Routing requests to use for pre-calculating stop-to-stop transfers. | array | `[ { modes: "WALK" } ]` |
-`transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
-`transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | date or period | &minus;P1Y | _2020&#8209;01&#8209;01, &minus;P1M3D, &minus;P3W_
-`transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | date or period | P3Y | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_
-`writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+| config key                         | description                                                                                                                                                                                                                                       | value type     | value default           | notes                                                                                     |
+|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|-------------------------|-------------------------------------------------------------------------------------------|
+| `areaVisibility`                   | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming).                            | boolean        | false                   |                                                                                           |
+| `banDiscouragedWalking`            | should walking should be allowed on OSM ways tagged with `foot=discouraged"`                                                                                                                                                                      | boolean        | false                   |                                                                                           |
+| `banDiscouragedBiking`             | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"`                                                                                                                                                                   | boolean        | false                   |                                                                                           |
+| `dataImportReport`                 | Generate nice HTML report of Graph errors/warnings                                                                                                                                                                                                | boolean        | false                   |                                                                                           |
+| `distanceBetweenElevationSamples`  | TODO OTP2                                                                                                                                                                                                                                         | double         | 10                      |                                                                                           |
+| `elevationBucket`                  | If specified, download NED elevation tiles from the given AWS S3 bucket                                                                                                                                                                           | object         | null                    | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3              |
+| `elevationUnitMultiplier`          | Specify a multiplier to convert elevation units from source to meters                                                                                                                                                                             | double         | 1.0                     | see [Elevation unit conversion](#elevation-unit-conversion)                               |
+| `embedRouterConfig`                | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire                                                                                                                                       | boolean        | true                    |                                                                                           |
+| `extraEdgesStopPlatformLink`       | add extra edges when linking a stop to a platform, to prevent detours along the platform edge                                                                                                                                                     | boolean        | false                   |                                                                                           |
+| `fares`                            | A specific fares service to use                                                                                                                                                                                                                   | object         | null                    | see [fares configuration](#fares-configuration)                                           |
+| `islandWithStopsMaxSize`           | Pruning threshold for islands with stops. Any such island under this size will be pruned                                                                                                                                                          | int            | 5                       |                                                                                           |
+| `islandWithoutStopsMaxSize`        | Pruning threshold for islands without stops. Any such island under this size will be pruned                                                                                                                                                       | int            | 40                      |                                                                                           |
+| `matchBusRoutesToStreets`          | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking                                                                                                                                                        | boolean        | false                   |                                                                                           |
+| `maxAreaNodes`                     | Visibility calculations for an area will not be done if there are more nodes than this limit                                                                                                                                                      | integer        | 500                     |                                                                                           |
+| `maxDataImportIssuesPerFile`       | If number of data import issues is larger then specified maximum number of issues the report will be split in multiple files                                                                                                                      | int            | 1,000                   |                                                                                           |
+| `maxInterlineDistance`             | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle                                                                                                                                      | int            | 200                     | units: meters                                                                             |
+| `maxStopToShapeSnapDistance`       | This field is used for mapping route's geometry shapes. It determines max distance between shape points and their stop sequence. If the mapper can not find any stops within this radius it will default to simple stop-to-stop geometry instead. | double         | 150                     | units: meters                                                                             |
+| `maxTransferDurationSeconds`       | Transfers up to this duration in seconds will be pre-calculated and included in the Graph                                                                                                                                                         | double         | 1800                    | units: seconds                                                                            |
+| `multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations.                                                                                                                                                             | boolean        | false                   | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations) |
+| `osmNaming`                        | A custom OSM namer to use                                                                                                                                                                                                                         | object         | null                    | see [custom naming](#custom-naming)                                                       |
+| `osmWayPropertySet`                | Custom OSM way properties                                                                                                                                                                                                                         | string         | `default`               | options: `default`, `finland`, `norway`, `uk`, `germany`                                  |
+| `platformEntriesLinking`           | Link unconnected entries to public transport platforms                                                                                                                                                                                            | boolean        | false                   |                                                                                           |
+| `readCachedElevations`             | If true, reads in pre-calculated elevation data.                                                                                                                                                                                                  | boolean        | true                    | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations) |
+| `staticBikeParkAndRide`            | Whether we should create bike P+R stations from OSM data                                                                                                                                                                                          | boolean        | false                   |                                                                                           |
+| `staticParkAndRide`                | Whether we should create car P+R stations from OSM data                                                                                                                                                                                           | boolean        | true                    |                                                                                           |
+| `streets`                          | Include street input files (OSM/PBF)                                                                                                                                                                                                              | boolean        | true                    |                                                                                           |
+| `storage`                          | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT.                                                                                                                                                                      | object         | null                    |                                                                                           |
+| `subwayAccessTime`                 | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street                                                                                                                                             | double         | 2.0                     | units: minutes                                                                            |
+| `transferRequests`                 | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                                                                                                               | array          | `[ { modes: "WALK" } ]` |                                                                                           |
+| `transit`                          | Include all transit input files (GTFS) from scanned directory                                                                                                                                                                                     | boolean        | true                    |                                                                                           |
+| `transitServiceStart`              | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`.                  | date or period | &minus;P1Y              | _2020&#8209;01&#8209;01, &minus;P1M3D, &minus;P3W_                                        |
+| `transitServiceEnd`                | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build.                                                                                               | date or period | P3Y                     | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_                                                  |
+| `writeCachedElevations`            | If true, writes the calculated elevation data.                                                                                                                                                                                                    | boolean        | false                   | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations) |
 
-This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
+This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
 
 
 ## Storage
@@ -52,17 +52,17 @@ If your OTP instance is running on a cloud compute service, you may get signific
 
 Here is a summary of the configuration keys that can be nested inside the`storage` property of the build-config JSON to specify input and output data sources:
 
-config key | description | value type | value default
----------- | ----------- | ---------- | -------------
-`gsCredentials` | Use an environment variable to point to the Google Cloud credentials: `"${MY_GOC_SERVICE}"`. | string | `null`
-`graph` | Absolute path where the graph file will be written, overriding the default of `graph.obj` in the base directory. Note that currently this option will also affect where the server _reads_ the graph from. | uri | `null`
-`streetGraph` | Absolute path to the input street-graph file. | uri | `null`
-`osm` | List of absolute paths of OpenStreetMap input files to read. | uri [] | `null`
-`dem` | List of absolute paths of Elevation DEM input files to read. | uri [] | `null`
-`gtfs` | List of GTFS transit data files to read. | uri [] | `null`
-`netex` | List of NeTEx transit data files to read. | uri [] | `null`
-`buildReportDir` | Path to directory where the build issue report will be written. | uri | `null`
-`localFileNamePatterns` | Patterns used in determining the type of input files from their names. | object | `null`
+| config key              | description                                                                                                                                                                                                | value type | value default |
+|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------------|
+| `gsCredentials`         | Use an environment variable to point to the Google Cloud credentials: `"${MY_GOC_SERVICE}"`.                                                                                                               | string     | `null`        |
+| `graph`                 | Absolute path where the graph file will be written, overriding the default of `graph.obj` in the base directory. Note that currently this option will also affect where the server _reads_ the graph from. | uri        | `null`        |
+| `streetGraph`           | Absolute path to the input street-graph file.                                                                                                                                                              | uri        | `null`        |
+| `osm`                   | List of absolute paths of OpenStreetMap input files to read.                                                                                                                                               | uri []     | `null`        |
+| `dem`                   | List of absolute paths of Elevation DEM input files to read.                                                                                                                                               | uri []     | `null`        |
+| `gtfs`                  | List of GTFS transit data files to read.                                                                                                                                                                   | uri []     | `null`        |
+| `netex`                 | List of NeTEx transit data files to read.                                                                                                                                                                  | uri []     | `null`        |
+| `buildReportDir`        | Path to directory where the build issue report will be written.                                                                                                                                            | uri        | `null`        |
+| `localFileNamePatterns` | Patterns used in determining the type of input files from their names.                                                                                                                                     | object     | `null`        |
 
 For example, this configuration could be used to load GTFS and OSM inputs from Google Cloud Storage:
 
@@ -89,7 +89,7 @@ OTP2 will still scan the base directory for all other types such as DEM files. S
 array for a particular file type will ensure that no inputs of that type are loaded, including by
 local directory scanning.
 
-See the comments in the source code of class [StorageConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java)
+See the comments in the source code of class [StorageConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java)
 for an up-to-date detailed description of each config parameter.
 
 
@@ -100,12 +100,12 @@ what kind of file it is. These patterns can be overridden in the config, by nest
 `localFileNamePatterns` property inside the `storage` property (see example below). Here are the
 keys you can place inside `localFileNamePatterns`:
 
-config key | description | value type | value default
----------- | ----------- | ---------- | -------------
-`osm` | Pattern used to match Open Street Map files on local disk | regexp pattern | `(?i)(\.pbf)`|\.osm|\.osm\.xml)$` 
-`dem` | Pattern used to match Elevation DEM files on local disk | regexp pattern | `(?i)\.tiff?$`
-`gtfs` | Pattern used to match GTFS files on local disk | regexp pattern | `(?i)gtfs`
-`netex` | Pattern used to match NeTEx files on local disk | regexp pattern | `(?i)netex`
+| config key | description                                               | value type     | value default  |
+|------------|-----------------------------------------------------------|----------------|----------------|
+| `osm`      | Pattern used to match Open Street Map files on local disk | regexp pattern | `(?i)(\.pbf)`  |
+| `dem`      | Pattern used to match Elevation DEM files on local disk   | regexp pattern | `(?i)\.tiff?$` |
+| `gtfs`     | Pattern used to match GTFS files on local disk            | regexp pattern | `(?i)gtfs`     |
+| `netex`    | Pattern used to match NeTEx files on local disk           | regexp pattern | `(?i)netex`    |
 
 OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now
 that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow
@@ -242,7 +242,7 @@ OTP allows you to adjust the elevation values reported in API responses in two w
 The first way is to store ellipsoid (GPS) elevation values internally, but apply a single geoid
 difference value in the OTP client where appropriate to display elevations above sea level.
 This ellipsoid to geoid difference is returned in each trip plan response in the
-[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field.
+[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/api/resource/ElevationMetadata.java) field.
 Using a single value can be sufficient for smaller OTP deployments, but might result in incorrect
 values at the edges of larger OTP deployments. If your OTP instance uses this, it is recommended
 to set a default request value in the `router-config.json` file as follows:
@@ -357,8 +357,13 @@ vehicle-rental) by defining a `combinationStrategy` parameter, and a list of sub
 // build-config.json
 {
   // Select the custom fare "seattle"
-  "fares": "seattle",
-  // OR this alternative form that could allow additional configuration
+  "fares": "seattle"
+}
+```
+Or this alternative form that could allow additional configuration
+```JSON
+// build-config.json
+{
   "fares": {
 	"type": "seattle"
   }

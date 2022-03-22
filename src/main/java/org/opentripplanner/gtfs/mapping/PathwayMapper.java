@@ -14,13 +14,13 @@ class PathwayMapper {
 
     private final StopMapper stopMapper;
 
-    private EntranceMapper entranceMapper;
+    private final EntranceMapper entranceMapper;
 
-    private PathwayNodeMapper nodeMapper;
+    private final PathwayNodeMapper nodeMapper;
 
-    private BoardingAreaMapper boardingAreaMapper;
+    private final BoardingAreaMapper boardingAreaMapper;
 
-    private Map<org.onebusaway.gtfs.model.Pathway, Pathway> mappedPathways = new HashMap<>();
+    private final Map<org.onebusaway.gtfs.model.Pathway, Pathway> mappedPathways = new HashMap<>();
 
     PathwayMapper(
         StopMapper stopMapper,

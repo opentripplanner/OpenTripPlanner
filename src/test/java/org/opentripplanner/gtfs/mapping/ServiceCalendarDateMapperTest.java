@@ -31,7 +31,7 @@ public class ServiceCalendarDateMapperTest {
         SERVICE_DATE.setServiceId(AGENCY_AND_ID);
     }
 
-    private ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper();
+    private final ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper();
 
     @Test
     public void testMapCollection() {
