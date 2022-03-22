@@ -220,26 +220,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 LOG.trace("{}", tripUpdate);
 
                 // Determine what kind of trip update this is
-                boolean applied = false;
-                final TripDescriptor.ScheduleRelationship tripScheduleRelationship = determineTripScheduleRelationship(
-                        tripUpdate);
-                switch (tripScheduleRelationship) {
-                    case SCHEDULED:
-                        applied = handleScheduledTrip(tripUpdate, feedId, serviceDate);
-                        break;
-                    case ADDED:
-                        applied = validateAndHandleAddedTrip(graph, tripUpdate, feedId, serviceDate);
-                        break;
-                    case UNSCHEDULED:
-                        applied = handleUnscheduledTrip();
-                        break;
-                    case CANCELED:
-                        applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
-                        break;
-                    case MODIFIED:
-                        applied = validateAndHandleModifiedTrip(graph, tripUpdate, feedId, serviceDate);
-                        break;
-                }
+                boolean applied = switch (determineTripScheduleRelationship(tripUpdate)) {
+                    case SCHEDULED -> handleScheduledTrip(tripUpdate, feedId, serviceDate);
+                    case ADDED -> validateAndHandleAddedTrip(
+                            graph, tripUpdate, feedId, serviceDate);
+                    case UNSCHEDULED -> handleUnscheduledTrip();
+                    case CANCELED -> handleCanceledTrip(tripUpdate, feedId, serviceDate);
+                    case REPLACEMENT -> validateAndHandleModifiedTrip(
+                            graph, tripUpdate, feedId, serviceDate);
+                };
 
                 if (applied) {
                     appliedBlockCount++;
@@ -303,7 +292,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
             // If stops are modified, handle trip update like a modified trip
             if (hasModifiedStops) {
-                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.MODIFIED;
+                tripScheduleRelationship = TripDescriptor.ScheduleRelationship.REPLACEMENT;
             }
         }
 
