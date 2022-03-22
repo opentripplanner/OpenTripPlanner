@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class ItineraryMapper {
     private final LegMapper legMapper;
 
-    public ItineraryMapper(Locale locale, boolean addIntermediateStops) {
-        this.legMapper = new LegMapper(locale, addIntermediateStops);
+    public ItineraryMapper(Locale locale, boolean addIntermediateStops, boolean addAccessibilityScore) {
+        this.legMapper = new LegMapper(locale, addIntermediateStops, addAccessibilityScore);
     }
 
     public List<ApiItinerary> mapItineraries(Collection<Itinerary> domain) {
