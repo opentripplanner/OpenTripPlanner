@@ -17,7 +17,7 @@ public class StreetVehicleRentalLink extends Edge {
 
     private static final long serialVersionUID = 1L;
 
-    private VehicleRentalStationVertex vehicleRentalStationVertex;
+    private final VehicleRentalStationVertex vehicleRentalStationVertex;
 
     public StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalStationVertex tov) {
         super(fromv, tov);

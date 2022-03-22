@@ -14,11 +14,8 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;

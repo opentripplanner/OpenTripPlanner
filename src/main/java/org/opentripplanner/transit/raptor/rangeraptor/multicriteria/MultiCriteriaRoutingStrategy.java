@@ -1,11 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
-import static org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
-
-import java.util.function.IntConsumer;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
@@ -14,6 +10,10 @@ import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
+
+import java.util.function.IntConsumer;
+
+import static org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide.paretoComparatorRelativeCost;
 
 
 /**
@@ -57,7 +57,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern pattern) {
+    public void prepareForTransitWith() {
         this.patternRides.clear();
     }
 

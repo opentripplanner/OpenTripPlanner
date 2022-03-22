@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
-import java.util.function.IntConsumer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
+
+import java.util.function.IntConsumer;
 
 
 /**
@@ -32,9 +32,9 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
     );
 
     /**
-     * Prepare the {@link RoutingStrategy} to route using the given pattern and tripSearch.
+     * Prepare the {@link RoutingStrategy} to route.
      */
-    void prepareForTransitWith(RaptorTripPattern pattern);
+    void prepareForTransitWith();
 
     /**
      * Alight the current trip at the given stop with the arrival times.

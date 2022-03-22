@@ -20,7 +20,6 @@ import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.*;
-import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.Router;

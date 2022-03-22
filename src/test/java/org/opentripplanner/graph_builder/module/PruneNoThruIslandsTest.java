@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -86,7 +85,7 @@ public class PruneNoThruIslandsTest {
                 public void postprocess(Graph graph) {}
 
                 @Override
-                public void configure(JsonNode config) {}
+                public void configure() {}
             };
             osmModule.skipVisibility = true;
             osmModule.buildGraph(graph, new HashMap<>());

@@ -10,11 +10,7 @@ import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
@@ -70,10 +66,9 @@ public class BikeRental {
         String[] lowerLeftParts = lowerLeft.split(",");
         String[] upperRightParts = upperRight.split(",");
 
-        Envelope envelope = new Envelope(Double.parseDouble(lowerLeftParts[1]),
+        return new Envelope(Double.parseDouble(lowerLeftParts[1]),
                 Double.parseDouble(upperRightParts[1]), Double.parseDouble(lowerLeftParts[0]),
                 Double.parseDouble(upperRightParts[0]));
-        return envelope;
     }
 
 }

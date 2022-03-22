@@ -19,7 +19,7 @@ public class FareComponent {
     public FareComponent(FeedScopedId fareId, Money amount) {
         this.fareId = fareId;
         price = amount;
-        routes = new ArrayList<FeedScopedId>();
+        routes = new ArrayList<>();
     }
 
     public void addRoute(FeedScopedId routeId) {
@@ -27,7 +27,7 @@ public class FareComponent {
     }
 
     public String toString() {
-        StringBuffer buffer = new StringBuffer("FareComponent(");
+        StringBuilder buffer = new StringBuilder("FareComponent(");
         buffer.append(fareId.toString());
         buffer.append(", ");
         buffer.append(price.toString());

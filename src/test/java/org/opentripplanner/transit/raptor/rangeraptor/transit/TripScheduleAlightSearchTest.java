@@ -1,17 +1,18 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
 
 public class TripScheduleAlightSearchTest implements RaptorTestConstants {
@@ -145,8 +146,7 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
         // where the first trip departure is at time 1000 and incremented by 1000.
         // We use 1 stop (we search for alighting, we do not care if we can board)
         final int firstArrivalTime = 1000;
-        final int n = TRIPS_BINARY_SEARCH_THRESHOLD;
-        final int N = 7 * n + 3;
+        final int N = 7 * TRIPS_BINARY_SEARCH_THRESHOLD + 3;
         final int dT = 1000;
 
         List<TestTripSchedule> tripSchedules = new ArrayList<>();
@@ -164,16 +164,15 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
 
         for (int i = 0; i < N; ++i) {
             int tripAlightTime = dT * (i + 1);
-            int okSearchTime = tripAlightTime;
 
             // Search and find trip 'i'
-            searchForTrip(okSearchTime, STOP_POS_0)
+            searchForTrip(tripAlightTime, STOP_POS_0)
                     .assertTripFound()
                     .withAlightTime(tripAlightTime)
                     .withIndex(i);
 
             // Search and find trip 'i' using the previous trip index
-            searchForTrip(okSearchTime, STOP_POS_0, i-1)
+            searchForTrip(tripAlightTime, STOP_POS_0, i-1)
                     .assertTripFound()
                     .withIndex(i);
 

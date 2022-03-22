@@ -1,16 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
 
-import static org.opentripplanner.util.TableFormatter.Align.Center;
-import static org.opentripplanner.util.TableFormatter.Align.Left;
-import static org.opentripplanner.util.TableFormatter.Align.Right;
-import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
-
-import java.text.NumberFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Consumer;
-import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
@@ -25,6 +15,17 @@ import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.util.TableFormatter;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
+
+import javax.annotation.Nullable;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Consumer;
+
+import static org.opentripplanner.util.TableFormatter.Align.Center;
+import static org.opentripplanner.util.TableFormatter.Align.Left;
+import static org.opentripplanner.util.TableFormatter.Align.Right;
+import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 
 
 /**
@@ -118,7 +119,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     }
 
     @Override
-    public boolean isEnabled(DebugTopic topic) {
+    public boolean isEnabled() {
         return enableDebugLogging;
     }
 

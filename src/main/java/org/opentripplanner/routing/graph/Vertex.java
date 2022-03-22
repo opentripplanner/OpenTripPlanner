@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A vertex in the graph. Each vertex has a longitude/latitude location, as well as a set of
@@ -254,7 +253,7 @@ public abstract class Vertex implements Serializable, Cloneable {
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
 
     public List<Edge> getOutgoingStreetEdges() {
-        List<Edge> result = new ArrayList<Edge>();
+        List<Edge> result = new ArrayList<>();
         for (Edge out : this.getOutgoing()) {
             if (!(out instanceof StreetEdge)) {
                 continue;

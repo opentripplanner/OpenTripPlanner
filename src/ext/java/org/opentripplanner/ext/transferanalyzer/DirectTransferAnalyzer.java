@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.transferanalyzer;
 
-import com.google.common.collect.Iterables;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferCouldNotBeRouted;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferRoutingDistanceTooLong;

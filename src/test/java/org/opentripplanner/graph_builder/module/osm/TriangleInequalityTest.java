@@ -8,10 +8,10 @@ import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -70,7 +70,7 @@ public class TriangleInequalityTest {
         RoutingRequest options = proto.clone();
         options.setRoutingContext(graph, startBackEdge, u, v);
         ShortestPathTree tree = aStar.getShortestPathTree(options);
-        GraphPath path = tree.getPath(v, false);
+        GraphPath path = tree.getPath(v);
         options.cleanup();
         return path;
     }
@@ -107,7 +107,7 @@ public class TriangleInequalityTest {
         AStar aStar = new AStar();
         
         ShortestPathTree tree = aStar.getShortestPathTree(options);
-        GraphPath path = tree.getPath(end, false);
+        GraphPath path = tree.getPath(end);
         options.cleanup();
         assertNotNull(path);
         

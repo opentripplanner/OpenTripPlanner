@@ -11,7 +11,7 @@ import static org.opentripplanner.gtfs.mapping.ServiceDateMapper.mapServiceDate;
 
 /** Responsible for mapping GTFS FeedInfo into the OTP model. */
 class FeedInfoMapper {
-    private Map<org.onebusaway.gtfs.model.FeedInfo, FeedInfo> mappedFeedInfos = new HashMap<>();
+    private final Map<org.onebusaway.gtfs.model.FeedInfo, FeedInfo> mappedFeedInfos = new HashMap<>();
 
     private final String feedId;
 

@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
-import java.util.function.IntConsumer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
+
+import java.util.function.IntConsumer;
 
 
 /**
@@ -58,7 +58,7 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern pattern) {
+    public void prepareForTransitWith() {
         this.onTripIndex = NOT_SET;
         this.onTripBoardTime = NOT_SET;
         this.onTripBoardStop = NOT_SET;

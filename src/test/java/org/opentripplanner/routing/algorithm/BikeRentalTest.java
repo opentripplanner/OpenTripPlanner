@@ -1,12 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.astar.AStar;
@@ -21,10 +14,18 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
-import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is adapted from {@link CarPickupTest}. All tests use the same graph structure, but a part of
@@ -41,7 +42,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     private VehicleRentalStationVertex B1, B2;
     private StreetEdge SE1, SE2, SE3;
 
-    private String NON_NETWORK = "non network";
+    private final String NON_NETWORK = "non network";
 
     @BeforeEach
     public void setUp() {
@@ -372,7 +373,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void pathIfWithOnlyAllowedNetworks() {
-        assertPathWithNetwork(B, C, Set.of(), Set.of(TEST_VEHICLE_RENTAL_NETWORK), Set.of(TEST_VEHICLE_RENTAL_NETWORK));
+        assertPathWithNetwork(B, C, Set.of(), Set.of(TEST_VEHICLE_RENTAL_NETWORK));
     }
 
     @Test
@@ -382,7 +383,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     @Test
     public void pathIfWithoutBannedNetworks() {
-        assertPathWithNetwork(B, C, Set.of(NON_NETWORK), Set.of(), Set.of(TEST_VEHICLE_RENTAL_NETWORK));
+        assertPathWithNetwork(B, C, Set.of(NON_NETWORK), Set.of());
     }
 
     private void assertNoRental(StreetVertex fromVertex, StreetVertex toVertex, Set<String> bannedNetworks, Set<String> allowedNetworks) {
@@ -408,7 +409,7 @@ public class BikeRentalTest extends GraphRoutingTest {
         );
     }
 
-    private void assertPathWithNetwork(StreetVertex fromVertex, StreetVertex toVertex, Set<String> bannedNetworks, Set<String> allowedNetworks, Set<String> usedNetworks) {
+    private void assertPathWithNetwork(StreetVertex fromVertex, StreetVertex toVertex, Set<String> bannedNetworks, Set<String> allowedNetworks) {
         Consumer<RoutingRequest> setter = options -> {
             options.allowedVehicleRentalNetworks = allowedNetworks;
             options.bannedVehicleRentalNetworks = bannedNetworks;
@@ -543,8 +544,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
         var tree = new AStar().getShortestPathTree(bikeRentalOptions);
         var path = tree.getPath(
-                arriveBy ? fromVertex : toVertex,
-                false
+                arriveBy ? fromVertex : toVertex
         );
 
         if (path == null) {

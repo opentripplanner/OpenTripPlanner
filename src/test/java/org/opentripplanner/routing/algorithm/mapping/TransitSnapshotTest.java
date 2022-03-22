@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.mapping;
 import static java.util.Collections.emptySet;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;

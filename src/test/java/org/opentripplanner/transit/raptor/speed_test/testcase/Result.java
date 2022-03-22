@@ -61,8 +61,8 @@ class Result {
 
     private static Comparator<Result> compareCost(boolean skipCost) {
         return (r1, r2) -> {
-            if(skipCost) { return 0; };
-            if(r1.cost == null || r1.cost.equals(0)) { return 0; }
+            if(skipCost) { return 0; }
+          if(r1.cost == null || r1.cost.equals(0)) { return 0; }
             if(r2.cost == null || r2.cost.equals(0)) { return 0; }
             return -(r2.cost - r1.cost);
         };

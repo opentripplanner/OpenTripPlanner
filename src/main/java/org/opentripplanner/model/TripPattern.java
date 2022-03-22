@@ -621,11 +621,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         });
         scheduledTimetable.setServiceCodes (serviceCodes);
     }
-
     /**
      * A set of serviceIds with at least one trip in this pattern.
      * Trips in a pattern are no longer necessarily running on the same service ID.
-     */ /**
+     *
      * @return bitset of service codes
      */
     public BitSet getServices() {

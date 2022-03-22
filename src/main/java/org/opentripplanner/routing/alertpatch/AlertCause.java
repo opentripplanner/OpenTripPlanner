@@ -51,5 +51,5 @@ public enum AlertCause {
     /**
      * Medical emergency.
      */
-    MEDICAL_EMERGENCY;
+    MEDICAL_EMERGENCY
 }

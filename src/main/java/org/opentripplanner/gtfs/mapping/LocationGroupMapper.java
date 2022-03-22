@@ -13,7 +13,7 @@ import java.util.Map;
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 public class LocationGroupMapper {
-  private static Logger LOG = LoggerFactory.getLogger(LocationGroupMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LocationGroupMapper.class);
 
   private final StopMapper stopMapper;
 

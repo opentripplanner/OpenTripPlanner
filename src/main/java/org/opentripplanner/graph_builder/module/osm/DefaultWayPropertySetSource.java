@@ -393,7 +393,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         // default ~= 25 mph
         props.defaultSpeed = 11.2f;
 
-        /*** special situations ****/
+        /* special situations */
 
         /*
          * cycleway:left/right=lane/track/shared_lane permutations - no longer needed because left/right matching algorithm does this

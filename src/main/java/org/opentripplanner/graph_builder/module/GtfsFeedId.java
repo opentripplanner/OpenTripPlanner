@@ -63,14 +63,11 @@ public class GtfsFeedId {
         public Builder fromGtfsFeed(CsvInputSource source) {
             try {
                 if (source.hasResource("feed_info.txt")) {
-                    InputStream feedInfoInputStream = source.getResource("feed_info.txt");
-                    try {
-	                    CsvReader result = new CsvReader(feedInfoInputStream, StandardCharsets.UTF_8);
-	                    result.readHeaders();
-	                    result.readRecord();
-	                    this.id = result.get("feed_id");
-                    } finally {
-                    	feedInfoInputStream.close();
+                    try (InputStream feedInfoInputStream = source.getResource("feed_info.txt")) {
+                        CsvReader result = new CsvReader(feedInfoInputStream, StandardCharsets.UTF_8);
+                        result.readHeaders();
+                        result.readRecord();
+                        this.id = result.get("feed_id");
                     }
                 }
             } catch (IOException e) {

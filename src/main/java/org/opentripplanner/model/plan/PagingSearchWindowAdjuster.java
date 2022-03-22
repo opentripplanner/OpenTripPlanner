@@ -3,7 +3,6 @@ package org.opentripplanner.model.plan;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import javax.annotation.Nullable;
 
 /**
  * The purpose of this class is to adjust the search-window for the next page so it better

@@ -13,13 +13,13 @@ public interface I18NString {
      * Returns default translation (english)
      * @return 
      */
-    public String toString();
+    String toString();
     
     /**
      * Returns wanted translation
      * @param locale Wanted locale
      * @return 
      */
-    public String toString(Locale locale);
+    String toString(Locale locale);
     
 }

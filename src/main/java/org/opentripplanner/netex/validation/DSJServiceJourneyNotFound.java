@@ -12,7 +12,7 @@ import java.util.List;
 class DSJServiceJourneyNotFound extends AbstractHMapValidationRule<String, DatedServiceJourney> {
 
   @Override
-  public Status validate(String dsjId, DatedServiceJourney dsj) {
+  public Status validate(DatedServiceJourney dsj) {
     var ref = getServiceJourneyRef(dsj);
     var sj = index.getServiceJourneyById().lookup(ref);
     return sj == null ? Status.DISCARD : Status.OK;

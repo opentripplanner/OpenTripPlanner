@@ -23,7 +23,6 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import javax.annotation.Nonnull;
 
 /**
  * Using this instrumentation we can precisely measure how queries and data fetchers are executed
@@ -49,7 +48,7 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
             "Timer that records the time to fetch the data by Operation Name";
 
     private final MeterRegistry meterRegistry;
-    private Iterable<Tag> tags;
+    private final Iterable<Tag> tags;
 
     public MicrometerGraphQLInstrumentation(MeterRegistry meterRegistry, Iterable<Tag> tags) {
         this.meterRegistry = meterRegistry;

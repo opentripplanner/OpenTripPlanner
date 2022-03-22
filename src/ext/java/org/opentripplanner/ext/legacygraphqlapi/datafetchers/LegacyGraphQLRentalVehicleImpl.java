@@ -7,8 +7,6 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 
-import java.util.List;
-
 public class LegacyGraphQLRentalVehicleImpl
         implements LegacyGraphQLDataFetchers.LegacyGraphQLRentalVehicle {
 

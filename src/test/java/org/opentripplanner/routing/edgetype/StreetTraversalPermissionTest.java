@@ -1,10 +1,13 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 public class StreetTraversalPermissionTest {
 
@@ -15,7 +18,7 @@ public class StreetTraversalPermissionTest {
         assertEquals(perm1, perm2);
 
         StreetTraversalPermission perm3 = StreetTraversalPermission.BICYCLE;
-        assertFalse(perm1.equals(perm3));
+      assertNotEquals(perm1, perm3);
     }
 
     @Test

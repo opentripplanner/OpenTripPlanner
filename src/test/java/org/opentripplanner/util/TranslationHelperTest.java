@@ -19,8 +19,8 @@ public class TranslationHelperTest {
     private static final Locale LOCALE_FEED = new Locale(LANGUAGE_FEED);
     private static final Locale LOCALE_SV = new Locale("sv");
 
-    private static Collection<Translation> ALL_TRANSLATIONS = new ArrayList<>();
-    private static Collection<FeedInfo> FEED_INFOS = new ArrayList<>();
+    private static final Collection<Translation> ALL_TRANSLATIONS = new ArrayList<>();
+    private static final Collection<FeedInfo> FEED_INFOS = new ArrayList<>();
 
     private static final TranslationHelper helper = new TranslationHelper();
 

@@ -47,10 +47,6 @@ public class BinHeap<T> {
     		return null;
     }
     
-    public void insert_or_dec_key(T e, double p) {
-    	throw new UnsupportedOperationException("BinHeap has no decrease key operation.");
-    }
-
     public void rekey(T e, double p) {
         // Perform "inefficient" but straightforward linear search 
     	// for an element then change its key by sifting up or down
@@ -77,18 +73,16 @@ public class BinHeap<T> {
                     i = child;
                 } else break;
             }
-            elem[i] = e;
-            prio[i] = p;
-    	} else { 
+        } else {
     		// sift down (as in insert)
             while (prio[i/2] > p) {
                 elem[i] = elem[i/2];
                 prio[i] = prio[i/2];
                 i /= 2;
             }
-            elem[i] = e;
-            prio[i] = p;
-    	}
+        }
+        elem[i] = e;
+        prio[i] = p;
     }
 
     public void dump() {

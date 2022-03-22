@@ -34,7 +34,7 @@ public class RepairStopTimesForEachTripOperation {
 
     private final TripStopTimes stopTimesByTrip;
 
-    private DataImportIssueStore issueStore;
+    private final DataImportIssueStore issueStore;
 
     public RepairStopTimesForEachTripOperation(TripStopTimes stopTimesByTrip, DataImportIssueStore issueStore) {
         this.stopTimesByTrip = stopTimesByTrip;

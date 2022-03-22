@@ -14,6 +14,8 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
+import javax.annotation.Nullable;
+
 /**
  * This class helps building GtfsContext and post process
  * the GtfsDao by repairing StopTimes(optional) and generating TripPatterns(optional).
@@ -31,13 +33,13 @@ public class GtfsContextBuilder {
 
     private Deduplicator deduplicator;
 
-    private boolean repairStopTimesAndGenerateTripPatterns = true;
+    private final boolean repairStopTimesAndGenerateTripPatterns = true;
 
     public static GtfsContextBuilder contextBuilder(String path) throws IOException {
         return contextBuilder(null, path);
     }
 
-    public static GtfsContextBuilder contextBuilder(String defaultFeedId, String path) throws IOException {
+    public static GtfsContextBuilder contextBuilder(@Nullable String defaultFeedId, String path) throws IOException {
         GtfsImport gtfsImport = gtfsImport(defaultFeedId, path);
         GtfsFeedId feedId = gtfsImport.getFeedId();
         var mapper = new GTFSToOtpTransitServiceMapper(

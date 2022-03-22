@@ -1,7 +1,6 @@
 package org.opentripplanner.common.geometry;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -10,14 +9,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CompactLineStringTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class CompactLineStringTest {
 
     @Test
     public final void testCompactString() {
 
         GeometryFactory gf = new GeometryFactory();
 
-        List<Coordinate> c = new ArrayList<Coordinate>();
+        List<Coordinate> c = new ArrayList<>();
         double x0 = 1.111111111;
         double y0 = 0.123456789;
         double x1 = 2.0;
@@ -26,11 +31,11 @@ public class CompactLineStringTest extends TestCase {
         c.add(new Coordinate(x1, y1));
         LineString ls = gf.createLineString(c.toArray(new Coordinate[0]));
         byte[] coords = CompactLineString.compactLineString(x0, y0, x1, y1, ls, false);
-        assertTrue(coords == CompactLineString.STRAIGHT_LINE_PACKED); // ==, not equals
+        assertSame(coords, CompactLineString.STRAIGHT_LINE_PACKED); // ==, not equals
         LineString ls2 = CompactLineString.uncompactLineString(x0, y0, x1, y1, coords, false);
         assertTrue(ls.equalsExact(ls2, 0.00000015));
         byte[] packedCoords = CompactLineString.compactLineString(x0, y0, x1, y1, ls, false);
-        assertTrue(packedCoords == CompactLineString.STRAIGHT_LINE_PACKED); // ==, not equals
+        assertSame(packedCoords, CompactLineString.STRAIGHT_LINE_PACKED); // ==, not equals
         ls2 = CompactLineString.uncompactLineString(x0, y0, x1, y1, packedCoords, false);
         assertTrue(ls.equalsExact(ls2, 0.00000015));
 
@@ -41,18 +46,18 @@ public class CompactLineStringTest extends TestCase {
         c.add(new Coordinate(x1, y1));
         ls = gf.createLineString(c.toArray(new Coordinate[0]));
         coords = CompactLineString.compactLineString(x0, y0, x1, y1, ls, false);
-        assertTrue(coords != CompactLineString.STRAIGHT_LINE_PACKED);
+        assertNotSame(coords, CompactLineString.STRAIGHT_LINE_PACKED);
         ls2 = CompactLineString.uncompactLineString(x0, y0, x1, y1, coords, false);
         assertTrue(ls.equalsExact(ls2, 0.00000015));
         packedCoords = CompactLineString.compactLineString(x0, y0, x1, y1, ls, false);
-        assertTrue(packedCoords != CompactLineString.STRAIGHT_LINE_PACKED);
+        assertNotSame(packedCoords, CompactLineString.STRAIGHT_LINE_PACKED);
         ls2 = CompactLineString.uncompactLineString(x0, y0, x1, y1, packedCoords, false);
         assertTrue(ls.equalsExact(ls2, 0.00000015));
 
         // Test reverse mode
         LineString lsi = (LineString) ls.reverse(); // The expected output
         byte[] coords2 = CompactLineString.compactLineString(x1, y1, x0, y0, ls, true);
-        assertTrue(coords2 != CompactLineString.STRAIGHT_LINE_PACKED);
+        assertNotSame(coords2, CompactLineString.STRAIGHT_LINE_PACKED);
         assertEquals(coords.length, coords2.length);
         for (int i = 0; i < coords.length; i++)
             assertEquals(coords[i], coords2[i]);
@@ -61,7 +66,7 @@ public class CompactLineStringTest extends TestCase {
         LineString ls3 = CompactLineString.uncompactLineString(x1, y1, x0, y0, coords, true);
         assertTrue(lsi.equalsExact(ls3, 0.00000015));
         byte[] packedCoords2 = CompactLineString.compactLineString(x1, y1, x0, y0, ls, true);
-        assertTrue(packedCoords2 != CompactLineString.STRAIGHT_LINE_PACKED);
+        assertNotSame(packedCoords2, CompactLineString.STRAIGHT_LINE_PACKED);
         assertEquals(packedCoords.length, packedCoords2.length);
         for (int i = 0; i < packedCoords.length; i++)
             assertEquals(packedCoords[i], packedCoords2[i]);
@@ -107,11 +112,11 @@ public class CompactLineStringTest extends TestCase {
                 + unsignedCharString(packed));
         assertEquals(expectedPackedLen, packed.length);
         int[] unpacked = DlugoszVarLenIntPacker.unpack(packed);
-        assertTrue(Arrays.equals(arr, unpacked));
+        assertArrayEquals(arr, unpacked);
     }
 
     private String unsignedCharString(byte[] data) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("[");
         for (int i = 0; i < data.length; i++) {
             sb.append(String.format("%02X", data[i] & 0xFF));

@@ -73,7 +73,7 @@ example. If it's an error, it's usually caused by improperly connected OSM data 
 
 OTP has a very flexible system for deciding when a street is to be allowed by pedestrians, bicycles or cars.
 
-To configure the which settings to use for your location, please use the [osmWayPropertySet config attribute](Configuration.md#Way-property-sets).
+To configure the which settings to use for your location, please use the [osmWayPropertySet config attribute](BuildConfiguration.md#Way-property-sets).
 
 In the following section we will discuss the default case, which will be used if the property is not set.
 

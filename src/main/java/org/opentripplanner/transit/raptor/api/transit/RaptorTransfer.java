@@ -56,9 +56,9 @@ public interface RaptorTransfer {
      */
     default int earliestDepartureTime(int requestedDepartureTime) {
         return requestedDepartureTime;
-    };
+    }
 
-    /**
+  /**
      * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares
      * where they can have operation time limitations.
      *
@@ -66,9 +66,9 @@ public interface RaptorTransfer {
      */
     default int latestArrivalTime(int requestedArrivalTime) {
         return requestedArrivalTime;
-    };
+    }
 
-    /**
+  /**
      * This method should return {@code true} if, and only if the instance have restricted
      * opening-hours.
      */

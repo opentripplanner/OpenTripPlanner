@@ -164,10 +164,11 @@ public abstract class RoutingResource {
     /**
      * The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.
      *
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
      *                       old functionality the same way, but we will try to map this parameter
      *                       so it does work similar as before.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxWalkDistance")
@@ -177,8 +178,9 @@ public abstract class RoutingResource {
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
      *
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxPreTransitTime")
@@ -526,6 +528,8 @@ public abstract class RoutingResource {
      *
      * Consider using the {@link #transferPenalty} instead of this parameter.
      *
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated  TODO OTP2 Regression. A maxTransfers should be set in the router config, not
      *                        here. Instead the client should be able to pass in a parameter for
      *                        the max number of additional/extra transfers relative to the best
@@ -535,7 +539,6 @@ public abstract class RoutingResource {
      *                        might stick to the old limit, but that have side-effects that you
      *                        might not find any trips on a day where a critical part of the
      *                        trip is not available, because of some real-time disruption.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxTransfers")
@@ -642,18 +645,20 @@ public abstract class RoutingResource {
     protected Boolean disableRemainingWeightHeuristic;
 
     /**
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated TODO OTP2 This is not useful as a search parameter, but could be used as a
      *                       post search filter to reduce number of itineraries down to an
      *                       acceptable number, but there are probably better ways to do that.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxHours")
     private Double maxHours;
 
     /**
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated see {@link #maxHours}
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @QueryParam("useRequestedDateTimeInMaxHours")
     @Deprecated

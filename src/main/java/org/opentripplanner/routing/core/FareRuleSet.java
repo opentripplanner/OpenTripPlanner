@@ -1,33 +1,33 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FeedScopedId;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.common.model.P2;
 
 public class FareRuleSet implements Serializable {
 
     private static final long serialVersionUID = 7218355718876553028L;
 
-    private Set<FeedScopedId> routes;
-    private Set<P2<String>> originDestinations;
-    private Set<String> contains;
-    private FareAttribute fareAttribute;
-    private Set<FeedScopedId> trips;
+    private final Set<FeedScopedId> routes;
+    private final Set<P2<String>> originDestinations;
+    private final Set<String> contains;
+    private final FareAttribute fareAttribute;
+    private final Set<FeedScopedId> trips;
     
     public FareRuleSet(FareAttribute fareAttribute) {
         this.fareAttribute = fareAttribute;
-        routes = new HashSet<FeedScopedId>();
-        originDestinations= new HashSet<P2<String>>();
-        contains = new HashSet<String>();
-        trips = new HashSet<FeedScopedId>();
+        routes = new HashSet<>();
+        originDestinations= new HashSet<>();
+        contains = new HashSet<>();
+        trips = new HashSet<>();
     }
 
     public void addOriginDestination(String origin, String destination) {
-        originDestinations.add(new P2<String>(origin, destination));
+        originDestinations.add(new P2<>(origin, destination));
     }
 
     public Set<P2<String>> getOriginDestinations() {
@@ -62,11 +62,11 @@ public class FareRuleSet implements Serializable {
                            Set<FeedScopedId> routesVisited, Set<FeedScopedId> tripsVisited) {
         //check for matching origin/destination, if this ruleset has any origin/destination restrictions
         if (originDestinations.size() > 0) {
-            P2<String> od = new P2<String>(startZone, endZone);
+            P2<String> od = new P2<>(startZone, endZone);
             if (!originDestinations.contains(od)) {
-                P2<String> od2 = new P2<String>(od.first, null);
+                P2<String> od2 = new P2<>(od.first, null);
                 if (!originDestinations.contains(od2)) {
-                    od2 = new P2<String>(null, od.first);
+                    od2 = new P2<>(null, od.first);
                     if (!originDestinations.contains(od2)) {
                         return false;
                     }

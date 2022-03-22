@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,10 +36,10 @@ public class GraphStats {
     private static final Logger LOG = LoggerFactory.getLogger(GraphStats.class);
 
     @Parameter(names = { "-v", "--verbose" }, description = "Verbose output")
-    private boolean verbose = false;
+    private final boolean verbose = false;
    
     @Parameter(names = { "-d", "--debug"}, description = "Debug mode")
-    private boolean debug = false;
+    private final boolean debug = false;
 
     @Parameter(names = { "-h", "--help"}, description = "Print this help message and exit", help = true)
     private boolean help;
@@ -50,11 +50,11 @@ public class GraphStats {
     @Parameter(names = { "-o", "--out"}, description = "output file")
     private String outPath;
 
-    private CommandEndpoints commandEndpoints = new CommandEndpoints(); 
+    private final CommandEndpoints commandEndpoints = new CommandEndpoints();
     
-    private CommandPatternStats commandPatternStats = new CommandPatternStats();
+    private final CommandPatternStats commandPatternStats = new CommandPatternStats();
 
-    private JCommander jc;
+    private final JCommander jc;
     
     private Graph graph;
     
@@ -98,13 +98,13 @@ public class GraphStats {
         /* open output stream (same for all commands) */
         if (outPath != null) {
             try {
-                writer = new CsvWriter(outPath, ',', Charset.forName("UTF8"));
+                writer = new CsvWriter(outPath, ',', StandardCharsets.UTF_8);
             } catch (Exception e) {
                 LOG.error("Exception while opening output file " + outPath);
                 return;
             }
         } else {
-            writer = new CsvWriter(System.out, ',', Charset.forName("UTF8"));
+            writer = new CsvWriter(System.out, ',', StandardCharsets.UTF_8);
         }
         LOG.info("done loading graph.");
         
@@ -122,22 +122,22 @@ public class GraphStats {
     class CommandEndpoints {
 
         @Parameter(names = { "-r", "--radius"}, description = "perturbation radius in meters")
-        private double radius = 100;
+        private final double radius = 100;
 
         @Parameter(names = { "-n", "--number"}, description = "number of endpoints to generate")
-        private int n = 20;
+        private final int n = 20;
 
         @Parameter(names = { "-s", "--stops"}, description = "choose endpoints near stops not street vertices")
-        private boolean useStops = false;
+        private final boolean useStops = false;
 
         @Parameter(names = { "-rs", "--seed"}, description = "random seed, allows reproducible results")
-        private Long seed = null;
+        private final Long seed = null;
 
         // go along road then random
         public void run() {
             LOG.info(String.format("Producing %d random endpoints within radius %2.2fm around %s.",
                     n, radius, useStops ? "stops" : "streets"));
-            List<Vertex> vertices = new ArrayList<Vertex>();
+            List<Vertex> vertices = new ArrayList<>();
             GeodeticCalculator gc = new GeodeticCalculator();
             Class<?> klasse = useStops ? TransitStopVertex.class : StreetVertex.class;
             for (Vertex v : graph.getVertices())

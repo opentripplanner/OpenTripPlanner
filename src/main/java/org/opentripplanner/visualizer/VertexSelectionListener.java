@@ -1,8 +1,8 @@
 package org.opentripplanner.visualizer;
 
-import java.util.List;
-
 import org.opentripplanner.routing.graph.Vertex;
+
+import java.util.List;
 
 /**
  * An interface allowing a map UI element to report
@@ -10,5 +10,5 @@ import org.opentripplanner.routing.graph.Vertex;
  *
  */
 public interface VertexSelectionListener {
-    public void verticesSelected(List<Vertex> selected);
+    void verticesSelected(List<Vertex> selected);
 }

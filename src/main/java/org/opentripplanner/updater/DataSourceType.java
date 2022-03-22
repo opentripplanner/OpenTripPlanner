@@ -13,5 +13,5 @@ public enum DataSourceType {
 
   // GTFS RT
   GTFS_RT_HTTP,
-  GTFS_RT_FILE;
+  GTFS_RT_FILE
 }

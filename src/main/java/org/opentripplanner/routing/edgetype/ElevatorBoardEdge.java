@@ -27,7 +27,7 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
      * It's generally a polyline with two coincident points, but some elevators have horizontal
      * dimension, e.g. the ones on the Eiffel Tower.
      */
-    private LineString the_geom;
+    private final LineString the_geom;
 
     public ElevatorBoardEdge(ElevatorOffboardVertex from, ElevatorOnboardVertex to) {
         super(from, to);

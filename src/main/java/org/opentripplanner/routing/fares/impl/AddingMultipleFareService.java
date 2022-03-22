@@ -12,7 +12,7 @@ public class AddingMultipleFareService implements FareService, Serializable {
 
     private static final long serialVersionUID = -5313317664330954335L;
 
-    private List<FareService> subServices;
+    private final List<FareService> subServices;
 
     protected AddingMultipleFareService(List<FareService> subServices) {
         this.subServices = subServices;

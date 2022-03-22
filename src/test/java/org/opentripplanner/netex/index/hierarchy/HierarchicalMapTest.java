@@ -194,7 +194,7 @@ public class HierarchicalMapTest {
     @Test public void validate() {
         // Given a filter to remove REAGAN
         HMapValidationRule<String, E> reagenFilter = new HMapValidationRule<>() {
-            @Override public Status validate(String key, E element) {
+            @Override public Status validate(E element) {
                 return REAGAN.equals(element) ? Status.DISCARD : Status.OK;
             }
             @Override public DataImportIssue logMessage(String key, E value) {
