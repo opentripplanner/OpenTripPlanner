@@ -26,7 +26,6 @@ import org.opentripplanner.standalone.server.Router;
 @Path("/routers/{ignoreRouterId}/park_and_ride")
 public class ParkAndRideResource {
 
-    @Context
     private final OTPServer otpServer;
 
     public ParkAndRideResource(

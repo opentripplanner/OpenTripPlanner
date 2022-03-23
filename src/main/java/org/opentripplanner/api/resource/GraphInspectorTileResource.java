@@ -42,7 +42,6 @@ import org.opentripplanner.standalone.server.Router;
  * @author laurent
  * 
  */
-@SuppressWarnings({"FieldMayBeFinal", "reson: FasterJackson can not set final fields"})
 @Path("/routers/{ignoreRouterId}/inspector")
 public class GraphInspectorTileResource {
 

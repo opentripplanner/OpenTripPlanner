@@ -68,14 +68,6 @@ public class IndexAPI {
 
     private static final double MAX_STOP_SEARCH_RADIUS = 5000;
 
-    /** Choose short or long form of results. */
-    @QueryParam("detail")
-    private boolean detail = false;
-
-    /** Include GTFS entities referenced by ID in the result. */
-    @QueryParam("refs")
-    private boolean refs = false;
-
     private final OTPServer otpServer;
 
     public IndexAPI(
@@ -136,7 +128,10 @@ public class IndexAPI {
     @GET
     @Path("/agencies/{feedId}/{agencyId}/routes")
     public Response getAgencyRoutes(
-            @PathParam("feedId") String feedId, @PathParam("agencyId") String agencyId
+            @PathParam("feedId") String feedId,
+            @PathParam("agencyId") String agencyId,
+            /** Choose short or long form of results. */
+            @QueryParam("detail") Boolean detail
     ) {
         RoutingService routingService = createRoutingService();
         Agency agency = getAgency(routingService, feedId, agencyId);
@@ -145,7 +140,7 @@ public class IndexAPI {
                 .filter(r -> r.getAgency() == agency)
                 .collect(Collectors.toList());
 
-        if (detail) {
+        if (detail != null && detail) {
             return Response.status(Status.OK).entity(RouteMapper.mapToApi(routes)).build();
         }
         else {
