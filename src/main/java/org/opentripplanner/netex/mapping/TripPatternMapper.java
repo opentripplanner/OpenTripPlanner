@@ -84,6 +84,7 @@ class TripPatternMapper {
         this.otpRouteById = otpRouteById;
         this.tripMapper = new TripMapper(
             idFactory,
+            issueStore,
             operatorById,
             otpRouteById,
             routeById,
@@ -116,7 +117,7 @@ class TripPatternMapper {
         result = new TripPatternMapperResult();
         Collection<ServiceJourney> serviceJourneys = serviceJourniesByPatternId.get(journeyPattern.getId());
 
-        if (serviceJourneys == null || serviceJourneys.isEmpty()) {
+        if (serviceJourneys.isEmpty()) {
             issueStore.add(
                     "ServiceJourneyPatternIsEmpty",
                     "ServiceJourneyPattern %s does not contain any serviceJourneys.",
