@@ -20,7 +20,6 @@
 <link rel="stylesheet" href="js/otp/modules/bikeshare/bikeshare-style.css?v=1" />
 <link rel="stylesheet" href="js/otp/modules/multimodal/multimodal-style.css?v=1" />
 <link rel="stylesheet" href="js/otp/modules/calltaker/calltaker-style.css?v=1" />
-<link rel="stylesheet" href="js/otp/modules/analyst/analyst-style.css?v=1" />
 <link rel="stylesheet" href="js/otp/modules/alerts/alerts-style.css?v=1" />
 <link rel="stylesheet" href="js/otp/modules/alerts/alerts-style.css?v=1" />
 <link rel="stylesheet" href="js/otp/modules/fieldtrip/fieldtrip-style.css?v=1" />
@@ -31,10 +30,6 @@
 <!--Loads jquery, underscore, json2, momentjs and raphael makes 7 requests less-->
 <script src="//cdn.jsdelivr.net/g/jquery@1.9.1,underscorejs@1.4.2,json2@0.1,momentjs@1.7.2,raphael@2.1.2"></script>
 
-<!--
-leaflet cannot be loaded with other scripts. it breaks the L.Icon.Default.imagePath regular expression
-Analyst's webinterface was broken by that
--->
 <script src="//cdn.jsdelivr.net/leaflet/0.7.3/leaflet.js"></script>
 
 <!-- jquery-ui -->
@@ -128,11 +123,6 @@ Analyst's webinterface was broken by that
 			[
 			'js/otp/modules/bikeshare/BikeShareModule.js?v=1',
 			'js/otp/modules/bikeshare/BikeStationsWidget.js?v=1'
-		],
-		'otp.modules.analyst.AnalystModule':
-			[
-			'js/otp/modules/analyst/AnalystModule.js?v=1',
-			'js/otp/modules/analyst/AnalystLegendWidget.js?v=1',
 		],
 		'otp.modules.calltaker.CallTakerModule':
 			[
