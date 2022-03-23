@@ -217,11 +217,10 @@ public class EstimatedCallType {
                     .withDirective(gqlUtil.timingData)
                     .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
                     .description("Get all relevant situations for this EstimatedCall.")
-                    .dataFetcher(environment -> {
-                      return getAllRelevantAlerts(environment.getSource(),
-                          GqlUtil.getRoutingService(environment)
-                      );
-                    })
+                    .dataFetcher(environment -> getAllRelevantAlerts(
+                            environment.getSource(),
+                            GqlUtil.getRoutingService(environment))
+                    )
                     .build())
              .field(GraphQLFieldDefinition.newFieldDefinition()
                      .name("bookingArrangements")
@@ -304,19 +303,8 @@ public class EstimatedCallType {
       // Handle repeating validityPeriods
       alertPatches.removeIf(alertPatch -> !alertPatch.displayDuring(fromTime.getTime()/1000, toTime.getTime()/1000));
 
-      alertPatches.removeIf(alert -> {
-        boolean removeByStopCondition = false;
-
-        if (!alert.getStopConditions().isEmpty()) {
-          removeByStopCondition = true;
-          for (StopCondition stopCondition : stopConditions) {
-            if (alert.getStopConditions().contains(stopCondition)) {
-              removeByStopCondition = false;
-            }
-          }
-        }
-        return removeByStopCondition;
-      });
+      alertPatches.removeIf(alert -> !alert.getStopConditions().isEmpty() &&
+          stopConditions.stream().noneMatch(stopCondition -> alert.getStopConditions().contains(stopCondition)));
     }
   }
 }
