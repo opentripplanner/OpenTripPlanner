@@ -5,6 +5,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.common.LocationStringParser;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
@@ -1591,7 +1592,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
         if (LOG.isDebugEnabled()) {
 
-            var geom = new GeometryFactory().toGeometry(env);
+            var geom = GeometryUtils.getGeometryFactory().toGeometry(env);
             var geoJson = new GeometryJSON();
 
             try {
