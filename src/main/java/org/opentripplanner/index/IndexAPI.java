@@ -62,7 +62,6 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@SuppressWarnings("FieldMayBeFinal")
 @Path("/routers/{ignoreRouterId}/index")  // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON)  // One @Produces annotation for all endpoints.
 public class IndexAPI {
