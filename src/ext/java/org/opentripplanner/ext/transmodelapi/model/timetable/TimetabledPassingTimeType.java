@@ -32,11 +32,7 @@ public class TimetabledPassingTimeType {
             .newFieldDefinition()
             .name("quay")
             .type(quayType)
-            .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment).getStopForId((
-                  (TripTimeOnDate) environment.getSource()
-              ).getStopId());
-            })
+            .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStop())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()

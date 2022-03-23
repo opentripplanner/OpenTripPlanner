@@ -20,6 +20,7 @@ import java.util.List;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -47,12 +48,8 @@ public class EstimatedCallType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("quay")
                     .type(quayType)
-                    .dataFetcher(environment -> {
-                      return GqlUtil.getRoutingService(environment).getStopForId((
-                          (TripTimeOnDate) environment.getSource()
-                      ).getStopId());
-                        }
-                    ).build())
+                    .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStop())
+                    .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                            .name("aimedArrivalTime")
                            .description("Scheduled time of arrival at quay. Not affected by read time updated")
@@ -255,9 +252,9 @@ public class EstimatedCallType {
     FeedScopedId tripId = trip.getId();
     FeedScopedId routeId = trip.getRoute().getId();
 
-    FeedScopedId stopId = tripTimeOnDate.getStopId();
+    StopLocation stop = tripTimeOnDate.getStop();
+    FeedScopedId stopId = stop.getId();
 
-    var stop = routingService.getStopForId(stopId);
     FeedScopedId parentStopId = stop.getParentStation().getId();
 
     Collection<TransitAlert> allAlerts = new HashSet<>();
