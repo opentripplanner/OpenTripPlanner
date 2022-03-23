@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.siri;
 
 import com.google.common.base.Preconditions;
+import java.util.Optional;
+import java.util.function.Supplier;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
@@ -29,11 +31,13 @@ import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
+import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
+import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityCancellationStructure;
@@ -902,13 +906,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         buffer.update(pattern, updatedTripTimes, serviceDate);
 
         // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
-        if(estimatedVehicleJourney.getDatedVehicleJourneyRef() != null || estimatedVehicleJourney.getFramedVehicleJourneyRef().getDatedVehicleJourneyRef() != null) {
-            TripAlteration tripAlteration;
-            var dsjId = estimatedVehicleJourney.getDatedVehicleJourneyRef() == null ? estimatedVehicleJourney.getFramedVehicleJourneyRef().getDatedVehicleJourneyRef(): estimatedVehicleJourney.getDatedVehicleJourneyRef().getValue();
+        Supplier<Optional<String>> framedVehicleJourneySupplier = () ->
+                Optional.ofNullable(estimatedVehicleJourney.getFramedVehicleJourneyRef())
+                        .map(FramedVehicleJourneyRefStructure::getDatedVehicleJourneyRef);
+        Optional<String> dsjId = Optional.ofNullable(estimatedVehicleJourney.getDatedVehicleJourneyRef())
+                .map(DatedVehicleJourneyRef::getValue)
+                .or(framedVehicleJourneySupplier);
 
-            FeedScopedId datedServiceJourneyId = new FeedScopedId(feedId,
-                    dsjId
-            );
+        if(dsjId.isPresent()) {
+            FeedScopedId datedServiceJourneyId = new FeedScopedId(feedId, dsjId.get());
             var tripOnServiceDate = new TripOnServiceDate(datedServiceJourneyId,
                             trip,
                             serviceDate,
