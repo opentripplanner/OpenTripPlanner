@@ -172,14 +172,12 @@ public class EstimatedCallType {
                     ((TripTimeOnDate) environment.getSource()).getDropoffType() != NONE
                 ).build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name("requestStop")
-                    .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-                    .description("Whether vehicle will only stop on request.")
-                    .dataFetcher(environment ->
-                        GqlUtil.getRoutingService(environment).getPatternForTrip()
-                            .get(((TripTimeOnDate) environment.getSource()).getTrip())
-                            .getAlightType(((TripTimeOnDate) environment.getSource()).getStopIndex()) == COORDINATE_WITH_DRIVER)
-                    .build())
+                .name("requestStop")
+                .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+                .description("Whether vehicle will only stop on request.")
+                .dataFetcher(environment ->
+                    ((TripTimeOnDate) environment.getSource()).getDropoffType() == COORDINATE_WITH_DRIVER)
+                .build())
 
             .field(GraphQLFieldDefinition
                     .newFieldDefinition()
