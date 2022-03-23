@@ -147,7 +147,7 @@ public class EstimatedCallType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("stopPositionInPattern")
-                    .type(Scalars.GraphQLInt)
+                    .type(new GraphQLNonNull(Scalars.GraphQLInt))
                     .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStopIndex())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
