@@ -709,10 +709,9 @@ public abstract class RoutingResource {
     /**
      * Range/sanity check the query parameter fields and build a Request object from them.
      *
-     * @throws ParameterException when there is a problem interpreting a query parameter
      * @param queryParameters incoming request parameters
      */
-    protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) throws ParameterException {
+    protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) {
         Router router = otpServer.getRouter();
         RoutingRequest request = router.copyDefaultRoutingRequest();
 
