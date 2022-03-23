@@ -131,7 +131,7 @@ public class IndexAPI {
             @PathParam("feedId") String feedId,
             @PathParam("agencyId") String agencyId,
             /** Choose short or long form of results. */
-            @QueryParam("detail") Boolean detail
+            @QueryParam("detail") @DefaultValue("false") Boolean detail
     ) {
         RoutingService routingService = createRoutingService();
         Agency agency = getAgency(routingService, feedId, agencyId);
@@ -140,7 +140,7 @@ public class IndexAPI {
                 .filter(r -> r.getAgency() == agency)
                 .collect(Collectors.toList());
 
-        if (detail != null && detail) {
+        if (detail) {
             return Response.status(Status.OK).entity(RouteMapper.mapToApi(routes)).build();
         }
         else {
