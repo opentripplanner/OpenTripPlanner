@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.TransitMode;
@@ -30,6 +31,7 @@ class TripMapper {
     private static final Logger LOG = LoggerFactory.getLogger(TripMapper.class);
 
     private final FeedScopedIdFactory idFactory;
+    private final DataImportIssueStore issueStore;
     private final EntityById<org.opentripplanner.model.Route> otpRouteById;
     private final ReadOnlyHierarchicalMap<String, Route> routeById;
     private final ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
@@ -40,6 +42,7 @@ class TripMapper {
 
   TripMapper(
             FeedScopedIdFactory idFactory,
+            DataImportIssueStore issueStore,
             EntityById<Operator> operatorsById,
             EntityById<org.opentripplanner.model.Route> otpRouteById,
             ReadOnlyHierarchicalMap<String, Route> routeById,
@@ -48,6 +51,7 @@ class TripMapper {
             Set<FeedScopedId> shapePointIds
     ) {
         this.idFactory = idFactory;
+        this.issueStore = issueStore;
         this.otpRouteById = otpRouteById;
         this.routeById = routeById;
         this.journeyPatternsById = journeyPatternsById;
@@ -91,10 +95,21 @@ class TripMapper {
         trip.setTripOperator(findOperator(serviceJourney));
 
         if (serviceJourney.getTransportMode() != null) {
-            T2<TransitMode, String> transitMode = transportModeMapper.map(
-                serviceJourney.getTransportMode(),
-                serviceJourney.getTransportSubmode()
-            );
+            T2<TransitMode, String> transitMode = null;
+            try {
+                transitMode = transportModeMapper.map(
+                    serviceJourney.getTransportMode(),
+                    serviceJourney.getTransportSubmode()
+                );
+            } catch (TransportModeMapper.UnsupportedModeException e) {
+                issueStore.add(
+                        "UnsupportedModeInServiceJourney",
+                        "Unsupported mode in ServiceJourney. Mode: %s, sj: %s",
+                        e.mode,
+                        serviceJourney.getId()
+                );
+                return null;
+            }
             trip.setMode(transitMode.first);
             trip.setNetexSubmode(transitMode.second);
         }

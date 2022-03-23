@@ -81,12 +81,25 @@ class RouteMapper {
         otpRoute.setLongName(line.getName().getValue());
         otpRoute.setShortName(line.getPublicCode());
 
-        T2<TransitMode, String> mode = transportModeMapper.map(
-                line.getTransportMode(),
-                line.getTransportSubmode()
-        );
+        T2<TransitMode, String> mode;
+        try {
+            mode = transportModeMapper.map(
+                    line.getTransportMode(),
+                    line.getTransportSubmode()
+            );
+        } catch (TransportModeMapper.UnsupportedModeException e) {
+            issueStore.add(
+                    "UnsupportedModeInLine",
+                    "Unsupported mode in Line. Mode: %s, line: %s",
+                    e.mode,
+                    line.getId()
+            );
+            return null;
+        }
+
         otpRoute.setMode(mode.first);
         otpRoute.setNetexSubmode(mode.second);
+
         if (line instanceof FlexibleLine_VersionStructure) {
             otpRoute.setFlexibleLineType(((FlexibleLine_VersionStructure) line)
                 .getFlexibleLineType().value());
