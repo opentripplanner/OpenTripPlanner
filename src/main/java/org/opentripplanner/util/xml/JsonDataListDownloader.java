@@ -39,7 +39,7 @@ public class JsonDataListDownloader<T> {
       return null;
     }
 
-    try (InputStream data = openInputStream()) {
+    try (InputStream data = HttpUtils.openInputStream(url, headers)) {
       if (data == null) {
         log.warn("Failed to get data from url " + url);
         return null;
@@ -53,17 +53,6 @@ public class JsonDataListDownloader<T> {
       log.warn("Error reading bike rental feed from " + url, e);
     }
     return null;
-  }
-
-  private InputStream openInputStream() throws IOException {
-    URL downloadUrl = new URL(url);
-    String proto = downloadUrl.getProtocol();
-    if (proto.equals("http") || proto.equals("https")) {
-      return HttpUtils.getData(URI.create(url), headers);
-    } else {
-      // Local file probably, try standard java
-      return downloadUrl.openStream();
-    }
   }
 
   private List<T> parseJSON(InputStream dataStream) throws IllegalArgumentException, IOException {

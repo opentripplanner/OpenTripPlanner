@@ -104,6 +104,8 @@ class LegacyGraphQLIndex {
           .type(IntrospectionTypeWiring.build(LegacyGraphQLUnknownImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLRouteTypeImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLStopGeometriesImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLVehiclePositionImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStopRelationshipImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

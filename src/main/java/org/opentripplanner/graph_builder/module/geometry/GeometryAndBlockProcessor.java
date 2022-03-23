@@ -21,6 +21,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
+import org.opentripplanner.graph_builder.issues.InterliningTeleport;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
@@ -248,10 +249,7 @@ public class GeometryAndBlockProcessor {
                             toStop.getLon()
                     );
                     if (teleportationDistance > maxInterlineDistance) {
-                        // FIXME Trimet data contains a lot of these -- in their data, two trips sharing a block ID just
-                        // means that they are served by the same vehicle, not that interlining is automatically allowed.
-                        // see #1654
-                        // LOG.error(graph.addBuilderAnnotation(new InterliningTeleport(prev.trip, block.blockId, (int)teleportationDistance)));
+                        issueStore.add(new InterliningTeleport(prev.getTrip(), block.blockId, (int)teleportationDistance));
                         // Only skip this particular interline edge; there may be other valid ones in the block.
                     } else {
                         interlines.put(new P2<>(prevPattern, currPattern),

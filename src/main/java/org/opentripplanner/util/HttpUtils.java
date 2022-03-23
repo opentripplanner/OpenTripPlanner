@@ -1,5 +1,6 @@
 package org.opentripplanner.util;
 
+import java.net.URL;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -85,4 +86,19 @@ public class HttpUtils {
                 .setConnectionTimeToLive(timeoutConnection, TimeUnit.MILLISECONDS)
                 .build();
     }
+
+    public static InputStream openInputStream(String url, Map<String, String> headers) throws IOException {
+        return openInputStream(URI.create(url), headers);
+    }
+    public static InputStream openInputStream(URI uri, Map<String, String> headers) throws IOException {
+        URL downloadUrl = uri.toURL();
+        String proto = downloadUrl.getProtocol();
+        if (proto.equals("http") || proto.equals("https")) {
+            return HttpUtils.getData(uri, headers);
+        } else {
+            // Local file probably, try standard java
+            return downloadUrl.openStream();
+        }
+    }
+
 }
