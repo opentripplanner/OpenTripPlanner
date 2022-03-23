@@ -61,38 +61,24 @@ public class TimetabledPassingTimeType {
             .name("forBoarding")
             .type(Scalars.GraphQLBoolean)
             .description("Whether vehicle may be boarded at quay.")
-            .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment)
-                  .getPatternForTrip()
-                  .get(((TripTimeOnDate) environment.getSource()).getTrip())
-                  .getBoardType(((TripTimeOnDate) environment.getSource()).getStopIndex()) != PickDrop.NONE;
-            })
+            .dataFetcher(environment ->
+                    ((TripTimeOnDate) environment.getSource()).getPickupType() != PickDrop.NONE)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("forAlighting")
             .type(Scalars.GraphQLBoolean)
             .description("Whether vehicle may be alighted at quay.")
-            .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment)
-                  .getPatternForTrip()
-                  .get(((TripTimeOnDate) environment.getSource()).getTrip())
-                  .getAlightType(((TripTimeOnDate) environment.getSource()).getStopIndex())
-                  != PickDrop.NONE;
-            })
+            .dataFetcher(environment ->
+                    ((TripTimeOnDate) environment.getSource()).getDropoffType() != PickDrop.NONE)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("requestStop")
             .type(Scalars.GraphQLBoolean)
             .description("Whether vehicle will only stop on request.")
-            .dataFetcher(environment -> {
-              return GqlUtil.getRoutingService(environment)
-                  .getPatternForTrip()
-                  .get(((TripTimeOnDate) environment.getSource()).getTrip())
-                  .getAlightType(((TripTimeOnDate) environment.getSource()).getStopIndex())
-                  == PickDrop.COORDINATE_WITH_DRIVER;
-            })
+            .dataFetcher(environment ->
+                    ((TripTimeOnDate) environment.getSource()).getDropoffType() == PickDrop.COORDINATE_WITH_DRIVER)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
