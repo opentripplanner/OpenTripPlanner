@@ -113,7 +113,7 @@ public class TimetabledPassingTimeType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("notices")
-            .type(new GraphQLNonNull(new GraphQLList(noticeType)))
+            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
             .dataFetcher(environment -> {
               TripTimeOnDate tripTimeOnDate = environment.getSource();
               return GqlUtil.getRoutingService(environment).getNoticesByEntity(tripTimeOnDate.getStopTimeKey());
