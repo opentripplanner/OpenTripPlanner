@@ -34,7 +34,7 @@ public class StopMapper {
         if (extended) {
             api.desc = domain.getDescription();
             api.zoneId = domain.getFirstZoneAsString();
-            api.url = Optional.ofNullable(domain.getUrl()).map(I18NString::toString).orElse(null);
+            api.url = I18NStringMapper.mapToApi(domain.getUrl(), null);
             api.locationType = 0;
             api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
             api.parentStation = mapToParentStationOldId(domain);
