@@ -218,6 +218,21 @@ public class Graph implements Serializable {
      */
     public Double ellipsoidToGeoidDifference = 0.0;
 
+    /**
+     * Does this graph contain elevation data?
+     */
+    public boolean hasElevation = false;
+
+    /**
+     * If this graph contains elevation data, the minimum value.
+     */
+    public Double minElevation = null;
+
+    /**
+     * If this graph contains elevation data, the maximum value.
+     */
+    public Double maxElevation = null;
+
     /** Parent stops **/
     public Map<FeedScopedId, Station> stationById = new HashMap<>();
 

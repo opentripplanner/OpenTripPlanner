@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.ned;
 
 import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -106,9 +105,6 @@ public class ElevationModule implements GraphBuilderModule {
      */
     private final double elevationUnitMultiplier;
 
-    /** the graph being built */
-    private Graph graph;
-
     /** A concurrent hashmap used for storing geoid difference values at various coordinates */
     private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
 
@@ -116,6 +112,9 @@ public class ElevationModule implements GraphBuilderModule {
     private Coverage singleThreadedCoverageInterpolator;
 
     private final ThreadLocal<Coverage> coverageInterpolatorThreadLocal = new ThreadLocal<>();
+
+    private double minElevation = Double.MAX_VALUE;
+    private double maxElevation = Double.MIN_VALUE;
 
     /** used only for testing purposes */
     public ElevationModule(ElevationGridCoverageFactory factory) {
@@ -151,17 +150,6 @@ public class ElevationModule implements GraphBuilderModule {
         this.distanceBetweenSamplesM = distanceBetweenSamplesM;
     }
 
-    /**
-     * Gets the desired amount of processors to use for elevation calculations from the build-config setting. It will
-     * return at least 1 processor and no more than the maximum available processors. The default return value is 1
-     * processor.
-     */
-    public static int fromConfig(JsonNode elevationModuleParallelism) {
-        int maxProcessors = Runtime.getRuntime().availableProcessors();
-        int minimumProcessors = 1;
-        return Math.max(minimumProcessors, Math.min(elevationModuleParallelism.asInt(minimumProcessors), maxProcessors));
-    }
-
     @Override
     public void buildGraph(
             Graph graph,
@@ -170,7 +158,6 @@ public class ElevationModule implements GraphBuilderModule {
     ) {
         Instant start = Instant.now();
         this.issueStore = issueStore;
-        this.graph = graph;
         gridCoverageFactory.fetchData(graph);
 
         graph.setDistanceBetweenElevationSamples(this.distanceBetweenSamplesM);
@@ -271,7 +258,17 @@ public class ElevationModule implements GraphBuilderModule {
         HashMap<Vertex, Double> extraElevation = (HashMap<Vertex, Double>) extra.get(ElevationPoint.class);
         assignMissingElevations(graph, edgesWithCalculatedElevations, extraElevation);
 
+        updateElevationMetadata(graph);
+
         LOG.info("Finished elevation processing in {}s", Duration.between(start, Instant.now()).toSeconds());
+    }
+
+    private void updateElevationMetadata(Graph graph) {
+        if (nPointsOutsideDEM.get() < nPointsEvaluated.get()) {
+            graph.hasElevation = true;
+            graph.minElevation = minElevation;
+            graph.maxElevation = maxElevation;
+        }
     }
 
     static class ElevationRepairState {
@@ -728,9 +725,16 @@ public class ElevationModule implements GraphBuilderModule {
             nPointsOutsideDEM.incrementAndGet();
             throw e;
         }
+
+        var elevation = (values[0] * elevationUnitMultiplier) -
+                (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
+
+        minElevation = Math.min(minElevation, elevation);
+        maxElevation = Math.max(maxElevation, elevation);
+
         nPointsEvaluated.incrementAndGet();
-        return (values[0] * elevationUnitMultiplier) -
-            (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
+
+        return elevation;
     }
 
     /**
