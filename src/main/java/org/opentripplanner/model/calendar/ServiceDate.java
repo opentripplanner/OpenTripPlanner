@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -144,6 +145,15 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
         return new ServiceDate(year, month, day);
     }
 
+    public static Optional<ServiceDate> parseStringToOptional(String value) {
+        try {
+            return Optional.of(parseString(value));
+        }
+        catch (ParseException e) {
+            return Optional.empty();
+        }
+    }
+
     public int getYear() {
         return year;
     }
@@ -158,7 +168,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
     /**
      * Create a ZonedDateTime based on the current service date, time zone and seconds-offset.
-     * This method add the offset seconds to the service date start time, witch is defined
+     * This method add the offset seconds to the service date start time, which is defined
      * to be NOON - 12 hours. This is midnight for most days, except days where the time is
      * adjusted for daylight saving time.
      */
@@ -170,7 +180,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
     /**
      * Add a given number of seconds to the service date and convert it to a new service date if it
-     * the new time is on another date. The given time-zone is used to account for days witch
+     * the new time is on another date. The given time-zone is used to account for days which
      * do not have 24 hours (switching between summer and winter time).
      */
     public ServiceDate plusSeconds(ZoneId zoneId, int seconds) {
@@ -188,7 +198,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
         return getAsDate(TimeZone.getDefault());
     }
 
-    private LocalDate toLocalDate() {
+    public LocalDate toLocalDate() {
         return LocalDate.of(year, month, day);
     }
 

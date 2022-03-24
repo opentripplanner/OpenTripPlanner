@@ -49,8 +49,7 @@ public class LegacyGraphQLDepartureRowImpl
           args.getLegacyGraphQLStartTime(),
           args.getLegacyGraphQLTimeRange(),
           args.getLegacyGraphQLNumberOfDepartures(),
-          args.getLegacyGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
-          args.getLegacyGraphQLOmitCanceled()
+          args.getLegacyGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
       );
     };
   }

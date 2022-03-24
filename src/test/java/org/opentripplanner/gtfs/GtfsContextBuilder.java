@@ -14,6 +14,8 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
+import javax.annotation.Nullable;
+
 /**
  * This class helps building GtfsContext and post process
  * the GtfsDao by repairing StopTimes(optional) and generating TripPatterns(optional).
@@ -31,13 +33,13 @@ public class GtfsContextBuilder {
 
     private Deduplicator deduplicator;
 
-    private boolean repairStopTimesAndGenerateTripPatterns = true;
+    private final boolean repairStopTimesAndGenerateTripPatterns = true;
 
     public static GtfsContextBuilder contextBuilder(String path) throws IOException {
         return contextBuilder(null, path);
     }
 
-    public static GtfsContextBuilder contextBuilder(String defaultFeedId, String path) throws IOException {
+    public static GtfsContextBuilder contextBuilder(@Nullable String defaultFeedId, String path) throws IOException {
         GtfsImport gtfsImport = gtfsImport(defaultFeedId, path);
         GtfsFeedId feedId = gtfsImport.getFeedId();
         var mapper = new GTFSToOtpTransitServiceMapper(
@@ -90,18 +92,6 @@ public class GtfsContextBuilder {
 
     public GtfsContextBuilder withDeduplicator(Deduplicator deduplicator) {
         this.deduplicator = deduplicator;
-        return this;
-    }
-
-    /**
-     * The {@link org.opentripplanner.graph_builder.module.GtfsModule} is responsible for repairing
-     * StopTimes for all trips and trip patterns generation, so turn this feature <b>off</b>
-     * when using GtfsModule to load data.
-     *
-     * This feature is turned <b>on</b> by <em>default</em>.
-     */
-    public GtfsContextBuilder turnOffRepairStopTimesAndTripPatternsGeneration() {
-        this.repairStopTimesAndGenerateTripPatterns = false;
         return this;
     }
 

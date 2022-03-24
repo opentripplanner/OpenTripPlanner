@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.interactivelauncher;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.beans.Transient;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -10,12 +10,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Model implements Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Model.class);
 
     private static final File MODEL_FILE = new File("interactive_otp_main.json");
 
     private final Map<String, Boolean> debugLogging = new HashMap<>();
+
+    @JsonIgnore
+    private transient Consumer<String> commandLineChange;
 
     private String rootDirectory = null;
     private String dataSource = null;
@@ -23,6 +31,7 @@ public class Model implements Serializable {
     private boolean buildTransit = true;
     private boolean saveGraph = false;
     private boolean serveGraph = true;
+    private boolean visualizer = false;
 
 
     public Model() {
@@ -30,18 +39,24 @@ public class Model implements Serializable {
     }
 
     public static Model load() {
+        return MODEL_FILE.exists() ? readFromFile() : new Model();
+    }
+
+    private static Model readFromFile() {
         try {
-            return MODEL_FILE.exists()
-                    ? new ObjectMapper().readValue(MODEL_FILE, Model.class)
-                    : new Model();
+            return new ObjectMapper().readValue(MODEL_FILE, Model.class);
         }
         catch (IOException e) {
             System.err.println(
                     "Unable to read the InteractiveOtpMain state cache. If the model changed this "
-                    + "is expected, and it will work next time. Cause: " + e.getMessage()
+                            + "is expected, and it will work next time. Cause: " + e.getMessage()
             );
             return new Model();
         }
+    }
+
+    public void subscribeCmdLineUpdates(Consumer<String> commandLineChange) {
+        this.commandLineChange = commandLineChange;
     }
 
     @SuppressWarnings("AccessOfSystemProperties")
@@ -56,6 +71,7 @@ public class Model implements Serializable {
         if (rootDirectory != null) {
             this.rootDirectory = rootDirectory;
         }
+        notifyChangeListener();
     }
 
     public String getDataSource() {
@@ -64,18 +80,27 @@ public class Model implements Serializable {
 
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;
+        notifyChangeListener();
     }
 
-    @Transient
+    @JsonIgnore
     public List<String> getDataSourceOptions() {
         List<String> dataSourceOptions = new ArrayList<>();
         File rootDir = new File(getRootDirectory());
         List<File> dirs = SearchForOtpConfig.search(rootDir);
-        // Add 1 char for the path separator character
+        // Add 1 char for the path-separator-character
         int length = rootDir.getAbsolutePath().length() + 1;
 
         for (File dir : dirs) {
-            dataSourceOptions.add(dir.getAbsolutePath().substring(length));
+            var path = dir.getAbsolutePath();
+            if(path.length() <= length) {
+                LOG.warn(
+                        "The root directory contains a config file, choose " +
+                        "the parent directory or delete the config file."
+                );
+                continue;
+            }
+            dataSourceOptions.add(path.substring(length));
         }
         return dataSourceOptions;
     }
@@ -86,6 +111,7 @@ public class Model implements Serializable {
 
     public void setBuildStreet(boolean buildStreet) {
         this.buildStreet = buildStreet;
+        notifyChangeListener();
     }
 
     public boolean isBuildTransit() {
@@ -94,6 +120,7 @@ public class Model implements Serializable {
 
     public void setBuildTransit(boolean buildTransit) {
         this.buildTransit = buildTransit;
+        notifyChangeListener();
     }
 
     public boolean isSaveGraph() {
@@ -102,6 +129,7 @@ public class Model implements Serializable {
 
     public void setSaveGraph(boolean saveGraph) {
         this.saveGraph = saveGraph;
+        notifyChangeListener();
     }
 
     public boolean isServeGraph() {
@@ -110,6 +138,16 @@ public class Model implements Serializable {
 
     public void setServeGraph(boolean serveGraph) {
         this.serveGraph = serveGraph;
+        notifyChangeListener();
+    }
+
+    public boolean isVisualizer() {
+        return visualizer;
+    }
+
+    public void setVisualizer(boolean visualizer) {
+        this.visualizer = visualizer;
+        notifyChangeListener();
     }
 
     public Map<String, Boolean> getDebugLogging() {
@@ -133,6 +171,7 @@ public class Model implements Serializable {
                 + (buildTransit ? ", buildTransit" : "")
                 + (saveGraph ? ", saveGraph" : "")
                 + (serveGraph ? ", serveGraph" : "")
+                + (visualizer ? ", visualizer" : "")
                 + ')';
     }
 
@@ -149,7 +188,7 @@ public class Model implements Serializable {
         }
     }
 
-    @Transient
+    @JsonIgnore
     String getDataSourceDirectory() {
         if (dataSource == null) {
             return "DATA_SOURCE_NOT_SET";
@@ -175,15 +214,22 @@ public class Model implements Serializable {
 
         if (saveGraph && (buildTransit || buildStreet)) { args.add("--save"); }
         if (serveGraph && !buildStreetOnly()) { args.add("--serve"); }
+        if (serveGraph && !buildStreetOnly() && visualizer) { args.add("--visualize"); }
 
         args.add(getDataSourceDirectory());
 
         return args.toArray(new String[0]);
     }
 
-    private boolean buildAll() { return isBuildStreet() && isBuildTransit(); }
+    private void notifyChangeListener() {
+        if(commandLineChange != null) {
+            commandLineChange.accept(toCliString());
+        }
+    }
 
-    private boolean buildStreetOnly() { return isBuildStreet() && !isBuildTransit(); }
+    private boolean buildAll() { return buildStreet && buildTransit; }
+
+    private boolean buildStreetOnly() { return buildStreet && !buildTransit; }
 
     private void setupListOfDebugLoggers() {
         for (String log : DebugLoggingSupport.getLogs()) {

@@ -1,7 +1,5 @@
 package org.opentripplanner.api.model;
 
-import org.opentripplanner.util.Constants;
-
 import java.util.Calendar;
 
 /** 
@@ -51,8 +49,6 @@ public class ApiPlace {
      */
     public Calendar departure = null;
 
-    public String orig;
-
     public String zoneId;
 
     /**
@@ -77,9 +73,7 @@ public class ApiPlace {
     public String bikeShareId;
 
     /**
-     * Returns the geometry in GeoJSON format
+     * In case the vertex is of type VEHICLEPARKING.
      */
-    String getGeometry() {
-        return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
-    }
+    public ApiVehicleParkingWithEntrance vehicleParking;
 }

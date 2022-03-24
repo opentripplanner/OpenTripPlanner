@@ -7,10 +7,18 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.FlexIndex;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
@@ -29,12 +37,6 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 public class GraphIndex {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
@@ -42,7 +44,7 @@ public class GraphIndex {
     // TODO: consistently key on model object or id string
     private final Map<FeedScopedId, Agency> agencyForId = Maps.newHashMap();
     private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
-    private final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
+    private final Map<FeedScopedId, StopLocation> stopForId = Maps.newHashMap();
     private final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
     private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
     private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
@@ -84,11 +86,11 @@ public class GraphIndex {
         for (TripPattern pattern : graph.tripPatternForId.values()) {
             patternsForFeedId.put(pattern.getFeedId(), pattern);
             patternsForRoute.put(pattern.getRoute(), pattern);
-            for (Trip trip : pattern.getTrips()) {
+            pattern.scheduledTripsAsStream().forEach(trip -> {
                 patternForTrip.put(trip, pattern);
                 tripForId.put(trip.getId(), trip);
-            }
-            for (Stop stop : pattern.getStops()) {
+            });
+            for (StopLocation stop : pattern.getStops()) {
                 patternsForStopId.put(stop, pattern);
             }
         }
@@ -108,9 +110,11 @@ public class GraphIndex {
             for (Route route : flexIndex.routeById.values()) {
                 routeForId.put(route.getId(), route);
             }
-            for (Trip trip : flexIndex.tripById.values()) {
-                tripForId.put(trip.getId(), trip);
+            for (FlexTrip flexTrip : flexIndex.tripById.values()) {
+                tripForId.put(flexTrip.getId(), flexTrip.getTrip());
+                flexTrip.getStops().stream().forEach(stop -> stopForId.put(stop.getId(), stop));
             }
+
         }
 
         LOG.info("GraphIndex init complete.");
@@ -155,7 +159,7 @@ public class GraphIndex {
         return agencyForId.get(id);
     }
 
-    public Stop getStopForId(FeedScopedId id) {
+    public StopLocation getStopForId(FeedScopedId id) {
         return stopForId.get(id);
     }
 
@@ -172,7 +176,7 @@ public class GraphIndex {
     }
 
     /** Dynamically generate the set of Routes passing though a Stop on demand. */
-    public Set<Route> getRoutesForStop(Stop stop) {
+    public Set<Route> getRoutesForStop(StopLocation stop) {
         Set<Route> routes = Sets.newHashSet();
         for (TripPattern p : getPatternsForStop(stop)) {
             routes.add(p.getRoute());
@@ -184,14 +188,20 @@ public class GraphIndex {
         return patternsForStopId.get(stop);
     }
 
+    public Collection<Trip> getTripsForStop(StopLocation stop) {
+        return getPatternsForStop(stop).stream()
+                .flatMap(TripPattern::scheduledTripsAsStream)
+                .collect(Collectors.toList());
+    }
+
     /**
-     * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
+     * Returns all the patterns for a specific stop. If timetableSnapshot is included, new patterns
      * added by realtime updates are added to the collection. A set is used here because trip
      * patterns that were updated by realtime data is both part of the GraphIndex and the
      * TimetableSnapshot.
      */
     public Collection<TripPattern> getPatternsForStop(
-            Stop stop,
+            StopLocation stop,
             TimetableSnapshot timetableSnapshot
     ) {
         Set<TripPattern> tripPatterns = new HashSet<>(getPatternsForStop(stop));
@@ -214,7 +224,7 @@ public class GraphIndex {
         return operatorForId;
     }
 
-    public Collection<Stop> getAllStops() {
+    public Collection<StopLocation> getAllStops() {
         return stopForId.values();
     }
 

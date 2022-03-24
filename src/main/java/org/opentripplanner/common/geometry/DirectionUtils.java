@@ -1,7 +1,6 @@
 package org.opentripplanner.common.geometry;
 
 import org.apache.commons.math3.util.FastMath;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -25,8 +24,7 @@ public class DirectionUtils {
         if (Math.abs(dX) < 1e-10 && Math.abs(dY) < 1e-10) {
             return 180;
         }
-        double az = FastMath.toDegrees(FastMath.atan2(dX, dY));
-        return az;
+        return FastMath.toDegrees(FastMath.atan2(dX, dY));
     }
     
     /**

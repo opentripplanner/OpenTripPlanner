@@ -9,11 +9,10 @@ public class ApiTripSearchMetadata {
      * This is the time window used by the raptor search. The window is an optional parameter and
      * OTP might override it/dynamically assign a new value.
      * <p>
-     * Note! The `searchWindowUsed` is NOT adjusted in the post-search-filtering. If the
-     * {@code numOfItineraries} request parameter is set, optimal itineraries are removed from the
-     * end of the result. Be aware of this when adding the results of more than on search together.
-     * If the client support paging/scrolling, do not use the {@code numOfItineraries} parameter,
-     * cache or hide the last part of the returned list of itineraries instead.
+     * If the {@code numOfItineraries} request parameter is set, optimal itineraries are removed
+     * from the end of the result. Be aware of this when adding the results of more than on search
+     * together. If the client support paging/scrolling, do not use the {@code numOfItineraries}
+     * parameter, cache or hide the last part of the returned list of itineraries instead.
      * <p>
      * Unit : seconds
      */
@@ -33,7 +32,10 @@ public class ApiTripSearchMetadata {
      * If OTP for some reason is not able to calculate this value then it will be {@code null}.
      * <p>
      * Unit : epoch milliseconds
+     *
+     * @deprecated Use the request/response cursor instead.
      */
+    @Deprecated
     public Long nextDateTime;
 
     /**
@@ -50,6 +52,9 @@ public class ApiTripSearchMetadata {
      * If OTP for some reason is not able to calculate this value then it will be {@code null}.
      * <p>
      * Unit : epoch milliseconds
+     *
+     * @deprecated Use the request/response cursor instead.
      */
+    @Deprecated
     public Long prevDateTime;
 }

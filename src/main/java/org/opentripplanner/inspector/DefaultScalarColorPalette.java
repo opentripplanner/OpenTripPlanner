@@ -11,11 +11,11 @@ import java.awt.Color;
  */
 public class DefaultScalarColorPalette implements ScalarColorPalette {
 
-    private double min;
+    private final double min;
 
-    private double max;
+    private final double max;
 
-    private double maxMax;
+    private final double maxMax;
 
     public DefaultScalarColorPalette(double min, double max, double maxMax) {
         this.min = min;

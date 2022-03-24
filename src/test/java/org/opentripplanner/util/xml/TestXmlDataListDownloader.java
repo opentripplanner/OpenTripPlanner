@@ -1,10 +1,11 @@
 package org.opentripplanner.util.xml;
 
-import static java.util.Locale.ROOT;
+import junit.framework.TestCase;
 
 import java.util.List;
 import java.util.Map;
-import junit.framework.TestCase;
+
+import static java.util.Locale.ROOT;
 
 public class TestXmlDataListDownloader extends TestCase {
 
@@ -17,17 +18,17 @@ public class TestXmlDataListDownloader extends TestCase {
     }
 
     public void testKML() {
-        XmlDataListDownloader<DataTest> xmlDataListDownloader = new XmlDataListDownloader<DataTest>();
+        XmlDataListDownloader<DataTest> xmlDataListDownloader = new XmlDataListDownloader<>();
         xmlDataListDownloader.setPath("//document/data/element");
-        xmlDataListDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<DataTest>() {
-            @Override
-            public DataTest build(Map<String, String> attributes) {
-                DataTest t = new DataTest();
-                t.name = attributes.get("name");
-                t.lat = Double.parseDouble(attributes.get("lat"));
-                t.lon = Double.parseDouble(attributes.get("lon"));
-                return t;
-            }
+        xmlDataListDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<>() {
+          @Override
+          public DataTest build(Map<String, String> attributes) {
+            DataTest t = new DataTest();
+            t.name = attributes.get("name");
+            t.lat = Double.parseDouble(attributes.get("lat"));
+            t.lon = Double.parseDouble(attributes.get("lon"));
+            return t;
+          }
         });
         List<DataTest> data = xmlDataListDownloader
                 .download("file:src/test/resources/xml/test-data.xml", false);

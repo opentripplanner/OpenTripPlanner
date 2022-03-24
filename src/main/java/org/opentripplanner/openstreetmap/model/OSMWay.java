@@ -3,12 +3,9 @@ package org.opentripplanner.openstreetmap.model;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class OSMWay extends OSMWithTags {
 
-    private TLongList nodes = new TLongArrayList();
+    private final TLongList nodes = new TLongArrayList();
 
     public void addNodeRef(OSMNodeRef nodeRef) {
         nodes.add(nodeRef.getRef());
@@ -127,5 +124,10 @@ public class OSMWay extends OSMWithTags {
         return (cycleway != null && cycleway.startsWith("opposite"))
                 || (cyclewayLeft != null && cyclewayLeft.startsWith("opposite"))
                 || (cyclewayRight != null && cyclewayRight.startsWith("opposite"));
+    }
+
+    @Override
+    public String getOpenStreetMapLink() {
+        return String.format("http://www.openstreetmap.org/way/%d", getId());
     }
 }

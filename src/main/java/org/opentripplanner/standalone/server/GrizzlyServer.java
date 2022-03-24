@@ -34,8 +34,8 @@ public class GrizzlyServer {
     }
 
     /** The command line parameters, including things like port number and content directories. */
-    private CommandLineParameters params;
-    private Application app;
+    private final CommandLineParameters params;
+    private final Application app;
 
     /** Construct a Grizzly server with the given IoC injector and command line parameters. */
     public GrizzlyServer (CommandLineParameters params, Application app) {

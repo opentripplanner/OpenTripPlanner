@@ -2,28 +2,11 @@ package org.opentripplanner.inspector;
 
 import com.jhlabs.awt.ShapeStroke;
 import com.jhlabs.awt.TextStroke;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Polygon;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.stream.Collectors;
 import org.locationtech.jts.awt.IdentityPointTransformation;
 import org.locationtech.jts.awt.PointShapeFactory;
 import org.locationtech.jts.awt.ShapeWriter;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.locationtech.jts.operation.buffer.OffsetCurveBuilder;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -31,6 +14,13 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+
+import java.awt.Polygon;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 /**
  * A TileRenderer implementation which get all edges/vertex in the bounding box of the tile, and
@@ -40,14 +30,14 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
  */
 public class EdgeVertexTileRenderer implements TileRenderer {
 
-    public class EdgeVisualAttributes {
+    public static class EdgeVisualAttributes {
 
         public Color color;
 
         public String label;
     }
 
-    public class VertexVisualAttributes {
+    public static class VertexVisualAttributes {
 
         public Color color;
 
@@ -98,7 +88,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         return BufferedImage.TYPE_INT_ARGB;
     }
 
-    private EdgeVertexRenderer evRenderer;
+    private final EdgeVertexRenderer evRenderer;
 
     public EdgeVertexTileRenderer(EdgeVertexRenderer evRenderer) {
         this.evRenderer = evRenderer;
@@ -133,7 +123,6 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         // since it's easier for the offset to work in pixel size.
         ShapeWriter shapeWriter = new ShapeWriter(new IdentityPointTransformation(),
                 new PointShapeFactory.Point());
-        GeometryFactory geomFactory = new GeometryFactory();
 
         Stroke stroke = new BasicStroke(lineWidth * 1.4f, BasicStroke.CAP_ROUND,
                 BasicStroke.JOIN_BEVEL);
@@ -185,7 +174,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
                     lineWidth * 0.4);
             if (coords.length < 2)
                 continue; // Can happen for very small edges (<1mm)
-            LineString offsetLine = geomFactory.createLineString(coords);
+            LineString offsetLine = GeometryUtils.makeLineString(coords);
             Shape midLineShape = shapeWriter.toShape(midLineGeom);
             Shape offsetShape = shapeWriter.toShape(offsetLine);
 
@@ -215,7 +204,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         for (Vertex vertex : vertices) {
             vvAttrs.color = null;
             vvAttrs.label = null;
-            Point point = geomFactory.createPoint(new Coordinate(vertex.getLon(), vertex.getLat()));
+            Point point = GeometryUtils.getGeometryFactory().createPoint(vertex.getCoordinate());
             boolean render = evRenderer.renderVertex(vertex, vvAttrs);
             if (!render)
                 continue;

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
@@ -8,8 +8,8 @@ import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.p
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -28,7 +28,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
  * The expected result is an itinerary with 3 transit legs:
  * <p>
  * <pre>
- *    Walk 1m ~ R1 ~ 3 ~ R2 ~ Walk ~ R3 ~ Walk 1m
+ *    Walk 1m ~ R1 ~ C ~ R2 ~ Walk ~ R3 ~ Walk 1m
  * </pre>
  */
 public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants {
@@ -39,13 +39,13 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
 
   /** The expected result is tha same for all tests */
   private static final String EXPECTED_RESULT
-      = "Walk 30s ~ 2 ~ "
-      + "BUS R1 0:02:11 0:03:01 ~ 3 ~ "
-      + "BUS R2 0:04:41 0:05:01 ~ 4 ~ "
+      = "Walk 30s ~ B ~ "
+      + "BUS R1 0:02:11 0:03:01 ~ C ~ "
+      + "BUS R2 0:04:41 0:05:01 ~ D ~ "
       + "Walk 20s "
-      + "[0:01:11 0:05:31 4m20s]";
+      + "[0:01:11 0:05:31 4m20s 1tx]";
 
-  @Before
+  @BeforeEach
   public void setup() {
     //Given slack: transfer 1m, board 30s, alight 10s
     requestBuilder.slackProvider(

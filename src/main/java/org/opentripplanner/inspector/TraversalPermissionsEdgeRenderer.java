@@ -1,15 +1,23 @@
 package org.opentripplanner.inspector;
 
-import java.awt.Color;
-
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.BarrierVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
+import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+
+import java.awt.*;
 
 /**
  * Render traversal permissions for each edge by color and label (walk, bicycle, car, stairs).
@@ -20,13 +28,15 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
 
     private static final Color LINK_COLOR_EDGE = Color.ORANGE;
 
+    private static final Color ELEVATOR_COLOR_EDGE = Color.YELLOW;
+
     private static final Color STAIRS_COLOR_EDGE = Color.PINK;
 
     private static final Color STREET_COLOR_VERTEX = Color.DARK_GRAY;
 
     private static final Color TRANSIT_STOP_COLOR_VERTEX = new Color(0.0f, 0.0f, 0.8f);
 
-    private static final Color BIKE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
+    private static final Color VEHICLE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
 
     private static final Color PARK_AND_RIDE_COLOR_VERTEX = Color.RED;
 
@@ -48,7 +58,23 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
                 attrs.label += " car NTT";
             }
             if (pse.isBicycleNoThruTraffic()) {
-                attrs.label += " bicycle NTT";
+                attrs.label += " bike NTT";
+            }
+            if (pse.isWalkNoThruTraffic()) {
+                attrs.label += " walk NTT";
+            }
+        } else if (e instanceof ElevatorHopEdge) {
+            ElevatorHopEdge ehe = (ElevatorHopEdge) e;
+            attrs.color = ELEVATOR_COLOR_EDGE;
+            attrs.label = "elevator";
+            if (ehe.wheelchairAccessible) {
+                attrs.label += " wheelchair";
+            }
+            if(ehe.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
+                attrs.label += " bike";
+            }
+            if(ehe.getPermission().allows(StreetTraversalPermission.CAR)) {
+                attrs.label += " car";
             }
         } else {
             attrs.color = LINK_COLOR_EDGE;
@@ -66,13 +92,13 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
             }
         } else if (v instanceof TransitStopVertex || v instanceof TransitEntranceVertex || v instanceof TransitPathwayNodeVertex || v instanceof TransitBoardingAreaVertex) {
             attrs.color = TRANSIT_STOP_COLOR_VERTEX;
-            attrs.label = v.getName();
-        } else if (v instanceof BikeRentalStationVertex) {
-            attrs.color = BIKE_RENTAL_COLOR_VERTEX;
-            attrs.label = v.getName();
-        } else if (v instanceof ParkAndRideVertex || v instanceof BikeParkVertex) {
+            attrs.label = v.getDefaultName();
+        } else if (v instanceof VehicleRentalStationVertex) {
+            attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
+            attrs.label = v.getDefaultName();
+        } else if (v instanceof VehicleParkingEntranceVertex) {
             attrs.color = PARK_AND_RIDE_COLOR_VERTEX;
-            attrs.label = v.getName();
+            attrs.label = v.getDefaultName();
         } else {
             return false;
         }
@@ -101,7 +127,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     }
 
     private String getLabel(StreetTraversalPermission permissions) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (permissions.allows(StreetTraversalPermission.PEDESTRIAN))
             sb.append("walk,");
         if (permissions.allows(StreetTraversalPermission.BICYCLE))

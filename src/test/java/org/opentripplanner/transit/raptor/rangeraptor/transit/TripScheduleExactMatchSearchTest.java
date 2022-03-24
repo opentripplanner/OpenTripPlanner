@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
 
@@ -24,7 +25,7 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
     private static final TestRoute TIME_TABLE = TestRoute.route("R1", STOP_A)
         .withTimetable(TRIP_SCHEDULE);
 
-    private TripScheduleSearch<TestTripSchedule> subject;
+    private RaptorTripScheduleSearch<TestTripSchedule> subject;
 
     public void setup(boolean forward) {
         TransitCalculator<TestTripSchedule> calculator = testDummyCalculator(forward);

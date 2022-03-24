@@ -22,6 +22,7 @@ otp.config = {
         'en': otp.locale.English,
         'es': otp.locale.Spanish,
         'fr': otp.locale.French,
+        'hu': otp.locale.Hungarian,
         'it': otp.locale.Italian,
         'no': otp.locale.Norwegian,
         'pl': otp.locale.Polish,
@@ -154,10 +155,6 @@ otp.config = {
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
             defaultBaseLayer : 'OSM Standard Tiles',
             isDefault: true
-        },
-        {
-            id : 'analyst',
-            className : 'otp.modules.analyst.AnalystModule'
         }
     ],
     
@@ -204,8 +201,9 @@ otp.config = {
      */    
      
     timeFormat  : "h:mma",
-    dateFormat  : "MMM Do YYYY"
-
+    dateFormat  : "MMM Do YYYY",
+    apiTimeFormat : "h:mma",
+    apiDateFormat  : "MM-DD-YYYY"
 };
 var options = {
 	resGetPath: 'js/otp/locale/__lng__.json',
@@ -327,6 +325,10 @@ otp.config.modes = {
     'BICYCLE_RENT'             : _tr('Rented Bicycle'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     'TRANSIT,BICYCLE_RENT'     : _tr('Transit & Rented Bicycle'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    'SCOOTER_RENT'             : _tr('Rented Scooter'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
+    'TRANSIT,SCOOTER_RENT'     : _tr('Transit & Rented Scooter'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "FLEX_ACCESS,WALK,TRANSIT" : _tr('Transit with flex access'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)

@@ -1,13 +1,16 @@
 package org.opentripplanner.netex.index.api;
 
 import java.util.Collection;
+
 import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.Branding;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleStopPlace;
+import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
@@ -27,6 +30,7 @@ import org.rutebanken.netex.model.TariffZone;
 
 public interface NetexEntityIndexReadOnlyView {
     Network lookupNetworkForLine(String groupOfLineOrNetworkId);
+    ReadOnlyHierarchicalMapById<GroupOfLines> getGroupsOfLinesById();
     ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById();
     ReadOnlyHierarchicalMapById<DayType> getDayTypeById();
     ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> getDayTypeAssignmentByDayTypeId();
@@ -51,6 +55,7 @@ public interface NetexEntityIndexReadOnlyView {
     ReadOnlyHierarchicalMapById<ServiceJourneyInterchange> getServiceJourneyInterchangeById();
     ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById();
     ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
-    ReadOnlyHierarchicalMapById<TariffZone> getTariffZonesById();
+    ReadOnlyHierarchicalVersionMapById<TariffZone> getTariffZonesById();
+    ReadOnlyHierarchicalMapById<Branding> getBrandingById();
     String getTimeZone();
 }

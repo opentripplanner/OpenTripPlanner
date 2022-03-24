@@ -2,10 +2,11 @@ package org.opentripplanner.model.plan;
 
 import com.google.common.collect.Lists;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.VehicleRentalStationInfo;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.util.I18NString;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -54,7 +55,7 @@ public class WalkStep {
     /**
      * The name of the street.
      */
-    public String streetName;
+    public I18NString streetName;
 
     /**
      * The absolute direction of this step.
@@ -98,18 +99,23 @@ public class WalkStep {
     public double angle;
 
     /**
+     * Is this step walking with a bike?
+     */
+    public boolean walkingBike;
+
+    /**
      * The street edges that make up this walkStep.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
     public List<Edge> edges = Lists.newArrayList();
 
     /**
-     * The bike rental on/off station info.
+     * The vehicle rental on/off station info.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
-    public BikeRentalStationInfo bikeRentalOnStation;
+    public VehicleRentalStationInfo vehicleRentalOnStation;
 
-    public BikeRentalStationInfo bikeRentalOffStation;
+    public VehicleRentalStationInfo vehicleRentalOffStation;
 
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);
@@ -167,11 +173,15 @@ public class WalkStep {
     }
 
     public String streetNameNoParens() {
-        int idx = streetName.indexOf('(');
-        if (idx <= 0) {
-            return streetName;
+        var str = streetName.toString();
+        if (str == null){
+            return null; //Avoid null reference exceptions with pathways which don't have names
         }
-        return streetName.substring(0, idx - 1);
+        int idx = str.indexOf('(');
+        if (idx > 0) {
+            return str.substring(0, idx - 1);
+        }
+        return str;
     }
 
     @Override

@@ -7,16 +7,15 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -26,6 +25,7 @@ import org.opentripplanner.util.LocalizedString;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +49,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-        File file = new File(URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8));
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
 
         loader.setProvider(provider);
@@ -88,10 +88,10 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         assertNotNull(e2);
         assertNotNull(e3);
 
-        assertTrue("name of e1 must be like \"Kamiennog\u00F3rska\"; was " + e1.getName(), e1
-                .getName().contains("Kamiennog\u00F3rska"));
-        assertTrue("name of e2 must be like \"Mariana Smoluchowskiego\"; was " + e2.getName(), e2
-                .getName().contains("Mariana Smoluchowskiego"));
+        assertTrue("name of e1 must be like \"Kamiennog\u00F3rska\"; was " + e1.getDefaultName(), e1
+                .getDefaultName().contains("Kamiennog\u00F3rska"));
+        assertTrue("name of e2 must be like \"Mariana Smoluchowskiego\"; was " + e2.getDefaultName(), e2
+                .getDefaultName().contains("Mariana Smoluchowskiego"));
     }
 
     /**
@@ -106,7 +106,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-        File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.pbf").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.pbf").getFile(), StandardCharsets.UTF_8));
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
 
         loader.setProvider(provider);
@@ -138,7 +138,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
             P2<Vertex> endpoints = new P2<>(se.getFromVertex(), se.getToVertex());
             // Check that we don't get any duplicate edges on this small graph.
             if (edgeEndpoints.contains(endpoints)) {
-                assertFalse(true);
+              fail();
             }
             edgeEndpoints.add(endpoints);
         }
@@ -160,7 +160,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.skipVisibility = skipVisibility;
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-        File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.pbf").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.pbf").getFile(), StandardCharsets.UTF_8));
         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
 
         loader.setProvider(provider);
@@ -218,7 +218,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         OSMSpecifier lane_only = new OSMSpecifier("cycleway=lane");
 
         WayProperties lane_is_safer = new WayProperties();
-        lane_is_safer.setSafetyFeatures(new P2<Double>(1.5, 1.5));
+        lane_is_safer.setSafetyFeatures(new P2<>(1.5, 1.5));
 
         wayPropertySet.addProperties(lane_only, lane_is_safer);
 
@@ -238,7 +238,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         OSMSpecifier lane_and_footway = new OSMSpecifier("cycleway=lane;highway=footway");
 
         WayProperties safer_and_peds = new WayProperties();
-        safer_and_peds.setSafetyFeatures(new P2<Double>(0.75, 0.75));
+        safer_and_peds.setSafetyFeatures(new P2<>(0.75, 0.75));
         safer_and_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
 
         wayPropertySet.addProperties(lane_and_footway, safer_and_peds);
@@ -248,7 +248,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         // add a mixin
         OSMSpecifier gravel = new OSMSpecifier("surface=gravel");
         WayProperties gravel_is_dangerous = new WayProperties();
-        gravel_is_dangerous.setSafetyFeatures(new P2<Double>(2.0, 2.0));
+        gravel_is_dangerous.setSafetyFeatures(new P2<>(2.0, 2.0));
         wayPropertySet.addProperties(gravel, gravel_is_dangerous, true);
 
         dataForWay = wayPropertySet.getDataForWay(way);
@@ -262,7 +262,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         OSMSpecifier track_only = new OSMSpecifier("highway=footway;cycleway=track");
         WayProperties track_is_safest = new WayProperties();
-        track_is_safest.setSafetyFeatures(new P2<Double>(0.25, 0.25));
+        track_is_safest.setSafetyFeatures(new P2<>(0.25, 0.25));
 
         wayPropertySet.addProperties(track_only, track_is_safest);
         dataForWay = wayPropertySet.getDataForWay(way);

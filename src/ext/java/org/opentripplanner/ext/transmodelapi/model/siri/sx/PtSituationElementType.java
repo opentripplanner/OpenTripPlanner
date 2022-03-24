@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
+import static org.opentripplanner.ext.transmodelapi.mapping.SeverityMapper.getTransmodelSeverity;
 
 public class PtSituationElementType {
   private static final String NAME = "PtSituationElement";
@@ -165,9 +166,15 @@ public class PtSituationElementType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("infoLinks")
-                    .type(new GraphQLList(infoLinkType))
+                    .type(new GraphQLList(new GraphQLNonNull(infoLinkType)))
                     .description("Optional links to more information.")
-                    .dataFetcher(environment -> null)
+                    .dataFetcher(environment -> {
+                        TransitAlert alert = environment.getSource();
+                        if (!alert.getAlertUrlList().isEmpty()) {
+                            return alert.getAlertUrlList();
+                        }
+                        return null;
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("validityPeriod")
@@ -196,7 +203,13 @@ public class PtSituationElementType {
                     .name("severity")
                     .type(EnumTypes.SEVERITY)
                     .description("Severity of this situation ")
-                    .dataFetcher(environment -> ((TransitAlert) environment.getSource()).severity)
+                    .dataFetcher(environment -> getTransmodelSeverity(((TransitAlert) environment.getSource()).severity))
+                    .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("priority")
+                    .type(Scalars.GraphQLInt)
+                    .description("Priority of this situation ")
+                    .dataFetcher(environment -> ((TransitAlert) environment.getSource()).priority)
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("reportAuthority")

@@ -1,10 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
-import java.util.ArrayList;
+import com.google.common.collect.Multimap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -16,13 +17,13 @@ import org.opentripplanner.model.TripPattern;
 class TripPatternMapperResult {
 
     /**
-     * A map from trip/serviceJourney id to a ordered list of scheduled stop point ids.
+     * A map from trip/serviceJourney id to an ordered list of scheduled stop point ids.
      */
     final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
 
     final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
 
-    final List<TripPattern> tripPatterns = new ArrayList<>();
+    final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
     /**
      * stopTimes by the timetabled-passing-time id

@@ -9,6 +9,7 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.util.TranslationHelper;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -18,22 +19,19 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 public class GTFSToOtpTransitServiceMapper {
     private final AgencyMapper agencyMapper;
 
-    private final StationMapper stationMapper = new StationMapper();
+    private final StationMapper stationMapper;
 
-    private final StopMapper stopMapper = new StopMapper();
+    private final StopMapper stopMapper;
 
-    private final EntranceMapper entranceMapper = new EntranceMapper();
+    private final EntranceMapper entranceMapper;
 
-    private final PathwayNodeMapper pathwayNodeMapper = new PathwayNodeMapper();
+    private final PathwayNodeMapper pathwayNodeMapper;
 
-    private final BoardingAreaMapper boardingAreaMapper = new BoardingAreaMapper();
+    private final BoardingAreaMapper boardingAreaMapper;
 
     private final LocationMapper locationMapper = new LocationMapper();
 
-    private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
-        stopMapper,
-        locationMapper
-    );
+    private final LocationGroupMapper locationGroupMapper;
 
     private final FareAttributeMapper fareAttributeMapper = new FareAttributeMapper();
 
@@ -45,12 +43,7 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final ServiceCalendarMapper serviceCalendarMapper = new ServiceCalendarMapper();
 
-    private final PathwayMapper pathwayMapper = new PathwayMapper(
-        stopMapper,
-        entranceMapper,
-        pathwayNodeMapper,
-        boardingAreaMapper
-    );
+    private final PathwayMapper pathwayMapper;
 
     private final RouteMapper routeMapper;
 
@@ -70,6 +63,7 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
 
+    private final TranslationHelper translationHelper;
 
     public GTFSToOtpTransitServiceMapper(
             String feedId,
@@ -78,9 +72,25 @@ public class GTFSToOtpTransitServiceMapper {
     ) {
         this.issueStore = issueStore;
         this.data = data;
+        translationHelper = new TranslationHelper();
         feedInfoMapper = new FeedInfoMapper(feedId);
         agencyMapper = new AgencyMapper(feedId);
-        routeMapper = new RouteMapper(agencyMapper);
+        stationMapper = new StationMapper(translationHelper);
+        stopMapper = new StopMapper(translationHelper);
+        entranceMapper = new EntranceMapper(translationHelper);
+        pathwayNodeMapper = new PathwayNodeMapper(translationHelper);
+        boardingAreaMapper = new BoardingAreaMapper(translationHelper);
+        locationGroupMapper = new LocationGroupMapper(
+                stopMapper,
+                locationMapper
+        );
+        pathwayMapper = new PathwayMapper(
+                stopMapper,
+                entranceMapper,
+                pathwayNodeMapper,
+                boardingAreaMapper
+        );
+        routeMapper = new RouteMapper(agencyMapper, issueStore);
         tripMapper = new TripMapper(routeMapper);
         bookingRuleMapper = new BookingRuleMapper();
         stopTimeMapper = new StopTimeMapper(stopMapper, locationMapper, locationGroupMapper, tripMapper, bookingRuleMapper);
@@ -95,6 +105,7 @@ public class GTFSToOtpTransitServiceMapper {
     }
 
     public void mapStopTripAndRouteDatantoBuilder() {
+        translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
         builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));
         builder.getCalendarDates().addAll(serviceCalendarDateMapper.map(data.getAllCalendarDates()));
@@ -128,7 +139,8 @@ public class GTFSToOtpTransitServiceMapper {
                 stationMapper,
                 stopMapper,
                 tripMapper,
-                builder.getStopTimesSortedByTrip()
+                builder.getStopTimesSortedByTrip(),
+                issueStore
         );
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
     }

@@ -1,30 +1,29 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TemporaryPartialStreetEdgeTest {
     
@@ -100,7 +99,7 @@ public class TemporaryPartialStreetEdgeTest {
     public void testTraversalOfSubdividedEdge() {
         DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
         Coordinate nearestPoint = new Coordinate(0.5, 2.0);
-        List<StreetEdge> edges = new ArrayList<StreetEdge>();
+        List<StreetEdge> edges = new ArrayList<>();
         edges.add(e2);
         TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocationForTest("middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true, tempEdges);
         TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
@@ -199,8 +198,7 @@ public class TemporaryPartialStreetEdgeTest {
     }
 
     private IntersectionVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
-        return v;
+        return new IntersectionVertex(graph, label, lat, lon);
     }
 
     /**
@@ -228,7 +226,7 @@ public class TemporaryPartialStreetEdgeTest {
      */
     private static class DummyCostModel implements IntersectionTraversalCostModel {
 
-        private double turnCostSecs;
+        private final double turnCostSecs;
         
         public DummyCostModel(double turnCostSecs) {
             this.turnCostSecs = turnCostSecs;

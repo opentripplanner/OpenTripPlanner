@@ -1,13 +1,7 @@
 package org.opentripplanner.api.resource;
 
-import org.geotools.geometry.Envelope2D;
-import org.opentripplanner.common.geometry.WebMercatorTile;
-import org.opentripplanner.common.geometry.MapTile;
-import org.opentripplanner.api.parameter.MIMEImageFormat;
-import org.opentripplanner.inspector.TileRenderer;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import javax.imageio.ImageIO;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,8 +11,13 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import org.geotools.geometry.Envelope2D;
+import org.opentripplanner.api.parameter.MIMEImageFormat;
+import org.opentripplanner.common.geometry.MapTile;
+import org.opentripplanner.common.geometry.WebMercatorTile;
+import org.opentripplanner.inspector.TileRenderer;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
@@ -46,34 +45,27 @@ import java.io.ByteArrayOutputStream;
 @Path("/routers/{ignoreRouterId}/inspector")
 public class GraphInspectorTileResource {
 
-    @Context
-    private OTPServer otpServer;
+    private final OTPServer otpServer;
 
-    @PathParam("x")
-    int x;
-
-    @PathParam("y")
-    int y;
-
-    @PathParam("z")
-    int z;
-
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated @PathParam("ignoreRouterId")
-    private String ignoreRouterId;
-
-    @PathParam("layer")
-    String layer;
-
-    @PathParam("ext")
-    String ext;
+    public GraphInspectorTileResource(
+            @Context
+            OTPServer otpServer,
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @Deprecated @PathParam("ignoreRouterId")
+            String ignoreRouterId
+    ) {
+        this.otpServer = otpServer;
+    }
 
     @GET @Path("/tile/{layer}/{z}/{x}/{y}.{ext}")
     @Produces("image/*")
-    public Response tileGet() throws Exception {
+    public Response tileGet(
+            @PathParam("x") int x, @PathParam("y") int y, @PathParam("z") int z,
+            @PathParam("layer") String layer, @PathParam("ext") String ext
+    ) throws Exception {
 
         // Re-use analyst
         Envelope2D env = WebMercatorTile.tile2Envelope(x, y, z);
@@ -102,8 +94,7 @@ public class GraphInspectorTileResource {
     public InspectorLayersList getLayers() {
 
         Router router = otpServer.getRouter();
-        InspectorLayersList layersList = new InspectorLayersList(router.tileRendererManager.getRenderers());
-        return layersList;
+        return new InspectorLayersList(router.tileRendererManager.getRenderers());
     }
 
 }

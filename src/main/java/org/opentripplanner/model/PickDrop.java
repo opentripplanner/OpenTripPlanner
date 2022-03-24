@@ -16,8 +16,16 @@ public enum PickDrop {
     this.gtfsCode = gtfsCode;
   }
 
+  public boolean is(PickDrop value) {
+    return this == value;
+  }
+
   public boolean isRoutable() {
     return routable;
+  }
+
+  public boolean isNotRoutable() {
+    return !routable;
   }
 
   public int getGtfsCode() {

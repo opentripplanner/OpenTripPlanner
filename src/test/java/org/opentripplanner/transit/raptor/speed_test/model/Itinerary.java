@@ -59,7 +59,7 @@ public class Itinerary {
      * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the
      * 6, then walks to their destination, has four legs.
      */
-    public List<Leg> legs = new ArrayList<Leg>();
+    public List<Leg> legs = new ArrayList<>();
 
     /** adds leg to array list */
     public void addLeg(Leg leg) {
@@ -84,7 +84,7 @@ public class Itinerary {
      * </pre>
      */
     public String details() {
-        PathStringBuilder buf = new PathStringBuilder(true);
+        PathStringBuilder buf = new PathStringBuilder(Integer::toString, true);
 
         for (Leg it : legs) {
             if(it.from != null && it.from.rrStopIndex >= 0) {

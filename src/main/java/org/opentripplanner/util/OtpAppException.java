@@ -17,7 +17,7 @@ import java.util.IllegalFormatException;
  *     <li>The configuration is not correct.</li>
  *     <li>
  *         The input data is missing or have severe errors and can not be processed. The later
- *         may be difficult to verify, in witch case another exception would be a better choice.
+ *         may be difficult to verify, in which case another exception would be a better choice.
  *      </li>
  *      <li>The command line parameters don´t match the input files.</li>
  *      <li>

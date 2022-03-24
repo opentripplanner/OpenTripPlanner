@@ -4,6 +4,7 @@ import static java.lang.Boolean.TRUE;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -18,16 +19,16 @@ import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
- * This toString builder witch add elements to a compact string of the form:
+ * This toString builder which add elements to a compact string of the form:
  * <p>
  * {@code ClassName{field1:value, field2:value, ...}}
  * <p>
  * Fields equals to 'ignoreValue' is NOT added to the result string. This produces a short and easy
  * to read result. You should use {@code null} as 'ignoreValue' if the field is nullable.
  * <p>
- * The naming of the 'add' methods should give a hint to witch type the value have, this make it
+ * The naming of the 'add' methods should give a hint to which type the value have, this make it
  * easier to choose the right method and less error prune as compared with relaying on pure
- * override, witch often result in a wrong method call.
+ * override, which often result in a wrong method call.
  * <p>
  * The builder should be independent of locale, the value should always be formatted the same way,
  * this allows us to use the toString in unit tests.
@@ -40,7 +41,7 @@ public class ToStringBuilder {
     private static final String NULL_VALUE = "null";
 
     private final StringBuilder sb = new StringBuilder();
-    private final NumberFormat numFormat = new NumberFormat();
+    private final OtpNumberFormat numFormat = new OtpNumberFormat();
 
     private SimpleDateFormat calendarTimeFormat;
     boolean first = true;
@@ -51,10 +52,19 @@ public class ToStringBuilder {
 
     /**
      * Create a ToStringBuilder for a regular POJO type. This builder
-     * will include metadata(class and field names) when building the to sting.
+     * will include metadata(class and field names) when building the to string.
      */
     public static ToStringBuilder of(Class<?> clazz) {
         return new ToStringBuilder(clazz.getSimpleName());
+    }
+
+    /**
+     * Create a ToStringBuilder for a regular POJO type without including the type in the name.
+     * Some classes are always embedded in other classes and the type is given, for these cases
+     * this builder make the toString a bit easier to read.
+     */
+    public static ToStringBuilder of() {
+        return new ToStringBuilder("");
     }
 
 
@@ -162,7 +172,7 @@ public class ToStringBuilder {
      * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss.
      * Note! The DATE is not printed. {@code null} value is ignored.
      */
-    public ToStringBuilder addCalTime(String name, Calendar time) {
+    public ToStringBuilder addTimeCal(String name, Calendar time) {
         return addIfNotNull(name, time, t -> formatTime(t.getTime()));
     }
 
@@ -195,6 +205,10 @@ public class ToStringBuilder {
                 .mapToObj(TimeUtils::timeToStrCompact)
                 .collect(Collectors.joining(" ", "[", "]"))
         );
+    }
+
+    public ToStringBuilder addTime(String name, Instant time) {
+        return addIfNotNull(name, time, Instant::toString);
     }
 
     /**

@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
-import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -11,30 +10,31 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
+import org.opentripplanner.graph_builder.issues.InterliningTeleport;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
@@ -49,10 +49,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
  * geometries. It also does some other postprocessing involving fares and interlined blocks.
+ *
+ * <p>
+ * THREAD SAFETY
+ * The computation runs in parallel so be careful about threadsafety when modifying the logic here.
  */
 public class GeometryAndBlockProcessor {
 
@@ -60,15 +65,18 @@ public class GeometryAndBlockProcessor {
 
     private DataImportIssueStore issueStore;
 
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-    private OtpTransitService transitService;
+    private final OtpTransitService transitService;
 
-    private Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new HashMap<ShapeSegmentKey, LineString>();
+    // this is threadsafe implementation
+    private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
 
-    private Map<FeedScopedId, LineString> geometriesByShapeId = new HashMap<FeedScopedId, LineString>();
+    // this is threadsafe implementation
+    private final Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
 
-    private Map<FeedScopedId, double[]> distancesByShapeId = new HashMap<>();
+    // this is threadsafe implementation
+    private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
 
     private FareServiceFactory fareServiceFactory;
 
@@ -102,7 +110,15 @@ public class GeometryAndBlockProcessor {
         run(graph, new DataImportIssueStore(false));
     }
 
-    /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
+    /**
+     * Generate the edges. Assumes that there are already vertices in the graph for the stops.
+     * <p>
+     * THREAD SAFETY
+     * The geometries for the trip patterns are computed in parallel. The collections needed for
+     * this are concurrent implementations and therefore threadsafe but the issue store, the graph,
+     * the OtpTransitService and others are not.
+     *
+     */
     @SuppressWarnings("Convert2MethodRef")
     public void run(Graph graph, DataImportIssueStore issueStore) {
         this.issueStore = issueStore;
@@ -121,7 +137,7 @@ public class GeometryAndBlockProcessor {
         // only the tripTimes (which don't have enough information to build a geometry). So we keep
         // them here. In the current design, a trip pattern does not have a single geometry, but
         // one per hop, so we store them in an array.
-        Map<TripPattern, LineString[]> geometriesByTripPattern = Maps.newHashMap();
+        Map<TripPattern, LineString[]> geometriesByTripPattern = new ConcurrentHashMap<>();
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
 
@@ -136,8 +152,8 @@ public class GeometryAndBlockProcessor {
         );
         LOG.info(progress.startMessage());
 
-        for (TripPattern tripPattern : tripPatterns) {
-            for (Trip trip : tripPattern.getTrips()) {
+        tripPatterns.parallelStream().forEach(tripPattern -> {
+            tripPattern.scheduledTripsAsStream().forEach(trip -> {
                 // create geometries if they aren't already created
                 // note that this is not only done on new trip patterns, because it is possible that
                 // there would be a trip pattern with no geometry yet because it failed some of these tests
@@ -147,10 +163,10 @@ public class GeometryAndBlockProcessor {
                     geometriesByTripPattern.put(tripPattern,
                             createGeometry(trip.getShapeId(), transitService.getStopTimesForTrip(trip)));
                 }
-            }
+            });
             //Keep lambda! A method-ref would causes incorrect class and line number to be logged
             progress.step(m -> LOG.info(m));
-        }
+        });
         LOG.info(progress.completeMessage());
 
         /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
@@ -167,7 +183,7 @@ public class GeometryAndBlockProcessor {
         }
 
         /* Identify interlined trips and create the necessary edges. */
-        interline(tripPatterns, graph);
+        interline(tripPatterns);
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
@@ -182,10 +198,10 @@ public class GeometryAndBlockProcessor {
      * Identify interlined trips (where a physical vehicle continues on to another logical trip)
      * and update the TripPatterns accordingly.
      */
-    private void interline(Collection<TripPattern> tripPatterns, Graph graph) {
+    private void interline(Collection<TripPattern> tripPatterns) {
 
         /* Record which Pattern each interlined TripTimes belongs to. */
-        Map<TripTimes, TripPattern> patternForTripTimes = Maps.newHashMap();
+        Map<TripTimes, TripPattern> patternForTripTimes = new HashMap<>();
 
         /* TripTimes grouped by the block ID and service ID of their trips. Must be a ListMultimap to allow sorting. */
         ListMultimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
@@ -224,8 +240,8 @@ public class GeometryAndBlockProcessor {
                     }
                     TripPattern prevPattern = patternForTripTimes.get(prev);
                     TripPattern currPattern = patternForTripTimes.get(curr);
-                    Stop fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
-                    Stop toStop = currPattern.getStop(0);
+                    var fromStop = prevPattern.lastStop();
+                    var toStop = currPattern.firstStop();
                     double teleportationDistance = SphericalDistanceLibrary.fastDistance(
                             fromStop.getLat(),
                             fromStop.getLon(),
@@ -233,10 +249,7 @@ public class GeometryAndBlockProcessor {
                             toStop.getLon()
                     );
                     if (teleportationDistance > maxInterlineDistance) {
-                        // FIXME Trimet data contains a lot of these -- in their data, two trips sharing a block ID just
-                        // means that they are served by the same vehicle, not that interlining is automatically allowed.
-                        // see #1654
-                        // LOG.error(graph.addBuilderAnnotation(new InterliningTeleport(prev.trip, block.blockId, (int)teleportationDistance)));
+                        issueStore.add(new InterliningTeleport(prev.getTrip(), block.blockId, (int)teleportationDistance));
                         // Only skip this particular interline edge; there may be other valid ones in the block.
                     } else {
                         interlines.put(new P2<>(prevPattern, currPattern),
@@ -247,13 +260,6 @@ public class GeometryAndBlockProcessor {
             }
         }
 
-        // Copy all interline relationships into the field holding them in the graph.
-        // TODO: verify whether we need to be keeping track of patterns at all here, or could just accumulate trip-trip relationships.
-        for (P2<TripPattern> patterns : interlines.keySet()) {
-            for (P2<Trip> trips : interlines.get(patterns)) {
-                graph.interlinedTrips.put(trips.first, trips.second);
-            }
-        }
         LOG.info("Done finding interlining trips.");
     }
 
@@ -351,6 +357,7 @@ public class GeometryAndBlockProcessor {
     }
 
     private List<LinearLocation> getLinearLocations(List<StopTime> stopTimes, LineString shape) {
+        var isFlexTrip = FlexTrip.containsFlexStops(stopTimes);
         // This trip does not have shape_dist in stop_times, but does have an associated shape.
         ArrayList<IndexedLineSegment> segments = new ArrayList<>();
         for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
@@ -374,7 +381,7 @@ public class GeometryAndBlockProcessor {
                     continue;
                 }
                 double distance = segment.distance(coord);
-                if (distance < maxStopToShapeSnapDistance) {
+                if (distance < maxStopToShapeSnapDistance || isFlexTrip) {
                     stopSegments.add(segment);
                     maxSegmentIndex = index;
                     if (minSegmentIndexForThisStop == -1)
@@ -636,16 +643,15 @@ public class GeometryAndBlockProcessor {
             i++;
         }
 
-        // If we don't have distances here, we can't calculate them ourselves because we can't
-        // assume the units will match
-        if (!hasAllDistances) {
-            distances = null;
-        }
-
         CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
         geometry = geometryFactory.createLineString(sequence);
         geometriesByShapeId.put(shapeId, geometry);
-        distancesByShapeId.put(shapeId, distances);
+
+        // If we don't have distances here, we can't calculate them ourselves because we can't
+        // assume the units will match
+        if(hasAllDistances) {
+            distancesByShapeId.put(shapeId, distances);
+        }
 
         return geometry;
     }

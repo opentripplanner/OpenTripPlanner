@@ -1,7 +1,14 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.Assert.assertEquals;
+
 import com.google.common.collect.Multimap;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopTime;
@@ -18,13 +25,6 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 public class NoticeAssignmentMapperTest {
 
@@ -53,6 +53,7 @@ public class NoticeAssignmentMapperTest {
         routesById.add(route);
 
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
+                new DataImportIssueStore(false),
                 MappingSupport.ID_FACTORY,
                 List.of(),
                 new HierarchicalMapById<>(),
@@ -97,6 +98,7 @@ public class NoticeAssignmentMapperTest {
                 .withNoticeRef(new NoticeRefStructure().withRef(NOTICE_ID));
 
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
+                new DataImportIssueStore(false),
                 MappingSupport.ID_FACTORY,
                 serviceJourneys,
                 noticesById,

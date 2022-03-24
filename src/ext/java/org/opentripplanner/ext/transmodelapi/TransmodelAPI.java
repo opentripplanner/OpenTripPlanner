@@ -1,16 +1,18 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import graphql.ExecutionResult;
 import graphql.schema.GraphQLSchema;
-import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import io.micrometer.core.instrument.Tag;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -21,17 +23,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import org.opentripplanner.api.json.GraphQLResponseSerializer;
+import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
 @Path("/routers/{ignoreRouterId}/transmodel/index")    // It would be nice to get rid of the final /index.
@@ -40,22 +43,22 @@ public class TransmodelAPI {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
 
-    private static GqlUtil gqlUtil;
     private static GraphQLSchema schema;
+    private static Collection<String> tracingHeaderTags;
 
     private final Router router;
-
     private final TransmodelGraph index;
     private final ObjectMapper deserializer = new ObjectMapper();
 
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated @PathParam("ignoreRouterId")
-    private String ignoreRouterId;
 
-    public TransmodelAPI(@Context OTPServer otpServer) {
+    public TransmodelAPI(
+            @Context OTPServer otpServer,
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+    ) {
         this.router = otpServer.getRouter();
         this.index = new TransmodelGraph(schema);
     }
@@ -66,14 +69,15 @@ public class TransmodelAPI {
      * was done more explicit and enforced, not relaying on a "static" setup method to be called.
      */
     public static void setUp(
-        boolean hideFeedId,
+        TransmodelAPIParameters config,
         Graph graph,
         RoutingRequest defaultRoutingRequest
     ) {
-        if(hideFeedId) {
+        if(config.hideFeedId()) {
           TransitIdMapper.setupFixedFeedId(graph.getAgencies());
         }
-        gqlUtil = new GqlUtil(graph.getTimeZone());
+        tracingHeaderTags = config.tracingHeaderTags();
+        GqlUtil gqlUtil = new GqlUtil(graph.getTimeZone());
         schema = TransmodelGraphQLSchema.create(defaultRoutingRequest, gqlUtil);
     }
 
@@ -89,7 +93,11 @@ public class TransmodelAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL(HashMap<String, Object> queryParameters, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
+    public Response getGraphQL(
+            HashMap<String, Object> queryParameters,
+            @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
+            @Context HttpHeaders headers
+    ) {
         if (queryParameters==null || !queryParameters.containsKey("query")) {
             LOG.debug("No query found in body");
             throw new BadRequestException("No query found in body");
@@ -110,24 +118,46 @@ public class TransmodelAPI {
         } else {
             variables = new HashMap<>();
         }
-        return index.getGraphQLResponse(query, router, variables, operationName, maxResolves);
+        return index.getGraphQLResponse(
+            query,
+            router,
+            variables,
+            operationName,
+            maxResolves,
+            getTagsFromHeaders(headers)
+        );
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL(String query, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
-        return index.getGraphQLResponse(query, router, null, null, maxResolves);
+    public Response getGraphQL(
+            String query,
+            @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
+            @Context HttpHeaders headers
+    ) {
+        return index.getGraphQLResponse(
+            query,
+            router,
+            null,
+            null,
+            maxResolves,
+            getTagsFromHeaders(headers)
+        );
     }
 
     @POST
     @Path("/graphql/batch")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQLBatch(List<HashMap<String, Object>> queries, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
-        List<Map<String, Object>> responses = new ArrayList<>();
-        List<Callable<Map>> futures = new ArrayList();
+    public Response getGraphQLBatch(
+            List<HashMap<String, Object>> queries,
+            @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout,
+            @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
+            @Context HttpHeaders headers
+    ) {
+        List<Callable<ExecutionResult>> futures = new ArrayList<>();
 
-        for (HashMap<String, Object> query : queries) {
+        for (Map<String, Object> query : queries) {
             Map<String, Object> variables;
             if (query.get("variables") instanceof Map) {
                 variables = (Map) query.get("variables");
@@ -142,22 +172,34 @@ public class TransmodelAPI {
             }
             String operationName = (String) query.getOrDefault("operationName", null);
 
-            futures.add(() -> index.getGraphQLExecutionResult((String) query.get("query"), router,
-                    variables, operationName, maxResolves));
+            futures.add(() -> index.getGraphQLExecutionResult(
+                (String) query.get("query"),
+                router,
+                variables,
+                operationName,
+                maxResolves,
+                getTagsFromHeaders(headers)
+            ));
         }
 
         try {
-            List<Future<Map>> results = index.threadPool.invokeAll(futures);
-
-            for (int i = 0; i < queries.size(); i++) {
-                HashMap<String, Object> response = new HashMap<>();
-                response.put("id", queries.get(i).get("id"));
-                response.put("payload", results.get(i).get());
-                responses.add(response);
-            }
-        } catch (CancellationException | ExecutionException | InterruptedException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            List<Future<ExecutionResult>> results = index.threadPool.invokeAll(futures);
+            return Response
+                .status(Response.Status.OK)
+                .entity(GraphQLResponseSerializer.serializeBatch(queries, results))
+                .build();
+        } catch (InterruptedException e) {
+            LOG.error("Batch query interrupted", e);
+            throw new RuntimeException(e);
         }
-        return Response.status(Response.Status.OK).entity(responses).build();
+    }
+
+    private static Iterable<Tag> getTagsFromHeaders(HttpHeaders headers) {
+        return tracingHeaderTags.stream()
+            .map(header -> {
+                String value = headers.getHeaderString(header);
+                return Tag.of(header, value == null ? "__UNKNOWN__" : value);
+            })
+            .collect(Collectors.toList());
     }
 }

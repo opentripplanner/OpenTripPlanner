@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNull;
 
 public class GsDataSourceRepositoryTest {
 
-    private GsDataSourceRepository subject = new GsDataSourceRepository(null);
+    private final GsDataSourceRepository subject = new GsDataSourceRepository(null);
 
     @Test
     public void description() {

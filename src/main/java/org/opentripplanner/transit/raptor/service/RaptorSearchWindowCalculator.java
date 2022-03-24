@@ -85,9 +85,6 @@ public class RaptorSearchWindowCalculator {
         // TravelWindow is the time from the earliest-departure-time to the latest-arrival-time
         int travelWindow = searchWindowSeconds + roundUpToNearestMinute(heuristicMinTransitTime);
 
-        if (!params.isLatestArrivalTimeSet()) {
-            latestArrivalTime = earliestDepartureTime + travelWindow;
-        }
         if (!params.isEarliestDepartureTimeSet()) {
             earliestDepartureTime = latestArrivalTime - travelWindow;
         }

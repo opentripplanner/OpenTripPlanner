@@ -18,13 +18,7 @@ public class GraphPath {
 
     public LinkedList<Edge> edges;
 
-    // needed to track repeat invocations of path-reversing methods
-    private boolean back;
-
     private double walkDistance = 0;
-
-    // don't really need to save this (available through State) but why not
-    private RoutingContext rctx;
 
     /**
      * Construct a GraphPath based on the given state by following back-edge fields all the way back
@@ -39,13 +33,12 @@ public class GraphPath {
      *
      */
     public GraphPath(State s) {
-        this.rctx = s.getContext();
-        this.back = s.getOptions().arriveBy;
+        walkDistance = s.getWalkDistance();
 
         /* Put path in chronological order */
         State lastState;
-        walkDistance = s.getWalkDistance();
-        if (back) {
+        // needed to track repeat invocations of path-reversing methods
+        if (s.getOptions().arriveBy) {
             lastState = s.reverse();
         } else {
             lastState = s;
@@ -160,10 +153,6 @@ public class GraphPath {
 
     public double getWalkDistance() {
         return walkDistance;
-    }
-    
-    public RoutingContext getRoutingContext() {
-        return rctx;
     }
 
 }

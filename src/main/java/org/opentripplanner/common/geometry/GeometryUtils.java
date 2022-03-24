@@ -11,6 +11,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;
 import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
@@ -25,8 +26,8 @@ import java.util.List;
 public class GeometryUtils {
     private static final Logger LOG = LoggerFactory.getLogger(GeometryUtils.class);
 
-    private static CoordinateSequenceFactory csf = new Serializable2DPackedCoordinateSequenceFactory();
-    private static GeometryFactory gf = new GeometryFactory(csf);
+    private static final CoordinateSequenceFactory csf = new PackedCoordinateSequenceFactory();
+    private static final GeometryFactory gf = new GeometryFactory(csf);
 
     /** A shared copy of the WGS84 CRS with longitude-first axis order. */
     public static final CoordinateReferenceSystem WGS84_XY;
@@ -46,6 +47,11 @@ public class GeometryUtils {
             coordinates[i / 2] = new Coordinate(coords[i], coords[i+1]);
         }
         return factory.createLineString(coordinates);
+    }
+
+    public static LineString makeLineString(List<Coordinate> coordinates) {
+        GeometryFactory factory = getGeometryFactory();
+        return factory.createLineString(coordinates.toArray(new Coordinate[]{}));
     }
 
     public static LineString makeLineString(Coordinate[] coordinates) {
@@ -94,7 +100,7 @@ public class GeometryUtils {
         LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
         LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
 
-        return new P2<LineString>(beginning, ending);
+        return new P2<>(beginning, ending);
     }
     
     /**
@@ -120,7 +126,7 @@ public class GeometryUtils {
         LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
         LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
 
-        return new P2<LineString>(beginning, ending);
+        return new P2<>(beginning, ending);
     }
 
     /**
@@ -171,8 +177,11 @@ public class GeometryUtils {
         throws UnsupportedGeometryException {
         if (geoJsonGeom instanceof org.geojson.Point) {
             org.geojson.Point geoJsonPoint = (org.geojson.Point) geoJsonGeom;
-            return gf.createPoint(new Coordinate(geoJsonPoint.getCoordinates().getLongitude(), geoJsonPoint
-                .getCoordinates().getLatitude()));
+            return gf.createPoint(new Coordinate(
+                    geoJsonPoint.getCoordinates().getLongitude(),
+                    geoJsonPoint.getCoordinates().getLatitude(),
+                    geoJsonPoint.getCoordinates().getAltitude()
+            ));
 
         } else if (geoJsonGeom instanceof org.geojson.Polygon) {
             org.geojson.Polygon geoJsonPolygon = (org.geojson.Polygon) geoJsonGeom;
@@ -219,8 +228,14 @@ public class GeometryUtils {
         Coordinate[] coords = new Coordinate[path.size()];
         int i = 0;
         for (LngLatAlt p : path) {
-            coords[i++] = new Coordinate(p.getLongitude(), p.getLatitude());
+            // the serialization library does serialize a 0 but not a NaN
+            coords[i++] = new Coordinate(
+                    p.getLongitude(),
+                    p.getLatitude(),
+                    p.getAltitude()
+            );
         }
         return coords;
     }
+
 }

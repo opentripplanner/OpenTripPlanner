@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -25,7 +26,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     private int maxNumberOfTransfers;
     private double relaxCostAtDestination;
     private boolean timetableEnabled;
-    private boolean guaranteedTransfersEnabled;
+    private boolean constrainedTransfersEnabled;
     private final Collection<RaptorTransfer> accessPaths = new ArrayList<>();
     private final Collection<RaptorTransfer> egressPaths = new ArrayList<>();
 
@@ -39,7 +40,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
         this.timetableEnabled = defaults.timetableEnabled();
-        this.guaranteedTransfersEnabled = defaults.guaranteedTransfersEnabled();
+        this.constrainedTransfersEnabled = defaults.constrainedTransfersEnabled();
         this.accessPaths.addAll(defaults.accessPaths());
         this.egressPaths.addAll(defaults.egressPaths());
     }
@@ -132,12 +133,12 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public boolean guaranteedTransfersEnabled() {
-        return guaranteedTransfersEnabled;
+    public boolean constrainedTransfersEnabled() {
+        return constrainedTransfersEnabled;
     }
 
-    public SearchParamsBuilder<T> guaranteedTransfersEnabled(boolean enable) {
-        this.guaranteedTransfersEnabled = enable;
+    public SearchParamsBuilder<T> constrainedTransfersEnabled(boolean enable) {
+        this.constrainedTransfersEnabled = enable;
         return this;
     }
 
@@ -176,4 +177,16 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return new SearchParams(this);
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(SearchParams.class)
+                .addServiceTime("earliestDepartureTime", earliestDepartureTime, SearchParams.TIME_NOT_SET)
+                .addServiceTime("latestArrivalTime", latestArrivalTime, SearchParams.TIME_NOT_SET)
+                .addDurationSec("searchWindow", searchWindowInSeconds)
+                .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
+                .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+                .addCollection("accessPaths", accessPaths, 5)
+                .addCollection("egressPaths", egressPaths, 5)
+                .toString();
+    }
 }

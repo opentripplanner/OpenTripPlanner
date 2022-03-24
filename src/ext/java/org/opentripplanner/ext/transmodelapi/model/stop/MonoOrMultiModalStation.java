@@ -4,10 +4,11 @@ import org.opentripplanner.model.*;
 
 import java.util.Collection;
 import java.util.TimeZone;
+import org.opentripplanner.util.I18NString;
 
 public class MonoOrMultiModalStation extends TransitEntity {
 
-  private final String name;
+  private final I18NString name;
 
   private final double lat;
 
@@ -26,11 +27,11 @@ public class MonoOrMultiModalStation extends TransitEntity {
   /**
    * URL to a web page containing information about this particular station
    */
-  private final String url;
+  private final I18NString url;
 
   private final TimeZone timezone;
 
-  private final Collection<Stop> childStops;
+  private final Collection<StopLocation> childStops;
 
   private final MonoOrMultiModalStation parentStation;
 
@@ -64,7 +65,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     this.parentStation = null;
   }
 
-  public String getName() {
+  public I18NString getName() {
     return name;
   }
 
@@ -84,7 +85,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     return description;
   }
 
-  public String getUrl() {
+  public I18NString getUrl() {
     return url;
   }
 
@@ -92,7 +93,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
     return timezone;
   }
 
-  public Collection<Stop> getChildStops() {
+  public Collection<StopLocation> getChildStops() {
     return childStops;
   }
 

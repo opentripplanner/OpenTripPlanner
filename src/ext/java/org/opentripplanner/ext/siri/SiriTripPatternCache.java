@@ -3,7 +3,13 @@ package org.opentripplanner.ext.siri;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.validation.constraints.NotNull;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -11,12 +17,6 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.validation.constraints.NotNull;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
@@ -27,7 +27,7 @@ public class SiriTripPatternCache {
 
     private final Map<StopPatternServiceDateKey, TripPattern> cache = new HashMap<>();
 
-    private final ListMultimap<Stop, TripPattern> patternsForStop = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
+    private final ListMultimap<StopLocation, TripPattern> patternsForStop = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
 
     private final Map<TripServiceDateKey, TripPattern> updatedTripPatternsForTripCache = new HashMap<>();
 
@@ -124,13 +124,12 @@ public class SiriTripPatternCache {
          */
         TripServiceDateKey tripServiceDateKey = new TripServiceDateKey(trip, serviceDate);
         if (updatedTripPatternsForTripCache.containsKey(tripServiceDateKey)) {
-            /**
-             * Remove previously added TripPatterns for the trip currently being updated - if the stopPattern does not match
-             */
+            // Remove previously added TripPatterns for the trip currently being updated - if the stopPattern does not match
             TripPattern cachedTripPattern = updatedTripPatternsForTripCache.get(tripServiceDateKey);
-            if (cachedTripPattern != null && !tripPattern
-                .getStopPattern()
-                .equals(cachedTripPattern.getStopPattern())) {
+            if (
+                    cachedTripPattern != null &&
+                    !tripPattern.stopPatternIsEqual(cachedTripPattern)
+            ) {
                 int sizeBefore = patternsForStop.values().size();
                 long t1 = System.currentTimeMillis();
                 patternsForStop.values().removeAll(Arrays.asList(cachedTripPattern));
@@ -145,15 +144,13 @@ public class SiriTripPatternCache {
         }
 
         // To make these trip patterns visible for departureRow searches.
-        for (Stop stop: tripPattern.getStops()) {
+        for (var stop: tripPattern.getStops()) {
             if (!patternsForStop.containsEntry(stop, tripPattern)) {
                 patternsForStop.put(stop, tripPattern);
             }
         }
 
-        /**
-         * Cache the last added tripPattern that has been used to update a specific trip
-         */
+        // Cache the last added tripPattern that has been used to update a specific trip
         updatedTripPatternsForTripCache.put(tripServiceDateKey, tripPattern);
 
         return tripPattern;

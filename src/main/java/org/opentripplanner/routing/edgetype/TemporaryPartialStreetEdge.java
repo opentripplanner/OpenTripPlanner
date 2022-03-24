@@ -2,15 +2,11 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.I18NString;
-
-import java.util.List;
 
 
 final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge implements TemporaryEdge {
@@ -48,13 +44,10 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
      */
     TemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
             LineString geometry, I18NString name) {
-        super(v1, v2, geometry, name, 0, parentEdge.getPermission(), false);
+        super(v1, v2, geometry, name, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
         this.geometry = super.getGeometry();
         setCarSpeed(parentEdge.getCarSpeed());
-
-        // No length is known, so we use the provided geometry to estimate it
-        calculateLengthFromGeometry();
         setElevationProfileUsingParents();
     }
 
@@ -85,14 +78,6 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     @Override
     public int getOutAngle() {
         return parentEdge.getInAngle();
-    }
-
-    /**
-     * Have the turn restrictions of  their parent.
-     */
-    @Override
-    protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
-        return graph.getTurnRestrictions(parentEdge);
     }
 
     /**
@@ -134,7 +119,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
 
     @Override
     public String toString() {
-        return "TemporaryPartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
+        return "TemporaryPartialStreetEdge(" + this.getDefaultName() + ", " + this.getFromVertex() + " -> "
                 + this.getToVertex() + " length=" + this.getDistanceMeters() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
     }

@@ -4,18 +4,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
+import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class is an object representation of the 'build-config.json'.
@@ -45,7 +50,7 @@ public class BuildConfig {
     private final JsonNode rawJson;
 
     /**
-     * The config-version is a parameter witch each OTP deployment may set to be able to
+     * The config-version is a parameter which each OTP deployment may set to be able to
      * query the OTP server and verify that it uses the correct version of the config. The
      * version must be injected into the config in the operation deployment pipeline. How this
      * is done is up to the deployment.
@@ -75,11 +80,6 @@ public class BuildConfig {
      * Include all transit input files (GTFS) from scanned directory.
      */
     public final boolean transit;
-
-    /**
-     * Create direct transfer edges from transfers.txt in GTFS, instead of based on distance.
-     */
-    public final boolean useTransfersTxt;
 
     /**
      * Link GTFS stops to their parent stops.
@@ -157,11 +157,6 @@ public class BuildConfig {
      * value is {@code false}.
      */
     public final boolean osmCacheDataInMem;
-
-    /**
-     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
-     */
-    public boolean staticBikeRental;
 
     /**
      * Whether we should create car P+R stations from OSM data.
@@ -302,10 +297,24 @@ public class BuildConfig {
      */
     public final StorageConfig storage;
 
+    public final List<RoutingRequest> transferRequests;
+
     /**
      * Visibility calculations for an area will not be done if there are more nodes than this limit.
      */
     public final int maxAreaNodes;
+
+    /**
+     * Config for the DataOverlay Sandbox module
+     */
+    public final DataOverlayConfig dataOverlay;
+
+    /**
+     * This field is used for mapping routes geometry shapes.
+     * It determines max distance between shape points and their stop sequence.
+     * If mapper can not find any stops within this radius it will default to simple stop-to-stop geometry instead.
+     */
+    public final double maxStopToShapeSnapDistance;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -337,6 +346,7 @@ public class BuildConfig {
         maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
         maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
         maxTransferDurationSeconds = c.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
+        maxStopToShapeSnapDistance = c.asDouble("maxStopToShapeSnapDistance", 150);
         multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
         osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
         osmWayPropertySet = WayPropertySetSource.fromConfig(c.asText("osmWayPropertySet", "default"));
@@ -344,7 +354,6 @@ public class BuildConfig {
         platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
         readCachedElevations = c.asBoolean("readCachedElevations", true);
         staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
-        staticBikeRental = c.asBoolean("staticBikeRental", false);
         staticParkAndRide = c.asBoolean("staticParkAndRide", true);
         stationTransfers = c.asBoolean("stationTransfers", false);
         streets = c.asBoolean("streets", true);
@@ -352,7 +361,6 @@ public class BuildConfig {
         transit = c.asBoolean("transit", true);
         transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
-        useTransfersTxt = c.asBoolean("useTransfersTxt", false);
         writeCachedElevations = c.asBoolean("writeCachedElevations", false);
         maxAreaNodes = c.asInt("maxAreaNodes", 500);
 
@@ -361,6 +369,18 @@ public class BuildConfig {
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
         netex = new NetexConfig(c.path("netex"));
         storage = new StorageConfig(c.path("storage"));
+        dataOverlay = DataOverlayConfigMapper.map(c.path("dataOverlay"));
+
+        if (c.path("transferRequests").isNonEmptyArray()) {
+            transferRequests = c
+                .path("transferRequests")
+                .asList()
+                .stream()
+                .map(RoutingRequestMapper::mapRoutingRequest)
+                .collect(Collectors.toUnmodifiableList());
+        } else {
+            transferRequests = List.of(new RoutingRequest());
+        }
 
         if(logUnusedParams) {
             c.logAllUnusedParameters(LOG);

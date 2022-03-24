@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.opentripplanner.util.I18NString;
+
 /**
  * A place along a platform, where the vehicle van be boarded. Equivalent to GTFS stop location.
  */
@@ -12,7 +14,7 @@ public final class BoardingArea extends StationElement {
 
   public BoardingArea(
           FeedScopedId id,
-          String name,
+          I18NString name,
           String code,
           String description,
           WgsCoordinate coordinate,
@@ -39,7 +41,7 @@ public final class BoardingArea extends StationElement {
   }
 
   /**
-   * Returns the parent stop whis boarding area belongs to.
+   * Returns the parent stop this boarding area belongs to.
    */
   public Stop getParentStop() {
     return parentStop;

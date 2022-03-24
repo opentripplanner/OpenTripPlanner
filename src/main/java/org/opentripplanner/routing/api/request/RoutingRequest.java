@@ -1,35 +1,22 @@
 package org.opentripplanner.routing.api.request;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import javax.annotation.Nonnull;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.common.LocationStringParser;
-import org.opentripplanner.api.common.Message;
-import org.opentripplanner.api.common.ParameterException;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.model.plan.pagecursor.PageCursor;
+import org.opentripplanner.model.plan.pagecursor.PageType;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
@@ -46,9 +33,33 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
@@ -74,10 +85,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
+    private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
+
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
     /** The complete list of incoming query parameters. */
-    public final HashMap<String, String> parameters = new HashMap<String, String>();
+    public final HashMap<String, String> parameters = new HashMap<>();
 
     /** The start location */
     public GenericLocation from;
@@ -110,7 +123,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * limit and should therefore be set high. Results close to the limit are not guaranteed to be
      * optimal. Use filters to limit what is presented to the client.
      *
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
+     * @see ItineraryListFilter
      */
     public double maxDirectStreetDurationSeconds = Duration.ofHours(4).toSeconds();
 
@@ -119,7 +132,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * performance limit and should therefore be set high. Results close to the limit are not
      * guaranteed to be optimal. Use filters to limit what is presented to the client.
      *
-     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter
+     * @see ItineraryListFilter
      */
     public double maxAccessEgressDurationSeconds = Duration.ofMinutes(45).toSeconds();
 
@@ -140,7 +153,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,
-        EnumSet.allOf(TransitMode.class)
+        AllowedTransitMode.getAllTransitModes()
     );
 
     /**
@@ -154,8 +167,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     public BicycleOptimizeType bicycleOptimizeType = BicycleOptimizeType.SAFE;
 
-    /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
-    public long dateTime = new Date().getTime() / 1000;
+    /**
+     * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
+     * arriveBy is true)
+     */
+    private Instant dateTime = Instant.now();
 
     /**
      * This is the time/duration in seconds from the earliest-departure-time(EDT) to
@@ -168,13 +184,40 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * Transit search as well; Hence this is named search-window and not raptor-search-window. Do
      * not confuse this with the travel-window, which is the time between EDT to LAT.
      * <p>
-     * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value is
-     * dynamically  assigned a suitable value, if not set. In a small to medium size operation
+     * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value
+     * is dynamically  assigned a suitable value, if not set. In a small to medium size operation
      * you may use a fixed value, like 60 minutes. If you have a mixture of high frequency cities
      * routes and infrequent long distant journeys, the best option is normally to use the dynamic
      * auto assignment.
+     * <p>
+     * There is no need to set this when going to the next/previous page any more.
      */
     public Duration searchWindow;
+
+    /**
+     * The expected maximum time a journey can last across all possible journeys for the current deployment.
+     * Normally you would just do an estimate and add enough slack, so you are sure that there is no journeys that
+     * falls outside this window. The parameter is used find all possible dates for the journey and then search only
+     * the services which run on those dates. The duration must include access, egress, wait-time and transit time
+     * for the whole journey. It should also take low frequency days/periods like holidays into account. In other words,
+     * pick the two points within your area that has the worst connection and then try to travel on the worst possible
+     * day, and find the maximum journey duration. Using a value that is too high has the effect of including more
+     * patterns in the search, hence, making it a bit slower. Recommended values would be from 12 hours(small
+     * town/city), 1 day (region) to 2 days (country like Norway).
+     */
+    public Duration maxJourneyDuration = Duration.ofHours(24);
+
+    /**
+     * Use the cursor to go to the next or previous "page" of trips.
+     * You should pass in the original request as is.
+     * <p>
+     * The next page of itineraries will depart after the current results
+     * and the previous page of itineraries will depart before the current results.
+     * <p>
+     * The paging does not support timeTableView=false and arriveBy=true, this will result in
+     * none pareto-optimal results.
+     */
+    public PageCursor pageCursor;
 
     /**
      * Search for the best trip options within a time window. If {@code true} two itineraries are
@@ -233,7 +276,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
-    // TODO OTP2 Maybe this should be up to the API?
     public boolean showIntermediateStops = false;
 
     /** max walk/bike speed along streets, in meters per second */
@@ -275,7 +317,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
 
     /** Configure the transfer optimization */
-    public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest(this);
+    public final TransferOptimizationParameters transferOptimization = new TransferOptimizationRequest();
 
     /**
      * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add
@@ -287,7 +329,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * This is a scalar multiplied with the time in second on board the transit vehicle. Default
      * value is not-set(empty map).
      */
-    private Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
+    private final Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
@@ -301,6 +343,18 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double bikeReluctance = 2.0;
 
     public double carReluctance = 2.0;
+
+
+    /**
+     * How much more time does it take to walk a flight of stairs compared to walking a similar
+     * horizontal length
+     *
+     * Default value is based on:
+     * Fujiyama, T., & Tyler, N. (2010).
+     * Predicting the walking speed of pedestrians on stairs.
+     * Transportation Planning and Technology, 33(2), 177–202.
+     */
+    public double stairsTimeFactor = 3.0;
 
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
@@ -332,25 +386,43 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /** Cost of getting on and off your own bike */
     public int bikeSwitchCost;
 
-    /** Time to rent a bike */
-    public int bikeRentalPickupTime = 60;
+    /** Time to rent a vehicle */
+    public int vehicleRentalPickupTime = 60;
 
     /**
-     * Cost of renting a bike. The cost is a bit more than actual time to model the associated cost and trouble.
+     * Cost of renting a vehicle. The cost is a bit more than actual time to model the associated cost and trouble.
      */
-    public int bikeRentalPickupCost = 120;
+    public int vehicleRentalPickupCost = 120;
 
-    /** Time to drop-off a rented bike */
-    public int bikeRentalDropoffTime = 30;
+    /** Time to drop-off a rented vehicle */
+    public int vehicleRentalDropoffTime = 30;
 
-    /** Cost of dropping-off a rented bike */
-    public int bikeRentalDropoffCost = 30;
+    /** Cost of dropping-off a rented vehicle */
+    public int vehicleRentalDropoffCost = 30;
+
+    /** The vehicle rental networks which may be used. If empty all networks may be used. */
+    public Set<String> allowedVehicleRentalNetworks = Set.of();
+
+    /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+    public Set<String> bannedVehicleRentalNetworks = Set.of();
 
     /** Time to park a bike */
     public int bikeParkTime = 60;
 
     /** Cost of parking a bike. */
     public int bikeParkCost = 120;
+
+    /** Time to park a car */
+    public int carParkTime = 60;
+
+    /** Cost of parking a car. */
+    public int carParkCost = 120;
+
+    /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
+    public Set<String> requiredVehicleParkingTags = Set.of();
+
+    /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
+    public Set<String> bannedVehicleParkingTags = Set.of();
 
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
@@ -468,11 +540,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     /**
      * Do not use certain trips
-     *
-     * @deprecated TODO OTP2: Needs to be implemented
      */
-    @Deprecated
-    public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
+    public Set<FeedScopedId> bannedTrips = Set.of();
 
     /**
      * A global minimum transfer time (in seconds) that specifies the minimum amount of time that
@@ -506,7 +575,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * <p>
      * Unit is seconds. Default value is not-set(empty map).
      */
-    public Map<TraverseMode, Integer> boardSlackForMode = new HashMap<>();
+    public Map<TransitMode, Integer> boardSlackForMode = new EnumMap<>(TransitMode.class);
 
     /**
      * The number of seconds to add after alighting a transit leg. It is recommended to use the
@@ -526,7 +595,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * <p>
      * Unit is seconds. Default value is not-set(empty map).
      */
-    public Map<TraverseMode, Integer> alightSlackForMode = new HashMap<>();
+    public Map<TransitMode, Integer> alightSlackForMode = new EnumMap<>(TransitMode.class);
 
     /**
      * Ideally maxTransfers should be set in the router config, not here. Instead the client should
@@ -537,7 +606,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * old limit, but that have side-effects that you might not find any trips on a day where a
      * critical part of the trip is not available, because of some real-time disruption.
      *
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     public Integer maxTransfers = 12;
 
@@ -554,25 +623,25 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double bikeTriangleSafetyFactor;
 
     /**
-     * Whether or not bike rental availability information will be used to plan bike rental trips
+     * Whether or not vehicle rental availability information will be used to plan vehicle rental trips
      */
-    public boolean useBikeRentalAvailabilityInformation = false;
+    public boolean useVehicleRentalAvailabilityInformation = false;
 
     /**
      * Whether arriving at the destination with a rented (station) bicycle is allowed without
      * dropping it off.
      *
-     * @see RoutingRequest#keepingRentedBicycleAtDestinationCost
-     * @see org.opentripplanner.routing.bike_rental.BikeRentalStation#isKeepingBicycleRentalAtDestinationAllowed
+     * @see RoutingRequest#keepingRentedVehicleAtDestinationCost
+     * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
      */
-    public boolean allowKeepingRentedBicycleAtDestination = false;
+    public boolean allowKeepingRentedVehicleAtDestination = false;
 
     /**
      * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
      *
-     * @see RoutingRequest#allowKeepingRentedBicycleAtDestination
+     * @see RoutingRequest#allowKeepingRentedVehicleAtDestination
      */
-    public double keepingRentedBicycleAtDestinationCost = 0;
+    public double keepingRentedVehicleAtDestinationCost = 0;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.
@@ -644,10 +713,16 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
       Additional flags affecting mode transitions.
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
     */
-    public boolean bikeRental = false;
-    public boolean bikeParkAndRide = false;
+    public boolean vehicleRental = false;
     public boolean parkAndRide  = false;
     public boolean carPickup = false;
+
+    public Set<FormFactor> allowedRentalFormFactors = new HashSet<>();
+
+    /**
+     * If true vehicle parking availability information will be used to plan park and ride trips where it exists.
+     */
+    public boolean useVehicleParkingAvailabilityInformation = false;
 
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
@@ -681,20 +756,16 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public ItineraryFilterParameters itineraryFilters = ItineraryFilterParameters.createDefault();
 
     /**
-     * The numbers of days before the search date to consider when filtering trips for this search.
-     * This is set to 1 to account for trips starting yesterday and crossing midnight so that they
-     * can be boarded today. If there are trips that last multiple days, this will need to be
-     * increased.
+     * The filled request parameters for penalties and thresholds values
      */
-    public int additionalSearchDaysBeforeToday = 1;
+    public DataOverlayParameters dataOverlay = null;
+
 
     /**
-     * The number of days after the search date to consider when filtering trips for this search.
-     * This is set to 1 to account for searches today having a search window that crosses midnight
-     * and would also need to board trips starting tomorrow. If a search window that lasts more than
-     * a day is used, this will need to be increased.
+     * Raptor can print all events when arriving at stops to system error. For developers only.
      */
-    public int additionalSearchDaysAfterToday = 2;
+    public DebugRaptor raptorDebuging = null;
+
 
     /* CONSTRUCTORS */
 
@@ -733,14 +804,15 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.setStreetSubRequestModes(modeSet);
     }
 
+    public RoutingRequest(RequestModes modes) {
+        this();
+        this.modes = modes;
+    }
+
     /* ACCESSOR/SETTER METHODS */
 
     public boolean transitAllowed() {
         return streetSubRequestModes.isTransit();
-    }
-
-    public long getSecondsSinceEpoch() {
-        return dateTime;
     }
 
     public void setArriveBy(boolean arriveBy) {
@@ -895,6 +967,17 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         whiteListedRoutes = RouteMatcher.idMatcher(routeIds);
     }
 
+    public void setBannedTrips(List<FeedScopedId> ids) {
+        if (ids != null) {
+            bannedTrips = Set.copyOf(ids);
+        }
+    }
+
+    public void setBannedTripsFromString(String ids) {
+        if (!ids.isEmpty()) {
+            bannedTrips = FeedScopedId.parseListOfIds(ids);
+        }
+    }
 
     public void setFromString(String from) {
         this.from = LocationStringParser.fromOldStyleString(from);
@@ -911,24 +994,99 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         streetSubRequestModes.setMode(mode, true);
     }
 
-    public Date getDateTime() {
-        return new Date(dateTime * 1000);
+    /**
+     * The search time for the current request. If the client have moved to the next page
+     * then this is the adjusted search time - the dateTime passed in is ignored and replaced with
+     * by a time from the pageToken.
+     */
+    public Instant getDateTime() {
+        return dateTime;
     }
 
-    public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime.getTime() / 1000;
+    public void setDateTime(Instant dateTime) {
+        this.dateTime = dateTime;
     }
 
     public void setDateTime(String date, String time, TimeZone tz) {
         Date dateObject = DateUtils.toDate(date, time, tz);
-        setDateTime(dateObject);
+        setDateTime(dateObject == null ? Instant.now() : dateObject.toInstant());
+    }
+
+    /**
+     * Is the trip originally planned withing the previous/next 15h?
+     */
+    public boolean isTripPlannedForNow() {
+        return Duration.between(dateTime, Instant.now()).abs().toSeconds() < NOW_THRESHOLD_SEC;
     }
 
     /**
      * Currently only one itinerary is returned for a direct street search
      */
-    public int getNumItineraries() {
+    public int getNumItinerariesForDirectStreetSearch() {
         return 1;
+    }
+
+    public void setPageCursor(String pageCursor) {
+        this.pageCursor = PageCursor.decode(pageCursor);
+    }
+
+    public SortOrder getItinerariesSortOrder() {
+        if(pageCursor != null) {
+            return pageCursor.originalSortOrder;
+        }
+        return arriveBy
+                ? SortOrder.STREET_AND_DEPARTURE_TIME
+                : SortOrder.STREET_AND_ARRIVAL_TIME;
+    }
+
+    /**
+     * Adjust the 'dateTime' if the page cursor is set to "goto next/previous page".
+     * The date-time is used for many things, for example finding the days to search,
+     * but the transit search is using the cursor[if exist], not the date-time.
+     */
+    public void applyPageCursor() {
+        if(pageCursor != null) {
+            // We switch to "depart-after" search when paging next(lat==null). It does not make
+            // sense anymore to keep the latest-arrival-time when going to the "next page".
+            if(pageCursor.latestArrivalTime == null) {
+                arriveBy = false;
+            }
+            setDateTime(arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime);
+            modes.directMode = StreetMode.NOT_SET;
+            LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
+        }
+    }
+
+
+    /**
+     * When paging we must crop the list of itineraries in the right end according to the
+     * sorting of the original search and according to the page cursor type (next or previous).
+     * <p>
+     * We need to flip the cropping and crop the head/start of the itineraries when:
+     * <ul>
+     * <li>Paging to the previous page for a {@code depart-after/sort-on-arrival-time} search.
+     * <li>Paging to the next page for a {@code arrive-by/sort-on-departure-time} search.
+     * </ul>
+     */
+    public boolean maxNumberOfItinerariesCropHead() {
+        if(pageCursor == null) { return false; }
+
+        var previousPage = pageCursor.type == PageType.PREVIOUS_PAGE;
+        return pageCursor.originalSortOrder.isSortedByArrivalTimeAcceding() == previousPage;
+    }
+
+    /**
+     * Related to {@link #maxNumberOfItinerariesCropHead()}, but is {@code true} if we should
+     * crop the search-window head(in the beginning) or tail(in the end).
+     * <p>
+     * For the first search we look if the sort is ascending(crop tail) or descending(crop head),
+     * and for paged results we look at the paging type: next(tail) and previous(head).
+     */
+    public boolean doCropSearchWindowAtTail() {
+        if(pageCursor == null) {
+            return getItinerariesSortOrder().isSortedByArrivalTimeAcceding();
+        }
+        return pageCursor.type == PageType.NEXT_PAGE;
     }
 
     public void setNumItineraries(int numItineraries) {
@@ -940,9 +1098,9 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     public String toString(String sep) {
-        return from + sep + to + sep + getDateTime() + sep
+        return from + sep + to + sep + dateTime + sep
                 + arriveBy + sep + bicycleOptimizeType + sep + streetSubRequestModes.getAsStr() + sep
-                + getNumItineraries();
+                + getNumItinerariesForDirectStreetSearch();
     }
 
     public void removeMode(TraverseMode mode) {
@@ -953,7 +1111,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * Sets intermediatePlaces by parsing GenericLocations from a list of string.
      */
     public void setIntermediatePlacesFromStrings(List<String> intermediates) {
-        this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
+        this.intermediatePlaces = new ArrayList<>(intermediates.size());
         for (String place : intermediates) {
             intermediatePlaces.add(LocationStringParser.fromOldStyleString(place));
         }
@@ -978,23 +1136,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     public void addIntermediatePlace(GenericLocation location) {
         if (this.intermediatePlaces == null) {
-            this.intermediatePlaces = new ArrayList<GenericLocation>();
+            this.intermediatePlaces = new ArrayList<>();
         }
         this.intermediatePlaces.add(location);
     }
-
-    public void setBikeTriangleSafetyFactor(double bikeTriangleSafetyFactor) {
-        this.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
-    }
-
-    public void setBikeTriangleSlopeFactor(double bikeTriangleSlopeFactor) {
-        this.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
-    }
-
-    public void setBikeTriangleTimeFactor(double bikeTriangleTimeFactor) {
-        this.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
-    }
-
 
     /* INSTANCE METHODS */
 
@@ -1013,11 +1158,17 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
                     break;
                 case BIKE_TO_PARK:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
-                    streetRequest.bikeParkAndRide = true;
+                    streetRequest.parkAndRide = true;
                     break;
                 case BIKE_RENTAL:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
-                    streetRequest.bikeRental = true;
+                    streetRequest.vehicleRental = true;
+                    streetRequest.allowedRentalFormFactors.add(FormFactor.BICYCLE);
+                    break;
+                case SCOOTER_RENTAL:
+                    streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
+                    streetRequest.vehicleRental = true;
+                    streetRequest.allowedRentalFormFactors.add(FormFactor.SCOOTER);
                     break;
                 case CAR:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
@@ -1032,6 +1183,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
                     break;
                 case CAR_RENTAL:
                     streetRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK));
+                    streetRequest.vehicleRental = true;
+                    streetRequest.allowedRentalFormFactors.add(FormFactor.CAR);
             }
         }
 
@@ -1056,6 +1209,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.streetSubRequestModes = streetSubRequestModes.clone();
 
+            clone.allowedVehicleRentalNetworks = Set.copyOf(allowedVehicleRentalNetworks);
+            clone.bannedVehicleRentalNetworks = Set.copyOf(bannedVehicleRentalNetworks);
+
+            clone.requiredVehicleParkingTags = Set.copyOf(requiredVehicleParkingTags);
+            clone.bannedVehicleParkingTags = Set.copyOf(bannedVehicleParkingTags);
+
             clone.preferredAgencies = Set.copyOf(preferredAgencies);
             clone.unpreferredAgencies = Set.copyOf(unpreferredAgencies);
             clone.whiteListedAgencies = Set.copyOf(whiteListedAgencies);
@@ -1066,7 +1225,9 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             clone.preferredRoutes = preferredRoutes.clone();
             clone.unpreferredRoutes = unpreferredRoutes.clone();
 
-            clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
+            clone.bannedTrips = Set.copyOf(bannedTrips);
+
+            clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
 
             return clone;
         } catch (CloneNotSupportedException e) {
@@ -1078,7 +1239,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public RoutingRequest reversedClone() {
         RoutingRequest ret = this.clone();
         ret.setArriveBy(!ret.arriveBy);
-        ret.useBikeRentalAvailabilityInformation = false;
+        ret.useVehicleRentalAvailabilityInformation = false;
         return ret;
     }
 
@@ -1091,11 +1252,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         } else {
             if (rctx.graph == graph) {
                 LOG.debug("keeping existing routing context");
-                return;
             } else {
                 LOG.error("attempted to reset routing context using a different graph");
-                return;
             }
+            return;
         }
     }
 
@@ -1146,11 +1306,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     /** Tear down any routing context (remove temporary edges from edge lists) */
     public void cleanup() {
-        if (this.rctx == null)
-            LOG.warn("routing context was not set, cannot destroy it.");
-        else {
-            rctx.destroy();
-            LOG.debug("routing context destroyed");
+        if (this.rctx != null) {
+            try {
+                rctx.destroy();
+            }
+            catch (Exception e) {
+                LOG.error("Could not destroy the routing context", e);
+            }
         }
     }
 
@@ -1249,6 +1411,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     public Set<FeedScopedId> getBannedRoutes(Collection<Route> routes) {
+        if (bannedRoutes.isEmpty() && bannedAgencies.isEmpty() &&
+            whiteListedRoutes.isEmpty() && whiteListedAgencies.isEmpty()
+        ) {
+            return Set.of();
+        }
+
         Set<FeedScopedId> bannedRoutes = new HashSet<>();
         for (Route route : routes) {
             if (routeIsBanned(route)) {
@@ -1273,14 +1441,14 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     private boolean routeIsBanned(Route route) {
         /* check if agency is banned for this plan */
-        if (bannedAgencies != null) {
+        if (!bannedAgencies.isEmpty()) {
             if (bannedAgencies.contains(route.getAgency().getId())) {
                 return true;
             }
         }
 
         /* check if route banned for this plan */
-        if (bannedRoutes != null) {
+        if (!bannedRoutes.isEmpty()) {
             if (bannedRoutes.matches(route)) {
                 return true;
             }
@@ -1290,7 +1458,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         boolean whiteListInUse = false;
 
         /* check if agency is whitelisted for this plan */
-        if (whiteListedAgencies != null && whiteListedAgencies.size() > 0) {
+        if (!whiteListedAgencies.isEmpty()) {
             whiteListInUse = true;
             if (whiteListedAgencies.contains(route.getAgency().getId())) {
                 whiteListed = true;
@@ -1298,7 +1466,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         }
 
         /* check if route is whitelisted for this plan */
-        if (whiteListedRoutes != null && !whiteListedRoutes.isEmpty()) {
+        if (!whiteListedRoutes.isEmpty()) {
             whiteListInUse = true;
             if (whiteListedRoutes.matches(route)) {
                 whiteListed = true;
@@ -1337,8 +1505,22 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * These three fields of the RoutingRequest should have values between 0 and 1, and should add up to 1.
      * This setter function accepts any three numbers and will normalize them to add up to 1.
      */
-    public void setTriangleNormalized (double safe, double slope, double time) {
+    public void setTriangleNormalized(double safe, double slope, double time) {
+        if(safe == 0 && slope == 0 && time == 0) {
+            var oneThird = 1f /3;
+            safe = oneThird;
+            slope = oneThird;
+            time = oneThird;
+        }
+        safe = setMinValue(safe);
+        slope = setMinValue(slope);
+        time = setMinValue(time);
+
         double total = safe + slope + time;
+        if(total != 1) {
+            LOG.warn("Bicycle triangle factors don't add up to 1. Values will be scaled proportionally to each other.");
+        }
+
         safe /= total;
         slope /= total;
         time /= total;
@@ -1347,23 +1529,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         this.bikeTriangleTimeFactor = time;
     }
 
-    public static void assertTriangleParameters(
-            Double triangleSafetyFactor,
-            Double triangleTimeFactor,
-            Double triangleSlopeFactor
-    )
-            throws ParameterException
-    {
-        if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
-            throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
-        }
-        if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
-            throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
-        }
-        // FIXME couldn't this be simplified by only specifying TWO of the values?
-        if (Math.abs(triangleSafetyFactor + triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
-            throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
-        }
+    private double setMinValue(double value) {
+        return Math.max(0, value);
     }
 
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
@@ -1399,7 +1566,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      *
      * If you encounter a case of this, you can adjust this code to take this into account.
      *
-     * @see RoutingRequest.MAX_CLOSENESS_METERS
+     * @see RoutingRequest#MAX_CLOSENESS_METERS
      * @see DominanceFunction#betterOrEqualAndComparable(State, State)
      */
     public boolean isCloseToStartOrEnd(Vertex vertex) {
@@ -1425,7 +1592,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
         if (LOG.isDebugEnabled()) {
 
-            var geom = new GeometryFactory().toGeometry(env);
+            var geom = GeometryUtils.getGeometryFactory().toGeometry(env);
             var geoJson = new GeometryJSON();
 
             try {

@@ -9,7 +9,7 @@ import java.util.Locale;
  *
  */
 public class WrappedCurrency {
-    private Currency value;
+    private final Currency value;
     
     public WrappedCurrency() {
         value = null;

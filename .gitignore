@@ -7,6 +7,7 @@
 .pydevproject
 .settings
 .sonar
+.nvmrc
 *~
 *.ipr
 *.iml
@@ -18,6 +19,7 @@ dependency-reduced-pom.xml
 interactive_otp_main.json
 /otp
 /otp-ui
+Dockerfile
 
 # Directories
 .idea/
@@ -36,3 +38,6 @@ target/
 
 # for local dev only
 src/ext/resources/reportapi/report.csv
+
+streetGraph.obj
+graph.obj

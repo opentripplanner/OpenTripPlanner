@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 
 public class LinkStopToPlatformTest {
 
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
     private Graph graph;
 
@@ -41,7 +41,7 @@ public class LinkStopToPlatformTest {
 
         graph = new Graph();
 
-        ArrayList<IntersectionVertex> vertices = new ArrayList<IntersectionVertex>();
+        ArrayList<IntersectionVertex> vertices = new ArrayList<>();
 
         vertices.add(new IntersectionVertex(graph, "1", 10.22054, 59.13568, "Platform vertex 1"));
         vertices.add(new IntersectionVertex(graph, "2", 10.22432, 59.13519, "Platform vertex 2"));
@@ -49,9 +49,9 @@ public class LinkStopToPlatformTest {
         vertices.add(new IntersectionVertex(graph, "4", 10.22493, 59.13518, "Platform vertex 4"));
         vertices.add(new IntersectionVertex(graph, "5", 10.22056, 59.13575, "Platform vertex 5"));
 
-        AreaEdgeList areaEdgeList = new AreaEdgeList();
+        AreaEdgeList areaEdgeList = new AreaEdgeList(GeometryUtils.getGeometryFactory().createPolygon());
 
-        ArrayList<AreaEdge> edges = new ArrayList<AreaEdge>();
+        ArrayList<AreaEdge> edges = new ArrayList<>();
 
         edges.add(createAreaEdge(vertices.get(0), vertices.get(1), areaEdgeList, "edge 1"));
         edges.add(createAreaEdge(vertices.get(1), vertices.get(2), areaEdgeList, "edge 2"));

@@ -1,7 +1,14 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
+import javax.xml.bind.JAXBElement;
+import org.opentripplanner.common.model.T2;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
@@ -14,11 +21,6 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import javax.xml.bind.JAXBElement;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * This maps a NeTEx ServiceJourney to an OTP Trip. A ServiceJourney can be connected to a Line (OTP
  * Route) in two ways. Either directly from the ServiceJourney or through JourneyPattern → Route.
@@ -28,15 +30,18 @@ class TripMapper {
     private static final Logger LOG = LoggerFactory.getLogger(TripMapper.class);
 
     private final FeedScopedIdFactory idFactory;
+    private final DataImportIssueStore issueStore;
     private final EntityById<org.opentripplanner.model.Route> otpRouteById;
     private final ReadOnlyHierarchicalMap<String, Route> routeById;
     private final ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
     private final Map<String, FeedScopedId> serviceIds;
     private final Set<FeedScopedId> shapePointIds;
     private final EntityById<Operator> operatorsById;
+    private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
-    TripMapper(
+  TripMapper(
             FeedScopedIdFactory idFactory,
+            DataImportIssueStore issueStore,
             EntityById<Operator> operatorsById,
             EntityById<org.opentripplanner.model.Route> otpRouteById,
             ReadOnlyHierarchicalMap<String, Route> routeById,
@@ -45,6 +50,7 @@ class TripMapper {
             Set<FeedScopedId> shapePointIds
     ) {
         this.idFactory = idFactory;
+        this.issueStore = issueStore;
         this.otpRouteById = otpRouteById;
         this.routeById = routeById;
         this.journeyPatternsById = journeyPatternsById;
@@ -86,6 +92,26 @@ class TripMapper {
 
         trip.setTripShortName(serviceJourney.getPublicCode());
         trip.setTripOperator(findOperator(serviceJourney));
+
+        if (serviceJourney.getTransportMode() != null) {
+            T2<TransitMode, String> transitMode = null;
+            try {
+                transitMode = transportModeMapper.map(
+                    serviceJourney.getTransportMode(),
+                    serviceJourney.getTransportSubmode()
+                );
+            } catch (TransportModeMapper.UnsupportedModeException e) {
+                issueStore.add(
+                        "UnsupportedModeInServiceJourney",
+                        "Unsupported mode in ServiceJourney. Mode: %s, sj: %s",
+                        e.mode,
+                        serviceJourney.getId()
+                );
+                return null;
+            }
+            trip.setMode(transitMode.first);
+            trip.setNetexSubmode(transitMode.second);
+        }
 
         trip.setDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
 

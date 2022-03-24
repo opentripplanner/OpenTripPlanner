@@ -1,13 +1,16 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.util.Date;
+import java.util.List;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-
-import java.util.List;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.LocalizedString;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class TripPlanMapper {
 
@@ -22,19 +25,22 @@ public class TripPlanMapper {
         Place to;
 
         if(itineraries.isEmpty()) {
-            from = placeFromGeoLocation(request.from);
-            to = placeFromGeoLocation(request.to);
+            from = placeFromGeoLocation(request.from, new LocalizedString("origin"));
+            to = placeFromGeoLocation(request.to, new LocalizedString("destination"));
         }
         else {
             List<Leg> legs = itineraries.get(0).legs;
-            from = legs.get(0).from;
-            to = legs.get(legs.size() - 1).to;
+            from = legs.get(0).getFrom();
+            to = legs.get(legs.size() - 1).getTo();
         }
-
-        return new TripPlan(from, to, request.getDateTime(), itineraries);
+        return new TripPlan(from, to, Date.from(request.getDateTime()), itineraries);
     }
 
-    private static Place placeFromGeoLocation(GenericLocation location) {
-        return new Place(location.lat, location.lng, location.label);
+    private static Place placeFromGeoLocation(GenericLocation location, I18NString defaultName) {
+        return Place.normal(
+                location.lat,
+                location.lng,
+                NonLocalizedString.ofNullableOrElse(location.label, defaultName)
+        );
     }
 }

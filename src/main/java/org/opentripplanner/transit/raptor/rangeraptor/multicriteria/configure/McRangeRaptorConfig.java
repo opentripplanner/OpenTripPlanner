@@ -1,19 +1,18 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure;
 
+import java.util.function.BiFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McTransitWorker;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.Stops;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.StopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
-
-import java.util.function.BiFunction;
 
 
 /**
@@ -47,7 +46,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     /* private factory methods */
 
     private RoutingStrategy<T> createTransitWorkerStrategy(McRangeRaptorWorkerState<T> state) {
-        return new McTransitWorker<>(
+        return new MultiCriteriaRoutingStrategy<>(
                 state,
                 context.slackProvider(),
                 context.costCalculator(),
@@ -57,7 +56,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
     private McRangeRaptorWorkerState<T> createState(Heuristics heuristics) {
         return new McRangeRaptorWorkerState<>(
-                createStops(),
+                createStopArrivals(),
                 createDestinationArrivalPaths(),
                 createHeuristicsProvider(heuristics),
                 context.costCalculator(),
@@ -66,14 +65,12 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         );
     }
 
-    private Stops<T> createStops() {
-        return new Stops<>(
+    private StopArrivals<T> createStopArrivals() {
+        return new StopArrivals<>(
                 context.nStops(),
                 context.egressPaths(),
                 createDestinationArrivalPaths(),
-                context.costCalculator(),
-                context.debugFactory(),
-                context.debugLogger()
+                context.debugFactory()
         );
     }
 

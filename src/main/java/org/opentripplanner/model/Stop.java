@@ -6,6 +6,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.common.geometry.GeometryUtils;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
@@ -26,7 +30,7 @@ public final class Stop extends StationElement implements StopLocation {
   /**
    * URL to a web page containing information about this particular stop.
    */
-  private final String url;
+  private final I18NString url;
 
   private final TimeZone timeZone;
 
@@ -36,11 +40,13 @@ public final class Stop extends StationElement implements StopLocation {
    */
   private final TransitMode vehicleType;
 
+  private final String netexSubmode;
+
   private HashSet<BoardingArea> boardingAreas;
 
   public Stop(
       FeedScopedId id,
-      String name,
+      I18NString name,
       String code,
       String description,
       WgsCoordinate coordinate,
@@ -48,9 +54,10 @@ public final class Stop extends StationElement implements StopLocation {
       StopLevel level,
       String platformCode,
       Collection<FareZone> fareZones,
-      String url,
+      I18NString url,
       TimeZone timeZone,
-      TransitMode vehicleType
+      TransitMode vehicleType,
+      String netexSubmode
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
     this.platformCode = platformCode;
@@ -58,16 +65,22 @@ public final class Stop extends StationElement implements StopLocation {
     this.url = url;
     this.timeZone = timeZone;
     this.vehicleType = vehicleType;
+    this.netexSubmode = netexSubmode;
   }
 
-  /**
-   * Create a minimal Stop object for unit-test use, where the test only care about id, name and
-   * coordinate. The feedId is static set to "TEST"
-   */
+  /** @see #stopForTest(String, double, double, Station) */
   public static Stop stopForTest(String idAndName, double lat, double lon) {
-    return new Stop(
+    return stopForTest(idAndName, lat, lon, null);
+  }
+
+    /**
+     * Create a minimal Stop object for unit-test use, where the test only care about id, name and
+     * coordinate. The feedId is static set to "F"
+     */
+  public static Stop stopForTest(String idAndName, double lat, double lon, Station parent) {
+    var stop = new Stop(
         new FeedScopedId("F", idAndName),
-        idAndName,
+        new NonLocalizedString(idAndName),
         idAndName,
         null,
         new WgsCoordinate(lat, lon),
@@ -77,10 +90,12 @@ public final class Stop extends StationElement implements StopLocation {
         null,
         null,
         null,
+        null,
         null
     );
+    stop.setParentStation(parent);
+    return stop;
   }
-
 
   public void addBoardingArea(BoardingArea boardingArea) {
     if (boardingAreas == null) {
@@ -98,15 +113,7 @@ public final class Stop extends StationElement implements StopLocation {
     return platformCode;
   }
 
-  /**
-   * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
-   * which only permits one zone per stop.
-   */
-  public String getFirstZoneAsString() {
-    return fareZones.stream().map(t -> t.getId().getId()).findFirst().orElse(null);
-  }
-
-  public String getUrl() {
+  public I18NString getUrl() {
     return url;
   }
 
@@ -133,5 +140,15 @@ public final class Stop extends StationElement implements StopLocation {
 
   public Collection<FareZone> getFareZones() {
     return Collections.unmodifiableCollection(fareZones);
+  }
+
+  @Override
+  public Geometry getGeometry() {
+    return GeometryUtils.getGeometryFactory().createPoint(getCoordinate().asJtsCoordinate());
+  }
+
+  @Override
+  public String getVehicleSubmode() {
+    return netexSubmode;
   }
 }

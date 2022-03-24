@@ -1,16 +1,14 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.HashSet;
-
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
-
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.HashSet;
 
 /**
  * These rules were developed in consultation with Grant Humphries, PJ Houser, and Mele Sax-Barnett.
@@ -28,9 +26,9 @@ public class PortlandCustomNamer implements CustomNamer {
     public static String[] PATH_WORDS = { "Trail", "Trails", "Greenway", "Esplanade", "Spur",
             "Loop" };
 
-    private HashSet<StreetEdge> nameByOrigin = new HashSet<StreetEdge>();
+    private final HashSet<StreetEdge> nameByOrigin = new HashSet<>();
 
-    private HashSet<StreetEdge> nameByDestination = new HashSet<StreetEdge>();
+    private final HashSet<StreetEdge> nameByDestination = new HashSet<>();
 
     @Override
     public String name(OSMWithTags way, String defaultName) {
@@ -130,7 +128,7 @@ public class PortlandCustomNamer implements CustomNamer {
     }
 
     @Override
-    public void configure(JsonNode config) {
+    public void configure() {
         // No configuration needed.
     }
 
@@ -148,7 +146,7 @@ public class PortlandCustomNamer implements CustomNamer {
                 e.setName(new NonLocalizedString(name));
                 return name;
             } else {
-                String name = out.getName();
+                String name = out.getDefaultName();
                 e.setName(new NonLocalizedString(name));
                 return name;
             }
@@ -170,7 +168,7 @@ public class PortlandCustomNamer implements CustomNamer {
                 e.setName(new NonLocalizedString(name));
                 return name;
             } else {
-                String name = in.getName();
+                String name = in.getDefaultName();
                 e.setName(new NonLocalizedString(name));
                 return name;
             }

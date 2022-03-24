@@ -1,24 +1,49 @@
 package org.opentripplanner.transit.raptor._data.api;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 
+/**
+ * This utility help converting a Raptor path to a string which is used in several
+ * unit tests for easy comparison. The Stop index(1..n) is translated to stop names(A..N)
+ * using {@link RaptorTestConstants#stopIndexToName(int)}.
+ */
 public class PathUtils {
+  private static final RaptorTestConstants TRANSLATOR = new RaptorTestConstants() {};
+
   /** Util class, private constructor */
   private PathUtils() { }
 
-  public static List<Path<TestTripSchedule>> pathsSorted(RaptorResponse<TestTripSchedule> response) {
-    return response.paths().stream().sorted().collect(Collectors.toList());
+  public static String pathsToString(RaptorResponse<?> response) {
+    return pathsToString(response.paths());
   }
 
-  public static String pathsToString(RaptorResponse<TestTripSchedule> response) {
-    return pathsSorted(response).stream().map(Path::toString).collect(Collectors.joining("\n"));
+  public static String pathsToString(Collection<? extends Path<?>> paths) {
+    return pathsToString(paths, p -> p.toString(TRANSLATOR::stopIndexToName));
   }
 
-  public static String pathsToStringDetailed(RaptorResponse<TestTripSchedule> response) {
-    return pathsSorted(response).stream().map(Path::toStringDetailed).collect(Collectors.joining("\n"));
+  public static String pathsToStringDetailed(RaptorResponse<?> response) {
+    return pathsToString(response.paths(), p -> p.toStringDetailed(TRANSLATOR::stopIndexToName));
+  }
+
+  public static String join(String ... paths) {
+    return String.join("\n", paths);
+  }
+
+
+  /* private methods */
+
+  private static String pathsToString(
+          Collection<? extends Path<?>> paths,
+          Function<Path<?>, String> mapToStr
+  ) {
+    return paths.stream()
+            .sorted()
+            .map(mapToStr)
+            .collect(Collectors.joining("\n"));
   }
 }

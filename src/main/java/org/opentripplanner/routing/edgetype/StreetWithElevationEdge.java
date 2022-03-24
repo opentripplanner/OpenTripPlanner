@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -44,6 +44,12 @@ public class StreetWithElevationEdge extends StreetEdge {
         this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
     }
 
+    public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
+            I18NString name, StreetTraversalPermission permission, boolean back
+    ) {
+        super(v1, v2, geometry, name, permission, back);
+    }
+
     @Override
     public StreetWithElevationEdge clone() {
         return (StreetWithElevationEdge) super.clone();
@@ -75,7 +81,7 @@ public class StreetWithElevationEdge extends StreetEdge {
     public PackedCoordinateSequence getElevationProfile() {
         return CompactElevationProfile.uncompactElevationProfileWithRegularSamples(
                 packedElevationProfile,
-                getEffectiveWalkDistance()
+                getDistanceMeters()
         );
     }
 
@@ -93,7 +99,7 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public double getEffectiveBikeDistance() {
-        return effectiveBikeDistanceFactor * getDistanceMeters();
+        return (isStairs() ? 1 : effectiveWalkDistanceFactor) * getDistanceMeters();
     }
 
     @Override
@@ -103,12 +109,12 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public double getEffectiveWalkDistance() {
-        return effectiveWalkDistanceFactor * getDistanceMeters();
+        return (isStairs() ? 1 : effectiveWalkDistanceFactor) * getDistanceMeters();
     }
 
     @Override
     public String toString() {
-        return "StreetWithElevationEdge(" + getName() + ", " + fromv + " -> "
+        return "StreetWithElevationEdge(" + getDefaultName() + ", " + fromv + " -> "
                 + tov + " length=" + this.getDistanceMeters() + " carSpeed=" + this.getCarSpeed()
                 + " permission=" + this.getPermission() + ")";
     }

@@ -21,7 +21,7 @@ public class TripTimeMapper {
 
         ApiTripTimeShort api = new ApiTripTimeShort();
 
-        api.stopId             = FeedScopedIdMapper.mapToApi(domain.getStopId());
+        api.stopId             = FeedScopedIdMapper.mapToApi(domain.getStop().getId());
         api.stopIndex          = domain.getStopIndex();
         api.stopCount          = domain.getStopCount();
         api.scheduledArrival   = domain.getScheduledArrival();
@@ -35,6 +35,8 @@ public class TripTimeMapper {
         api.realtimeState      = ApiRealTimeState.RealTimeState(domain.getRealtimeState());
         api.blockId            = domain.getBlockId();
         api.headsign           = domain.getHeadsign();
+        api.tripId             = FeedScopedIdMapper.mapToApi(domain.getTrip().getId());
+        api.serviceDay         = domain.getServiceDay();
 
         return api;
     }

@@ -11,6 +11,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.Branding;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
@@ -59,7 +60,7 @@ import org.rutebanken.netex.model.TariffZone;
  * {@link HierarchicalElement} classes.
  * <p/>
  * The mapping code should not insert entities, so an instance of this class implements the
- * {@link NetexEntityIndexReadOnlyView} witch is passed to the mapping code for translation into
+ * {@link NetexEntityIndexReadOnlyView} which is passed to the mapping code for translation into
  * OTP domain model objects.
  */
 public class NetexEntityIndex {
@@ -92,7 +93,8 @@ public class NetexEntityIndex {
     public final HierarchicalMapById<ServiceJourneyInterchange> serviceJourneyInterchangeById;
     public final HierarchicalMapById<ServiceLink> serviceLinkById;
     public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
-    public final HierarchicalMapById<TariffZone> tariffZonesById;
+    public final HierarchicalVersionMapById<TariffZone> tariffZonesById;
+    public final HierarchicalMapById<Branding> brandingById;
 
 
     // Relations between entities - The Netex XML sometimes rely on the the
@@ -138,7 +140,8 @@ public class NetexEntityIndex {
         this.serviceLinkById = new HierarchicalMapById<>();
         this.serviceJourneyInterchangeById = new HierarchicalMapById<>();
         this.stopPlaceById = new HierarchicalVersionMapById<>();
-        this.tariffZonesById = new HierarchicalMapById<>();
+        this.tariffZonesById = new HierarchicalVersionMapById<>();
+        this.brandingById = new HierarchicalMapById<>();
         this.timeZone = new HierarchicalElement<>();
     }
 
@@ -175,7 +178,8 @@ public class NetexEntityIndex {
         this.serviceLinkById = new HierarchicalMapById<>(parent.serviceLinkById);
         this.serviceJourneyInterchangeById = new HierarchicalMapById<>(parent.serviceJourneyInterchangeById);
         this.stopPlaceById = new HierarchicalVersionMapById<>(parent.stopPlaceById);
-        this.tariffZonesById = new HierarchicalMapById<>(parent.tariffZonesById);
+        this.tariffZonesById = new HierarchicalVersionMapById<>(parent.tariffZonesById);
+        this.brandingById = new HierarchicalMapById<>(parent.brandingById);
         this.timeZone = new HierarchicalElement<>(parent.timeZone);
     }
 
@@ -217,6 +221,11 @@ public class NetexEntityIndex {
                         : networkIdByGroupOfLineId.lookup(groupOfLines.getId());
 
                 return networkById.lookup(networkId);
+            }
+
+            @Override
+            public ReadOnlyHierarchicalMapById<GroupOfLines> getGroupsOfLinesById() {
+                return groupOfLinesById;
             }
 
             @Override
@@ -343,13 +352,18 @@ public class NetexEntityIndex {
             }
 
             @Override
-            public ReadOnlyHierarchicalMapById<TariffZone> getTariffZonesById() {
+            public ReadOnlyHierarchicalVersionMapById<TariffZone> getTariffZonesById() {
                 return tariffZonesById;
             }
 
             @Override
             public String getTimeZone() {
                 return timeZone.get();
+            }
+
+            @Override
+            public ReadOnlyHierarchicalMapById<Branding> getBrandingById() {
+                return brandingById;
             }
         };
     }

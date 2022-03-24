@@ -1,0 +1,45 @@
+name: Automatic changelog entry
+on:
+  pull_request_target:
+    branches:
+      - dev-2.x
+    types: [closed]
+
+jobs:
+  changelog-entry:
+    if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner'
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.CHANGELOG_TOKEN }}
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name 'OTP Changelog Bot'
+          git config --global user.email 'changelog-bot@opentripplanner.org'
+
+      - name: Generate changelog entry from PR information
+        run: |
+          # if the title contains "changelog skip" we don't generate an entry
+          TITLE_LOWER_CASE=`echo $TITLE | awk '{print tolower($0)}'`
+          if  [[ "${TITLE_LOWER_CASE}" =~ "changelog skip" ]]; then
+            echo "Skipping changelog entry generation"
+          else
+            # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
+            ITEM="${TITLE} [#${NUMBER}](${URL})"
+            TEMP_FILE=docs/Changelog.generated.md
+            FILE=docs/Changelog.md
+            awk "/CHANGELOG_PLACEHOLDER/{print \"- $ITEM\"}1" $FILE > $TEMP_FILE
+            mv $TEMP_FILE $FILE
+            git add $FILE
+            git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
+            git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
+          fi
+        env:
+          # Use environment variables to prevent injection attack
+          TITLE: ${{ github.event.pull_request.title }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          URL: ${{ github.event.pull_request.html_url }}

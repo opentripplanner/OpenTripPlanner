@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.api.transit;
 import org.opentripplanner.util.time.DurationUtils;
 
 /**
- * Encapsulate information about a access, transfer or egress path. We do not distinguish
+ * Encapsulate information about an access, transfer or egress path. We do not distinguish
  * between the access (origin to first stop), transfer (stop to stop) or egress (last stop to
  * destination), to Raptor - all these are the same thing.
  */
@@ -28,8 +28,6 @@ public interface RaptorTransfer {
      *
      * This methods is called many times, so care needs to be taken that the value is stored, not
      * calculated for each invocation.
-     *
-     * @see RaptorCostConverter#toRaptorCost(double)
      */
     int generalizedCost();
 
@@ -58,9 +56,9 @@ public interface RaptorTransfer {
      */
     default int earliestDepartureTime(int requestedDepartureTime) {
         return requestedDepartureTime;
-    };
+    }
 
-    /**
+  /**
      * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares
      * where they can have operation time limitations.
      *
@@ -68,13 +66,22 @@ public interface RaptorTransfer {
      */
     default int latestArrivalTime(int requestedArrivalTime) {
         return requestedArrivalTime;
-    };
+    }
 
-    /* ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS */
-    // The methods below should be only overridden when a RaptorTransfer contains information about
-    // public services, which were generated outside the RAPTOR algorithm. Examples of such schemes
-    // include flexible transit service and TNC. They should not be used for regular
-    // access/transfer/egress.
+  /**
+     * This method should return {@code true} if, and only if the instance have restricted
+     * opening-hours.
+     */
+     boolean hasOpeningHours();
+
+    /*
+       ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
+
+       The methods below should be only overridden when a RaptorTransfer contains information about
+       public services, which were generated outside the RAPTOR algorithm. Examples of such schemes
+       include flexible transit service and TNC. They should not be used for regular
+       access/transfer/egress.
+    */
 
     /**
      * Some services involving multiple legs are not handled by the RAPTOR algorithm and need to be
@@ -98,13 +105,13 @@ public interface RaptorTransfer {
      * rental-bicycle |      0       | Picking up the bike and returning it is is best
      *                |              | accounted using time and cost penalties, not transfers.
      *     taxi       |     0/1      | Currently 0 in OTP(car), but this is definitely discussable.
-     *     flex       |      1       | Waking leg followed by a flex transit leg
-     * walk-flex-walk |      1       | Waking , then flex transit and then walking again
+     *     flex       |      1       | Walking leg followed by a flex transit leg
+     * walk-flex-walk |      1       | Walking , then flex transit and then walking again
      *   flex-flex    |      2       | Two flex transit legs after each other
      * </pre>
      * {@code flex} is used as a placeholder for any type of on-board public service.
      *
-     * @return the number transfers including thefirst boarding in the RAPTOR algorithm.
+     * @return the number transfers including the first boarding in the RAPTOR algorithm.
      */
     default int numberOfRides() {
         return 0;
@@ -117,7 +124,7 @@ public interface RaptorTransfer {
     /**
      * Is this {@link RaptorTransfer} is connected to the given {@code stop} directly by
      * <b>transit</b>? For access and egress paths we allow plugging in flexible transit and other
-     * means of transport, witch might include one or more legs onboard a vehicle. This method
+     * means of transport, which might include one or more legs onboard a vehicle. This method
      * should return {@code true} if the leg connecting to the given stop arrives `onBoard` a public
      * transport or riding another kind of service like a taxi.
      *
@@ -132,7 +139,7 @@ public interface RaptorTransfer {
     default String asString() {
       String duration = DurationUtils.durationToStr(durationInSeconds());
         return hasRides()
-            ? String.format("Flex %s %dx ~ %d", duration, numberOfRides(), stop())
-            : String.format("Walk %s ~ %d", duration, stop());
+            ? String.format("Flex%s %s %dx ~ %d", stopReachedOnBoard() ? "" : "+Walk",   duration, numberOfRides(), stop())
+            : String.format("On-Street %s ~ %d", duration, stop());
     }
 }

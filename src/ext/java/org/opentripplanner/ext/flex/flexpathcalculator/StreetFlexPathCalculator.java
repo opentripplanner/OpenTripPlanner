@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
@@ -21,7 +20,7 @@ import java.util.Map;
  * using the AStar algorithm.
  *
  * Note that it caches the whole ShortestPathTree the first time it encounters a new fromVertex.
- * Subsequents requests from the same fromVertex can fetch the path to the toVertex from the
+ * Subsequent requests from the same fromVertex can fetch the path to the toVertex from the
  * existing ShortestPathTree. This one-to-many approach is needed to make the performance acceptable.
  *
  * Because we will have lots of searches with the same origin when doing access searches and a lot
@@ -59,16 +58,18 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       cache.put(originVertex, shortestPathTree);
     }
 
-    GraphPath path = shortestPathTree.getPath(destinationVertex, false);
+    GraphPath path = shortestPathTree.getPath(destinationVertex);
     if (path == null) {
       return null;
     }
 
     int distance = (int) path.getDistanceMeters();
     int duration = path.getDuration();
-    LineString geometry = path.getGeometry();
 
-    return new FlexPath(distance, duration, geometry);
+    // computing the linestring from the graph path is a surprisingly expensive operation
+    // so we delay it until it's actually needed. since most flex paths are never shown to the user
+    // this improves performance quite a bit.
+    return new FlexPath(distance, duration, path::getGeometry);
   }
 
   private ShortestPathTree routeToMany(Vertex vertex) {

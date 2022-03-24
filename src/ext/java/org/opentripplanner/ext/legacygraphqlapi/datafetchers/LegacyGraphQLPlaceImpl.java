@@ -2,26 +2,47 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.Locale;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVertexType;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 
 public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlace {
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> getSource(environment).place.name;
+    return environment -> {
+      Locale locale = LegacyGraphQLUtils.getLocale(environment);
+      return getSource(environment).place.name.toString(locale);
+    };
   }
 
   @Override
   public DataFetcher<String> vertexType() {
-    return environment -> getSource(environment).place.vertexType.name();
+    return environment -> {
+      var place = getSource(environment).place;
+      switch (place.vertexType) {
+        case NORMAL:
+          return LegacyGraphQLVertexType.NORMAL.name();
+        case TRANSIT:
+          return LegacyGraphQLVertexType.TRANSIT.name();
+        case VEHICLERENTAL:
+          return LegacyGraphQLVertexType.BIKESHARE.name();
+        case VEHICLEPARKING:
+          return LegacyGraphQLVertexType.BIKEPARK.name();
+        default:
+          throw new IllegalStateException("Unhandled vertexType: " + place.vertexType.name());
+      }
+    };
   }
 
   @Override
@@ -46,44 +67,70 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<Object> stop() {
+    return environment -> getSource(environment).place.stop;
+  }
+
+  @Override
+  public DataFetcher<VehicleRentalPlace> bikeRentalStation() {
     return environment -> {
       Place place = getSource(environment).place;
-      return place.vertexType.equals(VertexType.TRANSIT) ?
-          getRoutingService(environment).getStopForId(place.stopId) : null;
+
+      if (!place.vertexType.equals(VertexType.VEHICLERENTAL)) { return null; }
+
+      return place.vehicleRentalPlace;
     };
   }
 
   @Override
-  public DataFetcher<BikeRentalStation> bikeRentalStation() {
+  public DataFetcher<VehicleRentalStation> vehicleRentalStation() {
     return environment -> {
       Place place = getSource(environment).place;
 
-      if (!place.vertexType.equals(VertexType.BIKESHARE)) { return null; }
+      if (!place.vertexType.equals(VertexType.VEHICLERENTAL)
+              || !(place.vehicleRentalPlace instanceof VehicleRentalStation)) {
+        return null;
+      }
 
-      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
-          .getBikerentalStationService();
-
-      if (bikerentalStationService == null) { return null; }
-
-      return bikerentalStationService
-          .getBikeRentalStations()
-          .stream()
-          .filter(bikeRentalStation -> bikeRentalStation.id.equals(place.bikeShareId))
-          .findAny()
-          .orElse(null);
+      return (VehicleRentalStation) place.vehicleRentalPlace;
     };
   }
 
-  // TODO
   @Override
-  public DataFetcher<BikePark> bikePark() {
-    return environment -> null;
+  public DataFetcher<VehicleRentalVehicle> rentalVehicle() {
+    return environment -> {
+      Place place = getSource(environment).place;
+
+      if (!place.vertexType.equals(VertexType.VEHICLERENTAL)
+              || !(place.vehicleRentalPlace instanceof VehicleRentalVehicle)) {
+        return null;
+      }
+
+      return (VehicleRentalVehicle) place.vehicleRentalPlace;
+    };
   }
 
-  // TODO
   @Override
-  public DataFetcher<Object> carPark() {
-    return environment -> null;
+  public DataFetcher<VehicleParking> bikePark() {
+    return this::getVehicleParking;
+  }
+
+  @Override
+  public DataFetcher<VehicleParking> carPark() {
+    return this::getVehicleParking;
+  }
+
+  @Override
+  public DataFetcher<VehicleParking> vehicleParking() {
+    return this::getVehicleParking;
+  }
+
+  private VehicleParking getVehicleParking(DataFetchingEnvironment environment) {
+    var vehicleParkingWithEntrance = getSource(environment).place.vehicleParkingWithEntrance;
+    if (vehicleParkingWithEntrance == null) {
+      return null;
+    }
+
+    return vehicleParkingWithEntrance.getVehicleParking();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

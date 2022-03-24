@@ -1,13 +1,14 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.TransitMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TransitModeMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TransitModeMapper.class);
-
+    /**
+     * Return an OTP TransitMode matching a routeType. If no good match is found, it returns null.
+     *
+     * @param routeType  Route type to be mapped into a mode
+     */
     public static TransitMode mapMode(int routeType) {
         // Should really be reference to org.onebusaway.gtfs.model.Stop.MISSING_VALUE, but it is private.
         if (routeType == -999) { return null; }
@@ -22,10 +23,16 @@ public class TransitModeMapper {
             if (routeType >= 401 && routeType <= 402) {
                 return TransitMode.SUBWAY;
             }
+            if (routeType == 405) {
+                return TransitMode.MONORAIL;
+            }
             return TransitMode.RAIL;
         } else if (routeType >= 500 && routeType < 700) { //Metro Service and Underground Service
             return TransitMode.SUBWAY;
         } else if (routeType >= 700 && routeType < 900) { //Bus Service and Trolleybus service
+            if (routeType == 800) {
+                return TransitMode.TROLLEYBUS;
+            }
             return TransitMode.BUS;
         } else if (routeType >= 900 && routeType < 1000) { //Tram service
             return TransitMode.TRAM;
@@ -40,10 +47,11 @@ public class TransitModeMapper {
         } else if (routeType >= 1400 && routeType < 1500) { //Funicalar Service
             return TransitMode.FUNICULAR;
         } else if (routeType >= 1500 && routeType < 1600) { //Taxi Service
-            LOG.warn("Treating taxi extended route type {} as a bus.", routeType);
-            return TransitMode.BUS;
+            return null;
         } else if (routeType >= 1600 && routeType < 1700) { //Self drive
             return TransitMode.BUS;
+        } else if (routeType >= 1700 && routeType < 1800) { //Miscellaneous Service
+            return null;
         }
         /* Original GTFS route types. Should these be checked before TPEG types? */
         switch (routeType) {
@@ -63,6 +71,10 @@ public class TransitModeMapper {
                 return TransitMode.GONDOLA;
             case 7:
                 return TransitMode.FUNICULAR;
+            case 11:
+                return TransitMode.TROLLEYBUS;
+            case 12:
+                return TransitMode.MONORAIL;
             default:
                 throw new IllegalArgumentException("unknown gtfs route type " + routeType);
         }

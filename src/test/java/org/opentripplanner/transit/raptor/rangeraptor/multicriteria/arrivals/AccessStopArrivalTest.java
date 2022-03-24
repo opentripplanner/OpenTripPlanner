@@ -72,7 +72,7 @@ public class AccessStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "Access { stop: 100, duration: 10m, arrival-time: 8:10 $1200.00 }",
+                "Access { stop: 100, duration: 10m, arrival-time: 8:10 $1200 }",
                 subject.toString()
         );
     }
@@ -125,6 +125,7 @@ public class AccessStopArrivalTest {
             @Override public int generalizedCost() { return 0; }
             @Override public int durationInSeconds() { return 0; }
             @Override public int earliestDepartureTime(int t) { return t; }
+            @Override public boolean hasOpeningHours() { return true; }
 
             @Override
             public int latestArrivalTime(int requestedArrivalTime) {

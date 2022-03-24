@@ -33,7 +33,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +90,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Map<Trip, List<StopTime>> stopTimesByTrip;
 
-    private final Collection<Transfer> transfers;
+    private final Collection<ConstrainedTransfer> transfers;
 
     private final Collection<TripPattern> tripPatterns;
 
@@ -244,7 +244,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
-    public Collection<Transfer> getAllTransfers() {
+    public Collection<ConstrainedTransfer> getAllTransfers() {
         return transfers;
     }
 

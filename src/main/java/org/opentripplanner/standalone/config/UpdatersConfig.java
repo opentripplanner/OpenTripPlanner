@@ -3,14 +3,17 @@ package org.opentripplanner.standalone.config;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import javax.annotation.Nullable;
-import org.opentripplanner.standalone.config.sandbox.BikeRentalServiceDirectoryFetcherConfig;
-import org.opentripplanner.ext.bikerentalservicedirectory.api.BikeRentalServiceDirectoryFetcherParameters;
+
+import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
+import org.opentripplanner.standalone.config.sandbox.VehicleRentalServiceDirectoryFetcherConfig;
+import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.BikeParkUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.VehicleParkingUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.VehiclePositionsUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.VehicleRentalUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterConfig;
@@ -22,14 +25,16 @@ import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdater
 import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
+import org.opentripplanner.updater.vehicle_positions.VehiclePositionsUpdaterParameters;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +47,15 @@ import java.util.function.BiFunction;
  */
 public class UpdatersConfig implements UpdatersParameters {
 
-  private static final String BIKE_RENTAL = "bike-rental";
+  private static final String BIKE_RENTAL = "bike-rental"; // TODO: deprecated, remove in next major version
+  private static final String VEHICLE_RENTAL = "vehicle-rental";
   private static final String STOP_TIME_UPDATER = "stop-time-updater";
   private static final String WEBSOCKET_GTFS_RT_UPDATER = "websocket-gtfs-rt-updater";
   private static final String MQTT_GTFS_RT_UPDATER = "mqtt-gtfs-rt-updater";
   private static final String REAL_TIME_ALERTS = "real-time-alerts";
-  private static final String BIKE_PARK = "bike-park";
+  private static final String VEHICLE_POSITIONS = "vehicle-positions";
+  private static final String BIKE_PARK = "bike-park"; // TODO: deprecated, remove in next major version
+  private static final String VEHICLE_PARKING = "vehicle-parking";
   private static final String WINKKI_POLLING_UPDATER = "winkki-polling-updater";
   private static final String SIRI_ET_UPDATER = "siri-et-updater";
   private static final String SIRI_ET_GOOGLE_PUBSUB_UPDATER = "siri-et-google-pubsub-updater";
@@ -57,12 +65,15 @@ public class UpdatersConfig implements UpdatersParameters {
   private static final Map<String, BiFunction<String, NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
 
   static {
-    CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterConfig::create);
-    CONFIG_CREATORS.put(BIKE_PARK, BikeParkUpdaterConfig::create);
+    CONFIG_CREATORS.put(BIKE_PARK, VehicleParkingUpdaterConfig::create); // TODO: deprecated, remove in next major version
+    CONFIG_CREATORS.put(VEHICLE_PARKING, VehicleParkingUpdaterConfig::create);
+    CONFIG_CREATORS.put(BIKE_RENTAL, VehicleRentalUpdaterConfig::create); // TODO: deprecated, remove in next major version
+    CONFIG_CREATORS.put(VEHICLE_RENTAL, VehicleRentalUpdaterConfig::create);
     CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::create);
     CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig::create);
     CONFIG_CREATORS.put(MQTT_GTFS_RT_UPDATER, MqttGtfsRealtimeUpdaterConfig::create);
     CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig::create);
+    CONFIG_CREATORS.put(VEHICLE_POSITIONS, VehiclePositionsUpdaterConfig::create);
     CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_ET_GOOGLE_PUBSUB_UPDATER, SiriETGooglePubsubUpdaterConfig::create);
@@ -73,12 +84,14 @@ public class UpdatersConfig implements UpdatersParameters {
   private final Multimap<String, Object> configList = ArrayListMultimap.create();
 
   @Nullable
-  private final BikeRentalServiceDirectoryFetcherParameters bikeRentalServiceDirectoryFetcherParameters;
+  private final VehicleRentalServiceDirectoryFetcherParameters vehicleRentalServiceDirectoryFetcherParameters;
 
   public UpdatersConfig(NodeAdapter rootAdapter) {
-    this.bikeRentalServiceDirectoryFetcherParameters =
-        BikeRentalServiceDirectoryFetcherConfig.create(
-          rootAdapter.path("bikeRentalServiceDirectory")
+    this.vehicleRentalServiceDirectoryFetcherParameters =
+        VehicleRentalServiceDirectoryFetcherConfig.create(
+          rootAdapter.exist("vehicleRentalServiceDirectory") ?
+          rootAdapter.path("vehicleRentalServiceDirectory") :
+          rootAdapter.path("bikeRentalServiceDirectory") // TODO: deprecated, remove in next major version
         );
 
     List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
@@ -94,18 +107,20 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   /**
-   * This is the endpoint url used for the BikeRentalServiceDirectory sandbox feature.
-   * @see org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher
+   * This is the endpoint url used for the VehicleRentalServiceDirectory sandbox feature.
+   * @see VehicleRentalServiceDirectoryFetcher
    */
   @Override
   @Nullable
-  public BikeRentalServiceDirectoryFetcherParameters getBikeRentalServiceDirectoryFetcherParameters() {
-   return this.bikeRentalServiceDirectoryFetcherParameters;
+  public VehicleRentalServiceDirectoryFetcherParameters getVehicleRentalServiceDirectoryFetcherParameters() {
+   return this.vehicleRentalServiceDirectoryFetcherParameters;
   }
 
   @Override
-  public List<BikeRentalUpdaterParameters> getBikeRentalParameters() {
-    return getParameters(BIKE_RENTAL);
+  public List<VehicleRentalUpdaterParameters> getVehicleRentalParameters() {
+    ArrayList<VehicleRentalUpdaterParameters> result = new ArrayList<>(getParameters(VEHICLE_RENTAL));
+    result.addAll(getParameters(BIKE_RENTAL));
+    return result;
   }
 
   @Override
@@ -116,6 +131,11 @@ public class UpdatersConfig implements UpdatersParameters {
   @Override
   public List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters() {
     return getParameters(STOP_TIME_UPDATER);
+  }
+
+  @Override
+  public List<VehiclePositionsUpdaterParameters> getVehiclePositionsUpdaterParameters() {
+    return getParameters(VEHICLE_POSITIONS);
   }
 
   @Override
@@ -149,8 +169,8 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<BikeParkUpdaterParameters> getBikeParkUpdaterParameters() {
-    return getParameters(BIKE_PARK);
+  public List<VehicleParkingUpdaterParameters> getVehicleParkingUpdaterParameters() {
+    return getParameters(VEHICLE_PARKING);
   }
 
   @Override

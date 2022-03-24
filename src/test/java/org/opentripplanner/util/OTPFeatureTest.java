@@ -10,12 +10,14 @@ import org.opentripplanner.standalone.configure.OTPConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class OTPFeatureTest {
-    private OTPFeature subject = OTPFeature.APIBikeRental;
-    private Map<OTPFeature, Boolean> backupValues = new HashMap<>();
+    private final OTPFeature subject = OTPFeature.APIBikeRental;
+    private final Map<OTPFeature, Boolean> backupValues = new HashMap<>();
 
     @Before
     public void setUp() {
@@ -50,6 +52,16 @@ public class OTPFeatureTest {
         assertTrue(subject.isOff());
     }
 
+    @Test public void isOnElseNull() {
+        subject.set(true);
+        // then expect value to be passed through
+        assertEquals("OK", subject.isOnElseNull(() -> "OK"));
+
+        subject.set(false);
+        // then expect supplier to be ignored
+        assertNull(subject.isOnElseNull(() -> Integer.parseInt("THROW EXCEPTION")));
+    }
+
     @Test public void allowOTPFeaturesToBeConfigurableFromJSON() {
         // Use a mapper to create a JSON configuration
         ObjectMapper mapper = new ObjectMapper();
@@ -72,7 +84,6 @@ public class OTPFeatureTest {
         OTPFeature.APIBikeRental.set(true);
 
         // And features missing in the config file
-        OTPFeature.APIExternalGeocoder.set(true);
         OTPFeature.APIGraphInspectorTile.set(false);
 
         // When
@@ -81,6 +92,5 @@ public class OTPFeatureTest {
         // Then
         assertTrue(OTPFeature.APIServerInfo.isOn());
         assertTrue(OTPFeature.APIBikeRental.isOff());
-        assertTrue(OTPFeature.APIExternalGeocoder.isOn());
     }
 }

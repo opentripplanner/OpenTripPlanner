@@ -1,17 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Sets;
-import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -41,12 +30,23 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class GtfsModule implements GraphBuilderModule {
 
@@ -54,17 +54,11 @@ public class GtfsModule implements GraphBuilderModule {
 
     private DataImportIssueStore issueStore;
 
-    private EntityHandler counter = new EntityCounter();
+    private final EntityHandler counter = new EntityCounter();
 
     private FareServiceFactory fareServiceFactory;
 
-    /** will be applied to all bundles which do not have the cacheDirectory property set */
-    private File cacheDirectory;
-
-    /** will be applied to all bundles which do not have the useCached property set */
-    private Boolean useCached;
-
-    private Set<String> agencyIdsSeen = Sets.newHashSet();
+    private final Set<String> agencyIdsSeen = Sets.newHashSet();
 
     private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
@@ -74,7 +68,7 @@ public class GtfsModule implements GraphBuilderModule {
      */
     private final ServiceDateInterval transitPeriodLimit;
 
-    private List<GtfsBundle> gtfsBundles;
+    private final List<GtfsBundle> gtfsBundles;
 
     public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
         this.gtfsBundles = bundles;
@@ -82,7 +76,7 @@ public class GtfsModule implements GraphBuilderModule {
     }
 
     public List<String> provides() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         result.add("transit");
         return result;
     }
@@ -110,19 +104,10 @@ public class GtfsModule implements GraphBuilderModule {
         // because the time zone from the first agency is cached
         graph.clearTimeZone();
 
-        CalendarServiceData calendarServiceData = new CalendarServiceData();
+        CalendarServiceData calendarServiceData = graph.getCalendarDataService();
 
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
-                // apply global defaults to individual GTFSBundles (if globals have been set)
-                if (cacheDirectory != null && gtfsBundle.cacheDirectory == null) {
-                    gtfsBundle.cacheDirectory = cacheDirectory;
-                }
-
-                if (useCached != null && gtfsBundle.useCached == null) {
-                    gtfsBundle.useCached = useCached;
-                }
-
                 GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
                 GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
                         gtfsBundle.getFeedId().getId(),
@@ -133,12 +118,14 @@ public class GtfsModule implements GraphBuilderModule {
 
                 OtpTransitServiceBuilder builder =  mapper.getBuilder();
 
-                builder.limitServiceDays(transitPeriodLimit);
+                builder.limitServiceDays(transitPeriodLimit, issueStore);
 
                 calendarServiceData.add(builder.buildCalendarServiceData());
 
                 if (OTPFeature.FlexRouting.isOn()) {
-                    builder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(builder));
+                    builder.getFlexTripsById().addAll(
+                            FlexTripsMapper.createFlexTrips(builder, issueStore)
+                    );
                 }
 
                 repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip());
@@ -161,6 +148,7 @@ public class GtfsModule implements GraphBuilderModule {
             gtfsBundles.forEach(GtfsBundle::close);
         }
 
+        graph.clearCachedCalenderService();
         // We need to save the calendar service data so we can use it later
         graph.putService(
                 org.opentripplanner.model.calendar.CalendarServiceData.class,
@@ -332,9 +320,9 @@ public class GtfsModule implements GraphBuilderModule {
         route.setTextColor(textColor);
     }
 
-    private class StoreImpl implements GenericMutableDao {
+    private static class StoreImpl implements GenericMutableDao {
 
-        private GtfsMutableRelationalDao dao;
+        private final GtfsMutableRelationalDao dao;
 
         StoreImpl(GtfsMutableRelationalDao dao) {
             this.dao = dao;
@@ -393,7 +381,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     private static class EntityCounter implements EntityHandler {
 
-        private Map<Class<?>, Integer> _count = new HashMap<Class<?>, Integer>();
+        private final Map<Class<?>, Integer> count = new HashMap<>();
 
         @Override
         public void handleEntity(Object bean) {
@@ -409,12 +397,12 @@ public class GtfsModule implements GraphBuilderModule {
         }
 
         private int incrementCount(Class<?> entityType) {
-            Integer value = _count.get(entityType);
+            Integer value = count.get(entityType);
             if (value == null) {
                 value = 0;
             }
             value++;
-            _count.put(entityType, value);
+            count.put(entityType, value);
             return value;
         }
 

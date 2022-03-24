@@ -1,26 +1,19 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.MultiLineString;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.operation.distance.DistanceOp;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This is a representation of a set of contiguous OSM areas, used for various tasks related to edge splitting, such as start/endpoint snapping and
@@ -31,81 +24,74 @@ import org.locationtech.jts.geom.Polygon;
 public class AreaEdgeList implements Serializable {
     private static final long serialVersionUID = 969137349467214074L;
 
-    private ArrayList<AreaEdge> edges = new ArrayList<AreaEdge>();
-
-    private HashSet<IntersectionVertex> vertices = new HashSet<IntersectionVertex>();
+    public final HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
 
     // these are all of the original edges of the area, whether
     // or not there are corresponding OSM edges. It is used as part of a hack
     // to fix up areas after network linking.
-    private Polygon originalEdges;
+    private final Polygon originalEdges;
 
-    private List<NamedArea> areas = new ArrayList<NamedArea>();
+    private final List<NamedArea> areas = new ArrayList<>();
 
-    public List<AreaEdge> getEdges() {
-        return edges;
-    }
-
-    public void setEdges(ArrayList<AreaEdge> edges) {
-        this.edges = edges;
-        for (AreaEdge edge : edges) {
-            vertices.add((IntersectionVertex) edge.getFromVertex());
-        }
-    }
-
-    public void addEdge(AreaEdge edge) {
-        edges.add(edge);
-        vertices.add((IntersectionVertex) edge.getFromVertex());
-    }
-
-    public void removeEdge(AreaEdge edge) {
-        edges.remove(edge);
-        // reconstruct vertices
-        vertices.clear();
-        for (Edge e : edges) {
-            vertices.add((IntersectionVertex) e.getFromVertex());
-        }
+    public AreaEdgeList(Polygon originalEdges) {
+        this.originalEdges = originalEdges;
     }
 
     /**
      * Safely add a vertex to this area. This creates edges to all other vertices unless those edges would cross one of the original edges.
      */
-    public void addVertex(IntersectionVertex newVertex, Graph graph) {
+    public void addVertex(IntersectionVertex newVertex) {
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-        if (edges.size() == 0) {
-            throw new RuntimeException("Can't add a vertex to an empty area");
-        }
 
-        @SuppressWarnings("unchecked")
-        HashSet<IntersectionVertex> verticesCopy = (HashSet<IntersectionVertex>) vertices.clone();
-        VERTEX: for (IntersectionVertex v : verticesCopy) {
-            LineString newGeometry = geometryFactory.createLineString(new Coordinate[] {
-                    newVertex.getCoordinate(), v.getCoordinate() });
+        Geometry polygon = originalEdges.union(originalEdges.getBoundary()).buffer(0.000001);
+
+        // Due to truncating of precision in storage of the edge geometry, the new split vertex
+        // might be located just outside the area, so we calculate the point closest to the polygon
+        // for the comparison.
+        Coordinate[] nearestPoints = DistanceOp.nearestPoints(
+            polygon,
+            geometryFactory.createPoint(newVertex.getCoordinate())
+        );
+
+        int added = 0;
+
+        for (IntersectionVertex v : visibilityVertices) {
+            LineString newGeometry = geometryFactory.createLineString(
+                new Coordinate[] {nearestPoints[0], v.getCoordinate() }
+            );
 
             // ensure that new edge does not leave the bounds of the original area, or
             // fall into any holes
-            if (!originalEdges.union(originalEdges.getBoundary()).contains(newGeometry)) {
-                continue VERTEX;
+            if (!polygon.contains(newGeometry)) {
+                continue;
             }
 
             // check to see if this splits multiple NamedAreas. This code is rather similar to
             // code in OSMGBI, but the data structures are different
-
-            createSegments(newVertex, v, areas, graph);
+            createSegments(newVertex, v, areas);
+            added++;
         }
 
-        vertices.add(newVertex);
+        // TODO: Temporary fix for unconnected area edges. This should go away when moving walkable
+        // area calculation to be done after stop linking
+        if (added == 0) {
+            for (IntersectionVertex v : visibilityVertices) {
+                createSegments(newVertex, v, areas);
+            }
+        }
+
+        visibilityVertices.add(newVertex);
     }
 
     private void createSegments(IntersectionVertex from, IntersectionVertex to,
-            List<NamedArea> areas, Graph graph) {
+            List<NamedArea> areas) {
 
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
         LineString line = geometryFactory.createLineString(new Coordinate[] { from.getCoordinate(),
                 to.getCoordinate() });
 
-        List<NamedArea> intersects = new ArrayList<NamedArea>();
+        List<NamedArea> intersects = new ArrayList<>();
         for (NamedArea area : areas) {
             Geometry polygon = area.getPolygon();
             Geometry intersection = polygon.intersection(line);
@@ -113,67 +99,19 @@ public class AreaEdgeList implements Serializable {
                 intersects.add(area);
             }
         }
-        if (intersects.size() == 1) {
+        if (intersects.size() > 0) {
+            // If more than one area intersects, we pick one by random for the name & properties
             NamedArea area = intersects.get(0);
 
             double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
 
-            AreaEdge forward = new AreaEdge(from, to, line, area.getRawName(), length,
+            AreaEdge forward = new AreaEdge(from, to, line, area.getName(), length,
                     area.getPermission(), false, this);
             forward.setStreetClass(area.getStreetClass());
-            AreaEdge backward = new AreaEdge(to, from, (LineString) line.reverse(), area.getRawName(),
+            AreaEdge backward = new AreaEdge(to, from, (LineString) line.reverse(), area.getName(),
                     length, area.getPermission(), true, this);
             backward.setStreetClass(area.getStreetClass());
-            edges.add(forward);
-            edges.add(backward);
-
-        } else {
-            Coordinate startCoordinate = from.getCoordinate();
-            Point startPoint = geometryFactory.createPoint(startCoordinate);
-            for (NamedArea area : intersects) {
-                Geometry polygon = area.getPolygon();
-                if (!polygon.intersects(startPoint))
-                    continue;
-                Geometry lineParts = line.intersection(polygon);
-                if (lineParts.getLength() > 0.000001) {
-                    Coordinate edgeCoordinate = null;
-                    // this is either a LineString or a MultiLineString (we hope)
-                    if (lineParts instanceof MultiLineString) {
-                        MultiLineString mls = (MultiLineString) lineParts;
-                        for (int i = 0; i < mls.getNumGeometries(); ++i) {
-                            LineString segment = (LineString) mls.getGeometryN(i);
-                            if (segment.contains(startPoint)
-                                    || segment.getBoundary().contains(startPoint)) {
-                                edgeCoordinate = segment.getEndPoint().getCoordinate();
-                            }
-                        }
-                    } else if (lineParts instanceof LineString) {
-                        edgeCoordinate = ((LineString) lineParts).getEndPoint().getCoordinate();
-                    } else {
-                        continue;
-                    }
-
-                    String label = "area splitter at " + edgeCoordinate;
-                    IntersectionVertex newEndpoint = (IntersectionVertex) graph.getVertex(label);
-                    if (newEndpoint == null) {
-                        newEndpoint = new IntersectionVertex(graph, label, edgeCoordinate.x,
-                                edgeCoordinate.y);
-                    }
-
-                    createSegments(from, newEndpoint, Arrays.asList(area), graph);
-                    createSegments(newEndpoint, to, intersects, graph);
-                    break;
-                }
-            }
         }
-    }
-
-    public Polygon getOriginalEdges() {
-        return originalEdges;
-    }
-
-    public void setOriginalEdges(Polygon polygon) {
-        this.originalEdges = polygon;
     }
 
     public void addArea(NamedArea namedArea) {
@@ -182,10 +120,5 @@ public class AreaEdgeList implements Serializable {
 
     public List<NamedArea> getAreas() {
         return areas;
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        edges.trimToSize();
-        out.defaultWriteObject();
     }
 }

@@ -3,8 +3,6 @@ package org.opentripplanner.transit.raptor.speed_test.model;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
 
-import java.util.List;
-
 /**
 * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
 * particular vehicle (or on foot).

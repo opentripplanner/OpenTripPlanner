@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+
 import java.util.Collection;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.util.time.DurationUtils;
 
 /**
  * This is a calculator to calculate a min-safe-transfer-time. The
@@ -14,11 +15,12 @@ import org.opentripplanner.util.time.DurationUtils;
  * <p>
  * The min-safe-transfer-time is calculated using the <em>minimum transit time</em>
  * across the list of journeys passed in. The transit time is used because we do not
- * want to include waiting time, witch variate more from search to search.
+ * want to include waiting time, which variate more from search to search.
  * <p>
  * Example:
  * <pre>
- *   upper limit: 40 minutes
+ *   Lower limit is:  2 minutes
+ *   Upper limit is: 40 minutes
  *   minSafeTransferTimeFactor: f = 6.67
  *
  *   Itineraries returned from search:
@@ -62,7 +64,13 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
    * This is an upper bound for min-safe-transfer-time. Journeys that
    * last for more than 10 hours will use 40 minutes as a {@code minSafeTransferTime}.
    */
-  private static final int MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND = DurationUtils.duration("40m");
+  private static final int MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND = durationInSeconds("40m");
+
+  /**
+   * This is an lower bound for min-safe-transfer-time. Journeys that
+   * last for less than 30 minutes will use 2 minutes as a {@code minSafeTransferTime}.
+   */
+  private static final int MIN_SAFE_TRANSFER_TIME_LIMIT_LOWER_BOUND = durationInSeconds("2m");
 
 
   public MinSafeTransferTimeCalculator(RaptorSlackProvider slackProvider) {
@@ -92,6 +100,17 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
     if(list.isEmpty()) { return MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND; }
     int minTransitTime = list.stream().mapToInt(transitTimeSeconds).min().getAsInt();
     int minSafeTransitTime = (int) Math.round(minTransitTime * P / 100.0);
-    return Math.min(MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND, minSafeTransitTime);
+    return bound(
+            minSafeTransitTime,
+            MIN_SAFE_TRANSFER_TIME_LIMIT_LOWER_BOUND,
+            MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND
+    );
+  }
+
+  /** Make sure value is within lower and upper bound. */
+  @SuppressWarnings("SameParameterValue")
+  static int bound(int value, final int lowerLimit, final int upperLimit) {
+    value = Math.max(value, lowerLimit);
+    return Math.min(value, upperLimit);
   }
 }

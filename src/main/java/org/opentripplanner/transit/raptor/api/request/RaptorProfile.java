@@ -2,46 +2,42 @@ package org.opentripplanner.transit.raptor.api.request;
 
 
 import java.util.stream.Stream;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.MinTravelDurationRoutingStrategy;
 
 /**
  * Several implementation are implemented - with different behaviour. Use the one
  * that suites your need best.
  */
 public enum RaptorProfile {
+
     /**
      * Multi criteria pareto search.
      */
     MULTI_CRITERIA("Mc"),
+
     /**
-     * Range Raptor finding the earliest arrival time, shortest travel duration and fewest transfers.
-     * The cost is not used.
+     * Used by Range Raptor finding the earliest-arrival-time, the shortest travel duration
+     * and the fewest transfers. Generalized-cost is not used.
      * <p/>
      * Computes result paths.
      */
     STANDARD("Standard"),
 
     /**
-     * Range Raptor finding the earliest arrival times - only. No paths are returned.
-     * Only one iteration is performed. This search is used internally to calculate
-     * heuristics.
-     * <p/>
-     * Computes best/min travel duration and number of transfers.
+     * Same as {@link #STANDARD}, but no paths are computed/returned.
      */
     BEST_TIME("StdBestTime"),
 
     /**
-     * Same as {@link #STANDARD}, but skip extra wait time - only board slack.
-     * <p/>
-     * Computes best/min travel duration and number of transfers.
+     * Used by Raptor to find the shortest travel duration ignoring wait-time. It also finds
+     * number transfers. This profile can only be used with one Raptor iteration - no {code searchWindow}. 
      */
-    NO_WAIT_STD("NoWaitStd"),
+    MIN_TRAVEL_DURATION("MinTravelDuration"),
 
     /**
-     * Same as {@link #BEST_TIME}, but skip extra wait time - only board slack.
-     * <p/>
-     * Computes best/min travel duration(without wait-time) and number of transfers.
+     * Same as {@link #MIN_TRAVEL_DURATION}, but no paths are computed/returned.
      */
-    NO_WAIT_BEST_TIME("NoWaitBT");
+    MIN_TRAVEL_DURATION_BEST_TIME("MinTravelDurationBT");
 
 
     private final String abbreviation;
@@ -60,5 +56,14 @@ public enum RaptorProfile {
 
     public boolean isOneOf(RaptorProfile... candidates) {
         return Stream.of(candidates).anyMatch(this::is);
+    }
+
+    /**
+     * The {@link MinTravelDurationRoutingStrategy} will time-shift the arrival-times, so we need
+     * to use the approximate trip-times search in path construction. The BEST_TIME state should
+     * not have path construction, but we include it here anyway.
+     */
+    public boolean useApproximateTripSearch() {
+        return isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME);
     }
 }

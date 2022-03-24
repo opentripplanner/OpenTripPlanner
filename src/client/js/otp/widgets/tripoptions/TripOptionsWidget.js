@@ -393,11 +393,11 @@ otp.widgets.tripoptions.TimeSelector =
         //var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
         //$('#'+this.id+'-picker').datepicker("setDate", new Date(m));
         if(data.queryParams.date) {
-            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, otp.config.locale.time.date_format)));
+            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, otp.config.apiDateFormat)));
             this.tripWidget.module.date = data.queryParams.date;
         }
         if(data.queryParams.time) {
-            $('#'+this.id+'-time').val(moment(data.queryParams.time, otp.config.locale.time.time_format).format(otp.config.locale.time.time_format));
+            $('#'+this.id+'-time').val(moment(data.queryParams.time, otp.config.apiTimeFormat).format(otp.config.locale.time.time_format));
             this.tripWidget.module.time = data.queryParams.time;
         }
         if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {
@@ -420,7 +420,7 @@ otp.widgets.tripoptions.WheelChairSelector =
 
     id           :  null,
     //TRANSLATORS: label for checkbox
-    label        : _tr("Wheelchair accesible trip:"),
+    label        : _tr("Wheelchair accessible trip:"),
 
     initialize : function(tripWidget) {
 
@@ -445,9 +445,9 @@ otp.widgets.tripoptions.WheelChairSelector =
     },
 
     restorePlan : function(data) {
-        if(data.queryParams.wheelchair) {
-            $("#"+this.id+"-wheelchair-input").prop("checked", data.queryParams.wheelchair);
-        }
+        var checked = data.queryParams.wheelchair === true || data.queryParams.wheelchair === 'true';
+        this.tripWidget.module.wheelchair = checked;
+        $("#"+this.id+"-wheelchair-input").prop("checked", checked);
     },
 
     isApplicableForMode : function(mode) {
@@ -485,9 +485,9 @@ otp.widgets.tripoptions.DebugItineraryFiltersSelector = otp.Class(
             });
         },
         restorePlan: function (data) {
-            if (data.queryParams.debugItineraryFilter) {
-                $("#" + this.id + "-debug-filters-input").prop("checked", data.queryParams.debugItineraryFilter);
-            }
+            var checked = data.queryParams.debugItineraryFilter === true || data.queryParams.debugItineraryFilter === 'true';
+            this.tripWidget.module.debugItineraryFilter = checked;
+            $("#" + this.id + "-debug-filters-input").prop("checked", checked);
         },
         isApplicableForMode : function(mode) { return true; }
     }
@@ -549,6 +549,8 @@ otp.widgets.tripoptions.ModeSelector =
         for(i = 0; i < this.modeControls.length; i++) {
             this.modeControls[i].restorePlan(data);
         }
+
+        this.refreshModeControls();
     },
 
     controlPadding : "8px",
@@ -785,6 +787,7 @@ otp.widgets.tripoptions.BikeTriangle =
 
     id           :  null,
     bikeTriangle :  null,
+    defaultValues: {time: 0.33, slope: 0.33, safety: 0.33},
 
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
@@ -798,7 +801,10 @@ otp.widgets.tripoptions.BikeTriangle =
     },
 
     doAfterLayout : function() {
-        if(!this.bikeTriangle) this.bikeTriangle = new otp.widgets.BikeTrianglePanel(this.id);
+        if(!this.bikeTriangle) {
+            this.bikeTriangle = new otp.widgets.BikeTrianglePanel(this.id);
+            this.bikeTriangle.setValues(this.defaultValues.time, this.defaultValues.slope, this.defaultValues.safety);
+        }
         var this_ = this;
         this.bikeTriangle.onChanged = function() {
             var formData = this_.bikeTriangle.getFormData();
@@ -808,15 +814,24 @@ otp.widgets.tripoptions.BikeTriangle =
                 triangleSlopeFactor : formData.triangleSlopeFactor,
                 triangleSafetyFactor : formData.triangleSafetyFactor,
             });
-
         };
     },
 
     restorePlan : function(planData) {
         if(planData.queryParams.optimize === 'TRIANGLE') {
-            this.bikeTriangle.setValues(planData.queryParams.triangleTimeFactor,
-                                        planData.queryParams.triangleSlopeFactor,
-                                        planData.queryParams.triangleSafetyFactor);
+            if (this.bikeTriangle) {
+                this.bikeTriangle.setValues(
+                    planData.queryParams.triangleTimeFactor,
+                    planData.queryParams.triangleSlopeFactor,
+                    planData.queryParams.triangleSafetyFactor);
+            } else {
+                // doAfterLayout creates the bikeTriangle, which hasn't yet run
+                this.defaultValues = {
+                    time: planData.queryParams.triangleTimeFactor,
+                    slope: planData.queryParams.triangleSlopeFactor,
+                    safety: planData.queryParams.triangleSafetyFactor,
+                };
+            }
         }
     },
 
@@ -1072,16 +1087,42 @@ otp.widgets.tripoptions.AdditionalTripParameters =
                 var params = {};
 
                 keyvalues.forEach(function(keyvalue) {
-                    var split = keyvalue.trim().split('=');
-                    if (!split[0].startsWith('#')) {
-                        params[split[0]] = split[1];
+                    var split = keyvalue.trim().match(/^((?!#)[^=]+)=(.*)$/);
+                    if (split) {
+                        params[split[1]] = split[2];
                     }
                 })
 
-                this_.tripWidget.module.additionalParameters = params;
+                var keys = _(params).keys().join(',');
+                if (keys) {
+                    params['additionalParameters'] = keys;
+                    this_.tripWidget.module.additionalParameters = params;
+                } else {
+                    this_.tripWidget.module.additionalParameters = null;
+                }
             });
         },
-});
+
+        restorePlan : function(data) {
+            if (data.queryParams.additionalParameters) {
+                var str = '';
+                var keys = data.queryParams.additionalParameters.split(',');
+                var params = {
+                  additionalParameters: data.queryParams.additionalParameters
+                };
+
+                _.each(keys, function (key) {
+                    str += key + '=' + data.queryParams[key] + '\n';
+                    params[key] = data.queryParams[key];
+                });
+
+                $('#'+this.id+'-value').val(str);
+
+                this.tripWidget.module.additionalParameters = params;
+            }
+        },
+    }
+);
 
 /*otp.widgets.TW_GroupTripSubmit =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {

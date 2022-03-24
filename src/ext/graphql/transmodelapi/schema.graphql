@@ -587,7 +587,6 @@ type RoutingParameters {
     allowBikeRental: Boolean
     "Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot."
     bikeBoardCost: Int
-    bikeParkAndRide: Boolean
     "Cost to park a bike."
     bikeParkCost: Int
     "Time to park a bike."
@@ -1264,7 +1263,7 @@ input Modes {
 
 "Used to specify board and alight slack for a given modes."
 input TransportModeSlack {
-    "List of modes for witch the given slack apply."
+    "List of modes for which the given slack apply."
     modes: [TransportMode!]!
     "The slack used for all given modes."
     slack: Int!

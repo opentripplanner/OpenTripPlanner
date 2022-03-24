@@ -23,7 +23,7 @@ public class SearchParams {
      * cases/system happens when DST is adjusted.
      * <p>
      * We do not use {@link Integer#MIN_VALUE} because this could potentially lead to overflow
-     * situations witch would be very hard to debug. Add -1 to MIN_VALUE and you get a positive
+     * situations which would be very hard to debug. Add -1 to MIN_VALUE and you get a positive
      * number - not an exception.
      */
     public static final int TIME_NOT_SET = -9_999_999;
@@ -38,7 +38,7 @@ public class SearchParams {
     private final int maxNumberOfTransfers;
     private final double relaxCostAtDestination;
     private final boolean timetableEnabled;
-    private final boolean guaranteedTransfersEnabled;
+    private final boolean constrainedTransfersEnabled;
     private final Collection<RaptorTransfer> accessPaths;
     private final Collection<RaptorTransfer> egressPaths;
 
@@ -54,7 +54,7 @@ public class SearchParams {
         maxNumberOfTransfers = NOT_SET;
         relaxCostAtDestination = NOT_SET;
         timetableEnabled = false;
-        guaranteedTransfersEnabled = false;
+        constrainedTransfersEnabled = false;
         accessPaths = List.of();
         egressPaths = List.of();
     }
@@ -68,7 +68,7 @@ public class SearchParams {
         this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
         this.timetableEnabled = builder.timetableEnabled();
-        this.guaranteedTransfersEnabled = builder.guaranteedTransfersEnabled();
+        this.constrainedTransfersEnabled = builder.constrainedTransfersEnabled();
         this.accessPaths = List.copyOf(builder.accessPaths());
         this.egressPaths = List.copyOf(builder.egressPaths());
     }
@@ -136,6 +136,7 @@ public class SearchParams {
     public boolean isSearchWindowSet() {
         return searchWindowInSeconds != NOT_SET;
     }
+
     public boolean searchOneIterationOnly() {
         return searchWindowInSeconds == 0;
     }
@@ -216,8 +217,8 @@ public class SearchParams {
      * Some of the profiles do not support guaranteed transfers, for these profiles this
      * flag is ignored. Transfers are supported for all profiles returning paths.
      */
-    public boolean guaranteedTransfersEnabled() {
-        return guaranteedTransfersEnabled;
+    public boolean constrainedTransfersEnabled() {
+        return constrainedTransfersEnabled;
     }
 
     /**
@@ -239,6 +240,16 @@ public class SearchParams {
      */
     public Collection<RaptorTransfer> egressPaths() {
         return egressPaths;
+    }
+
+    /**
+     * Get the maximum duration of any access or egress path in seconds.
+     */
+    public int getAccessEgressMaxDurationSeconds() {
+        return Math.max(
+            accessPaths.stream().mapToInt(RaptorTransfer::durationInSeconds).max().orElse(0),
+            egressPaths.stream().mapToInt(RaptorTransfer::durationInSeconds).max().orElse(0)
+        );
     }
 
     @Override

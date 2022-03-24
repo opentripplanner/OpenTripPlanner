@@ -1,8 +1,11 @@
 package org.opentripplanner.transit.raptor.util;
 
 import java.util.Calendar;
+import javax.annotation.Nullable;
+import org.opentripplanner.model.base.OtpNumberFormat;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -12,15 +15,26 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class PathStringBuilder {
+    private final RaptorStopNameResolver stopNameResolver;
     private final StringBuilder buf = new StringBuilder();
     private final boolean padDuration;
     private boolean elementAdded = false;
     private boolean sepAdded = false;
 
-    public PathStringBuilder() {
-        this(false);
+    public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver) {
+        this(stopNameResolver, false);
     }
-    public PathStringBuilder(boolean padDuration) {
+
+    /**
+     * @param stopNameResolver Used to translate stopIndexes to stopNames, if {@code null} the
+     *                           index is used in the result string.
+     * @param padDuration        This can be set to {@code true} for padding the duration output.
+     *                           This would be used in cases were several similar paths are listed.
+     *                           If the legs are similar, the path elements is more likely to be
+     *                           aligned.
+     */
+    public PathStringBuilder(@Nullable RaptorStopNameResolver stopNameResolver, boolean padDuration) {
+        this.stopNameResolver = RaptorStopNameResolver.nullSafe(stopNameResolver);
         this.padDuration = padDuration;
     }
 
@@ -29,8 +43,12 @@ public class PathStringBuilder {
         return this;
     }
 
-    public PathStringBuilder stop(int stop) {
-        return start().append(stop).end();
+    /**
+     * The given {@code stopIndex} is translated to stop name using the {@code stopNameTranslator}
+     * set in the constructor. If not translator is set the stopIndex is used.
+     */
+    public PathStringBuilder stop(int stopIndex) {
+        return stop(stopNameResolver.apply(stopIndex));
     }
 
     public PathStringBuilder stop(String stop) {
@@ -72,18 +90,30 @@ public class PathStringBuilder {
     }
 
     public PathStringBuilder timeAndCostCentiSec(int fromTime, int toTime, int generalizedCost) {
-        return space().time(fromTime, toTime).costCentiSec(generalizedCost);
+        if(buf.length() != 0) { space(); }
+        return time(fromTime, toTime).generalizedCostSentiSec(generalizedCost);
     }
 
-    public PathStringBuilder costSec(int generalizedCost) {
-        if(generalizedCost <= 0) { return this; }
-        space().append("$").append(RaptorCostConverter.toOtpDomainCost(generalizedCost));
-        return this;
+    /** Add generalizedCostCentiSec {@link #costCentiSec(int, int, String)} */
+    public PathStringBuilder generalizedCostSentiSec(int cost) {
+        return costCentiSec(cost, CostCalculator.ZERO_COST, null);
     }
 
-    public PathStringBuilder costCentiSec(int generalizedCost) {
-        if(generalizedCost <= 0) { return this; }
-        space().append(RaptorCostConverter.toString(generalizedCost));
+    /**
+     * Add a cost to the string with an optional unit. Try to be consistent with unit naming,
+     * use lower-case:
+     * <ul>
+     *     <li>{@code null} - Generalized-cost (no unit used)</li>
+     *     <li>{@code "wtc"} - Wait-time cost</li>
+     *     <li>{@code "pri"} - Transfer priority cost</li>
+     * </ul>
+     */
+    public PathStringBuilder costCentiSec(int cost, int defaultValue, String unit) {
+        if(cost == defaultValue) { return this; }
+        space().append(OtpNumberFormat.formatCost(cost));
+        if(unit != null) {
+            append(unit);
+        }
         return this;
     }
 

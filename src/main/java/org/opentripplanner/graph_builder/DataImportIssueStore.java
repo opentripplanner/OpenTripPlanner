@@ -1,12 +1,12 @@
 package org.opentripplanner.graph_builder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DataImportIssueStore {
 
@@ -21,17 +21,25 @@ public class DataImportIssueStore {
   }
 
   public void add(DataImportIssue issue) {
-    ISSUE_LOG.debug("{} - {}", issue.getClass().getSimpleName(), issue.getMessage());
+    ISSUE_LOG.debug("{} - {}", issue.getType(), issue.getMessage());
     if (storeIssues) {
       this.issues.add(issue);
     }
   }
 
+  public void add(String type, String message) {
+    add(Issue.issue(type, message));
+  }
+
+  public void add(String type, String message, Object ... arguments) {
+    add(Issue.issue(type, message, arguments));
+  }
+
   void summarize() {
     Map<String, Long> issueCounts = issues
         .stream()
-        .map(Object::getClass)
-        .collect(Collectors.groupingBy(Class::getSimpleName, Collectors.counting()));
+        .map(DataImportIssue::getType)
+        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
     int maxLength = issueCounts.keySet().stream().mapToInt(String::length).max().orElse(10);
     final String FMT = "  - %-" + maxLength + "s  %,7d";

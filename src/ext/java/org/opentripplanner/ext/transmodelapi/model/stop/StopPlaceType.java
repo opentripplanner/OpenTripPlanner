@@ -10,6 +10,7 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
@@ -17,8 +18,8 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopCollection;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
@@ -57,6 +58,17 @@ public class StopPlaceType {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("name")
             .type(new GraphQLNonNull(Scalars.GraphQLString))
+            .argument(GraphQLArgument
+                .newArgument()
+                .name("lang")
+                .description("Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned.")
+                .type(Scalars.GraphQLString)
+                .build())
+            .dataFetcher(environment -> {
+              String lang = environment.getArgument("lang");
+              Locale locale = lang != null ? new Locale(lang) : null;
+              return (((MonoOrMultiModalStation) environment.getSource()).getName().toString(locale));
+            })
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("latitude")
@@ -91,15 +103,24 @@ public class StopPlaceType {
             .type(new GraphQLList(TRANSPORT_MODE))
             .dataFetcher(environment ->
                 ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
-                    .stream().map(Stop::getVehicleType).collect(Collectors.toSet())
+                    .stream()
+                    .map(StopLocation::getVehicleType)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet())
                 )
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("transportSubmode")
-            .description("The transport submode serviced by this stop place. NOT IMPLEMENTED")
-            .deprecate("Submodes not implemented")
-            .type(TRANSPORT_SUBMODE)
-            .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
+            .description("The transport submode serviced by this stop place.")
+            .type(new GraphQLList(TRANSPORT_SUBMODE))
+            .dataFetcher(environment ->
+                ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
+                    .stream()
+                    .map(StopLocation::getVehicleSubmode)
+                    .filter(Objects::nonNull)
+                    .map(TransmodelTransportSubmode::fromValue)
+                    .collect(Collectors.toList())
+            )
             .build())
         //                .field(GraphQLFieldDefinition.newFieldDefinition()
         //                        .name("adjacentSites")
@@ -111,6 +132,7 @@ public class StopPlaceType {
 
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("quays")
+            .withDirective(gqlUtil.timingData)
             .description("Returns all quays that are children of this stop place")
             .type(new GraphQLList(quayType))
             .argument(GraphQLArgument.newArgument()
@@ -120,7 +142,7 @@ public class StopPlaceType {
                 .defaultValue(Boolean.FALSE)
                 .build())
             .dataFetcher(environment -> {
-              Collection<Stop> quays = ((MonoOrMultiModalStation) environment.getSource()).getChildStops();
+              var quays = ((MonoOrMultiModalStation) environment.getSource()).getChildStops();
               if (TRUE.equals(environment.getArgument("filterByInUse"))) {
                 quays=quays.stream().filter(stop -> {
                   return !GqlUtil.getRoutingService(environment)
@@ -153,8 +175,9 @@ public class StopPlaceType {
             )
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("estimatedCalls")
+            .withDirective(gqlUtil.timingData)
             .description("List of visits to this stop place as part of vehicle journeys.")
-            .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
+            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
             .argument(GraphQLArgument.newArgument()
                 .name("startTime")
                 .type(gqlUtil.dateTimeScalar)
@@ -240,7 +263,7 @@ public class StopPlaceType {
   }
 
   public static Stream<TripTimeOnDate> getTripTimesForStop(
-      Stop stop,
+      StopLocation stop,
       Long startTimeSeconds,
       int timeRage,
       ArrivalDeparture arrivalDeparture,
@@ -338,7 +361,7 @@ public class StopPlaceType {
     Stream<Station> stations = routingService
         .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon)
         .stream()
-        .map(Stop::getParentStation)
+        .map(StopLocation::getParentStation)
         .filter(Objects::nonNull)
         .distinct();
 
@@ -391,7 +414,7 @@ public class StopPlaceType {
   }
 
   public static boolean isStopPlaceInUse(StopCollection station, RoutingService routingService) {
-    for (Stop quay : station.getChildStops()) {
+    for (var quay : station.getChildStops()) {
       if (!routingService.getPatternsForStop(quay, true).isEmpty()) {
         return true;
       }

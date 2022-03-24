@@ -1,6 +1,10 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public final class Route extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
@@ -11,13 +15,19 @@ public final class Route extends TransitEntity {
 
     private Operator operator;
 
+    private Branding branding;
+
+    private List<GroupOfRoutes> groupsOfRoutes = new ArrayList<>();
+
     private String shortName;
 
     private String longName;
 
-    private int type;
-
     private TransitMode mode;
+
+    // TODO: consolidate these
+    private Integer gtfsType;
+    private String netexSubmode;
 
     private String desc;
 
@@ -31,12 +41,18 @@ public final class Route extends TransitEntity {
 
     private int sortOrder = MISSING_VALUE;
 
-    private String brandingUrl;
-
     private String flexibleLineType;
 
     public Route(FeedScopedId id) {
         super(id);
+    }
+
+    public Branding getBranding() {
+        return branding;
+    }
+
+    public void setBranding(Branding branding) {
+        this.branding = branding;
     }
 
     /**
@@ -87,12 +103,12 @@ public final class Route extends TransitEntity {
         this.desc = desc;
     }
 
-    public int getType() {
-        return type;
+    public Integer getGtfsType() {
+        return gtfsType;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setGtfsType(int gtfsType) {
+        this.gtfsType = gtfsType;
     }
 
     public TransitMode getMode() {
@@ -147,14 +163,6 @@ public final class Route extends TransitEntity {
         this.sortOrder = sortOrder;
     }
 
-    public String getBrandingUrl() {
-        return brandingUrl;
-    }
-
-    public void setBrandingUrl(String brandingUrl) {
-        this.brandingUrl = brandingUrl;
-    }
-
     /**
      * Pass-through information from NeTEx FlexibleLineType. This information is not used by OTP.
      */
@@ -173,6 +181,22 @@ public final class Route extends TransitEntity {
 
     @Override
     public String toString() {
-        return "<Route " + getId() + " " + shortName + ">";
+        return "<Route " + getId() + " " + getName() + ">";
+    }
+
+    public String getNetexSubmode() {
+        return netexSubmode;
+    }
+
+    public void setNetexSubmode(String netexSubmode) {
+        this.netexSubmode = netexSubmode;
+    }
+
+    public List<GroupOfRoutes> getGroupsOfRoutes() {
+        return groupsOfRoutes;
+    }    
+    
+    public void setGroupsOfRoutes(Collection<GroupOfRoutes> list) {
+        groupsOfRoutes = List.copyOf(list);
     }
 }

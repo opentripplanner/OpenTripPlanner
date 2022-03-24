@@ -1,18 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
+import java.util.List;
+
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListenerComposite;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetWithMarker;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * A pareto optimal set of stop arrivals for a given stop.
@@ -40,20 +38,20 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule> extends ParetoSetWithMa
 
     /**
      * Create a new StopArrivalParetoSet and attach a debugger if it exist. Also
-     * attach a {@link CalculateTransferToDestination} listener witch will create
+     * attach a {@link CalculateTransferToDestination} listener which will create
      * new destination arrivals for each accepted egress stop arrival.
      */
     static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
-            Map.Entry<Integer, List<RaptorTransfer>> egressPaths,
-            CostCalculator<T> costCalculator,
+            int stop,
+            List<RaptorTransfer> egressPaths,
             DestinationArrivalPaths<T> destinationArrivals,
             DebugHandlerFactory<T> debugHandlerFactory
     ) {
         ParetoSetEventListener<ArrivalView<T>> listener;
         ParetoSetEventListener<ArrivalView<T>> debugListener;
 
-        listener = new CalculateTransferToDestination<>(egressPaths.getValue(), destinationArrivals, costCalculator);
-        debugListener = debugHandlerFactory.paretoSetStopArrivalListener(egressPaths.getKey());
+        listener = new CalculateTransferToDestination<>(egressPaths, destinationArrivals);
+        debugListener = debugHandlerFactory.paretoSetStopArrivalListener(stop);
 
         if(debugListener != null) {
             listener = new ParetoSetEventListenerComposite<>(debugListener, listener);

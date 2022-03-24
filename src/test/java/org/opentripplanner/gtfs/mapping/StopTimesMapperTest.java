@@ -14,6 +14,8 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.util.TranslationHelper;
 
 public class StopTimesMapperTest {
     private static final String FEED_ID = "FEED";
@@ -38,6 +40,8 @@ public class StopTimesMapperTest {
 
     private static final Stop STOP = new Stop();
 
+    private static final String STOP_NAME = "Stop";
+
     private static final String HEAD_SIGN = "Head Sign";
 
     private static final int STOP_SEQUENCE = 4;
@@ -51,6 +55,7 @@ public class StopTimesMapperTest {
     static {
         TRIP.setId(AGENCY_AND_ID);
         STOP.setId(AGENCY_AND_ID);
+        STOP.setName(STOP_NAME);
 
         STOP_TIME.setId(ID);
         STOP_TIME.setArrivalTime(ARRIVAL_TIME);
@@ -67,7 +72,7 @@ public class StopTimesMapperTest {
         STOP_TIME.setTrip(TRIP);
     }
 
-    private final StopMapper stopMapper = new StopMapper();
+    private final StopMapper stopMapper = new StopMapper(new TranslationHelper());
     private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
     private final LocationMapper locationMapper = new LocationMapper();
     private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper);
@@ -76,7 +81,7 @@ public class StopTimesMapperTest {
             stopMapper,
             locationMapper,
             locationGroupMapper,
-            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID))),
+            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))),
             bookingRuleMapper
     );
 

@@ -4,6 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
@@ -12,32 +13,32 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
 
   @Override
   public DataFetcher<Object> stop() {
-    return environment -> getRoutingService(environment).getStopForId(getSource(environment).getStopId());
+    return environment -> getSource(environment).getStop();
   }
 
   @Override
   public DataFetcher<Integer> scheduledArrival() {
-    return environment -> getSource(environment).getScheduledArrival();
+    return environment -> missingValueToNull(getSource(environment).getScheduledArrival());
   }
 
   @Override
   public DataFetcher<Integer> realtimeArrival() {
-    return environment -> getSource(environment).getRealtimeArrival();
+    return environment -> missingValueToNull(getSource(environment).getRealtimeArrival());
   }
 
   @Override
   public DataFetcher<Integer> arrivalDelay() {
-    return environment -> getSource(environment).getArrivalDelay();
+    return environment -> missingValueToNull(getSource(environment).getArrivalDelay());
   }
 
   @Override
   public DataFetcher<Integer> scheduledDeparture() {
-    return environment -> getSource(environment).getScheduledDeparture();
+    return environment -> missingValueToNull(getSource(environment).getScheduledDeparture());
   }
 
   @Override
   public DataFetcher<Integer> realtimeDeparture() {
-    return environment -> getSource(environment).getRealtimeDeparture();
+    return environment -> missingValueToNull(getSource(environment).getRealtimeDeparture());
   }
 
   @Override
@@ -107,5 +108,18 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
 
   private TripTimeOnDate getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
+  }
+
+  /**
+   * Generally the missing values are removed during the graph build. However, for flex
+   * trips they are not and have to be converted to null here.
+   */
+  private Integer missingValueToNull(int value) {
+      if(value == StopTime.MISSING_VALUE) {
+        return null;
+      }
+      else {
+        return value;
+      }
   }
 }

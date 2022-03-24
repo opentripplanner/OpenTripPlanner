@@ -3,10 +3,9 @@ package org.opentripplanner.routing.core;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
 
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
@@ -48,6 +47,11 @@ public class StateEditor {
             child.backState = null;
             child.vertex = parent.vertex;
             child.stateData = child.stateData.clone();
+        } else if (e.getFromVertex() == null || e.getToVertex() == null) {
+            child.vertex = parent.vertex;
+            child.stateData = child.stateData.clone();
+            LOG.error("From or to vertex is null for {}", e);
+            defectiveTraversal = true;
         } else {
             // be clever
             // Note that we use equals(), not ==, here to allow for dynamically
@@ -219,86 +223,77 @@ public class StateEditor {
     }
 
     public void beginFloatingVehicleRenting(
-            TraverseMode vehicleMode,
-            Set<String> networks,
+            FormFactor formFactor,
+            String network,
             boolean reverse
     ) {
         cloneStateDataAsNeeded();
         if (reverse) {
-            child.stateData.bikeRentalState = BikeRentalState.BEFORE_RENTING;
+            child.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
             child.stateData.currentMode = TraverseMode.WALK;
-            child.stateData.bikeRentalNetworks = null;
+            child.stateData.vehicleRentalNetwork = null;
+            child.stateData.rentalVehicleFormFactor = null;
         } else {
-            child.stateData.bikeRentalState = BikeRentalState.RENTING_FLOATING;
-            child.stateData.currentMode = vehicleMode;
-            child.stateData.bikeRentalNetworks = networks;
+            child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
+            child.stateData.currentMode = formFactor.traverseMode;
+            child.stateData.vehicleRentalNetwork = network;
+            child.stateData.rentalVehicleFormFactor = formFactor;
         }
     }
 
     public void beginVehicleRentingAtStation(
-            TraverseMode vehicleMode,
-            Set<String> networks,
+            FormFactor formFactor,
+            String network,
             boolean mayKeep,
             boolean reverse
     ) {
         cloneStateDataAsNeeded();
         if (reverse) {
-            child.stateData.mayKeepRentedBicycleAtDestination = mayKeep;
-            child.stateData.bikeRentalState = BikeRentalState.BEFORE_RENTING;
+            child.stateData.mayKeepRentedVehicleAtDestination = mayKeep;
+            child.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
             child.stateData.currentMode = TraverseMode.WALK;
-            child.stateData.bikeRentalNetworks = null;
+            child.stateData.vehicleRentalNetwork = null;
+            child.stateData.rentalVehicleFormFactor = null;
             child.stateData.backWalkingBike = false;
         } else {
-            child.stateData.mayKeepRentedBicycleAtDestination = mayKeep;
-            child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
-            child.stateData.currentMode = vehicleMode;
-            child.stateData.bikeRentalNetworks = networks;
+            child.stateData.mayKeepRentedVehicleAtDestination = mayKeep;
+            child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
+            child.stateData.currentMode = formFactor.traverseMode;
+            child.stateData.vehicleRentalNetwork = network;
+            child.stateData.rentalVehicleFormFactor = formFactor;
         }
     }
 
     public void dropOffRentedVehicleAtStation(
-            TraverseMode vehicleMode,
-            Set<String> networks,
+            FormFactor formFactor,
+            String network,
             boolean reverse
     ) {
         cloneStateDataAsNeeded();
         if (reverse) {
-            child.stateData.mayKeepRentedBicycleAtDestination = false;
-            child.stateData.bikeRentalState = BikeRentalState.RENTING_FROM_STATION;
-            child.stateData.currentMode = vehicleMode;
-            child.stateData.bikeRentalNetworks = networks;
+            child.stateData.mayKeepRentedVehicleAtDestination = false;
+            child.stateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
+            child.stateData.currentMode = formFactor.traverseMode;
+            child.stateData.vehicleRentalNetwork = network;
+            child.stateData.rentalVehicleFormFactor = formFactor;
         } else {
-            child.stateData.mayKeepRentedBicycleAtDestination = false;
-            child.stateData.bikeRentalState = BikeRentalState.HAVE_RENTED;
+            child.stateData.mayKeepRentedVehicleAtDestination = false;
+            child.stateData.vehicleRentalState = VehicleRentalState.HAVE_RENTED;
             child.stateData.currentMode = TraverseMode.WALK;
-            child.stateData.bikeRentalNetworks = null;
+            child.stateData.vehicleRentalNetwork = null;
+            child.stateData.rentalVehicleFormFactor = null;
             child.stateData.backWalkingBike = false;
         }
     }
 
     /**
-     * This has two effects: marks the car as parked, and switches the current mode.
-     * Marking the car parked is important for allowing co-dominance of walking and driving states.
+     * This has two effects: marks the vehicle as parked, and switches the current mode.
+     * Marking the vehicle parked is important for allowing co-dominance of walking and driving states.
      */
-    public void setCarParked(boolean carParked) {
+    public void setVehicleParked(boolean vehicleParked, TraverseMode nonTransitMode) {
         cloneStateDataAsNeeded();
-        child.stateData.carParked = carParked;
-        if (carParked) {
-            // We do not handle mixed-mode P+BIKE...
-            child.stateData.currentMode = TraverseMode.WALK;
-        } else {
-            child.stateData.currentMode = TraverseMode.CAR;
-        }
-    }
-
-    public void setBikeParked(boolean bikeParked) {
-        cloneStateDataAsNeeded();
-        child.stateData.bikeParked = bikeParked;
-        if (bikeParked) {
-            child.stateData.currentMode = TraverseMode.WALK;
-        } else {
-            child.stateData.currentMode = TraverseMode.BICYCLE;
-        }
+        child.stateData.vehicleParked = vehicleParked;
+        child.stateData.currentMode = nonTransitMode;
     }
 
     public void setTimeSeconds(long seconds) {
@@ -319,17 +314,15 @@ public class StateEditor {
     public void setFromState(State state) {
         cloneStateDataAsNeeded();
         child.stateData.carPickupState = state.stateData.carPickupState;
-        child.stateData.carParked = state.stateData.carParked;
-        child.stateData.bikeParked = state.stateData.bikeParked;
+        child.stateData.vehicleParked = state.stateData.vehicleParked;
         child.stateData.backWalkingBike = state.stateData.backWalkingBike;
     }
 
     public void setNonTransitOptionsFromState(State state) {
         cloneStateDataAsNeeded();
         child.stateData.currentMode = state.getNonTransitMode();
-        child.stateData.carParked = state.isCarParked();
-        child.stateData.bikeParked = state.isBikeParked();
-        child.stateData.bikeRentalState = state.stateData.bikeRentalState;
+        child.stateData.vehicleParked = state.isVehicleParked();
+        child.stateData.vehicleRentalState = state.stateData.vehicleRentalState;
     }
 
     public void setCarPickupState(CarPickupState carPickupState) {
@@ -357,7 +350,7 @@ public class StateEditor {
     }
 
     public boolean isRentingBike() {
-        return child.isBikeRenting();
+        return child.isRentingVehicle();
     }
 
     public double getWalkDistance() {
@@ -385,9 +378,9 @@ public class StateEditor {
         child.stateData.opt = options;
     }
 
-    public void setBikeRentalNetwork(Set<String> networks) {
+    public void setBikeRentalNetwork(String network) {
         cloneStateDataAsNeeded();
-        child.stateData.bikeRentalNetworks = networks;
+        child.stateData.vehicleRentalNetwork = network;
     }
 
     public State getBackState() {

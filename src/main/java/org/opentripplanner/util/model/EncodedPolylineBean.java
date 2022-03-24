@@ -76,7 +76,7 @@ public class EncodedPolylineBean implements Serializable {
 
     private static String encodeNumber(int num) {
 
-        StringBuffer encodeString = new StringBuffer();
+        StringBuilder encodeString = new StringBuilder();
 
         while (num >= 0x20) {
             int nextValue = (0x20 | (num & 0x1f)) + 63;

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -11,6 +10,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.I18NString;
 
 /**
  * This represents the connection between a street vertex and a transit vertex.
@@ -55,13 +55,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
-    public String getName() {
+    public I18NString getName() {
         return this.transitEntityVertex.getName();
-    }
-
-    public String getName(Locale locale) {
-        //TODO: localize
-        return getName();
     }
 
 
@@ -85,22 +80,29 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
             return null;
         }
 
+        // Do not check here whether any transit modes are selected. A check for the presence of
+        // transit modes will instead be done in the following PreBoard edge.
+        // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
         switch (s0.getNonTransitMode()) {
             case BICYCLE:
                 // Forbid taking your own bike in the station if bike P+R activated.
-                if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
+                if (s0.getOptions().parkAndRide && !s0.isVehicleParked()) {
                     return null;
                 }
-                // Forbid taking a (station) rental bike in the station. This allows taking along
-                // floating bikes.
-                else if (s0.isBikeRentingFromStation() && !(s0.mayKeepRentedBicycleAtDestination() && s0.getOptions().allowKeepingRentedBicycleAtDestination)) {
+                // Forbid taking a (station) rental vehicle in the station. This allows taking along
+                // floating rental vehicles.
+                else if (s0.isRentingVehicleFromStation() && !(s0.mayKeepRentedVehicleAtDestination() && s0.getOptions().allowKeepingRentedVehicleAtDestination)) {
                     return null;
                 }
                 // Allow taking an owned bike in the station
                 break;
             case CAR:
+                // Forbid taking your own car in the station if bike P+R activated.
+                if (s0.getOptions().parkAndRide && !s0.isVehicleParked()) {
+                    return null;
+                }
                 // For Kiss & Ride allow dropping of the passenger before entering the station
                 if (s0.getCarPickupState() != null) {
                     if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(req)) {
@@ -119,10 +121,10 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
                 return null;
         }
 
-        if (s0.isBikeRentingFromStation()
-                && s0.mayKeepRentedBicycleAtDestination()
-                && s0.getOptions().allowKeepingRentedBicycleAtDestination) {
-            s1.incrementWeight(s0.getOptions().keepingRentedBicycleAtDestinationCost);
+        if (s0.isRentingVehicleFromStation()
+                && s0.mayKeepRentedVehicleAtDestination()
+                && s0.getOptions().allowKeepingRentedVehicleAtDestination) {
+            s1.incrementWeight(s0.getOptions().keepingRentedVehicleAtDestinationCost);
         }
 
         s1.setBackMode(null);

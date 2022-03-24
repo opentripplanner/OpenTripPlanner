@@ -10,9 +10,11 @@ import org.opentripplanner.model.plan.VertexType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class EnumMapperTest {
     private final static String MSG = "Assert that the API enums have the exact same values that "
@@ -22,11 +24,6 @@ public class EnumMapperTest {
     @Test
     public void map() {
         try {
-            verifyExactMatch(
-                    VertexType.class,
-                    ApiVertexType.class,
-                    VertexTypeMapper::mapVertexType
-            );
             verifyExactMatch(
                     AbsoluteDirection.class,
                     ApiAbsoluteDirection.class,
@@ -44,15 +41,42 @@ public class EnumMapperTest {
         }
     }
 
+    @Test
+    public void testVertexTypeMapping() {
+        verifyExplicitMatch(
+                VertexType.class,
+                ApiVertexType.class,
+                Map.of(
+                        VertexType.NORMAL, ApiVertexType.NORMAL,
+                        VertexType.TRANSIT, ApiVertexType.TRANSIT,
+                        VertexType.VEHICLEPARKING, ApiVertexType.BIKEPARK,
+                        VertexType.VEHICLERENTAL, ApiVertexType.BIKESHARE
+                ),
+                VertexTypeMapper::mapVertexType
+        );
+    }
+
+    private <D extends Enum<?>,A extends Enum<?>> void  verifyExplicitMatch(
+            Class<D> domainClass, Class<A> apiClass, Map<D, A> mappings, Function<D, A> mapper
+    ) {
+        List<A> rest = new ArrayList<>(List.of(apiClass.getEnumConstants()));
+        for (D it : domainClass.getEnumConstants()) {
+            A result = mapper.apply(it);
+            assertEquals("Map " + it, mappings.get(it), result);
+            rest.remove(result);
+        }
+        assertTrue(rest.isEmpty());
+    }
+
     private <D extends Enum<?>,A extends Enum<?>> void  verifyExactMatch(
             Class<D> domainClass, Class<A> apiClass, Function<D, A> mapper
     ) {
-        List<A> rest = new ArrayList<A>(List.of(apiClass.getEnumConstants()));
+        List<A> rest = new ArrayList<>(List.of(apiClass.getEnumConstants()));
         for (D it : domainClass.getEnumConstants()) {
             A result = mapper.apply(it);
             assertEquals("Map " + it, result.name(), it.name());
             rest.remove(result);
         }
-        assertEquals("[]", rest.toString());
+        assertTrue(rest.isEmpty());
     }
 }

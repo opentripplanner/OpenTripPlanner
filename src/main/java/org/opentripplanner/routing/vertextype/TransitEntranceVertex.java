@@ -14,9 +14,9 @@ public class TransitEntranceVertex extends Vertex {
 
   private static final long serialVersionUID = 1L;
 
-  private boolean wheelchairEntrance;
+  private final boolean wheelchairEntrance;
 
-  private Entrance entrance;
+  private final Entrance entrance;
 
   /**
    * @param entrance The transit model entrance reference.
@@ -25,18 +25,14 @@ public class TransitEntranceVertex extends Vertex {
     super(
         graph,
         entrance.getId().toString(),
-        entrance.getLon(),
-        entrance.getLat()
+        entrance.getCoordinate().longitude(),
+        entrance.getCoordinate().latitude(),
+        entrance.getName()
     );
     this.entrance = entrance;
     this.wheelchairEntrance = entrance.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
-    graph.expandToInclude(entrance.getLon(), entrance.getLat());
-  }
-
-  @Override
-  public String getName() {
-    return entrance.getName();
+    graph.expandToInclude(entrance.getCoordinate().longitude(), entrance.getCoordinate().latitude());
   }
 
   public boolean isWheelchairEntrance() {

@@ -2,6 +2,10 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.Collection;
+import java.util.Map;
+import javax.annotation.Nullable;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
@@ -15,12 +19,6 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Maps NeTEx NoticeAssignment, which is the connection between a Notice and the object it refers
@@ -29,6 +27,8 @@ import java.util.Map;
  * same JourneyPattern.
  */
 class NoticeAssignmentMapper {
+
+    private final DataImportIssueStore issueStore;
 
     private final FeedScopedIdFactory idFactory;
 
@@ -45,9 +45,9 @@ class NoticeAssignmentMapper {
     /** Note! The notce mapper cashes notices, making sure duplicates are not created. */
     private final NoticeMapper noticeMapper;
 
-    private static final Logger LOG = LoggerFactory.getLogger(NoticeAssignmentMapper.class);
 
     NoticeAssignmentMapper(
+            DataImportIssueStore issueStore,
             FeedScopedIdFactory idFactory,
             Collection<ServiceJourney> serviceJourneys,
             ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
@@ -55,6 +55,7 @@ class NoticeAssignmentMapper {
             EntityById<Trip> tripsById,
             Map<String, StopTime> stopTimesByNetexId
     ) {
+        this.issueStore = issueStore;
         this.idFactory = idFactory;
         this.noticeMapper = new NoticeMapper(idFactory);
         this.noticesById = noticesById;
@@ -72,7 +73,7 @@ class NoticeAssignmentMapper {
 
     Multimap<TransitEntity, Notice> map(NoticeAssignment noticeAssignment) {
         // TODO OTP2 - Idealy this should en up as one key,value pair.
-        //             The `StopPointInJourneyPattern` witch result in more than one key/valye pair,
+        //             The `StopPointInJourneyPattern` which result in more than one key/valye pair,
         //             can be replaced with a new compound key type.
         Multimap<TransitEntity, Notice> noticiesByEntity = ArrayListMultimap.create();
 
@@ -80,7 +81,11 @@ class NoticeAssignmentMapper {
         Notice otpNotice = getOrMapNotice(noticeAssignment);
 
         if(otpNotice == null) {
-            LOG.warn("Notice in notice assignment is missing for assignment {}", noticeAssignment);
+            issueStore.add(
+                    "NoticeAssignmentWithoutNotice",
+                    "Notice in notice assignment is missing for assignment %s",
+                    noticeAssignment
+            );
             return noticiesByEntity;
         }
 
@@ -103,7 +108,11 @@ class NoticeAssignmentMapper {
                 noticiesByEntity.put(tripsById.get(otpId), otpNotice);
             }
             else {
-                LOG.warn("Could not map noticeAssignment for element with id {}", noticedObjectId);
+                issueStore.add(
+                        "NoticeAssignmentWithUnknownEntity",
+                        "Could not map notice assignment %s for element with id %s",
+                        noticeAssignment.getId(), noticedObjectId
+                );
             }
         }
         return noticiesByEntity;
@@ -125,7 +134,11 @@ class NoticeAssignmentMapper {
     private void addStopTimeNotice(Multimap<TransitEntity, Notice> map, String stopTimeId, Notice notice) {
         StopTime stopTime = stopTimesByNetexId.get(stopTimeId);
         if(stopTime == null) {
-            LOG.warn("NoticeAssigment mapping failed, StopTime not found. StopTime id: {}", stopTimeId);
+            issueStore.add(
+                    "NoticeAssigmentWithoutStopTime",
+                    "NoticeAssigment mapping failed, StopTime not found. StopTime id: %s",
+                    stopTimeId
+            );
             return;
         }
         map.put(stopTime.getId(), notice);

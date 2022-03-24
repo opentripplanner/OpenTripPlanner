@@ -48,76 +48,75 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class OSMDatabase {
 
-    private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
-    private DataImportIssueStore issueStore;
+    private final DataImportIssueStore issueStore;
 
     /* Map of all nodes used in ways/areas keyed by their OSM ID */
-    private TLongObjectMap<OSMNode> nodesById = new TLongObjectHashMap<>();
-
-    /* Map of all bike-rental nodes, keyed by their OSM ID */
-    private TLongObjectMap<OSMNode> bikeRentalNodes = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMNode> nodesById = new TLongObjectHashMap<>();
 
     /* Map of all bike parking nodes, keyed by their OSM ID */
-    private TLongObjectMap<OSMNode> bikeParkingNodes = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMNode> bikeParkingNodes = new TLongObjectHashMap<>();
+
+    /* Map of all bike parking nodes, keyed by their OSM ID */
+    private final TLongObjectMap<OSMNode> carParkingNodes = new TLongObjectHashMap<>();
 
     /* Map of all non-area ways keyed by their OSM ID */
-    private TLongObjectMap<OSMWay> waysById = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMWay> waysById = new TLongObjectHashMap<>();
 
     /* Map of all area ways keyed by their OSM ID */
-    private TLongObjectMap<OSMWay> areaWaysById = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMWay> areaWaysById = new TLongObjectHashMap<>();
 
     /* Map of all relations keyed by their OSM ID */
-    private TLongObjectMap<OSMRelation> relationsById = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMRelation> relationsById = new TLongObjectHashMap<>();
 
     /* All walkable areas */
-    private List<Area> walkableAreas = new ArrayList<Area>();
+    private final List<Area> walkableAreas = new ArrayList<>();
 
     /* All P+R areas */
-    private List<Area> parkAndRideAreas = new ArrayList<Area>();
+    private final List<Area> parkAndRideAreas = new ArrayList<>();
 
     /* All bike parking areas */
-    private List<Area> bikeParkingAreas = new ArrayList<Area>();
+    private final List<Area> bikeParkingAreas = new ArrayList<>();
 
     /* Map of all area OSMWay for a given node */
-    private TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
+    private final TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
 
     /* Map of all area OSMWay for a given node */
-    private List<OSMWay> singleWayAreas = new ArrayList<OSMWay>();
+    private final List<OSMWay> singleWayAreas = new ArrayList<>();
 
-    private Set<OSMWithTags> processedAreas = new HashSet<OSMWithTags>();
+    private final Set<OSMWithTags> processedAreas = new HashSet<>();
 
     /* Set of area way IDs */
-    private TLongSet areaWayIds = new TLongHashSet();
+    private final TLongSet areaWayIds = new TLongHashSet();
 
     /* Set of all node IDs of kept ways. Needed to mark which nodes to keep in stage 3. */
-    private TLongSet waysNodeIds = new TLongHashSet();
+    private final TLongSet waysNodeIds = new TLongHashSet();
 
     /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
-    private TLongSet areaNodeIds = new TLongHashSet();
+    private final TLongSet areaNodeIds = new TLongHashSet();
 
     /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-    private Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<OSMWithTags, OSMLevel>();
+    private final Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<>();
 
     /* Set of turn restrictions for each turn "from" way ID */
-    private Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
+    private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
             .create();
 
     /* Set of turn restrictions for each turn "to" way ID */
-    private Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
+    private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
 
     /*
      * Map of all transit stop nodes that lie within an area and which are connected to the area by
      * a relation. Keyed by the area's OSM way.
      */
-    private Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
+    private final Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<>();
 
     /*
      * ID of the next virtual node we create during building phase. Negative to prevent conflicts
@@ -147,6 +146,8 @@ public class OSMDatabase {
         return Collections.unmodifiableCollection(waysById.valueCollection());
     }
 
+    public boolean isAreaWay(Long wayId) { return areaWayIds.contains(wayId); }
+
     public int nodeCount() {
         return nodesById.size();
     }
@@ -155,12 +156,12 @@ public class OSMDatabase {
         return waysById.size();
     }
 
-    public Collection<OSMNode> getBikeRentalNodes() {
-        return Collections.unmodifiableCollection(bikeRentalNodes.valueCollection());
-    }
-
     public Collection<OSMNode> getBikeParkingNodes() {
         return Collections.unmodifiableCollection(bikeParkingNodes.valueCollection());
+    }
+
+    public Collection<OSMNode> getCarParkingNodes() {
+        return Collections.unmodifiableCollection(carParkingNodes.valueCollection());
     }
 
     public Collection<Area> getWalkableAreas() {
@@ -196,12 +197,12 @@ public class OSMDatabase {
         return level != null ? level : OSMLevel.DEFAULT;
     }
 
-    public boolean isNodeSharedByMultipleAreas(Long nodeId) {
+    public Set<OSMWay> getAreasForNode(Long nodeId) {
         Set<OSMWay> areas = areasForNode.get(nodeId);
         if (areas == null) {
-            return false;
+            return Set.of();
         }
-        return areas.size() > 1;
+        return areas;
     }
 
     public boolean isNodeBelongsToWay(Long nodeId) {
@@ -209,11 +210,11 @@ public class OSMDatabase {
     }
 
     public void addNode(OSMNode node) {
-        if (node.isBikeRental()) {
-            bikeRentalNodes.put(node.getId(), node);
-        }
         if (node.isBikeParking()) {
             bikeParkingNodes.put(node.getId(), node);
+        }
+        if (node.isParkAndRide()) {
+            carParkingNodes.put(node.getId(), node);
         }
         if (!(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node
                 .isStop())) {
@@ -279,12 +280,12 @@ public class OSMDatabase {
         }
 
         if (relation.isTag("type", "multipolygon")
-                && (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide())) {
+                && (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide()) || relation.isBikeParking()) {
             // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
             // without reference to the ways that compose them. Accordingly, we will merely
             // mark the ways for preservation here, and deal with the details once we have
             // the ways loaded.
-            if (!OSMFilter.isWayRoutable(relation) && !relation.isParkAndRide()) {
+            if (!OSMFilter.isWayRoutable(relation) && !relation.isParkAndRide() && !relation.isBikeParking()) {
                 return;
             }
             for (OSMRelationMember member : relation.getMembers()) {
@@ -357,6 +358,17 @@ public class OSMDatabase {
         processUnconnectedAreas();
     }
 
+    // Simple holder for the spatial index
+    static class RingSegment {
+        Area area;
+
+        Ring ring;
+
+        OSMNode nA;
+
+        OSMNode nB;
+    }
+
     /**
      * Connect areas with ways when unconnected (areas outer rings crossing with ways at the same
      * level, but with no common nodes). Currently process P+R areas only, but could easily be
@@ -364,17 +376,6 @@ public class OSMDatabase {
      */
     private void processUnconnectedAreas() {
         LOG.info("Intersecting unconnected areas...");
-
-        // Simple holder for the spatial index
-        class RingSegment {
-            Area area;
-
-            Ring ring;
-
-            OSMNode nA;
-
-            OSMNode nB;
-        }
 
         /*
          * Create a spatial index for each segment of area outer rings. Note: The spatial index is
@@ -386,22 +387,7 @@ public class OSMDatabase {
         HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
         for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
             for (Ring ring : area.outermostRings) {
-                for (int j = 0; j < ring.nodes.size(); j++) {
-                    RingSegment ringSegment = new RingSegment();
-                    ringSegment.area = area;
-                    ringSegment.ring = ring;
-                    ringSegment.nA = ring.nodes.get(j);
-                    ringSegment.nB = ring.nodes.get((j + 1) % ring.nodes.size());
-                    Envelope env = new Envelope(ringSegment.nA.lon, ringSegment.nB.lon,
-                            ringSegment.nA.lat, ringSegment.nB.lat);
-                    P2<Long> key1 = new P2<>(ringSegment.nA.getId(), ringSegment.nB.getId());
-                    P2<Long> key2 = new P2<>(ringSegment.nB.getId(), ringSegment.nA.getId());
-                    if (!commonSegments.contains(key1) && !commonSegments.contains(key2)) {
-                        spndx.insert(env, ringSegment);
-                        commonSegments.add(key1);
-                        commonSegments.add(key2);
-                    }
-                }
+                processAreaRingForUnconnectedAreas(commonSegments, spndx, area, ring);
             }
         }
 
@@ -602,7 +588,33 @@ public class OSMDatabase {
         LOG.info("Created {} virtual intersection nodes.", nCreatedNodes);
     }
 
-	/**
+    private void processAreaRingForUnconnectedAreas(
+            Set<P2<Long>> commonSegments,
+            HashGridSpatialIndex<RingSegment> spndx,
+            Area area,
+            Ring ring
+    ) {
+        for (int j = 0; j < ring.nodes.size(); j++) {
+            RingSegment ringSegment = new RingSegment();
+            ringSegment.area = area;
+            ringSegment.ring = ring;
+            ringSegment.nA = ring.nodes.get(j);
+            ringSegment.nB = ring.nodes.get((j + 1) % ring.nodes.size());
+            Envelope env = new Envelope(ringSegment.nA.lon, ringSegment.nB.lon,
+                    ringSegment.nA.lat, ringSegment.nB.lat);
+            P2<Long> key1 = new P2<>(ringSegment.nA.getId(), ringSegment.nB.getId());
+            P2<Long> key2 = new P2<>(ringSegment.nB.getId(), ringSegment.nA.getId());
+            if (!commonSegments.contains(key1) && !commonSegments.contains(key2)) {
+                spndx.insert(env, ringSegment);
+                commonSegments.add(key1);
+                commonSegments.add(key2);
+            }
+        }
+
+        ring.getHoles().forEach(hole -> processAreaRingForUnconnectedAreas(commonSegments, spndx, area, hole));
+    }
+
+    /**
      * Create a virtual OSM node, using a negative unique ID.
      * 
      * @param c The location of the node to create.
@@ -648,14 +660,13 @@ public class OSMDatabase {
     }
 
     private void markNodesForKeeping(Collection<OSMWay> osmWays, TLongSet nodeSet) {
-        for (Iterator<OSMWay> it = osmWays.iterator(); it.hasNext();) {
-            OSMWay way = it.next();
-            // Since the way is kept, update nodes-with-neighbors
-            TLongList nodes = way.getNodeRefs();
-            if (nodes.size() > 1) {
-                nodeSet.addAll(nodes);
-            }
+      for (OSMWay way : osmWays) {
+        // Since the way is kept, update nodes-with-neighbors
+        TLongList nodes = way.getNodeRefs();
+        if (nodes.size() > 1) {
+          nodeSet.addAll(nodes);
         }
+      }
     }
 
     /**
@@ -679,9 +690,11 @@ public class OSMDatabase {
                 // this area cannot be constructed, but we already have all the
                 // necessary nodes to construct it. So, something must be wrong with
                 // the area; we'll mark it as processed so that we don't retry.
+                issueStore.add("InvalidGeometry", "Invalid geometry for osm way %s", way.getId());
             } catch (IllegalArgumentException iae) {
                 // This occurs when there are an invalid number of points in a LinearRing
                 // Mark the ring as processed so we don't retry it.
+                issueStore.add("InvalidGeometry", "Invalid geometry for osm way %s", way.getId());
             }
             processedAreas.add(way);
         }
@@ -698,12 +711,12 @@ public class OSMDatabase {
                 continue;
             }
             if (!(relation.isTag("type", "multipolygon") && (OSMFilter
-                    .isOsmEntityRoutable(relation) || relation.isParkAndRide()))) {
+                    .isOsmEntityRoutable(relation) || relation.isParkAndRide() || relation.isBikeParking()))) {
                 continue;
             }
             // Area multipolygons -- pedestrian plazas
-            ArrayList<OSMWay> innerWays = new ArrayList<OSMWay>();
-            ArrayList<OSMWay> outerWays = new ArrayList<OSMWay>();
+            ArrayList<OSMWay> innerWays = new ArrayList<>();
+            ArrayList<OSMWay> outerWays = new ArrayList<>();
             for (OSMRelationMember member : relation.getMembers()) {
                 String role = member.getRole();
                 OSMWay way = areaWaysById.get(member.getRef());
@@ -734,6 +747,7 @@ public class OSMDatabase {
             try {
                 newArea(new Area(relation, outerWays, innerWays, nodesById));
             } catch (Area.AreaConstructionException|Ring.RingConstructionException e) {
+                issueStore.add("InvalidGeometry", "Invalid geometry for osm relation %s", relation.getId());
                 continue;
             }
 

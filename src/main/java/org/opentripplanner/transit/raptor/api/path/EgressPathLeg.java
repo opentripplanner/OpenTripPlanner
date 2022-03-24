@@ -14,34 +14,36 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
     private final RaptorTransfer egress;
     private final int fromTime;
     private final int toTime;
+    private final int generalizedCost;
 
-    public EgressPathLeg(RaptorTransfer egress, int fromTime, int toTime) {
+    public EgressPathLeg(RaptorTransfer egress, int fromTime, int toTime, int generalizedCost) {
         this.egress = egress;
         this.fromTime = fromTime;
         this.toTime = toTime;
+        this.generalizedCost = generalizedCost;
     }
 
     /**
      * The stop index where the leg start, also called the leg departure stop index.
      */
     @Override
-    public final int fromStop() {
+    public int fromStop() {
         return egress.stop();
     }
 
     @Override
-    public final int fromTime() {
+    public int fromTime() {
         return fromTime;
     }
 
     @Override
-    public final int toTime() {
+    public int toTime() {
         return toTime;
     }
 
     @Override
     public int generalizedCost() {
-        return egress.generalizedCost();
+        return generalizedCost;
     }
 
     public RaptorTransfer egress() {
@@ -52,14 +54,14 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
      * @throws UnsupportedOperationException - an egress leg is the last leg in a path and does not have a next leg.
      */
     @Override
-    public final TransitPathLeg<T> nextLeg() {
+    public TransitPathLeg<T> nextLeg() {
         throw new java.lang.UnsupportedOperationException(
                 "The egress leg is the last leg in a path. Use isEgressLeg() to identify last leg."
         );
     }
 
     @Override
-    public final boolean isEgressLeg() {
+    public boolean isEgressLeg() {
         return true;
     }
 

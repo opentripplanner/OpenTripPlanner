@@ -1,35 +1,66 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.TranslatedString;
+import org.rutebanken.netex.model.NameTypeEnumeration;
 import org.rutebanken.netex.model.StopPlace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 class StationMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StationMapper.class);
+  private final DataImportIssueStore issueStore;
 
   private final FeedScopedIdFactory idFactory;
 
-  StationMapper(FeedScopedIdFactory idFactory) {
+  StationMapper(DataImportIssueStore issueStore, FeedScopedIdFactory idFactory) {
+    this.issueStore = issueStore;
     this.idFactory = idFactory;
   }
 
   Station map(StopPlace stopPlace) {
+    final I18NString name;
+    if (stopPlace.getName() == null) {
+      name = new NonLocalizedString("N/A");
+    } else if (stopPlace.getAlternativeNames() != null) {
+      Map<String, String> translations = new HashMap<>();
+      translations.put(null, stopPlace.getName().getValue());
+      for (var translation : stopPlace.getAlternativeNames().getAlternativeName()) {
+        if (translation.getNameType().equals(NameTypeEnumeration.TRANSLATION)) {
+          String lang = translation.getLang() != null
+                  ? translation.getLang()
+                  : translation.getName().getLang();
+          translations.put(lang, translation.getName().getValue());
+        }
+      }
+
+      name = TranslatedString.getI18NString(translations);
+    } else {
+      name = new NonLocalizedString(stopPlace.getName().getValue());
+    }
+
     Station station = new Station(
         idFactory.createId(stopPlace.getId()),
-        stopPlace.getName() == null ? "N/A" : stopPlace.getName().getValue(),
+        name,
         WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid()),
         null,
         stopPlace.getDescription() != null ? stopPlace.getDescription().getValue() : null,
         null,
         null,
-        TransferPriorityMapper.mapToDomain(stopPlace.getWeighting())
+        StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting())
     );
 
     if (station.getCoordinate() == null) {
-      LOG.warn("Station {} does not contain any coordinates.", station.getId());
+      issueStore.add(
+              "StationWithoutCoordinates",
+              "Station %s does not contain any coordinates.",
+              station.getId()
+      );
     }
     return station;
   }

@@ -3,28 +3,32 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolylineBean;
-
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
 
@@ -123,11 +127,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Iterable<Object>> stops() {
-    return environment -> {
-      TripPattern tripPattern = getTripPattern(environment);
-      if (tripPattern == null) { return List.of(); }
-      return List.copyOf(tripPattern.getStops());
-    };
+    return this::getStops;
   }
 
   @Override
@@ -166,10 +166,9 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
             routingService.getServiceCodes(),
             ServiceDate.parseString(args.getLegacyGraphQLServiceDate()),
             routingService.getCalendarService(),
-            getSource(environment).getRoute().getAgency().getId()
+            getAgency(environment).getId()
         );
 
-        Stop stop = timetable.getPattern().getStop(0);
         return new TripTimeOnDate(triptimes, 0, tripPattern, serviceDate
         );
       } catch (ParseException e) {
@@ -197,10 +196,9 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
               routingService.getServiceCodes(),
               ServiceDate.parseString(args.getLegacyGraphQLServiceDate()),
               routingService.getCalendarService(),
-              getSource(environment).getRoute().getAgency().getId()
+              getAgency(environment).getId()
           );
 
-        Stop stop = timetable.getPattern().getStop(triptimes.getNumStops() - 1);
         return new TripTimeOnDate(triptimes, triptimes.getNumStops() - 1, tripPattern, serviceDate
         );
       } catch (ParseException e) {
@@ -258,20 +256,94 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<EncodedPolylineBean> tripGeometry() {
+  public DataFetcher<Geometry> tripGeometry() {
     return environment -> {
       TripPattern tripPattern = getTripPattern(environment);
       if (tripPattern == null) { return null; }
-      LineString geometry = tripPattern.getGeometry();
-      if (geometry == null) { return null; }
-      return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
+      return tripPattern.getGeometry();
     };
   }
 
-  //TODO
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
-    return environment -> List.of();
+    return environment -> {
+      TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
+      var args = new LegacyGraphQLTypes.LegacyGraphQLTripAlertsArgs(
+              environment.getArguments());
+      Iterable<LegacyGraphQLTypes.LegacyGraphQLTripAlertType> types =
+              args.getLegacyGraphQLTypes();
+      if (types != null) {
+        Collection<TransitAlert> alerts = new ArrayList<>();
+        types.forEach(type -> {
+          switch (type) {
+            case TRIP:
+              alerts.addAll(alertService.getTripAlerts(getSource(environment).getId(), null));
+              break;
+            case AGENCY:
+              alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
+              break;
+            case ROUTE_TYPE:
+              int routeType = getRoute(environment).getGtfsType();
+              alerts.addAll(alertService.getRouteTypeAlerts(
+                      routeType,
+                      getSource(environment).getId().getFeedId()
+              ));
+              alerts.addAll(alertService.getRouteTypeAndAgencyAlerts(
+                      routeType,
+                      getAgency(environment).getId()
+              ));
+              break;
+            case ROUTE:
+              alerts.addAll(alertService.getRouteAlerts(getRoute(environment).getId()));
+              break;
+            case PATTERN:
+              alerts.addAll(alertService.getDirectionAndRouteAlerts(
+                      getSource(environment).getDirection().gtfsCode,
+                      getRoute(environment).getId()
+              ));
+              break;
+            case STOPS_ON_TRIP:
+              alerts.addAll(alertService.getAllAlerts()
+                      .stream()
+                      .filter(alert -> alert.getEntities()
+                              .stream()
+                              .anyMatch(entity -> (
+                                      entity instanceof EntitySelector.StopAndRoute
+                                              && ((EntitySelector.StopAndRoute) entity).stopAndRoute.routeOrTrip.equals(
+                                              getRoute(environment).getId())
+                              ) || (
+                                      entity instanceof EntitySelector.StopAndTrip
+                                              && ((EntitySelector.StopAndTrip) entity).stopAndTrip.routeOrTrip.equals(
+                                              getSource(environment).getId())
+                              )))
+                      .collect(Collectors.toList()));
+              getStops(environment).forEach(stop -> {
+                FeedScopedId stopId = ((StopLocation) stop).getId();
+                alerts.addAll(alertService.getStopAlerts(stopId));
+              });
+              break;
+          }
+        });
+        return alerts.stream().distinct().collect(Collectors.toList());
+      }
+      else {
+        return alertService.getTripAlerts(getSource(environment).getId(), null);
+      }
+    };
+  }
+
+  private List<Object> getStops(DataFetchingEnvironment environment) {
+    TripPattern tripPattern = getTripPattern(environment);
+    if (tripPattern == null) {return List.of();}
+    return List.copyOf(tripPattern.getStops());
+  }
+
+  private Agency getAgency(DataFetchingEnvironment environment) {
+    return getRoute(environment).getAgency();
+  }
+
+  private Route getRoute(DataFetchingEnvironment environment) {
+    return getSource(environment).getRoute();
   }
 
   private TripPattern getTripPattern(DataFetchingEnvironment environment) {

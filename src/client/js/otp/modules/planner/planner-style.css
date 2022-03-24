@@ -81,7 +81,7 @@
 
 .otp-itinsAccord-header-time {
     position:absolute;
-    width: 30px;
+    width: 38px;
     height: 12px;
     top: 4px;
     color: white;
@@ -100,7 +100,24 @@
     font-weight: bold;
     text-shadow: none;
     padding-top:3px;
-    text-align: left;
+    text-align: center;
+    overflow: hidden;
+}
+
+.otp-itinsAccord-header-segment .mode-icon {
+    width: 17px;
+    height: 17px;
+    display: inline-block;
+    margin-top: -1px;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+}
+
+.otp-itinsAccord-header-segment span {
+    vertical-align: top;
+    padding-left: 2px;
 }
 
 .otp-itinsAccord-header-groupSize {
@@ -202,7 +219,6 @@ h3.sysNotice {
     margin-left: 55px;
     padding: .0em 0 0 5px;
     color: gray;
-    cursor: pointer;
 }
 
 .otp-itin-leg-buffer {
@@ -218,6 +234,19 @@ h3.sysNotice {
     color: gray;
     margin-left: 55px;
     padding-left: 5px;
+}
+
+.otp-itin-leg-ids {
+    font-size: .9em;
+    border-left: 1px solid #ccc;
+    color: gray;
+    margin-left: 55px;
+    padding-left: 5px;
+    font-style: italic;
+}
+
+.otp-itin-leg-ids td:first-child {
+    padding-right: 5px;
 }
 
 .otp-itin-leg-intStops {
@@ -243,9 +272,15 @@ h3.sysNotice {
 
 .otp-itin-leg-intStopsListItem {
     padding-bottom: .3em;
+}
+
+.otp-itin-leg-intStopsListItem span {
     cursor: pointer;
 }
 
+.otp-itin-leg-intStopsListItem i {
+    font-size: 0.8em;
+}
 
 .otp-itin-iconModeSymbol {
     width: 16px;

@@ -3,13 +3,15 @@ package org.opentripplanner.transit.raptor.util.paretoset;
 import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
 /**
  * This {@link java.util.Collection} store all pareto-optimal elements. The
  * {@link #add(Object)} method returns {@code true} if and only if the element
- * was added successfully. When an element is added other elements witch are no
+ * was added successfully. When an element is added other elements which are no
  * longer pareto-optimal are dropped.
  * <p/>
  * Like the {@link java.util.ArrayList} the elements are stored internally in
@@ -191,11 +193,19 @@ public class ParetoSet<T> extends AbstractCollection<T> {
         return elements.length;
     }
 
+    /**
+     * A special toSting method which allows the caller to provide a to-string-mapper for the
+     * elements in the set.
+     */
+    public String toString(Function<? super T, String> toStringMapper) {
+        return "{" + Arrays.stream(elements, 0, size)
+                .map(toStringMapper)
+                .collect(Collectors.joining(", ")) + "}";
+    }
+
     @Override
     public String toString() {
-        return "{" + Arrays.stream(elements, 0, size)
-                .map(Object::toString)
-                .collect(Collectors.joining(", ")) + "}";
+        return toString(Objects::toString);
     }
 
     /**

@@ -13,7 +13,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 /**
  * Mock the TransferGenerator
  */
-class TransferGeneratorDummy {
+public class TransferGeneratorDummy {
   private static final int D0s = 0;
 
   @SafeVarargs
@@ -31,7 +31,7 @@ class TransferGeneratorDummy {
   }
 
   /** Transfer from trip & stop, walk, to stop & trip */
-  static TripToTripTransfer<TestTripSchedule> tx(
+  public static TripToTripTransfer<TestTripSchedule> tx(
           TestTripSchedule fromTrip,
           int fromStop,
           int walkDuration,
@@ -42,7 +42,7 @@ class TransferGeneratorDummy {
   }
 
   /** Transfer from trip via same stop to trip */
-  static TripToTripTransfer<TestTripSchedule> tx(
+  public static TripToTripTransfer<TestTripSchedule> tx(
           TestTripSchedule fromTrip,
           int sameStop,
           TestTripSchedule toTrip
@@ -51,12 +51,12 @@ class TransferGeneratorDummy {
   }
 
   /** Transfer from transfer constraints - same stop */
-  static TripToTripTransfer<TestTripSchedule> tx(TestTransferBuilder<TestTripSchedule> builder) {
+  public static TripToTripTransfer<TestTripSchedule> tx(TestTransferBuilder<TestTripSchedule> builder) {
     return createTripToTripTransfer(builder, D0s);
   }
 
   /** Transfer from transfer constraints - with walking */
-  static TripToTripTransfer<TestTripSchedule> tx(
+  public static TripToTripTransfer<TestTripSchedule> tx(
           TestTransferBuilder<TestTripSchedule> builder,
           int walkDuration
   ) {

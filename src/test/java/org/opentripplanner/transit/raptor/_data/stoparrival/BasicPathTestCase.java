@@ -1,15 +1,17 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 import static org.opentripplanner.util.time.TimeUtils.time;
 
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
@@ -20,9 +22,10 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
@@ -48,39 +51,43 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleS
  * at 12:00, total 2 hours.
  */
 public class BasicPathTestCase implements RaptorTestConstants {
+
+    private static final RaptorConstrainedTransfer EMPTY_CONSTRAINTS = null;
+
+
     public static final String BASIC_PATH_AS_DETAILED_STRING =
-            "Walk 3m15s 10:00 10:03:15 $390.00 "
-            + "~ 1 45s ~ "
-            + "BUS L11 10:04 10:35 31m $1998.00 "
-            + "~ 2 15s ~ "
-            + "Walk 3m45s 10:35:15 10:39 $450.00 "
-            + "~ 3 21m ~ "
-            + "BUS L21 11:00 11:23 23m $2640.00 "
-            + "~ 4 17m ~ "
-            + "BUS L31 11:40 11:52 12m $1776.00 "
-            + "~ 5 15s ~ "
-            + "Walk 7m45s 11:52:15 12:00 $930.00 "
-            + "[10:00 12:00 2h $8184.00]";
+            "Walk 3m15s 10:00 10:03:15 $390 "
+            + "~ A 45s ~ "
+            + "BUS L11 10:04 10:35 31m $1998 "
+            + "~ B 15s ~ "
+            + "Walk 3m45s 10:35:15 10:39 $450 "
+            + "~ C 21m ~ "
+            + "BUS L21 11:00 11:23 23m $2640 "
+            + "~ D 17m ~ "
+            + "BUS L31 11:40 11:52 12m $1776 "
+            + "~ E 15s ~ "
+            + "Walk 7m45s 11:52:15 12:00 $930 "
+            + "[10:00 12:00 2h 2tx $8184]";
 
     public static final String BASIC_PATH_AS_STRING =
-        "Walk 3m15s ~ 1"
-        + " ~ BUS L11 10:04 10:35 ~ 2"
-        + " ~ Walk 3m45s ~ 3"
-        + " ~ BUS L21 11:00 11:23 ~ 4"
-        + " ~ BUS L31 11:40 11:52 ~ 5"
+        "Walk 3m15s ~ A"
+        + " ~ BUS L11 10:04 10:35 ~ B"
+        + " ~ Walk 3m45s ~ C"
+        + " ~ BUS L21 11:00 11:23 ~ D"
+        + " ~ BUS L31 11:40 11:52 ~ E"
         + " ~ Walk 7m45s "
-        + "[10:00 12:00 2h $8184]";
+        + "[10:00 12:00 2h 2tx $8184]";
 
     private static final int BOARD_COST_SEC = 60;
     private static final int TRANSFER_COST_SEC = 120;
     private static final double[] TRANSIT_RELUCTANCE = new double[] { 1.0 };
     public static final int TRANSIT_RELUCTANCE_INDEX = 0;
-    private static final double WAIT_RELUCTANCE = 0.8;
+    public static final double WAIT_RELUCTANCE = 0.8;
 
     /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
     private static final int[] STOP_COSTS = {0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0};
 
-    // Some times witch should not have eny effect on tests
+    // Some times which should not have eny effect on tests
     private static final int VERY_EARLY = time("00:00");
     private static final int VERY_LATE = time("23:59");
 
@@ -133,8 +140,10 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
     public static final int TRIP_DURATION = EGRESS_END - ACCESS_START;
 
-    private static final RaptorTransfer ACCESS = walk(STOP_B, ACCESS_DURATION, ACCESS_COST);
+    private static final RaptorTransfer ACCESS = walk(STOP_A, ACCESS_DURATION, ACCESS_COST);
     private static final RaptorTransfer EGRESS = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
+    // this is of course not a real flex egress
+    private static final RaptorTransfer FLEX = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
 
     public static final String LINE_11 = "L11";
     public static final String LINE_21 = "L21";
@@ -156,12 +165,12 @@ public class BasicPathTestCase implements RaptorTestConstants {
         .build();
 
 
-    public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+    public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
             BOARD_COST_SEC,
             TRANSFER_COST_SEC,
             WAIT_RELUCTANCE,
-            STOP_COSTS,
-            TRANSIT_RELUCTANCE
+            TRANSIT_RELUCTANCE,
+            STOP_COSTS
     );
 
     public static final RaptorSlackProvider SLACK_PROVIDER =
@@ -223,23 +232,40 @@ public class BasicPathTestCase implements RaptorTestConstants {
      */
     public static Path<TestTripSchedule> basicTripAsPath() {
         PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
-                EGRESS, EGRESS_START, EGRESS_END
+                EGRESS, EGRESS_START, EGRESS_END, EGRESS_COST
         );
+        var times5 = BoardAndAlightTime.create(TRIP_3, STOP_D, L31_START, STOP_E, L31_END);
         TransitPathLeg<TestTripSchedule> leg5 = new TransitPathLeg<>(
-            STOP_D, L31_START, STOP_E, L31_END, LINE_31_COST, TRIP_3, leg6
+                TRIP_3, times5, EMPTY_CONSTRAINTS, LINE_31_COST, leg6
         );
+        var times4 = BoardAndAlightTime.create(TRIP_2, STOP_C, L21_START, STOP_D, L21_END);
         TransitPathLeg<TestTripSchedule> leg4 = new TransitPathLeg<>(
-            STOP_C, L21_START, STOP_D, L21_END, LINE_21_COST, TRIP_2, leg5
+                TRIP_2, times4, EMPTY_CONSTRAINTS, LINE_21_COST, leg5
         );
         var transfer = TestTransfer.walk(STOP_C, TX_END - TX_START);
         PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
-            STOP_B, TX_START, TX_END, transfer, leg4.asTransitLeg()
+            STOP_B, TX_START, TX_END, transfer.generalizedCost(), transfer, leg4.asTransitLeg()
         );
-        TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(
-            STOP_A, L11_START, STOP_B, L11_END, LINE_11_COST, TRIP_1, leg3
-        );
+        var times2 = BoardAndAlightTime.create(TRIP_1, STOP_A, L11_START, STOP_B, L11_END);
+        var leg2 = new TransitPathLeg<>(TRIP_1, times2, EMPTY_CONSTRAINTS, LINE_11_COST, leg3);
         AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
-            ACCESS, ACCESS_START, ACCESS_END, leg2.asTransitLeg()
+            ACCESS, ACCESS_START, ACCESS_END, ACCESS_COST, leg2.asTransitLeg()
+        );
+        return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST);
+    }
+
+    public static Path<TestTripSchedule> flexTripAsPath() {
+        PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(
+                FLEX, EGRESS_START, EGRESS_END, EGRESS_COST
+        );
+        var transfer = TestTransfer.walk(STOP_C, TX_END - TX_START);
+        PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
+                STOP_B, TX_START, TX_END, transfer.generalizedCost(), transfer, leg6
+        );
+        var times2 = BoardAndAlightTime.create(TRIP_1, STOP_A, L11_START, STOP_B, L11_END);
+        var leg2 = new TransitPathLeg<>(TRIP_1, times2, EMPTY_CONSTRAINTS, LINE_11_COST, leg3);
+        AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
+                ACCESS, ACCESS_START, ACCESS_END, ACCESS_COST, leg2.asTransitLeg()
         );
         return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST);
     }
@@ -278,25 +304,41 @@ public class BasicPathTestCase implements RaptorTestConstants {
         // The calculator is not under test here, so we assert everything is as expected
         assertEquals(
             LINE_11_COST,
-            COST_CALCULATOR.transitArrivalCost(
-                true, STOP_A, L11_WAIT_DURATION, L11_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_B
-            )
+            transitArrivalCost(ACCESS_END, TRIP_1, STOP_A, L11_START, STOP_B, L11_END)
         );
         assertEquals(
             LINE_21_COST,
-            COST_CALCULATOR.transitArrivalCost(
-                false, STOP_C, L21_WAIT_DURATION, L21_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_D
-            )
+            transitArrivalCost(TX_END, TRIP_2, STOP_C, L21_START, STOP_D, L21_END)
         );
         assertEquals(
             LINE_31_COST,
-            COST_CALCULATOR.transitArrivalCost(
-                false, STOP_D, L31_WAIT_DURATION, L31_DURATION, TRANSIT_RELUCTANCE_INDEX, STOP_E
-            )
+            transitArrivalCost(L21_END+ALIGHT_SLACK, TRIP_3, STOP_D, L31_START, STOP_E, L31_END)
         );
 
-        assertEquals(BASIC_PATH_AS_STRING, basicTripAsPath().toString());
+        assertEquals(BASIC_PATH_AS_STRING, basicTripAsPath().toString(this::stopIndexToName));
 
-        assertEquals(BASIC_PATH_AS_DETAILED_STRING, basicTripAsPath().toStringDetailed());
+        assertEquals(BASIC_PATH_AS_DETAILED_STRING, basicTripAsPath().toStringDetailed(this::stopIndexToName));
+    }
+
+    private static int transitArrivalCost(
+            int prevArrivalTime,
+            TestTripSchedule trip,
+            int boardStop,
+            int boardTime,
+            int alightStop,
+            int alightTime
+    ) {
+        boolean firstTransit = TRIP_1 == trip;
+        int boardCost = COST_CALCULATOR.boardingCost(
+                firstTransit, prevArrivalTime, boardStop, boardTime, trip, REGULAR_TRANSFER
+        );
+
+        return COST_CALCULATOR.transitArrivalCost(
+                boardCost,
+                ALIGHT_SLACK,
+                alightTime - boardTime,
+                trip.transitReluctanceFactorIndex(),
+                alightStop
+        );
     }
 }

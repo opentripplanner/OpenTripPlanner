@@ -24,6 +24,8 @@ otp.widgets.ItinerariesWidget =
 
     itineraries : null,
     activeIndex : 0,
+    previousPageCursor: null,
+    nextPageCursor: null,
 
     // set to true by next/previous/etc. to indicate to only refresh the currently active itinerary
     refreshActiveOnly : false,
@@ -56,10 +58,22 @@ otp.widgets.ItinerariesWidget =
     },
 
     updatePlan : function(plan) {
-        this.updateItineraries(plan.itineraries, plan.queryParams);
+        this.updateItineraries(
+            plan.itineraries,
+            plan.queryParams,
+            undefined,
+            plan.previousPageCursor,
+            plan.nextPageCursor
+        );
     },
 
-    updateItineraries : function(itineraries, queryParams, itinIndex) {
+    updateItineraries : function(
+        itineraries,
+        queryParams,
+        itinIndex,
+        previousPageCursor,
+        nextPageCursor
+    ) {
 
         var this_ = this;
         var divId = this.id+"-itinsAccord";
@@ -77,7 +91,7 @@ otp.widgets.ItinerariesWidget =
             // create an alert if we moved to another day
             var alerts = null;
             if(newItin.differentServiceDayFrom(oldItin)) {
-                alerts = [ "This itinerary departs on a different day from the previous one"];
+                alerts = [ _tr("This itinerary departs on a different day from the previous one") ];
             }
 
             // refresh all itinerary headers
@@ -92,6 +106,8 @@ otp.widgets.ItinerariesWidget =
         }
 
         this.itineraries = itineraries;
+        this.previousPageCursor = previousPageCursor;
+        this.nextPageCursor = nextPageCursor;
 
         this.clear();
         //TRANSLATORS: widget title
@@ -153,10 +169,10 @@ otp.widgets.ItinerariesWidget =
         this.renderHeaders();
         this_.itinsAccord.accordion("resize");
 
-        this.$().resize(function(){
+        this.$().resize(_.throttle(function(){
             this_.itinsAccord.accordion("resize");
             this_.renderHeaders();
-        });
+        }, 100, {leading: false}));
 
         this.$().draggable({ cancel: "#"+divId });
 
@@ -172,70 +188,25 @@ otp.widgets.ItinerariesWidget =
         var serviceBreakTime = "03:00am";
         var this_ = this;
         var buttonRow = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.footer);
-        //TRANSLATORS: button to first itinerary
-        $('<button>'+_tr("First")+'</button>').button().appendTo(buttonRow).click(function() {
-            var itin = this_.itineraries[this_.activeIndex];
-            var params = itin.tripPlan.queryParams;
-            var stopId = itin.getFirstStopID();
+        //TRANSLATORS: button to next page of itineraries
+        $('<button>'+_tr("Previous Page")+'</button>').button().appendTo(buttonRow).click(function() {
+            var params = this_.module.lastQueryParams;
             _.extend(params, {
-                startTransitStopId :  stopId,
-                date: moment(this_.module.date, otp.config.locale.time.date_format).format("MM-DD-YYYY"),
-                time : serviceBreakTime,
-                arriveBy : false,
-                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
+                pageCursor :  this_.previousPageCursor,
             });
-            this_.refreshActiveOnly = true;
-            this_.module.updateActiveOnly = true;
+            this_.refreshActiveOnly = false;
+            this_.module.updateActiveOnly = false;
             this_.module.planTripFunction.call(this_.module, params);
         });
-        //TRANSLATORS: button to previous itinerary
-        $('<button>'+_tr("Previous")+'</button>').button().appendTo(buttonRow).click(function() {
-            var itin = this_.itineraries[this_.activeIndex];
-            var params = itin.tripPlan.queryParams;
-            var newEndTime = itin.itinData.endTime - 90000;
-            var stopId = itin.getFirstStopID();
+
+        //TRANSLATORS: button to next page of itineraries
+        $('<button>'+_tr("Next Page")+'</button>').button().appendTo(buttonRow).click(function() {
+            var params = this_.module.lastQueryParams;
             _.extend(params, {
-                startTransitStopId :  stopId,
-                time : otp.util.Time.formatItinTime(newEndTime, "h:mma"),
-                date : otp.util.Time.formatItinTime(newEndTime, "MM-DD-YYYY"),
-                arriveBy : true,
-                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
+                pageCursor :  this_.nextPageCursor,
             });
-            this_.refreshActiveOnly = true;
-            this_.module.updateActiveOnly = true;
-            this_.module.planTripFunction.call(this_.module, params);
-        });
-        //TRANSLATORS: button to next itinerary
-        $('<button>'+_tr("Next")+'</button>').button().appendTo(buttonRow).click(function() {
-            var itin = this_.itineraries[this_.activeIndex];
-            var params = itin.tripPlan.queryParams;
-            var newStartTime = itin.itinData.startTime + 90000;
-            var stopId = itin.getFirstStopID();
-            _.extend(params, {
-                startTransitStopId :  stopId,
-                time : otp.util.Time.formatItinTime(newStartTime, "h:mma"),
-                date : otp.util.Time.formatItinTime(newStartTime, "MM-DD-YYYY"),
-                arriveBy : false,
-                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
-            });
-            this_.refreshActiveOnly = true;
-            this_.module.updateActiveOnly = true;
-            this_.module.planTripFunction.call(this_.module, params);
-        });
-        //TRANSLATORS: button to last itinerary
-        $('<button>'+_tr("Last")+'</button>').button().appendTo(buttonRow).click(function() {
-            var itin = this_.itineraries[this_.activeIndex];
-            var params = itin.tripPlan.queryParams;
-            var stopId = itin.getFirstStopID();
-            _.extend(params, {
-                startTransitStopId :  stopId,
-                date : moment(this_.module.date, otp.config.locale.time.date_format).add('days', 1).format("MM-DD-YYYY"),
-                time : serviceBreakTime,
-                arriveBy : true,
-                originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
-            });
-            this_.refreshActiveOnly = true;
-            this_.module.updateActiveOnly = true;
+            this_.refreshActiveOnly = false;
+            this_.module.updateActiveOnly = false;
             this_.module.planTripFunction.call(this_.module, params);
         });
     },
@@ -279,7 +250,7 @@ otp.widgets.ItinerariesWidget =
         var maxSpan = itin.tripPlan.latestEndTime - itin.tripPlan.earliestStartTime;
         var startPct = (itin.itinData.startTime - itin.tripPlan.earliestStartTime) / maxSpan;
         var itinSpan = itin.getEndTime() - itin.getStartTime();
-        var timeWidth = 32;
+        var timeWidth = 40;
         var startPx = 20+timeWidth, endPx = div.width()-timeWidth - (itin.groupSize ? 48 : 0);
         var pxSpan = endPx-startPx;
         var leftPx = startPx + startPct * pxSpan;
@@ -289,7 +260,7 @@ otp.widgets.ItinerariesWidget =
 
         var timeStr = otp.util.Time.formatItinTime(itin.getStartTime(), otp.config.locale.time.time_format);
 	/*timeStr = timeStr.substring(0, timeStr.length - 1);*/
-        div.append('<div class="otp-itinsAccord-header-time" style="left: '+(leftPx-32)+'px;">' + timeStr + '</div>');
+        div.append('<div class="otp-itinsAccord-header-time" style="left: '+(leftPx-timeWidth)+'px;">' + timeStr + '</div>');
 
         var timeStr = otp.util.Time.formatItinTime(itin.getEndTime(), otp.config.locale.time.time_format);
 	/*timeStr = timeStr.substring(0, timeStr.length - 1);*/
@@ -303,17 +274,23 @@ otp.widgets.ItinerariesWidget =
             var widthPx = pxSpan * (leg.endTime - leg.startTime) / maxSpan - 1;
 
             //div.append('<div class="otp-itinsAccord-header-segment" style="width: '+widthPx+'px; left: '+leftPx+'px; background: '+this.getModeColor(leg.mode)+' url(images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat;"></div>');
-
+            var legTextColor = otp.util.Itin.getLegTextColor(leg);
+            var legBackgroundColor = otp.util.Itin.getLegBackgroundColor(leg);
+            var routeTitle = _.chain([leg.mode, leg.agencyName, leg.routeShortName, leg.routeLongName])
+                    .filter(function (value) { return !!value; })
+                    .reduce(function (l, r) { return l ? l + " " + r : r; }, "")
+                    .value();
             var showRouteLabel = widthPx > 40 && otp.util.Itin.isTransit(leg.mode) && leg.routeShortName && leg.routeShortName.length <= 6;
-            var segment = $('<div class="otp-itinsAccord-header-segment" />')
+            var segment = $('<div class="otp-itinsAccord-header-segment" title="' + routeTitle + '" />')
             .css({
                 width: widthPx,
                 left: leftPx,
-                //background: this.getModeColor(leg.mode)
-                background: this.getModeColor(leg.mode)+' url('+otp.config.resourcePath+'images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat'
+                color: legTextColor,
+                background: legBackgroundColor,
             })
             .appendTo(div);
-            if(showRouteLabel) segment.append('<div style="margin-left:'+(widthPx/2+9)+'px;">'+leg.routeShortName+'</div>');
+            segment.append('<div class="mode-icon" style="background: ' + legTextColor + '; mask-image: url(' + otp.util.Itin.getModeIcon(leg.mode) + '); -webkit-mask-image: url(' + otp.util.Itin.getModeIcon(leg.mode) + ')"></div>');
+            if(showRouteLabel) segment.append('<span>'+leg.routeShortName+'</span>');
 
         }
 
@@ -323,18 +300,6 @@ otp.widgets.ItinerariesWidget =
         }
 
     },
-
-    getModeColor : function(mode) {
-        if(mode === "WALK") return '#bbb';
-        if(mode === "BICYCLE") return '#44f';
-        if(mode === "SUBWAY") return '#f00';
-        if(mode === "RAIL") return '#b00';
-        if(mode === "BUS") return '#0f0';
-        if(mode === "TRAM") return '#f00';
-        if(mode === "AIRPLANE") return '#f0f';
-        return '#aaa';
-    },
-
 
     municoderResultId : 0,
 
@@ -371,20 +336,20 @@ otp.widgets.ItinerariesWidget =
                 }
             }
 
-            if(leg.mode === "WALK" || leg.mode === "BICYCLE" || leg.mode === "CAR") {
-                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
+            if(leg.mode === "WALK" || leg.mode === "BICYCLE" || leg.mode === "SCOOTER" || leg.mode === "CAR") {
+                headerHtml += " "+otp.util.Itin.distanceString(leg.distance) + ", " + otp.util.Itin.durationString(leg.startTime, leg.endTime) + pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
                 if(otp.config.municoderHostname) {
                     var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
                     headerHtml += '<span id="'+spanId+'"></span>';
                 }
             }
             else if(leg.agencyId !== null) {
-                headerHtml += ": "+leg.agencyName+", ";
-                if(leg.route !== leg.routeLongName) {
-                    headerHtml += "("+leg.route+") ";
+                headerHtml += ": " + leg.agencyName + ", ";
+                if (leg.routeShortName) {
+                    headerHtml += leg.routeShortName + " ";
                 }
                 if (leg.routeLongName) {
-                    headerHtml += leg.routeLongName;
+                    headerHtml += leg.routeLongName + " ";
                 }
 
                 if(leg.headsign) {
@@ -442,7 +407,7 @@ otp.widgets.ItinerariesWidget =
         var queryTime = otp.util.Time.constructQueryTime(itin.tripPlan.queryParams);
         if(itin.differentServiceDayFromQuery(itin.tripPlan.queryParams.originalQueryTime || queryTime)) {
             //TRANSLATORS: Shown as alert text before showing itinerary.
-            alerts = [ "This itinerary departs on a different day than the one searched for"];
+            alerts = [ _tr("This itinerary departs on a different day than the one searched for") ];
         }
 
         for(var i = 0; i < alerts.length; i++) {
@@ -583,14 +548,15 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
 
-            var stopHtml = '<div class="otp-itin-leg-endpointDescSub">';
-            if( typeof leg.from.stopCode != 'undefined' ) {
-                stopHtml += _tr("Stop") + ' #'+leg.from.stopCode+ ' ';
-            }
-            stopHtml += '[<a href="#">' + _tr("Stop Viewer") +'</a>]</div>';
-
-            $(stopHtml)
+            $(
+                '<div class="otp-itin-leg-endpointDescSub">'
+                 + _tr("Stop")
+                 + ' #' + (leg.from.stopCode || leg.from.stopId)
+                 + ' [<a href="#">' + _tr("Stop Viewer") + '</a>]'
+                 + '</div>'
+            )
             .appendTo(legDiv)
+            .children('a')
             .click(function(evt) {
                 if(!this_.module.stopViewerWidget) {
                     this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this_.module.id+"-stopViewerWidget", this_.module);
@@ -602,7 +568,6 @@ otp.widgets.ItinerariesWidget =
                 this_.module.stopViewerWidget.bringToFront();
             });
 
-
             $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);
 
             // show the "time in transit" line
@@ -610,6 +575,14 @@ otp.widgets.ItinerariesWidget =
             var inTransitDiv = $('<div class="otp-itin-leg-elapsedDesc" />').appendTo(legDiv);
 
             $('<span><i>' + _tr("Time in transit") + ": " + otp.util.Time.secsToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
+
+            $('<div class="otp-itin-leg-ids"></div>')
+                .append($('<table></table>').append([
+                    '<tr><td>' + _tr("Route ID") + ":</td><td>" + leg.routeId + '</td></tr>',
+                    '<tr><td>' + _tr("Trip ID") + ":</td><td>" + leg.tripId + '</td></tr>',
+                    '<tr><td>' + _tr("Service Date") + ":</td><td>" + leg.serviceDate + '</td></tr>'
+                ]))
+                .appendTo(legDiv);
 
             $('<span>&nbsp;[<a href="#">' + _tr("Trip Viewer") + '</a>]</span>')
             .appendTo(inTransitDiv)
@@ -626,7 +599,7 @@ otp.widgets.ItinerariesWidget =
 
             // show the intermediate stops, if applicable -- REPLACED BY TRIP VIEWER
 
-            /*if(this.module.showIntermediateStops) {
+            if(this.module.showIntermediateStops) {
 
                 $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);
                 var intStopsDiv = $('<div class="otp-itin-leg-intStops"></div>').appendTo(legDiv);
@@ -643,8 +616,12 @@ otp.widgets.ItinerariesWidget =
 
                 for(var i=0; i < leg.intermediateStops.length; i++) {
                     var stop = leg.intermediateStops[i];
-                    $('<div class="otp-itin-leg-intStopsListItem">'+(i+1)+'. '+stop.name+' (ID #'+stop.stopId.id+')</div>').
-                    appendTo(intStopsListDiv)
+                    var time = stop.arrival === stop.departure
+                                ? otp.util.Time.formatItinTime(stop.arrival, otp.config.locale.time.time_format)
+                                : otp.util.Time.formatItinTime(stop.arrival, otp.config.locale.time.time_format) + " - " + otp.util.Time.formatItinTime(stop.departure, otp.config.locale.time.time_format);
+                    $('<div class="otp-itin-leg-intStopsListItem"><span>'+time+' '+stop.name+' <i>(#'+(stop.stopCode || stop.stopId)+')</i></span></div>')
+                    .appendTo(intStopsListDiv)
+                    .children('span')
                     .data("stop", stop)
                     .click(function(evt) {
                         var stop = $(this).data("stop");
@@ -652,7 +629,7 @@ otp.widgets.ItinerariesWidget =
                     }).hover(function(evt) {
                         var stop = $(this).data("stop");
                         $(this).css('color', 'red');
-                        var popup = L.popup()
+                        L.popup()
                             .setLatLng(new L.LatLng(stop.lat, stop.lon))
                             .setContent(stop.name)
                             .openOn(this_.module.webapp.map.lmap);
@@ -662,7 +639,7 @@ otp.widgets.ItinerariesWidget =
                     });
                 }
                 intStopsListDiv.hide();
-            }*/
+            }
 
             // show the end time and stop
 
@@ -695,6 +672,25 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
 
+            $(
+                '<div class="otp-itin-leg-endpointDescSub">'
+                + _tr("Stop")
+                + ' #' + (leg.to.stopCode || leg.to.stopId)
+                + ' [<a href="#">' + _tr("Stop Viewer") + '</a>]'
+                + '</div>'
+            )
+                .appendTo(legDiv)
+                .children('a')
+                .click(function(evt) {
+                    if(!this_.module.stopViewerWidget) {
+                        this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this_.module.id+"-stopViewerWidget", this_.module);
+                        this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
+                    }
+                    this_.module.stopViewerWidget.show();
+                    this_.module.stopViewerWidget.setActiveTime(leg.endTime);
+                    this_.module.stopViewerWidget.setStop(leg.to.stopId, leg.to.name);
+                    this_.module.stopViewerWidget.bringToFront();
+                });
 
             // render any alerts
 

@@ -7,7 +7,7 @@ import org.opentripplanner.standalone.OTPMain;
 
 
 /**
- * This class provide a main method to start a GUI witch can start OTPMain.
+ * This class provide a main method to start a GUI which can start OTPMain.
  * <p>
  * The UI allow the user to select a OTP configuration data set. The list of
  * data location is created by searching the a root data source directory.
@@ -26,7 +26,7 @@ public class InteractiveOtpMain {
 
   private void run() {
     this.model = Model.load();
-    MainView frame = new MainView(this::startOtp, model);
+    MainView frame = new MainView(new Thread(this::startOtp)::start, model);
     frame.start();
   }
 

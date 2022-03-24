@@ -4,18 +4,24 @@ package org.opentripplanner.transit.raptor._data.transit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorGuaranteedTransferProvider;
+import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
 
     private final TestTripPattern pattern;
     private final List<TestTripSchedule> schedules = new ArrayList<>();
-    private final TestTransferProvider transfersFrom = new TestTransferProvider();
-    private final TestTransferProvider transfersTo = new TestTransferProvider();
+    private final TestConstrainedBoardingSearch transferConstraintsForwardSearch =
+            new TestConstrainedBoardingSearch(true);
+    private final TestConstrainedBoardingSearch transferConstraintsReverseSearch =
+            new TestConstrainedBoardingSearch(false);
 
 
     private TestRoute(TestTripPattern pattern) {
@@ -36,8 +42,37 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     }
 
     @Override
+    public IntUnaryOperator getArrivalTimes(int stopPositionInPattern) {
+        final int[] arrivalTimes = schedules.stream()
+                .mapToInt(schedule -> schedule.arrival(stopPositionInPattern))
+                .toArray();
+        return (int i) -> arrivalTimes[i];
+    }
+
+    @Override
+    public IntUnaryOperator getDepartureTimes(int stopPositionInPattern) {
+        final int[] departureTimes = schedules.stream()
+                .mapToInt(schedule -> schedule.departure(stopPositionInPattern))
+                .toArray();
+        return (int i) -> departureTimes[i];
+    }
+
+    @Override
     public int numberOfTripSchedules() {
         return schedules.size();
+    }
+
+    @Override
+    public boolean useCustomizedTripSearch() { return false; }
+
+    @Override
+    public RaptorTripScheduleSearch<TestTripSchedule> createCustomizedTripSearch(
+            SearchDirection direction
+    ) {
+        throw new IllegalStateException(
+                "Support for frequency based trips are not implemented here. " +
+                "This is outside the scope of the Raptor unit tests."
+        );
     }
 
     @Override
@@ -51,13 +86,17 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     }
 
     @Override
-    public RaptorGuaranteedTransferProvider<TestTripSchedule> getGuaranteedTransfersTo() {
-        return transfersTo;
+    public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch() {
+        return transferConstraintsForwardSearch;
     }
 
     @Override
-    public RaptorGuaranteedTransferProvider<TestTripSchedule> getGuaranteedTransfersFrom() {
-        return transfersFrom;
+    public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch() {
+        return transferConstraintsReverseSearch;
+    }
+
+    public List<TestConstrainedTransfer> listTransferConstraintsForwardSearch() {
+        return transferConstraintsForwardSearch.constrainedBoardings();
     }
 
     public TestRoute withTimetable(TestTripSchedule ... trips) {
@@ -81,30 +120,43 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
                 .toString();
     }
 
-    void addGuaranteedTxFrom(
-            TestTripSchedule fromTrip,
-            int fromTripIndex,
-            int fromStopPos,
-            TestTripSchedule toTrip,
-            int toStopPos
-    ) {
-        int fromTime = fromTrip.arrival(fromStopPos);
-        this.transfersFrom.addGuaranteedTransfers(
-                toTrip, toStopPos, fromTrip, fromTripIndex, fromStopPos, fromTime
-        );
+    void clearTransferConstraints() {
+        transferConstraintsForwardSearch.clear();
+        transferConstraintsReverseSearch.clear();
     }
 
-    void addGuaranteedTxTo(
+    /**
+     * Add a transfer constraint to the route by iterating over all trips and matching
+     * the provided {@code toTrip}(added to forward search) {@code fromTrip}(added to reverse
+     * search) with the rips in the route timetable.
+     */
+    void addTransferConstraint(
             TestTripSchedule fromTrip,
             int fromStopPos,
             TestTripSchedule toTrip,
-            int toTripIndex,
-            int toStopPos
-            ) {
-        final int toTime = toTrip.departure(toStopPos);
-        // This is used in the revers search
-        this.transfersTo.addGuaranteedTransfers(
-                fromTrip, fromStopPos, toTrip, toTripIndex, toStopPos, toTime
-        );
+            int toStopPos,
+            TransferConstraint constraint
+    ) {
+        for (int i = 0; i < timetable().numberOfTripSchedules(); i++) {
+            var trip = timetable().getTripSchedule(i);
+            if(toTrip == trip) {
+                this.transferConstraintsForwardSearch.addConstraintTransfers(
+                        fromTrip, fromStopPos,
+                        trip, i, toStopPos,
+                        trip.arrival(toStopPos),
+                        constraint
+                );
+            }
+            // Reverse search transfer, the {@code source/target} is the trips in order of the
+            // reverse search, which is opposite from {@code from/to} in the result path.
+            if(fromTrip == trip) {
+                this.transferConstraintsReverseSearch.addConstraintTransfers(
+                        toTrip, toStopPos,
+                        trip, i, fromStopPos,
+                        trip.departure(fromStopPos),
+                        constraint
+                );
+            }
+        }
     }
 }

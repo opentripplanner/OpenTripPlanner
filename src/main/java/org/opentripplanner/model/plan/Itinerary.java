@@ -70,14 +70,25 @@ public class Itinerary {
     public int generalizedCost = -1;
 
     /**
-     * This is the wait-time-adjusted-generalized-cost. The aim is to distribute wait-time and
-     * adding a high penalty on short transfers. Do not use this to compare or filter itineraries.
+     * This is the transfer-wait-time-cost. The aim is to distribute wait-time and adding a high penalty
+     * on short transfers. Do not use this to compare or filter itineraries.
      * The filtering on this parameter is done on paths, before mapping to itineraries and is
      * provided here as reference information.
      * <p>
      * -1 indicate that the cost is not set/computed.
      */
-    public int waitTimeAdjustedGeneralizedCost = -1;
+    public int waitTimeOptimizedCost = -1;
+
+    /**
+     * This is the transfer-priority-cost. If two paths ride the same trips with different
+     * transfers, this cost is used to pick the one with the best transfer constraints (guaranteed,
+     * stay-seated, not-allowed ...). Do not use this to compare or filter itineraries.
+     * The filtering on this parameter is done on paths, before mapping to itineraries and is
+     * provided here as reference information.
+     * <p>
+     * -1 indicate that the cost is not set/computed.
+     */
+    public int transferPriorityCost = -1;
 
     /**
      * This itinerary has a greater slope than the user requested (but there are no possible
@@ -86,10 +97,10 @@ public class Itinerary {
     public boolean tooSloped = false;
 
     /**
-     * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedBicycleAtDestination}
+     * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedVehicleAtDestination}
      * is set than it is possible to end a trip without dropping off the rented bicycle.
      */
-    public boolean arrivedAtDestinationWithRentedBicycle = false;
+    public boolean arrivedAtDestinationWithRentedVehicle = false;
 
      /** TRUE if mode is WALK from start ot end (all legs are walking). */
     public final boolean walkOnly;
@@ -140,14 +151,14 @@ public class Itinerary {
      * Time that the trip departs.
      */
     public Calendar startTime() {
-        return firstLeg().startTime;
+        return firstLeg().getStartTime();
     }
 
     /**
      * Time that the trip arrives.
      */
     public Calendar endTime() {
-        return lastLeg().endTime;
+        return lastLeg().getEndTime();
     }
 
     /**
@@ -155,14 +166,14 @@ public class Itinerary {
      * Unit: seconds.
      */
     public int departureDelay() {
-        return firstLeg().departureDelay;
+        return firstLeg().getDepartureDelay();
     }
     /**
      * Reflects the arrivalDelay on the last Leg
      * Unit: seconds.
      */
     public int arrivalDelay() {
-        return lastLeg().arrivalDelay;
+        return lastLeg().getArrivalDelay();
     }
 
 
@@ -178,7 +189,7 @@ public class Itinerary {
      * Total distance in meters.
      */
     public double distanceMeters() {
-        return legs.stream().mapToDouble(it -> it.distanceMeters).sum();
+        return legs.stream().mapToDouble(Leg::getDistanceMeters).sum();
     }
 
     /**
@@ -214,21 +225,24 @@ public class Itinerary {
     }
 
     /**
-     * A itinerary can be tagged with a system notice. System notices should only be added to a
-     * response if explicit asked for in the request.
+     * An itinerary can be flagged for removal with a system notice.
      * <p>
      * For example when tuning or manually testing the itinerary-filter-chain it you can enable
-     * the {@link org.opentripplanner.routing.api.request.RoutingRequest#debugItineraryFilter} and instead
-     * of removing itineraries from the result the itineraries would be tagged by the filters
-     * instead. This enable investigating, why an expected itinerary is missing from the result
-     * set.
+     * {@link org.opentripplanner.routing.api.request.ItineraryFilterParameters#debug} and instead
+     * of removing itineraries from the result the itineraries will be tagged by the filters
+     * instead. This enables investigating, why an expected itinerary is missing from the result
+     * set. It can be also used by other filters to see the already filtered itineraries.
      */
-    public void addSystemNotice(SystemNotice notice) {
+    public void flagForDeletion(SystemNotice notice) {
         systemNotices.add(notice);
     }
 
+    public boolean isFlaggedForDeletion() {
+        return !systemNotices.isEmpty();
+    }
+
     public void timeShiftToStartAt(Calendar afterTime) {
-        Calendar startTimeFirstLeg = firstLeg().startTime;
+        Calendar startTimeFirstLeg = firstLeg().getStartTime();
         long adjustmentMilliSeconds =
             afterTime.getTimeInMillis() - startTimeFirstLeg.getTimeInMillis();
         timeShift(adjustmentMilliSeconds);
@@ -236,8 +250,8 @@ public class Itinerary {
 
     private void timeShift(long adjustmentMilliSeconds) {
         for (Leg leg : this.legs) {
-            leg.startTime.setTimeInMillis(leg.startTime.getTimeInMillis() + adjustmentMilliSeconds);
-            leg.endTime.setTimeInMillis(leg.endTime.getTimeInMillis() + adjustmentMilliSeconds);
+            leg.getStartTime().setTimeInMillis(leg.getStartTime().getTimeInMillis() + adjustmentMilliSeconds);
+            leg.getEndTime().setTimeInMillis(leg.getEndTime().getTimeInMillis() + adjustmentMilliSeconds);
         }
     }
 
@@ -260,10 +274,10 @@ public class Itinerary {
     @Override
     public String toString() {
         return ToStringBuilder.of(Itinerary.class)
-                .addStr("from", firstLeg().from.toStringShort())
-                .addStr("to", lastLeg().to.toStringShort())
-                .addCalTime("start", firstLeg().startTime)
-                .addCalTime("end", lastLeg().endTime)
+                .addStr("from", firstLeg().getFrom().toStringShort())
+                .addStr("to", lastLeg().getTo().toStringShort())
+                .addTimeCal("start", firstLeg().getStartTime())
+                .addTimeCal("end", lastLeg().getEndTime())
                 .addNum("nTransfers", nTransfers, -1)
                 .addDurationSec("duration", durationSeconds)
                 .addNum("generalizedCost", generalizedCost)
@@ -304,8 +318,9 @@ public class Itinerary {
      * 12:14 ...
      */
     public String toStr() {
-        PathStringBuilder buf = new PathStringBuilder();
-        buf.stop(firstLeg().from.name);
+        // No translater needed, stop indexes are never passed to the builder
+        PathStringBuilder buf = new PathStringBuilder(null);
+        buf.stop(firstLeg().getFrom().name.toString());
 
         for (Leg leg : legs) {
             buf.sep();
@@ -313,14 +328,15 @@ public class Itinerary {
                 buf.walk((int)leg.getDuration());
             }
             else if(leg.isTransitLeg()) {
-              buf.transit(leg.mode, leg.getTrip().logInfo(), leg.startTime, leg.endTime);
+              buf.transit(
+                      leg.getMode(), leg.getTrip().logInfo(), leg.getStartTime(), leg.getEndTime());
             }
             else {
-                buf.other(leg.mode, leg.startTime, leg.endTime);
+                buf.other(leg.getMode(), leg.getStartTime(), leg.getEndTime());
             }
 
             buf.sep();
-            buf.stop(leg.to.name);
+            buf.stop(leg.getTo().name.toString());
         }
 
         buf.space().append(String.format(ROOT, "[ $%d ]", generalizedCost));

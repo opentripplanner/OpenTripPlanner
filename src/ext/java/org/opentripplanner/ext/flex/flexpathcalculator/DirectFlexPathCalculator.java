@@ -4,7 +4,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -15,9 +14,9 @@ public class DirectFlexPathCalculator implements FlexPathCalculator {
 
   private static final int DIRECT_EXTRA_TIME = 5 * 60;
 
-  private double flexSpeed;
+  private final double flexSpeed;
 
-  public DirectFlexPathCalculator(Graph graph) {
+  public DirectFlexPathCalculator() {
     this.flexSpeed = FLEX_SPEED;
   }
 
@@ -33,7 +32,7 @@ public class DirectFlexPathCalculator implements FlexPathCalculator {
     return new FlexPath(
         (int) distance,
         (int) (distance / flexSpeed) + DIRECT_EXTRA_TIME,
-        geometry
+        () -> geometry
     );
   }
 }

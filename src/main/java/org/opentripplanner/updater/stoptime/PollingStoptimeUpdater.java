@@ -1,15 +1,14 @@
 package org.opentripplanner.updater.stoptime;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import java.util.List;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * Update OTP stop time tables from some (realtime) source
@@ -31,12 +30,12 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     /**
      * Parent update manager. Is used to execute graph writer runnables.
      */
-    private GraphUpdaterManager updaterManager;
+    private WriteToGraphCallback saveResultOnGraph;
 
     /**
      * Update streamer
      */
-    private TripUpdateSource updateSource;
+    private final TripUpdateSource updateSource;
 
     /**
      * Property to set on the RealtimeDataSnapshotSource
@@ -87,8 +86,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+        this.saveResultOnGraph = saveResultOnGraph;
     }
 
     @Override
@@ -130,7 +129,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
             // Handle trip updates via graph writer runnable
             TripUpdateGraphWriterRunnable runnable =
                     new TripUpdateGraphWriterRunnable(fullDataset, updates, feedId);
-            updaterManager.execute(runnable);
+            saveResultOnGraph.execute(runnable);
         }
     }
 

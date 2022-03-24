@@ -4,19 +4,20 @@ import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
+import java.util.function.Consumer;
+import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
 import org.opentripplanner.routing.api.request.RequestFunctions;
-
-import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
 
 public class ItineraryFiltersInputType {
 
   private static final String MIN_SAFE_TRANSFER_TIME_FACTOR = "minSafeTransferTimeFactor";
   private static final String TRANSIT_GENERALIZED_COST_LIMIT = "transitGeneralizedCostLimit";
   private static final String GROUP_SIMILARITY_KEEP_ONE = "groupSimilarityKeepOne";
+  private static final String GROUP_SIMILARITY_KEEP_THREE = "groupSimilarityKeepThree";
+  private static final String GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER = "groupedOtherThanSameLegsMaxCostMultiplier";
   private static final String GROUP_SIMILARITY_KEEP_N_ITINERARIES = "groupSimilarityKeepNumOfItineraries";
 
   public static GraphQLInputObjectType create(GqlUtil gqlUtil, ItineraryFilterParameters dft) {
@@ -29,9 +30,9 @@ public class ItineraryFiltersInputType {
             .newInputObjectField()
             .name(MIN_SAFE_TRANSFER_TIME_FACTOR)
             .type(Scalars.GraphQLFloat)
+            .deprecate("This filter is removed, it has undesired side-effects")
             .description("Add an additional cost for short transfers on long transit itineraries. "
                 + "See javaDoc on `AddMinSafeTransferCostFilter` details.")
-            .defaultValue(dft.minSafeTransferTimeFactor)
             .build())
         .field(GraphQLInputObjectField.newInputObjectField().name(TRANSIT_GENERALIZED_COST_LIMIT).type(gqlUtil.doubleFunctionScalar)
             // There is a bug in the GraphQL lib. The default value is shown as a `boolean`
@@ -52,11 +53,31 @@ public class ItineraryFiltersInputType {
         .field(GraphQLInputObjectField
             .newInputObjectField()
             .type(Scalars.GraphQLFloat)
-            .name(GROUP_SIMILARITY_KEEP_N_ITINERARIES)
+            .name(GROUP_SIMILARITY_KEEP_THREE)
             .description(
-                "Reduce the number of itineraries to the requested number by reducing each "
-                    + "group of itineraries grouped by 68% similarity.")
-            .defaultValue(dft.groupSimilarityKeepNumOfItineraries)
+                "Reduce the number of itineraries in each group to to maximum 3 itineraries. "
+                + "The itineraries are grouped by similar legs (on board same journey). So, if "
+                + " 68% of the distance is traveled by similar legs, then two itineraries are "
+                + "in the same group. Default value is 68%, must be at least 50%.")
+            .defaultValue(dft.groupSimilarityKeepThree)
+            .build())
+        .field(GraphQLInputObjectField
+                .newInputObjectField()
+                .type(Scalars.GraphQLFloat)
+                .name(GROUP_SIMILARITY_KEEP_N_ITINERARIES)
+                .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
+                .defaultValue(dft.groupSimilarityKeepThree)
+                .build())
+        .field(GraphQLInputObjectField
+            .newInputObjectField()
+            .type(Scalars.GraphQLFloat)
+            .name(GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER)
+            .description(
+                "Of the itineraries grouped to maximum of three itineraries, how much worse can the "
+                + "non-grouped legs be compared to the lowest cost. 2.0 means that they can be "
+                + "double the cost, and any itineraries having a higher cost will be filtered. "
+                + "Default value is 2.0, use a value lower than 1.0 to turn off")
+            .defaultValue(dft.groupedOtherThanSameLegsMaxCostMultiplier)
             .build())
         .build();
   }
@@ -70,8 +91,12 @@ public class ItineraryFiltersInputType {
       return;
     }
     setField(callWith, GROUP_SIMILARITY_KEEP_ONE, (Double v) -> target.groupSimilarityKeepOne = v);
-    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, (Double v) -> target.groupSimilarityKeepNumOfItineraries = v);
-    setField(callWith, MIN_SAFE_TRANSFER_TIME_FACTOR, (Double v) -> target.minSafeTransferTimeFactor = v);
+
+    // This is deprecated, sets same value as GROUP_SIMILARITY_KEEP_THREE
+    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, (Double v) -> target.groupSimilarityKeepThree = v);
+
+    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, (Double v) -> target.groupSimilarityKeepThree = v);
+    setField(callWith, GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER, (Double v) -> target.groupedOtherThanSameLegsMaxCostMultiplier = v);
     setField(callWith, TRANSIT_GENERALIZED_COST_LIMIT, (DoubleFunction<Double> v) -> target.transitGeneralizedCostLimit = v);
   }
 

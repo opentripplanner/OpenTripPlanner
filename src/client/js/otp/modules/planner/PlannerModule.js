@@ -181,6 +181,10 @@ otp.modules.planner.PlannerModule =
 
         this.noTripWidget = new otp.widgets.Widget('otp-noTripWidget', this);
         this.addWidget(this.noTripWidget);*/
+
+        window.onpopstate = function (event) {
+            this_.restoreTrip(event.state);
+        };
     },
 
     restore : function() {
@@ -336,9 +340,9 @@ otp.modules.planner.PlannerModule =
        	    queryParams = {
                 fromPlace: this.getStartOTPString(),
                 toPlace: this.getEndOTPString(),
-                time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format("h:mma"),
+                time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format(otp.config.apiTimeFormat),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
-                date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
+                date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format(otp.config.apiDateFormat) : moment().format(otp.config.apiDateFormat),
                 mode: this.mode
             };
             if(this.mode !== "CAR") _.extend(queryParams, { maxWalkDistance: this.maxWalkDistance} );
@@ -378,6 +382,11 @@ otp.modules.planner.PlannerModule =
         //sends wanted translation to server
         _.extend(queryParams, {locale : otp.config.locale.config.locale_short} );
 
+        // Only save the state if 1) we are not loading from an existing state and 2) it differs from the previous state
+        if (window.history.pushState && !existingQueryParams && !_.isEqual(this.lastQueryParams, queryParams)) {
+          window.history.pushState(queryParams, null, this.constructLink(queryParams, {}));
+        }
+
         this.lastQueryParams = queryParams;
 
         this.planTripRequestCount = 0;
@@ -407,15 +416,9 @@ otp.modules.planner.PlannerModule =
                 }
 
                 if(data.plan) {
-                    // allow for optional pre-processing step (used by Fieldtrip module)
-                    if(typeof this_.preprocessPlan == 'function') {
-                        this_.preprocessPlan(data.plan, queryParams, function() {
-                            this_.planReceived(data.plan, url, queryParams, successCallback);
-                        });
-                    }
-                    else {
-                        this_.planReceived(data.plan, url, queryParams, successCallback);
-                    }
+                    data.plan.nextPageCursor = data.nextPageCursor;
+                    data.plan.previousPageCursor = data.previousPageCursor;
+                    this_.planReceived(data.plan, url, queryParams, successCallback);
                 }
                 else {
                     this_.noTripFound(data.error);
@@ -429,8 +432,9 @@ otp.modules.planner.PlannerModule =
 
     planReceived : function(plan, url, queryParams, successCallback) {
         // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
-        otp.config.timeOffset = (otp.config.timeOffset) ||
-            (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(plan.date))/3600000;
+        otp.config.timeOffset = (otp.config.timeOffset !== undefined)
+            ? otp.config.timeOffset
+            : (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(plan.date))/3600000;
 
         var tripPlan = new otp.modules.planner.TripPlan(plan, queryParams);
 
@@ -489,6 +493,12 @@ otp.modules.planner.PlannerModule =
         otp.widgets.Dialogs.showOkDialog(msg, _tr('No Trip Found'));
     },
 
+    constructLink : function(queryParams, additionalParams) {
+        additionalParams = additionalParams ||  { };
+        return otp.config.siteUrl + '?module=' + this.id + "&" +
+            otp.util.Text.constructUrlParamString(_.extend(_.clone(queryParams), additionalParams));
+    },
+
     drawItinerary : function(itin) {
         var this_ = this;
 
@@ -504,7 +514,9 @@ otp.modules.planner.PlannerModule =
             // draw the polyline
             var polyline = new L.Polyline(otp.util.Geo.decodePolyline(leg.legGeometry.points));
             var weight = 8;
-            polyline.setStyle({ color : this.getModeColor(leg.mode), weight: weight});
+            var legColor = otp.util.Itin.getLegBackgroundColor(leg);
+
+            polyline.setStyle({ color : legColor, weight: weight});
             this.pathLayer.addLayer(polyline);
             polyline.leg = leg;
             polyline.bindPopup("("+leg.routeShortName+") "+leg.routeLongName);
@@ -570,7 +582,16 @@ otp.modules.planner.PlannerModule =
                 	//this.resetStationMarkers();
                 }
             }
-            //FIXME: CAR is missing
+            else if(leg.mode === 'SCOOTER') {
+                //TRANSLATORS: Text which is shown when clicking scooter route in a map
+                polyline.bindPopup(_tr('Your route using the scooter'));
+                //this.resetStationMarkers();
+            }
+            else if(leg.mode === 'CAR') {
+                //TRANSLATORS: Text which is shown when clicking driving route in a map
+                polyline.bindPopup(_tr('Your driving route'));
+                //this.resetStationMarkers();
+            }
         }
         if (otp.config.zoomToFitResults) this.webapp.map.lmap.fitBounds(itin.getBoundsArray());
     },
@@ -613,6 +634,7 @@ otp.modules.planner.PlannerModule =
     getModeColor : function(mode) {
         if(mode === "WALK") return '#444';
         if(mode === "BICYCLE") return '#0073e5';
+        if(mode === "SCOOTER") return '#88f';
         if(mode === "SUBWAY") return '#f00';
         if(mode === "RAIL") return '#b00';
         if(mode === "BUS") return '#080';

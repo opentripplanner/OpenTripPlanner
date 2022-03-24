@@ -11,8 +11,8 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.util.OTPFeature;
 
@@ -29,8 +29,8 @@ import java.util.List;
  * but it is intended to be updated later to support other profiles.
  */
 public class NetexModule implements GraphBuilderModule {
-    private final static double MAX_STOP_TO_SHAPE_SNAP_DISTANCE = 150;
 
+    private final double maxStopToShapeSnapDistance;
     private final int subwayAccessTime;
     private final int maxInterlineDistance;
     private final String netexFeedId;
@@ -49,6 +49,7 @@ public class NetexModule implements GraphBuilderModule {
             String netexFeedId,
             int subwayAccessTime,
             int maxInterlineDistance,
+            double maxStopToShapeSnapDistance,
             ServiceDateInterval transitPeriodLimit,
             List<NetexBundle> netexBundles
     ) {
@@ -57,6 +58,7 @@ public class NetexModule implements GraphBuilderModule {
         this.maxInterlineDistance = maxInterlineDistance;
         this.transitPeriodLimit = transitPeriodLimit;
         this.netexBundles = netexBundles;
+        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     }
 
     @Override
@@ -67,8 +69,7 @@ public class NetexModule implements GraphBuilderModule {
     ) {
 
         graph.clearTimeZone();
-        CalendarServiceData calendarServiceData = new CalendarServiceData();
-
+        CalendarServiceData calendarServiceData = graph.getCalendarDataService();
         try {
             for (NetexBundle netexBundle : netexBundles) {
                 netexBundle.checkInputs();
@@ -77,12 +78,14 @@ public class NetexModule implements GraphBuilderModule {
                         graph.deduplicator,
                         issueStore
                 );
-                transitBuilder.limitServiceDays(transitPeriodLimit);
+                transitBuilder.limitServiceDays(transitPeriodLimit, issueStore);
 
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 if (OTPFeature.FlexRouting.isOn()) {
-                    transitBuilder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(transitBuilder));
+                    transitBuilder.getFlexTripsById().addAll(
+                            FlexTripsMapper.createFlexTrips(transitBuilder, issueStore)
+                    );
                 }
 
                 OtpTransitService otpService = transitBuilder.build();
@@ -103,7 +106,7 @@ public class NetexModule implements GraphBuilderModule {
                 new GeometryAndBlockProcessor(
                         otpService,
                         fareServiceFactory,
-                        MAX_STOP_TO_SHAPE_SNAP_DISTANCE,
+                        maxStopToShapeSnapDistance,
                         maxInterlineDistance
                 ).run(graph, issueStore);
             }
@@ -111,6 +114,7 @@ public class NetexModule implements GraphBuilderModule {
             throw new RuntimeException(e);
         }
 
+        graph.clearCachedCalenderService();
         graph.putService(CalendarServiceData.class, calendarServiceData);
         graph.updateTransitFeedValidity(calendarServiceData, issueStore);
 

@@ -9,6 +9,7 @@ import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.model.ContactInfo;
 
 public class BookingArrangementType {
@@ -65,15 +66,49 @@ public class BookingArrangementType {
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("latestBookingTime")
-            .description("Latest time service can be booked. ISO 8601 timestamp")
+            .description("Latest time the service can be booked. ISO 8601 timestamp")
             .type(gqlUtil.localTimeScalar)
-            .dataFetcher(environment -> ((bookingInfo(environment)).getLatestBookingTime().getTime()))
+            .dataFetcher(environment -> {
+              final BookingTime latestBookingTime = (bookingInfo(environment)).getLatestBookingTime();
+              return latestBookingTime == null ? null : latestBookingTime.getTime();
+            })
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("latestBookingDay")
-            .description("Latest time service can be booked. ISO 8601 timestamp")
-            .type(gqlUtil.localTimeScalar)
-            .dataFetcher(environment -> ((bookingInfo(environment)).getLatestBookingTime().getDaysPrior()))
+            .description("How many days prior to the travel the service needs to be booked")
+            .type(Scalars.GraphQLInt)
+                .dataFetcher(environment -> {
+                  final BookingTime latestBookingTime = (bookingInfo(environment)).getLatestBookingTime();
+                  return latestBookingTime == null ? null : latestBookingTime.getDaysPrior();
+                })
+            .build())
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+            .name("bookWhen")
+            .description("Time constraints for booking")
+            .type(EnumTypes.PURCHASE_WHEN)
+            .dataFetcher(environment -> {
+                BookingInfo bookingInfo = bookingInfo(environment);
+                if (bookingInfo.getMinimumBookingNotice() != null) { return null; }
+                BookingTime latestBookingTime = bookingInfo.getLatestBookingTime();
+                BookingTime earliestBookingTime = bookingInfo.getEarliestBookingTime();
+
+                // Try to deduce the original enum from stored values
+                if (earliestBookingTime == null) {
+                    if (latestBookingTime == null) {
+                        return "timeOfTravelOnly";
+                    } else if (latestBookingTime.getDaysPrior() == 1) {
+                        return "untilPreviousDay";
+                    } else if (latestBookingTime.getDaysPrior() == 0) {
+                        return "advanceAndDayOfTravel";
+                    } else {
+                        return "other";
+                    }
+                } else if (earliestBookingTime.getDaysPrior() == 0 && latestBookingTime.getDaysPrior() == 0) {
+                    return "dayOfTravelOnly";
+                } else {
+                    return "other";
+                }
+            })
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("minimumBookingPeriod")

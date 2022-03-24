@@ -87,7 +87,7 @@ public class AStarTest {
         options.setRoutingContext(graph, graph.getVertex("56th_24th"), graph.getVertex("leary_20th"));
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(graph.getVertex("leary_20th"), false);
+        GraphPath path = tree.getPath(graph.getVertex("leary_20th"));
 
         List<State> states = path.states;
 
@@ -112,7 +112,7 @@ public class AStarTest {
                 graph.getVertex("leary_20th"));
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(graph.getVertex("56th_24th"), false);
+        GraphPath path = tree.getPath(graph.getVertex("56th_24th"));
 
         List<State> states = path.states;
 
@@ -155,7 +155,7 @@ public class AStarTest {
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
         options.cleanup();
 
-        GraphPath path = tree.getPath(to, false);
+        GraphPath path = tree.getPath(to);
 
         List<State> states = path.states;
 
@@ -191,7 +191,7 @@ public class AStarTest {
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
         options.cleanup();
 
-        GraphPath path = tree.getPath(from, false);
+        GraphPath path = tree.getPath(from);
 
         List<State> states = path.states;
 
@@ -214,7 +214,7 @@ public class AStarTest {
         options.walkSpeed = 1.0;
         options.setRoutingContext(graph, graph.getVertex("56th_24th"), graph.getVertex("leary_20th"));
 
-        Set<Vertex> targets = new HashSet<Vertex>();
+        Set<Vertex> targets = new HashSet<>();
         targets.add(graph.getVertex("shilshole_22nd"));
         targets.add(graph.getVertex("market_russell"));
         targets.add(graph.getVertex("56th_20th"));
@@ -224,7 +224,7 @@ public class AStarTest {
         ShortestPathTree tree = new AStar().getShortestPathTree(options, -1, strategy);
 
         for (Vertex v : targets) {
-            GraphPath path = tree.getPath(v, false);
+            GraphPath path = tree.getPath(v);
             assertNotNull("No path found for target " + v.getLabel(), path);
         }
     }
@@ -234,8 +234,7 @@ public class AStarTest {
      ****/
 
     private SimpleConcreteVertex vertex(String label, double lat, double lon) {
-        SimpleConcreteVertex v = new SimpleConcreteVertex(graph, label, lat, lon);
-        return v;
+        return new SimpleConcreteVertex(graph, label, lat, lon);
     }
 
     private void edges(String... vLabels) {

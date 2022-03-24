@@ -1,28 +1,31 @@
 package org.opentripplanner.api.common;
 
-import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.BannedStopSet;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.util.ResourceBundleSingleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.time.Duration;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.time.Duration;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.plan.pagecursor.PageCursor;
+import org.opentripplanner.routing.api.request.DebugRaptor;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.ResourceBundleSingleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -36,7 +39,8 @@ import java.util.TimeZone;
  *
  * @author abyrd
  */
-public abstract class RoutingResource { 
+@SuppressWarnings("FieldMayBeFinal")
+public abstract class RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
 
@@ -70,24 +74,43 @@ public abstract class RoutingResource {
     protected String time;
 
     /**
-     * This is the time/duration in seconds from the earliest-departure-time(EDT) to
-     * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest
-     * to latest arrival time (LAT minus EAT).
+     * The length of the search-window in seconds. This parameter is optional.
      * <p>
-     * All optimal travels that depart within the search window is guarantied to be found.
+     * The search-window is defined as the duration between the earliest-departure-time(EDT) and
+     * the latest-departure-time(LDT). OTP will search for all itineraries in this departure
+     * window. If {@code arriveBy=true} the {@code dateTime} parameter is the latest-arrival-time, so OTP
+     * will dynamically calculate the EDT. Using a short search-window is faster than using a
+     * longer one, but the search duration is not linear. Using a \"too\" short search-window will
+     * waste resources server side, while using a search-window that is too long will be slow.
      * <p>
-     * This is sometimes referred to as the Range Raptor Search Window - but should apply to all
-     * scheduled/time dependent travels.
+     * OTP will dynamically calculate a reasonable value for the search-window, if not provided.
+     * The calculation comes with a significant overhead (10-20% extra). Whether you should use the
+     * dynamic calculated value or pass in a value depends on your use-case. For a travel planner
+     * in a small geographical area, with a dense network of public transportation, a fixed value
+     * between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it
+     * so that the number of itineraries on average is around the wanted {@code numItineraries}.
+     * Make sure you set the {@code numItineraries} to a high number while testing. For a country
+     * wide area like Norway, using the dynamic search-window is the best.
      * <p>
-     * Optional - it is NOT recommended to set this value, unless you use the value returned by the
-     * previous search. Then it can be used to get the next/previous "page". The value is
-     * dynamically assigned a suitable value, if not set. In a small to medium size operation
-     * you may use a fixed value, like 60 minutes. If you have a mixture of high frequency cities
-     * routes and infrequent long distant journeys, the best option is normally to use the dynamic
-     * auto assignment.
+     * When paginating, the search-window is calculated using the {@code numItineraries} in the original
+     * search together with statistics from the search for the last page. This behaviour is
+     * configured server side, and can not be overridden from the client.
+     * <p>
+     * The search-window used is returned to the response metadata as {@code searchWindowUsed} for
+     * debugging purposes.
      */
     @QueryParam("searchWindow")
     protected Integer searchWindow;
+
+    /**
+     * Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last
+     * response and keep the original request as is. This will enable you to search for itineraries
+     * in the next or previous time-window.
+     * <p>
+     * This is an optional parameter.
+     */
+    @QueryParam("pageCursor")
+    public String pageCursor;
 
     /**
      * Search for the best trip options within a time window. If {@code true} two itineraries are
@@ -142,10 +165,11 @@ public abstract class RoutingResource {
     /**
      * The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.
      *
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
      *                       old functionality the same way, but we will try to map this parameter
      *                       so it does work similar as before.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxWalkDistance")
@@ -155,8 +179,9 @@ public abstract class RoutingResource {
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
      *
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxPreTransitTime")
@@ -318,16 +343,12 @@ public abstract class RoutingResource {
 
     /**
      * The comma-separated list of banned agencies.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("bannedAgencies")
     protected String bannedAgencies;
 
     /**
      * Functions the same as banned agencies, except only the listed agencies are allowed.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("whiteListedAgencies")
     protected String whiteListedAgencies;
@@ -362,12 +383,42 @@ public abstract class RoutingResource {
     @QueryParam("keepingRentedBicycleAtDestinationCost")
     protected Double keepingRentedBicycleAtDestinationCost;
 
+    /** The vehicle rental networks which may be used. If empty all networks may be used. */
+    @QueryParam("allowedVehicleRentalNetworks")
+    protected Set<String> allowedVehicleRentalNetworks;
+
+    /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+    @QueryParam("bannedVehicleRentalNetworks")
+    protected Set<String> bannedVehicleRentalNetworks;
+
+    /** Time to park a bike */
+    @QueryParam("bikeParkTime")
+    protected Integer bikeParkTime;
+
+    /** Cost of parking a bike. */
+    @QueryParam("bikeParkCost")
+    protected Integer bikeParkCost;
+
+    /** Time to park a car */
+    @QueryParam("carParkTime")
+    protected Integer carParkTime = 60;
+
+    /** Cost of parking a car. */
+    @QueryParam("carParkCost")
+    protected Integer carParkCost = 120;
+
+    /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
+    @QueryParam("requiredVehicleParkingTags")
+    protected Set<String> requiredVehicleParkingTags = Set.of();
+
+    /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
+    @QueryParam("bannedVehicleParkingTags")
+    protected Set<String> bannedVehicleParkingTags = Set.of();
+
     /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
      * TriMet_100 (100 is route short name) or Trimet__42 (two underscores, 42 is the route
      * internal ID).
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @Deprecated
     @QueryParam("bannedRoutes")
@@ -375,8 +426,6 @@ public abstract class RoutingResource {
 
     /**
      * Functions the same as bannnedRoutes, except only the listed routes are allowed.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("whiteListedRoutes")
     @Deprecated
@@ -413,12 +462,8 @@ public abstract class RoutingResource {
     protected Integer otherThanPreferredRoutesPenalty;
 
     /**
-     * The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
-     * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The comma-separated list of banned trips.  The format is feedId:tripId
      */
-    @Deprecated
     @QueryParam("bannedTrips")
     protected String bannedTrips;
 
@@ -484,6 +529,8 @@ public abstract class RoutingResource {
      *
      * Consider using the {@link #transferPenalty} instead of this parameter.
      *
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated  TODO OTP2 Regression. A maxTransfers should be set in the router config, not
      *                        here. Instead the client should be able to pass in a parameter for
      *                        the max number of additional/extra transfers relative to the best
@@ -493,7 +540,6 @@ public abstract class RoutingResource {
      *                        might stick to the old limit, but that have side-effects that you
      *                        might not find any trips on a day where a critical part of the
      *                        trip is not available, because of some real-time disruption.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxTransfers")
@@ -563,16 +609,20 @@ public abstract class RoutingResource {
     protected Boolean reverseOptimizeOnTheFly;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add before boarding a transit leg. It is recommended to use the
+     * {@code boardTimes} in the {@code router-config.json} to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("boardSlack")
     private Integer boardSlack;
 
     /**
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The number of seconds to add after alighting a transit leg. It is recommended to use the
+     * {@code alightTimes} in the {@code router-config.json} to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     @QueryParam("alightSlack")
     private Integer alightSlack;
 
@@ -596,18 +646,20 @@ public abstract class RoutingResource {
     protected Boolean disableRemainingWeightHeuristic;
 
     /**
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated TODO OTP2 This is not useful as a search parameter, but could be used as a
      *                       post search filter to reduce number of itineraries down to an
      *                       acceptable number, but there are probably better ways to do that.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxHours")
     private Double maxHours;
 
     /**
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated see {@link #maxHours}
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @QueryParam("useRequestedDateTimeInMaxHours")
     @Deprecated
@@ -635,6 +687,15 @@ public abstract class RoutingResource {
     @QueryParam("pathComparator")
     private String pathComparator;
 
+    @QueryParam("useVehicleParkingAvailabilityInformation")
+    private Boolean useVehicleParkingAvailabilityInformation;
+
+    @QueryParam("debugRaptorStops")
+    private String debugRaptorStops;
+
+    @QueryParam("debugRaptorPath")
+    private String debugRaptorPath;
+
     /**
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -649,11 +710,11 @@ public abstract class RoutingResource {
     /**
      * Range/sanity check the query parameter fields and build a Request object from them.
      *
-     * @throws ParameterException when there is a problem interpreting a query parameter
+     * @param queryParameters incoming request parameters
      */
-    protected RoutingRequest buildRequest() throws ParameterException {
+    protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) {
         Router router = otpServer.getRouter();
-        RoutingRequest request = router.defaultRoutingRequest.clone();
+        RoutingRequest request = router.copyDefaultRoutingRequest();
 
         // The routing request should already contain defaults, which are set when it is initialized or in the JSON
         // router configuration and cloned. We check whether each parameter was supplied before overwriting the default.
@@ -677,8 +738,7 @@ public abstract class RoutingResource {
                     if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
                         gregCal.setTimeZone(tz);
                     }
-                    Date d2 = gregCal.getTime();
-                    request.setDateTime(d2);
+                    request.setDateTime(gregCal.toInstant());
                 } catch (DatatypeConfigurationException e) {
                     request.setDateTime(date, time, tz);
                 }
@@ -689,6 +749,9 @@ public abstract class RoutingResource {
 
         if(searchWindow != null) {
             request.searchWindow = Duration.ofSeconds(searchWindow);
+        }
+        if(pageCursor != null) {
+            request.pageCursor = PageCursor.decode(pageCursor);
         }
         if(timetableView != null) {
             request.timetableView = timetableView;
@@ -734,21 +797,40 @@ public abstract class RoutingResource {
             request.bikeSwitchCost = bikeSwitchCost;
 
         if (allowKeepingRentedBicycleAtDestination != null)
-            request.allowKeepingRentedBicycleAtDestination = allowKeepingRentedBicycleAtDestination;
+            request.allowKeepingRentedVehicleAtDestination = allowKeepingRentedBicycleAtDestination;
 
         if (keepingRentedBicycleAtDestinationCost != null)
-            request.keepingRentedBicycleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+            request.keepingRentedVehicleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+
+        if (allowedVehicleRentalNetworks != null)
+            request.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
+
+        if (bannedVehicleRentalNetworks != null)
+            request.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+
+        if (bikeParkCost != null)
+            request.bikeParkCost = bikeParkCost;
+
+        if (bikeParkTime != null)
+            request.bikeParkTime = bikeParkTime;
+
+        if (carParkCost != null)
+            request.carParkCost = carParkCost;
+
+        if (carParkTime != null)
+            request.carParkTime = carParkTime;
+
+        if (bannedVehicleParkingTags != null)
+            request.bannedVehicleParkingTags = bannedVehicleParkingTags;
+
+        if (requiredVehicleParkingTags != null)
+            request.requiredVehicleParkingTags = requiredVehicleParkingTags;
 
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setBicycleOptimizeType(optimize);
             if (optimize == BicycleOptimizeType.TRIANGLE) {
-                RoutingRequest.assertTriangleParameters(
-                        triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor
-                );
-                request.setBikeTriangleSafetyFactor(triangleSafetyFactor);
-                request.setBikeTriangleSlopeFactor(triangleSlopeFactor);
-                request.setBikeTriangleTimeFactor(triangleTimeFactor);
+                request.setTriangleNormalized(triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor);
             }
         }
 
@@ -794,18 +876,12 @@ public abstract class RoutingResource {
         if (whiteListedAgencies != null) {
             request.setWhiteListedAgenciesFromSting(whiteListedAgencies);
         }
-        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
-      
-        if (bannedTripMap != null) {
-            request.bannedTrips = bannedTripMap;
+        if (bannedTrips != null) {
+            request.setBannedTripsFromString(bannedTrips);
         }
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
         if (transferPenalty != null) { request.transferCost = transferPenalty; }
-        if (optimize == BicycleOptimizeType.TRANSFERS) {
-            optimize = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
-        }
 
         if (optimize != null) {
             request.setBicycleOptimizeType(optimize);
@@ -815,7 +891,7 @@ public abstract class RoutingResource {
             request.modes = modes.getRequestModes();
         }
 
-        if (request.bikeRental && bikeSpeed == null) {
+        if (request.vehicleRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }
@@ -843,9 +919,7 @@ public abstract class RoutingResource {
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;
 
-        final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
-        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useBikeRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
+        request.useVehicleRentalAvailabilityInformation = request.isTripPlannedForNow();
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
             request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);
@@ -872,42 +946,26 @@ public abstract class RoutingResource {
             request.itineraryFilters.debug = debugItineraryFilter;
         }
 
+        if(debugRaptorPath != null || debugRaptorStops != null) {
+            request.raptorDebuging = new DebugRaptor()
+                    .withStops(debugRaptorStops)
+                    .withPath(debugRaptorPath);
+        }
+
+        if (useVehicleParkingAvailabilityInformation != null) {
+            request.useVehicleParkingAvailabilityInformation = useVehicleParkingAvailabilityInformation;
+        }
+
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
+
+        if (OTPFeature.DataOverlay.isOn()) {
+            var queryDataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
+            if (!queryDataOverlayParameters.isEmpty()) {
+                request.dataOverlay = queryDataOverlayParameters;
+            }
+        }
+
         return request;
     }
-
-    /**
-     * Take a string in the format agency:id or agency:id:1:2:3:4.
-     * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
-     * Convert to a Map from trip --> set of int.
-     */
-    public HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
-        if (banned == null) {
-            return null;
-        }
-        
-        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = new HashMap<FeedScopedId, BannedStopSet>();
-        String[] tripStrings = banned.split(",");
-        for (String tripString : tripStrings) {
-            // TODO this apparently allows banning stops within a trip with integers. Why?
-            String[] parts = tripString.split(":");
-            if (parts.length < 2) continue; // throw exception?
-            String agencyIdString = parts[0];
-            String tripIdString = parts[1];
-            FeedScopedId tripId = new FeedScopedId(agencyIdString, tripIdString);
-            BannedStopSet bannedStops;
-            if (parts.length == 2) {
-                bannedStops = BannedStopSet.ALL;
-            } else {
-                bannedStops = new BannedStopSet();
-                for (int i = 2; i < parts.length; ++i) {
-                    bannedStops.add(Integer.parseInt(parts[i]));
-                }
-            }
-            bannedTripMap.put(tripId, bannedStops);
-        }
-        return bannedTripMap;
-    }
-
 }

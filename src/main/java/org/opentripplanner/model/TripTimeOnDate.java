@@ -1,12 +1,12 @@
 package org.opentripplanner.model;
 
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.trippattern.RealTimeState;
-import org.opentripplanner.routing.trippattern.TripTimes;
-
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
  * Represents a Trip at a specific stop index and on a specific service day. This is a read-only
@@ -20,13 +20,20 @@ public class TripTimeOnDate {
     private final int stopIndex;
     // This is only needed because TripTimes has no reference to TripPattern
     private final TripPattern tripPattern;
-    private final ServiceDay serviceDay;
+    private final long midnight;
 
     public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern, ServiceDay serviceDay) {
         this.tripTimes = tripTimes;
         this.stopIndex = stopIndex;
         this.tripPattern = tripPattern;
-        this.serviceDay = serviceDay;
+        this.midnight = serviceDay != null ? serviceDay.time(0) : UNDEFINED;
+    }
+
+    public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern, Instant midnight) {
+        this.tripTimes = tripTimes;
+        this.stopIndex = stopIndex;
+        this.tripPattern = tripPattern;
+        this.midnight = midnight.getEpochSecond();
     }
 
     /** Must pass in both Timetable and Trip, because TripTimes do not have a reference to StopPatterns. */
@@ -34,7 +41,7 @@ public class TripTimeOnDate {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));        
         List<TripTimeOnDate> out = new ArrayList<>();
         for (int i = 0; i < times.getNumStops(); ++i) {
-            out.add(new TripTimeOnDate(times, i, table.getPattern(), null));
+            out.add(new TripTimeOnDate(times, i, table.getPattern(), (ServiceDay) null));
         }
         return out;
     }
@@ -57,8 +64,8 @@ public class TripTimeOnDate {
         return Comparator.comparing(t -> t.getServiceDay() + t.getRealtimeDeparture());
     }
 
-    public FeedScopedId getStopId() {
-        return tripPattern.getStopPattern().getStop(stopIndex).getId();
+    public StopLocation getStop() {
+        return tripPattern.getStop(stopIndex);
     }
 
     public int getStopIndex() {
@@ -119,8 +126,7 @@ public class TripTimeOnDate {
 
     public boolean isCancelledStop() {
         return tripTimes.isCancelledStop(stopIndex) ||
-            tripPattern.getStopPattern().getPickup(stopIndex) == PickDrop.CANCELLED
-            && tripPattern.getStopPattern().getDropoff(stopIndex) == PickDrop.CANCELLED;
+            tripPattern.isBoardAndAlightAt(stopIndex, PickDrop.CANCELLED);
     }
 
     /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
@@ -135,7 +141,7 @@ public class TripTimeOnDate {
     }
 
     public long getServiceDay() {
-        return serviceDay != null ? serviceDay.time(0) : UNDEFINED;
+        return midnight;
     }
 
     public Trip getTrip() {
@@ -150,19 +156,31 @@ public class TripTimeOnDate {
         return tripTimes.getHeadsign(stopIndex);
     }
 
+    public List<String> getHeadsignVias() {
+        return tripTimes.getHeadsignVias(stopIndex);
+    }
+
     public PickDrop getPickupType() {
         return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
             ? PickDrop.CANCELLED
-            : tripPattern.getStopPattern().getPickup(stopIndex);
+            : tripPattern.getBoardType(stopIndex);
     }
 
     public PickDrop getDropoffType() {
         return tripTimes.isCanceled() || tripTimes.isCancelledStop(stopIndex)
             ? PickDrop.CANCELLED
-            : tripPattern.getStopPattern().getDropoff(stopIndex);
+            : tripPattern.getAlightType(stopIndex);
     }
 
     public StopTimeKey getStopTimeKey() {
         return new StopTimeKey(tripTimes.getTrip().getId(), stopIndex);
+    }
+
+    public BookingInfo getPickupBookingInfo() {
+        return tripTimes.getPickupBookingInfo(stopIndex);
+    }
+
+    public BookingInfo getDropOffBookingInfo() {
+        return tripTimes.getDropOffBookingInfo(stopIndex);
     }
 }

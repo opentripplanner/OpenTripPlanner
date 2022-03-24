@@ -1,8 +1,7 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.model.base.ToStringBuilder;
-
 import java.util.Calendar;
+import org.opentripplanner.model.base.ToStringBuilder;
 
 
 /**
@@ -21,18 +20,35 @@ public class StopArrival {
      */
     public final Calendar departure;
 
+    /**
+     * For transit trips, the stop index (numbered from zero from the start of the trip).
+     */
+    public final Integer stopPosInPattern;
 
-    public StopArrival(Place place, Calendar arrival, Calendar departure) {
+    /**
+     * For transit trips, the sequence number of the stop. Per GTFS, these numbers are increasing.
+     */
+    public final Integer gtfsStopSequence;
+
+    public StopArrival(
+            Place place,
+            Calendar arrival,
+            Calendar departure,
+            Integer stopPosInPattern,
+            Integer gtfsStopSequence
+    ) {
         this.place = place;
         this.arrival = arrival;
         this.departure = departure;
+        this.stopPosInPattern = stopPosInPattern;
+        this.gtfsStopSequence = gtfsStopSequence;
     }
 
     @Override
     public String toString() {
         return ToStringBuilder.of(StopArrival.class)
-                .addCalTime("arrival",arrival)
-                .addCalTime("departure", departure)
+                .addTimeCal("arrival",arrival)
+                .addTimeCal("departure", departure)
                 .addObj("place", place)
                 .toString();
     }

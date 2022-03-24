@@ -1,13 +1,12 @@
 package org.opentripplanner.graph_builder.module.map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -16,15 +15,15 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import java.util.Locale;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TestStreetMatcher {
     static GeometryFactory gf = new GeometryFactory();
@@ -130,8 +129,7 @@ public class TestStreetMatcher {
      ****/
 
     private SimpleVertex vertex(String label, double lat, double lon) {
-        SimpleVertex v = new SimpleVertex(graph, label, lat, lon);
-        return v;
+        return new SimpleVertex(graph, label, lat, lon);
     }
 
     private void edges(String... vLabels) {
@@ -144,14 +142,7 @@ public class TestStreetMatcher {
         }
     }
 
-    private static class SimpleVertex extends StreetVertex {
 
-        private static final long serialVersionUID = 1L;
-
-        public SimpleVertex(Graph g, String label, double lat, double lon) {
-            super(g, label, lon, lat, new NonLocalizedString(label));
-        }
-    }
 
     /* TODO explain why this exists and is "simple" */
     private static class SimpleEdge extends StreetEdge {
@@ -173,17 +164,7 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public String getName() {
-            return null;
-        }
-
-        @Override
-        public I18NString getRawName() {
-            return null;
-        }
-
-        @Override
-        public String getName(Locale locale) {
+        public I18NString getName() {
             return null;
         }
 

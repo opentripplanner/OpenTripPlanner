@@ -1,68 +1,66 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-
 import java.time.Instant;
 import java.util.function.Consumer;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
+import org.opentripplanner.routing.algorithm.filterchain.ListSection;
+import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
 
 public class RoutingRequestToFilterChainMapper {
-  private static final int KEEP_ONE = 1;
-
   /** Filter itineraries down to this limit, but not below. */
-  private static final int MIN_NUMBER_OF_ITINERARIES = 3;
+  private static final int KEEP_THREE = 3;
 
   /** Never return more that this limit of itineraries. */
   private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
-  public static ItineraryFilter createFilterChain(
-      RoutingRequest request,
+  public static ItineraryListFilterChain createFilterChain(
+      SortOrder sortOrder,
+      ItineraryFilterParameters params,
+      int maxNumOfItineraries,
       Instant filterOnLatestDepartureTime,
       boolean removeWalkAllTheWayResults,
+      boolean maxNumberOfItinerariesCropHead,
       Consumer<Itinerary> maxLimitReachedSubscriber
   ) {
-    var builder = new ItineraryFilterChainBuilder(request.arriveBy);
-    var p = request.itineraryFilters;
+    var builder = new ItineraryListFilterChainBuilder(sortOrder);
 
     // Group by similar legs filter
-    if(request.itineraryFilters != null) {
+    if (params.groupSimilarityKeepOne >= 0.5) {
+      builder.addGroupBySimilarity(
+          GroupBySimilarity.createWithOneItineraryPerGroup(params.groupSimilarityKeepOne)
+      );
+    }
 
-      builder.withMinSafeTransferTimeFactor(p.minSafeTransferTimeFactor);
+    if (params.groupSimilarityKeepThree >= 0.5) {
+      builder.addGroupBySimilarity(
+        GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(
+            params.groupSimilarityKeepThree,
+            KEEP_THREE,
+            true,
+            params.groupedOtherThanSameLegsMaxCostMultiplier
+        )
+      );
+    }
 
-      if (p.groupSimilarityKeepOne >= 0.5) {
-        builder.addGroupBySimilarity(
-            new GroupBySimilarity(p.groupSimilarityKeepOne, KEEP_ONE)
-        );
-      }
-
-      if (p.groupSimilarityKeepNumOfItineraries >= 0.5) {
-        int minLimit = request.numItineraries;
-
-        if (minLimit < 0 || minLimit > MIN_NUMBER_OF_ITINERARIES) {
-          minLimit = MIN_NUMBER_OF_ITINERARIES;
-        }
-
-        builder.addGroupBySimilarity(
-            new GroupBySimilarity(p.groupSimilarityKeepNumOfItineraries, minLimit)
-        );
-      }
+    if(maxNumberOfItinerariesCropHead) {
+      builder.withMaxNumberOfItinerariesCrop(ListSection.HEAD);
     }
 
     builder
-        .withMaxNumberOfItineraries(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES))
-        .withMinSafeTransferTimeFactor(p.minSafeTransferTimeFactor)
-        .withTransitGeneralizedCostLimit(p.transitGeneralizedCostLimit)
-        .withBikeRentalDistanceRatio(p.bikeRentalDistanceRatio)
-        .withParkAndRideDurationRatio(p.parkAndRideDurationRatio)
-        .withNonTransitGeneralizedCostLimit(p.nonTransitGeneralizedCostLimit)
+        .withMaxNumberOfItineraries(Math.min(maxNumOfItineraries, MAX_NUMBER_OF_ITINERARIES))
+        .withTransitGeneralizedCostLimit(params.transitGeneralizedCostLimit)
+        .withBikeRentalDistanceRatio(params.bikeRentalDistanceRatio)
+        .withParkAndRideDurationRatio(params.parkAndRideDurationRatio)
+        .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit)
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
         .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
         .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
         .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
-        .withDebugEnabled(p.debug);
+        .withDebugEnabled(params.debug);
 
     return builder.build();
   }

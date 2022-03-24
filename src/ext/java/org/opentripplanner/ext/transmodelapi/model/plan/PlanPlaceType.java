@@ -5,16 +5,22 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import java.util.Locale;
+import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VertexType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 
 public class PlanPlaceType {
 
   public static GraphQLObjectType create(
       GraphQLOutputType bikeRentalStationType,
+      GraphQLOutputType rentalVehicleType,
       GraphQLOutputType quayType
   ) {
     return GraphQLObjectType
@@ -28,7 +34,10 @@ public class PlanPlaceType {
             .description(
                 "For transit quays, the name of the quay. For points of interest, the name of the POI.")
             .type(Scalars.GraphQLString)
-            .dataFetcher(environment -> ((Place) environment.getSource()).name)
+            .dataFetcher(environment -> {
+                Locale locale = TransmodelGraphQLUtils.getLocale(environment);
+                return ((Place) environment.getSource()).name.toString(locale);
+            })
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -57,19 +66,17 @@ public class PlanPlaceType {
             .name("quay")
             .description("The quay related to the place.")
             .type(quayType)
-            .dataFetcher(environment -> ((Place) environment.getSource()).stopId != null
-                ? GqlUtil.getRoutingService(environment)
-                .getStopForId(((Place) environment.getSource()).stopId) : null)
+            .dataFetcher(environment -> ((Place) environment.getSource()).stop instanceof Stop
+                ? ((Stop) ((Place) environment.getSource()).stop)
+                : null)
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("flexibleArea")
             .description("The flexible area related to the place.")
             .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
-            .dataFetcher(environment -> ((Place) environment.getSource()).stopId != null
-                ? GqlUtil.getRoutingService(environment)
-                .getLocationById(((Place) environment.getSource()).stopId)
-                .getGeometry().getCoordinates()
+            .dataFetcher(environment -> ((Place) environment.getSource()).stop instanceof FlexStopLocation
+                ? ((FlexStopLocation) ((Place) environment.getSource()).stop).getGeometry().getCoordinates()
                 : null)
             .build())
         .field(GraphQLFieldDefinition
@@ -77,25 +84,27 @@ public class PlanPlaceType {
             .name("bikeRentalStation")
             .type(bikeRentalStationType)
             .description("The bike rental station related to the place")
-            .dataFetcher(environment -> {
-              return ((Place) environment.getSource()).vertexType.equals(VertexType.BIKESHARE)
-                  ? GqlUtil
-                  .getRoutingService(environment)
-                  .getBikerentalStationService()
-                  .getBikeRentalStations()
-                  .stream()
-                  .filter(bikeRentalStation -> bikeRentalStation.id.equals(((Place) environment.getSource()).bikeShareId))
-                  .findFirst()
-                  .orElse(null)
-                  : null;
-            })
+            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.VEHICLERENTAL)
+                    && ((Place) environment.getSource()).vehicleRentalPlace instanceof VehicleRentalStation
+                ? ((Place) environment.getSource()).vehicleRentalPlace
+                : null)
+            .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("rentalVehicle")
+            .type(rentalVehicleType)
+            .description("The rental vehicle related to the place")
+            .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.VEHICLERENTAL)
+                    && ((Place) environment.getSource()).vehicleRentalPlace instanceof VehicleRentalVehicle
+                ? ((Place) environment.getSource()).vehicleRentalPlace
+                : null)
             .build())
         //                .field(GraphQLFieldDefinition.newFieldDefinition()
         //                        .name("bikePark")
         //                        .type(bikeParkType)
         //                        .description("The bike parking related to the place")
         //                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKEPARK) ?
-        //                                index.graph.getService(BikeRentalStationService.class)
+        //                                index.graph.getService(VehicleRentalStationService.class)
         //                                        .getBikeParks()
         //                                        .stream()
         //                                        .filter(bikePark -> bikePark.id.equals(((Place) environment.getSource()).bikeParkId))

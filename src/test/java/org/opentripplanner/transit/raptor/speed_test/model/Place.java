@@ -19,8 +19,8 @@ public class Place {
     /** This is the stop index in the RaptorTransitData */
     public final int rrStopIndex;
 
-    public Place(org.opentripplanner.model.Stop stop, int rrStopIndex) {
-        this(stop.getName(), stop.getId(), stop.getCoordinate(), rrStopIndex);
+    public Place(org.opentripplanner.model.StopLocation stop, int rrStopIndex) {
+        this(stop.getName().toString(), stop.getId(), stop.getCoordinate(), rrStopIndex);
     }
 
     public Place(String name, String feedId, String stopId, Double lat, Double lon) {

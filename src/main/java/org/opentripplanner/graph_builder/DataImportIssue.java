@@ -15,6 +15,13 @@ import org.opentripplanner.routing.graph.Vertex;
 public interface DataImportIssue {
 
     /**
+     * The issue report is grouped by type name.
+     */
+    default String getType() {
+        return getClass().getSimpleName();
+    }
+
+    /**
      * Provide a detailed message, including enough data to be able to fix the problem (in the
      * source system).
      */

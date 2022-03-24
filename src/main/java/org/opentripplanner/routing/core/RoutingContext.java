@@ -1,7 +1,12 @@
 package org.opentripplanner.routing.core;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -14,6 +19,8 @@ import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -60,6 +68,11 @@ public class RoutingContext implements Cloneable {
 
     /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
     public boolean slopeRestrictionRemoved = false;
+
+    /**
+     * DataOverlay Sandbox module context.
+     */
+    public DataOverlayContext dataOverlayContext;
 
     /* CONSTRUCTORS */
 
@@ -101,6 +114,9 @@ public class RoutingContext implements Cloneable {
         this.opt = routingRequest;
         this.graph = graph;
         this.tempEdges = new HashSet<>();
+        this.dataOverlayContext = OTPFeature.DataOverlay.isOnElseNull(() ->
+            new DataOverlayContext(graph.dataOverlayParameterBindings, routingRequest.dataOverlay)
+        );
 
         Set<Vertex> fromVertices;
         Set<Vertex> toVertices;
@@ -167,17 +183,19 @@ public class RoutingContext implements Cloneable {
         List<RoutingError> routingErrors = new ArrayList<>();
 
         // check that vertices where found if from-location was specified
-        if (opt.from.isSpecified() && fromVertices == null) {
-            routingErrors.add(
-                new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
-            );
+        if (opt.from.isSpecified() && isDisconnected(fromVertices, true)) {
+            routingErrors.add(new RoutingError(
+                getRoutingErrorCodeForDisconnected(opt.from),
+                InputField.FROM_PLACE
+            ));
         }
 
         // check that vertices where found if to-location was specified
-        if (opt.to.isSpecified() && toVertices == null) {
-            routingErrors.add(
-                new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE)
-            );
+        if (opt.to.isSpecified() && isDisconnected(toVertices, false)) {
+            routingErrors.add(new RoutingError(
+                getRoutingErrorCodeForDisconnected(opt.to),
+                InputField.TO_PLACE
+            ));
         }
 
         if (routingErrors.size() > 0) {
@@ -192,5 +210,31 @@ public class RoutingContext implements Cloneable {
      */
     public void destroy() {
         this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
+    }
+
+
+    /* PRIVATE METHODS */
+
+    private boolean isDisconnected(Set<Vertex> vertices, boolean isFrom) {
+        // Not connected if linking was not attempted, and vertices were not specified in the request.
+        if (vertices == null) { return true; }
+
+        Predicate<Vertex> isNotTransit = Predicate.not(TransitStopVertex.class::isInstance);
+        Predicate<Vertex> hasNoIncoming = v -> v.getIncoming().isEmpty();
+        Predicate<Vertex> hasNoOutgoing = v -> v.getOutgoing().isEmpty();
+
+        // Not connected if linking did not create incoming/outgoing edges depending on the
+        // direction and the end.
+        Predicate<Vertex> isNotConnected = (isFrom == opt.arriveBy) ? hasNoIncoming : hasNoOutgoing;
+
+        return vertices.stream().allMatch(isNotTransit.and(isNotConnected));
+    }
+
+    private RoutingErrorCode getRoutingErrorCodeForDisconnected(GenericLocation location) {
+        Coordinate coordinate = location.getCoordinate();
+        GeometryFactory gf = GeometryUtils.getGeometryFactory();
+        return coordinate != null && graph.getConvexHull().disjoint(gf.createPoint(coordinate))
+                ? RoutingErrorCode.OUTSIDE_BOUNDS
+                : RoutingErrorCode.LOCATION_NOT_FOUND;
     }
 }

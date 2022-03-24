@@ -4,16 +4,19 @@ import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProvid
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.SlackProviderAdapter.reverseSlackProvider;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.ToIntFunction;
-import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
-import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.DefaultCostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
+import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -36,7 +39,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleS
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class SearchContext<T extends RaptorTripSchedule> {
-    private static final DebugLogger NOOP_DEBUG_LOGGER = (topic, message) -> { };
     /**
      * The request input used to customize the worker to the clients needs.
      */
@@ -48,12 +50,14 @@ public class SearchContext<T extends RaptorTripSchedule> {
     protected final RaptorTransitDataProvider<T> transit;
 
     private final TransitCalculator<T> calculator;
-    private final CostCalculator<T> costCalculator;
+    private final CostCalculator costCalculator;
     private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
     private final PathMapper<T> pathMapper;
     private final WorkerPerformanceTimers timers;
     private final DebugHandlerFactory<T> debugFactory;
+    private final EgressPaths egressPaths;
+    private final AccessPaths accessPaths;
 
     private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
@@ -66,36 +70,39 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.request = request;
         this.tuningParameters = tuningParameters;
         this.transit = transit;
+        this.accessPaths = accessPaths(request);
+        this.egressPaths = egressPaths(request);
+
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
-        this.costCalculator = createCostCalculator(
-            transit.stopBoarAlightCost(),
-            request.multiCriteriaCostFactors()
-        );
+        this.costCalculator = request.profile().is(RaptorProfile.MULTI_CRITERIA)
+                ? transit.multiCriteriaCostCalculator() : null;
         this.roundTracker = new RoundTracker(
-            nRounds(),
-            request.searchParams().numberOfAdditionalTransfers(),
-            lifeCycle()
+                nRounds(),
+                request.searchParams().numberOfAdditionalTransfers(),
+                lifeCycle()
         );
-        this.pathMapper = createPathMapper(request, lifeCycle());
+        this.pathMapper = createPathMapper(
+                this.transit.transferConstraintsSearch(),
+                this.costCalculator,
+                transit.stopNameResolver(),
+                request,
+                lifeCycle()
+        );
         this.timers = timers;
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
 
-    public Collection<RaptorTransfer> accessPaths() {
-        return request.searchDirection().isForward()
-                ? request.searchParams().accessPaths()
-                : request.searchParams().egressPaths();
+    public AccessPaths accessPaths() {
+        return accessPaths;
     }
 
-    public Collection<RaptorTransfer> egressPaths() {
-        return request.searchDirection().isForward()
-                ? request.searchParams().egressPaths()
-                : request.searchParams().accessPaths();
+    public EgressPaths egressPaths() {
+        return egressPaths;
     }
 
     public int[] egressStops() {
-        return egressPaths().stream().mapToInt(RaptorTransfer::stop).toArray();
+        return egressPaths().stops();
     }
 
     public SearchParams searchParams() {
@@ -117,12 +124,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
     /**
      * Create new slack-provider for use in Raptor, handles reverse and forward
      * search as well as including transfer-slack into board-slack between transits.
-     * <p>
-     * The {@code SlackProvider} is stateful, so this method create a new instance
-     * every time it is called, so each consumer could have their own instance and
-     * not get surprised by the life-cycle update. Remember to call the
-     * {@link SlackProvider#setCurrentPattern(RaptorTripPattern)} before retriving
-     * slack values.
      */
     public SlackProvider slackProvider() {
         return createSlackProvider(request, lifeCycle());
@@ -143,7 +144,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return pathMapper;
     }
 
-    public CostCalculator<T> costCalculator() {
+    @Nullable
+    public CostCalculator costCalculator() {
         return costCalculator;
     }
 
@@ -153,11 +155,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     public DebugHandlerFactory<T> debugFactory() {
         return debugFactory;
-    }
-
-    public DebugLogger debugLogger() {
-        DebugLogger logger = request.debug().logger();
-        return logger != null ? logger : NOOP_DEBUG_LOGGER;
     }
 
     /** Number of stops in transit graph. */
@@ -189,12 +186,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return publisher;
     }
 
-    public boolean enableGuaranteedTransfers() {
-        if(profile().isOneOf(RaptorProfile.BEST_TIME, RaptorProfile.NO_WAIT_BEST_TIME)) {
-            return false;
-        }
-        return searchParams().guaranteedTransfersEnabled();
+    public boolean enableConstrainedTransfers() {
+        return searchParams().constrainedTransfersEnabled();
     }
+
 
     /* private methods */
 
@@ -236,21 +231,83 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
+            RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
+            CostCalculator costCalculator,
+            RaptorStopNameResolver stopNameResolver,
             RaptorRequest<S> request,
             WorkerLifeCycle lifeCycle
     ) {
         return request.searchDirection().isForward()
-                ? new ForwardPathMapper<>(request.slackProvider(), lifeCycle)
-                : new ReversePathMapper<>(request.slackProvider(), lifeCycle);
+                ? new ForwardPathMapper<>(
+                        txConstraintsSearch,
+                        request.slackProvider(),
+                        costCalculator,
+                        stopNameResolver,
+                        lifeCycle,
+                        request.profile().useApproximateTripSearch()
+                )
+                : new ReversePathMapper<>(
+                        txConstraintsSearch,
+                        request.slackProvider(),
+                        costCalculator,
+                        stopNameResolver,
+                        lifeCycle,
+                        request.profile().useApproximateTripSearch()
+                );
     }
 
-    private CostCalculator<T> createCostCalculator(int[] stopVisitCost, McCostParams f) {
-        return new DefaultCostCalculator<T>(
-                f.boardCost(),
-                f.transferCost(),
-                f.waitReluctanceFactor(),
-                stopVisitCost,
-                f.transitReluctanceFactors()
-        );
+    public RaptorStopNameResolver stopNameResolver() {
+        return transit.stopNameResolver();
+    }
+
+
+    private static AccessPaths accessPaths(RaptorRequest<?> request) {
+        boolean forward = request.searchDirection().isForward();
+        var params = request.searchParams();
+        var paths = forward ? params.accessPaths() : params.egressPaths();
+        return AccessPaths.create(paths, request.profile());
+    }
+
+    private static EgressPaths egressPaths(RaptorRequest<?> request) {
+        boolean forward = request.searchDirection().isForward();
+        var params = request.searchParams();
+        var paths = forward ? params.egressPaths() : params.accessPaths();
+        return EgressPaths.create(paths, request.profile());
+    }
+
+    /**
+     * The multi-criteria state can handle multiple access/egress paths to a single stop, but the
+     * Standard and BestTime states do not. To get a deterministic behaviour we filter the paths
+     * and return the paths with the shortest duration for none multi-criteria search. If two
+     * paths have the same duration the first one is picked. Note! If the access/egress paths
+     * contains flex as well, then we need to look at mode for arriving at tha stop as well.
+     * A Flex arrive-on-board can be used with a transfer even if the time is worse compared with
+     * walking.
+     * <p>
+     * This method is static and package local to enable unit-testing.
+     */
+    static Collection<RaptorTransfer> accessOrEgressPaths(
+            boolean getAccess,
+            RaptorProfile profile,
+            SearchParams searchParams
+    ) {
+        var paths = getAccess
+                ? searchParams.accessPaths()
+                : searchParams.egressPaths();
+
+        if(profile.is(RaptorProfile.MULTI_CRITERIA)) {
+            return paths;
+        }
+
+        // For none MC-search we only want the fastest transfer for each stop,
+        // no duplicates are accepted
+        Map<Integer, RaptorTransfer> bestTimePaths = new HashMap<>();
+        for (RaptorTransfer it : paths) {
+            RaptorTransfer existing = bestTimePaths.get(it.stop());
+            if(existing == null || it.durationInSeconds() < existing.durationInSeconds()) {
+                bestTimePaths.put(it.stop(), it);
+            }
+        }
+        return List.copyOf(bestTimePaths.values());
     }
 }

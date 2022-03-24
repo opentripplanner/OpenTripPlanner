@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.util.TranslationHelper;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class PathwayNodeMapperTest {
@@ -58,7 +60,7 @@ public class PathwayNodeMapperTest {
     STOP.setZoneId(ZONE_ID);
   }
 
-  private PathwayNodeMapper subject = new PathwayNodeMapper();
+  private final PathwayNodeMapper subject = new PathwayNodeMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() throws Exception {
@@ -74,9 +76,9 @@ public class PathwayNodeMapperTest {
     assertEquals("A:N1", result.getId().toString());
     assertEquals(CODE, result.getCode());
     assertEquals(DESC, result.getDescription());
-    assertEquals(LAT, result.getLat(), 0.0001d);
-    assertEquals(LON, result.getLon(), 0.0001d);
-    assertEquals(NAME, result.getName());
+    assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
+    assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
+    assertEquals(NAME, result.getName().toString());
     assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
   }
 
@@ -91,7 +93,7 @@ public class PathwayNodeMapperTest {
     assertNotNull(result.getId());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertNull(result.getName());
+    assertEquals(PathwayNodeMapper.DEFAULT_NAME, result.getName().toString());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
@@ -105,7 +107,7 @@ public class PathwayNodeMapperTest {
 
     org.opentripplanner.model.PathwayNode result = subject.map(input);
 
-    result.getLat();
+    result.getCoordinate().latitude();
   }
 
   /** Mapping the same object twice, should return the the same instance. */
@@ -114,6 +116,6 @@ public class PathwayNodeMapperTest {
     org.opentripplanner.model.PathwayNode result1 = subject.map(STOP);
     org.opentripplanner.model.PathwayNode result2 = subject.map(STOP);
 
-    assertTrue(result1 == result2);
+    assertSame(result1, result2);
   }
 }

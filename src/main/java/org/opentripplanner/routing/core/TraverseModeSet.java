@@ -42,8 +42,12 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     private static final int MODE_AIRPLANE = 4096;
 
+    private static final int MODE_TROLLEYBUS = 8192;
+
+    private static final int MODE_MONORAIL = 16384;
+
     private static final int MODE_TRANSIT = MODE_TRAM | MODE_RAIL | MODE_SUBWAY | MODE_FUNICULAR
-            | MODE_GONDOLA | MODE_CABLE_CAR | MODE_BUS | MODE_FERRY | MODE_AIRPLANE;
+            | MODE_GONDOLA | MODE_CABLE_CAR | MODE_BUS | MODE_FERRY | MODE_AIRPLANE | MODE_TROLLEYBUS | MODE_MONORAIL;
  
     private static final int MODE_ALL = MODE_TRANSIT | MODE_WALK | MODE_BICYCLE;
 
@@ -57,8 +61,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
     
     /**
      * Returns a mode set containing all modes.
-     * 
-     * @return
      */
     public static TraverseModeSet allModes() {
     	TraverseModeSet modes = new TraverseModeSet();
@@ -66,36 +68,25 @@ public class TraverseModeSet implements Cloneable, Serializable {
     	return modes;
     }
 
-    private final int getMaskForMode(TraverseMode mode) {
-        switch (mode) {
-        case BICYCLE:
-            return MODE_BICYCLE;
-        case WALK:
-            return MODE_WALK;
-        case CAR:
-            return MODE_CAR;
-        case BUS:
-            return MODE_BUS;
-        case TRAM:
-            return MODE_TRAM;
-        case CABLE_CAR:
-            return MODE_CABLE_CAR;
-        case GONDOLA:
-            return MODE_GONDOLA;
-        case FERRY:
-            return MODE_FERRY;
-        case FUNICULAR:
-            return MODE_FUNICULAR;
-        case SUBWAY:
-            return MODE_SUBWAY;
-        case RAIL:
-            return MODE_RAIL;
-        case AIRPLANE:
-            return MODE_AIRPLANE;
-        case TRANSIT:
-            return MODE_TRANSIT;
-        }
-        return 0;
+    private int getMaskForMode(TraverseMode mode) {
+        return switch (mode) {
+            case BICYCLE -> MODE_BICYCLE;
+            case WALK -> MODE_WALK;
+            case CAR -> MODE_CAR;
+            case BUS -> MODE_BUS;
+            case TRAM -> MODE_TRAM;
+            case CABLE_CAR -> MODE_CABLE_CAR;
+            case GONDOLA -> MODE_GONDOLA;
+            case FERRY -> MODE_FERRY;
+            case FUNICULAR -> MODE_FUNICULAR;
+            case SUBWAY -> MODE_SUBWAY;
+            case RAIL -> MODE_RAIL;
+            case TROLLEYBUS -> MODE_TROLLEYBUS;
+            case MONORAIL -> MODE_MONORAIL;
+            case AIRPLANE -> MODE_AIRPLANE;
+            case TRANSIT -> MODE_TRANSIT;
+            default -> 0;
+        };
     }
 
     public TraverseModeSet(Collection<TraverseMode> modeList) {
@@ -150,7 +141,15 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public boolean getRail() {
         return (modes & MODE_RAIL) != 0;
     }
-    
+
+    public boolean getTrolleyBus() {
+        return (modes & MODE_TROLLEYBUS) != 0;
+    }
+
+    public boolean geMonorail() {
+        return (modes & MODE_MONORAIL) != 0;
+    }
+
     public boolean getSubway() {
         return (modes & MODE_SUBWAY) != 0;
     }
@@ -257,6 +256,22 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     }
 
+    public void setTrolleybus(boolean trolleybus) {
+        if (trolleybus) {
+            modes |= MODE_TROLLEYBUS;
+        } else {
+            modes &= ~MODE_TROLLEYBUS;
+        }
+    }
+
+    public void setMonorail(boolean monorail) {
+        if(monorail) {
+            modes |= MODE_MONORAIL;
+        } else {
+            modes &= ~MODE_MONORAIL;
+        }
+    }
+
     /** Returns true if the trip may use some transit mode */
     public boolean isTransit() {
         return (modes & (MODE_TRANSIT)) != 0;
@@ -279,7 +294,7 @@ public class TraverseModeSet implements Cloneable, Serializable {
     }
 
     public List<TraverseMode> getModes() {
-        ArrayList<TraverseMode> modeList = new ArrayList<TraverseMode>();
+        ArrayList<TraverseMode> modeList = new ArrayList<>();
         for (TraverseMode mode : TraverseMode.values()) {
             if ((modes & getMaskForMode(mode)) != 0) {
                 modeList.add(mode);

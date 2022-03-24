@@ -4,7 +4,7 @@ package org.opentripplanner.netex.index.api;
 import org.opentripplanner.graph_builder.DataImportIssue;
 
 /**
- * This interface is used to make validation rules witch can be passed to a hierarchical map. The
+ * This interface is used to make validation rules which can be passed to a hierarchical map. The
  * rule is applied to all local elements. Depending on the validation status on of 3 actions is
  * performed for each element in the map:
  * <ol>
@@ -34,7 +34,7 @@ public interface HMapValidationRule<K, V> {
    * Validate and return status, the caller will take the appropriate acction according to  the
    * retuned status.
    */
-  Status validate(K key, V value);
+  Status validate(V value);
 
   /**
    * The rule should provide a log message to use if the validation fails.

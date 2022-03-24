@@ -1,9 +1,10 @@
 package org.opentripplanner.common.pqueue;
 
+import junit.framework.TestCase;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
-import junit.framework.TestCase;
 
 /*
  * Test correctness and relative speed of various
@@ -14,7 +15,7 @@ public class TestPQueues extends TestCase {
 
     public void doQueue(BinHeap<Integer> q,
                         List<Integer> input, List<Integer> expected) {
-        List<Integer> result = new ArrayList<Integer>(N);
+        List<Integer> result = new ArrayList<>(N);
         int expectedSum = 0;
         for (Integer i : input) {
             q.insert(i, i * 0.5);
@@ -42,7 +43,7 @@ public class TestPQueues extends TestCase {
         while (!q.empty())
             sum += q.extract_min();
         // keep compiler from optimizing out extract
-        assertTrue(sum == expectedSum);
+      assertEquals(sum, expectedSum);
     }
     
     public void fillQueue(BinHeap<Integer> q, List<Integer> input) {
@@ -63,20 +64,20 @@ public class TestPQueues extends TestCase {
 
     public void testCompareHeaps() throws InterruptedException {
         List<Integer> input, expected;
-        input = new ArrayList<Integer>(N);
+        input = new ArrayList<>(N);
         for (int i=0; i<N; i++) input.add((int) (Math.random() * 10000));
         
         // First determine the expected results using a plain old PriorityQueue
-        expected = new ArrayList<Integer>(N);
-        PriorityQueue<Integer> q = new PriorityQueue<Integer>(N);
+        expected = new ArrayList<>(N);
+        PriorityQueue<Integer> q = new PriorityQueue<>(N);
         for (Integer j : input) {
             q.add(j);
         }
         while (!q.isEmpty()) {
             expected.add(q.remove());
         }
-        doQueue(new BinHeap<Integer>(), input, expected);
-        fillQueue(new BinHeap<Integer>(), input);
+        doQueue(new BinHeap<>(), input, expected);
+        fillQueue(new BinHeap<>(), input);
     }
 
     /*
@@ -89,10 +90,10 @@ public class TestPQueues extends TestCase {
 
     	List<Double>  keys;
         List<Integer> vals;
-        keys = new ArrayList<Double>(N);
-        vals = new ArrayList<Integer>(N);
+        keys = new ArrayList<>(N);
+        vals = new ArrayList<>(N);
         
-        BinHeap<Integer> bh = new BinHeap<Integer>(20);
+        BinHeap<Integer> bh = new BinHeap<>(20);
 
         for (int iter = 0; iter < ITER; iter++) {
 

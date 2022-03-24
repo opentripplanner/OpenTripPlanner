@@ -1,5 +1,25 @@
 package org.opentripplanner.index;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.mapping.AgencyMapper;
 import org.opentripplanner.api.mapping.AlertMapper;
@@ -26,7 +46,7 @@ import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
@@ -40,46 +60,25 @@ import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
-@Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
+@Path("/routers/{ignoreRouterId}/index")  // It would be nice to get rid of the final /index.
+@Produces(MediaType.APPLICATION_JSON)  // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
     private static final double MAX_STOP_SEARCH_RADIUS = 5000;
 
-    /** Choose short or long form of results. */
-    @QueryParam("detail")
-    private boolean detail = false;
-
-    /** Include GTFS entities referenced by ID in the result. */
-    @QueryParam("refs")
-    private boolean refs = false;
-
     private final OTPServer otpServer;
 
-    public IndexAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
+    public IndexAPI(
+            @Context
+            OTPServer otpServer,
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @PathParam("ignoreRouterId") String ignoreRouterId
+    ) {
         this.otpServer = otpServer;
     }
 
@@ -129,7 +128,10 @@ public class IndexAPI {
     @GET
     @Path("/agencies/{feedId}/{agencyId}/routes")
     public Response getAgencyRoutes(
-            @PathParam("feedId") String feedId, @PathParam("agencyId") String agencyId
+            @PathParam("feedId") String feedId,
+            @PathParam("agencyId") String agencyId,
+            /** Choose short or long form of results. */
+            @QueryParam("detail") @DefaultValue("false") Boolean detail
     ) {
         RoutingService routingService = createRoutingService();
         Agency agency = getAgency(routingService, feedId, agencyId);
@@ -164,7 +166,7 @@ public class IndexAPI {
     @GET
     @Path("/stops/{stopId}")
     public ApiStop getStop(@PathParam("stopId") String stopIdString) {
-        Stop stop = getStop(createRoutingService(), stopIdString);
+        var stop = getStop(createRoutingService(), stopIdString);
         return StopMapper.mapToApi(stop);
     }
 
@@ -212,10 +214,9 @@ public class IndexAPI {
                     .lessThan("minLat", minLat, "maxLat", maxLat)
                     .lessThan("minLon", minLon, "maxLon", maxLon)
                     .validate();
-            Collection<Stop> stops = createRoutingService()
+            var stops = createRoutingService()
                     .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
-            return StopMapper.mapToApiShort(stops
-            );
+            return StopMapper.mapToApiShort(stops);
         }
     }
 
@@ -223,11 +224,11 @@ public class IndexAPI {
     @Path("/stops/{stopId}/routes")
     public List<ApiRouteShort> getRoutesForStop(@PathParam("stopId") String stopId) {
         RoutingService routingService = createRoutingService();
-        Stop stop = getStop(routingService, stopId);
+        var stop = getStop(routingService, stopId);
         return routingService
                 .getPatternsForStop(stop)
                 .stream()
-                .map(it -> it.getRoute())
+                .map(TripPattern::getRoute)
                 .map(RouteMapper::mapToApiShort)
                 .collect(Collectors.toList());
     }
@@ -237,7 +238,7 @@ public class IndexAPI {
     @Path("/stops/{stopId}/patterns")
     public List<ApiPatternShort> getPatternsForStop(@PathParam("stopId") String stopId) {
         RoutingService routingService = createRoutingService();
-        Stop stop = getStop(routingService, stopId);
+        var stop = getStop(routingService, stopId);
         return routingService
                 .getPatternsForStop(stop)
                 .stream()
@@ -263,7 +264,7 @@ public class IndexAPI {
             @QueryParam("omitNonPickups") boolean omitNonPickups
     ) {
         RoutingService routingService = createRoutingService();
-        Stop stop = getStop(routingService, stopIdString);
+        var stop = getStop(routingService, stopIdString);
 
         return routingService.stopTimesForStop(
                 stop,
@@ -290,7 +291,7 @@ public class IndexAPI {
             @QueryParam("omitNonPickups") boolean omitNonPickups
     ) {
         RoutingService routingService = createRoutingService();
-        Stop stop = getStop(routingService, stopId);
+        var stop = getStop(routingService, stopId);
         ServiceDate serviceDate = parseServiceDate("date", date);
         List<StopTimesInPattern> stopTimes = routingService.getStopTimesForStop(
                 stop,
@@ -307,7 +308,7 @@ public class IndexAPI {
     @Path("/stops/{stopId}/transfers")
     public Collection<ApiTransfer> getTransfers(@PathParam("stopId") String stopId) {
         RoutingService routingService = createRoutingService();
-        Stop stop = getStop(routingService, stopId);
+        var stop = getStop(routingService, stopId);
 
         // get the transfers for the stop
         return routingService.getTransfersByStop(stop)
@@ -340,7 +341,7 @@ public class IndexAPI {
             // Protective copy, we are going to calculate the intersection destructively
             routes = new ArrayList<>(routes);
             for (String stopId : stopIds) {
-                Stop stop = getStop(routingService, stopId);
+                var stop = getStop(routingService, stopId);
                 Set<Route> routesHere = new HashSet<>();
                 for (TripPattern pattern : routingService.getPatternsForStop(stop)) {
                     routesHere.add(pattern.getRoute());
@@ -377,7 +378,7 @@ public class IndexAPI {
         RoutingService routingService = createRoutingService();
         Route route = getRoute(routingService, routeId);
 
-        Set<Stop> stops = new HashSet<>();
+        Set<StopLocation> stops = new HashSet<>();
         Collection<TripPattern> patterns = routingService.getPatternsForRoute().get(route);
         for (TripPattern pattern : patterns) {
             stops.addAll(pattern.getStops());
@@ -392,12 +393,11 @@ public class IndexAPI {
         RoutingService routingService = createRoutingService();
         Route route = getRoute(routingService, routeId);
 
-        List<Trip> trips = new ArrayList<>();
-        Collection<TripPattern> patterns = routingService.getPatternsForRoute().get(route);
-        for (TripPattern pattern : patterns) {
-            trips.addAll(pattern.getTrips());
-        }
-        return TripMapper.mapToApiShort(trips);
+        var patterns = routingService.getPatternsForRoute().get(route);
+        return patterns.stream()
+                .flatMap(TripPattern::scheduledTripsAsStream)
+                .map(TripMapper::mapToApiShort)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -425,7 +425,7 @@ public class IndexAPI {
     @GET
     @Path("/trips/{tripId}/stops")
     public List<ApiStopShort> getStopsForTrip(@PathParam("tripId") String tripId) {
-        Collection<Stop> stops = getTripPatternForTripId(createRoutingService(), tripId).getStops();
+        Collection<StopLocation> stops = getTripPatternForTripId(createRoutingService(), tripId).getStops();
         return StopMapper.mapToApiShort(stops);
     }
 
@@ -466,7 +466,7 @@ public class IndexAPI {
         RoutingService routingService = createRoutingService();
         AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
         FeedScopedId id = createId("tripId", tripId);
-        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripAlerts(id));
+        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripAlerts(id, null));
     }
 
     @GET
@@ -486,14 +486,14 @@ public class IndexAPI {
     @GET
     @Path("/patterns/{patternId}/trips")
     public List<ApiTripShort> getTripsForPattern(@PathParam("patternId") String patternId) {
-        List<Trip> trips = getTripPattern(createRoutingService(), patternId).getTrips();
+        var trips = getTripPattern(createRoutingService(), patternId).scheduledTripsAsStream();
         return TripMapper.mapToApiShort(trips);
     }
 
     @GET
     @Path("/patterns/{patternId}/stops")
     public List<ApiStopShort> getStopsForPattern(@PathParam("patternId") String patternId) {
-        List<Stop> stops = getTripPattern(createRoutingService(), patternId).getStops();
+        var stops = getTripPattern(createRoutingService(), patternId).getStops();
         return StopMapper.mapToApiShort(stops);
     }
 
@@ -520,8 +520,10 @@ public class IndexAPI {
     public Collection<ApiAlert> getAlertsForPattern(@PathParam("patternId") String patternId) {
         RoutingService routingService = createRoutingService();
         AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
-        FeedScopedId id = createId("patternId", patternId);
-        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripPatternAlerts(id));
+        TripPattern pattern = getTripPattern(createRoutingService(), patternId);
+        return alertMapper.mapToApi(routingService.getTransitAlertService()
+                .getDirectionAndRouteAlerts(
+                        pattern.getDirection().gtfsCode, pattern.getRoute().getId()));
     }
 
     // TODO include pattern ID for each trip in responses
@@ -600,8 +602,8 @@ public class IndexAPI {
         return agency;
     }
 
-    private static Stop getStop(RoutingService routingService, String stopId) {
-        Stop stop = routingService.getStopForId(createId("stopId", stopId));
+    private static StopLocation getStop(RoutingService routingService, String stopId) {
+        var stop = routingService.getStopForId(createId("stopId", stopId));
         return validateExist("Stop", stop, "stopId", stop);
     }
 

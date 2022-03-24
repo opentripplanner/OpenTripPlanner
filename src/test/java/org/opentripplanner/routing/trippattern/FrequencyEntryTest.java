@@ -20,7 +20,7 @@ public class FrequencyEntryTest {
     static {
         Trip trip = new Trip(new FeedScopedId("agency", "testtrip"));
 
-        List<StopTime> stopTimes = new ArrayList<StopTime>();
+        List<StopTime> stopTimes = new ArrayList<>();
 
         int time = 0;
         for(int i = 0; i < STOP_NUM; ++i) {

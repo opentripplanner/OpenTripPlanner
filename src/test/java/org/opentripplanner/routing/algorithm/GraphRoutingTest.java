@@ -1,59 +1,67 @@
 package org.opentripplanner.routing.algorithm;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.BikeParkEdge;
-import org.opentripplanner.routing.edgetype.BikeRentalEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
+import org.opentripplanner.routing.edgetype.StreetVehicleRentalLink;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class GraphRoutingTest {
 
     public static final String TEST_FEED_ID = "testFeed";
-    public static final String TEST_BIKE_RENTAL_NETWORK = "test network";
+    public static final String TEST_VEHICLE_RENTAL_NETWORK = "test network";
 
     protected Graph graphOf(Builder builder) {
         return builder.graph();
@@ -92,7 +100,7 @@ public abstract class GraphRoutingTest {
             return new StreetEdge(from, to,
                     GeometryUtils.makeLineString(
                             from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-                    String.format("%s%s street", from.getName(), to.getName()),
+                    String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                     length,
                     permissions,
                     false
@@ -110,7 +118,7 @@ public abstract class GraphRoutingTest {
                     new StreetEdge(from, to,
                             GeometryUtils.makeLineString(
                                     from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-                            String.format("%s%s street", from.getName(), to.getName()),
+                            String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                             length,
                             forwardPermissions,
                             false
@@ -118,7 +126,7 @@ public abstract class GraphRoutingTest {
                     new StreetEdge(to, from,
                             GeometryUtils.makeLineString(
                                     to.getLat(), to.getLon(), from.getLat(), from.getLon()),
-                            String.format("%s%s street", from.getName(), to.getName()),
+                            String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
                             length,
                             reversePermissions,
                             true
@@ -126,55 +134,27 @@ public abstract class GraphRoutingTest {
             );
         }
 
-        public TurnRestriction turnRestriction(
-                Edge from,
-                Edge to,
-                TurnRestrictionType type,
-                TraverseModeSet modes
-        ) {
-            var turnRestriction = new TurnRestriction(from, to, type, modes);
-            graph.addTurnRestriction(from, turnRestriction);
-            return turnRestriction;
-        }
-
-        public TurnRestriction turnRestriction(Edge from, Edge to, TurnRestrictionType type) {
-            return turnRestriction(
-                    from, to, type, new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR));
-        }
-
-        public TurnRestriction bicycleTurnRestriction(
-                Edge from,
-                Edge to,
-                TurnRestrictionType type
-        ) {
-            return turnRestriction(from, to, type, new TraverseModeSet(TraverseMode.BICYCLE));
-        }
-
-        public TurnRestriction carTurnRestriction(Edge from, Edge to, TurnRestrictionType type) {
-            return turnRestriction(from, to, type, new TraverseModeSet(TraverseMode.CAR));
-        }
-
         public List<ElevatorEdge> elevator(StreetTraversalPermission permission, Vertex ... vertices) {
             List<ElevatorEdge> edges = new ArrayList<>();
             List<ElevatorOnboardVertex> onboardVertices = new ArrayList<>();
 
             for (Vertex v : vertices) {
-                var level = String.format("L-%s", v.getName());
+                var level = String.format("L-%s", v.getDefaultName());
                 var boardLabel = String.format("%s-onboard", level);
                 var alightLabel = String.format("%s-offboard", level);
 
                 var onboard = new ElevatorOnboardVertex(
-                        graph, boardLabel, v.getX(), v.getY(), boardLabel
+                        graph, boardLabel, v.getX(), v.getY(), new NonLocalizedString(boardLabel)
                 );
                 var offboard = new ElevatorOffboardVertex(
-                        graph, alightLabel, v.getX(), v.getY(), alightLabel
+                        graph, alightLabel, v.getX(), v.getY(), new NonLocalizedString(alightLabel)
                 );
 
                 new FreeEdge(v, offboard);
                 new FreeEdge(offboard, v);
 
                 edges.add(new ElevatorBoardEdge(offboard, onboard));
-                edges.add(new ElevatorAlightEdge(onboard, offboard, level));
+                edges.add(new ElevatorAlightEdge(onboard, offboard, new NonLocalizedString(level)));
 
                 onboardVertices.add(onboard);
             }
@@ -188,13 +168,13 @@ public abstract class GraphRoutingTest {
             }
 
             return edges;
-        };
+        }
 
-        // -- Transit network (pathways, linking)
+      // -- Transit network (pathways, linking)
         public Entrance entranceEntity(String id, double latitude, double longitude) {
             return new Entrance(
                     new FeedScopedId(TEST_FEED_ID, id),
-                    id,
+                    new NonLocalizedString(id),
                     id,
                     null,
                     WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
@@ -206,11 +186,12 @@ public abstract class GraphRoutingTest {
         public Stop stopEntity(String id, double latitude, double longitude) {
             return new Stop(
                     new FeedScopedId(TEST_FEED_ID, id),
-                    id,
+                    new NonLocalizedString(id),
                     id,
                     null,
                     WgsCoordinate.creatOptionalCoordinate(latitude, longitude),
                     WheelChairBoarding.NO_INFORMATION,
+                    null,
                     null,
                     null,
                     null,
@@ -260,7 +241,7 @@ public abstract class GraphRoutingTest {
         public PathwayEdge pathway(Vertex from, Vertex to, int time, int length) {
             return new PathwayEdge(
                     from, to, null,
-                    String.format("%s%s pathway", from.getName(), to.getName()),
+                    new NonLocalizedString(String.format("%s%s pathway", from.getDefaultName(), to.getDefaultName())),
                     time, length, 0, 0, false
             );
         }
@@ -290,109 +271,146 @@ public abstract class GraphRoutingTest {
             return List.of(link(from, to), link(to, from));
         }
 
-        // -- Bike rental
-        public BikeRentalStation bikeRentalStationEntity(
+        // -- Vehicle rental
+        public VehicleRentalPlace vehicleRentalStationEntity(
                 String id,
                 double latitude,
                 double longitude,
-                Set<String> networks
+                String network
         ) {
-            var bikeRentalStation = new BikeRentalStation();
-            bikeRentalStation.id = id;
-            bikeRentalStation.x = longitude;
-            bikeRentalStation.y = latitude;
-            bikeRentalStation.networks = networks;
-            bikeRentalStation.isKeepingBicycleRentalAtDestinationAllowed = false;
-            return bikeRentalStation;
+            var vehicleRentalStation = new VehicleRentalStation();
+            vehicleRentalStation.id = new FeedScopedId(network, id);
+            vehicleRentalStation.name = new NonLocalizedString(id);
+            vehicleRentalStation.longitude = longitude;
+            vehicleRentalStation.latitude = latitude;
+            vehicleRentalStation.vehiclesAvailable = 2;
+            vehicleRentalStation.spacesAvailable = 2;
+            final RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(network);
+            vehicleRentalStation.vehicleTypesAvailable = Map.of(vehicleType, 2);
+            vehicleRentalStation.vehicleSpacesAvailable = Map.of(vehicleType, 2);
+            vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = false;
+            return vehicleRentalStation;
         }
 
-        public BikeRentalStationVertex bikeRentalStation(
+        public VehicleRentalStationVertex vehicleRentalStation(
                 String id,
                 double latitude,
                 double longitude,
-                Set<String> networks
+                String network
         ) {
-            var vertex = new BikeRentalStationVertex(
+            var vertex = new VehicleRentalStationVertex(
                     graph,
-                    bikeRentalStationEntity(id, latitude, longitude, networks)
+                    vehicleRentalStationEntity(id, latitude, longitude, network)
             );
-            new BikeRentalEdge(vertex);
+            new VehicleRentalEdge(vertex, RentalVehicleType.getDefaultType(network).formFactor);
             return vertex;
         }
 
-        public BikeRentalStationVertex bikeRentalStation(
+        public VehicleRentalStationVertex vehicleRentalStation(
                 String id,
                 double latitude,
                 double longitude
         ) {
-            return bikeRentalStation(id, latitude, longitude, Set.of(TEST_BIKE_RENTAL_NETWORK));
+            return vehicleRentalStation(id, latitude, longitude, TEST_VEHICLE_RENTAL_NETWORK);
         }
 
-        public StreetBikeRentalLink link(StreetVertex from, BikeRentalStationVertex to) {
-            return new StreetBikeRentalLink(from, to);
+        public StreetVehicleRentalLink link(StreetVertex from, VehicleRentalStationVertex to) {
+            return new StreetVehicleRentalLink(from, to);
         }
 
-        public StreetBikeRentalLink link(BikeRentalStationVertex from, StreetVertex to) {
-            return new StreetBikeRentalLink(from, to);
+        public StreetVehicleRentalLink link(VehicleRentalStationVertex from, StreetVertex to) {
+            return new StreetVehicleRentalLink(from, to);
         }
 
-        public List<StreetBikeRentalLink> biLink(StreetVertex from, BikeRentalStationVertex to) {
+        public List<StreetVehicleRentalLink> biLink(StreetVertex from, VehicleRentalStationVertex to) {
             return List.of(link(from, to), link(to, from));
         }
 
-        // -- Bike P+R
-        public BikePark bikeParkEntity(String id, double latitude, double longitude) {
-            var bikePark = new BikePark();
-            bikePark.id = id;
-            bikePark.x = longitude;
-            bikePark.y = latitude;
-            return bikePark;
+        public VehicleParking vehicleParking(String id, double x, double y, boolean bicyclePlaces, boolean carPlaces, List<VehicleParkingEntranceCreator> entrances, String ... tags) {
+            return vehicleParking(id, x, y, bicyclePlaces, carPlaces, false, entrances, tags);
         }
 
-        public BikeParkVertex bikePark(String id, double latitude, double longitude) {
-            var vertex = new BikeParkVertex(
-                    graph,
-                    bikeParkEntity(id, latitude, longitude)
-            );
-            new BikeParkEdge(vertex);
-            return vertex;
+        public VehicleParking vehicleParking(String id, double x, double y, boolean bicyclePlaces, boolean carPlaces, boolean wheelchairAccessibleCarPlaces, List<VehicleParkingEntranceCreator> entrances, String ... tags) {
+            var vehicleParking = VehicleParking.builder()
+                .id(new FeedScopedId(TEST_FEED_ID, id))
+                .x(x)
+                .y(y)
+                .bicyclePlaces(bicyclePlaces)
+                .carPlaces(carPlaces)
+                .entrances(entrances)
+                .wheelchairAccessibleCarPlaces(wheelchairAccessibleCarPlaces)
+                .tags(List.of(tags))
+                .build();
+
+            var vertices = VehicleParkingHelper.createVehicleParkingVertices(graph, vehicleParking);
+            VehicleParkingHelper.linkVehicleParkingEntrances(vertices);
+            vertices.forEach(v -> biLink(v.getParkingEntrance().getVertex(), v));
+            return vehicleParking;
         }
 
-        public StreetBikeParkLink link(StreetVertex from, BikeParkVertex to) {
-            return new StreetBikeParkLink(from, to);
+        public VehicleParking.VehicleParkingEntranceCreator vehicleParkingEntrance(StreetVertex streetVertex, String id, boolean carAccessible, boolean walkAccessible) {
+            return builder -> builder
+                .entranceId(new FeedScopedId(TEST_FEED_ID, id))
+                .name(new NonLocalizedString(id))
+                .x(streetVertex.getX())
+                .y(streetVertex.getY())
+                .vertex(streetVertex)
+                .carAccessible(carAccessible)
+                .walkAccessible(walkAccessible);
         }
 
-        public StreetBikeParkLink link(BikeParkVertex from, StreetVertex to) {
-            return new StreetBikeParkLink(from, to);
+        public StreetVehicleParkingLink link(StreetVertex from, VehicleParkingEntranceVertex to) {
+            return new StreetVehicleParkingLink(from, to);
         }
 
-        public List<StreetBikeParkLink> biLink(StreetVertex from, BikeParkVertex to) {
+        public StreetVehicleParkingLink link(VehicleParkingEntranceVertex from, StreetVertex to) {
+            return new StreetVehicleParkingLink(from, to);
+        }
+
+        public List<StreetVehicleParkingLink> biLink(StreetVertex from, VehicleParkingEntranceVertex to) {
             return List.of(link(from, to), link(to, from));
         }
 
-        // -- Car P+R
-        public ParkAndRideVertex carPark(String id, double latitude, double longitude) {
-            var vertex =
-                    new ParkAndRideVertex(graph, id, id, longitude, latitude, null);
-            new ParkAndRideEdge(vertex);
-            return vertex;
+        public Agency agency(String name) {
+            return new Agency(new FeedScopedId("Test", name), name, null);
         }
 
-        public ParkAndRideLinkEdge link(StreetVertex from, ParkAndRideVertex to) {
-            return new ParkAndRideLinkEdge(from, to);
-        }
-
-        public ParkAndRideLinkEdge link(ParkAndRideVertex from, StreetVertex to) {
-            return new ParkAndRideLinkEdge(from, to);
-        }
-
-        public List<ParkAndRideLinkEdge> biLink(StreetVertex from, ParkAndRideVertex to) {
-            return List.of(link(from, to), link(to, from));
+        public Route route(String id, TransitMode mode, Agency agency) {
+            var route = new Route(new FeedScopedId("Test", id));
+            route.setAgency(agency);
+            route.setMode(mode);
+            return route;
         }
 
         // Transit
         public void tripPattern(TripPattern tripPattern) {
             graph.tripPatternForId.put(tripPattern.getId(), tripPattern);
         }
+
+        public StopTime st(TransitStopVertex s1) {
+            var st = new StopTime();
+            st.setStop(s1.getStop());
+            return st;
+        }
+    }
+
+    public static String graphPathToString(GraphPath graphPath) {
+        return graphPath.states.stream()
+            .flatMap(s -> Stream.of(
+                s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
+                s.getVertex().getDefaultName()
+            ))
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(" - "));
+    }
+
+    protected GraphPath routeParkAndRide(Graph graph, StreetVertex from, StreetVertex to, TraverseModeSet traverseModeSet) {
+        RoutingRequest request = new RoutingRequest(traverseModeSet);
+        request.setRoutingContext(graph, from, to);
+        request.parkAndRide = true;
+
+        AStar aStar = new AStar();
+        ShortestPathTree tree = aStar.getShortestPathTree(request);
+        return tree.getPath(to);
     }
 }

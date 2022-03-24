@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.Collection;
+import java.util.Optional;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -10,22 +12,21 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.util.NonLocalizedString;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.KeyValueStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Optional;
-
 class FlexStopLocationMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(FlexStopLocationMapper.class);
 
   private final FeedScopedIdFactory idFactory;
 
   private final HashGridSpatialIndex<Stop> stopsSpatialIndex;
 
-  private static final Logger LOG = LoggerFactory.getLogger(FlexStopLocationMapper.class);
 
   /**
    * Key-value pair used until proper NeTEx support is added
@@ -89,7 +90,7 @@ class FlexStopLocationMapper {
    */
   FlexStopLocation mapFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
     FlexStopLocation result = new FlexStopLocation(idFactory.createId(flexibleStopPlace.getId()));
-    result.setName(flexibleStopPlace.getName().getValue());
+    result.setName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
     result.setGeometry(OpenGisMapper.mapGeometry(area.getPolygon()));
     return result;
   }
@@ -99,7 +100,7 @@ class FlexStopLocationMapper {
    */
   FlexLocationGroup mapStopsInFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
     FlexLocationGroup result = new FlexLocationGroup(idFactory.createId(flexibleStopPlace.getId()));
-    result.setName(flexibleStopPlace.getName().getValue());
+    result.setName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
     Geometry geometry = OpenGisMapper.mapGeometry(area.getPolygon());
 
     for (Stop stop : stopsSpatialIndex.query(geometry.getEnvelopeInternal())) {

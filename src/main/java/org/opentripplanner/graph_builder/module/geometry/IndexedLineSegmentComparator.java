@@ -7,7 +7,7 @@ import java.util.Comparator;
 
 class IndexedLineSegmentComparator implements Comparator<IndexedLineSegment> {
 
-    private Coordinate coord;
+    private final Coordinate coord;
 
     public IndexedLineSegmentComparator(Coordinate coord) {
         this.coord = coord;

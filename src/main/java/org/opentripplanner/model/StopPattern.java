@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * This class represents what is called a JourneyPattern in Transmodel: the sequence of stops at
@@ -33,16 +35,17 @@ import java.util.Iterator;
  * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique
  * key for a TripPattern. Should the route be included in the StopPattern?
  */
-public class StopPattern implements Serializable {
+public final class StopPattern implements Serializable {
 
     private static final long serialVersionUID = 20140101L;
-    
-    private final Stop[] stops;
+    public static final int NOT_FOUND = -1;
+
+    private final StopLocation[] stops;
     private final PickDrop[]  pickups;
     private final PickDrop[]  dropoffs;
 
     private StopPattern (int size) {
-        stops     = new Stop[size];
+        stops     = new StopLocation[size];
         pickups   = new PickDrop[size];
         dropoffs  = new PickDrop[size];
     }
@@ -56,35 +59,40 @@ public class StopPattern implements Serializable {
 
         for (int i = 0; i < size; ++i) {
             StopTime stopTime = stopTimeIterator.next();
-            stops[i] = (Stop) stopTime.getStop();
+            stops[i] = stopTime.getStop();
             // should these just be booleans? anything but 1 means pick/drop is allowed.
             // pick/drop messages could be stored in individual trips
-            pickups[i] = stopTime.getPickupType();
-            dropoffs[i] = stopTime.getDropOffType();
+            pickups[i] = computePickDrop(stopTime.getStop(), stopTime.getPickupType());
+            dropoffs[i] = computePickDrop(stopTime.getStop(), stopTime.getDropOffType());
         }
-        /*
-         * TriMet GTFS has many trips that differ only in the pick/drop status of their initial and
-         * final stops. This may have something to do with interlining. They are turning pickups off
-         * on the final stop of a trip to indicate that there is no interlining, because they supply
-         * block IDs for all trips, even those followed by dead runs. See issue 681. Enabling
-         * dropoffs at the initial stop and pickups at the final merges similar patterns while
-         * having no effect on routing.
-         */
-        dropoffs[0] = PickDrop.SCHEDULED;
-        pickups[size - 1] = PickDrop.SCHEDULED;
     }
 
-    /**
-     * @param stopId in agency_id format
-     */
-    public boolean containsStop (String stopId) {
-        if (stopId == null) { return false; }
-        for (Stop stop : stops) if (stopId.equals(stop.getId().toString())) { return true; }
-        return false;
-    }
-
-    public int getSize() {
+    int getSize() {
         return stops.length;
+    }
+
+    /** Find the given stop position in the sequence, return -1 if not found. */
+    int findStopPosition(StopLocation stop) {
+        for (int i=0; i<stops.length; ++i) {
+            if(stops[i] == stop) { return i; }
+        }
+        return -1;
+    }
+
+    int findBoardingPosition(StopLocation stop) {
+        return findStopPosition(0, stops.length - 1, (s) -> s == stop);
+    }
+
+    int findAlightPosition(StopLocation stop) {
+        return findStopPosition(1, stops.length, (s) -> s == stop);
+    }
+
+    int findBoardingPosition(Station station) {
+        return findStopPosition(0, stops.length - 1, station::includes);
+    }
+
+    int findAlightPosition(Station station) {
+        return findStopPosition(1, stops.length, station::includes);
     }
 
     public boolean equals(Object other) {
@@ -124,16 +132,15 @@ public class StopPattern implements Serializable {
      * want a way to consistently identify trips across versions of a GTFS feed, when the feed
      * publisher cannot ensure stable trip IDs. Therefore we define some additional hash functions.
      */
-    public HashCode semanticHash(HashFunction hashFunction) {
+    HashCode semanticHash(HashFunction hashFunction) {
         Hasher hasher = hashFunction.newHasher();
         int size = stops.length;
-        for (int s = 0; s < size; s++) {
-            Stop stop = stops[s];
-            // Truncate the lat and lon to 6 decimal places in case they move slightly between
-            // feed versions
-            hasher.putLong((long) (stop.getLat() * 1000000));
-            hasher.putLong((long) (stop.getLon() * 1000000));
-        }
+      for (StopLocation stop : stops) {
+        // Truncate the lat and lon to 6 decimal places in case they move slightly between
+        // feed versions
+        hasher.putLong((long) (stop.getLat() * 1000000));
+        hasher.putLong((long) (stop.getLon() * 1000000));
+      }
         // Use hops rather than stops because drop-off at stop 0 and pick-up at last stop are
         // not important and have changed between OTP versions.
         for (int hop = 0; hop < size - 1; hop++) {
@@ -143,19 +150,66 @@ public class StopPattern implements Serializable {
         return hasher.hash();
     }
 
-    public Stop[] getStops() {
-        return stops;
+    /** Get a copy of the internal collection of stops. */
+    List<StopLocation> getStops() {
+        return List.of(stops);
     }
 
-    public Stop getStop(int i) {
-        return stops[i];
+    StopLocation getStop(int stopPosInPattern) {
+        return stops[stopPosInPattern];
     }
 
-    public PickDrop getPickup(int i) {
-        return pickups[i];
+    PickDrop getPickup(int stopPosInPattern) {
+        return pickups[stopPosInPattern];
     }
 
-    public PickDrop getDropoff(int i) {
-        return dropoffs[i];
+    PickDrop getDropoff(int stopPosInPattern) {
+        return dropoffs[stopPosInPattern];
+    }
+
+    /** Returns whether passengers can alight at a given stop */
+    boolean canAlight(int stopPosInPattern) {
+        return dropoffs[stopPosInPattern].isRoutable();
+    }
+
+    /** Returns whether passengers can board at a given stop */
+    boolean canBoard(int stopPosInPattern) {
+        return pickups[stopPosInPattern].isRoutable();
+    }
+
+    /**
+     * Returns whether passengers can board at a given stop.
+     * This is an inefficient method iterating over the stops, do not use it in routing.
+     */
+    boolean canBoard(StopLocation stop) {
+        // We skip the last stop, not allowed for boarding
+        for (int i=0; i<stops.length-1; ++i) {
+            if(stop == stops[i] && canBoard(i)) { return true; }
+        }
+        return false;
+    }
+
+    /**
+     * Raptor should not be allowed to board or alight flex stops because they have fake
+     * coordinates (centroids) and might not have times.
+     */
+    private static PickDrop computePickDrop(StopLocation stop, PickDrop pickDrop) {
+        if(stop instanceof FlexStopLocation) { return PickDrop.NONE; }
+        else { return pickDrop; }
+    }
+
+    /**
+     * Find the given stop position in the sequence according to match Predicate, return -1 if not
+     * found.
+     */
+    private int findStopPosition(
+            final int start,
+            final int end,
+            final Predicate<StopLocation> match
+    ) {
+        for (int i = start; i < end; ++i) {
+            if (match.test(stops[i])) { return i; }
+        }
+        return -1;
     }
 }

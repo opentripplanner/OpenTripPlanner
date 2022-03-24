@@ -26,7 +26,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTim
 */
 public interface StopArrivalsState<T extends RaptorTripSchedule> {
 
-    void setAccessTime(int arrivalTime, RaptorTransfer access);
+    void setAccessTime(int arrivalTime, RaptorTransfer access, boolean bestTime);
 
     default void rejectAccessTime(int arrivalTime, RaptorTransfer access) { }
 
@@ -41,9 +41,7 @@ public interface StopArrivalsState<T extends RaptorTripSchedule> {
     default void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {}
 
     @Nullable
-    default TransitArrival<T> previousTransit(int boardStopIndex) {
-        return null;
-    }
+    TransitArrival<T> previousTransit(int boardStopIndex);
 
     default Collection<Path<T>> extractPaths() { return List.of(); }
 }

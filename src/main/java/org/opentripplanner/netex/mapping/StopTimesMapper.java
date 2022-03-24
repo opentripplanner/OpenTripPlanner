@@ -1,12 +1,18 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
+import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.model.PickDrop.SCHEDULED;
+
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
-
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
@@ -20,20 +26,19 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.DestinationDisplay_VersionStructure;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LineRefStructure;
+import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.PickDrop.COORDINATE_WITH_DRIVER;
-import static org.opentripplanner.model.PickDrop.SCHEDULED;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+import org.rutebanken.netex.model.Via_VersionedChildStructure;
+import org.rutebanken.netex.model.Vias_RelStructure;
 
 /**
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the StopTime has a reference
@@ -43,7 +48,7 @@ import static org.opentripplanner.model.PickDrop.SCHEDULED;
  */
 class StopTimesMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TripPatternMapper.class);
+    private final DataImportIssueStore issueStore;
 
     private static final int DAY_IN_SECONDS = 3600 * 24;
 
@@ -68,6 +73,7 @@ class StopTimesMapper {
     private String currentHeadSign;
 
     StopTimesMapper(
+            DataImportIssueStore issueStore,
             FeedScopedIdFactory idFactory,
             EntityById<Stop> stopsById,
             EntityById<FlexStopLocation> flexStopLocationsById,
@@ -78,6 +84,7 @@ class StopTimesMapper {
             ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
             ReadOnlyHierarchicalMap<String, Route> routeById
     ) {
+        this.issueStore = issueStore;
         this.idFactory = idFactory;
         this.destinationDisplayById = destinationDisplayById;
         this.stopsById = stopsById;
@@ -112,7 +119,8 @@ class StopTimesMapper {
 
             StopLocation stop = lookUpStopLocation(stopPoint);
             if (stop == null) {
-                LOG.warn(
+                issueStore.add(
+                        "JourneyPatternStopNotFound",
                         "Stop with id {} not found for StopPoint {} in JourneyPattern {}. "
                                 + "Trip {} will not be mapped.",
                         stopPoint != null && stopPoint.getScheduledStopPointRef() != null
@@ -133,7 +141,7 @@ class StopTimesMapper {
             }
 
 
-            BookingInfo bookingInfo = BookingInfoMapper.map(
+            BookingInfo bookingInfo = new BookingInfoMapper(issueStore).map(
                     stopPoint,
                     serviceJourney,
                     lookUpFlexibleLine(serviceJourney, journeyPattern)
@@ -165,17 +173,43 @@ class StopTimesMapper {
         stopTime.setTrip(trip);
         stopTime.setStopSequence(stopSequence);
         stopTime.setStop(stop);
-        // TODO PassingTimes containing EarliestArrivalTime or LatestDepartureTime only not yet
-        //      supported
-        if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
+        if (passingTime.getArrivalTime() != null || passingTime.getDepartureTime() != null) {
+            stopTime.setArrivalTime(calculateOtpTime(
+                    passingTime.getArrivalTime(),
+                    passingTime.getArrivalDayOffset(),
+                    passingTime.getDepartureTime(),
+                    passingTime.getDepartureDayOffset()
+            ));
+            stopTime.setDepartureTime(calculateOtpTime(
+                    passingTime.getDepartureTime(),
+                    passingTime.getDepartureDayOffset(),
+                    passingTime.getArrivalTime(),
+                    passingTime.getArrivalDayOffset()
+            ));
+
+            // From NeTEx we define timepoint as a waitpoint with waiting time defined (also 0)
+            if (Boolean.TRUE.equals(stopPoint.isIsWaitPoint())
+                    && passingTime.getWaitingTime() != null) {
+                stopTime.setTimepoint(1);
+            }
+        } else if (passingTime.getEarliestDepartureTime() != null && passingTime.getLatestArrivalTime() != null) {
+            stopTime.setFlexWindowStart(
+                    calculateOtpTime(
+                            passingTime.getEarliestDepartureTime(),
+                            passingTime.getEarliestDepartureDayOffset()
+                    )
+            );
+            stopTime.setFlexWindowEnd(
+                    calculateOtpTime(
+                            passingTime.getLatestArrivalTime(),
+                            passingTime.getLatestArrivalDayOffset()
+                    )
+            );
+        } else {
             return null;
         }
-        stopTime.setArrivalTime(
-                calculateOtpTime(passingTime.getArrivalTime(), passingTime.getArrivalDayOffset(),
-                        passingTime.getDepartureTime(), passingTime.getDepartureDayOffset()));
-        stopTime.setDepartureTime(calculateOtpTime(passingTime.getDepartureTime(),
-                passingTime.getDepartureDayOffset(), passingTime.getArrivalTime(),
-                passingTime.getArrivalDayOffset()));
+
+        List<String> vias = null;
 
         if (stopPoint != null) {
             if (isFalse(stopPoint.isForAlighting())) {
@@ -197,22 +231,44 @@ class StopTimesMapper {
             if (stopPoint.getDestinationDisplayRef() != null) {
                 DestinationDisplay destinationDisplay =
                         destinationDisplayById.lookup(stopPoint.getDestinationDisplayRef().getRef());
+
+                Vias_RelStructure viaValues = null;
+
                 if (destinationDisplay != null) {
                     currentHeadSign = destinationDisplay.getFrontText().getValue();
+                    viaValues = destinationDisplay.getVias();
+                }
+
+                if (viaValues != null && viaValues.getVia() != null) {
+                    vias = viaValues.getVia().stream()
+                            .map(Via_VersionedChildStructure::getDestinationDisplayRef)
+                            .filter(Objects::nonNull)
+                            .map(VersionOfObjectRefStructure::getRef)
+                            .filter(Objects::nonNull)
+                            .map(destinationDisplayById::lookup)
+                            .filter(Objects::nonNull)
+                            .map(DestinationDisplay_VersionStructure::getFrontText)
+                            .filter(Objects::nonNull)
+                            .map(MultilingualString::getValue)
+                            .collect(Collectors.toList());
+
+                    if (vias.isEmpty()) {
+                        vias = null;
+                    }
                 }
             }
         }
 
-        if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
-            LOG.warn("Time missing for trip " + trip.getId());
+        if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null &&
+            passingTime.getEarliestDepartureTime() == null && passingTime.getLatestArrivalTime() == null
+        ) {
+            issueStore.add("TripWithoutTime","Time missing for trip %s", trip.getId());
         }
 
         if (currentHeadSign != null) {
             stopTime.setStopHeadsign(currentHeadSign);
         }
-
-
-
+        stopTime.setHeadsignVias(vias);
         return stopTime;
     }
 
@@ -226,7 +282,11 @@ class StopTimesMapper {
         String flexibleStopPlaceId = flexibleStopPlaceIdByStopPointRef.lookup(stopPointRef);
 
         if (stopId == null && flexibleStopPlaceId == null) {
-            LOG.warn("No passengerStopAssignment found for " + stopPointRef);
+            issueStore.add(
+                    "PassengerStopAssignmentNotFound",
+                    "No passengerStopAssignment found for %s",
+                    stopPointRef
+            );
             return null;
         }
 
@@ -244,7 +304,11 @@ class StopTimesMapper {
         }
 
         if (stopLocation == null) {
-            LOG.warn("No Quay or FlexibleStopPlace found for " + stopPointRef);
+            issueStore.add(
+                    "StopPointInJourneyPatternMissingStopLocation",
+                    "No Quay or FlexibleStopPlace found for %s",
+                    stopPointRef
+            );
         }
 
         return stopLocation;
@@ -302,10 +366,14 @@ class StopTimesMapper {
             int arrivalTime = stopTimes.get(1).getArrivalTime();
 
             for (StopTime stopTime : stopTimes) {
-                stopTime.clearArrivalTime();
-                stopTime.clearDepartureTime();
-                stopTime.setFlexWindowStart(departureTime);
-                stopTime.setFlexWindowEnd(arrivalTime);
+                if (stopTime.getFlexWindowStart() == StopTime.MISSING_VALUE) {
+                    stopTime.clearDepartureTime();
+                    stopTime.setFlexWindowStart(departureTime);
+                }
+                if (stopTime.getFlexWindowEnd() == StopTime.MISSING_VALUE) {
+                    stopTime.clearArrivalTime();
+                    stopTime.setFlexWindowEnd(arrivalTime);
+                }
             }
         }
     }

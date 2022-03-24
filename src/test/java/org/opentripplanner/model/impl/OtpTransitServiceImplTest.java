@@ -3,15 +3,15 @@ package org.opentripplanner.model.impl;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.Agency;
@@ -24,6 +24,7 @@ import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 
@@ -36,7 +37,7 @@ public class OtpTransitServiceImplTest {
     private static OtpTransitService subject;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() throws IOException {
         GtfsContextBuilder contextBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
         OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
@@ -105,16 +106,14 @@ public class OtpTransitServiceImplTest {
                         .collect(joining("\n"))
         );
 
-        // There is 9 transfers, but because of the route to trip we get more
-        // TODO TGR - Support Route to trip expansion
         assertEquals(
-                //"Transfer{from: (route: 2, trip: 2.1, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), guaranteed}\n"
-                //+ "Transfer{from: (route: 2, trip: 2.2, stopPos: 2), to: (route: 5, trip: 5.1, stopPos: 0), guaranteed}\n"
-                "Transfer{from: (stop: K), to: (stop: L), priority: RECOMMENDED}\n"
-                + "Transfer{from: (stop: K), to: (stop: M), priority: NOT_ALLOWED}\n"
-                + "Transfer{from: (stop: L), to: (stop: K), priority: RECOMMENDED}\n"
-                + "Transfer{from: (stop: M), to: (stop: K), priority: NOT_ALLOWED}\n"
-                + "Transfer{from: (trip: 1.1, stopPos: 1), to: (trip: 2.2, stopPos: 0), guaranteed}",
+                "ConstrainedTransfer{from: <Route 2, stop D>, to: <Route 5, stop I>, constraint: {guaranteed}}\n"
+                + "ConstrainedTransfer{from: <Stop F>, to: <Stop E>, constraint: {minTransferTime: 20m}}\n"
+                + "ConstrainedTransfer{from: <Stop K>, to: <Stop L>, constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: <Stop K>, to: <Stop M>, constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: <Stop L>, to: <Stop K>, constraint: {priority: RECOMMENDED}}\n"
+                + "ConstrainedTransfer{from: <Stop M>, to: <Stop K>, constraint: {priority: NOT_ALLOWED}}\n"
+                + "ConstrainedTransfer{from: <Trip 1.1, stopPos 1>, to: <Trip 2.2, stopPos 0>, constraint: {guaranteed}}",
                 result
         );
     }
@@ -163,7 +162,7 @@ public class OtpTransitServiceImplTest {
 
     @Test
     public void testGetStopsForStation() {
-        List<Stop> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
+        List<StopLocation> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
         assertEquals("[<Stop Z:A>]", stops.toString());
     }
 
@@ -208,8 +207,7 @@ public class OtpTransitServiceImplTest {
     }
 
     private static <T> T first(Collection<? extends T> c) {
-        //noinspection ConstantConditions
-        return c.stream().sorted(comparing(T::toString)).findFirst().get();
+        return c.stream().min(comparing(T::toString)).orElseThrow();
     }
 
     private static String toString(ShapePoint sp) {

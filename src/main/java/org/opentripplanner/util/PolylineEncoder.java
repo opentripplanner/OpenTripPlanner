@@ -1,15 +1,16 @@
 package org.opentripplanner.util;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.opentripplanner.util.model.EncodedPolylineBean;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.opentripplanner.util.model.EncodedPolylineBean;
+
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PolylineEncoder {
 
@@ -32,13 +33,18 @@ public class PolylineEncoder {
 
     public static EncodedPolylineBean createEncodings(Geometry geometry) {
         if (geometry instanceof LineString) {
-
             LineString string = (LineString) geometry;
             Coordinate[] coordinates = string.getCoordinates();
             return createEncodings(new CoordinateList(coordinates));
         } else if (geometry instanceof MultiLineString) {
             MultiLineString mls = (MultiLineString) geometry;
             return createEncodings(new CoordinateList(mls.getCoordinates()));
+        } else if (geometry instanceof Polygon) {
+            Polygon polygon = (Polygon) geometry;
+            return createEncodings(new CoordinateList(polygon.getCoordinates()));
+        } else if (geometry instanceof Point) {
+            Point point = (Point) geometry;
+            return createEncodings(new CoordinateList(point.getCoordinates()));
         } else {
             throw new IllegalArgumentException(geometry.toString());
         }
@@ -91,7 +97,7 @@ public class PolylineEncoder {
         double lon = 0;
 
         int strIndex = 0;
-        List<Coordinate> points = new ArrayList<Coordinate>();
+        List<Coordinate> points = new ArrayList<>();
 
         while (strIndex < pointString.length()) {
 
@@ -113,7 +119,7 @@ public class PolylineEncoder {
      * Private Methods
      ****************************************************************************/
 
-    private static final int floor1e5(double coordinate) {
+    private static int floor1e5(double coordinate) {
         return (int) Math.floor(coordinate * 1e5);
     }
 
@@ -142,7 +148,7 @@ public class PolylineEncoder {
 
     public static String encodeNumber(int num) {
 
-        StringBuffer encodeString = new StringBuffer();
+        StringBuilder encodeString = new StringBuilder();
 
         while (num >= 0x20) {
             int nextValue = (0x20 | (num & 0x1f)) + 63;
@@ -181,10 +187,10 @@ public class PolylineEncoder {
 
     private static class PointAdapterList extends AbstractList<Coordinate> {
 
-        private double[] lat;
-        private double[] lon;
-        private int offset;
-        private int length;
+        private final double[] lat;
+        private final double[] lon;
+        private final int offset;
+        private final int length;
 
         public PointAdapterList(double[] lat, double[] lon) {
             this(lat, lon, 0, lat.length);
@@ -210,7 +216,7 @@ public class PolylineEncoder {
 
     private static class CoordinateList extends AbstractList<Coordinate> {
 
-        private Coordinate[] coordinates;
+        private final Coordinate[] coordinates;
 
         public CoordinateList(Coordinate[] coordinates) {
             this.coordinates = coordinates;

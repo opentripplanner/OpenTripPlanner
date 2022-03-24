@@ -1,24 +1,22 @@
 package org.opentripplanner.routing.core;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import junit.framework.TestCase;
-
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TestGraph extends TestCase {
     public void testBasic() throws Exception {
@@ -53,7 +51,7 @@ public class TestGraph extends TestCase {
         Vertex b = new IntersectionVertex(g, "B", 6, 6);
         FreeEdge ee = new FreeEdge(a, b);
 
-        List<Edge> edges = new ArrayList<Edge>(g.getEdges());
+        List<Edge> edges = new ArrayList<>(g.getEdges());
         assertEquals(1, edges.size());
         assertEquals(ee, edges.get(0));
     }
@@ -64,13 +62,13 @@ public class TestGraph extends TestCase {
         Vertex b = new IntersectionVertex(g, "B", 6, 6);
         Vertex c = new IntersectionVertex(g, "C", 3, 2);
 
-        Set<Edge> expectedEdges = new HashSet<Edge>(4);
+        Set<Edge> expectedEdges = new HashSet<>(4);
         expectedEdges.add(new FreeEdge(a, b));
         expectedEdges.add(new FreeEdge(b, c));
         expectedEdges.add(new FreeEdge(c, b));
         expectedEdges.add(new FreeEdge(c, a));
 
-        Set<Edge> edges = new HashSet<Edge>(g.getEdges());
+        Set<Edge> edges = new HashSet<>(g.getEdges());
         assertEquals(4, edges.size());
         assertEquals(expectedEdges, edges);
     }
@@ -81,13 +79,13 @@ public class TestGraph extends TestCase {
         Vertex b = new IntersectionVertex(g, "B", 6, 6);
         Vertex c = new IntersectionVertex(g, "C", 3, 2);
 
-        Set<Edge> allEdges = new HashSet<Edge>(4);
+        Set<Edge> allEdges = new HashSet<>(4);
         allEdges.add(new FreeEdge(a, b));
         allEdges.add(new FreeEdge(b, c));
         allEdges.add(new FreeEdge(c, b));
         allEdges.add(new FreeEdge(c, a));
 
-        Set<StreetEdge> edges = new HashSet<StreetEdge>(g.getStreetEdges());
+        Set<StreetEdge> edges = new HashSet<>(g.getStreetEdges());
         assertEquals(0, edges.size());
     }
 
@@ -97,13 +95,13 @@ public class TestGraph extends TestCase {
         StreetVertex b = new IntersectionVertex(g, "B", 6, 6);
         StreetVertex c = new IntersectionVertex(g, "C", 3, 2);
 
-        Set<Edge> allStreetEdges = new HashSet<Edge>(4);
+        Set<Edge> allStreetEdges = new HashSet<>(4);
         allStreetEdges.add(edge(a, b, 1.0));
         allStreetEdges.add(edge(b, c, 1.0));
         allStreetEdges.add(edge(c, b, 1.0));
         allStreetEdges.add(edge(c, a, 1.0));
 
-        Set<StreetEdge> edges = new HashSet<StreetEdge>(g.getStreetEdges());
+        Set<StreetEdge> edges = new HashSet<>(g.getStreetEdges());
         assertEquals(4, edges.size());
         assertEquals(allStreetEdges, edges);
     }
@@ -114,7 +112,7 @@ public class TestGraph extends TestCase {
         StreetVertex b = new IntersectionVertex(g, "B", 6, 6);
         StreetVertex c = new IntersectionVertex(g, "C", 3, 2);
 
-        Set<Edge> allEdges = new HashSet<Edge>(4);
+        Set<Edge> allEdges = new HashSet<>(4);
         allEdges.add(edge(a, b, 1.0));
         allEdges.add(edge(b, c, 1.0));
         allEdges.add(edge(c, b, 1.0));

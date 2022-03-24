@@ -48,7 +48,7 @@ abstract class NetexParser<T> {
 
 
     /**
-     * Log a warning for Netex elements witch is not mapped. There might be something wrong
+     * Log a warning for Netex elements which is not mapped. There might be something wrong
      * with the data or there might be something wrong with the Netex data import(ignoring these
      * elements). The element should be relevant to OTP. OTP do not support Netex 100%, but
      * elements in Nordic profile, see https://enturas.atlassian.net/wiki/spaces/PUBLIC/overview

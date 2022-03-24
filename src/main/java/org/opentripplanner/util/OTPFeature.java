@@ -2,6 +2,7 @@ package org.opentripplanner.util;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,30 +10,33 @@ import org.slf4j.LoggerFactory;
 /**
  * The purpose of this class is to be able to turn features on and off.
  * <p>
- * This configuration is optional an found under "feature" in the top
+ * This configuration is optional and found under "feature" in the top
  * level 'otp-config.json' file.
  */
 public enum OTPFeature {
-    APIExternalGeocoder(true),
     APIBikeRental(true),
     APIServerInfo(true),
     APIGraphInspectorTile(true),
     APIUpdaterStatus(true),
+    MinimumTransferTimeIsDefinitive(false),
     OptimizeTransfers(true),
-    GuaranteedTransfers(true),
+    ParallelRouting(false),
+    TransferConstraints(true),
+    FloatingBike(true),
 
     // Sandbox extension features - Must be turned OFF by default
     ActuatorAPI(false),
+    DataOverlay(false),
     FlexRouting(false),
-    FloatingBike(false),
     GoogleCloudStorage(false),
     ReportApi(false),
-    SandboxAPITransmodelApi(false),
     SandboxAPILegacyGraphQLApi(false),
     SandboxAPIMapboxVectorTilesApi(false),
+    SandboxAPITransmodelApi(false),
     SandboxExampleAPIGraphStatistics(false),
     SandboxAPIParkAndRideApi(false),
-    TransferAnalyzer(false);
+    TransferAnalyzer(false),
+    VehicleToStopHeuristics(false);
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
 
@@ -44,7 +48,7 @@ public enum OTPFeature {
 
 
     /**
-     * This method allowes the application to initilize each OTP feature. Only use this
+     * This method allows the application to initialize each OTP feature. Only use this
      * method at startup-time.
      *
      * THIS METHOD IS NOT THREAD-SAFE!
@@ -72,6 +76,13 @@ public enum OTPFeature {
      */
     void set(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * If feature is turned on, then return supplied object if not return {@code null}.
+     */
+    public <T> T isOnElseNull(Supplier<T> supplier) {
+        return isOn() ? supplier.get() : null;
     }
 
 

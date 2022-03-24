@@ -1,17 +1,18 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
@@ -21,9 +22,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should return a path if it exist when a transfer is only possible because it is
+ * Raptor should return a path if it exists when a transfer is only possible because it is
  * guaranteed/stay-seated. A guarantied transfer should be able even if there is zero time to do the transfer.
- * In these cases the transfer-slack should be ignored and the connection should be possible. .
+ * In these cases the transfer-slack should be ignored and the connection should be possible.
  */
 public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
@@ -33,17 +34,17 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
     private final RaptorService<TestTripSchedule> raptorService =
             new RaptorService<>(RaptorConfig.defaultConfigForTest());
 
-    private static final String EXP_PATH = "Walk 30s ~ 1 ~ BUS R1 0:02 0:05 ~ 2 "
-            + "~ BUS R2 0:05 0:10 ~ 3 ~ Walk 30s [0:01:10 0:10:40 9m30s";
+    private static final String EXP_PATH = "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B "
+            + "~ BUS R2 0:05 0:10 ~ C ~ Walk 30s [0:01:10 0:10:40 9m30s 1tx";
     private static final String EXP_PATH_NO_COST = EXP_PATH + "]";
-    private static final String EXP_PATH_WITH_COST = EXP_PATH + " $1830]";
+    private static final String EXP_PATH_WITH_COST = EXP_PATH + " $1230]";
 
     /**
      * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
      * <p>
      * Access(stop 1) and egress(stop 3) is 30s.
      */
-    @Before
+    @BeforeEach
     public void setup() {
         var r1 = route("R1", STOP_A, STOP_B)
                 .withTimetable(schedule("0:02 0:05"));
@@ -55,16 +56,17 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
         data.withRoutes(r1, r2);
         data.withGuaranteedTransfer(tripA, STOP_B, tripB, STOP_B);
+        data.mcCostParamsBuilder().transferCost(100);
 
         requestBuilder.searchParams()
-                .guaranteedTransfersEnabled(true)
+                .constrainedTransfersEnabled(true)
                 .addAccessPaths(walk(STOP_A, D30s))
                 .addEgressPaths(walk(STOP_C, D30s))
                 .earliestDepartureTime(T00_00)
                 .latestArrivalTime(T00_30)
                 .timetableEnabled(true);
 
-        // Make sure the slack have values witch prevent the normal from happening transfer.
+        // Make sure the slack have values which prevent the normal from happening transfer.
         // The test scenario have zero seconds to transfer, so any slack will do.
         requestBuilder.slackProvider(
                 RaptorSlackProvider.defaultSlackProvider(30, 20, 10)
@@ -93,10 +95,11 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
     }
 
     @Test
-    public void standardReverse() {
+    public void standardReverseOneIteration() {
         var request = requestBuilder
                 .searchDirection(SearchDirection.REVERSE)
                 .profile(RaptorProfile.STANDARD)
+                .searchParams().searchOneIterationOnly()
                 .build();
 
         var response = raptorService.route(request, data);
@@ -106,6 +109,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
 
     @Test
     public void multiCriteria() {
+        requestBuilder.optimizations().add(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
         var request = requestBuilder
                 .profile(RaptorProfile.MULTI_CRITERIA)
                 .build();

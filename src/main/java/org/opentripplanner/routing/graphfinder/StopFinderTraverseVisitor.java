@@ -26,10 +26,10 @@ public class StopFinderTraverseVisitor implements TraverseVisitor {
   public final List<NearbyStop> stopsFound = new ArrayList<>();
 
   @Override
-  public void visitEdge(Edge edge, State state) { }
+  public void visitEdge(Edge edge) { }
 
   @Override
-  public void visitEnqueue(State state) { }
+  public void visitEnqueue() { }
 
   // Accumulate stops into ret as the search runs.
   @Override

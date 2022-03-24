@@ -1,14 +1,24 @@
 package org.opentripplanner.ext.siri;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.util.I18NString;
@@ -36,16 +46,10 @@ import uk.org.siri.siri20.OperatorRefStructure;
 import uk.org.siri.siri20.PtSituationElement;
 import uk.org.siri.siri20.RoutePointTypeEnumeration;
 import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.SeverityEnumeration;
 import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
 import uk.org.siri.siri20.StopPointRef;
 import uk.org.siri.siri20.VehicleJourneyRef;
 import uk.org.siri.siri20.WorkflowStatusEnumeration;
-
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.*;
 
 /**
  * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds.
@@ -100,11 +104,16 @@ public class SiriAlertsUpdateHandler {
                         addedCounter++;
                         if (alert != null) {
                             alert.setId(situationNumber);
+                            if (alert.getEntities().isEmpty()) {
+                                LOG.info(
+                                        "No match found for Alert - setting Unknown entity for situation with situationNumber {}",
+                                        situationNumber
+                                );
+                                alert.addEntity(new EntitySelector.Unknown(
+                                        "Alert had no entities that could be handled"));
+                            }
                             alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
                             alerts.add(alert);
-                            if (alert.getEntities().isEmpty()) {
-                                LOG.info("No match found for Alert - ignoring situation with situationNumber {}", situationNumber);
-                            }
                         }
                     }
                 }
@@ -309,43 +318,26 @@ public class SiriAlertsUpdateHandler {
 
                             FeedScopedId tripIdFromVehicleJourney = siriFuzzyTripMatcher.getTripId(vehicleJourneyRef.getValue());
 
-                            // Need to know if validity is set explicitly or calculated based on ServiceDate
-                            boolean effectiveValiditySetExplicitly = false;
+                            ZonedDateTime originAimedDepartureTime = affectedVehicleJourney.getOriginAimedDepartureTime() != null
+                                ? affectedVehicleJourney.getOriginAimedDepartureTime()
+                                : ZonedDateTime.now();
 
-                            ZonedDateTime originAimedDepartureTime = (affectedVehicleJourney.getOriginAimedDepartureTime() != null ? affectedVehicleJourney.getOriginAimedDepartureTime():ZonedDateTime.now());
                             ZonedDateTime startOfService = DateMapper.asStartOfService(originAimedDepartureTime);
 
-                            ServiceDate serviceDate = new ServiceDate(startOfService.getYear(), startOfService.getMonthValue(), startOfService.getDayOfMonth());
+                            ServiceDate serviceDate = new ServiceDate(startOfService.toLocalDate());
 
                             if (tripIdFromVehicleJourney != null) {
-
                                 tripIds.add(tripIdFromVehicleJourney);
-
-                                effectiveValiditySetExplicitly = true;
-
                             } else {
-
-//                                Commented out for now
-//
-//                                // TODO - SIRI: Support submode when fuzzy-searching for trips
-//                                tripIds = siriFuzzyTripMatcher.getTripIdForTripShortNameServiceDateAndMode(vehicleJourneyRef.getValue(),
-//                                        serviceDate, TraverseMode.RAIL/*, TransmodelTransportSubmode.RAIL_REPLACEMENT_BUS*/);
+                                tripIds = siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDateAndMode(
+                                    vehicleJourneyRef.getValue(),
+                                    serviceDate,
+                                    TransitMode.RAIL,
+                                    "railReplacementBus"
+                                );
                             }
 
                             for (FeedScopedId tripId : tripIds) {
-
-                                if (!effectiveValiditySetExplicitly) {
-                                    // Effective validity is set based on ServiceDate - need to calculate correct validity based on departuretimes
-
-                                    final TimePeriod timePeriod = calculateTimePeriodForTrip(alert,
-                                        tripId,
-                                        serviceDate,
-                                        startOfService, 6 * 3600
-                                    );
-
-                                    // TODO: Make it possible to add time periods for trip selectors
-                                    alert.setTimePeriods(Arrays.asList(timePeriod));
-                                }
 
                                 if (! affectedStops.isEmpty()) {
                                     for (AffectedStopPointStructure affectedStop : affectedStops) {
@@ -354,14 +346,14 @@ public class SiriAlertsUpdateHandler {
                                             stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
                                         }
                                         // Creating unique, deterministic id for the alert
-                                        alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId));
+                                        alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId, serviceDate));
 
                                         // TODO: is this correct? Should the stop conditions be in the entity selector?
                                         updateStopConditions(alert, affectedStop.getStopConditions());
 
                                     }
                                 } else {
-                                    alert.addEntity(new EntitySelector.Trip(tripId));
+                                    alert.addEntity(new EntitySelector.Trip(tripId, serviceDate));
 
                                 }
                             }
@@ -377,9 +369,8 @@ public class SiriAlertsUpdateHandler {
 
                         if (tripId != null) {
                             ServiceDate serviceDate = null;
-                            ZonedDateTime startOfService = null;
                             if (dataFrameRef != null && dataFrameRef.getValue() != null) {
-                                startOfService = DateMapper.asStartOfService(LocalDate.parse(
+                                ZonedDateTime startOfService = DateMapper.asStartOfService(LocalDate.parse(
                                     dataFrameRef.getValue()), graph.getTimeZone().toZoneId());
 
                                 serviceDate = new ServiceDate(startOfService.getYear(),
@@ -388,17 +379,6 @@ public class SiriAlertsUpdateHandler {
                                 );
 
                             }
-                            final TimePeriod timePeriod = calculateTimePeriodForTrip(alert,
-                                tripId,
-                                serviceDate,
-                                startOfService,
-                                6 * 3600
-                            );
-
-                            //  A tripId for a given date may be reused for other dates not affected by this alert.
-
-                            // TODO: Make it possible to add time periods for trip selectors
-                            alert.setTimePeriods(Arrays.asList(timePeriod));
 
                             if (!affectedStops.isEmpty()) {
                                 for (AffectedStopPointStructure affectedStop : affectedStops) {
@@ -411,11 +391,11 @@ public class SiriAlertsUpdateHandler {
                                         );
                                     }
 
-                                    alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId));
+                                    alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId, serviceDate));
                                 }
                             }
                             else {
-                                alert.addEntity(new EntitySelector.Trip(tripId));
+                                alert.addEntity(new EntitySelector.Trip(tripId, serviceDate));
                             }
                         }
                     }
@@ -439,12 +419,8 @@ public class SiriAlertsUpdateHandler {
 
         alert.alertType = situation.getReportType();
 
-        if (situation.getSeverity() != null) {
-            alert.severity = situation.getSeverity().value();
-        } else {
-            // When severity is not set - use default
-            alert.severity = SeverityEnumeration.NORMAL.value();
-        }
+        alert.severity =
+                SiriSeverityMapper.getAlertSeverityForSiriSeverity(situation.getSeverity());
 
         if (situation.getParticipantRef() != null) {
             String codespace = situation.getParticipantRef().getValue();
@@ -452,56 +428,6 @@ public class SiriAlertsUpdateHandler {
         }
 
         return alert;
-    }
-
-    /**
-     * @return A TimePeriod for the provided Trip. The period will start at scheduled
-     * departure, and end <code>secondsToAppend</code> seconds after scheduled arrival.
-     */
-    private TimePeriod calculateTimePeriodForTrip(
-        TransitAlert alert, FeedScopedId tripId, ServiceDate serviceDate,
-        ZonedDateTime startOfService, int secondsToAppend
-    ) {
-        Long validFrom;
-        Long validTo;
-        if (serviceDate != null && startOfService != null) {
-            // Calculate exact from-validity based on actual departure
-            int tripDepartureTime = siriFuzzyTripMatcher.getTripDepartureTime(tripId);
-            int tripArrivalTime = siriFuzzyTripMatcher.getTripArrivalTime(tripId);
-
-            // ServiceJourneyId does NOT match - calculate validity based on serviceDate (calculated from originalAimedDepartureTime)
-            validFrom = startOfService.toEpochSecond() + tripDepartureTime;
-
-            // Appending 6 hours to end-validity in case of delays.
-            final int tripDuration = tripArrivalTime - tripDepartureTime;
-            validTo = validFrom + (tripDuration + secondsToAppend);
-
-        } else {
-            validFrom = alert.getEffectiveStartDate().getTime()/1000;
-            validTo = alert.getEffectiveEndDate().getTime()/1000;
-        }
-
-        if (validTo == null) {
-            validTo = Long.MAX_VALUE;
-        }
-
-        if (alert.getEffectiveStartDate() != null) {
-            // Verify that calculated validity does not exceed explicitly set validity
-            if (validFrom < alert.getEffectiveStartDate().getTime() / 1000) {
-                validFrom = alert.getEffectiveStartDate().getTime() / 1000;
-            }
-        }
-        if (alert.getEffectiveEndDate() != null) {
-            if (validTo > alert.getEffectiveEndDate().getTime() / 1000) {
-                validTo = alert.getEffectiveEndDate().getTime() / 1000;
-            }
-        }
-
-        final TimePeriod timePeriod = new TimePeriod(
-            validFrom,
-            validTo
-        );
-        return timePeriod;
     }
 
     private long getEpochSecond(ZonedDateTime startTime) {

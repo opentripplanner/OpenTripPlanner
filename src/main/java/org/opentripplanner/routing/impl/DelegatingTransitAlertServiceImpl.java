@@ -2,6 +2,7 @@ package org.opentripplanner.routing.impl;
 
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
-  private ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
+  private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
 
   public DelegatingTransitAlertServiceImpl(Graph graph) {
     if (graph.updaterManager != null) {
@@ -77,10 +78,10 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip) {
+  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, ServiceDate serviceDate) {
     return transitAlertServices
         .stream()
-        .map(transitAlertService -> transitAlertService.getTripAlerts(trip))
+        .map(transitAlertService -> transitAlertService.getTripAlerts(trip, serviceDate))
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }
@@ -107,23 +108,42 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getStopAndTripAlerts(
-      FeedScopedId stop, FeedScopedId trip
+      FeedScopedId stop, FeedScopedId trip, ServiceDate serviceDate
   ) {
     return transitAlertServices
         .stream()
-        .map(transitAlertService -> transitAlertService.getStopAndTripAlerts(stop, trip))
+        .map(transitAlertService -> transitAlertService.getStopAndTripAlerts(stop, trip, serviceDate))
         .flatMap(Collection::stream)
         .collect(Collectors.toList());
   }
 
   @Override
-  public Collection<TransitAlert> getTripPatternAlerts(
-      FeedScopedId tripPattern
+  public Collection<TransitAlert> getRouteTypeAndAgencyAlerts(
+      int routeType, FeedScopedId agency
   ) {
     return transitAlertServices
-        .stream()
-        .map(transitAlertService -> transitAlertService.getTripPatternAlerts(tripPattern))
-        .flatMap(Collection::stream)
-        .collect(Collectors.toList());
+            .stream()
+            .map(transitAlertService -> transitAlertService.getRouteTypeAndAgencyAlerts(
+                    routeType, agency))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+  }
+
+  @Override
+  public Collection<TransitAlert> getRouteTypeAlerts(int routeType, String feedId) {
+    return transitAlertServices
+            .stream()
+            .map(transitAlertService -> transitAlertService.getRouteTypeAlerts(routeType, feedId))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+  }
+
+  @Override
+  public Collection<TransitAlert> getDirectionAndRouteAlerts(int directionId, FeedScopedId route) {
+    return transitAlertServices
+            .stream()
+            .map(transitAlertService -> transitAlertService.getDirectionAndRouteAlerts(directionId, route))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
   }
 }

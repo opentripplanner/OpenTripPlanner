@@ -8,12 +8,12 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -21,6 +21,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.TestUtils;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -40,12 +41,12 @@ import static org.opentripplanner.util.TestUtils.AUGUST;
 public class TimetableTest {
     
     private static Graph graph;
-    private AStar aStar = new AStar();
+    private final AStar aStar = new AStar();
     private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TripPattern pattern;
     private static Timetable timetable;
-    private static TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
-    private static ServiceDate serviceDate = new ServiceDate(2009, 8, 7);
+    private static final TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
+    private static final ServiceDate serviceDate = new ServiceDate(2009, 8, 7);
     
     @BeforeClass
     public static void setUp() throws Exception {
@@ -62,9 +63,9 @@ public class TimetableTest {
         patternIndex = new HashMap<>();
 
         for (TripPattern pattern : graph.tripPatternForId.values()) {
-            for (Trip trip : pattern.getTrips()) {
-                patternIndex.put(trip.getId(), pattern);
-            }
+            pattern.scheduledTripsAsStream().forEach(trip ->
+                patternIndex.put(trip.getId(), pattern)
+            );
         }
         
         pattern = patternIndex.get(new FeedScopedId("agency", "1.1"));
@@ -137,12 +138,12 @@ public class TimetableTest {
         //---
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 0, 0);
         long endTime;
-        options.dateTime = startTime;
+        options.setDateTime(Instant.ofEpochSecond(startTime));
 
         //---
         options.setRoutingContext(graph, stop_a, stop_c);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_c, false);
+        path = spt.getPath(stop_c);
         assertNotNull(path);
         endTime = startTime + 20 * 60;
         assertEquals(endTime, path.getEndTime());
@@ -174,7 +175,7 @@ public class TimetableTest {
         //---
         options.setRoutingContext(graph, stop_a, stop_c);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_c, false);
+        path = spt.getPath(stop_c);
         assertNotNull(path);
         endTime = startTime + 20 * 60 + 120;
         assertEquals(endTime, path.getEndTime());
@@ -195,14 +196,14 @@ public class TimetableTest {
         // TODO This will not work since individual stops cannot be cancelled using GTFS updates
         //      yet
         for (int i = 0; i < tripTimes.getNumStops(); i++) {
-            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getPickup(i) );
-            assertEquals(PickDrop.CANCELLED, pattern.getStopPattern().getDropoff(i) );
+            assertEquals(PickDrop.CANCELLED, pattern.getBoardType(i));
+            assertEquals(PickDrop.CANCELLED, pattern.getAlightType(i));
         }
 
         //---
         options.setRoutingContext(graph, stop_a, stop_c);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_c, false);
+        path = spt.getPath(stop_c);
         assertNotNull(path);
         endTime = startTime + 40 * 60;
         assertEquals(endTime, path.getEndTime());

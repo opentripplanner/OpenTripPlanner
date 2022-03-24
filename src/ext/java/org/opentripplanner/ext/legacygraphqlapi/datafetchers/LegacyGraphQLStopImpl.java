@@ -5,20 +5,26 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
+import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRoute;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 
 import java.text.ParseException;
@@ -51,8 +57,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args = new LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs(environment.getArguments());
           TripPattern pattern = routingService.getTripPatternForId(FeedScopedId.parseId(args.getLegacyGraphQLId()));
 
-          if (pattern == null) { return null; };
-          
+          if (pattern == null) { return null; }
+
           // TODO: use args.getLegacyGraphQLOmitCanceled()
 
           return routingService.stopTimesForPatternAtStop(
@@ -79,37 +85,45 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> getValue(environment, Stop::getName, Station::getName);
+    return environment -> getValue(
+          environment,
+          stop -> LegacyGraphQLUtils.getTranslation(stop.getName(), environment),
+          station -> LegacyGraphQLUtils.getTranslation(station.getName(), environment)
+    );
   }
 
   @Override
   public DataFetcher<Double> lat() {
-    return environment -> getValue(environment, Stop::getLat, Station::getLat);
+    return environment -> getValue(environment, StopLocation::getLat, Station::getLat);
   }
 
   @Override
   public DataFetcher<Double> lon() {
-    return environment -> getValue(environment, Stop::getLon, Station::getLon);
+    return environment -> getValue(environment, StopLocation::getLon, Station::getLon);
   }
 
   @Override
   public DataFetcher<String> code() {
-    return environment -> getValue(environment, Stop::getCode, Station::getCode);
+    return environment -> getValue(environment, StopLocation::getCode, Station::getCode);
   }
 
   @Override
   public DataFetcher<String> desc() {
-    return environment -> getValue(environment, Stop::getDescription, Station::getDescription);
+    return environment -> getValue(environment, StopLocation::getDescription, Station::getDescription);
   }
 
   @Override
   public DataFetcher<String> zoneId() {
-    return environment -> getValue(environment, Stop::getFirstZoneAsString, station -> null);
+    return environment -> getValue(environment, StopLocation::getFirstZoneAsString, station -> null);
   }
 
   @Override
   public DataFetcher<String> url() {
-    return environment -> getValue(environment, Stop::getUrl, Station::getUrl);
+    return environment -> getValue(
+          environment,
+          stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
+          station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
+    );
   }
 
   @Override
@@ -119,18 +133,23 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Object> parentStation() {
-    return environment -> getValue(environment, Stop::getParentStation, station -> null);
+    return environment -> getValue(environment, StopLocation::getParentStation, station -> null);
   }
 
   @Override
   public DataFetcher<Object> wheelchairBoarding() {
-    return environment -> getValue(environment, Stop::getWheelchairBoarding, station -> null);
+    return environment -> getValue(environment, StopLocation::getWheelchairBoarding, station -> null);
   }
 
   // TODO
   @Override
   public DataFetcher<String> direction() {
     return environment -> null;
+  }
+
+  @Override
+  public DataFetcher<Object> geometries() {
+    return environment -> getValue(environment, StopLocation::getGeometry, Station::getGeometry);
   }
 
   @Override
@@ -185,7 +204,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> platformCode() {
-    return environment -> getValue(environment, Stop::getPlatformCode, station -> null);
+    return environment -> getValue(environment, StopLocation::getPlatformCode, station -> null);
   }
 
   @Override
@@ -203,20 +222,12 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Iterable<Route>> routes() {
-    return environment -> getValue(
-        environment,
-        stop -> getRoutingService(environment).getRoutesForStop(stop),
-        station -> null
-    );
+    return this::getRoutes;
   }
 
   @Override
   public DataFetcher<Iterable<TripPattern>> patterns() {
-    return environment -> getValue(
-        environment,
-        stop -> getRoutingService(environment).getPatternsForStop(stop, true),
-        station -> null
-    );
+    return this::getPatterns;
   }
 
   @Override
@@ -231,8 +242,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           return getRoutingService(environment)
               .getTransfersByStop(stop)
               .stream()
-              .filter(simpleTransfer -> maxDistance == null || simpleTransfer.getDistanceMeters() < maxDistance)
-              .filter(simpleTransfer -> simpleTransfer.to instanceof Stop)
+              .filter(transfer -> maxDistance == null || transfer.getDistanceMeters() < maxDistance)
+              .filter(transfer -> transfer.to instanceof Stop)
               .map(transfer -> new NearbyStop(
                   transfer.to,
                   transfer.getDistanceMeters(),
@@ -265,7 +276,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
-      Function<Stop, List<StopTimesInPattern>> stopTFunction = stop ->
+      Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
           routingService.getStopTimesForStop(
               stop,
               date,
@@ -295,7 +306,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
-      Function<Stop, List<StopTimesInPattern>> stopTFunction = stop ->
+      Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
           routingService.stopTimesForStop(
               stop,
               args.getLegacyGraphQLStartTime(),
@@ -326,7 +337,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
       // TODO: use args.getLegacyGraphQLOmitCanceled()
 
-      Function<Stop, Stream<StopTimesInPattern>> stopTFunction = stop ->
+      Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
           routingService.stopTimesForStop(
               stop,
               args.getLegacyGraphQLStartTime(),
@@ -352,10 +363,92 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     };
   }
 
-  // TODO
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
-    return environment -> List.of();
+    return environment -> {
+      TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
+      var args = new LegacyGraphQLTypes.LegacyGraphQLStopAlertsArgs(
+              environment.getArguments());
+      List<LegacyGraphQLTypes.LegacyGraphQLStopAlertType> types =
+              (List) args.getLegacyGraphQLTypes();
+      FeedScopedId id = getValue(
+              environment,
+              stop -> stop.getId(),
+              station -> station.getId()
+      );
+      if (types != null) {
+        Collection<TransitAlert> alerts = new ArrayList<>();
+        if (types.contains(LegacyGraphQLStopAlertType.STOP)) {
+          alerts.addAll(alertService.getStopAlerts(id));
+        }
+        if (types.contains(LegacyGraphQLStopAlertType.STOP_ON_ROUTES) || types.contains(
+                LegacyGraphQLStopAlertType.STOP_ON_TRIPS)) {
+          alerts.addAll(alertService.getAllAlerts()
+                  .stream()
+                  .filter(alert -> alert.getEntities()
+                          .stream()
+                          .anyMatch(entity -> (
+                                  types.contains(LegacyGraphQLStopAlertType.STOP_ON_ROUTES) &&
+                                          entity instanceof EntitySelector.StopAndRoute
+                                          && ((StopAndRoute) entity).stopAndRoute.stop.equals(id)
+                          ) || (
+                                  types.contains(
+                                          LegacyGraphQLStopAlertType.STOP_ON_TRIPS) &&
+                                          entity instanceof EntitySelector.StopAndTrip
+                                          && ((EntitySelector.StopAndTrip) entity).stopAndTrip.stop.equals(
+                                          id)
+                          )))
+                  .collect(Collectors.toList()));
+        }
+        if (types.contains(LegacyGraphQLStopAlertType.PATTERNS) || types.contains(
+                LegacyGraphQLStopAlertType.TRIPS)) {
+          getPatterns(environment).forEach(pattern -> {
+            if (types.contains(LegacyGraphQLStopAlertType.PATTERNS)) {
+              alerts.addAll(alertService.getDirectionAndRouteAlerts(
+                      pattern.getDirection().gtfsCode,
+                      pattern.getRoute().getId()
+              ));
+            }
+            if (types.contains(LegacyGraphQLStopAlertType.TRIPS)) {
+              pattern.scheduledTripsAsStream().forEach(trip ->
+                alerts.addAll(alertService.getTripAlerts(trip.getId(), null))
+              );
+            }
+          });
+        }
+        if (types.contains(LegacyGraphQLStopAlertType.ROUTES) || types.contains(
+                LegacyGraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
+          getRoutes(environment).forEach(route -> {
+            if (types.contains(LegacyGraphQLStopAlertType.ROUTES)) {
+              alerts.addAll(alertService.getRouteAlerts(route.getId()));
+            }
+            if (types.contains(LegacyGraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
+              alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
+            }
+          });
+        }
+        return alerts.stream().distinct().collect(Collectors.toList());
+      }
+      else {
+        return alertService.getStopAlerts(id);
+      }
+    };
+  }
+
+  private Collection<TripPattern> getPatterns(DataFetchingEnvironment environment) {
+    return getValue(
+            environment,
+            stop -> getRoutingService(environment).getPatternsForStop(stop, true),
+            station -> null
+    );
+  }
+
+  private Collection<Route> getRoutes(DataFetchingEnvironment environment) {
+    return getValue(
+            environment,
+            stop -> getRoutingService(environment).getRoutesForStop(stop),
+            station -> null
+    );
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
@@ -364,12 +457,12 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   private <T> T getValue(
       DataFetchingEnvironment environment,
-      Function<Stop, T> stopTFunction,
+      Function<StopLocation, T> stopTFunction,
       Function<Station, T> stationTFunction
   ) {
       Object source = environment.getSource();
-      if (source instanceof Stop) {
-        return stopTFunction.apply((Stop) source);
+      if (source instanceof StopLocation) {
+        return stopTFunction.apply((StopLocation) source);
       }
       else if (source instanceof Station) {
         return stationTFunction.apply((Station) source);

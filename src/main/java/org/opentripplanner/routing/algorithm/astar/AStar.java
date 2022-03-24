@@ -5,16 +5,14 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.time.DateUtils;
-import org.opentripplanner.util.monitoring.MonitoringStore;
-import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +31,8 @@ import java.util.List;
 public class AStar {
 
     private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
-    // FIXME this is not really a factory, it's a way to fake a global variable. This should be stored at the OTPServer level.
-    private static final MonitoringStore store = MonitoringStoreFactory.getStore();
 
-    private boolean verbose = false;
+    private final boolean verbose = false;
 
     private TraverseVisitor traverseVisitor;
 
@@ -47,7 +43,7 @@ public class AStar {
     private SkipEdgeStrategy skipEdgeStrategy;
 
     /* TODO instead of having a separate class for search state, we should just make one GenericAStar per request. */
-    class RunState {
+    static class RunState {
 
         public State u;
         public ShortestPathTree spt;
@@ -57,8 +53,8 @@ public class AStar {
         public int nVisited;
         public List<State> targetAcceptedStates;
         public RunStatus status;
-        private RoutingRequest options;
-        private SearchTerminationStrategy terminationStrategy;
+        private final RoutingRequest options;
+        private final SearchTerminationStrategy terminationStrategy;
         public Vertex u_vertex;
 
         public RunState(RoutingRequest options, SearchTerminationStrategy terminationStrategy) {
@@ -94,7 +90,7 @@ public class AStar {
     private void startSearch(RoutingRequest options,
             SearchTerminationStrategy terminationStrategy, long abortTime, boolean addToQueue) {
 
-        runState = new RunState( options, terminationStrategy );
+        runState = new RunState(options, terminationStrategy);
         runState.rctx = options.getRoutingContext();
         runState.spt = options.getNewShortestPathTree();
 
@@ -104,7 +100,7 @@ public class AStar {
         // Since initial states can be multiple, heuristic cannot depend on the initial state.
         // Initializing the bidirectional heuristic is a pretty complicated operation that involves searching through
         // the streets around the origin and destination.
-        runState.heuristic.initialize(runState.options, abortTime);
+        runState.heuristic.initialize(runState.options);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of goal direction heuristic.");
             runState = null; // Search timed out
@@ -169,7 +165,8 @@ public class AStar {
                         runState.rctx.fromVertices,
                         runState.rctx.toVertices,
                         runState.u,
-                        edge,runState.spt,
+                        edge,
+                        runState.spt,
                         runState.options
                     )
             ) {
@@ -182,7 +179,7 @@ public class AStar {
                 // Could be: for (State v : traverseEdge...)
 
                 if (traverseVisitor != null) {
-                    traverseVisitor.visitEdge(edge, v);
+                    traverseVisitor.visitEdge(edge);
                 }
 
                 double remaining_w = runState.heuristic.estimateRemainingWeight(v);
@@ -205,7 +202,7 @@ public class AStar {
                 if (runState.spt.add(v)) {
                     // report to the visitor if there is one
                     if (traverseVisitor != null)
-                        traverseVisitor.visitEnqueue(v);
+                        traverseVisitor.visitEnqueue();
                     //LOG.info("u.w={} v.w={} h={}", runState.u.weight, v.weight, remaining_w);
                     runState.pq.insert(v, estimate);
                 } 
@@ -246,7 +243,7 @@ public class AStar {
             
             if (runState.terminationStrategy != null) {
                 if (runState.terminationStrategy.shouldSearchTerminate(
-                    runState.rctx.fromVertices, runState.rctx.toVertices, runState.u, runState.spt, runState.options)) {
+                  runState.u)) {
                     break;
                 }
             }
@@ -258,7 +255,7 @@ public class AStar {
 
                 /* Break out of the search if we've found the requested number of paths. */
                 // TODO Refactor. This check for getNumItineraries always returns 1
-                if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
+                if (runState.targetAcceptedStates.size() >= runState.options.getNumItinerariesForDirectStreetSearch()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
                     break;
                 }
@@ -280,7 +277,6 @@ public class AStar {
             spt = runState.spt;
         }
         
-        storeMemory();
         return spt;
     }
     
@@ -306,15 +302,6 @@ public class AStar {
         }
         
         return spt;
-    }
-
-    private void storeMemory() {
-        if (store.isMonitoring("memoryUsed")) {
-            System.gc();
-            long memoryUsed = Runtime.getRuntime().totalMemory() -
-                    Runtime.getRuntime().freeMemory();
-            store.setLongMax("memoryUsed", memoryUsed);
-        }
     }
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {

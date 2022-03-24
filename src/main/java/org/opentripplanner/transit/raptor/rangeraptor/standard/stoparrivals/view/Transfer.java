@@ -36,7 +36,7 @@ final class Transfer<T extends RaptorTripSchedule>
 
     @Override
     public int durationInSeconds() {
-        return arrival.transferDuration();
+        return arrival.transferPath().durationInSeconds();
     }
 
     @Override
@@ -46,7 +46,6 @@ final class Transfer<T extends RaptorTripSchedule>
 
     @Override
     public ArrivalView<T> previous() {
-        return cursor.transit(round(), arrival.transferFromStop());
+        return cursor.stop(round(), arrival.transferFromStop(), true);
     }
-
 }

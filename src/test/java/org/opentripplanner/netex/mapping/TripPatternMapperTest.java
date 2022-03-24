@@ -3,11 +3,10 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.EntityById;
@@ -28,6 +27,7 @@ public class TripPatternMapperTest {
         NetexTestDataSample sample = new NetexTestDataSample();
 
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
+                new DataImportIssueStore(false),
                 MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 sample.getStopsById(),
@@ -50,19 +50,18 @@ public class TripPatternMapperTest {
 
         assertEquals(1, r.tripPatterns.size());
 
-        TripPattern tripPattern = r.tripPatterns.get(0);
+        TripPattern tripPattern = r.tripPatterns.values().stream().findFirst().orElseThrow();
 
-        assertEquals(4, tripPattern.getStops().size());
-        assertEquals(1, tripPattern.getTrips().size());
+        assertEquals(4, tripPattern.numberOfStops());
+        assertEquals(1, tripPattern.scheduledTripsAsStream().count());
 
-        List<Stop> stops = tripPattern.getStops();
-        Trip trip = tripPattern.getTrips().get(0);
+        Trip trip = tripPattern.scheduledTripsAsStream().findFirst().get();
 
         assertEquals("RUT:ServiceJourney:1", trip.getId().getId());
-        assertEquals("NSR:Quay:1", stops.get(0).getId().getId());
-        assertEquals("NSR:Quay:2", stops.get(1).getId().getId());
-        assertEquals("NSR:Quay:3", stops.get(2).getId().getId());
-        assertEquals("NSR:Quay:4", stops.get(3).getId().getId());
+        assertEquals("NSR:Quay:1", tripPattern.getStop(0).getId().getId());
+        assertEquals("NSR:Quay:2", tripPattern.getStop(1).getId().getId());
+        assertEquals("NSR:Quay:3", tripPattern.getStop(2).getId().getId());
+        assertEquals("NSR:Quay:4", tripPattern.getStop(3).getId().getId());
 
         assertEquals(1, tripPattern.getScheduledTimetable().getTripTimes().size());
 

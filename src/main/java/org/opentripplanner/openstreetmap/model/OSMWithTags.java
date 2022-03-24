@@ -1,12 +1,14 @@
 package org.opentripplanner.openstreetmap.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.function.Consumer;
 
 /**
  * A base class for OSM entities containing common methods.
@@ -40,7 +42,7 @@ public class OSMWithTags {
      */
     public void addTag(OSMTag tag) {
         if (tags == null)
-            tags = new HashMap<String, String>();
+            tags = new HashMap<>();
 
         tags.put(tag.getK().toLowerCase(), tag.getV());
     }
@@ -53,7 +55,7 @@ public class OSMWithTags {
             return;
 
         if (tags == null)
-            tags = new HashMap<String, String>();
+            tags = new HashMap<>();
 
         tags.put(key.toLowerCase(), value);
     }
@@ -120,6 +122,24 @@ public class OSMWithTags {
     }
 
     /**
+     * Get tag and convert it to an integer. If the tag exist, but can not be parsed into a
+     * number, then the error handler is called with the value witch failed to parse.
+     */
+    public OptionalInt getTagAsInt(String tag, Consumer<String> errorHandler) {
+        String value = getTag(tag);
+        if (value != null) {
+            try {
+                return OptionalInt.of(Integer.parseInt(value));
+            }
+            catch (NumberFormatException e) {
+                errorHandler.accept(value);
+            }
+        }
+        return OptionalInt.empty();
+    }
+
+
+    /**
      * Checks is a tag contains the specified value.
      */
     public Boolean isTag(String tag, String value) {
@@ -136,6 +156,9 @@ public class OSMWithTags {
      * {@link org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule}
      */
     public I18NString getAssumedName() {
+        if (tags == null) {
+            return null;
+        }
         if (tags.containsKey("name")) {
             return TranslatedString.getI18NString(TemplateLibrary.generateI18N("{name}", this));
         }
@@ -155,7 +178,7 @@ public class OSMWithTags {
     }
 
     public Map<String, String> getTagsByPrefix(String prefix) {
-        Map<String, String> out = new HashMap<String, String>();
+        Map<String, String> out = new HashMap<>();
         for (Map.Entry<String, String> entry : tags.entrySet()) {
             String k = entry.getKey();
             if (k.equals(prefix) || k.startsWith(prefix + ":")) {
@@ -298,8 +321,10 @@ public class OSMWithTags {
         String parkingType = getTag("parking");
         String parkAndRide = getTag("park_ride");
         return isTag("amenity", "parking")
-                && (parkingType != null && parkingType.contains("park_and_ride"))
-                || (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"));
+                && (
+                        (parkingType != null && parkingType.contains("park_and_ride"))
+                     || (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"))
+        );
     }
 
     /**
@@ -312,5 +337,9 @@ public class OSMWithTags {
 
     public void setCreativeName(I18NString creativeName) {
         this.creativeName = creativeName;
+    }
+
+    public String getOpenStreetMapLink() {
+        return null;
     }
 }

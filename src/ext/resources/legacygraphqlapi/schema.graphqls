@@ -33,9 +33,31 @@ type Agency implements Node {
     routes: [Route]
 
     """
-    List of alerts which have an effect on all operations of the agency (e.g. a strike)
+    By default, list of alerts which have an effect on all operations of the agency (e.g. a strike).
+    It's also possible to return other relevant alerts through defining types.
     """
-    alerts: [Alert]
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the agency.
+        By default only returns alerts that have an effect on all operations of the agency (e.g. a strike).
+        """
+        types: [AgencyAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for an agency and can contain alerts"""
+enum AgencyAlertType {
+    """Alerts affecting the agency."""
+    AGENCY
+
+    """Alerts affecting agency's routes"""
+    ROUTES
+
+    """
+    Alerts affecting the different route types of the agency.
+    Alerts that affect route types on all agencies can be fetched through Feed.
+    """
+    ROUTE_TYPES
 }
 
 """Alert of a current or upcoming disruption in public transportation"""
@@ -55,19 +77,43 @@ type Alert implements Node {
     Agency affected by the disruption. Note that this value is present only if the
     disruption has an effect on all operations of the agency (e.g. in case of a strike).
     """
-    agency: Agency
+    agency: Agency @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected agencies.
+       Use entities instead.
+       """
+    )
 
     """Route affected by the disruption"""
-    route: Route
+    route: Route @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected routes.
+       Use entities instead.
+       """
+    )
 
     """Trip affected by the disruption"""
-    trip: Trip
+    trip: Trip @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected trips.
+       Use entities instead.
+       """
+    )
 
     """Stop affected by the disruption"""
-    stop: Stop
+    stop: Stop @deprecated(reason:
+       """
+       Alert can have multiple affected entities now instead of there being duplicate alerts
+       for different entities. This will return only one of the affected stops.
+       Use entities instead.
+       """
+    )
 
     """Patterns affected by the disruption"""
-    patterns: [Pattern]
+    patterns: [Pattern] @deprecated(reason: "This will always return an empty list. Use entities instead.")
 
     """Header of the alert, if available"""
     alertHeaderText: String
@@ -105,6 +151,11 @@ type Alert implements Node {
     Time when this alert is not in effect anymore. Format: Unix timestamp in seconds
     """
     effectiveEndDate: Long
+
+    """
+    Entities affected by the disruption.
+    """
+    entities: [AlertEntity]
 }
 
 """Cause of a alert"""
@@ -177,7 +228,14 @@ enum AlertEffectType {
 
     """NO_EFFECT"""
     NO_EFFECT
+
+    """ACCESSIBILITY_ISSUE"""
+    ACCESSIBILITY_ISSUE
 }
+
+
+"""Entity related to an alert"""
+union AlertEntity = Agency | Route | Pattern | Stop | Trip | StopOnRoute | StopOnTrip | RouteType | Unknown
 
 """Severity level of a alert"""
 enum AlertSeverityLevelType {
@@ -231,6 +289,139 @@ type BikePark implements Node & PlaceInterface {
 
     """Latitude of the bike park (WGS 84)"""
     lat: Float
+
+    """
+    Source specific tags of the bike park, which describe the available features.
+    """
+    tags: [String]
+
+    """
+    Opening hours for the selected dates using the local time of the park.
+    Each date can have multiple time spans.
+    """
+    openingHours(
+        """
+        Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
+        """
+        dates: [String!]!
+    ): [LocalTimeSpanDate]
+}
+
+"""Vehicle parking represents a location where bicycles or cars can be parked."""
+type VehicleParking implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the park"""
+    vehicleParkingId: String
+
+    """Name of the park"""
+    name: String!
+
+    """
+    If true, value of `spacesAvailable` is updated from a real-time source.
+    """
+    realtime: Boolean
+
+    """Longitude of the bike park (WGS 84)"""
+    lon: Float
+
+    """Latitude of the bike park (WGS 84)"""
+    lat: Float
+
+    """
+    URL which contains details of this vehicle parking.
+    """
+    detailsUrl: String
+
+    """
+    URL of an image which may be displayed to the user showing the vehicle parking.
+    """
+    imageUrl: String
+
+    """
+    Source specific tags of the vehicle parking, which describe the available features. For example
+    park_and_ride, bike_lockers, or static_osm_data.
+    """
+    tags: [String]
+
+    """
+    A short translatable note containing details of this vehicle parking.
+    """
+    note: String
+
+    """
+    The state of this vehicle parking.
+    Only ones in an OPERATIONAL state may be used for Park and Ride.
+    """
+    state: VehicleParkingState
+
+    """
+    Does this vehicle parking have spaces (capacity) for bicycles.
+    """
+    bicyclePlaces: Boolean
+
+    """
+    Does this vehicle parking have spaces (capacity) for either wheelchair accessible (disabled)
+    or normal cars.
+    """
+    anyCarPlaces: Boolean
+
+    """
+    Does this vehicle parking have spaces (capacity) for cars excluding wheelchair accessible spaces.
+    Use anyCarPlaces to check if any type of car may use this vehicle parking.
+    """
+    carPlaces: Boolean
+
+    """
+    Does this vehicle parking have wheelchair accessible (disabled) car spaces (capacity).
+    """
+    wheelchairAccessibleCarPlaces: Boolean
+
+    """
+    The capacity (maximum available spaces) of this vehicle parking.
+    """
+    capacity: VehicleParkingSpaces
+
+    """
+    The currently available spaces at this vehicle parking.
+    """
+    availability: VehicleParkingSpaces
+}
+
+"""
+The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that they
+may be represented differently to the user.
+"""
+enum VehicleParkingState {
+    """May be used for park and ride."""
+    OPERATIONAL
+    """Can't be used for park and ride."""
+    TEMPORARILY_CLOSED
+    """Can't be used for park and ride."""
+    CLOSED
+}
+
+"""
+The number of spaces by type. null if unknown.
+"""
+type VehicleParkingSpaces {
+    """
+    The number of bicycle spaces.
+    """
+    bicycleSpaces: Int
+
+    """
+    The number of car spaces.
+    """
+    carSpaces: Int
+
+    """
+    The number of wheelchair accessible (disabled) car spaces.
+    """
+    wheelchairAccessibleCarSpaces: Int
 }
 
 """
@@ -250,22 +441,23 @@ type BikeRentalStation implements Node & PlaceInterface {
 
     """
     Number of bikes currently available on the rental station.
+    See field `allowPickupNow` to know if is currently possible to pick up a bike.
     """
     bikesAvailable: Int
 
     """
     Number of free spaces currently available on the rental station.
     Note that this value being 0 does not necessarily indicate that bikes cannot be returned
-    to this station, as it might be possible to leave the bike in the vicinity of
-    the rental station,
-    even if the bike racks don't have any spaces available (see field `allowDropoff`).
+    to this station, as for example it might be possible to leave the bike in the vicinity of
+    the rental station, even if the bike racks don't have any spaces available.
+    See field `allowDropoffNow` to know if is currently possible to return a bike.
     """
     spacesAvailable: Int
 
     """
     A description of the current state of this bike rental station, e.g. "Station on"
-  """
-    state: String
+    """
+    state: String @deprecated(reason: "Use operative instead")
 
     """
     If true, values of `bikesAvailable` and `spacesAvailable` are updated from a
@@ -274,8 +466,23 @@ type BikeRentalStation implements Node & PlaceInterface {
     """
     realtime: Boolean
 
-    """If true, bikes can be returned to this station."""
+    """
+    If true, bikes can be returned to this station if the station has spaces available
+    or allows overloading.
+    """
     allowDropoff: Boolean
+
+    """
+    If true, bikes can be picked up from this station if the station has bikes available.
+    """
+    allowPickup: Boolean
+
+    """If true, bikes can be currently returned to this station."""
+    allowDropoffNow: Boolean
+
+    """If true, bikes can be currently picked up from this station."""
+    allowPickupNow: Boolean
+
     networks: [String]
 
     """Longitude of the bike rental station (WGS 84)"""
@@ -292,6 +499,125 @@ type BikeRentalStation implements Node & PlaceInterface {
 
     """Platform-specific URLs to begin renting a bike from this station."""
     rentalUris: BikeRentalStationUris
+
+    """
+    If true, station is on and in service.
+    """
+    operative: Boolean
+}
+
+"""
+Vehicle rental station represents a location where users can rent bicycles etc. for a fee.
+"""
+type VehicleRentalStation implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the vehicle in the format of network:id"""
+    stationId: String
+
+    """Name of the vehicle rental station"""
+    name: String!
+
+    """
+    Number of vehicles currently available on the rental station.
+    See field `allowPickupNow` to know if is currently possible to pick up a vehicle.
+    """
+    vehiclesAvailable: Int
+
+    """
+    Number of free spaces currently available on the rental station.
+    Note that this value being 0 does not necessarily indicate that vehicles cannot be returned
+    to this station, as for example it might be possible to leave the vehicle in the vicinity of
+    the rental station, even if the vehicle racks don't have any spaces available.
+    See field `allowDropoffNow` to know if is currently possible to return a vehicle.
+    """
+    spacesAvailable: Int
+
+    """
+    If true, values of `vehiclesAvailable` and `spacesAvailable` are updated from a
+    real-time source. If false, values of `vehiclesAvailable` and `spacesAvailable`
+    are always the total capacity divided by two.
+    """
+    realtime: Boolean
+
+    """
+    If true, vehicles can be returned to this station if the station has spaces available
+    or allows overloading.
+    """
+    allowDropoff: Boolean
+
+    """
+    If true, vehicles can be picked up from this station if the station has vehicles available.
+    """
+    allowPickup: Boolean
+
+    """If true, vehicles can be currently returned to this station."""
+    allowDropoffNow: Boolean
+
+    """If true, vehicles can be currently picked up from this station."""
+    allowPickupNow: Boolean
+
+    """ID of the rental network."""
+    network: String
+
+    """Longitude of the vehicle rental station (WGS 84)"""
+    lon: Float
+
+    """Latitude of the vehicle rental station (WGS 84)"""
+    lat: Float
+
+    """Nominal capacity (number of racks) of the rental station."""
+    capacity: Int
+
+    """If true, vehicles can be returned even if spacesAvailable is zero or vehicles > capacity."""
+    allowOverloading: Boolean
+
+    """Platform-specific URLs to begin renting a vehicle from this station."""
+    rentalUris: VehicleRentalUris
+
+    """
+    If true, station is on and in service.
+    """
+    operative: Boolean
+}
+
+"""
+Rental vehicle represents a vehicle that belongs to a rental network.
+"""
+type RentalVehicle implements Node & PlaceInterface {
+    """
+    Global object ID provided by Relay. This value can be used to refetch this object using **node** query.
+    """
+    id: ID!
+
+    """ID of the vehicle in the format of network:id"""
+    vehicleId: String
+
+    """Name of the vehicle"""
+    name: String!
+
+    """If true, vehicle is currently available for renting."""
+    allowPickupNow: Boolean
+
+    """ID of the rental network."""
+    network: String
+
+    """Longitude of the vehicle (WGS 84)"""
+    lon: Float
+
+    """Latitude of the vehicle (WGS 84)"""
+    lat: Float
+
+    """Platform-specific URLs to begin the vehicle."""
+    rentalUris: VehicleRentalUris
+
+    """
+    If true, vehicle is not disabled.
+    """
+    operative: Boolean
 }
 
 type BikeRentalStationUris {
@@ -311,6 +637,27 @@ type BikeRentalStationUris {
     """
     A URL that can be used by a web browser to show more information about renting a vehicle at
     this station.
+    May be {@code null} if a rental URL does not exist.
+    """
+    web: String
+}
+
+type VehicleRentalUris {
+    """
+    A URI that can be passed to an Android app with an {@code android.intent.action.VIEW} Android
+    intent to support Android Deep Links.
+    May be null if a rental URI does not exist.
+    """
+    android: String
+
+    """
+    A URI that can be used on iOS to launch the rental app for this rental network.
+    May be {@code null} if a rental URI does not exist.
+    """
+    ios: String
+
+    """
+    A URL that can be used by a web browser to show more information about renting a vehicle.
     May be {@code null} if a rental URL does not exist.
     """
     web: String
@@ -358,6 +705,22 @@ type CarPark implements Node & PlaceInterface {
 
     """Latitude of the car park (WGS 84)"""
     lat: Float
+
+    """
+    Source specific tags of the car park, which describe the available features.
+    """
+    tags: [String]
+
+    """
+    Opening hours for the selected dates using the local time of the park.
+    Each date can have multiple time spans.
+    """
+    openingHours(
+        """
+        Opening hours will be returned for these dates. Dates should use YYYYMMDD format.
+        """
+        dates: [String!]!
+    ): [LocalTimeSpanDate]
 }
 
 """Cluster is a list of stops grouped by name and proximity"""
@@ -498,6 +861,29 @@ type Feed {
 
     """List of agencies which provide data to this feed"""
     agencies: [Agency]
+
+    """
+    Alerts relevant for the feed.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the feed.
+        """
+        types: [FeedAlertType!]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a feed and can contain alerts"""
+enum FeedAlertType {
+    """Alerts affecting the feed's agencies"""
+    AGENCIES
+
+    """
+    Alerts affecting the route types across the feed.
+    There might be alerts that only affect route types within an agency of the feed,
+    and those can be fetched through the Agency.
+    """
+    ROUTE_TYPES
 }
 
 enum FilterPlaceType {
@@ -526,6 +912,22 @@ type Geometry {
     https://developers.google.com/maps/documentation/utilities/polylinealgorithm)
     """
     points: Polyline
+}
+
+scalar GeoJson
+
+type StopGeometries {
+    """Representation of the stop geometries as GeoJSON (https://geojson.org/)"""
+    geoJson: GeoJson,
+
+    """
+    Representation of a stop as a series of polylines.
+
+    Polygons of flex stops are represented as linear rings (lines where the first and last point are the same).
+
+    Proper stops are represented as single point "lines".
+    """
+    googleEncoded: [Geometry]
 }
 
 input InputBanned {
@@ -579,7 +981,7 @@ input InputFilters {
     """Routes to include by GTFS id."""
     routes: [String]
 
-    """Bike rentals to include by id."""
+    """Bike rentals to include by id (without network identifier)."""
     bikeRentalStations: [String]
 
     """Bike parks to include by id."""
@@ -863,6 +1265,24 @@ type Leg {
     pickupBookingInfo: BookingInfo
 }
 
+"""A span of time."""
+type LocalTimeSpan {
+    """The start of the time timespan as seconds from midnight."""
+    from: Int!
+
+    """The end of the timespan as seconds from midnight."""
+    to: Int!
+}
+
+"""A date using the local timezone of the object that can contain timespans."""
+type LocalTimeSpanDate {
+    """The time spans for this date."""
+    timeSpans: [LocalTimeSpan]
+
+    """The date of this time span. Format: YYYYMMDD."""
+    date: String!
+}
+
 """Identifies whether this stop represents a stop or station."""
 enum LocationType {
     """A location where passengers board or disembark from a transit vehicle."""
@@ -915,6 +1335,9 @@ enum Mode {
 
     """RAIL"""
     RAIL
+
+    """SCOOTER"""
+    SCOOTER
 
     """SUBWAY"""
     SUBWAY
@@ -970,6 +1393,51 @@ type PageInfo {
 
     """When paginating forwards, the cursor to continue."""
     endCursor: String
+}
+
+type VehiclePosition {
+    """Feed-scoped ID that uniquely identifies the vehicle in the format FeedId:VehicleId"""
+    vehicleId: String,
+    """Human-readable label of the vehicle, eg. a publicly visible number or a license plate"""
+    label: String
+    """Latitude of the vehicle"""
+    lat: Float
+    """Longitude of the vehicle"""
+    lon: Float
+    """The current stop where the vehicle will be or is currently arriving."""
+    stopRelationship: StopRelationship!
+    """Speed of the vehicle in meters/second"""
+    speed: Float
+    """
+    Bearing, in degrees, clockwise from North, i.e., 0 is North and 90 is East. This can be the
+    compass bearing, or the direction towards the next stop or intermediate location.
+    """
+    heading: Float
+    """When the position of the vehicle was recorded in seconds since the UNIX epoch."""
+    lastUpdated: Long
+    """Which trip this vehicles runs on."""
+    trip: Trip!
+}
+
+type StopRelationship {
+    """How close the vehicle is to `stop`"""
+    status: VehicleStopStatus!
+    stop: Stop!
+}
+
+enum VehicleStopStatus {
+    """
+    The vehicle is standing at the stop.
+    """
+    STOPPED_AT,
+    """
+    The vehicle has departed the previous stop and is in transit.
+    """
+    IN_TRANSIT_TO,
+    """
+    The vehicle is just about to arrive at the stop (on a stop display, the vehicle symbol typically flashes).
+    """
+    INCOMING_AT
 }
 
 """
@@ -1029,8 +1497,46 @@ type Pattern implements Node {
     """
     semanticHash: String
 
-    """List of alerts which have an effect on trips of the pattern"""
-    alerts: [Alert]
+    """
+    By default, list of alerts which have directly an effect on just the pattern.
+    It's also possible to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the pattern.
+        By default, list of alerts which have directly an effect on just the pattern.
+        """
+        types: [PatternAlertType]
+    ): [Alert]
+
+    """
+    Realtime-updated position of vehicles that are serving this pattern.
+    """
+    vehiclePositions: [VehiclePosition!]
+}
+
+"""Entities, which are relevant for a pattern and can contain alerts"""
+enum PatternAlertType {
+    """Alerts affecting the pattern"""
+    PATTERN
+
+    """Alerts affecting the pattern's route's agency"""
+    AGENCY
+
+    """Alerts affecting the route that the pattern runs on"""
+    ROUTE
+
+    """Alerts affecting the route type of the route that the pattern runs on"""
+    ROUTE_TYPE
+
+    """Alerts affecting the trips which run on this pattern"""
+    TRIPS
+
+    """Alerts affecting the stops which are on this pattern"""
+    STOPS_ON_PATTERN
+
+    """Alerts affecting the stops of the trips which run on this pattern"""
+    STOPS_ON_TRIPS
 }
 
 enum PickupDropoffType {
@@ -1105,13 +1611,22 @@ type Place {
     stop: Stop
 
     """The bike rental station related to the place"""
-    bikeRentalStation: BikeRentalStation
+    bikeRentalStation: BikeRentalStation @deprecated(reason: "Use vehicleRentalStation and rentalVehicle instead")
+
+    """The vehicle rental station related to the place"""
+    vehicleRentalStation: VehicleRentalStation
+
+    """The rental vehicle related to the place"""
+    rentalVehicle: RentalVehicle
 
     """The bike parking related to the place"""
-    bikePark: BikePark
+    bikePark: BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """The car parking related to the place"""
-    carPark: CarPark
+    carPark: CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
+
+    """The vehicle parking related to the place"""
+    vehicleParking: VehicleParking
 }
 
 type placeAtDistance implements Node {
@@ -1169,24 +1684,45 @@ type Plan {
     messageStrings: [String]!
 
     """
+    Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
+    to the pageCursor query parameter and keep the original request as is. This will enable you to
+    search for itineraries in the next search-window.
+    The cursor based paging only support stepping to the next page, as it does not support jumping.
+    This is only usable when public transportation mode(s) are included in the query.
+    """
+    nextPageCursor: String
+
+    """
+    Use the cursor to go to the previous "page" of itineraries. Copy the cursor from the last
+    response to the pageCursor query parameter and keep the original request otherwise as is.
+    This will enable you to search for itineraries in the previous search-window.
+    The cursor based paging only support stepping to the previous page, as it does not support
+    jumping.
+    This is only usable when public transportation mode(s) are included in the query.
+    """
+    previousPageCursor: String
+
+    """
     This is the suggested search time for the "previous page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips preceding in the
-    time-window BEFORE the current search. No duplicate trips should be returned, unless a trip
+    search-window BEFORE the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    prevDateTime: Long
+    prevDateTime: Long @deprecated(reason: "Use previousPageCursor instead")
 
     """
     This is the suggested search time for the "next page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips following in the
-    time-window AFTER the current search. No duplicate trips should be returned, unless a trip
+    search-window AFTER the current search. No duplicate trips should be returned, unless a trip
     is delayed and new realtime-data is available.
     """
-    nextDateTime: Long
+    nextDateTime: Long @deprecated(reason: "Use nextPageCursor instead")
 
     """
-    This is the time window used by the raptor search. The window is an optional parameter and
-    OTP might override it/dynamically assign a new value. The unit is seconds.
+    This is the `searchWindow` used by the raptor search. It is provided here for debugging
+    purpousess.
+
+    The unit is seconds.
     """
     searchWindowUsed: Long
 
@@ -1524,6 +2060,12 @@ type QueryType {
 
         """Only return alerts with these causes"""
         cause: [AlertCauseType!]
+
+        """Only return alerts affecting these routes"""
+        route: [String!]
+
+        """Only return alerts affecting these stops"""
+        stop: [String!]
     ): [Alert]
 
     """Get the time range for which the API has data available"""
@@ -1537,20 +2079,50 @@ type QueryType {
         the returned list will contain `null` values.
         """
         ids: [String]
-    ): [BikeRentalStation]
+    ): [BikeRentalStation] @deprecated(reason: "Use rentalVehicles or vehicleRentalStations instead")
 
     """
     Get a single bike rental station based on its ID, i.e. value of field `stationId`
     """
-    bikeRentalStation(id: String!): BikeRentalStation
+    bikeRentalStation(id: String!): BikeRentalStation @deprecated(reason: "Use rentalVehicle or vehicleRentalStation instead")
+
+    """Get all rental vehicles"""
+    rentalVehicles(
+        """
+        Return rental vehicles with these ids, i.e. value of field `vehicleId`.
+        **Note:** if an id is invalid (or the rental service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [RentalVehicle]
+
+    """
+    Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`
+    """
+    rentalVehicle(id: String!): RentalVehicle
+
+    """Get all vehicle rental stations"""
+    vehicleRentalStations(
+        """
+        Return vehicle rental stations with these ids, i.e. value of field `stationId`.
+        **Note:** if an id is invalid (or the rental service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [VehicleRentalStation]
+
+    """
+    Get a single vehicle rental station based on its ID, i.e. value of field `stationId`
+    """
+    vehicleRentalStation(id: String!): VehicleRentalStation
 
     """Get all bike parks"""
-    bikeParks: [BikePark]
+    bikeParks: [BikePark] @deprecated(reason: "bikeParks is deprecated. Use vehicleParkings instead.")
 
     """
     Get a single bike park based on its ID, i.e. value of field `bikeParkId`
     """
-    bikePark(id: String!): BikePark
+    bikePark(id: String!): BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """Get all car parks"""
     carParks(
@@ -1559,10 +2131,25 @@ type QueryType {
         **Note:** if an id is invalid (or the car park service is unavailable) the returned list will contain `null` values.
         """
         ids: [String]
-    ): [CarPark]
+    ): [CarPark] @deprecated(reason: "carParks is deprecated. Use vehicleParkings instead.")
 
     """Get a single car park based on its ID, i.e. value of field `carParkId`"""
-    carPark(id: String!): CarPark
+    carPark(id: String!): CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
+
+    """Get all vehicle parkings"""
+    vehicleParkings(
+        """
+        Return vehicle parkings with these ids.
+        **Note:** if an id is invalid (or the vehicle parking service is unavailable)
+        the returned list will contain `null` values.
+        """
+        ids: [String]
+    ): [VehicleParking]
+
+    """
+    Get a single vehicle parking based on its ID
+    """
+    vehicleParking(id: String!): VehicleParking
 
     """Needed until https://github.com/facebook/relay/issues/112 is resolved"""
     viewer: QueryType
@@ -1618,15 +2205,40 @@ type QueryType {
         numItineraries: Int = 3
 
         """
-        The length of the search-window in seconds. This is normally dynamically
-        calculated by the server, but you may override this by setting it. The
-        search-window used in a request is returned in the response metadata.
-        To get the \"next page\" of trips use the metadata(searchWindowUsed and
-        nextWindowDateTime) to create a new request. If not provided the value
-        is resolved depending on the other input parameters, available transit
-        options and realtime changes.
+        The length of the search-window in seconds. This parameter is optional.
+
+        The search-window is defined as the duration between the earliest-departure-time(EDT) and
+        the latest-departure-time(LDT). OTP will search for all itineraries in this departure
+        window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP
+        will dynamically calculate the EDT. Using a short search-window is faster than using a
+        longer one, but the search duration is not linear. Using a \"too\" short search-window will
+        waste resources server side, while using a search-window that is too long will be slow.
+
+        OTP will dynamically calculate a reasonable value for the search-window, if not provided.
+        The calculation comes with a significant overhead (10-20% extra). Whether you should use the
+        dynamic calculated value or pass in a value depends on your use-case. For a travel planner
+        in a small geographical area, with a dense network of public transportation, a fixed value
+        between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust
+        it so that the number of itineraries on average is around the wanted `numItineraries`. Make
+        sure you set the `numItineraries` to a high number while testing. For a country wide area
+        like Norway, using the dynamic search-window is the best.
+
+        When paginating, the search-window is calculated using the `numItineraries` in the original
+        search together with statistics from the search for the last page. This behaviour is
+        configured server side, and can not be overridden from the client.
+
+        The search-window used is returned to the response metadata as `searchWindowUsed` for
+        debugging purposes.
         """
         searchWindow: Long,
+
+        """
+        Use the cursor to get the next or previous page of results.
+        The next page is a set of itineraries departing after the last itinerary in this result and
+        the previous page is a set of itineraries departing before the first itinerary.
+        This is only usable when public transportation mode(s) are included in the query.
+        """
+        pageCursor: String
 
         """
         The maximum distance (in meters) the user is willing to walk per walking
@@ -1819,7 +2431,7 @@ type QueryType {
         debugItineraryFilter: Boolean
 
         """Is bike rental allowed? Default value: false"""
-        allowBikeRental: Boolean
+        allowBikeRental: Boolean @deprecated(reason: "Rental is specified by modes")
 
         """
         Whether arriving at the destination with a rented (station) bicycle is allowed without
@@ -2027,8 +2639,67 @@ type Route implements Node {
     """List of trips which operate on this route"""
     trips: [Trip]
 
-    """List of alerts which have an effect on the route"""
-    alerts: [Alert]
+    """
+    List of alerts which have an effect on the route directly or indirectly.
+    By default only alerts directly affecting this route are returned. It's also possible
+    to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the route.
+        By default only returns alerts that directly affect this route.
+        """
+        types: [RouteAlertType]
+    ): [Alert]
+}
+
+"""Entities that are relevant for routes that can contain alerts"""
+enum RouteAlertType {
+    """Alerts affecting the route's agency."""
+    AGENCY
+
+    """Alerts directly affecting the route."""
+    ROUTE
+
+    """Alerts affecting the route type of the route."""
+    ROUTE_TYPE
+
+    """Alerts affecting the stops that are on the route."""
+    STOPS_ON_ROUTE
+
+    """Alerts affecting the route's trips."""
+    TRIPS
+
+    """Alerts affecting the stops on some trips of the route."""
+    STOPS_ON_TRIPS
+
+    """
+    Alerts affecting route's patterns.
+    """
+    PATTERNS
+}
+
+"""
+Route type entity which covers all agencies if agency is null,
+otherwise only relevant for one agency.
+"""
+type RouteType {
+    """
+    GTFS Route type.
+    For the list of possible values, see:
+        https://developers.google.com/transit/gtfs/reference/#routestxt and
+        https://developers.google.com/transit/gtfs/reference/extended-route-types
+    """
+    routeType: Int!
+
+    """A public transport agency"""
+    agency: Agency
+
+    """
+    The routes which have the defined routeType and belong to the agency, if defined.
+    Otherwise all routes of the feed that have the defined routeType.
+    """
+    routes: [Route]
 }
 
 """Time range for which the API has data available"""
@@ -2096,13 +2767,32 @@ type Stop implements Node & PlaceInterface {
     gtfsId: String!
 
     """Name of the stop, e.g. Pasilan asema"""
-    name: String!
+    name(
+        """If translated name is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses name from stops.txt.
+        E.g. Swedish name for Pasilan asema is Böle station."""
+        language: String): String!
 
     """Latitude of the stop (WGS 84)"""
     lat: Float
 
     """Longitude of the stop (WGS 84)"""
     lon: Float
+
+    """
+    Representations of this stop's geometry. This is mainly interesting for flex stops which can be
+    a polygon or a group of stops either consisting of either points or polygons.
+
+    Regular fixed-schedule stops return a single point.
+
+    Stations (parent stations with child stops) contain a geometry collection with a point for the
+    central coordinate plus a convex hull polygon (https://en.wikipedia.org/wiki/Convex_hull) of all
+    coordinates of the child stops.
+
+    If there are only two child stops then the convex hull is a straight line between the them. If
+    there is a single child stop then it's a single point.
+    """
+    geometries: StopGeometries
 
     """Stop code which is visible at the stop"""
     code: String
@@ -2112,7 +2802,11 @@ type Stop implements Node & PlaceInterface {
 
     """ID of the zone where this stop is located"""
     zoneId: String
-    url: String
+
+    url(
+        """If translated url is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses url from stops.txt."""
+        language: String): String
 
     """Identifies whether this stop represents a stop or station."""
     locationType: LocationType
@@ -2229,8 +2923,41 @@ type Stop implements Node & PlaceInterface {
         omitCanceled: Boolean = true
     ): [Stoptime]
 
-    """List of alerts which have an effect on this stop"""
-    alerts: [Alert]
+    """
+    By default, list of alerts which have directly an effect on just the stop.
+    It's also possible to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the stop.
+        By default, list of alerts which have directly an effect on just the stop.
+        """
+        types: [StopAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a stop and can contain alerts"""
+enum StopAlertType {
+    """Alerts affecting the stop"""
+    STOP
+
+    """Alerts affecting the stop's patterns"""
+    PATTERNS
+
+    """Alerts affecting the agencies of the routes going through the stop"""
+    AGENCIES_OF_ROUTES
+
+    """Alerts affecting the routes that go through the stop"""
+    ROUTES
+
+    """Alerts affecting the trips that go through this stop"""
+    TRIPS
+
+    """Alerts affecting the stop on specific routes"""
+    STOP_ON_ROUTES
+
+    """Alerts affecting the stop on specific trips"""
+    STOP_ON_TRIPS
 }
 
 type stopAtDistance implements Node {
@@ -2255,6 +2982,32 @@ type stopAtDistanceEdge {
     """The item at the end of the edge"""
     node: stopAtDistance
     cursor: String!
+}
+
+"""
+Stop that should (but not guaranteed) to exist on a route.
+"""
+type StopOnRoute {
+    """
+    Stop at the route. It's also possible that the stop is no longer on the route.
+    """
+    stop: Stop!
+    """Route which contains the stop."""
+    route: Route!
+}
+
+"""
+Stop that should (but not guaranteed) to exist on a trip.
+"""
+type StopOnTrip {
+    """
+    Stop at the trip. It's also possible that the stop is no longer on the trip.
+    """
+    stop: Stop!
+    """
+    Trip which contains the stop.
+    """
+    trip: Trip!
 }
 
 """
@@ -2470,8 +3223,41 @@ type Trip implements Node {
     """
     tripGeometry: Geometry
 
-    """List of alerts which have an effect on this trip"""
-    alerts: [Alert]
+    """
+    By default, list of alerts which have directly an effect on just the trip.
+    It's also possible to return other relevant alerts through defining types.
+    """
+    alerts(
+        """
+        Returns alerts for these types that are relevant for the trip.
+        By default, list of alerts which have directly an effect on just the trip.
+        """
+        types: [TripAlertType]
+    ): [Alert]
+}
+
+"""Entities, which are relevant for a trip and can contain alerts"""
+enum TripAlertType {
+    """Alerts affecting the trip"""
+    TRIP
+
+    """Alerts affecting the trip's pattern"""
+    PATTERN
+
+    """Alerts affecting the trip's agency"""
+    AGENCY
+
+    """Alerts affecting the trip's route"""
+    ROUTE
+
+    """Alerts affecting the route type of the trip's route"""
+    ROUTE_TYPE
+
+    """
+    Alerts affecting the stops visited on the trip.
+    Some of the alerts can only affect the trip or its route on the stop.
+    """
+    STOPS_ON_TRIP
 }
 
 """
@@ -2487,6 +3273,14 @@ type SystemNotice {
     tag: String
     """Notice's description"""
     text: String
+}
+
+"""
+This is used for alert entities that we don't explicitly handle or they are missing.
+"""
+type Unknown {
+    """Entity's description"""
+    description: String
 }
 
 enum VertexType {

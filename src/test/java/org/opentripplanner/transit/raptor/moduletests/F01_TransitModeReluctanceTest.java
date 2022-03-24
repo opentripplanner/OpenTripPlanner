@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -31,10 +31,10 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
           RaptorConfig.defaultConfigForTest()
   );
 
-  private final static String EXPECTED =  "Walk 30s ~ 1 ~ BUS %s 0:01 0:02:40 ~ 2 ~ Walk 20s "
-          + "[0:00:30 0:03 2m30s $%d]";
+  private final static String EXPECTED =  "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s "
+          + "[0:00:30 0:03 2m30s 0tx $%d]";
 
-  @Before
+  @BeforeEach
   public void setup() {
     // Given 2 identical routes R1 and R2
     data.withRoute(
@@ -61,7 +61,7 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
   @Test
   public void preferR1() {
     // Give R1 a slightly smaller(0.01 less then R2) transit reluctance factor
-    requestBuilder.mcCostFactors().transitReluctanceFactors(new double[] {0.99, 1.0 });
+    data.mcCostParamsBuilder().transitReluctanceFactors(new double[] { 0.99, 1.0 });
     var request = requestBuilder.build();
     var response = raptorService.route(request, data);
 
@@ -71,7 +71,7 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
 
   @Test
   public void preferR2() {
-    requestBuilder.mcCostFactors().transitReluctanceFactors(new double[] {0.9, 0.89 });
+    data.mcCostParamsBuilder().transitReluctanceFactors(new double[] { 0.9, 0.89 });
     var request = requestBuilder.build();
     var response = raptorService.route(request, data);
 

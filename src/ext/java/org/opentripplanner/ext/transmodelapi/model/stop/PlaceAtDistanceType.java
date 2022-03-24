@@ -6,7 +6,12 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
+import java.util.ArrayList;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
+import org.opentripplanner.model.MultiModalStation;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -62,31 +67,21 @@ public class PlaceAtDistanceType {
       String multiModalMode,
       RoutingService routingService
   ) {
-    if (placeTypes==null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
-      // Convert quays to stop places
-      List<PlaceAtDistance> stations = places
-          .stream()
-          .filter(p -> p.place instanceof Stop)
-          .map(p -> new PlaceAtDistance(new MonoOrMultiModalStation(((Stop) p.place).getParentStation(),
-              null
-          ), p.distance))
-          .collect(Collectors.toList());
+      if (placeTypes == null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
+          // Convert quays to stop places
+          List<PlaceAtDistance> stations = places
+              .stream()
+              // Find all stops
+              .filter(p -> p.place instanceof Stop)
+              // Get their parent stations (possibly including multimodal parents)
+              .flatMap(p -> getStopPlaces(p, multiModalMode, routingService))
+              // Sort by distance
+              .sorted(Comparator.comparing(p -> p.distance))
+              // Make sure each parent appears exactly once
+              .filter(new SeenPlacePredicate())
+              .collect(Collectors.toList());
 
-      List<PlaceAtDistance> parentStations = stations.stream()
-          .filter(p -> routingService.getMultiModalStationForStations().containsKey(p.place))
-          .map(p -> new PlaceAtDistance( routingService.getMultiModalStationForStations().get(p.place), p.distance))
-          .collect(Collectors.toList());
-
-      if ("parent".equals(multiModalMode)) {
-        // Replace monomodal children with their multimodal parents
-        stations = parentStations;
-      }
-      else if ("all".equals(multiModalMode)) {
-        // Add multimodal parents in addition to their monomodal children
-        places.addAll(parentStations);
-      }
-
-      places.addAll(stations);
+          places.addAll(stations);
 
       if (placeTypes != null && !placeTypes.contains(TransmodelPlaceType.QUAY)) {
         // Remove quays if only stop places are requested
@@ -100,4 +95,50 @@ public class PlaceAtDistanceType {
     return places.stream().filter(s -> uniquePlaces.add(s.place)).collect(Collectors.toList());
   }
 
+    private static Stream<PlaceAtDistance> getStopPlaces(
+        PlaceAtDistance p,
+        String multiModalMode,
+        RoutingService routingService
+    ) {
+        Station stopPlace = ((Stop) p.place).getParentStation();
+
+        if (stopPlace == null) {
+            return Stream.of();
+        }
+
+        List<PlaceAtDistance> res = new ArrayList<>();
+
+        MultiModalStation multiModalStation = routingService
+            .getMultiModalStationForStations()
+            .get(stopPlace);
+
+        if ("child".equals(multiModalMode) ||
+            "all".equals(multiModalMode) ||
+            multiModalStation == null
+        ) {
+            res.add(new PlaceAtDistance(
+                new MonoOrMultiModalStation(stopPlace, multiModalStation),
+                p.distance
+            ));
+        }
+
+        if (multiModalStation == null) {
+            return res.stream();
+        }
+
+        if ("parent".equals(multiModalMode) || "all".equals(multiModalMode)) {
+            res.add(new PlaceAtDistance(new MonoOrMultiModalStation(multiModalStation), p.distance));
+        }
+        return res.stream();
+    }
+
+    static class SeenPlacePredicate implements Predicate<PlaceAtDistance> {
+
+      Set<Object> seen = new HashSet<>();
+
+      @Override
+      public boolean test(PlaceAtDistance p) {
+          return seen.add(p.place);
+      }
+  }
 }

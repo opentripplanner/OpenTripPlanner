@@ -5,5 +5,5 @@ public enum TransmodelPlaceType {
     STOP_PLACE,
     BICYCLE_RENT,
     BIKE_PARK,
-    CAR_PARK;
+    CAR_PARK
 }

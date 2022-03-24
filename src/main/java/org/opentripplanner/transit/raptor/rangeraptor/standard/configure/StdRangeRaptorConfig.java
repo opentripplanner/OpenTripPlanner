@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.configure;
 
+import java.util.function.BiFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
@@ -7,11 +8,11 @@ import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.path.configure.PathConfig;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivalTimeRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivedAtDestinationCheck;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.NoWaitTransitWorker;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.MinTravelDurationRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StdRangeRaptorWorkerState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StdTransitWorker;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StdWorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
@@ -22,12 +23,10 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.debug.DebugStopAr
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicsAdapter;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StdStopArrivalsState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stops;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
-
-import java.util.function.BiFunction;
 
 
 /**
@@ -43,7 +42,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     private final PathConfig<T> pathConfig;
 
     private BestTimes bestTimes = null;
-    private Stops<T> stops = null;
+    private StopArrivals<T> arrivals = null;
     private ArrivedAtDestinationCheck destinationCheck = null;
     private BestNumberOfTransfers bestNumberOfTransfers = null;
 
@@ -80,10 +79,10 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         new VerifyRequestIsValid(ctx).verify();
         switch (ctx.profile()) {
             case STANDARD:
-            case NO_WAIT_STD:
+            case MIN_TRAVEL_DURATION:
                 return workerState(stdStopArrivalsState());
             case BEST_TIME:
-            case NO_WAIT_BEST_TIME:
+            case MIN_TRAVEL_DURATION_BEST_TIME:
                 return workerState(bestTimeStopArrivalsState());
         }
         throw new IllegalArgumentException(ctx.profile().toString());
@@ -93,10 +92,10 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         switch (ctx.profile()) {
             case STANDARD:
             case BEST_TIME:
-                return new StdTransitWorker<>(state);
-            case NO_WAIT_STD:
-            case NO_WAIT_BEST_TIME:
-                return new NoWaitTransitWorker<>(state);
+                return new ArrivalTimeRoutingStrategy<>(ctx.calculator(), state);
+            case MIN_TRAVEL_DURATION:
+            case MIN_TRAVEL_DURATION_BEST_TIME:
+                return new MinTravelDurationRoutingStrategy<>(ctx.calculator(), state);
         }
         throw new IllegalArgumentException(ctx.profile().toString());
     }
@@ -137,7 +136,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
      * the stop arrival state is wrapped.
      */
     private StopArrivalsState<T> stdStopArrivalsState() {
-        StdStopArrivalsState<T> state = new StdStopArrivalsState<>(stops(), destinationArrivalPaths());
+        StdStopArrivalsState<T> state = new StdStopArrivalsState<>(stopArrivals(), destinationArrivalPaths());
         return wrapStopArrivalsStateWithDebugger(state);
     }
 
@@ -149,16 +148,16 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         }
     }
 
-    private Stops<T> stops() {
-        if (stops == null) {
-            stops = new Stops<>(
+    private StopArrivals<T> stopArrivals() {
+        if (arrivals == null) {
+            arrivals = new StopArrivals<>(
                     ctx.nRounds(),
                     ctx.nStops(),
                     ctx.roundProvider()
             );
-            setBestNumberOfTransfers(stops);
+            setBestNumberOfTransfers(arrivals);
         }
-        return stops;
+        return arrivals;
     }
 
     private void setBestNumberOfTransfers(BestNumberOfTransfers bestNumberOfTransfers) {
@@ -168,7 +167,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
     private StopsCursor<T> stopsCursor() {
         // Always create new cursors
-        return new StopsCursor<>(stops(), ctx.calculator(), ctx.boardSlackProvider());
+        return new StopsCursor<>(stopArrivals(), ctx.calculator(), ctx.boardSlackProvider());
     }
 
     private DestinationArrivalPaths<T> destinationArrivalPaths() {
@@ -180,14 +179,13 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
                 destinationArrivalPaths,
                 ctx.calculator(),
                 stopsCursor(),
-                ctx.lifeCycle(),
-                ctx.debugFactory()
+                ctx.lifeCycle()
         );
 
         // Use the  adapter to play the role of the destination arrival check
         setDestinationCheck(pathsAdapter);
 
-        stops().setupEgressStopStates(ctx.egressPaths(), pathsAdapter::add);
+        stopArrivals().setupEgressStopStates(ctx.egressPaths(), pathsAdapter);
 
         return destinationArrivalPaths;
     }

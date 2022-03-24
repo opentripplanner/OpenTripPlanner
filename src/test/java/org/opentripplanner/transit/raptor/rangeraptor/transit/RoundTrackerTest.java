@@ -1,14 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.junit.Test;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 public class RoundTrackerTest {
     private static final int ANY = 500;
@@ -68,6 +67,10 @@ public class RoundTrackerTest {
 
     private WorkerLifeCycle lifeCycle() {
         return new WorkerLifeCycle() {
+            @Override
+            public void onRouteSearch(Consumer<Boolean> routeSearchWithDirectionSubscriber) {
+                throw new IllegalStateException("Not expected");
+            }
             @Override public void onSetupIteration(IntConsumer setupIteration) {
                 RoundTrackerTest.this.setupIteration = setupIteration;
             }

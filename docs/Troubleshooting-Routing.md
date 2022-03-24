@@ -51,7 +51,7 @@ Currently you can choose between:
 - [Bicycle safety](Troubleshooting-Routing.md#Bicycle-safety-factor) (colors street edges based on how good are for cycling [smaller is better])
 - Traversal permissions (colors street edges based on what types of transit modes are allowed to
  travel on them (Pedestrian, cycling, car are currently supported)) Traversal permissions layer also
- draws links from transit stops/bike rentals and P+R to graph. And also draws transit stops, bike rentals
+ draws links from transit stops/vehicle rentals and P+R to graph. And also draws transit stops, vehicle rentals
   and P+R vertices with different color.
 - No thru traffic - streets are colored if the edge has thru traffic restrictions (car and bicycle = `red`, car only = `orange`, bicycle only = `blue`, and no-restriction = `light gray`)
 
@@ -73,7 +73,7 @@ example. If it's an error, it's usually caused by improperly connected OSM data 
 
 OTP has a very flexible system for deciding when a street is to be allowed by pedestrians, bicycles or cars.
 
-To configure the which settings to use for your location, please use the [osmWayPropertySet config attribute](Configuration.md#Way-property-sets).
+To configure the which settings to use for your location, please use the [osmWayPropertySet config attribute](BuildConfiguration.md#Way-property-sets).
 
 In the following section we will discuss the default case, which will be used if the property is not set.
 
@@ -168,7 +168,7 @@ The Raptor implementation support instrumentation of ACCEPT, REJECT, and DROP ev
 
 ### GTFS Transfers.txt and NeTEx Interchange import
 
-Transfers may have effects on the routing witch may be difficult to predict. OTP can dump all 
+Transfers may have effects on the routing which may be difficult to predict. OTP can dump all 
 imported transfers to file - _transfers-debug.csv_. This may help verify the result of the import
 or find special test cases. To turn on the export enable the slf4j logger:
 

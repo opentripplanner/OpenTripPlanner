@@ -1,7 +1,7 @@
 {
+  "configVersion" : "{{ Entur CI config build number inserted here }}",
   "dataImportReport": true,
   "transit": true,
-  "useTransfersTxt": false,
   "parentStopLinking": true,
   "stationTransfers": false,
   "subwayAccessTime": 0,
@@ -11,7 +11,6 @@
   "platformEntriesLinking": true,
   "matchBusRoutesToStreets": false,
   "osmWayPropertySet": "norway",
-  "staticBikeRental": false,
   "staticParkAndRide": true,
   "staticBikeParkAndRide": true,
   "maxDataImportIssuesPerFile": 1000,
@@ -20,7 +19,7 @@
   "islandWithStopsMaxSize": 5,
   "banDiscouragedWalking": false,
   "banDiscouragedBiking": false,
-  "maxTransferDistance": 2000,
+  "maxTransferDurationSeconds": 1800,
   "extraEdgesStopPlatformLink": true,
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
@@ -32,11 +31,15 @@
   },
   "storage" : {
     "gsCredentials": "/etc/otp2/credentials.json",
-    "osm" : ["gs://<bucket>/osm/norway-latest.osm.pbf", "gs://<bucket>/osm/static/osm_static_sweden_extract.pbf", "gs://<bucket>/osm/static/osm_static_sweden_storlien_extract.pbf"],
+    "osm" : [
+      "gs://<bucket>/osm/norway-latest.osm.pbf",
+      "gs://<bucket>/osm/static/osm_static_sweden_extract.pbf",
+      "gs://<bucket>/osm/static/osm_static_sweden_storlien_extract.pbf"
+    ],
     "dem" : ["gs://<bucket>/kartverket/heightData/norge_dem_50m_33.tif"],
     "netex": ["gs://<bucket>/outbound/netex/rb_norway-aggregated-netex-otp2.zip"],
-    "streetGraph": "gs://<bucket>/${OTP_GCS_BASE_GRAPH_DIR}/streetGraph-otp2.obj",
-    "graph": "gs://<bucket>/${OTP_GCS_WORK_DIR}/Graph-otp2.obj",
+    "streetGraph": "gs://<bucket>/${OTP_GCS_BASE_GRAPH_PATH}",
+    "graph": "gs://<bucket>/${OTP_GCS_WORK_DIR}/Graph-otp2-${otp.serialization.version.id}.obj",
     "buildReportDir": "gs://<bucket>/${OTP_GCS_WORK_DIR}/report"
   }
 }

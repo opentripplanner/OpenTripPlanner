@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import com.esotericsoftware.minlog.Log;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -18,11 +18,12 @@ import java.util.Set;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class RaptorRequest<T extends RaptorTripSchedule> {
+    private static final Logger LOG = LoggerFactory.getLogger(RaptorRequest.class);
+
     private final SearchParams searchParams;
     private final RaptorProfile profile;
     private final SearchDirection searchDirection;
     private final Set<Optimization> optimizations;
-    private final McCostParams mcCostParams;
     private final DebugRequest debug;
     private final RaptorSlackProvider slackProvider;
 
@@ -36,7 +37,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         profile = RaptorProfile.MULTI_CRITERIA;
         searchDirection = SearchDirection.FORWARD;
         optimizations = Collections.emptySet();
-        mcCostParams = McCostParams.DEFAULTS;
         // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
         slackProvider = RaptorSlackProvider.defaultSlackProvider(60, 0, 0);
         debug = DebugRequest.defaults();
@@ -47,25 +47,24 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         this.profile = builder.profile();
         this.searchDirection = builder.searchDirection();
         this.optimizations = Set.copyOf(builder.optimizations());
-        this.mcCostParams = new McCostParams(builder.mcCostFactors());
         this.slackProvider = builder.slackProvider();
         this.debug = builder.debug().build();
         verify();
     }
 
     public RaptorRequestBuilder<T> mutate() {
-        return new RaptorRequestBuilder<T>(this);
+        return new RaptorRequestBuilder<>(this);
     }
 
     /**
-     * Requered travel search parameters.
+     * Required travel search parameters.
      */
     public SearchParams searchParams() {
         return searchParams;
     }
 
     /**
-     * A dynamic search is a search witch uses heuristics to resolve search parameters
+     * A dynamic search is a search which uses heuristics to resolve search parameters
      * as earliest-departure-time, latest-arrival-time and search-window. This is an aggregated
      * value:
      * <ul>
@@ -126,13 +125,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     }
 
     /**
-     * The multi-criteria cost criteria factors.
-     */
-    public McCostParams multiCriteriaCostFactors() {
-        return mcCostParams;
-    }
-
-    /**
      * Specify what to debug in the debug request.
      * <p/>
      * This feature is optional, by default debugging is turned off.
@@ -147,7 +139,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
                 "profile=" + profile +
                 ", searchForward=" + searchDirection +
                 ", optimizations=" + optimizations +
-                ", mcCostParams=" + mcCostParams +
                 ", debug=" + debug +
                 ", searchParams=" + searchParams +
                 '}';
@@ -160,15 +151,13 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         RaptorRequest<?> that = (RaptorRequest<?>) o;
         return profile == that.profile &&
                 Objects.equals(searchParams, that.searchParams) &&
-                Objects.equals(mcCostParams, that.mcCostParams) &&
                 Objects.equals(debug, that.debug);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(searchParams, profile, mcCostParams, debug);
+        return Objects.hash(searchParams, profile, debug);
     }
-
 
 
     static void assertProperty(boolean predicate, String message) {
@@ -183,7 +172,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         searchParams.verify();
         if(!profile.is(RaptorProfile.MULTI_CRITERIA)) {
             if(useDestinationPruning()) {
-                Log.warn("Destination pruning is only supported using McRangeRaptor");
+                LOG.warn("Destination pruning is only supported using McRangeRaptor");
             }
         }
     }

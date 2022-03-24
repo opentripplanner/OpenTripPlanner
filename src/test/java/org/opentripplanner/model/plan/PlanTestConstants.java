@@ -1,13 +1,14 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.util.time.DurationUtils;
-
 import static org.opentripplanner.util.time.TimeUtils.time;
 
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.time.DurationUtils;
+
 public interface PlanTestConstants {
-  ServiceDate SERVICE_DATE = new ServiceDate(2020, 9, 21);
   String FEED_ID = "F";
 
   int NOT_SET = -999_999;
@@ -23,16 +24,12 @@ public interface PlanTestConstants {
   float CAR_SPEED = 25.0f;
 
   // Time duration(D) constants, all values are in seconds
-  int D1m = DurationUtils.duration("1m");
-  int D2m = DurationUtils.duration("2m");
-  int D3m = DurationUtils.duration("3m");
-  int D5m = DurationUtils.duration("5m");
-  int D6m = DurationUtils.duration("6m");
-  int D7m = DurationUtils.duration("7m");
-  int D10m = DurationUtils.duration("10m");
-  int D12m = DurationUtils.duration("12m");
-  int D24m = DurationUtils.duration("24m");
-  int D40m = DurationUtils.duration("40m");
+  int D1m = DurationUtils.durationInSeconds("1m");
+  int D2m = DurationUtils.durationInSeconds("2m");
+  int D3m = DurationUtils.durationInSeconds("3m");
+  int D5m = DurationUtils.durationInSeconds("5m");
+  int D10m = DurationUtils.durationInSeconds("10m");
+  int D12m = DurationUtils.durationInSeconds("12m");
 
   // Time constants, all values are in seconds
   int T11_00 = time("11:00");
@@ -68,10 +65,24 @@ public interface PlanTestConstants {
   Place E = place("E", 9.0, 10.0);
   Place F = place("F", 9.0, 10.5);
   Place G = place("G", 9.5, 11.0);
+  Place H = place("H", 10.0, 11.5);
 
   private static Place place(String name, double lat, double lon) {
-    Place p = new Place(lat, lon, name);
-    p.stopId = new FeedScopedId(FEED_ID, name);
-    return p;
+    var stop = new Stop(
+            new FeedScopedId(FEED_ID, name),
+            new NonLocalizedString(name),
+            null,
+            null,
+            WgsCoordinate.creatOptionalCoordinate(lat, lon),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+    );
+    return Place.forStop(stop);
   }
 }

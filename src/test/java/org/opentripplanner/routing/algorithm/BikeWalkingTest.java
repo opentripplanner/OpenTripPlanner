@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.astar.AStar;
@@ -16,6 +12,11 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test switching between biking / walking over multiple edges.
@@ -351,8 +352,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
 
         var tree = new AStar().getShortestPathTree(bikeOptions);
         var path = tree.getPath(
-                arriveBy ? fromVertex : toVertex,
-                false
+                arriveBy ? fromVertex : toVertex
         );
 
         if (path == null) {
@@ -369,7 +369,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
                                 ? ((double) Math.round(s.getWeightDelta() * 10)) / 10
                                 : 0.0,
                         s.getBackEdge() != null
-                                ? s.getBackEdge().getName()
+                                ? s.getBackEdge().getDefaultName()
                                 : null
                 ))
                 .collect(Collectors.toList());

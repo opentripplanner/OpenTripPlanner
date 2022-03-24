@@ -1,25 +1,20 @@
 package org.opentripplanner.updater;
 
 public enum DataSourceType {
-  // Bike Rental
-  B_CYCLE,
-  BICIMAD,
-  BIXI,
-  CITY_BIKES,
-  CITI_BIKE_NYC,
+  // Vehicle Rental
   GBFS,
-  JCDECAUX,
-  KEOLIS_RENNES,
-  KML,
-  NEXT_BIKE,
-  OV_FIETS,
-  SF_BAY_AREA,
-  SHARE_BIKE,
   SMOOVE,
-  UIP_BIKE,
-  VCUV,
+
+  // Vehicle Parking
+  KML,
+  PARK_API,
+  BICYCLE_PARK_API,
+  HSL_PARK,
 
   // GTFS RT
   GTFS_RT_HTTP,
-  GTFS_RT_FILE;
+  GTFS_RT_FILE,
+
+  // GTFS-RT Vehicle Positions
+  GTFS_RT_VEHICLE_POSITIONS,
 }

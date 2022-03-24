@@ -25,7 +25,7 @@ import static org.opentripplanner.util.HttpToGraphQLMapper.mapHttpQuerryParamsTo
 public class GraphStatisticsResource {
 
     private final ObjectMapper deserializer = new ObjectMapper();
-    private GraphQL graphQL;
+    private final GraphQL graphQL;
 
     @SuppressWarnings("unused")
     public GraphStatisticsResource(@Context OTPServer server) {
@@ -33,7 +33,7 @@ public class GraphStatisticsResource {
     }
 
     GraphStatisticsResource(RoutingService routingService) {
-        this.graphQL = new GraphQL(StatisticsGraphQLSchemaFactory.createSchema(routingService));
+        this.graphQL = GraphQL.newGraphQL(StatisticsGraphQLSchemaFactory.createSchema(routingService)).build();
     }
 
     @POST @Path("/graphql")

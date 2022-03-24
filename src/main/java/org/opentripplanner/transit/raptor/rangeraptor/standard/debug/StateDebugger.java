@@ -28,23 +28,33 @@ class StateDebugger<T extends RaptorTripSchedule> {
         this.debugHandlerStopArrivals = dFactory.debugStopArrival();
     }
 
-    void acceptAccess(int stop) {
+    void acceptAccessPath(int stop, RaptorTransfer access) {
         if(isDebug(stop)) {
-            accept(stop);
+            debugHandlerStopArrivals.accept(cursor.access(round(), stop, access));
         }
     }
 
     void rejectAccessPath(RaptorTransfer accessPath, int arrivalTime) {
         if (isDebug(accessPath.stop())) {
-            reject(cursor.rejectedAccess(round(), accessPath, arrivalTime));
+            reject(cursor.fictiveAccess(round(), accessPath, arrivalTime));
         }
     }
 
-    void dropOldStateAndAcceptNewState(int stop, Runnable body) {
+    void dropOldStateAndAcceptNewOnBoardArrival(int stop, boolean newBestOverall, Runnable body) {
         if (isDebug(stop)) {
-            drop(stop);
+            drop(stop, true, newBestOverall);
             body.run();
-            accept(stop);
+            accept(stop, true);
+        } else {
+            body.run();
+        }
+    }
+
+    void dropOldStateAndAcceptNewOnStreetArrival(int stop, Runnable body) {
+        if (isDebug(stop)) {
+            drop(stop, false, true);
+            body.run();
+            accept(stop, false);
         } else {
             body.run();
         }
@@ -52,13 +62,13 @@ class StateDebugger<T extends RaptorTripSchedule> {
 
     void rejectTransit(int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
         if (isDebug(alightStop)) {
-            reject(cursor.rejectedTransit(round(), alightStop, alightTime, trip, boardStop, boardTime));
+            reject(cursor.fictiveTransit(round(), alightStop, alightTime, trip, boardStop, boardTime));
         }
     }
 
     void rejectTransfer(int fromStop, RaptorTransfer transfer, int toStop, int arrivalTime) {
         if (isDebug(transfer.stop())) {
-            reject(cursor.rejectedTransfer(round(), fromStop, transfer, toStop, arrivalTime));
+            reject(cursor.fictiveTransfer(round(), fromStop, transfer, toStop, arrivalTime));
         }
     }
 
@@ -69,18 +79,47 @@ class StateDebugger<T extends RaptorTripSchedule> {
         return debugHandlerStopArrivals.isDebug(stop);
     }
 
-    private void accept(int stop) {
-        debugHandlerStopArrivals.accept(cursor.stop(round(), stop));
+    private void accept(int stop, boolean stopReachedOnBoard) {
+        debugHandlerStopArrivals.accept(cursor.stop(round(), stop, stopReachedOnBoard));
     }
 
-    private void drop(int stop) {
-        if(cursor.exist(round(), stop)) {
-            debugHandlerStopArrivals.drop(cursor.stop(round(), stop), null, null);
+    /**
+     * This method mimic the logic in the worker/state. A better approach would be
+     * to do the logging where the changes happen as in the multi-criteria version,
+     * but that would lead to a much more complicated instrumentation. So, this
+     * method replicate the logic that is done in the worker and state classes combined.
+     * <p>
+     * Note! Arrivals in the state is not dropped by this method, this class only notify the
+     * debug handler about arrivals that are about to be dropped.
+     */
+    private void drop(int stop, boolean onBoard, boolean newBestOverall) {
+        final int round = round();
+
+        // if new arrival arrived on-board,
+        if(onBoard) {
+            // and an existing on-board arrival exist
+            if(cursor.reachedOnBoard(round, stop)) {
+                dropExistingArrival(round, stop, onBoard);
+            }
+            // and an existing best-over-all arrival exist
+            if(newBestOverall) {
+                if(cursor.reachedOnStreet(round, stop)) {
+                    dropExistingArrival(round, stop, false);
+                }
+            }
+        }
+        // drop existing best over all arrival, but not existing on-board
+        else if(cursor.reachedOnStreet(round, stop)) {
+            dropExistingArrival(round, stop, onBoard);
         }
     }
 
     private void reject(ArrivalView<T> arrival) {
         debugHandlerStopArrivals.reject(arrival, null, null);
+    }
+
+    private void dropExistingArrival(int round, int stop, boolean onBoard) {
+        debugHandlerStopArrivals.drop(cursor.stop(round, stop, onBoard), null, null);
     }
 
     private int round() {

@@ -33,6 +33,7 @@ those paths (the post-processing).
     3. For a transfer between two trips we want to find the right balance, between
        extra-transfer-time and the path generalized-cost(like the cost of walking and riding a
        bus). 
+
  
 ## Not Supported (jet)
  - Using GTFS transfers.txt it is possible to set the `min_transfer_time` with `transfer_type = 2`.
@@ -42,8 +43,7 @@ those paths (the post-processing).
    See issue [#3505](https://github.com/opentripplanner/OpenTripPlanner/issues/3505).
  - Support for Trip matching when only Route is specified in transfers.txt.
    See issue [#3429](https://github.com/opentripplanner/OpenTripPlanner/issues/3429)
- - Add support for redused cost for guaranteed interchange. 
-   See issue [#3478](https://github.com/opentripplanner/OpenTripPlanner/issues/3478)  
+
 
 ## Implementation
 
@@ -51,12 +51,12 @@ OTP finds the best transfers in 2 steps:
 
  1. As part of the routing. The routing engine (Raptor) applies generalized-cost and 
     number-of-transfers as criteria during the routing. In addition, Raptor supports overriding 
-    regular transfers with guaranteed transfers. 
+    regular transfers with constrained transfers. 
     1. Goal 1 is achieved by having `number-of-transfers` as a Raptor criterion.
     2. Goal 2 is achieved by giving some stops a lower _visiting-cost_ according to the 
        `StopTransferPriority`.
-    3. Goal 3 and 6 is achieved by allowing guaranteed transfers to override regular transfers. An 
-       optional `RaptorGuaranteedTransferProvider` is injected into Raptor witch Raptor calls to 
+    3. Goal 3 and 6 is achieved by allowing constrained transfers to override regular transfers. An 
+       optional `RaptorTransferConstraintsProvider` is injected into Raptor which Raptor calls to 
        get guaranteed transfers. This service is also responsible for rejecting a transfer(TODO). 
  2. Optimize transfers: Goal 4, 5, and 7 are achieved by post-processing paths. Paths from the 
     routing search are revised, optimizing the stop at which transfers happen between each pair of
@@ -72,7 +72,7 @@ OTP finds the best transfers in 2 steps:
     3. Another filter which breaks ties based on an "optimize-transfer-cost" function.
     4. Because the number of permutations grow exponentially with the number of transfers, 
        each filter above is applied for each sub-path starting from the end of the path. This 
-       keep the number of options down to almost O(N), where N is the number of transfers.
+       keep the number of options down, close to O(N), where N is the number of transfers.
 
 
 ## Design - Optimize transfers
@@ -96,8 +96,8 @@ Here is an outline of the calls:
 Package `org.opentripplanner.routing.algorithm.transferoptimization` has the following subpackages:
 - `api` classes used outside the transfer-optimization.
 - `configure` creates and wires up the the module.
-- `model` simple internal model classes used by the services to build the result.
-- `services` internal transfer-optimization domain services, witch collaborate to do the job.
+- `model` simple internal model classes used by the services.
+- `services` internal transfer-optimization domain services, which collaborate to do the job.
 
 ### Important classes
 
@@ -115,7 +115,7 @@ The `OptimizePathService` finds the best optimized path using the other domain s
 The `TransferGenerator` is responsible for finding all possible transfer options and decorating each 
 transfer with information that the other services will use later to do their job. The additional
 information added to each transfer is:
-- Guaranteed transfer information including priority, guaranteed, stay-seated and so on
+- Constrained transfer information including priority, guaranteed, stay-seated and so on
 - The various cost described in `TransferOptimized`:
   - `transfer-priority-cost`
   - `wait-time-optimized-cost` or `generalized-cost`
@@ -127,7 +127,7 @@ The `TransitPathLegSelector` uses the filter-chain to prune the results already 
 combining them with new transfer-points and a new transit-path-leg. 
 
 The domain `OptimizedPathTail` is used to store the intermediate results. It decorates the `PathLeg`
-from Raptor with `TransferOptimized` costs and keep a list of all relevant guaranteed-transfers.
+from Raptor with `TransferOptimized` costs.
 
 
 ### The Optimize-transfer-cost Function
@@ -151,7 +151,7 @@ each transfer in the path.
 We have created a function with two parts:
 - a linear decreasing component with a factor `a`. This should be adjusted to balance with the 
   components of the path `generalized-cost`.
-- an inverse logarithmic function witch have a high cost for short wait-times. 
+- an inverse logarithmic function which have a high cost for short wait-times. 
   This function is relative to the calculated `min-safe-transfer-time`. 
 
 The `f(t)` is constructed so only 2 parameters are needed to tune it. Let:
@@ -186,7 +186,7 @@ f(t) =  -----------------------  -  a * t
 
 where the constant `C = (e - 1.0)/t0`.
 
-Here is a plot with three examples with different values for `n` and `a` witch illustrate how the 
+Here is a plot with three examples with different values for `n` and `a` which illustrate how the 
 function look like when the linear, and the logarithmic part is present or not. The blue line have 
 only the logarithmic part(n=4, a=0), the purple line is a combination (n=2, a=0.5), and the yellow
 line have the linear path only(n=0, a=1). The minimum-safe-transfer-time is set to 600s or 10

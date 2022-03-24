@@ -1,21 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.FareZone;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.impl.EntityById;
-import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
-import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.StopPlace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,8 +12,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
+import org.opentripplanner.common.model.T2;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.Issue;
+import org.opentripplanner.model.FareZone;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
+import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
+import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
+import org.rutebanken.netex.model.Quay;
+import org.rutebanken.netex.model.Quays_RelStructure;
+import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TariffZoneRef;
 
 /**
  * This maps a NeTEx StopPlace and its child quays to and OTP parent stop and child stops. NeTEx also contains
@@ -40,13 +42,13 @@ import static java.util.stream.Collectors.toList;
  * of the StopPlace.
  */
 class StopAndStationMapper {
-    private static final Logger LOG = LoggerFactory.getLogger(StopAndStationMapper.class);
-
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
     private final StationMapper stationMapper;
     private final StopMapper stopMapper;
-    private final EntityById<FareZone> tariffZonesById;
-    private final FeedScopedIdFactory idFactory;
+    private final TariffZoneMapper tariffZoneMapper;
+    private final StopPlaceTypeMapper stopPlaceTypeMapper = new StopPlaceTypeMapper();
+    private final DataImportIssueStore issueStore;
+
 
     /**
      * Quay ids for all processed stop places
@@ -61,14 +63,14 @@ class StopAndStationMapper {
     StopAndStationMapper(
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
-            EntityById<FareZone> tariffZonesById,
+            TariffZoneMapper tariffZoneMapper,
             DataImportIssueStore issueStore
     ) {
-        this.stationMapper = new StationMapper(idFactory);
+        this.stationMapper = new StationMapper(issueStore, idFactory);
         this.stopMapper = new StopMapper(idFactory, issueStore);
+        this.tariffZoneMapper = tariffZoneMapper;
         this.quayIndex = quayIndex;
-        this.tariffZonesById = tariffZonesById;
-        this.idFactory = idFactory;
+        this.issueStore = issueStore;
     }
 
     /**
@@ -80,26 +82,27 @@ class StopAndStationMapper {
         // TODO OTP2 - This should pushed up into the ReadOnlyHierarchicalVersionMapById as part of
         //           - Issue: Netex import resolve version for all entities , not just stops #2781
         List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
-        Station station = mapStopPlaceAllVersionsToStation(stopPlaceAllVersions);
-        List<FareZone> fareZones = mapTariffZones(stopPlaceAllVersions);
+        StopPlace selectedStopPlace = first(stopPlaceAllVersions);
 
-        // Loop through all versions of the StopPlace in order to collect all quays, even if they were deleted in
-        // never versions of the StopPlace
+        Station station = mapStopPlaceAllVersionsToStation(selectedStopPlace);
+        Collection<FareZone> fareZones = mapTariffZones(selectedStopPlace);
+        T2<TransitMode, String> transitMode = stopPlaceTypeMapper.map(selectedStopPlace);
+
+        // Loop through all versions of the StopPlace in order to collect all quays, even if they
+        // were deleted in never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Quay quay : listOfQuays(stopPlace)) {
-                addNewStopToParentIfNotPresent(quay, station, fareZones);
+                addNewStopToParentIfNotPresent(
+                        quay, station, fareZones, transitMode, selectedStopPlace);
             }
         }
     }
 
-    private Station mapStopPlaceAllVersionsToStation(List<StopPlace> stopPlaceAllVersions) {
-        // Map the highest priority StopPlace version to station
-        StopPlace selectedStopPlace = first(stopPlaceAllVersions);
-
-        Station station = stationMapper.map(selectedStopPlace);
-        if (selectedStopPlace.getParentSiteRef() != null) {
+    private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
+        Station station = stationMapper.map(stopPlace);
+        if (stopPlace.getParentSiteRef() != null) {
             resultStationByMultiModalStationRfs.put(
-                    selectedStopPlace.getParentSiteRef().getRef(),
+                    stopPlace.getParentSiteRef().getRef(),
                     station
             );
         }
@@ -107,15 +110,32 @@ class StopAndStationMapper {
         return station;
     }
 
-    private List<FareZone> mapTariffZones(List<StopPlace> stopPlaceAllVersions) {
-        StopPlace selectedStopPlace = first(stopPlaceAllVersions);
-        return selectedStopPlace.getTariffZones() != null ? selectedStopPlace
-            .getTariffZones()
+    private Collection<FareZone> mapTariffZones(StopPlace stopPlace) {
+        if(stopPlace.getTariffZones() == null) { return List.of(); }
+
+        return stopPlace.getTariffZones()
             .getTariffZoneRef()
             .stream()
-            .map(t -> tariffZonesById.get(idFactory.createId(t.getRef())))
+            .map(ref -> findTariffZone(stopPlace, ref))
             .filter(Objects::nonNull)
-            .collect(Collectors.toList()) : Collections.emptyList();
+            .collect(Collectors.toList());
+    }
+
+    private FareZone findTariffZone(StopPlace stopPlace, TariffZoneRef ref) {
+        if(ref == null) { return null; }
+        var result = tariffZoneMapper.findAndMapTariffZone(ref);
+
+        if(result == null) {
+            issueStore.add(
+                    Issue.issue(
+                            "StopPlaceMissingFareZone",
+                            "StopPlace %s has unsupported tariff zone reference: %s",
+                            stopPlace.getId(),
+                            ref
+                    )
+            );
+        }
+        return result;
     }
 
     /**
@@ -128,11 +148,13 @@ class StopAndStationMapper {
     }
 
     private void addNewStopToParentIfNotPresent(
-        Quay quay,
-        Station station,
-        List<FareZone> fareZones
+            Quay quay,
+            Station station,
+            Collection<FareZone> fareZones,
+            T2<TransitMode, String> transitMode,
+            StopPlace stopPlace
     ) {
-        // TODO OTP2 - This assumtion is only valid because Norway have a
+        // TODO OTP2 - This assumption is only valid because Norway have a
         //           - national stop register, we should add all stops/quays
         //           - for version resolution.
         // Continue if this is not newest version of quay
@@ -143,8 +165,11 @@ class StopAndStationMapper {
             return;
         }
 
-        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones);
-        if (stop == null) return;
+        var wheelchairBoarding = wheelChairBoardingFromQuay(quay, stopPlace);
+
+        Stop stop =
+                stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchairBoarding);
+        if (stop == null) {return;}
 
         station.addChildStop(stop);
 
@@ -159,11 +184,11 @@ class StopAndStationMapper {
      * We do not support quay references, all quays must be included as part of the
      * given stopPlace.
      */
-    private static List<Quay> listOfQuays(StopPlace stopPlace) {
+    private List<Quay> listOfQuays(StopPlace stopPlace) {
         Quays_RelStructure quays = stopPlace.getQuays();
 
         if(quays == null) {
-            LOG.warn("StopPlace {} has no quays.", stopPlace.getId());
+            issueStore.add(new StopPlaceWithoutQuays(stopPlace.getId()));
             return Collections.emptyList();
         }
 
@@ -174,7 +199,14 @@ class StopAndStationMapper {
                 result.add((Quay) it);
             }
             else {
-                LOG.warn("StopPlace {} has unsupported quay reference: {}", stopPlace.getId(), it);
+                issueStore.add(
+                        Issue.issue(
+                                "StopPlaceWithoutQuays",
+                                "StopPlace %s has unsupported quay reference: %s",
+                                stopPlace.getId(),
+                                it
+                        )
+                );
             }
         }
         return result;
@@ -183,4 +215,28 @@ class StopAndStationMapper {
     private static StopPlace first(List<StopPlace> stops) {
         return stops.get(0);
     }
+
+    /**
+     * Get WheelChairBoarding from Quay and parent Station.
+     *
+     * @param quay      NeTEx quay could contain information about accessability
+     * @param stopPlace Parent StopPlace for given Quay
+     * @return not null value with default NO_INFORMATION if nothing defined in quay or
+     * parentStation.
+     */
+    private WheelChairBoarding wheelChairBoardingFromQuay(Quay quay, StopPlace stopPlace) {
+
+        var defaultWheelChairBoarding = WheelChairBoarding.NO_INFORMATION;
+
+        if (stopPlace != null) {
+            defaultWheelChairBoarding = WheelChairMapper.wheelChairBoarding(
+                    stopPlace.getAccessibilityAssessment(),
+                    WheelChairBoarding.NO_INFORMATION
+            );
+        }
+
+        return WheelChairMapper.wheelChairBoarding(
+                quay.getAccessibilityAssessment(), defaultWheelChairBoarding);
+    }
+
 }

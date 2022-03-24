@@ -5,7 +5,7 @@ import java.util.List;
 
 public class OSMRelation extends OSMWithTags {
 
-  private List<OSMRelationMember> members = new ArrayList<OSMRelationMember>();
+  private final List<OSMRelationMember> members = new ArrayList<>();
 
   public void addMember(OSMRelationMember member) {
     members.add(member);
@@ -17,5 +17,10 @@ public class OSMRelation extends OSMWithTags {
 
   public String toString() {
     return "osm relation " + id;
+  }
+
+  @Override
+  public String getOpenStreetMapLink() {
+    return String.format("http://www.openstreetmap.org/relation/%d", getId());
   }
 }

@@ -1,13 +1,7 @@
 package org.opentripplanner.ext.parkAndRideApi;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -17,8 +11,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 /**
  * Created by demory on 7/26/18.
@@ -27,16 +26,18 @@ import java.util.List;
 @Path("/routers/{ignoreRouterId}/park_and_ride")
 public class ParkAndRideResource {
 
-    @Context
-    OTPServer otpServer;
+    private final OTPServer otpServer;
 
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated
-    @PathParam("ignoreRouterId")
-    private String ignoreRouterId;
+    public ParkAndRideResource(
+            @Context OTPServer otpServer,
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+    ) {
+        this.otpServer = otpServer;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -58,7 +59,10 @@ public class ParkAndRideResource {
         List<ParkAndRideInfo> prs = new ArrayList<>();
         for (Vertex v : router.graph.getVertices()) {
             // Check if vertex is a ParkAndRideVertex
-            if (!(v instanceof ParkAndRideVertex)) continue;
+            if (!(v instanceof VehicleParkingEntranceVertex)) continue;
+
+            // Check if cars are allowed
+            if (!((VehicleParkingEntranceVertex) v).getVehicleParking().hasAnyCarPlaces()) continue;
 
             // Check if vertex is within envelope
             if (!envelope.contains(v.getX(), v.getY())) continue;
@@ -70,7 +74,7 @@ public class ParkAndRideResource {
                 if (stops.isEmpty()) { continue; }
             }
 
-            prs.add(new ParkAndRideInfo((ParkAndRideVertex) v));
+            prs.add(new ParkAndRideInfo((VehicleParkingEntranceVertex) v));
         }
 
         return Response.status(Status.OK).entity(prs).build();
@@ -81,21 +85,19 @@ public class ParkAndRideResource {
         String[] lowerLeftParts = lowerLeft.split(",");
         String[] upperRightParts = upperRight.split(",");
 
-        Envelope envelope = new Envelope(Double.parseDouble(lowerLeftParts[1]),
+        return new Envelope(Double.parseDouble(lowerLeftParts[1]),
             Double.parseDouble(upperRightParts[1]), Double.parseDouble(lowerLeftParts[0]),
             Double.parseDouble(upperRightParts[0]));
-        return envelope;
     }
 
-    public class ParkAndRideInfo {
-        private static final long serialVersionUID = 1L;
+    public static class ParkAndRideInfo {
 
         public String name;
 
         public Double x, y;
 
-        public ParkAndRideInfo(ParkAndRideVertex vertex) {
-            this.name = vertex.getName();
+        public ParkAndRideInfo(VehicleParkingEntranceVertex vertex) {
+            this.name = vertex.getDefaultName();
             this.x = vertex.getX();
             this.y = vertex.getY();
         }

@@ -3,16 +3,18 @@ package org.opentripplanner.routing.algorithm;
 import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
+
+import java.time.Instant;
 
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
@@ -22,7 +24,7 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 @Ignore
 public class TestAStar extends TestCase {
     
-    private AStar aStar = new AStar();
+    private final AStar aStar = new AStar();
 
     public void testBasic() throws Exception {
 
@@ -40,10 +42,10 @@ public class TestAStar extends TestCase {
         GraphPath path = null;
 
         String feedId = gg.getFeedIds().iterator().next();
-        options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
+        options.setDateTime(TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0));
         options.setRoutingContext(gg, feedId + ":Millbrae Caltrain", feedId + ":Mountain View Caltrain");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":Mountain View Caltrain"), true);
+        path = spt.getPath(gg.getVertex(feedId + ":Mountain View Caltrain"));
 
         long endTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 13, 29, 0);
 
@@ -51,10 +53,10 @@ public class TestAStar extends TestCase {
 
         /* test backwards traversal */
         options.setArriveBy(true);
-        options.dateTime = endTime;
+        options.setDateTime(Instant.ofEpochSecond(endTime));
         options.setRoutingContext(gg, feedId + ":Millbrae Caltrain", feedId + ":Mountain View Caltrain");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":Millbrae Caltrain"), true);
+        path = spt.getPath(gg.getVertex(feedId + ":Millbrae Caltrain"));
 
         long expectedStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 39, 0);
 
@@ -71,17 +73,17 @@ public class TestAStar extends TestCase {
 
         RoutingRequest options = new RoutingRequest();
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
-        options.dateTime = startTime;
+        options.setDateTime(Instant.ofEpochSecond(startTime));
         // one hour is more than enough time
         options.setRoutingContext(graph, start, end);
 
         ShortestPathTree spt = aStar.getShortestPathTree(options);
-        GraphPath path = spt.getPath(end, true);
+        GraphPath path = spt.getPath(end);
         assertNotNull(path);
         
         // but one minute is not enough
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(end, true);
+        path = spt.getPath(end);
         assertNull(path);        
     }
 

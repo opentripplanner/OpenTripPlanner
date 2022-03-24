@@ -1,15 +1,10 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -19,6 +14,8 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+
+import static org.junit.Assert.*;
 
 public class PlainStreetEdgeTest {
 
@@ -265,9 +262,17 @@ public class PlainStreetEdgeTest {
         State state = new State(v2, 0, proto.clone());
 
         state.getOptions().setArriveBy(true);
-        graph.addTurnRestriction(e1, new TurnRestriction(e1, e0, null, TraverseModeSet.allModes()));
+        e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
 
         assertNotNull(e0.traverse(e1.traverse(state)));
+    }
+
+    @Test
+    public void testElevationProfile() {
+        var elevationProfile = new PackedCoordinateSequence.Double(new double[]{0, 10, 50, 12}, 2, 0);
+        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL, elevationProfile);
+
+        assertArrayEquals(elevationProfile.toCoordinateArray(), e0.getElevationProfile().toCoordinateArray());
     }
 
     /****
@@ -275,8 +280,7 @@ public class PlainStreetEdgeTest {
      ****/
 
     private IntersectionVertex vertex(String label, double x, double y) {
-        IntersectionVertex v = new IntersectionVertex(graph, label, x, y);
-        return v;
+        return new IntersectionVertex(graph, label, x, y);
     }
 
     /**
@@ -299,4 +303,23 @@ public class PlainStreetEdgeTest {
         return new StreetEdge(vA, vB, geom, name, length, perm, false);
     }
 
+    private StreetWithElevationEdge edge(
+            StreetVertex vA,
+            StreetVertex vB,
+            double length,
+            StreetTraversalPermission perm,
+            PackedCoordinateSequence elevationProfile
+    ) {
+        String labelA = vA.getLabel();
+        String labelB = vB.getLabel();
+        String name = String.format("%s_%s", labelA, labelB);
+        Coordinate[] coords = new Coordinate[2];
+        coords[0] = vA.getCoordinate();
+        coords[1] = vB.getCoordinate();
+        LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+
+        var edge = new StreetWithElevationEdge(vA, vB, geom, name, length, perm, false);
+        edge.setElevationProfile(elevationProfile, false);
+        return edge;
+    }
 }

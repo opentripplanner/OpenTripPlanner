@@ -12,6 +12,7 @@ import org.opentripplanner.standalone.server.OTPApplication;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.logging.MetricsLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class OTPAppConstruction {
     }
 
     /**
-     * Create or retrieve a data store witch provide access to files, remote or local.
+     * Create or retrieve a data store which provide access to files, remote or local.
      */
     public OtpDataStore store() {
         if(store == null) {
@@ -85,7 +86,9 @@ public class OTPAppConstruction {
         return GraphBuilder.create(
                 config.buildConfig(),
                 graphBuilderDataSources(),
-                baseGraph
+                baseGraph,
+                config.getCli().doLoadStreetGraph(),
+                config.getCli().doSaveStreetGraph()
         );
     }
 
@@ -118,6 +121,7 @@ public class OTPAppConstruction {
     public OTPServer server(Router router) {
         if (server == null) {
             server = new OTPServer(config.getCli(), router);
+            new MetricsLogging(server);
         }
         return server;
     }

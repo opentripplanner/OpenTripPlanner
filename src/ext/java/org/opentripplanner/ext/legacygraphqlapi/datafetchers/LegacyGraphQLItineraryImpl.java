@@ -9,7 +9,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.Fare;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -63,14 +62,13 @@ public class LegacyGraphQLItineraryImpl
       if (fare == null) {
         return null;
       }
-      List<Map<String, Object>> results = fare.fare.keySet().stream().map(fareKey -> {
+      return fare.fare.keySet().stream().map(fareKey -> {
         Map<String, Object> result = new HashMap<>();
         result.put("name", fareKey.name());
         result.put("fare", fare.getFare(fareKey));
         result.put("details", fare.getDetails(fareKey));
         return result;
       }).collect(Collectors.toList());
-      return results;
     };
   }
 
@@ -86,7 +84,7 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {
-    return environment -> getSource(environment).arrivedAtDestinationWithRentedBicycle;
+    return environment -> getSource(environment).arrivedAtDestinationWithRentedVehicle;
   }
 
   @Override

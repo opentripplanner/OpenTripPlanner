@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BikeAccess;
 
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class TripMapperTest {
@@ -56,7 +58,8 @@ public class TripMapperTest {
         TRIP.setWheelchairAccessible(WHEELCHAIR_ACCESSIBLE);
     }
 
-    private TripMapper subject = new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)));
+    private final TripMapper subject = new TripMapper(
+            new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false)));
 
     @Test
     public void testMapCollection() throws Exception {
@@ -110,6 +113,6 @@ public class TripMapperTest {
         org.opentripplanner.model.Trip result1 = subject.map(TRIP);
         org.opentripplanner.model.Trip result2 = subject.map(TRIP);
 
-        assertTrue(result1 == result2);
+      assertSame(result1, result2);
     }
 }

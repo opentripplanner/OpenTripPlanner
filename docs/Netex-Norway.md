@@ -29,7 +29,12 @@ The `build-config.json` for a Norwegian graph using Netex data looks like this:
     "sharedFilePattern": "_stops.xml",
     "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
     "groupFilePattern": "(\\w{3})_.*\\.xml",
-    "netexFeedId": "EN"
+    "netexFeedId": "EN",
+    "ferryIdsNotAllowedForBicycle": [
+      "NYC:Line:1",
+      "NYC:Line:012fc5c4-131b-4dfc-8160-4e49136e531a",
+      "NYC:Line:8bfef12a-ac98-4376-8a2a-eb5a336d107b"
+    ]
   }
 }
 ```
@@ -96,5 +101,3 @@ These updaters can handle differential updates, but they use a polling approach 
 Note that between these SIRI updaters and the GTFS-RT Websocket updater, we now have both polling and streaming examples of GTFS-RT "incrementality" semantics, so should be able to finalize that part of the specification.
 
 The final updater regularly performs a copy of the realtime data into a format suitable for use by OTP2's new Raptor router. Without this updater the realtime data will be received and cataloged, but not visible to the router.
-
-TODO explain on `blockReadinessUntilInitialized` for load balancers.

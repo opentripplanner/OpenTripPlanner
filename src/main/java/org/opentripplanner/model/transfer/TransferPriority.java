@@ -5,13 +5,24 @@ package org.opentripplanner.model.transfer;
  * the highest priority PREFERRED. This follow the NeTEx/Transmodel naming and functionality. In
  * GTFS the priority is mapped using {@code transfer_type}:
  * <ol>
- *     <li>NOT_ALLOWED: 3 - Transfers are not possible
- *     <li>ALLOWED:  1 - Timed transfer point and 2 - Transfer requires a minimum amount of time,
- *     <li>PREFERRED: 0 or empty - Recommended transfer point between routes
+ *     <li>
+ *         {@code 0 or empty -> PREFERRED}. Recommended transfer point between routes.
+ *     </li>
+ *     <li>
+ *         {@code 1 -> ALLOWED}. Timed transfer point between two routes. The departing vehicle is
+ *         expected to wait for the arriving one and leave sufficient time for a rider to transfer
+ *         between routes. The transfer is also set as GUARANTEED.
+ *     </li>
+ *     <li>
+ *         {@code 3 -> NOT_ALLOWED}. Transfers are not possible
+ *     /li>
  * </ol>
+ * <p>
  * Note that for {@code transfer_type=1} the guarantied flag is also set causing it to take
- * residence over the priority. A guarantied ALLOWED transfer is preferred over a PREFERRED
+ * precedence over the priority. A guarantied ALLOWED transfer is preferred over a PREFERRED
  * none-guarantied transfer.
+ * <p>
+ * Note that {@code transfer_type=2} is not a constraint, just a regular path transfer.
  */
 public enum TransferPriority {
   /**
@@ -19,42 +30,28 @@ public enum TransferPriority {
    * <p>
    * GTFS: 3 - Transfers are not possible.
    */
-  NOT_ALLOWED(1_000),
+  NOT_ALLOWED(1000_00),
 
   /**
    * This is the same as a regular transfer.
    * <p>
    * GTFS: 1 - Timed transfer point, 2 - Transfer requires a minimum amount of time.
    */
-  ALLOWED(0),
+  ALLOWED(3_00),
 
   /**
    * A recommended transfer, but not as good as preferred.
    * <p>
    * GTFS: Not available in GTFS
    */
-  RECOMMENDED(-1),
+  RECOMMENDED(2_00),
 
   /**
    * The highest priority there exist.
    * <p>
    * GTFS: 0 or empty - Recommended transfer point between routes.
    */
-  PREFERRED(-2);
-
-  /**
-   * STAY_SEATED is not a priority, but we assign a cost to it to be able to compare it with other
-   * transfers with a priority and the {@link #GUARANTIED_TRANSFER_COST}.
-   */
-  public static final int  STAY_SEATED_TRANSFER_COST = -100;
-
-  /**
-   * GUARANTIED is not a priority, but we assign a cost to it to be able to compare it with other
-   * transfers with a priority. The cost is better than a pure prioritized transfer, but the
-   * priority and GUARANTIED attribute is added together; Hence a (GUARANTIED, RECOMMENDED)
-   * transfer is better than (GUARANTIED, ALLOWED).
-   */
-  public static final int  GUARANTIED_TRANSFER_COST = -10;
+  PREFERRED(1_00);
 
 
   private final int cost;
@@ -64,20 +61,26 @@ public enum TransferPriority {
   }
 
   /**
-   * This method return a cost for how good a transfer is compared with another transfer. This
-   * cost can only be used to compare transfers and should not be mixed with the transit
-   * generalized-cost. A regular transit have cost 0(zero). A PREFERRED transfer have a negative
-   * cost and the NOT_ALLOWED have a positive very high cost. We include stay-seated and guarantied
-   * transfers here, even if thy are not priority values. The STAY_SEATED and GUARANTIED cost
-   * value are added to the PRIORITY cost.
-   *
-   * @param staySeated is given a super-low cost to take precedence over all other possible options.
-   * @param guarantied is lower than stay-seated, but better than the PREFERRED priority.
+   * The default priority is ALLOWED. All transfers are ALLOWED unless they have the priority
+   * set to something else.
    */
-  public int cost(boolean staySeated, boolean guarantied) {
-    int cost = this.cost;
-    if(staySeated) { cost += STAY_SEATED_TRANSFER_COST; }
-    if(guarantied) { cost += GUARANTIED_TRANSFER_COST; }
-    return cost;
+  public boolean isConstrained() {
+    return this != ALLOWED;
+  }
+
+  /**
+   * This method returns a cost for how good a transfer priority is compared to other transfer
+   * priorities. The cost can only be used to compare transfers and should not be mixed with the
+   * generalized-cost. A regular transfer (without any constraints) has the same cost as ALLOWED.
+   * <p>
+   * <ol>
+   * <li>{@code PREFERRED} - cost: 1 points.</li>
+   * <li>{@code RECOMMENDED} - cost: 2 points.</li>
+   * <li>{@code ALLOWED} - cost: 3 points.</li>
+   * <li>{@code NOT_ALLOWED} - cost: 1000 points.</li>
+   * </ol>
+   */
+  public int cost() {
+    return this.cost;
   }
 }
