@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.AccessibilityRequirements.Strictness;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
@@ -104,11 +105,11 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return bikeAccessForTrip(trip) == BikeAccess.ALLOWED;
     }
 
-    if (accessibilityRequirements == AccessibilityRequirements.KNOWN_INFORMATION_ONLY) {
+    if (accessibilityRequirements.strictness() == Strictness.KNOWN_INFORMATION_ONLY) {
       // if the accessibility mode is STRICTLY_REQUIRED we only want trips of which we know that they
       // are wheelchair accessible
       return trip.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
-    } else if (accessibilityRequirements == AccessibilityRequirements.ALLOW_UNKNOWN_INFORMATION) {
+    } else if (accessibilityRequirements.strictness() == Strictness.ALLOW_UNKNOWN_INFORMATION) {
       // when it's PREFERRED we also allow trips with unknown accessibility, but remove
       // those which are known to be inaccessible
       return trip.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

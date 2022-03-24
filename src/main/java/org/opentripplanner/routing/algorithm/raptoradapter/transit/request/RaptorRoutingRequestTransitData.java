@@ -99,7 +99,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     if (accessibilityMode.requestsWheelchair()) {
       this.generalizedCostCalculator = new WheelchairCostCalculator(
               defaultCostCalculator,
-              mcCostParams
+              mcCostParams.accessibilityRequirements()
       );
     }
     else {

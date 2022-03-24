@@ -402,7 +402,7 @@ public class TestHalfEdges {
         graph.streetNotesService.addStaticNote(leftBack, wheelchairAlert,
                 StreetNotesService.WHEELCHAIR_MATCHER);
 
-        req.setAccessibilityMode(true);
+        req.setAccessibility(true);
 
         start = StreetVertexIndex.createTemporaryStreetLocationForTest(
             "start", new NonLocalizedString("start"),

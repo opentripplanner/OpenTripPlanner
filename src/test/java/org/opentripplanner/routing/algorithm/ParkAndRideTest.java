@@ -1,5 +1,13 @@
 package org.opentripplanner.routing.algorithm;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.opentripplanner.model.AccessibilityRequirements.Strictness;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.model.AccessibilityRequirements;
@@ -9,14 +17,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public abstract class ParkAndRideTest extends GraphRoutingTest {
 
@@ -110,9 +110,9 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
         options.carParkCost = 240;
         options.carParkTime = 180;
         if(requireWheelChairAccessible) {
-            options.accessibilityRequirements = AccessibilityRequirements.KNOWN_INFORMATION_ONLY;
+            options.accessibilityRequirements = AccessibilityRequirements.makeDefault(Strictness.KNOWN_INFORMATION_ONLY);
         } else {
-            options.accessibilityRequirements = AccessibilityRequirements.NOT_REQUIRED;
+            options.accessibilityRequirements = AccessibilityRequirements.makeDefault(Strictness.NOT_REQUIRED);
         }
         options.bannedVehicleParkingTags = bannedTags;
         options.requiredVehicleParkingTags = requiredTags;

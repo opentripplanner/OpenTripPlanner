@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.model.AccessibilityRequirements.Strictness;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.model.AccessibilityRequirements;
@@ -21,8 +22,6 @@ public class McCostParams {
     private final double[] transitReluctanceFactors;
     private final double waitReluctanceFactor;
     private final AccessibilityRequirements accessibilityRequirements;
-    private final int unknownTripAccessibilityCost;
-    private final int inaccessibleTripCost;
 
     /**
      * Default constructor defines default values. These defaults are
@@ -33,9 +32,7 @@ public class McCostParams {
         this.transferCost = 0;
         this.transitReluctanceFactors = null;
         this.waitReluctanceFactor = 1.0;
-        this.accessibilityRequirements = AccessibilityRequirements.NOT_REQUIRED;
-        this.unknownTripAccessibilityCost = 60 * 5;
-        this.inaccessibleTripCost = 60 * 60;
+        this.accessibilityRequirements = AccessibilityRequirements.makeDefault(Strictness.NOT_REQUIRED);
     }
 
     McCostParams(McCostParamsBuilder builder) {
@@ -44,8 +41,6 @@ public class McCostParams {
         this.transitReluctanceFactors = builder.transitReluctanceFactors();
         this.waitReluctanceFactor = builder.waitReluctanceFactor();
         this.accessibilityRequirements = builder.accessibilityMode();
-        this.unknownTripAccessibilityCost = builder.unknownAccessibilityCost();
-        this.inaccessibleTripCost = builder.inaccessibleTripCost();
     }
 
     public int boardCost() {
@@ -76,23 +71,7 @@ public class McCostParams {
         return waitReluctanceFactor;
     }
 
-    /**
-     * If you are planning a trip for a wheelchair user, how much should the extra cost be for
-     * boarding a trip which has unknown accessibility.
-     */
-    public int unknownTripAccessibilityCost() {
-        return unknownTripAccessibilityCost;
-    }
-
-    /**
-     * If you are planning a trip for a wheelchair user, how much should the extra cost be for
-     * boarding a trip which we know to be inaccessible.
-     */
-    public int inaccessibleTripCost() {
-        return inaccessibleTripCost;
-    }
-
-    public AccessibilityRequirements accessibilityMode() {
+    public AccessibilityRequirements accessibilityRequirements() {
         return accessibilityRequirements;
     }
 
@@ -103,7 +82,7 @@ public class McCostParams {
                 .addNum("transferCost", transferCost, 0)
                 .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
                 .addDoubles("transitReluctanceFactors",  transitReluctanceFactors, 1.0)
-                .addEnum("accessibilityMode", accessibilityRequirements)
+                .addObj("accessibilityRequirements", accessibilityRequirements)
                 .toString();
     }
 
@@ -115,7 +94,6 @@ public class McCostParams {
         return boardCost == that.boardCost &&
                 transferCost == that.transferCost &&
                 accessibilityRequirements == that.accessibilityRequirements &&
-                unknownTripAccessibilityCost == that.unknownTripAccessibilityCost &&
                 Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0;
     }
 

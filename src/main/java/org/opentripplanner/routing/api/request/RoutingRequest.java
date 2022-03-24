@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
+import static org.opentripplanner.model.AccessibilityRequirements.Strictness.ALLOW_UNKNOWN_INFORMATION;
+import static org.opentripplanner.model.AccessibilityRequirements.Strictness.NOT_REQUIRED;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 import java.io.Serializable;
@@ -25,6 +27,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.AccessibilityRequirements;
+import org.opentripplanner.model.AccessibilityRequirements.Strictness;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -238,7 +241,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
      */
-    public AccessibilityRequirements accessibilityRequirements = AccessibilityRequirements.NOT_REQUIRED;
+    public AccessibilityRequirements accessibilityRequirements = AccessibilityRequirements.makeDefault(
+            NOT_REQUIRED);
 
     public int unknownStopAccessibilityPenalty = 60 * 10;
     public int unknownTripAccessibilityPenalty = 60 * 10;
@@ -814,12 +818,14 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.bicycleOptimizeType = bicycleOptimizeType;
     }
 
-    public void setAccessibilityMode(boolean accessibilityMode) {
-        if(accessibilityMode) {
-            this.accessibilityRequirements = AccessibilityRequirements.ALLOW_UNKNOWN_INFORMATION;
-        } else {
-            this.accessibilityRequirements = AccessibilityRequirements.NOT_REQUIRED;
+    public void setAccessibility(boolean wheelchair) {
+        Strictness strictness = NOT_REQUIRED;
+
+        if (wheelchair) {
+            strictness = ALLOW_UNKNOWN_INFORMATION;
         }
+
+        this.accessibilityRequirements = AccessibilityRequirements.makeDefault(strictness);
     }
 
     public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {

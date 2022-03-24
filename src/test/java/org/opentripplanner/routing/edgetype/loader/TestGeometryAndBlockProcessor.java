@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.edgetype.loader;
 
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import static org.opentripplanner.model.AccessibilityRequirements.Strictness.KNOWN_INFORMATION_ONLY;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
@@ -331,7 +334,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         }
         
         RoutingRequest options = new RoutingRequest();
-        options.accessibilityRequirements = AccessibilityRequirements.KNOWN_INFORMATION_ONLY;
+        options.accessibilityRequirements = AccessibilityRequirements.makeDefault(KNOWN_INFORMATION_ONLY);
         options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
 
         ShortestPathTree spt;

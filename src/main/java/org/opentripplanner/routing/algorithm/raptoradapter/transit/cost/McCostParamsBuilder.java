@@ -25,9 +25,7 @@ public class McCostParamsBuilder {
         this.transferCost = other.transferCost();
         this.transitReluctanceFactors = other.transitReluctanceFactors();
         this.waitReluctanceFactor = other.waitReluctanceFactor();
-        this.accessibilityRequirements = other.accessibilityMode();
-        this.unknownTripAccessibilityCost = other.unknownTripAccessibilityCost();
-        this.inaccessibleTripCost = other.inaccessibleTripCost();
+        this.accessibilityRequirements = other.accessibilityRequirements();
     }
 
     public int boardCost() {

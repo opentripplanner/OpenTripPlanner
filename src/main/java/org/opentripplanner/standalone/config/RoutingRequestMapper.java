@@ -100,13 +100,9 @@ public class RoutingRequestMapper {
         request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
         request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
         request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
-        //request.accessibilityMode =
+
         boolean wheelchairAccessible = c.asBoolean("wheelchairAccessible", dft.accessibilityRequirements.requestsWheelchair());
-        if(wheelchairAccessible) {
-            request.accessibilityRequirements = AccessibilityRequirements.ALLOW_UNKNOWN_INFORMATION;
-        } else {
-            request.accessibilityRequirements = AccessibilityRequirements.NOT_REQUIRED;
-        }
+        request.setAccessibility(wheelchairAccessible);
 
         mapTransferOptimization(
             (TransferOptimizationRequest)request.transferOptimization,
