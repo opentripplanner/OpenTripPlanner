@@ -4,19 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
 import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Tag;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.HttpHeaders;
-import org.opentripplanner.api.json.GraphQLResponseSerializer;
-import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -27,15 +23,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
+import org.opentripplanner.api.json.GraphQLResponseSerializer;
+import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
 @Path("/routers/{ignoreRouterId}/transmodel/index")    // It would be nice to get rid of the final /index.
@@ -44,23 +43,22 @@ public class TransmodelAPI {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
 
-    private static GqlUtil gqlUtil;
     private static GraphQLSchema schema;
     private static Collection<String> tracingHeaderTags;
 
     private final Router router;
-
     private final TransmodelGraph index;
     private final ObjectMapper deserializer = new ObjectMapper();
 
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated @PathParam("ignoreRouterId")
-    private String ignoreRouterId;
 
-    public TransmodelAPI(@Context OTPServer otpServer) {
+    public TransmodelAPI(
+            @Context OTPServer otpServer,
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+    ) {
         this.router = otpServer.getRouter();
         this.index = new TransmodelGraph(schema);
     }
@@ -79,7 +77,7 @@ public class TransmodelAPI {
           TransitIdMapper.setupFixedFeedId(graph.getAgencies());
         }
         tracingHeaderTags = config.tracingHeaderTags();
-        gqlUtil = new GqlUtil(graph.getTimeZone());
+        GqlUtil gqlUtil = new GqlUtil(graph.getTimeZone());
         schema = TransmodelGraphQLSchema.create(defaultRoutingRequest, gqlUtil);
     }
 

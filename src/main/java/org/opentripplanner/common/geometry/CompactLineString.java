@@ -1,7 +1,6 @@
 package org.opentripplanner.common.geometry;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 
 /**
@@ -41,11 +40,6 @@ public final class CompactLineString {
      * Singleton representation of a straight-line (where nothing has to be stored), to be re-used.
      */
     public static final byte[] STRAIGHT_LINE_PACKED = new byte[0];
-
-    /**
-     * Geometry factory. TODO - Do we need to make this parametrable?
-     */
-    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     /**
      * Public factory to create a compact line string. Optimize for straight-line only line string
@@ -146,9 +140,9 @@ public final class CompactLineString {
             }
         }
         c[c.length - 1] = new Coordinate(x1, y1);
-        LineString out = geometryFactory.createLineString(c);
+        LineString out = GeometryUtils.makeLineString(c);
         if (reverse) {
-            out = (LineString) out.reverse();
+            out = out.reverse();
         }
         return out;
     }

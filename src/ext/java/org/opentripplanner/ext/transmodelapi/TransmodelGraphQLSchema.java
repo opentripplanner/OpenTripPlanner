@@ -1083,7 +1083,7 @@ public class TransmodelGraphQLSchema {
             .name("situations")
             .description("Get all active situations.")
             .withDirective(gqlUtil.timingData)
-            .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
+            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
             .argument(GraphQLArgument
                 .newArgument()
                 .name("authorities")

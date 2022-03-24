@@ -22,12 +22,12 @@ public enum OTPFeature {
     OptimizeTransfers(true),
     ParallelRouting(false),
     TransferConstraints(true),
+    FloatingBike(true),
 
     // Sandbox extension features - Must be turned OFF by default
     ActuatorAPI(false),
     DataOverlay(false),
     FlexRouting(false),
-    FloatingBike(false),
     GoogleCloudStorage(false),
     ReportApi(false),
     SandboxAPILegacyGraphQLApi(false),

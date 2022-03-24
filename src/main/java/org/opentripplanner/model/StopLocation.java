@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.util.I18NString;
 
@@ -22,6 +23,7 @@ public interface StopLocation {
 
   String getDescription();
 
+  @Nullable
   I18NString getUrl();
 
   /**

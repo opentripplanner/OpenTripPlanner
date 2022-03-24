@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -269,7 +269,7 @@ public class PlainStreetEdgeTest {
 
     @Test
     public void testElevationProfile() {
-        var elevationProfile = new PackedCoordinateSequence.Double(new double[]{0, 10, 50, 12}, 2);
+        var elevationProfile = new PackedCoordinateSequence.Double(new double[]{0, 10, 50, 12}, 2, 0);
         StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL, elevationProfile);
 
         assertArrayEquals(elevationProfile.toCoordinateArray(), e0.getElevationProfile().toCoordinateArray());

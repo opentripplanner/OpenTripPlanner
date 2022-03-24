@@ -2,7 +2,7 @@ package org.opentripplanner.routing.util;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.routing.util.elevation.ToblersHikingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

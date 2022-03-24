@@ -16,14 +16,10 @@ public class Subgraph {
 
     private final Set<Vertex> streetVertexSet;
     private final Set<Vertex> stopsVertexSet;
-    private final ArrayList<Coordinate> vertexCoords;
-    private final Geometry convexHullAsGeom = null;
-    private boolean newVertexAdded = true;
 
     public Subgraph(){
         streetVertexSet = new HashSet<>();
         stopsVertexSet = new HashSet<>();
-        vertexCoords = new ArrayList<>();
     }
 
     public void addVertex(Vertex vertex){
@@ -32,16 +28,10 @@ public class Subgraph {
         }else{
             streetVertexSet.add(vertex);
         }
-        newVertexAdded = true;
-        vertexCoords.add(vertex.getCoordinate());
     }
 
     public boolean contains(Vertex vertex){
         return (streetVertexSet.contains(vertex) || stopsVertexSet.contains(vertex));
-    }
-
-    public boolean containsStreet(Vertex vertex){
-        return streetVertexSet.contains(vertex);
     }
 
     public int streetSize(){
@@ -63,15 +53,5 @@ public class Subgraph {
 
     public Iterator<Vertex> stopIterator() {
         return stopsVertexSet.iterator();
-    }
-
-    private static final GeometryFactory gf = new GeometryFactory();
-    public Geometry getConvexHull() {
-        if (newVertexAdded) {
-            MultiPoint mp = gf.createMultiPoint(vertexCoords.toArray(new Coordinate[0]));
-            newVertexAdded = false;
-            mp.convexHull();
-        }
-        return convexHullAsGeom;
     }
 }
