@@ -730,20 +730,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             if (stopTimeUpdate.hasStopSequence()) {
                 stopTime.setStopSequence(stopTimeUpdate.getStopSequence());
             }
-            // Set pickup type
-            // Set different pickup type for last stop
-            if (index == tripUpdate.getStopTimeUpdateCount() - 1) {
-                stopTime.setPickupType(NONE); // No pickup available
-            } else {
-                stopTime.setPickupType(SCHEDULED); // Regularly scheduled pickup
-            }
-            // Set drop off type
-            // Set different drop off type for first stop
-            if (index == 0) {
-                stopTime.setDropOffType(NONE); // No drop off available
-            } else {
-                stopTime.setDropOffType(SCHEDULED); // Regularly scheduled drop off
-            }
+            stopTime.setPickupType(SCHEDULED); // Regularly scheduled pickup
+            stopTime.setDropOffType(SCHEDULED); // Regularly scheduled drop off
             // Add stop time to list
             stopTimes.add(stopTime);
         }
