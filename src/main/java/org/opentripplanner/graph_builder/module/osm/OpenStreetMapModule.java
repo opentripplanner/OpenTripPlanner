@@ -20,9 +20,7 @@ import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
-import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StreetNote;
@@ -121,12 +119,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * Ignore wheelchair accessibility information.
      */
     public boolean ignoreWheelchairAccessibility = false;
-
-    /**
-     * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
-     * around.
-     */
-    public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
 
     /**
      * Whether we should create car P+R stations from OSM data. The default value is true. In normal
@@ -357,7 +349,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
             WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(graph, osmdb,
-                    wayPropertySet, edgeFactory, this, issueStore, maxAreaNodes,
+                    wayPropertySet, this, issueStore, maxAreaNodes,
                     platformEntriesLinking
             );
             if (skipVisibility) {
@@ -1278,7 +1270,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
-            StreetEdge street = edgeFactory.createEdge(startEndpoint, endEndpoint, geometry, name, length,
+            StreetEdge street = new StreetEdge(startEndpoint, endEndpoint, geometry, name, length,
                     permissions, back);
             street.setCarSpeed(carSpeed);
 

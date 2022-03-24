@@ -38,7 +38,7 @@ import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPo
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
+import org.opentripplanner.routing.edgetype.StreetElevationExtension;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -189,11 +189,11 @@ public class ElevationModule implements GraphBuilderModule {
         }
         LOG.info("Setting street elevation profiles from digital elevation model...");
 
-        List<StreetWithElevationEdge> streetsWithElevationEdges = new LinkedList<>();
+        List<StreetEdge> streetsWithElevationEdges = new LinkedList<>();
 
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
-                if (ee instanceof StreetWithElevationEdge) {
+                if (ee instanceof StreetEdge) {
                     if (multiThreadElevationCalculations) {
                         // Multi-threaded execution requested, check and prepare a few things that are used only during
                         // multi-threaded runs.
@@ -203,7 +203,7 @@ public class ElevationModule implements GraphBuilderModule {
                             examplarCoordinate = ee.getGeometry().getCoordinates()[0];
                         }
                     }
-                    streetsWithElevationEdges.add((StreetWithElevationEdge) ee);
+                    streetsWithElevationEdges.add((StreetEdge) ee);
                 }
             }
         }
@@ -218,7 +218,7 @@ public class ElevationModule implements GraphBuilderModule {
             streetsWithElevationEdges.parallelStream().forEach(ee -> processEdgeWithProgress(ee, progress));
         } else {
             // If using just a single thread, process each edge inline
-            for (StreetWithElevationEdge ee : streetsWithElevationEdges) {
+            for (StreetEdge ee : streetsWithElevationEdges) {
                 processEdgeWithProgress(ee, progress);
             }
         }
@@ -244,8 +244,8 @@ public class ElevationModule implements GraphBuilderModule {
 
         // Iterate again to find edges that had elevation calculated.
         LinkedList<StreetEdge> edgesWithCalculatedElevations = new LinkedList<>();
-        for (StreetWithElevationEdge edgeWithElevation : streetsWithElevationEdges) {
-            if (edgeWithElevation.hasPackedElevationProfile() && !edgeWithElevation.isElevationFlattened()) {
+        for (StreetEdge edgeWithElevation : streetsWithElevationEdges) {
+            if (edgeWithElevation.hasElevationExtension() && !edgeWithElevation.isElevationFlattened()) {
                 edgesWithCalculatedElevations.add(edgeWithElevation);
             }
         }
@@ -478,14 +478,14 @@ public class ElevationModule implements GraphBuilderModule {
         for (Vertex v : graph.getVertices()) {
             Double fromElevation = elevations.get(v);
             for (Edge e : v.getOutgoing()) {
-                if (e instanceof StreetWithElevationEdge) {
-                    StreetWithElevationEdge edge = ((StreetWithElevationEdge) e);
+                if (e instanceof StreetEdge) {
+                    StreetEdge edge = ((StreetEdge) e);
 
                     Double toElevation = elevations.get(edge.getToVertex());
 
                     if (fromElevation == null || toElevation == null) {
                         if (!edge.isElevationFlattened() && !edge.isSlopeOverride()) {
-                            issueStore.add(new ElevationProfileFailure(edge, "Unexpectedly missing elevation data"));
+                            issueStore.add(new ElevationProfileFailure(edge, "Failed to propagate elevation data"));
                         }
                         continue;
                     }
@@ -501,7 +501,9 @@ public class ElevationModule implements GraphBuilderModule {
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
                     try {
-                        if (edge.setElevationProfile(profile, true)) {
+                        StreetElevationExtension.addToEdge(edge, profile, true);
+
+                        if (edge.isElevationFlattened()) {
                             issueStore.add(new ElevationFlattened(edge));
                         }
                     } catch (Exception ex) {
@@ -515,7 +517,7 @@ public class ElevationModule implements GraphBuilderModule {
     /**
      * Calculate the elevation for a single street edge. After the calculation is complete, update the current progress.
      */
-    private void processEdgeWithProgress(StreetWithElevationEdge ee, ProgressTracker progress) {
+    private void processEdgeWithProgress(StreetEdge ee, ProgressTracker progress) {
         processEdge(ee);
         // Keep lambda to get correct line number in log
         //noinspection Convert2MethodRef
@@ -527,11 +529,11 @@ public class ElevationModule implements GraphBuilderModule {
      *
      * @param ee the street edge
      */
-    private void processEdge(StreetWithElevationEdge ee) {
+    private void processEdge(StreetEdge ee) {
         // First, check if the edge already has been calculated or if it exists in a pre-calculated cache. Checking
         // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
         // coverage.
-        if (ee.hasPackedElevationProfile()) {
+        if (ee.hasElevationExtension()) {
             return; /* already set up */
         }
 
@@ -543,7 +545,7 @@ public class ElevationModule implements GraphBuilderModule {
             );
             if (coordinateSequence != null) {
                 // found a cached value! Set the elevation profile with the pre-calculated data.
-                setEdgeElevationProfile(ee, coordinateSequence, graph);
+                setEdgeElevationProfile(ee, coordinateSequence);
                 return;
             }
         }
@@ -613,7 +615,7 @@ public class ElevationModule implements GraphBuilderModule {
             PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
                     coordList.toArray(coordArr));
 
-            setEdgeElevationProfile(ee, elevPCS, graph);
+            setEdgeElevationProfile(ee, elevPCS);
         } catch (ElevationLookupException e) {
             issueStore.add(new ElevationProfileFailure(ee, e.getMessage()));
         }
@@ -662,12 +664,14 @@ public class ElevationModule implements GraphBuilderModule {
         }
     }
 
-    private void setEdgeElevationProfile(StreetWithElevationEdge ee, PackedCoordinateSequence elevPCS, Graph graph) {
+    private void setEdgeElevationProfile(
+            StreetEdge ee,
+            PackedCoordinateSequence elevPCS
+    ) {
         try {
-            if (ee.setElevationProfile(elevPCS, false)) {
-                synchronized (graph) {
-                    issueStore.add(new ElevationFlattened(ee));
-                }
+            StreetElevationExtension.addToEdge(ee, elevPCS, false);
+            if (ee.isElevationFlattened()) {
+                issueStore.add(new ElevationFlattened(ee));
             }
         } catch (Exception e) {
             issueStore.add(new ElevationProfileFailure(ee, e.getMessage()));

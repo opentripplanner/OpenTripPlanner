@@ -27,7 +27,6 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -149,13 +148,9 @@ public class ConstantsForTests {
             Graph graph = new Graph();
             // Add street data from OSM
             {
-                var edgeFactory = new DefaultStreetEdgeFactory();
-                edgeFactory.useElevationData = withElevation;
-
                 File osmFile = new File(PORTLAND_CENTRAL_OSM);
                 BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
                 OpenStreetMapModule osmModule = new OpenStreetMapModule(List.of(osmProvider));
-                osmModule.edgeFactory = edgeFactory;
                 osmModule.staticBikeParkAndRide = true;
                 osmModule.staticParkAndRide = true;
                 osmModule.skipVisibility = true;

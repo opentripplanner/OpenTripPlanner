@@ -3,12 +3,11 @@ package org.opentripplanner.routing.edgetype;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
 
 
-final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge implements TemporaryEdge {
+final public class TemporaryPartialStreetEdge extends StreetEdge implements TemporaryEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,8 +31,6 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
         super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
         this.geometry = super.getGeometry();
-        setCarSpeed(parentEdge.getCarSpeed());
-        setElevationProfileUsingParents();
     }
 
     /**
@@ -42,12 +39,10 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
      * The elevation data is calculated using the 'parentEdge' and the calculated 'length'.
      */
     TemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-            LineString geometry, I18NString name) {
-        super(v1, v2, geometry, name, parentEdge.getPermission(), false);
+            LineString geometry, I18NString name, boolean back) {
+        super(v1, v2, geometry, name, parentEdge.getPermission(), back);
         this.parentEdge = parentEdge;
         this.geometry = super.getGeometry();
-        setCarSpeed(parentEdge.getCarSpeed());
-        setElevationProfileUsingParents();
     }
 
     @Override
@@ -121,14 +116,5 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
         return "TemporaryPartialStreetEdge(" + this.getDefaultName() + ", " + this.getFromVertex() + " -> "
                 + this.getToVertex() + " length=" + this.getDistanceMeters() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
-    }
-
-    private void setElevationProfileUsingParents() {
-        setElevationProfile(
-                ElevationUtils.getPartialElevationProfile(
-                        getParentEdge().getElevationProfile(), 0, getDistanceMeters()
-                ),
-                false
-        );
     }
 }

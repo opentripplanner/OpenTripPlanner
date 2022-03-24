@@ -1,5 +1,10 @@
 package org.opentripplanner.graph_builder.module;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.util.HashMap;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -9,16 +14,10 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.OsmVertex;
-
-import java.io.File;
-import java.util.HashMap;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class ElevationModuleTest {
 
@@ -79,7 +78,7 @@ public class ElevationModuleTest {
         for (int i = 1; i < coordinates.length; ++i) {
             length += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
         }
-        StreetWithElevationEdge edge = new StreetWithElevationEdge(
+        StreetEdge edge = new StreetEdge(
             from,
             to,
             geometry,
