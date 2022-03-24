@@ -1,9 +1,13 @@
 package org.opentripplanner;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
@@ -12,15 +16,13 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
@@ -35,7 +37,7 @@ import java.util.Collections;
 import java.util.List;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
-public abstract class GtfsTest extends TestCase {
+public abstract class GtfsTest {
 
     public Graph graph;
     AlertsUpdateHandler alertsUpdateHandler;
@@ -46,12 +48,7 @@ public abstract class GtfsTest extends TestCase {
 
     public abstract String getFeedName();
 
-    public boolean isLongDistance() { return false; }
-
-    private String agencyId;
-
-    public Itinerary itinerary = null;
-
+    @BeforeEach
     protected void setUp() {
         File gtfs = new File("src/test/resources/" + getFeedName());
         File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
@@ -66,13 +63,14 @@ public abstract class GtfsTest extends TestCase {
 
         alertsUpdateHandler = new AlertsUpdateHandler();
         graph = new Graph();
-        router = new Router(graph, RouterConfig.DEFAULT);
 
         gtfsGraphBuilderImpl.buildGraph(graph, null);
         // Set the agency ID to be used for tests to the first one in the feed.
-        agencyId = graph.getAgencies().iterator().next().getId().getId();
+        String agencyId = graph.getAgencies().iterator().next().getId().getId();
         System.out.printf("Set the agency ID for this test to %s\n", agencyId);
         graph.index();
+        router = new Router(graph, RouterConfig.DEFAULT);
+        router.startup();
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
         timetableSnapshotSource.purgeExpiredData = false;
         graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
@@ -94,16 +92,10 @@ public abstract class GtfsTest extends TestCase {
         } catch (Exception exception) {}
     }
 
-    public Leg plan(long dateTime, String fromVertex, String toVertex, String onTripId,
-             boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
-             String excludedRoute, String excludedStop) {
-        return plan(dateTime, fromVertex, toVertex, onTripId, wheelchairAccessible,
-                preferLeastTransfers, preferredMode, excludedRoute, excludedStop, 1)[0];
-    }
-
-    public Leg[] plan(long dateTime, String fromVertex, String toVertex, String onTripId,
-               boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
-               String excludedRoute, String excludedStop, int legCount) {
+    public Itinerary plan(long dateTime, String fromVertex, String toVertex, String onTripId,
+            boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
+            String excludedRoute, String excludedStop, int legCount
+    ) {
         final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
         RoutingRequest routingRequest = new RoutingRequest();
         routingRequest.setNumItineraries(1);
@@ -123,9 +115,8 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWheelchairAccessible(wheelchairAccessible);
         routingRequest.transferCost = (preferLeastTransfers ? 300 : 0);
         routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
-        // TODO route matcher still using underscores because it's quite nonstandard and should be eliminated from the 1.0 release rather than reworked
         if (excludedRoute != null && !excludedRoute.isEmpty()) {
-            routingRequest.setBannedRoutesFromSting(feedId.getId() + "__" + excludedRoute);
+            routingRequest.setBannedRoutes(List.of(new FeedScopedId(feedId.getId(), excludedRoute)));
         }
         if (excludedStop != null && !excludedStop.isEmpty()) {
             throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
@@ -137,21 +128,16 @@ public abstract class GtfsTest extends TestCase {
         // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
         routingRequest.setWaitReluctance(1);
         routingRequest.setWalkBoardCost(30);
+        routingRequest.transferSlack = 0;
 
-        List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
-        GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-                graph.getTimeZone(),
-                new AlertToLegMapper(graph.getTransitAlertService()),
-                graph.streetNotesService,
-                graph.ellipsoidToGeoidDifference
-        );
-        List<Itinerary> itineraries = graphPathToItineraryMapper.mapItineraries(paths);
+        RoutingResponse res = new RoutingWorker(router, routingRequest, graph.getTimeZone().toZoneId()).route();
+        List<Itinerary> itineraries = res.getTripPlan().itineraries;
         // Stored in instance field for use in individual tests
-        itinerary = itineraries.get(0);
+        Itinerary itinerary = itineraries.get(0);
 
         assertEquals(legCount, itinerary.legs.size());
 
-        return itinerary.legs.toArray(new Leg[legCount]);
+        return itinerary;
     }
 
     public void validateLeg(

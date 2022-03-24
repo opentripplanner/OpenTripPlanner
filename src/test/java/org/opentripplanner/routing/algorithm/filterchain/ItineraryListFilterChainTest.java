@@ -160,7 +160,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertEquals(toStr(List.of(bus)), toStr(chain.filter(List.of(walk, bus))));
   }
 
-  @org.junit.Test
+  @Test
   public void groupByTheLongestItineraryAndTwoGroups() {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
             .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
