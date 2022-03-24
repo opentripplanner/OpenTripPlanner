@@ -233,7 +233,7 @@ public class ServiceJourneyType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")
-                    .type(new GraphQLNonNull(new GraphQLList(noticeType)))
+                    .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
                     .dataFetcher(env ->
                         GqlUtil.getRoutingService(env).getNoticesByEntity(trip(env))
                     )
@@ -241,7 +241,7 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("situations")
                     .description("Get all situations active for the service journey.")
-                    .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
+                    .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
                     .dataFetcher(environment ->
                         GqlUtil.getRoutingService(environment)
                             .getTransitAlertService()

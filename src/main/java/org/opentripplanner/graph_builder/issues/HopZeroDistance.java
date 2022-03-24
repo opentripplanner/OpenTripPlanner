@@ -11,7 +11,7 @@ public class HopZeroDistance implements DataImportIssue {
     final Trip trip;
     final int seq;
     
-    HopZeroDistance(int sec, Trip trip, int seq){
+    public HopZeroDistance(int sec, Trip trip, int seq){
     	this.sec = sec;
     	this.trip = trip;
     	this.seq = seq;

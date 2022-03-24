@@ -21,6 +21,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Update to Java 17 and Kryo 5 [#3994](https://github.com/opentripplanner/OpenTripPlanner/pull/3994)
 - Remove optimize=TRANSFERS [#4004](https://github.com/opentripplanner/OpenTripPlanner/pull/4004)
 - Consume GTFS-RT Vehicle Positions, introduce API [#3981](https://github.com/opentripplanner/OpenTripPlanner/pull/3981)
+- Enable GBFS floating vehicles by default [#4012](https://github.com/opentripplanner/OpenTripPlanner/pull/4012)
+- Don't try to repair trips with negative dwell or driving times, drop them instead [#4019](https://github.com/opentripplanner/OpenTripPlanner/pull/4019)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

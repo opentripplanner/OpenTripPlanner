@@ -11,6 +11,7 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.HopSpeedFast;
 import org.opentripplanner.graph_builder.issues.HopSpeedSlow;
+import org.opentripplanner.graph_builder.issues.HopZeroDistance;
 import org.opentripplanner.graph_builder.issues.HopZeroTime;
 import org.opentripplanner.graph_builder.issues.NegativeDwellTime;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
@@ -64,7 +65,9 @@ public class RepairStopTimesForEachTripOperation {
             if (!removedStopSequences.isEmpty()) {
                 issueStore.add(new RepeatedStops(trip, removedStopSequences));
             }
-            filterStopTimes(stopTimes);
+            if (!filterStopTimes(stopTimes)) {
+                stopTimesByTrip.replace(trip, List.of());
+            }
 
             interpolateStopTimes(stopTimes);
 
@@ -116,42 +119,27 @@ public class RepairStopTimesForEachTripOperation {
     }
 
     /**
-     * Scan through the given list, looking for clearly incorrect series of stoptimes and unsetting
-     * them. This includes duplicate times (0-time hops), as well as negative, fast or slow hops.
-     * Unsetting the arrival/departure time of clearly incorrect stoptimes will cause them to be
-     * interpolated in the next step. {@link DataImportIssue}s are reported to reveal the problems
-     * to the user.
+     * Scan through the given list, looking for clearly incorrect series of stoptimes. This includes
+     * duplicate times (0-time hops), as well as negative, fast or slow hops.
+     * {@link DataImportIssue}s are reported to reveal the problems to the user.
      *
      * @param stopTimes the stoptimes to be filtered (from a single trip)
+     * @return whether the stop time is usable
      */
-    private void filterStopTimes(List<StopTime> stopTimes) {
+    private boolean filterStopTimes(List<StopTime> stopTimes) {
+        if (stopTimes.size() < 2) {return false;}
 
-        if (stopTimes.size() < 2)
-            return;
         StopTime st0 = stopTimes.get(0);
 
-        /* Set departure time if it is missing */
-        if (!st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) {
-            st0.setDepartureTime(st0.getArrivalTime());
-        }
-
         /* If the feed does not specify any timepoints, we want to mark all times that are present as timepoints. */
-        boolean hasTimepoints = false;
-        for (StopTime stopTime : stopTimes) {
-            if (stopTime.getTimepoint() == 1) {
-                hasTimepoints = true;
-                break;
-            }
-        }
-        // TODO verify that the first (and last?) stop should always be considered a timepoint.
-        if (!hasTimepoints)
-            st0.setTimepoint(1);
+        boolean hasTimepoints = stopTimes.stream().anyMatch(stopTime -> stopTime.getTimepoint() == 1);
 
-        /* Indicates that stop times in this trip are being shifted forward one day. */
-        boolean midnightCrossed = false;
+        // TODO verify that the first (and last?) stop should always be considered a timepoint.
+        if (!hasTimepoints) {
+            st0.setTimepoint(1);
+        }
 
         for (int i = 1; i < stopTimes.size(); i++) {
-            boolean st1bogus = false;
             StopTime st1 = stopTimes.get(i);
 
             /* If the feed did not specify any timepoints, mark all times that are present as timepoints. */
@@ -159,17 +147,13 @@ public class RepairStopTimesForEachTripOperation {
                 st1.setTimepoint(1);
             }
 
-            if (midnightCrossed) {
-                if (st1.isDepartureTimeSet())
-                    st1.setDepartureTime(st1.getDepartureTime() + 24 * SECONDS_IN_HOUR);
-                if (st1.isArrivalTimeSet())
-                    st1.setArrivalTime(st1.getArrivalTime() + 24 * SECONDS_IN_HOUR);
-            }
-            /* Set departure time if it is missing. */
-            // TODO: doc: what if arrival time is missing?
-            if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
+            /* Set arrival and departure times if either is missing. */
+            if (!st1.isArrivalTimeSet() && st1.isDepartureTimeSet()) {
+                st1.setArrivalTime(st1.getDepartureTime());
+            } else if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
                 st1.setDepartureTime(st1.getArrivalTime());
             }
+
             /* Do not process (skip over) non-timepoint stoptimes, leaving them in place for interpolation. */
             // All non-timepoint stoptimes in a series will have identical arrival and departure values of MISSING_VALUE.
             if (!(st1.isArrivalTimeSet() && st1.isDepartureTimeSet())) {
@@ -178,66 +162,57 @@ public class RepairStopTimesForEachTripOperation {
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
             if (dwellTime < 0) {
                 issueStore.add(new NegativeDwellTime(st0));
-                if (st0.getArrivalTime() > 23 * SECONDS_IN_HOUR
-                        && st0.getDepartureTime() < 1 * SECONDS_IN_HOUR) {
-                    midnightCrossed = true;
-                    st0.setDepartureTime(st0.getDepartureTime() + 24 * SECONDS_IN_HOUR);
-                } else {
-                    st0.setDepartureTime(st0.getArrivalTime());
-                }
+                return false;
             }
-            int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
+            int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
             if (runningTime < 0) {
                 issueStore.add(new NegativeHopTime(new StopTime(st0), new StopTime(st1)));
-                // negative hops are usually caused by incorrect coding of midnight crossings
-                midnightCrossed = true;
-                if (st0.getDepartureTime() > 23 * SECONDS_IN_HOUR
-                        && st1.getArrivalTime() < 1 * SECONDS_IN_HOUR) {
-                    st1.setArrivalTime(st1.getArrivalTime() + 24 * SECONDS_IN_HOUR);
-                } else {
-                    st1.setArrivalTime(st0.getDepartureTime());
-                }
+                return false;
             }
-            double hopDistance = SphericalDistanceLibrary
-                    .fastDistance(st0.getStop().getCoordinate().asJtsCoordinate(),
-                        st1.getStop().getCoordinate().asJtsCoordinate());
+
+            double hopDistance = SphericalDistanceLibrary.fastDistance(
+                    st0.getStop().getCoordinate().asJtsCoordinate(),
+                    st1.getStop().getCoordinate().asJtsCoordinate()
+            );
             double hopSpeed = hopDistance / runningTime;
-            /* zero-distance hops are probably not harmful, though they could be better
-             * represented as dwell times
+
             if (hopDistance == 0) {
-                LOG.warn(GraphBuilderAnnotation.register(graph,
-                        Variety.HOP_ZERO_DISTANCE, runningTime,
-                        st1.getTrip().getId(),
-                        st1.getStopSequence()));
+                issueStore.add(new HopZeroDistance(
+                        runningTime,
+                        st1.getTrip(),
+                        st1.getStopSequence()
+                ));
             }
-            */
             // sanity-check the hop
-            if (st0.getArrivalTime() == st1.getArrivalTime() || st0.getDepartureTime() == st1
-                    .getDepartureTime()) {
-                LOG.trace("{} {}", st0, st1);
+            if (runningTime == 0) {
                 // series of identical stop times at different stops
-                issueStore.add(new HopZeroTime((float) hopDistance, st1.getTrip(),
-                                st1.getStopSequence()));
-                // clear stoptimes that are obviously wrong, causing them to later be interpolated
-/* FIXME (lines commented out because they break routability in multi-feed NYC for some reason -AMB) */
-                //                st1.clearArrivalTime();
-                //                st1.clearDepartureTime();
-                st1bogus = true;
+                issueStore.add(new HopZeroTime(
+                        (float) hopDistance,
+                        st1.getTrip(),
+                        st1.getStopSequence()
+                ));
             } else if (hopSpeed > 45) {
                 // 45 m/sec ~= 100 miles/hr
                 // elapsed time of 0 will give speed of +inf
-                issueStore.add(new HopSpeedFast((float) hopSpeed, (float) hopDistance,
-                        st0.getTrip(), st0.getStopSequence()));
+                issueStore.add(new HopSpeedFast(
+                        (float) hopSpeed,
+                        (float) hopDistance,
+                        st0.getTrip(),
+                        st0.getStopSequence()
+                ));
             } else if (hopSpeed < 0.1) {
                 // 0.1 m/sec ~= 0.2 miles/hr
-                issueStore.add(new HopSpeedSlow((float) hopSpeed, (float) hopDistance,
-                        st0.getTrip(), st0.getStopSequence()));
+                issueStore.add(new HopSpeedSlow(
+                        (float) hopSpeed,
+                        (float) hopDistance,
+                        st0.getTrip(),
+                        st0.getStopSequence()
+                ));
             }
-            // st0 should reflect the last stoptime that was not clearly incorrect
-            if (!st1bogus)
-                st0 = st1;
+            st0 = st1;
         } // END for loop over stop times
+        return true;
     }
 
     /**

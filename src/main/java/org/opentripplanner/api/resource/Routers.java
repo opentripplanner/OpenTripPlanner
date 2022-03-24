@@ -1,11 +1,5 @@
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.api.model.ApiRouterInfo;
-import org.opentripplanner.api.model.ApiRouterList;
-import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,6 +7,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import org.opentripplanner.api.model.ApiRouterInfo;
+import org.opentripplanner.api.model.ApiRouterList;
+import org.opentripplanner.routing.error.GraphNotFoundException;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 /**
  * This REST API endpoint returns some meta-info about a router. OTP2 does no longer support
@@ -30,8 +29,11 @@ import javax.ws.rs.core.MediaType;
 @PermitAll // exceptions on methods
 public class Routers {
 
-    @Context
-    protected OTPServer otpServer;
+    private final OTPServer otpServer;
+
+    public Routers(@Context OTPServer otpServer) {
+        this.otpServer = otpServer;
+    }
 
     /**
      * Return the "default" router information.

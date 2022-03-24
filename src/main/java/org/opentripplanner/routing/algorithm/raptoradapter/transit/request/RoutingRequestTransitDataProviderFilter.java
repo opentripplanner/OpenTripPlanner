@@ -1,20 +1,19 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
-
-import java.util.Set;
 
 public class RoutingRequestTransitDataProviderFilter implements TransitDataProviderFilter {
 
@@ -92,16 +91,17 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (requireBikesAllowed) {
-      return bikeAccessForTrip(trip) == BikeAccess.ALLOWED;
+    if (requireBikesAllowed && bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
+      return false;
     }
 
-    if (requireWheelchairAccessible) {
-      return trip.getWheelchairAccessible() == 1;
+    if (requireWheelchairAccessible && trip.getWheelchairAccessible() != 1) {
+      return false;
     }
 
-    if (!includePlannedCancellations) {
-      return !trip.getTripAlteration().isCanceledOrReplaced();
+    //noinspection RedundantIfStatement
+    if (!includePlannedCancellations && trip.getTripAlteration().isCanceledOrReplaced()) {
+      return false;
     }
 
     return true;

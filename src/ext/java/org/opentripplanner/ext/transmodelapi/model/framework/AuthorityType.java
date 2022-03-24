@@ -62,7 +62,7 @@ public class AuthorityType {
                 .name("situations")
                 .withDirective(gqlUtil.timingData)
                 .description("Get all situations active for the authority.")
-                .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
+                .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
                 .dataFetcher(environment -> getRoutingService(environment)
                     .getTransitAlertService()
                     .getAgencyAlerts(((Agency)environment.getSource()).getId()))

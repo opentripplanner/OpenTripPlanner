@@ -391,11 +391,15 @@ public class NetexMapper {
         );
         for (Line line : currentNetexIndex.getLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
-            transitBuilder.getRoutes().add(route);
+            if(route != null) {
+                transitBuilder.getRoutes().add(route);
+            }
         }
         for (FlexibleLine line : currentNetexIndex.getFlexibleLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
-            transitBuilder.getRoutes().add(route);
+            if(route != null) {
+                transitBuilder.getRoutes().add(route);
+            }
         }
     }
 
