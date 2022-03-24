@@ -5,7 +5,7 @@ import org.opentripplanner.model.StopTime;
 
 public class NegativeDwellTime implements DataImportIssue {
 
-    public static final String FMT = "Negative time dwell at %s; we will assume it is zero.";
+    public static final String FMT = "Negative time dwell at %s; skipping the entire trip.";
     
     final StopTime stop;
     
