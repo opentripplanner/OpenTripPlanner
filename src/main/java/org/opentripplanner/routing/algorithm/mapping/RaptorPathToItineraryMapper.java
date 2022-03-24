@@ -53,6 +53,10 @@ public class RaptorPathToItineraryMapper {
 
     private final ZonedDateTime transitSearchTimeZero;
 
+    private final AlertToLegMapper alertToLegMapper;
+
+    private final GraphPathToItineraryMapper graphPathToItineraryMapper;
+
 
     /**
      * Constructs an itinerary mapper for a request and a set of results
@@ -72,6 +76,13 @@ public class RaptorPathToItineraryMapper {
         this.transitLayer = transitLayer;
         this.transitSearchTimeZero = transitSearchTimeZero;
         this.request = request;
+        this.alertToLegMapper = new AlertToLegMapper(graph.getTransitAlertService());
+        this.graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+                graph.getTimeZone(),
+                alertToLegMapper,
+                graph.streetNotesService,
+                graph.ellipsoidToGeoidDifference
+        );
     }
 
     public Itinerary createItinerary(Path<TripSchedule> path) {
@@ -130,7 +141,7 @@ public class RaptorPathToItineraryMapper {
 
         GraphPath graphPath = new GraphPath(accessPath.getLastState());
 
-        Itinerary subItinerary = GraphPathToItineraryMapper.generateItinerary(graphPath);
+        Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 
         if (subItinerary.legs.isEmpty()) { return List.of(); }
 
@@ -189,11 +200,7 @@ public class RaptorPathToItineraryMapper {
             );
         }
 
-        AlertToLegMapper.addTransitAlertPatchesToLeg(
-            graph,
-            leg,
-            firstLeg
-        );
+        alertToLegMapper.addTransitAlertPatchesToLeg(leg, firstLeg);
 
         return leg;
     }
@@ -215,7 +222,7 @@ public class RaptorPathToItineraryMapper {
 
         GraphPath graphPath = new GraphPath(egressPath.getLastState());
 
-        Itinerary subItinerary = GraphPathToItineraryMapper.generateItinerary(graphPath);
+        Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 
         if (subItinerary.legs.isEmpty()) { return null; }
 
@@ -265,7 +272,7 @@ public class RaptorPathToItineraryMapper {
                 State[] states = transferStates.toArray(new State[0]);
                 GraphPath graphPath = new GraphPath(states[states.length - 1]);
 
-                Itinerary subItinerary = GraphPathToItineraryMapper.generateItinerary(graphPath);
+                Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 
                 if (subItinerary.legs.isEmpty()) {
                     return List.of();

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -35,7 +36,13 @@ public class DirectStreetRouter {
       List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(directRequest);
 
       // Convert the internal GraphPaths to itineraries
-      List<Itinerary> response = GraphPathToItineraryMapper.mapItineraries(paths);
+      final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+              router.graph.getTimeZone(),
+              new AlertToLegMapper(router.graph.getTransitAlertService()),
+              router.graph.streetNotesService,
+              router.graph.ellipsoidToGeoidDifference
+      );
+      List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
       ItinerariesHelper.decorateItinerariesWithRequestData(response, directRequest);
       return response;
     }

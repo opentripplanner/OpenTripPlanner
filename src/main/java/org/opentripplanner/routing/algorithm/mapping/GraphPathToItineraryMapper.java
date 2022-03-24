@@ -19,7 +19,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -27,9 +26,9 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -41,20 +40,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
- * returned by the OTP "planner" web service. TripPlans are made up of Itineraries, so the functions to produce them
- * are also bundled together here. This only produces itineraries for non-transit searches, as well as
- * the non-transit parts of itineraries containing transit, while the whole transit itinerary is produced
- * by {@link RaptorPathToItineraryMapper}.
+ * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the
+ * OTP APIs. This only produces itineraries for non-transit searches, as well as the non-transit
+ * parts of itineraries containing transit, while the whole transit itinerary is produced by
+ * {@link RaptorPathToItineraryMapper}.
  */
-public abstract class GraphPathToItineraryMapper {
+public class GraphPathToItineraryMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPathToItineraryMapper.class);
+
+    private final TimeZone timeZone;
+    private final AlertToLegMapper alertToLegMapper;
+    private final StreetNotesService streetNotesService;
+    private final double ellipsoidToGeoidDifference;
+
+    public GraphPathToItineraryMapper(
+            TimeZone timeZone,
+            AlertToLegMapper alertToLegMapper,
+            StreetNotesService streetNotesService,
+            double ellipsoidToGeoidDifference
+    ) {
+        this.timeZone = timeZone;
+        this.alertToLegMapper = alertToLegMapper;
+        this.streetNotesService = streetNotesService;
+        this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
+    }
 
     /**
      * Generates a TripPlan from a set of paths
      */
-    public static List<Itinerary> mapItineraries(List<GraphPath> paths) {
+    public List<Itinerary> mapItineraries(List<GraphPath> paths) {
 
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
@@ -73,18 +88,16 @@ public abstract class GraphPathToItineraryMapper {
      * @param path The graph path to base the itinerary on
      * @return The generated itinerary
      */
-    public static Itinerary generateItinerary(GraphPath path) {
-        Graph graph = path.getRoutingContext().graph;
-
+    public Itinerary generateItinerary(GraphPath path) {
         List<Leg> legs = new ArrayList<>();
         WalkStep previousStep = null;
         for (List<State> legStates : sliceStates(path.states)) {
             if (OTPFeature.FlexRouting.isOn() && legStates.get(1).backEdge instanceof FlexTripEdge) {
-                legs.add(generateFlexLeg(graph, legStates));
+                legs.add(generateFlexLeg(legStates));
                 previousStep = null;
                 continue;
             }
-            StreetLeg leg = generateLeg(graph, legStates, previousStep);
+            StreetLeg leg = generateLeg(legStates, previousStep);
             legs.add(leg);
 
             List<WalkStep> walkSteps = leg.getWalkSteps();
@@ -107,9 +120,7 @@ public abstract class GraphPathToItineraryMapper {
         return itinerary;
     }
 
-    private static Calendar makeCalendar(State state) {
-        RoutingContext rctx = state.getContext();
-        TimeZone timeZone = rctx.graph.getTimeZone();
+    private Calendar makeCalendar(State state) {
         Calendar calendar = Calendar.getInstance(timeZone);
         calendar.setTimeInMillis(state.getTimeInMillis());
         return calendar;
@@ -192,7 +203,7 @@ public abstract class GraphPathToItineraryMapper {
     /**
      * Generate a flex leg from the states belonging to the flex leg
      */
-    private static Leg generateFlexLeg(Graph graph, List<State> states) {
+    private Leg generateFlexLeg(List<State> states) {
         State fromState = states.get(0);
         State toState = states.get(1);
         FlexTripEdge flexEdge = (FlexTripEdge) toState.backEdge;
@@ -202,7 +213,7 @@ public abstract class GraphPathToItineraryMapper {
 
         Leg leg = new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
 
-        AlertToLegMapper.addTransitAlertPatchesToLeg(graph, leg, true);
+        alertToLegMapper.addTransitAlertPatchesToLeg(leg, true);
         return leg;
     }
 
@@ -214,7 +225,7 @@ public abstract class GraphPathToItineraryMapper {
      *                     calculated correctly
      * @return The generated leg
      */
-    private static StreetLeg generateLeg(Graph graph, List<State> states, WalkStep previousStep) {
+    private StreetLeg generateLeg(List<State> states, WalkStep previousStep) {
         List<Edge> edges = states.stream()
                 // The first back edge is part of the previous leg, skip it
                 .skip(1)
@@ -229,7 +240,8 @@ public abstract class GraphPathToItineraryMapper {
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         LineString geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
 
-        List<WalkStep> walkSteps = new StatesToWalkStepsMapper(graph, states, previousStep).generateWalkSteps();
+        var statesToWalkStepsMapper = new StatesToWalkStepsMapper(states, previousStep, streetNotesService, ellipsoidToGeoidDifference);
+        List<WalkStep> walkSteps = statesToWalkStepsMapper.generateWalkSteps();
 
         /* For the from/to vertices to be in the correct place for vehicle parking
          * the state for actually parking (traversing the VehicleParkEdge) is excluded
@@ -265,7 +277,7 @@ public abstract class GraphPathToItineraryMapper {
             }
         }
 
-        addStreetNotes(graph, leg, states);
+        addStreetNotes(leg, states);
 
         setPathwayInfo(leg, states);
 
@@ -277,8 +289,7 @@ public abstract class GraphPathToItineraryMapper {
      */
     private static void setPathwayInfo(StreetLeg leg, List<State> legStates) {
         for (State legsState : legStates) {
-            if (legsState.getBackEdge() instanceof PathwayEdge) {
-                PathwayEdge pe = (PathwayEdge) legsState.getBackEdge();
+            if (legsState.getBackEdge() instanceof PathwayEdge pe) {
                 leg.setPathwayId(pe.getId());
                 return;
             }
@@ -293,9 +304,7 @@ public abstract class GraphPathToItineraryMapper {
      */
     private static void calculateElevations(Itinerary itinerary, List<Edge> edges) {
         for (Edge edge : edges) {
-            if (!(edge instanceof StreetEdge)) continue;
-
-            StreetEdge edgeWithElevation = (StreetEdge) edge;
+            if (!(edge instanceof StreetEdge edgeWithElevation)) { continue; }
             PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
 
             if (coordinates == null) continue;
@@ -325,16 +334,11 @@ public abstract class GraphPathToItineraryMapper {
             if (mode != null) {
                 // Resolve correct mode if renting vehicle
                 if (state.isRentingVehicle()) {
-                    switch (state.stateData.rentalVehicleFormFactor) {
-                        case BICYCLE:
-                        case OTHER:
-                            return TraverseMode.BICYCLE;
-                        case SCOOTER:
-                        case MOPED:
-                            return TraverseMode.SCOOTER;
-                        case CAR:
-                            return TraverseMode.CAR;
-                    }
+                    return switch (state.stateData.rentalVehicleFormFactor) {
+                        case BICYCLE, OTHER -> TraverseMode.BICYCLE;
+                        case SCOOTER, MOPED -> TraverseMode.SCOOTER;
+                        case CAR -> TraverseMode.CAR;
+                    };
                 } else {
                     return mode;
                 }
@@ -351,9 +355,9 @@ public abstract class GraphPathToItineraryMapper {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addStreetNotes(Graph graph, StreetLeg leg, List<State> states) {
+    private void addStreetNotes(StreetLeg leg, List<State> states) {
         for (State state : states) {
-            Set<StreetNote> streetNotes = graph.streetNotesService.getNotes(state);
+            Set<StreetNote> streetNotes = streetNotesService.getNotes(state);
 
             if (streetNotes != null) {
                 for (StreetNote streetNote : streetNotes) {
