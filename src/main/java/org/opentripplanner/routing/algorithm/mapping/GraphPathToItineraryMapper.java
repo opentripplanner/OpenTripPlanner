@@ -40,11 +40,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
- * returned by the OTP "planner" web service. TripPlans are made up of Itineraries, so the functions to produce them
- * are also bundled together here. This only produces itineraries for non-transit searches, as well as
- * the non-transit parts of itineraries containing transit, while the whole transit itinerary is produced
- * by {@link RaptorPathToItineraryMapper}.
+ * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the
+ * OTP APIs. This only produces itineraries for non-transit searches, as well as the non-transit
+ * parts of itineraries containing transit, while the whole transit itinerary is produced by
+ * {@link RaptorPathToItineraryMapper}.
  */
 public class GraphPathToItineraryMapper {
 
