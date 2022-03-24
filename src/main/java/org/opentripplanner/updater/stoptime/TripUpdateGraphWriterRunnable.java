@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
-    private static Logger LOG = LoggerFactory.getLogger(TripUpdateGraphWriterRunnable.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TripUpdateGraphWriterRunnable.class);
 
     /**
      * True iff the list with updates represent all updates that are active right now, i.e. all

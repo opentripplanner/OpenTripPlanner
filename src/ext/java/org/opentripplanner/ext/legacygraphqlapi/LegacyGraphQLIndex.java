@@ -20,7 +20,6 @@ import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.*;
-import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.Router;
@@ -105,6 +104,8 @@ class LegacyGraphQLIndex {
           .type(IntrospectionTypeWiring.build(LegacyGraphQLUnknownImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLRouteTypeImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLStopGeometriesImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLVehiclePositionImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStopRelationshipImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

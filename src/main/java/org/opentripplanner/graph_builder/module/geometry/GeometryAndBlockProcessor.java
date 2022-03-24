@@ -4,16 +4,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
@@ -31,6 +21,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
+import org.opentripplanner.graph_builder.issues.InterliningTeleport;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
@@ -49,6 +40,17 @@ import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
  * geometries. It also does some other postprocessing involving fares and interlined blocks.
@@ -63,18 +65,18 @@ public class GeometryAndBlockProcessor {
 
     private DataImportIssueStore issueStore;
 
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-    private OtpTransitService transitService;
-
-    // this is threadsafe implementation
-    private Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
+    private final OtpTransitService transitService;
 
     // this is threadsafe implementation
-    private Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
+    private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
 
     // this is threadsafe implementation
-    private Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
+    private final Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
+
+    // this is threadsafe implementation
+    private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
 
     private FareServiceFactory fareServiceFactory;
 
@@ -181,7 +183,7 @@ public class GeometryAndBlockProcessor {
         }
 
         /* Identify interlined trips and create the necessary edges. */
-        interline(tripPatterns, graph);
+        interline(tripPatterns);
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
@@ -196,7 +198,7 @@ public class GeometryAndBlockProcessor {
      * Identify interlined trips (where a physical vehicle continues on to another logical trip)
      * and update the TripPatterns accordingly.
      */
-    private void interline(Collection<TripPattern> tripPatterns, Graph graph) {
+    private void interline(Collection<TripPattern> tripPatterns) {
 
         /* Record which Pattern each interlined TripTimes belongs to. */
         Map<TripTimes, TripPattern> patternForTripTimes = new HashMap<>();
@@ -247,10 +249,7 @@ public class GeometryAndBlockProcessor {
                             toStop.getLon()
                     );
                     if (teleportationDistance > maxInterlineDistance) {
-                        // FIXME Trimet data contains a lot of these -- in their data, two trips sharing a block ID just
-                        // means that they are served by the same vehicle, not that interlining is automatically allowed.
-                        // see #1654
-                        // LOG.error(graph.addBuilderAnnotation(new InterliningTeleport(prev.trip, block.blockId, (int)teleportationDistance)));
+                        issueStore.add(new InterliningTeleport(prev.getTrip(), block.blockId, (int)teleportationDistance));
                         // Only skip this particular interline edge; there may be other valid ones in the block.
                     } else {
                         interlines.put(new P2<>(prevPattern, currPattern),
@@ -261,13 +260,6 @@ public class GeometryAndBlockProcessor {
             }
         }
 
-        // Copy all interline relationships into the field holding them in the graph.
-        // TODO: verify whether we need to be keeping track of patterns at all here, or could just accumulate trip-trip relationships.
-        for (P2<TripPattern> patterns : interlines.keySet()) {
-            for (P2<Trip> trips : interlines.get(patterns)) {
-                graph.interlinedTrips.put(trips.first, trips.second);
-            }
-        }
         LOG.info("Done finding interlining trips.");
     }
 

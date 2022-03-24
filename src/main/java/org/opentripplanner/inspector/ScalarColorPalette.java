@@ -1,6 +1,6 @@
 package org.opentripplanner.inspector;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * Convert a scalar value (bounded or unbounded) to a color.
@@ -9,5 +9,5 @@ import java.awt.Color;
  */
 public interface ScalarColorPalette {
 
-    public Color getColor(double value);
+    Color getColor(double value);
 }

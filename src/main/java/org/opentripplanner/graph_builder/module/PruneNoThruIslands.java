@@ -1,14 +1,12 @@
 package org.opentripplanner.graph_builder.module;
 
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.issues.GraphIsland;
 import org.opentripplanner.graph_builder.issues.IsolatedStop;
 import org.opentripplanner.graph_builder.issues.PrunedIslandStop;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -16,10 +14,10 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitEntityLink;
+import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
-import org.opentripplanner.routing.edgetype.StreetTransitEntityLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -28,16 +26,14 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -52,7 +48,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(PruneNoThruIslands.class);
 
-    private static int islandCounter = 0;
+    private static final int islandCounter = 0;
 
     /**
      * this field indicate the maximum size for island without stops
@@ -77,11 +73,10 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     }
 
     public List<String> getPrerequisites() {
-        /**this module can run after the street module only but if
-         * the street linker did not run then it couldn't identifies island with stops.
-         * so if the need is to distinguish between island with stops or without stops
-         * as explained before this module should run after the streets and the linker modules.
-         */
+        // this module can run after the street module only but if
+        //  the street linker did not run then it couldn't identifies island with stops.
+        //  so if the need is to distinguish between island with stops or without stops
+        //  as explained before this module should run after the streets and the linker modules.
         return Arrays.asList("streets");
     }
 
@@ -161,12 +156,12 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             TraverseMode traverseMode
     ) {
         LOG.debug("nothru pruning");
-        Map<Vertex, Subgraph> subgraphs = new HashMap<Vertex, Subgraph>();
-        Map<Vertex, Subgraph> extgraphs = new HashMap<Vertex, Subgraph>();
+        Map<Vertex, Subgraph> subgraphs = new HashMap<>();
+        Map<Vertex, Subgraph> extgraphs = new HashMap<>();
         Map<Vertex, ArrayList<Vertex>> neighborsForVertex =
-                new HashMap<Vertex, ArrayList<Vertex>>();
-        Map<Edge, Boolean> isolated = new HashMap<Edge, Boolean>();
-        ArrayList<Subgraph> islands = new ArrayList<Subgraph>();
+          new HashMap<>();
+        Map<Edge, Boolean> isolated = new HashMap<>();
+        ArrayList<Subgraph> islands = new ArrayList<>();
         int count;
 
         /* establish vertex neighbourhood without currently relevant noThruTrafficEdges */
@@ -190,8 +185,8 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 maxIslandSize, islandWithStopMaxSize, issueStore, traverseMode
         );
 
-        extgraphs = new HashMap<Vertex, Subgraph>(); // let old map go
-        islands = new ArrayList<Subgraph>(); // reset this too
+        extgraphs = new HashMap<>(); // let old map go
+        islands = new ArrayList<>(); // reset this too
 
         /* Recompute expanded subgraphs by accepting noThruTraffic edges in graph expansion.
            However, expansion is not allowed to jump from an original island to another one
@@ -222,7 +217,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             TraverseMode traverseMode
     ) {
 
-        Map<String, Integer> stats = new HashMap<String, Integer>();
+        Map<String, Integer> stats = new HashMap<>();
 
         stats.put("isolated", 0);
         stats.put("removed", 0);
@@ -282,7 +277,6 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             }
             State s0 = new State(gv, options);
             for (Edge e : gv.getOutgoing()) {
-                Vertex in = gv;
                 if (!(
                     e instanceof StreetEdge || e instanceof StreetTransitStopLink ||
                     e instanceof StreetTransitEntranceLink || e instanceof ElevatorEdge ||
@@ -302,19 +296,19 @@ public class PruneNoThruIslands implements GraphBuilderModule {
                 }
                 Vertex out = s1.getVertex();
 
-                ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
+                ArrayList<Vertex> vertexList = neighborsForVertex.get(gv);
                 if (vertexList == null) {
-                    vertexList = new ArrayList<Vertex>();
-                    neighborsForVertex.put(in, vertexList);
+                    vertexList = new ArrayList<>();
+                    neighborsForVertex.put(gv, vertexList);
                 }
                 vertexList.add(out);
 
                 vertexList = neighborsForVertex.get(out);
                 if (vertexList == null) {
-                    vertexList = new ArrayList<Vertex>();
+                    vertexList = new ArrayList<>();
                     neighborsForVertex.put(out, vertexList);
                 }
-                vertexList.add(in);
+                vertexList.add(gv);
             }
         }
     }
@@ -332,19 +326,18 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             if (!(gv instanceof StreetVertex)) {
                 continue;
             }
-            Vertex vertex = gv;
 
-            if (subgraphs != null && !subgraphs.containsKey(vertex)) {
+            if (subgraphs != null && !subgraphs.containsKey(gv)) {
                 // do not start new graph generation from non-classified vertex
                 continue;
             }
-            if (newgraphs.containsKey(vertex)) { // already processed
+            if (newgraphs.containsKey(gv)) { // already processed
                 continue;
             }
-            if (!neighborsForVertex.containsKey(vertex)) {
+            if (!neighborsForVertex.containsKey(gv)) {
                 continue;
             }
-            Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, vertex, subgraphs);
+            Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, gv, subgraphs);
             if (subgraph != null) {
                 for (Iterator<Vertex> vIter = subgraph.streetIterator(); vIter.hasNext(); ) {
                     Vertex subnode = vIter.next();
@@ -371,7 +364,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         //iterate over the street vertex of the subgraph
         for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext(); ) {
             Vertex v = vIter.next();
-            Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
+            Collection<Edge> outgoing = new ArrayList<>(v.getOutgoing());
             for (Edge e : outgoing) {
                 if (e instanceof StreetEdge) {
                     if (markIsolated) {
@@ -433,7 +426,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             // maybe this needs more logic for flex routing cases
             for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext(); ) {
                 Vertex v = vIter.next();
-                Collection<Edge> edges = new ArrayList<Edge>(v.getOutgoing());
+                Collection<Edge> edges = new ArrayList<>(v.getOutgoing());
                 edges.addAll(v.getIncoming());
                 for (Edge e : edges) {
                     if (e instanceof StreetTransitStopLink || e instanceof StreetTransitEntranceLink) {
@@ -452,7 +445,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
             Map<Vertex, Subgraph> anchors
     ) {
         Subgraph subgraph = new Subgraph();
-        Queue<Vertex> q = new LinkedList<Vertex>();
+        Queue<Vertex> q = new LinkedList<>();
         Subgraph anchor = null;
 
         if (anchors != null) {

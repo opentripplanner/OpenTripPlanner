@@ -1,9 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -52,7 +48,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Theoretically, it is not correct to build the visibility graph on the joined polygon of areas
@@ -75,30 +74,30 @@ import java.util.Set;
  */
 public class WalkableAreaBuilder {
 
-    private static Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
-    private DataImportIssueStore issueStore;
+    private final DataImportIssueStore issueStore;
 
     private final int maxAreaNodes;
 
-    private Graph graph;
+    private final Graph graph;
 
-    private OSMDatabase osmdb;
+    private final OSMDatabase osmdb;
 
-    private WayPropertySet wayPropertySet;
+    private final WayPropertySet wayPropertySet;
 
-    private Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
+    private final Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
-    private StreetEdgeFactory edgeFactory;
+    private final StreetEdgeFactory edgeFactory;
 
     // This is an awful hack, but this class (WalkableAreaBuilder) ought to be rewritten.
-    private Handler handler;
+    private final Handler handler;
 
-    private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
+    private final HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<>();
 
-    private boolean platformEntriesLinking;
+    private final boolean platformEntriesLinking;
 
-    private List<OsmVertex> platformLinkingEndpoints;
+    private final List<OsmVertex> platformLinkingEndpoints;
 
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
             StreetEdgeFactory edgeFactory, Handler handler, DataImportIssueStore issueStore,
@@ -126,7 +125,7 @@ public class WalkableAreaBuilder {
      * @param group
      */
     public void buildWithoutVisibility(AreaGroup group) {
-        Set<Edge> edges = new HashSet<Edge>();
+        Set<Edge> edges = new HashSet<>();
 
         // create polygon and accumulate nodes for area
         for (Ring ring : group.outermostRings) {
@@ -134,7 +133,7 @@ public class WalkableAreaBuilder {
             AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon);
             // the points corresponding to concave or hole vertices
             // or those linked to ways
-            HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
+            HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
 
             // we also want to fill in the edges of this area anyway, because we can,
             // and to avoid the numerical problems that they tend to cause
@@ -163,11 +162,11 @@ public class WalkableAreaBuilder {
     public void buildWithVisibility(AreaGroup group) {
         // These sets contain the nodes/vertices which can be used to traverse from the rest of the
         // street network onto the walkable area
-        Set<OSMNode> startingNodes = new HashSet<OSMNode>();
-        Set<Vertex> startingVertices = new HashSet<Vertex>();
+        Set<OSMNode> startingNodes = new HashSet<>();
+        Set<Vertex> startingVertices = new HashSet<>();
 
         // List of edges belonging to the walkable area
-        Set<Edge> edges = new HashSet<Edge>();
+        Set<Edge> edges = new HashSet<>();
 
         // Edges which are part of the rings. We want to keep there for linking even tough they
         // might not be part of the visibility edges.
@@ -190,8 +189,8 @@ public class WalkableAreaBuilder {
 
             // the points corresponding to concave or hole vertices
             // or those linked to ways
-            HashSet<OSMNode> visibilityNodes = new HashSet<OSMNode>();
-            HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<P2<OSMNode>>();
+            HashSet<OSMNode> visibilityNodes = new HashSet<>();
+            HashSet<P2<OSMNode>> alreadyAddedEdges = new HashSet<>();
             HashSet<OsmVertex> platformLinkingVertices = new HashSet<>();
             // we need to accumulate visibility points from all contained areas
             // inside this ring, but only for shared nodes; we don't care about
@@ -307,7 +306,7 @@ public class WalkableAreaBuilder {
                 }
 
                 for (OSMNode nodeJ : visibilityNodes) {
-                    P2<OSMNode> nodePair = new P2<OSMNode>(nodeI, nodeJ);
+                    P2<OSMNode> nodePair = new P2<>(nodeI, nodeJ);
                     if (alreadyAddedEdges.contains(nodePair))
                         continue;
 
@@ -340,8 +339,8 @@ public class WalkableAreaBuilder {
         pruneAreaEdges(startingVertices, edges, ringEdges);
     }
 
-    class ListedEdgesOnly implements SkipEdgeStrategy {
-        private Set<Edge> edges;
+    static class ListedEdgesOnly implements SkipEdgeStrategy {
+        private final Set<Edge> edges;
 
         public ListedEdgesOnly(Set<Edge> edges) {
             this.edges = edges;
@@ -385,13 +384,13 @@ public class WalkableAreaBuilder {
         options.setDummyRoutingContext(graph);
         AStar search = new AStar();
         search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
-        Set<Edge> usedEdges = new HashSet<Edge>();
+        Set<Edge> usedEdges = new HashSet<>();
         for (Vertex vertex : startingVertices) {
             options.setRoutingContext(graph, vertex, null);
             options.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
             ShortestPathTree spt = search.getShortestPathTree(options);
             for (Vertex endVertex : startingVertices) {
-                GraphPath path = spt.getPath(endVertex, false);
+                GraphPath path = spt.getPath(endVertex);
                 if (path != null) {
                     usedEdges.addAll(path.edges);
                 }
@@ -416,7 +415,7 @@ public class WalkableAreaBuilder {
             Ring ring, int i, HashSet<P2<OSMNode>> alreadyAddedEdges) {
         OSMNode node = ring.nodes.get(i);
         OSMNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
-        P2<OSMNode> nodePair = new P2<OSMNode>(node, nextNode);
+        P2<OSMNode> nodePair = new P2<>(node, nextNode);
         if (alreadyAddedEdges.contains(nodePair)) {
             return Set.of();
         }
@@ -430,7 +429,7 @@ public class WalkableAreaBuilder {
     private Set<AreaEdge> createSegments(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
             Collection<Area> areas, AreaEdgeList edgeList
     ) {
-        List<Area> intersects = new ArrayList<Area>();
+        List<Area> intersects = new ArrayList<>();
 
         Coordinate[] coordinates = new Coordinate[] { startEndpoint.getCoordinate(),
                 endEndpoint.getCoordinate() };

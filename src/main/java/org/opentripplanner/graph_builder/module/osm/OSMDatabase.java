@@ -48,76 +48,75 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class OSMDatabase {
 
-    private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
-    private DataImportIssueStore issueStore;
+    private final DataImportIssueStore issueStore;
 
     /* Map of all nodes used in ways/areas keyed by their OSM ID */
-    private TLongObjectMap<OSMNode> nodesById = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMNode> nodesById = new TLongObjectHashMap<>();
 
     /* Map of all bike parking nodes, keyed by their OSM ID */
-    private TLongObjectMap<OSMNode> bikeParkingNodes = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMNode> bikeParkingNodes = new TLongObjectHashMap<>();
 
     /* Map of all bike parking nodes, keyed by their OSM ID */
-    private TLongObjectMap<OSMNode> carParkingNodes = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMNode> carParkingNodes = new TLongObjectHashMap<>();
 
     /* Map of all non-area ways keyed by their OSM ID */
-    private TLongObjectMap<OSMWay> waysById = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMWay> waysById = new TLongObjectHashMap<>();
 
     /* Map of all area ways keyed by their OSM ID */
-    private TLongObjectMap<OSMWay> areaWaysById = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMWay> areaWaysById = new TLongObjectHashMap<>();
 
     /* Map of all relations keyed by their OSM ID */
-    private TLongObjectMap<OSMRelation> relationsById = new TLongObjectHashMap<>();
+    private final TLongObjectMap<OSMRelation> relationsById = new TLongObjectHashMap<>();
 
     /* All walkable areas */
-    private List<Area> walkableAreas = new ArrayList<Area>();
+    private final List<Area> walkableAreas = new ArrayList<>();
 
     /* All P+R areas */
-    private List<Area> parkAndRideAreas = new ArrayList<Area>();
+    private final List<Area> parkAndRideAreas = new ArrayList<>();
 
     /* All bike parking areas */
-    private List<Area> bikeParkingAreas = new ArrayList<Area>();
+    private final List<Area> bikeParkingAreas = new ArrayList<>();
 
     /* Map of all area OSMWay for a given node */
-    private TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
+    private final TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
 
     /* Map of all area OSMWay for a given node */
-    private List<OSMWay> singleWayAreas = new ArrayList<OSMWay>();
+    private final List<OSMWay> singleWayAreas = new ArrayList<>();
 
-    private Set<OSMWithTags> processedAreas = new HashSet<OSMWithTags>();
+    private final Set<OSMWithTags> processedAreas = new HashSet<>();
 
     /* Set of area way IDs */
-    private TLongSet areaWayIds = new TLongHashSet();
+    private final TLongSet areaWayIds = new TLongHashSet();
 
     /* Set of all node IDs of kept ways. Needed to mark which nodes to keep in stage 3. */
-    private TLongSet waysNodeIds = new TLongHashSet();
+    private final TLongSet waysNodeIds = new TLongHashSet();
 
     /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
-    private TLongSet areaNodeIds = new TLongHashSet();
+    private final TLongSet areaNodeIds = new TLongHashSet();
 
     /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-    private Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<OSMWithTags, OSMLevel>();
+    private final Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<>();
 
     /* Set of turn restrictions for each turn "from" way ID */
-    private Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
+    private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
             .create();
 
     /* Set of turn restrictions for each turn "to" way ID */
-    private Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
+    private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
 
     /*
      * Map of all transit stop nodes that lie within an area and which are connected to the area by
      * a relation. Keyed by the area's OSM way.
      */
-    private Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
+    private final Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<>();
 
     /*
      * ID of the next virtual node we create during building phase. Negative to prevent conflicts
@@ -360,7 +359,7 @@ public class OSMDatabase {
     }
 
     // Simple holder for the spatial index
-    class RingSegment {
+    static class RingSegment {
         Area area;
 
         Ring ring;
@@ -661,14 +660,13 @@ public class OSMDatabase {
     }
 
     private void markNodesForKeeping(Collection<OSMWay> osmWays, TLongSet nodeSet) {
-        for (Iterator<OSMWay> it = osmWays.iterator(); it.hasNext();) {
-            OSMWay way = it.next();
-            // Since the way is kept, update nodes-with-neighbors
-            TLongList nodes = way.getNodeRefs();
-            if (nodes.size() > 1) {
-                nodeSet.addAll(nodes);
-            }
+      for (OSMWay way : osmWays) {
+        // Since the way is kept, update nodes-with-neighbors
+        TLongList nodes = way.getNodeRefs();
+        if (nodes.size() > 1) {
+          nodeSet.addAll(nodes);
         }
+      }
     }
 
     /**
@@ -717,8 +715,8 @@ public class OSMDatabase {
                 continue;
             }
             // Area multipolygons -- pedestrian plazas
-            ArrayList<OSMWay> innerWays = new ArrayList<OSMWay>();
-            ArrayList<OSMWay> outerWays = new ArrayList<OSMWay>();
+            ArrayList<OSMWay> innerWays = new ArrayList<>();
+            ArrayList<OSMWay> outerWays = new ArrayList<>();
             for (OSMRelationMember member : relation.getMembers()) {
                 String role = member.getRole();
                 OSMWay way = areaWaysById.get(member.getRef());

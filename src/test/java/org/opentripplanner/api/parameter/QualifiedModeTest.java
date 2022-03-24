@@ -1,8 +1,7 @@
+package org.opentripplanner.api.parameter;
+
 import org.junit.Assert;
 import org.junit.Test;
-import org.opentripplanner.api.parameter.ApiRequestMode;
-import org.opentripplanner.api.parameter.QualifiedMode;
-import org.opentripplanner.api.parameter.Qualifier;
 
 import java.util.Arrays;
 import java.util.Set;

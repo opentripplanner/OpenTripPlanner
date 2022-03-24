@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -181,13 +182,12 @@ public final class StopPattern implements Serializable {
     HashCode semanticHash(HashFunction hashFunction) {
         Hasher hasher = hashFunction.newHasher();
         int size = stops.length;
-        for (int s = 0; s < size; s++) {
-            StopLocation stop = stops[s];
-            // Truncate the lat and lon to 6 decimal places in case they move slightly between
-            // feed versions
-            hasher.putLong((long) (stop.getLat() * 1000000));
-            hasher.putLong((long) (stop.getLon() * 1000000));
-        }
+      for (StopLocation stop : stops) {
+        // Truncate the lat and lon to 6 decimal places in case they move slightly between
+        // feed versions
+        hasher.putLong((long) (stop.getLat() * 1000000));
+        hasher.putLong((long) (stop.getLon() * 1000000));
+      }
         // Use hops rather than stops because drop-off at stop 0 and pick-up at last stop are
         // not important and have changed between OTP versions.
         for (int hop = 0; hop < size - 1; hop++) {

@@ -5,8 +5,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.graph.Edge;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**

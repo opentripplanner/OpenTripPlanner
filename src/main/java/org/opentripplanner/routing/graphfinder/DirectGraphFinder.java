@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.graphfinder;
 
 import com.beust.jcommander.internal.Lists;
-import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.FeedScopedId;
@@ -10,6 +9,8 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.List;
 
 /**
  * A Graph finder used in conjunction with a graph, which does not have a street network included.
@@ -51,10 +52,16 @@ public class DirectGraphFinder implements GraphFinder {
 
   @Override
   public List<PlaceAtDistance> findClosestPlaces(
-      double lat, double lon, double maxDistance, int maxResults, List<TransitMode> filterByModes,
-      List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
-      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
-      List<String> filterByBikeParks, List<String> filterByCarParks, RoutingService routingService
+    double lat,
+    double lon,
+    double maxDistance,
+    int maxResults,
+    List<TransitMode> filterByModes,
+    List<PlaceType> filterByPlaceTypes,
+    List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByRoutes,
+    List<String> filterByBikeRentalStations,
+    RoutingService routingService
   ) {
     throw new UnsupportedOperationException("Not implemented");
   }

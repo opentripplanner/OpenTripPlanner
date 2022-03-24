@@ -50,7 +50,7 @@ public class TimetableSnapshot {
      * Class to use as key in HashMap containing feed id, trip id and service date
      * TODO shouldn't this be a static class?
      */
-    protected class TripIdAndServiceDate {
+    protected static class TripIdAndServiceDate {
         private final FeedScopedId tripId;
         private final ServiceDate serviceDate;
         
@@ -70,8 +70,7 @@ public class TimetableSnapshot {
 
         @Override
         public int hashCode() {
-            int result = Objects.hash(tripId, serviceDate);
-            return result;
+            return Objects.hash(tripId, serviceDate);
         }
 
         @Override
@@ -140,7 +139,7 @@ public class TimetableSnapshot {
      * A set of all timetables which have been modified and are waiting to be indexed. When
      * <code>dirty</code> is <code>null</code>, it indicates that the snapshot is read-only.
      */
-    private Set<Timetable> dirtyTimetables = new HashSet<>();
+    private final Set<Timetable> dirtyTimetables = new HashSet<>();
 
     /**
      * Returns an updated timetable for the specified pattern if one is available in this snapshot,
@@ -198,8 +197,7 @@ public class TimetableSnapshot {
      */
     public TripPattern getLastAddedTripPattern(FeedScopedId tripId, ServiceDate serviceDate) {
         TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
-        TripPattern pattern = lastAddedTripPattern.get(tripIdAndServiceDate);
-        return pattern;
+        return lastAddedTripPattern.get(tripIdAndServiceDate);
     }
 
     /**
@@ -375,7 +373,7 @@ public class TimetableSnapshot {
             TripPattern pattern = it.next();
             SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
             SortedSet<Timetable> toKeepTimetables =
-                    new TreeSet<Timetable>(new SortedTimetableComparator());
+              new TreeSet<>(new SortedTimetableComparator());
             for(Timetable timetable : sortedTimetables) {
                 if(serviceDate.compareTo(timetable.getServiceDate()) < 0) {
                     toKeepTimetables.add(timetable);

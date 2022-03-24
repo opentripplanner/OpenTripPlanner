@@ -1,15 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
 public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
@@ -168,16 +169,15 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
         for (int i = 0; i < N; ++i) {
             int tripBoardTime = dT * (i + 1);
-            int okArrivalTime = tripBoardTime;
 
             // Search and find trip 'i'
-            searchForTrip(okArrivalTime, STOP_POS_0)
+            searchForTrip(tripBoardTime, STOP_POS_0)
                     .assertTripFound()
                     .withIndex(i)
                     .withBoardTime(tripBoardTime);
 
             // Search and find trip 'i' using the next trip index
-            searchForTrip(okArrivalTime, STOP_POS_0, i+1)
+            searchForTrip(tripBoardTime, STOP_POS_0, i+1)
                     .assertTripFound()
                     .withIndex(i);
 

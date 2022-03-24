@@ -2,12 +2,14 @@ package org.opentripplanner.ext.legacygraphqlapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
-import org.opentripplanner.api.json.GraphQLResponseSerializer;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.HeaderParam;
@@ -19,14 +21,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
+import org.opentripplanner.api.json.GraphQLResponseSerializer;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -40,14 +39,15 @@ public class LegacyGraphQLAPI {
   private final Router router;
   private final ObjectMapper deserializer = new ObjectMapper();
 
-  /**
-   * @deprecated The support for multiple routers are removed from OTP2.
-   * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-   */
-  @Deprecated @PathParam("ignoreRouterId")
-  private String ignoreRouterId;
 
-  public LegacyGraphQLAPI(@Context OTPServer otpServer) {
+  public LegacyGraphQLAPI(
+          @Context OTPServer otpServer,
+          /**
+           * @deprecated The support for multiple routers are removed from OTP2.
+           * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+           */
+          @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+  ) {
     this.router = otpServer.getRouter();
   }
 
@@ -70,12 +70,13 @@ public class LegacyGraphQLAPI {
 
     Locale locale = headers.getAcceptableLanguages().size() > 0
         ? headers.getAcceptableLanguages().get(0)
-        : router.defaultRoutingRequest.locale;
+        : router.getDefaultLocale();
 
     String query = (String) queryParameters.get("query");
     Object queryVariables = queryParameters.getOrDefault("variables", null);
     String operationName = (String) queryParameters.getOrDefault("operationName", null);
     Map<String, Object> variables;
+
     if (queryVariables instanceof Map) {
       variables = (Map) queryVariables;
     }
@@ -115,7 +116,7 @@ public class LegacyGraphQLAPI {
   ) {
     Locale locale = headers.getAcceptableLanguages().size() > 0
         ? headers.getAcceptableLanguages().get(0)
-        : router.defaultRoutingRequest.locale;
+        : router.getDefaultLocale();
     return LegacyGraphQLIndex.getGraphQLResponse(
         query,
         router,
@@ -138,7 +139,7 @@ public class LegacyGraphQLAPI {
     List<Callable<ExecutionResult>> futures = new ArrayList<>();
     Locale locale = headers.getAcceptableLanguages().size() > 0
         ? headers.getAcceptableLanguages().get(0)
-        : router.defaultRoutingRequest.locale;
+        : router.getDefaultLocale();
 
     for (HashMap<String, Object> query : queries) {
       Map<String, Object> variables;

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This graph does a quick sanity check that the GraphQL schema can be built. It's much
- * quicker to run the test than to build a jar and start up OTP.`
+ * quicker to run the test than to build a jar and start up OTP.
  */
 public class GraphQLIndexTest {
 

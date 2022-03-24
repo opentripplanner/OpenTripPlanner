@@ -14,7 +14,7 @@ import java.util.List;
 class TurnRestrictionTag {
 
     enum Direction {
-        LEFT, RIGHT, U, STRAIGHT;
+        LEFT, RIGHT, U, STRAIGHT
     }
 
     long via;
@@ -28,9 +28,9 @@ class TurnRestrictionTag {
 
     RepeatingTimePeriod time;
 
-    public List<StreetEdge> possibleFrom = new ArrayList<StreetEdge>();
+    public List<StreetEdge> possibleFrom = new ArrayList<>();
 
-    public List<StreetEdge> possibleTo = new ArrayList<StreetEdge>();
+    public List<StreetEdge> possibleTo = new ArrayList<>();
 
     public TraverseModeSet modes;
 

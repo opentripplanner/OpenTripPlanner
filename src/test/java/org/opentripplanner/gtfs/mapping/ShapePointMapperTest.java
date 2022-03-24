@@ -9,8 +9,8 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class ShapePointMapperTest {
@@ -37,7 +37,7 @@ public class ShapePointMapperTest {
         SHAPE_POINT.setShapeId(AGENCY_AND_ID);
     }
 
-    private ShapePointMapper subject = new ShapePointMapper();
+    private final ShapePointMapper subject = new ShapePointMapper();
 
     @Test
     public void testMapCollection() throws Exception {
@@ -74,6 +74,6 @@ public class ShapePointMapperTest {
         org.opentripplanner.model.ShapePoint result1 = subject.map(SHAPE_POINT);
         org.opentripplanner.model.ShapePoint result2 = subject.map(SHAPE_POINT);
 
-        assertTrue(result1 == result2);
+      assertSame(result1, result2);
     }
 }

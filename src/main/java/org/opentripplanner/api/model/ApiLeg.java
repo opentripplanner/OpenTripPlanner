@@ -4,9 +4,8 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
- /**
+/**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle (or on foot).
  */

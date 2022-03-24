@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 class DSJOperatingDayNotFound extends AbstractHMapValidationRule<String, DatedServiceJourney> {
 
   @Override
-  public Status validate(String dsjId, DatedServiceJourney dsj) {
+  public Status validate(DatedServiceJourney dsj) {
     var ref = getOperatingDayRef(dsj);
     var opDay = index.getOperatingDayById().lookup(ref);
 

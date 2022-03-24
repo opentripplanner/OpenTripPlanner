@@ -1,38 +1,35 @@
 package org.opentripplanner.api.resource;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 
 /**
  * Report the status of the graph updaters via a web service.
  */
+@SuppressWarnings("FieldMayBeFinal")
 @Path("/routers/{ignoreRouterId}/updaters")
 @Produces(MediaType.APPLICATION_JSON)
 public class UpdaterStatusResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UpdaterStatusResource.class);
+    private final Router router;
 
-    /** Choose short or long form of results. */
-    @QueryParam("detail") private boolean detail = false;
-
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated @PathParam("ignoreRouterId")
-    private String ignoreRouterId;
-    Router router;
-
-    public UpdaterStatusResource (@Context OTPServer otpServer) {
+    public UpdaterStatusResource (
+            @Context OTPServer otpServer,
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+    ) {
         router = otpServer.getRouter();
     }
 

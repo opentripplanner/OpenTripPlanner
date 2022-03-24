@@ -1,16 +1,23 @@
 package org.opentripplanner.inspector;
 
-import java.awt.Color;
-
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
-import org.opentripplanner.routing.edgetype.*;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.BarrierVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
+import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+
+import java.awt.*;
 
 /**
  * Render traversal permissions for each edge by color and label (walk, bicycle, car, stairs).
@@ -120,7 +127,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     }
 
     private String getLabel(StreetTraversalPermission permissions) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (permissions.allows(StreetTraversalPermission.PEDESTRIAN))
             sb.append("walk,");
         if (permissions.allows(StreetTraversalPermission.BICYCLE))

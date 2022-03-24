@@ -2,6 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model.framework;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 
 import java.util.Map;
@@ -16,13 +17,13 @@ public class MultilingualStringType {
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("value")
-            .type(Scalars.GraphQLString)
+            .type(new GraphQLNonNull(Scalars.GraphQLString))
             .dataFetcher(environment -> ((Map.Entry<String, String>) environment.getSource()).getValue())
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("language")
-            .type(Scalars.GraphQLString)
+            .type(new GraphQLNonNull(Scalars.GraphQLString))
             .dataFetcher(environment -> ((Map.Entry<String, String>) environment.getSource()).getKey())
             .build())
         .build();

@@ -36,11 +36,9 @@ import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.Branding;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.LineRefs_RelStructure;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
@@ -297,8 +295,7 @@ public class NetexMapper {
                 idFactory,
                 currentNetexIndex.getQuayById(),
                 tariffZoneMapper,
-                issueStore,
-                currentNetexIndex.getStopPlaceById()
+                issueStore
         );
         for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex.getStopPlaceById().lookup(stopPlaceId);
@@ -394,11 +391,15 @@ public class NetexMapper {
         );
         for (Line line : currentNetexIndex.getLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
-            transitBuilder.getRoutes().add(route);
+            if(route != null) {
+                transitBuilder.getRoutes().add(route);
+            }
         }
         for (FlexibleLine line : currentNetexIndex.getFlexibleLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
-            transitBuilder.getRoutes().add(route);
+            if(route != null) {
+                transitBuilder.getRoutes().add(route);
+            }
         }
     }
 

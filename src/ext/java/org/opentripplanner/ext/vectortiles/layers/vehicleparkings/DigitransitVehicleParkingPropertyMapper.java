@@ -1,19 +1,19 @@
 package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import org.json.simple.JSONObject;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.TranslatedString;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class DigitransitVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {
-    public static DigitransitVehicleParkingPropertyMapper create(Graph graph) {
+    public static DigitransitVehicleParkingPropertyMapper create() {
         return new DigitransitVehicleParkingPropertyMapper();
     }
 

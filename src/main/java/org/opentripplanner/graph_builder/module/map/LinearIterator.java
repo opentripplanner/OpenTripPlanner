@@ -14,7 +14,7 @@ import org.locationtech.jts.linearref.LinearLocation;
  */
 public class LinearIterator implements Iterable<LinearLocation> {
 
-    private Geometry linearGeom;
+    private final Geometry linearGeom;
 
     private final int numLines;
 

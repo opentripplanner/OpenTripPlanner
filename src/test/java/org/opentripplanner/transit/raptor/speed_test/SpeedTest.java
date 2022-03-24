@@ -455,10 +455,11 @@ public class SpeedTest {
                 false,
                 false,
                 request.getTransitModes(),
+                Set.of(),
                 Set.of()
         );
 
-        RoutingRequest routingRequest = new RoutingRequest();
+        RoutingRequest routingRequest = config.request.clone();
         routingRequest.walkSpeed = config.walkSpeedMeterPrSecond;
         RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
         transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);

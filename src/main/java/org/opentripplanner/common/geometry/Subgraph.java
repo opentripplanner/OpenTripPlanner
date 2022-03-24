@@ -1,30 +1,29 @@
 package org.opentripplanner.common.geometry;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.MultiPoint;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.opentripplanner.routing.graph.Vertex;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.MultiPoint;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-
 public class Subgraph {
 
-    private Set<Vertex> streetVertexSet;
-    private Set<Vertex> stopsVertexSet;
-    private ArrayList<Coordinate> vertexCoords;
-    private Geometry convexHullAsGeom = null;
+    private final Set<Vertex> streetVertexSet;
+    private final Set<Vertex> stopsVertexSet;
+    private final ArrayList<Coordinate> vertexCoords;
+    private final Geometry convexHullAsGeom = null;
     private boolean newVertexAdded = true;
 
     public Subgraph(){
-        streetVertexSet = new HashSet<Vertex>();
-        stopsVertexSet = new HashSet<Vertex>();
-        vertexCoords = new ArrayList<Coordinate>();
+        streetVertexSet = new HashSet<>();
+        stopsVertexSet = new HashSet<>();
+        vertexCoords = new ArrayList<>();
     }
 
     public void addVertex(Vertex vertex){
@@ -66,7 +65,7 @@ public class Subgraph {
         return stopsVertexSet.iterator();
     }
 
-    private static GeometryFactory gf = new GeometryFactory();
+    private static final GeometryFactory gf = new GeometryFactory();
     public Geometry getConvexHull() {
         if (newVertexAdded) {
             MultiPoint mp = gf.createMultiPoint(vertexCoords.toArray(new Coordinate[0]));

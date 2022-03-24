@@ -14,37 +14,30 @@ class TransportModeMapper {
     public T2<TransitMode, String> map(
         AllVehicleModesOfTransportEnumeration netexMode,
         TransportSubmodeStructure submode
-    ) {
+    ) throws UnsupportedModeException {
         if (submode != null) {
             return getSubmodeAsString(submode);
         }
         return new T2<>(mapAllVehicleModesOfTransport(netexMode), null);
     }
 
-    private TransitMode mapAllVehicleModesOfTransport(AllVehicleModesOfTransportEnumeration mode) {
-        switch (mode) {
-            case AIR:
-                return TransitMode.AIRPLANE;
-            case BUS:
-            case TAXI:
-                return TransitMode.BUS;
-            case CABLEWAY:
-                return TransitMode.CABLE_CAR;
-            case COACH:
-                return TransitMode.COACH;
-            case FUNICULAR:
-                return TransitMode.FUNICULAR;
-            case METRO:
-                return TransitMode.SUBWAY;
-            case RAIL:
-                return TransitMode.RAIL;
-            case TRAM:
-                return TransitMode.TRAM;
-            case WATER:
-                return TransitMode.FERRY;
-            default:
-                throw new IllegalArgumentException(mode.toString());
+    private TransitMode mapAllVehicleModesOfTransport(AllVehicleModesOfTransportEnumeration mode)
+            throws UnsupportedModeException {
+        if(mode == null) {
+            throw new UnsupportedModeException(null);
         }
+        return switch (mode) {
+            case AIR -> TransitMode.AIRPLANE;
+            case BUS, TAXI -> TransitMode.BUS;
+            case CABLEWAY -> TransitMode.CABLE_CAR;
+            case COACH -> TransitMode.COACH;
+            case FUNICULAR -> TransitMode.FUNICULAR;
+            case METRO -> TransitMode.SUBWAY;
+            case RAIL -> TransitMode.RAIL;
+            case TRAM -> TransitMode.TRAM;
+            case WATER -> TransitMode.FERRY;
+            default -> throw new UnsupportedModeException(mode);
+        };
     }
 
     private T2<TransitMode, String> getSubmodeAsString(TransportSubmodeStructure submode) {
@@ -68,5 +61,13 @@ class TransportModeMapper {
             return new T2<>(TransitMode.FERRY, submode.getWaterSubmode().value());
         }
         throw new IllegalArgumentException();
+    }
+
+    static class UnsupportedModeException extends Exception {
+        final AllVehicleModesOfTransportEnumeration mode;
+
+        public UnsupportedModeException(AllVehicleModesOfTransportEnumeration mode) {
+            this.mode = mode;
+        }
     }
 }

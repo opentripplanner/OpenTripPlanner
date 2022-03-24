@@ -9,13 +9,13 @@ import java.util.HashMap;
 public interface GraphBuilderModule {
 
     /** Process whatever inputs were supplied to this module and add the resulting elements to the given graph. */
-    public void buildGraph(
+    void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
             DataImportIssueStore issueStore
     );
 
-    public default void buildGraph(
+    default void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra
     ) {
@@ -23,6 +23,6 @@ public interface GraphBuilderModule {
     }
 
     /** Check that all inputs to the graphbuilder are valid; throw an exception if not. */
-    public void checkInputs();
+    void checkInputs();
 
 }

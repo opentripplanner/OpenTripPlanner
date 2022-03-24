@@ -27,8 +27,8 @@ import org.opentripplanner.transit.raptor.util.PathStringBuilder;
  * allowing us to add legs starting with the access leg and ending with the egress leg. The other
  * adds legs in the opposite order, from egress to access. Hence the forward and reverse mappers
  * are simplified using the head and tail builder respectively.
- * See {@link #headPathBuilder(RaptorPathConstrainedTransferSearch, RaptorSlackProvider, CostCalculator)}
- * and {@link #tailPathBuilder(RaptorPathConstrainedTransferSearch, RaptorSlackProvider, CostCalculator)}
+ * See {@link #headPathBuilder(RaptorPathConstrainedTransferSearch, RaptorSlackProvider, CostCalculator, RaptorStopNameResolver)}
+ * and {@link #tailPathBuilder(RaptorPathConstrainedTransferSearch, RaptorSlackProvider, CostCalculator, RaptorStopNameResolver)}
  * <p>
  * The builder is also used for creating test data in unit test.
  * <p>

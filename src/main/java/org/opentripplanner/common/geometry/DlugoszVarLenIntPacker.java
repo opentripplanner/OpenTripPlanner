@@ -66,7 +66,7 @@ public class DlugoszVarLenIntPacker {
         if (arr == null) {
             return null;
         }
-        List<Integer> retval = new ArrayList<Integer>(arr.length);
+        List<Integer> retval = new ArrayList<>(arr.length);
         int i = 0;
         while (i < arr.length) {
             int v1 = arr[i] & 0xFF;

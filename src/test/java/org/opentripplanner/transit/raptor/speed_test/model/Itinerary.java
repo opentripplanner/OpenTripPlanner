@@ -1,9 +1,10 @@
 package org.opentripplanner.transit.raptor.speed_test.model;
 
 
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -58,7 +59,7 @@ public class Itinerary {
      * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the
      * 6, then walks to their destination, has four legs.
      */
-    public List<Leg> legs = new ArrayList<Leg>();
+    public List<Leg> legs = new ArrayList<>();
 
     /** adds leg to array list */
     public void addLeg(Leg leg) {

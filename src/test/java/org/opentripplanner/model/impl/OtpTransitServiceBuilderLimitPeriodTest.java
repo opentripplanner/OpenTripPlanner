@@ -2,6 +2,7 @@ package org.opentripplanner.model.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
@@ -100,11 +101,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         subject.getTripsById().addAll(List.of(tripCSIn, tripCSOut, tripCSDIn, tripCSDOut));
 
         // Pattern with trips that is partially deleted later
-        patternInT1 = createTripPattern("P1", List.of(tripCSIn, tripCSOut));
+        patternInT1 = createTripPattern(List.of(tripCSIn, tripCSOut));
         // Pattern with trip that is inside period
-        patternInT2 = createTripPattern("P2", List.of(tripCSDIn));
+        patternInT2 = createTripPattern(List.of(tripCSDIn));
         // Pattern with trip outside limiting period - pattern is deleted later
-        TripPattern patternOut = createTripPattern("P3", List.of(tripCSDOut));
+        TripPattern patternOut = createTripPattern(List.of(tripCSDOut));
 
         subject.getTripPatterns().put(STOP_PATTERN, patternInT1);
         subject.getTripPatterns().put(STOP_PATTERN, patternInT2);
@@ -124,7 +125,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
         // Limit service to last half of month
-        subject.limitServiceDays(new ServiceDateInterval(D2, D3));
+        subject.limitServiceDays(new ServiceDateInterval(D2, D3), new DataImportIssueStore(false));
 
         // Verify calendar
         List<ServiceCalendar> calendars = subject.getCalendars();
@@ -164,7 +165,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
     }
 
-    private TripPattern createTripPattern(String id, Collection<Trip> trips) {
+    private TripPattern createTripPattern(Collection<Trip> trips) {
         FeedScopedId patternId = new FeedScopedId(FEED_ID,
             trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
         );

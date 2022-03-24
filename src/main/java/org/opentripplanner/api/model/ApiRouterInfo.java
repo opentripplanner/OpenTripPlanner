@@ -1,26 +1,22 @@
 package org.opentripplanner.api.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.api.mapping.TraverseModeMapper;
-import org.opentripplanner.common.geometry.GeometrySerializer;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.util.TravelOption;
-import org.opentripplanner.util.TravelOptionsMaker;
-import org.opentripplanner.util.WorldEnvelope;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.api.mapping.TraverseModeMapper;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.util.TravelOption;
+import org.opentripplanner.util.TravelOptionsMaker;
+import org.opentripplanner.util.WorldEnvelope;
 
 public class ApiRouterInfo {
 
     public String routerId;
     
-    @JsonSerialize(using= GeometrySerializer.class)
     public Geometry polygon;
 
     public Date buildTime;
@@ -31,7 +27,7 @@ public class ApiRouterInfo {
 
     public List<String> transitModes;
 
-    private WorldEnvelope envelope;
+    private final WorldEnvelope envelope;
 
     public double centerLatitude;
 
@@ -72,7 +68,7 @@ public class ApiRouterInfo {
         this.hasCarPark = mapHasCarPark(vehicleParkingService);
         this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
         this.travelOptions = TravelOptionsMaker.makeOptions(graph);
-        addCenter(graph.getCenter());
+        graph.getCenter().ifPresentOrElse(this::setCenter, this::calculateCenter);
     }
 
     public boolean mapHasBikeSharing(VehicleRentalStationService service) {
@@ -106,22 +102,25 @@ public class ApiRouterInfo {
     }
 
     /**
-     * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used
-     * or as mean coordinate if not
+     * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used.
      *
      * It is first called when OSM is loaded. Then after transit data is loaded.
      * So that center is set in all combinations of street and transit loading.
      */
-    public void addCenter(Optional<Coordinate> center) {
+    public void setCenter(Coordinate center) {
         //Transit data was loaded and center was calculated with calculateTransitCenter
-        if(center.isPresent()) {
-            centerLongitude = center.get().x;
-            centerLatitude = center.get().y;
-        } else {
-            // Does not work around 180th parallel.
-            centerLatitude = (getUpperRightLatitude() + getLowerLeftLatitude()) / 2;
-            centerLongitude = (getUpperRightLongitude() + getLowerLeftLongitude()) / 2;
-        }
+        centerLongitude = center.x;
+        centerLatitude = center.y;
+    }
+
+    /**
+     * Set center coordinate from mean coordinates of bounding box.
+     * @see #setCenter(Coordinate)
+     */
+    public void calculateCenter() {
+        // Does not work around 180th parallel.
+        centerLatitude = (getUpperRightLatitude() + getLowerLeftLatitude()) / 2;
+        centerLongitude = (getUpperRightLongitude() + getLowerLeftLongitude()) / 2;
     }
 
     public double getLowerLeftLatitude() {

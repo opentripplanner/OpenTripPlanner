@@ -22,13 +22,13 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>18</otp.serialization.version.id>
+        <otp.serialization.version.id>21</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>26.2</geotools.version>
-        <jackson.version>2.13.1</jackson.version>
+        <jackson.version>2.13.2</jackson.version>
         <jersey.version>2.34</jersey.version>
-        <junit.version>5.7.2</junit.version>
-        <micrometer.version>1.7.4</micrometer.version>
+        <junit.version>5.8.2</junit.version>
+        <micrometer.version>1.8.3</micrometer.version>
         <netcdf4.version>5.5.2</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <!-- Other properties -->
@@ -37,7 +37,7 @@
         <!-- Set argLine to an empty string so that running the tests without the coverage agent works.
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
-        <argLine></argLine>
+        <argLine/>
     </properties>
 
     <distributionManagement>
@@ -85,61 +85,14 @@
                 <directory>src/ext-test/resources</directory>
             </testResource>
         </testResources>
-        <pluginManagement>
-            <plugins>
-                <!-- m2eclipse lifecycle mapping configuration. This controls which Maven build goals should
-                be performed during incremental builds within the Eclipse IDE. There are sensible defaults
-                for most plugins, but some others require manual configuration with <action><ignore /> or
-                <action><execute /> filters. This section only affects incremental builds within Eclipse,
-                not command-line Maven builds. That's why it's a pluginManagement without an accompanying plugin. -->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-dependency-plugin</artifactId>
-                                        <versionRange>[1.0,)</versionRange>
-                                        <goals>
-                                            <goal>copy-dependencies</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>io.github.git-commit-id</groupId>
-                                        <artifactId>git-commit-id-maven-plugin</artifactId>
-                                        <versionRange>5.0.0</versionRange>
-                                        <goals>
-                                            <goal>revision</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <execute />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <!-- Target Java versions -->
-                    <release>11</release>
+                    <!-- Target Java version -->
+                    <release>17</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -160,7 +113,7 @@
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
-                <version>2.12.0</version>
+                <version>2.13.3</version>
                 <executions>
                     <execution>
                         <!-- override default binding to process-sources phase (enunciate generates web services). -->
@@ -220,6 +173,13 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.11.0</version>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -234,8 +194,17 @@
                         @{argLine}
                         -Xmx2G
                         -Dfile.encoding=UTF-8
-                        --illegal-access=permit
+                        --add-opens java.base/java.io=ALL-UNNAMED
+                        --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-opens java.base/java.lang.module=ALL-UNNAMED
+                        --add-opens java.base/java.math=ALL-UNNAMED
+                        --add-opens java.base/java.net=ALL-UNNAMED
+                        --add-opens java.base/java.text=ALL-UNNAMED
+                        --add-opens java.base/java.time=ALL-UNNAMED
+                        --add-opens java.base/java.time.zone=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.util.concurrent.locks=ALL-UNNAMED
+                        --add-opens java.base/java.util.regex=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
@@ -243,7 +212,11 @@
                         --add-opens java.base/jdk.internal.util=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.module=ALL-UNNAMED
-                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED
+                        --add-opens java.base/sun.net.www.protocol.jar=ALL-UNNAMED
+                        --add-opens java.base/sun.util.calendar=ALL-UNNAMED
+                        --add-opens java.base/sun.util.locale=ALL-UNNAMED
+                        --add-opens java.xml/org.xml.sax.helpers=ALL-UNNAMED
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
@@ -406,7 +379,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.10</version>
+            <version>1.2.11</version>
         </dependency>
         <!-- Jersey uses java.util logging, redirect it to slf4j API (we use the Logback implementation) -->
         <dependency>
@@ -457,6 +430,11 @@
             <artifactId>gt-wfs-ng</artifactId>
             <version>${geotools.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojsondatastore</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
         <!-- provides EPSG database for projections (shapefile loading) -->
         <dependency>
             <groupId>org.geotools</groupId>
@@ -496,7 +474,7 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>netex-java-model</artifactId>
-            <version>1.0.11</version>
+            <version>1.0.13</version>
         </dependency>
 
         <!-- SIRI -->
@@ -546,8 +524,8 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
+            <artifactId>mockito-core</artifactId>
+            <version>4.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -561,13 +539,13 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>kryo-tools</artifactId>
-            <version>1.3.0</version>
+            <version>1.4.0</version>
         </dependency>
         <!-- Direct dependency with -jre version, in order to not resolve to the limited -android version -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.0.1-jre</version>
+            <version>31.1-jre</version>
         </dependency>
         <!-- Jersey annontation-driven REST web services (JAX-RS implementation) -->
         <dependency>
@@ -687,19 +665,19 @@
         <dependency>
             <groupId>net.java.dev.jets3t</groupId>
             <artifactId>jets3t</artifactId>
-            <version>0.8.1</version>
+            <version>0.9.4</version>
         </dependency>
         <!-- OpenStreetMap protobuf (PBF) definitions and parser -->
         <dependency>
             <groupId>org.openstreetmap.osmosis</groupId>
             <artifactId>osmosis-osm-binary</artifactId>
-            <version>0.47.3</version>
+            <version>0.48.3</version>
         </dependency>
         <!-- Command line parameter parsing -->
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.78</version>
+            <version>1.82</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -709,7 +687,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>17.2</version>
+            <version>17.3</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -719,12 +697,12 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.5</version>
+            <version>4.5.13</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.4</version>
+            <version>1.5.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

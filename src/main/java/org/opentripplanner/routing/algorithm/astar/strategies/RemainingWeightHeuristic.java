@@ -15,21 +15,19 @@ public interface RemainingWeightHeuristic extends Serializable {
      * Perform any one-time setup and pre-computation that will be needed by later calls to
      * computeForwardWeight/computeReverseWeight. We may want to start from multiple origin states, so initialization
      * cannot depend on the origin vertex or state.
-     * @param abortTime time since the Epoch in milliseconds at which we should bail out of initialization,
-     *                  or Long.MAX_VALUE for no limit.
      */
-    public void initialize (RoutingRequest options, long abortTime);
+    void initialize(RoutingRequest options);
 
-    public double estimateRemainingWeight (State s);
+    double estimateRemainingWeight(State s);
 
     /** Reset any cached data in the heuristic, before reuse in a search with the same destination. */
-    public void reset();
+    void reset();
     
     /** 
      * Call to cause the heuristic to perform some predetermined amount of work improving its 
      * estimate. Avoids thread synchronization evil by interleaving forward and backward searches. 
      */
-    public void doSomeWork();
+    void doSomeWork();
     
 }
 

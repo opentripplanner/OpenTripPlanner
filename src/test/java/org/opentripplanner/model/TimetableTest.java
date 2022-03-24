@@ -1,19 +1,9 @@
 package org.opentripplanner.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-import static org.opentripplanner.util.TestUtils.AUGUST;
-
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,6 +21,17 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.TestUtils;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
+import static org.opentripplanner.util.TestUtils.AUGUST;
+
 
 
 /**
@@ -40,12 +41,12 @@ import org.opentripplanner.util.TestUtils;
 public class TimetableTest {
     
     private static Graph graph;
-    private AStar aStar = new AStar();
+    private final AStar aStar = new AStar();
     private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TripPattern pattern;
     private static Timetable timetable;
-    private static TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
-    private static ServiceDate serviceDate = new ServiceDate(2009, 8, 7);
+    private static final TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
+    private static final ServiceDate serviceDate = new ServiceDate(2009, 8, 7);
     
     @BeforeClass
     public static void setUp() throws Exception {
@@ -145,7 +146,7 @@ public class TimetableTest {
         //---
         options.setRoutingContext(graph, stop_a, stop_c);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_c, false);
+        path = spt.getPath(stop_c);
         assertNotNull(path);
         endTime = startTime + 20 * 60;
         assertEquals(endTime, path.getEndTime());
@@ -178,7 +179,7 @@ public class TimetableTest {
         //---
         options.setRoutingContext(graph, stop_a, stop_c);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_c, false);
+        path = spt.getPath(stop_c);
         assertNotNull(path);
         endTime = startTime + 20 * 60 + 120;
         assertEquals(endTime, path.getEndTime());
@@ -207,7 +208,7 @@ public class TimetableTest {
         //---
         options.setRoutingContext(graph, stop_a, stop_c);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_c, false);
+        path = spt.getPath(stop_c);
         assertNotNull(path);
         endTime = startTime + 40 * 60;
         assertEquals(endTime, path.getEndTime());

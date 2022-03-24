@@ -22,18 +22,18 @@ public class LocationStringParser {
 
         // Pattern for matching a latitude or longitude string: an optional '-' character followed
         // by one or more digits, and an optional (decimal point followed by one or more digits).
-        private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
+        private static final String DOUBLE_PATTERN = "-{0,1}\\d+(\\.\\d+){0,1}";
 
         // The pattern for a latitude and longitude together. For some reason this is designed to
         // ignore any number of non-digit characters except +/- signs at the beginning of the
         // string. So it ignores any number of non-(digit or sign or decimal point).
         // Regex has been rewritten following https://bugs.openjdk.java.net/browse/JDK-8189343
         // from "[^[\\d&&[-|+|.]]]*(" to "[\\D&&[^-+.]]*("
-        private static final Pattern _latLonPattern = Pattern.compile(
+        private static final Pattern LAT_LON_PATTERN = Pattern.compile(
             "[\\D&&[^-+.]]*("
-            + _doublePattern
+            + DOUBLE_PATTERN
             + ")(\\s*,\\s*|\\s+)("
-            + _doublePattern
+            + DOUBLE_PATTERN
             + ")\\D*"
         );
 
@@ -66,7 +66,7 @@ public class LocationStringParser {
             Double lon = null;
             FeedScopedId placeId = null;
 
-            Matcher matcher = _latLonPattern.matcher(place);
+            Matcher matcher = LAT_LON_PATTERN.matcher(place);
             if (matcher.find()) {
                 lat = Double.parseDouble(matcher.group(1));
                 lon = Double.parseDouble(matcher.group(4));

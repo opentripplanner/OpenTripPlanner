@@ -38,6 +38,11 @@ public class ReversedRaptorTransfer implements RaptorTransfer {
     }
 
     @Override
+    public boolean hasOpeningHours() {
+        return transfer.hasOpeningHours();
+    }
+
+    @Override
     public int numberOfRides() {
         return transfer.numberOfRides();
     }

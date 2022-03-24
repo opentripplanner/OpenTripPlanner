@@ -12,6 +12,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
@@ -48,6 +49,17 @@ public class QuayType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("name")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .argument(GraphQLArgument
+                        .newArgument()
+                        .name("lang")
+                        .description("Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned.")
+                        .type(Scalars.GraphQLString)
+                        .build())
+                    .dataFetcher(environment -> {
+                        String lang = environment.getArgument("lang");
+                        Locale locale = lang != null ? new Locale(lang) : null;
+                        return (((StopLocation) environment.getSource()).getName().toString(locale));
+                    })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("latitude")
@@ -227,7 +239,7 @@ public class QuayType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("situations")
                     .description("Get all situations active for the quay.")
-                    .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
+                    .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
                     .dataFetcher(env -> {
                         return GqlUtil.getRoutingService(env).getTransitAlertService()
                                 .getStopAlerts(((StopLocation) env.getSource()).getId());

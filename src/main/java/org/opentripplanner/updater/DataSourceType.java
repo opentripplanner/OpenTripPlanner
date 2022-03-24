@@ -13,5 +13,8 @@ public enum DataSourceType {
 
   // GTFS RT
   GTFS_RT_HTTP,
-  GTFS_RT_FILE;
+  GTFS_RT_FILE,
+
+  // GTFS-RT Vehicle Positions
+  GTFS_RT_VEHICLE_POSITIONS,
 }

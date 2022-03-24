@@ -3,9 +3,6 @@ package org.opentripplanner.ext.flex;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedScopedId;
@@ -14,8 +11,11 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graph.Graph;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 public class FlexIndex {
   public Multimap<StopLocation, PathTransfer> transfersToStop = ArrayListMultimap.create();
@@ -24,7 +24,7 @@ public class FlexIndex {
 
   public Multimap<StopLocation, FlexLocationGroup> locationGroupsByStop = ArrayListMultimap.create();
 
-  public HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<FlexStopLocation>();
+  public HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
 
   public Map<FeedScopedId, Route> routeById = new HashMap<>();
 

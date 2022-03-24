@@ -1,5 +1,16 @@
 package org.opentripplanner.api.resource;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.mapping.VehicleRentalStationMapper;
 import org.opentripplanner.api.model.ApiVehicleRentalStation;
@@ -10,29 +21,23 @@ import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-
 @Path("/routers/{ignoreRouterId}/bike_rental")
 public class BikeRental {
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated @PathParam("ignoreRouterId")
-    private String ignoreRouterId;
 
-    @Context
-    OTPServer otpServer;
+    private final OTPServer otpServer;
+
+    public BikeRental(
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @Deprecated @PathParam("ignoreRouterId")
+            String ignoreRouterId,
+            @Context
+            OTPServer otpServer
+    ) {
+        this.otpServer = otpServer;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -70,10 +75,9 @@ public class BikeRental {
         String[] lowerLeftParts = lowerLeft.split(",");
         String[] upperRightParts = upperRight.split(",");
 
-        Envelope envelope = new Envelope(Double.parseDouble(lowerLeftParts[1]),
+        return new Envelope(Double.parseDouble(lowerLeftParts[1]),
                 Double.parseDouble(upperRightParts[1]), Double.parseDouble(lowerLeftParts[0]),
                 Double.parseDouble(upperRightParts[0]));
-        return envelope;
     }
 
 }

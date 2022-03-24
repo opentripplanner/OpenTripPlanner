@@ -41,7 +41,7 @@ public class ScheduledTransitLeg implements Leg {
     private final Calendar startTime;
     private final Calendar endTime;
 
-    private Double distanceMeters;
+    private double distanceMeters;
     private final LineString legGeometry;
 
     private final Set<TransitAlert> transitAlerts = new HashSet<>();
@@ -196,12 +196,12 @@ public class ScheduledTransitLeg implements Leg {
     }
 
     @Override
-    public Double getDistanceMeters() {
+    public double getDistanceMeters() {
         return distanceMeters;
     }
 
     /** Only for testing purposes */
-    protected void setDistanceMeters(Double distanceMeters) {
+    protected void setDistanceMeters(double distanceMeters) {
         this.distanceMeters = distanceMeters;
     }
 

@@ -10,7 +10,6 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -103,9 +102,9 @@ public class Place {
                 .toString();
     }
 
-    public static Place normal(Double lat, Double lon, String name) {
+    public static Place normal(Double lat, Double lon, I18NString name) {
         return new Place(
-                new NonLocalizedString(name),
+                name,
                 WgsCoordinate.creatOptionalCoordinate(lat, lon),
                 VertexType.NORMAL,
                 null, null, null
@@ -123,7 +122,7 @@ public class Place {
 
     public static Place forStop(StopLocation stop) {
         return new Place(
-                new NonLocalizedString(stop.getName()),
+                stop.getName(),
                 stop.getCoordinate(),
                 VertexType.TRANSIT,
                 stop,
@@ -136,7 +135,7 @@ public class Place {
         // The actual vertex is used because the StopLocation coordinates may not be equal to the vertex's
         // coordinates.
         return new Place(
-                new NonLocalizedString(stop.getName()),
+                stop.getName(),
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.TRANSIT,
                 stop,

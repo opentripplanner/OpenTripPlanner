@@ -43,26 +43,25 @@ nested objects `{...}`, arrays `[]`, numbers `789.0` and boolean `true` or `fals
 these basic types some configuration parameters are parsed with some restrictions. In the 
 documentation below we will refer to the following types:
 
-Type | Description | Examples
------|-------------|---------
-boolean | This is the Boolean JSON type. | `true` or `false`
-number | This is the Number JSON type. | `1`, `5`, `3.14` 
-string | A quoted string. This is the String JSON type. | `"This is a string!"`
-_Type_[] | Array of of given Type. This is the Array JSON type. | `[ 1, 2, 3 ]` 
-double | A decimal floating point _number_. 64 bit.| `3.14`
-integer | A decimal integer _number_. 32 bit. | `1`, `-7`, `2100200300`
-long | A decimal integer _number_. 64 bit. | `-1234567890123456789`
-enum | A fixed set of string literals. | BicycleOptimize: `"QUICK"`, `"SAFE"` ...
-enum-map | List of key/value pairs, where the key is a enum and the value can be any given type. | `{ RAIL: 1.2, BUS: 2.3 }` 
-enum-set | List of enum string values | `[ "RAIL", "TRAM" ]`
-locale | _`Language[\_country[\_variant]]`_. A Locale object represents a specific geographical, political, or cultural region. For more information see the [Java 11 Locale](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html). | `en_US`, `nn_NO`
-date | Local date. The format is _YYYY-MM-DD_ (ISO-8601). | `2020-09-21`
-date or period | A _local date_, or a _period_ relative to today. The local date has the format `YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer number. | `P1Y` is one year from now, `-P3M2D` means 3 months and 2 days ago, and `P1D` means tomorrow.
-duration | A _duration_ is a amount of time. The format is `PnDTnHnMnS` or `nDnHnMnS` where `n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not case sensitive. | `3h` is 3 hours, `2m` means 2 minutes, and `1d5h2m3s` is 1 day, 5 hours, 2 minutes and 3 seconds. Use the "PT" form with negative values like `-P2dT-1s` and `P-2dT1s` (both is minus 2 days plus one second). 
-regexp pattern | A regular expression pattern used to match a sting. | `"$^"` matches an empty string. `"gtfs"` matches `"A-*gtfs*-file.zip"`. `"$\w{3})-.*\.xml^"` matches a filename with 3 alpha-numeric characters in the beginning of the filename and _.xml_ as file extension.   
-uri | An URI path to a resource like a file or a URL. Relative URIs are resolved relative to the OTP base path. | `"gs://bucket/path/a.obj"` `"http://foo.bar/"` `"file:///Users/x/local/file"` `"myGraph.obj"` `"../street/streetGraph-${otp.serialization.version.id}.obj"`
-linear function | A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x` | `"600 + 2.0 x"`
-
+| Type            | Description                                                                                                                                                                                                                                                         | Examples                                                                                                                                                                                                       |
+|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| boolean         | This is the Boolean JSON type.                                                                                                                                                                                                                                      | `true` or `false`                                                                                                                                                                                              |
+| number          | This is the Number JSON type.                                                                                                                                                                                                                                       | `1`, `5`, `3.14`                                                                                                                                                                                               |
+| string          | A quoted string. This is the String JSON type.                                                                                                                                                                                                                      | `"This is a string!"`                                                                                                                                                                                          |
+| _Type_[]        | Array of of given Type. This is the Array JSON type.                                                                                                                                                                                                                | `[ 1, 2, 3 ]`                                                                                                                                                                                                  |
+| double          | A decimal floating point _number_. 64 bit.                                                                                                                                                                                                                          | `3.14`                                                                                                                                                                                                         |
+| integer         | A decimal integer _number_. 32 bit.                                                                                                                                                                                                                                 | `1`, `-7`, `2100200300`                                                                                                                                                                                        |
+| long            | A decimal integer _number_. 64 bit.                                                                                                                                                                                                                                 | `-1234567890123456789`                                                                                                                                                                                         |
+| enum            | A fixed set of string literals.                                                                                                                                                                                                                                     | BicycleOptimize: `"QUICK"`, `"SAFE"` ...                                                                                                                                                                       |
+| enum-map        | List of key/value pairs, where the key is a enum and the value can be any given type.                                                                                                                                                                               | `{ RAIL: 1.2, BUS: 2.3 }`                                                                                                                                                                                      |
+| enum-set        | List of enum string values                                                                                                                                                                                                                                          | `[ "RAIL", "TRAM" ]`                                                                                                                                                                                           |
+| locale          | _`Language[\_country[\_variant]]`_. A Locale object represents a specific geographical, political, or cultural region. For more information see the [Java 11 Locale](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html).           | `en_US`, `nn_NO`                                                                                                                                                                                               |
+| date            | Local date. The format is _YYYY-MM-DD_ (ISO-8601).                                                                                                                                                                                                                  | `2020-09-21`                                                                                                                                                                                                   |
+| date or period  | A _local date_, or a _period_ relative to today. The local date has the format `YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer number.                                                                                    | `P1Y` is one year from now, `-P3M2D` means 3 months and 2 days ago, and `P1D` means tomorrow.                                                                                                                  |
+| duration        | A _duration_ is a amount of time. The format is `PnDTnHnMnS` or `nDnHnMnS` where `n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not case sensitive.                                                                         | `3h` is 3 hours, `2m` means 2 minutes, and `1d5h2m3s` is 1 day, 5 hours, 2 minutes and 3 seconds. Use the "PT" form with negative values like `-P2dT-1s` and `P-2dT1s` (both is minus 2 days plus one second). |
+| regexp pattern  | A regular expression pattern used to match a sting.                                                                                                                                                                                                                 | `"$^"` matches an empty string. `"gtfs"` matches `"A-*gtfs*-file.zip"`. `"$\w{3})-.*\.xml^"` matches a filename with 3 alpha-numeric characters in the beginning of the filename and _.xml_ as file extension. |
+| uri             | An URI path to a resource like a file or a URL. Relative URIs are resolved relative to the OTP base path.                                                                                                                                                           | `"gs://bucket/path/a.obj"` `"http://foo.bar/"` `"file:///Users/x/local/file"` `"myGraph.obj"` `"../street/streetGraph-${otp.serialization.version.id}.obj"`                                                    |
+| linear function | A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x` | `"600 + 2.0 x"`                                                                                                                                                                                                |
 
 ## System environment and project information substitution
 
@@ -75,9 +74,9 @@ deployment.
 
 ```JSON
 {
-  storage : {
-    gsCredentials: "${GCS_SERVICE_CREDENTIALS}",
-    graph: "file:///var/otp/graph-${otp.serialization.version.id}.obj",
+  "storage" : {
+    "gsCredentials": "${GCS_SERVICE_CREDENTIALS}",
+    "graph": "file:///var/otp/graph-${otp.serialization.version.id}.obj"
   }
 }
 ```     
@@ -182,7 +181,7 @@ Using the file `otp-config.json` you can enable or disable different APIs and ex
 sandbox features are disabled. So for most OTP2 use cases it is not necessary to create this file.
 Features that can be toggled in this file are generally only affect the routing phase of OTP2
 usage, but for consistency all such "feature flags", even those that would affect graph building,
-are managed in this one file. See the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/util/OTPFeature.java) 
+are managed in this one file. See the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/util/OTPFeature.java) 
 Java class for an enumeration of all available features and their default settings. Here is an 
 example:
 
@@ -199,22 +198,22 @@ example:
 ## OTP Features
 Here is a list of all features which can be toggled on/off.
 
-Feature | Description | Enabled by default | Sandbox
---------|-------------|--------------------|-------- 
-`APIBikeRental` | Enable the bike rental endpoint | yes | no
-`APIServerInfo` | Enable the server info endpoint |  yes | no
-`APIGraphInspectorTile` | Enable the inspector  endpoint for graph information for inspection/debugging purpose | yes | no
-`APIUpdaterStatus` | Enable endpoint for graph updaters status | yes | no
-`OptimizeTransfers` | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account. | yes | no
-`MinimumTransferTimeIsDefinitive` | If the minimum transfer time is a lower bound (default) or the definitive time for the transfer. Set this to true if you want to set a transfer time lower than what OTP derives from OSM data. | no | no
-`ParallelRouting` | Enable performing parts of the trip planning in parallel | no | no
-`TransferConstraints` | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little. | yes | no
-`ActuatorAPI` | Enpoint for actuators (service health status) | no | yes
-`GoogleCloudStorage` | Enable Google Cloud Storage integration | no | yes
-`SandboxAPITransmodelApi` | Enable Entur Transmodel(NeTEx) GraphQL API | no | yes
-`SandboxAPILegacyGraphQLApi` | Enable (GTFS) GraphQL API | no | yes
-`SandboxAPIMapboxVectorTilesApi` | Enable Mapbox vector tiles API | no | yes
-`SandboxAPIParkAndRideApi` | Enable park-and-ride endpoint | no | yes
-`TransferAnalyzer` | Analyze transfers during graph build | no | yes
-`FlexRouting` | Enable FLEX routing | no | yes
-`FloatingBike` | Enable floating bike routing | no | yes
+| Feature                           | Description                                                                                                                                                                                     | Enabled by default | Sandbox |
+|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|---------|
+| `APIBikeRental`                   | Enable the bike rental endpoint                                                                                                                                                                 | yes                | no      |
+| `APIServerInfo`                   | Enable the server info endpoint                                                                                                                                                                 | yes                | no      |
+| `APIGraphInspectorTile`           | Enable the inspector  endpoint for graph information for inspection/debugging purpose                                                                                                           | yes                | no      |
+| `APIUpdaterStatus`                | Enable endpoint for graph updaters status                                                                                                                                                       | yes                | no      |
+| `OptimizeTransfers`               | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account.                       | yes                | no      |
+| `MinimumTransferTimeIsDefinitive` | If the minimum transfer time is a lower bound (default) or the definitive time for the transfer. Set this to true if you want to set a transfer time lower than what OTP derives from OSM data. | no                 | no      |
+| `ParallelRouting`                 | Enable performing parts of the trip planning in parallel                                                                                                                                        | no                 | no      |
+| `TransferConstraints`             | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little.                                   | yes                | no      |
+| `ActuatorAPI`                     | Enpoint for actuators (service health status)                                                                                                                                                   | no                 | yes     |
+| `GoogleCloudStorage`              | Enable Google Cloud Storage integration                                                                                                                                                         | no                 | yes     |
+| `SandboxAPITransmodelApi`         | Enable Entur Transmodel(NeTEx) GraphQL API                                                                                                                                                      | no                 | yes     |
+| `SandboxAPILegacyGraphQLApi`      | Enable (GTFS) GraphQL API                                                                                                                                                                       | no                 | yes     |
+| `SandboxAPIMapboxVectorTilesApi`  | Enable Mapbox vector tiles API                                                                                                                                                                  | no                 | yes     |
+| `SandboxAPIParkAndRideApi`        | Enable park-and-ride endpoint                                                                                                                                                                   | no                 | yes     |
+| `TransferAnalyzer`                | Analyze transfers during graph build                                                                                                                                                            | no                 | yes     |
+| `FlexRouting`                     | Enable FLEX routing                                                                                                                                                                             | no                 | yes     |
+| `FloatingBike`                    | Enable floating bike routing                                                                                                                                                                    | no                 | yes     |

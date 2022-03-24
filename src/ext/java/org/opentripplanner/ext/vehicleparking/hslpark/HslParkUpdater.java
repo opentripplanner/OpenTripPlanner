@@ -1,14 +1,15 @@
 package org.opentripplanner.ext.vehicleparking.hslpark;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces.VehicleParkingSpacesBuilder;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.util.xml.JsonDataListDownloader;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Vehicle parking updater class for https://github.com/HSLdevcom/parkandrideAPI format APIs. There
@@ -117,29 +118,28 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
         VehicleParkingSpacesBuilder availabilityBuilder = VehicleParkingSpaces.builder();
         boolean hasHandledSpaces = false;
 
-        for (int i = 0; i < patches.size(); i++) {
-            HslParkPatch patch = patches.get(i);
-            String type = patch.getCapacityType();
+      for (HslParkPatch patch : patches) {
+        String type = patch.getCapacityType();
 
-            if (type != null) {
-                Integer spaces = patch.getSpacesAvailable();
+        if (type != null) {
+          Integer spaces = patch.getSpacesAvailable();
 
-                switch (type) {
-                    case "CAR":
-                        availabilityBuilder.carSpaces(spaces);
-                        hasHandledSpaces = true;
-                        break;
-                    case "BICYCLE":
-                        availabilityBuilder.bicycleSpaces(spaces);
-                        hasHandledSpaces = true;
-                        break;
-                    case "DISABLED":
-                        availabilityBuilder.wheelchairAccessibleCarSpaces(spaces);
-                        hasHandledSpaces = true;
-                        break;
-                }
-            }
+          switch (type) {
+            case "CAR":
+              availabilityBuilder.carSpaces(spaces);
+              hasHandledSpaces = true;
+              break;
+            case "BICYCLE":
+              availabilityBuilder.bicycleSpaces(spaces);
+              hasHandledSpaces = true;
+              break;
+            case "DISABLED":
+              availabilityBuilder.wheelchairAccessibleCarSpaces(spaces);
+              hasHandledSpaces = true;
+              break;
+          }
         }
+      }
 
         return hasHandledSpaces ? availabilityBuilder.build() : null;
     }

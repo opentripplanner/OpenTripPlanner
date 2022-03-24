@@ -14,11 +14,8 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
@@ -236,7 +233,7 @@ public class ServiceJourneyType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")
-                    .type(new GraphQLNonNull(new GraphQLList(noticeType)))
+                    .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
                     .dataFetcher(env ->
                         GqlUtil.getRoutingService(env).getNoticesByEntity(trip(env))
                     )
@@ -244,7 +241,7 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("situations")
                     .description("Get all situations active for the service journey.")
-                    .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
+                    .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
                     .dataFetcher(environment ->
                         GqlUtil.getRoutingService(environment)
                             .getTransitAlertService()

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -75,7 +75,7 @@ public final class ConstrainedBoardingSearch
     ) {
         var transfers = findMatchingTransfers(sourceTripSchedule, sourceStopIndex);
 
-        if(transfers.isEmpty()) { return null; }
+        if(!transfers.iterator().hasNext()) { return null; }
 
         boolean found = findTimetableTripInfo(
                 timetable,
@@ -100,14 +100,21 @@ public final class ConstrainedBoardingSearch
         );
     }
 
-    private List<TransferForPattern> findMatchingTransfers(
+    private Iterable<TransferForPattern> findMatchingTransfers(
             TripSchedule tripSchedule,
             int stopIndex
     ) {
         final Trip trip = tripSchedule.getOriginalTripTimes().getTrip();
-        return currentTransfers.stream()
-                .filter(t -> t.matchesSourcePoint(stopIndex, trip))
-                .collect(Collectors.toList());
+        // for performance reasons we use a for loop here as streams are much slower.
+        // I experimented with LinkedList and ArrayList and LinkedList was faster, presumably
+        // because insertion is quick and we don't need index-based access, only iteration.
+        var result = new LinkedList<TransferForPattern>();
+        for (var t : currentTransfers) {
+            if (t.matchesSourcePoint(stopIndex, trip)) {
+                result.add(t);
+            }
+        }
+        return result;
     }
 
     /**
@@ -124,7 +131,7 @@ public final class ConstrainedBoardingSearch
      */
     public boolean findTimetableTripInfo(
             RaptorTimeTable<TripSchedule> timetable,
-            List<TransferForPattern> transfers,
+            Iterable<TransferForPattern> transfers,
             int stopPos,
             int sourceTransitArrivalTime,
             int earliestBoardTime

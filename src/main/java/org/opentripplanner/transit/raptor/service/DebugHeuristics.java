@@ -38,7 +38,7 @@ public class DebugHeuristics {
             RaptorRequest<?> request
     ) {
         DebugRequest debug = request.debug();
-        if (debug.logger().isEnabled(HEURISTICS)) {
+        if (debug.logger().isEnabled()) {
             new DebugHeuristics(aName, bName, debug).debug(h1, h2, request.searchDirection());
         }
     }

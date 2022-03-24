@@ -92,7 +92,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -1084,7 +1083,7 @@ public class TransmodelGraphQLSchema {
             .name("situations")
             .description("Get all active situations.")
             .withDirective(gqlUtil.timingData)
-            .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
+            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
             .argument(GraphQLArgument
                 .newArgument()
                 .name("authorities")

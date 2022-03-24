@@ -1,13 +1,7 @@
 package org.opentripplanner.ext.parkAndRideApi;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -17,8 +11,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 /**
  * Created by demory on 7/26/18.
@@ -27,16 +26,18 @@ import java.util.List;
 @Path("/routers/{ignoreRouterId}/park_and_ride")
 public class ParkAndRideResource {
 
-    @Context
-    OTPServer otpServer;
+    private final OTPServer otpServer;
 
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated
-    @PathParam("ignoreRouterId")
-    private String ignoreRouterId;
+    public ParkAndRideResource(
+            @Context OTPServer otpServer,
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+    ) {
+        this.otpServer = otpServer;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

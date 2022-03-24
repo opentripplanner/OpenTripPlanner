@@ -73,7 +73,7 @@ public class Fare {
     }
 
     public String toString() {
-        StringBuffer buffer = new StringBuffer("Fare(");
+        StringBuilder buffer = new StringBuilder("Fare(");
         for (FareType type : fare.keySet()) {
             Money cost = fare.get(type);
             buffer.append("[");

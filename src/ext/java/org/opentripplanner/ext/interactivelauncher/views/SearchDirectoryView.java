@@ -2,7 +2,6 @@ package org.opentripplanner.ext.interactivelauncher.views;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.function.Consumer;
 
@@ -39,7 +38,7 @@ public class SearchDirectoryView {
     box.setAlignmentX(Component.LEFT_ALIGNMENT);
     box.add(fileTxt);
     box.add(searchBtn);
-    searchBtn.addActionListener(this::onSelectSource);
+    searchBtn.addActionListener(l -> onSelectSource());
     panel.add(box);
   }
 
@@ -47,7 +46,7 @@ public class SearchDirectoryView {
     return panel;
   }
 
-  private void onSelectSource(ActionEvent l) {
+  private void onSelectSource() {
     JFileChooser chooser = new JFileChooser(new File(fileTxt.getText()));
     chooser.setBackground(ViewUtils.BACKGROUND);
     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

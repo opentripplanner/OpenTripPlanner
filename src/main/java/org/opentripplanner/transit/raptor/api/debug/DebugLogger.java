@@ -13,7 +13,7 @@ public interface DebugLogger {
      * <p/>
      * PLEASE IMPLEMENT THIS AND RETURN TRUE TO ENABLE DEBUGGING.
      */
-    default boolean isEnabled(DebugTopic topic) {
+    default boolean isEnabled() {
         return false;
     }
 
@@ -37,7 +37,7 @@ public interface DebugLogger {
      * Handy method which uses the Java String#format to format the message.
      */
     default void debug(DebugTopic topic, String format, Object... args) {
-        if(isEnabled(topic)) {
+        if(isEnabled()) {
             debug(topic, String.format(format, args));
         }
     }

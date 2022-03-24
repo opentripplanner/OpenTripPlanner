@@ -5,7 +5,7 @@ import gnu.trove.list.array.TLongArrayList;
 
 public class OSMWay extends OSMWithTags {
 
-    private TLongList nodes = new TLongArrayList();
+    private final TLongList nodes = new TLongArrayList();
 
     public void addNodeRef(OSMNodeRef nodeRef) {
         nodes.add(nodeRef.getRef());

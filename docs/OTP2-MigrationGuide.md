@@ -3,18 +3,19 @@
 ## Command Line
 
 The OTP2 command line parameters are different than in OTP1. Use the `--help` option to get the 
-current documentation, and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#starting-otp) 
+current documentation, and look at [Basic Tutorial - Starting OTP](Basic-Tutorial.md#starting-otp) 
 for examples. The possibility to build the graph in 2 steps (streets then transit) is new in OTP2. 
-OTP2 does not support multiple routers.
+OTP2 does not support routing on more than one separate transportation network with a single 
+server (referred to as multiple "routers" in OTP1).
 
 
 ## File Loading
 
-OTP1 accesses all files using the local file system, no other _data-source_ is supported. In OTP2 we 
-support accessing cloud storage. So far Google Cloud Storage is added and we plan to add support 
-for AWS S3 as well. Config files (_otp-config.json, build-config.json, router-config.json_) are read 
-from the local file system, while other files can be read/written from the local file-system or the
-cloud. OTP2 supports mixing any data sources that are supported. 
+OTP1 reads and writes all files on the local filesystem, and no other _data-source_ is supported. 
+In OTP2 we support accessing cloud storage. So far support for Google Cloud Storage has been added
+and we plan to add support for AWS S3 as well. Config files (_otp-config.json, build-config.json, 
+router-config.json_) must be read from the local file system, while other files can be read/written 
+from either the local filesystem or cloud storage. OTP2 supports mixing any supported data sources.
 
 OTP1 loads input data files (_DEM, OSM, GTFS, NeTEx_) based on the suffix (file extension). But for 
 GTFS files OTP1 also opens the zip-file and looks for _stops.txt_. OTP2 identifies GTFS files by the 
@@ -22,30 +23,46 @@ name only: it will detect any zip-file or directory that contains "gtfs" as part
 file types in OTP2 are resolved by matching the name with a regexp pattern. You can configure the 
 patterns in the _build-config.json_ if the defaults do not suit you. 
 
-OTP2 does not support multiple routers, but you can load as many GTFS and/or NeTEx feeds as 
-you want into a single instance of OTP2.
+OTP2 does not support multiple routers (separate named networks to route on), but you can load as 
+many GTFS and/or NeTEx feeds as you want into a single routable network in a single instance of OTP2.
 
 
 ## Build Config
+OTP will log all unrecognized parameters when starting up. Make sure to investigate all log events
+of this type:
+```
+16:18:46.911 WARN (NodeAdapter.java:413) Unexpected config parameter: 'fetchElevationUS:false' in 'build-config.json'. Is the spelling correct?
+```
 
-New parameters:
- - `maxJourneyDuration (2.1)` This limits the patterns we consider in the transit search. See [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
- - `transitServiceStart` Limit the import of transit services to the given *start* date. Default: `-P1Y`
- - `transitServiceEnd` Limit the import of transit services to the given *end* date. *Inclusive*. Default: `P3Y`
+#### New parameters
+- `configVersion` Optional parameter which can be used to version the build config file. Since v2.1
+- `dataOverlay` Config for the DataOverlay Sandbox module. Since v2.1
+- `maxAreaNodes` Visibility calculations will not be done for areas with more nodes than this limit. Since v2.1
+- `maxJourneyDuration` This limits the patterns we consider in the transit search. See [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java). Since v2.1
+- `maxStopToShapeSnapDistance` Used for mapping route geometry shapes. Since v2.1
+- `transferRequests` Pre-calculate transfers. Since v2.1
+- `transitServiceStart` Limit the import of transit services to the given *start* date. Default: `-P1Y`. Since v2.0
+- `transitServiceEnd` Limit the import of transit services to the given *end* date. *Inclusive*. Default: `P3Y`. Since v2.0
 
 
-These properties changed names from:
+#### Parameters whose names were changed
 
- - `htmlAnnotations` to `dataImportReport`
- - `maxHtmlAnnotationsPerFile` to `maxDataImportIssuesPerFile`
- - `boardTimes` to `routingDefaults.boardSlackByMode`
- - `alightTimes` to `routingDefaults.alightSlackByMode`
+- `alightTimes` to `routingDefaults.alightSlackByMode`. Since v2.0
+- `boardTimes` to `routingDefaults.boardSlackByMode`. Since v2.0
+- `htmlAnnotations` to `dataImportReport`. Since v2.0
+- `maxHtmlAnnotationsPerFile` to `maxDataImportIssuesPerFile`. Since v2.0
+- `maxTransferDistance` to `maxTransferDurationSeconds`. Since v2.1
+
  
-These parameters are no longer supported:
+#### These parameters are no longer supported
 
- - `stopClusterMode` 
- - `parentStopLinking`
- - `stationTransfers`
+- `fetchElevationUS`. Since v2.1
+- `parentStopLinking`. Since v2.0
+- `staticBikeRental`. Since v2.1
+- `stationTransfers`. Since v2.0
+- `stopClusterMode`. Since v2.0
+- `useTransfersTxt`. Since v2.1
+
  
  OTP2 records the "parentStation" relationship between stops and stations in its internal transit 
  model, based on the GTFS and/or NeTEx input. This enables OTP to search from all stop in a station 
@@ -64,117 +81,137 @@ These parameters are no longer supported:
  
 ## Router Config
 
-See the [Router Configuration](Configuration.md#router-configuration) for a description of the 
+See the [Router Configuration](RouterConfiguration) for a description of the 
 new and existing routing parameters.
 
-New parameters:
+#### New parameters
 
- - `streetRoutingTimeout` Maximum time limit for street route queries. Replace the old `timeout`.
- - `transit` Transit tuning parameters, configure the raptor router. A set of parameters to tune 
-             the Raptor transit router. 
- - `itineraryFilters` Configure itinerary filters that may modify itineraries, sort them, and 
-                      filter away less preferable results.            
- 
-These parameters are no longer supported:
+- `flex` Add configuration for flex services (sandbox feature). Since v2.1
+- `configVersion` Optional parameter which can be used to version the build config file. Since v2.1
+- `streetRoutingTimeout` Maximum time limit for street route queries. Replace the old `timeout`. Since v2.0
+- `transit` A set of parameters to tune the Raptor transit router. Since v2.0, changed in v2.1
+- `itineraryFilters` Configure itinerary filters that may modify itineraries, sort them, and 
+                     filter away less preferable results. Since v2.0, changed in v2.1
+- `transferOptimization` Configure the new transfer optimization feature. Since 2.1
 
- - `timeout` Replaced by `streetRoutingTimeout`
- - `timeouts` OTP1 searches the graph many times, while OTP2 do one search finding multiple results
-              in one search. So, there is no need for this parameter.
- - `boardTimes` is replaced by `request` parameter `boardSlack` and `boardSlackForMode`.
- - `alightTimes` is replaced by `request` parameter `alightSlack` and `alightSlackForMode`.
+
+#### These parameters are no longer supported
+
+ - `timeout` Replaced by `streetRoutingTimeout`. Since v2.0
+ - `timeouts` OTP1 searches the graph many times. OTP2 finds multiple results in a single search so there is no longer a need for this parameter. Since v2.0
+ - `boardTimes` is replaced by `request` parameter `boardSlack` and `boardSlackForMode`. Since v2.0
+ - `alightTimes` is replaced by `request` parameter `alightSlack` and `alightSlackForMode`. Since v2.0
  
    
 ## REST API
-  
+
 ### Trip Planning 
 
 Support for XML as a request/response format is removed. The only supported format is JSON.
+Some of these parameters may only be available as `defaultRequest` configuration parameters.
+
 
 #### Query parameter changes
 
-A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java) 
- and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/v2.0.0/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
- class for the documentation on what is now supported in 2.0. A few features did not make it into 
- the 2.0, but is sheduled for the 2.1 release.
- See [GitHub issues 2.1](https://github.com/opentripplanner/OpenTripPlanner/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.1).  
+A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java) 
+ and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
+ class for the documentation on what is now supported in OTP2.  
  
  
-The following parameters are missing in OTP2 but will be added:
- 
-  - `startingTransitTripId` The ability to plan a trip from on board a vehicle should be implemented 
-    by Q1 2021.
-  - `intermediatePlaces` - ability to specify intermediate destinations along the route. It is not 
-    certain when this will be implemented. 
-  - `nonpreferredTransferCost`, `(un)preferredRoutes`, `(un)preferredAgencies` - these help diversify
-    or customize the trips and operators visible in results. Due to the new transit routing
-    algorithm, Entur plans to   completely rewrite these features, accounting for market-neutrality
-    requirements and showing relevant trips and operators in local vs. intercity trips.
+#### Parameters missing in OTP2 but intended to be reintroduced
+
+- `startingTransitTripId` - ability to plan a trip from on board a vehicle 
+- `intermediatePlaces` - ability to specify intermediate destinations along the route. It is not 
+  certain when this will be implemented. 
+- `nonpreferredTransferCost`, `(un)preferredRoutes`, `(un)preferredAgencies` - these help diversify
+  or customize the trips and operators visible in results. Due to the new transit routing
+  algorithm, Entur plans to   completely rewrite these features, accounting for market-neutrality
+  requirements and showing relevant trips and operators in local vs. intercity trips.
  
  
  Some features in OTP1 will not be present upon launch in OTP2, and they are proposed to be removed
  permanently from OTP2, but may require some development to support valid important cases:
  
-  - `maxWalkDistance`, `maxTransferWalkDistance`, & `maxWait` - these parameters impose hard limits
-    and are no longer the preferred way to reduce the amount of walking or waiting in returned 
-    itineraries. In OTP2 the goal is to control this with `walkReluctance` and `waitReluctance`. 
-    Internally some limits on walking and waiting do still exist, but they are set quite high so 
-    trips with long walking or waiting times are still considered. Note that unlike in OTP1, if you
-    do set your own max walk or wait time on an API request, it will apply to both transit searches
-    and non-transit searches.
-  - `maxHours` & `useRequestedDateTimeInMaxHours` - This is replaced by `searchWindow`, which
-    limits the arrival or departure window of the trip
-  - `worstTime` - This factor returns the “worst” trip in a depart after/arrive by search, i.e.
-    the latest or earliest trip available. It is not a priority for current OTP2 users but could
-    be added as a filter.
-  - `waitAtBeginningFactor` - No longer necessary to weight the initial wait differently based on
-    the the Range Raptor search algorithm, which no longer prefers a departure at one valid time
-    over another. Filtering could be implemented on top of Raptor to show certain departure times
-    before others.
-  - `pathComparator` - The ability to set a sort order based on departure or arrival should be the
-    domain of the API rather than the search. 
-  - `startingTransitStopId` - duplicative with fromPlace
-  - `onlyTransitTrips` - the new feature for specifying access, egress, transit and direct mode
-    replace the need for this parameter.
-  - `driveOnRight` - this is removed. You can specify the driving direction in your way property set.
+- `maxWalkDistance`, `maxTransferWalkDistance`, & `maxWait` - these parameters impose hard limits
+  and are no longer the preferred way to reduce the amount of walking or waiting in returned 
+  itineraries. In OTP2 the goal is to control this with `walkReluctance` and `waitReluctance`. 
+  Internally some limits on walking and waiting do still exist, but they are set quite high so 
+  trips with long walking or waiting times are still considered. Note that unlike in OTP1, if you
+  do set your own max walk or wait time on an API request, it will apply to both transit searches
+  and non-transit searches.
+- `maxHours` & `useRequestedDateTimeInMaxHours` - This is replaced by `searchWindow`, which
+  limits the arrival or departure window of the trip
+- `worstTime` - This factor returns the “worst” trip in a depart after/arrive by search, i.e.
+  the latest or earliest trip available. It is not a priority for current OTP2 users but could
+  be added as a filter.
+- `waitAtBeginningFactor` - No longer necessary to weight the initial wait differently based on
+  the the Range Raptor search algorithm, which no longer prefers a departure at one valid time
+  over another. Filtering could be implemented on top of Raptor to show certain departure times
+  before others.
+- `pathComparator` - The ability to set a sort order based on departure or arrival should be the
+  domain of the API rather than the search. 
+- `startingTransitStopId` - this is redundant, as the same thing can be achieved with fromPlace
+- `onlyTransitTrips` - it is now possible to specify access, egress, transit and direct modes
+   separately, making this parameter unnecessary.
 
-Parameters that have changed:
 
-  - `numItineraries` The parameter is no longer used to terminate the request when the 
-    numItineraries is found, instead the new `searchWindow` parameter should be used to limit the
-    search. In OTP2 it crops the list of itineraries AFTER the search is complete. This parameter
-    is a post search filter function. The best option is to configure this on the server side and
-    not use it as a client side input parameter. A side effect from reducing the result is that
-    OTP2 cannot guarantee to find all pareto-optimal itineraries when paging. Also, a large
-    search-window and a small `numItineraries` waste computer CPU calculation time. Consider
-    tuning the `searchWindow` instead of setting this to a small value.
-  - `modes` The REST API is unchanged, but is mapped into a new structure in the RoutingRequest. 
-    This means not all combinations of non-transit modes that was available in OTP1 is available in
-    OTP2.
-  - `preferredAgencies`, `unpreferredAgencies`, `bannedAgencies` and `whiteListedAgencies` use
-    feed-scoped ids. If you are using the ids directly from the Index API, no changes are needed.
+#### Parameters that have changed
 
-    
- New parameters in OTP2:   
+- `numItineraries` The parameter is no longer used to terminate the request when the 
+  numItineraries is found, instead the new `searchWindow` parameter should be used to limit the
+  search. In OTP2 it crops the list of itineraries AFTER the search is complete. This parameter
+  is a post search filter function. The best option is to configure this on the server side and
+  not use it as a client side input parameter. A side effect from reducing the result is that
+  OTP2 cannot guarantee to find all pareto-optimal itineraries when paging. Also, a large
+  search-window and a small `numItineraries` waste computer CPU calculation time. Consider
+  tuning the `searchWindow` instead of setting this to a small value. Since 2.0
+- `modes` The REST API is unchanged, but is mapped into a new structure in the RoutingRequest. 
+  This means not all combinations of non-transit modes that was available in OTP1 is available in
+  OTP2. Since 2.0
+- `preferredAgencies`, `unpreferredAgencies`, `bannedAgencies` and `whiteListedAgencies` use
+  feed-scoped ids. If you are using the ids directly from the Index API, no changes are needed. 
+  Since 2.0 
+- `maxTransferDistance`, replaced by `maxTransferDurationSeconds` Since 2.1
+- `bannedTrips` no longer allows specifying stop indices, but only allows banning complete trips.
+  Since 2.2 
 
-  - `searchWindow` Limit the departure window or arrival window for the routing search.
-  - `boardSlackByMode` How much time ride a vehicle takes for each given mode.
-  - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
+
+
+#### New parameters in OTP2
+
+- `alightSlackByMode` How much time alighting a vehicle takes for each given mode. Since 2.0
+- `allowedVehicleRentalNetworks` and `bannedVehicleRentalNetworks`. Since 2.1
+- `bikeReluctance`, `bikeWalkingReluctance`, `bikeWalkingSpeed`, `carReluctance`, and `walkingBike`   Add explicit bike / bike-walking / car / walk reluctance. Since 2.1
+- `boardSlackByMode` How much time ride a vehicle takes for each given mode. Since 2.0
+- `carPickupCost` and `carPickupTime`. Add a cost/time for CarPickup changes when a pickup or drop off takes place. Since 2.1
+- `maxAccessEgressDurationSecondsForMode` Limit access/egress per street mode. Since 2.0
+- `parkAndRideDurationRatio` Filter for park and ride with long walk. Since 2.1
+- `requiredVehicleParkingTags` and `bannedVehicleParkingTags`. Since 2.1
+- `searchWindow` Limit the departure window or arrival window for the routing search. Since 2.0
+- `stairsTimeFactor` Add a penalty to the time it takes to walk up and down stairs. Since 2.1
+
+
+#### These parameters are no longer supported
+
+- `maxHours` Since 2.1
+- `maxPreTransitTime` Since 2.1
+- `maxWeight` Since 2.1
+- `driveOnRight` You can specify the driving direction in your way property set. Since 2.1
+- `bannedTrips` Not supported in 2.0 and 2.1
 
 
 #### Paging
 
- In OTP1 most client provided a way to page the results by looking at the trips returned and passing 
- in something like the `last-depature-time` + 1 minute to the next request, to get trips to add to 
- the already fetched results. In OTP2 the recommended way to do this is to use the new `TripPlan` 
- `metadata` returned by the router call.
+ In OTP1 most clients provided a way to break results into pages by looking at the trips returned 
+ and issuing another request, supplying something like the `last-depature-time` + 1 minute to the 
+ next request. This yields another batch of trips to show to the user. In OTP2 the recommended way
+ to do this is to use the new `TripPlan metadata` returned by the router call.
   
+In OTP 2.0 the server returned a set of parameters(`searchWindowUsed`, `nextDateTime`, and `prevDateTime`), but in OTP 2.1 we have switched to a token-based approach to paging. In the response there is a next/previous cursor. Duplicate the request and set the new `pageCursor` to go the next/previous page.
+
 
 #### Response changes
 
-  - `metadata` is added to `TripPlan`. The `TripSearchMetadata` has three fields:
-  - `searchWindowUsed`
-  - `nextDateTime`
-  - `prevDateTime`
   - `agencyId` in the `leg` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
   - `debugOutput` in `TripPlan` has changed due to the different algorithms used in OTP version 1.x and 2.x.
   - The `totalTime` is left as is, `directStreetRouterTime`, `transitRouterTime`, `filteringTime` 
@@ -241,3 +278,6 @@ The scripting API endpoint has been removed.
 
 - Floating bikes have been disabled by default in the GbfsBikeRentalDataSource unless explicitly 
 turned on via OTPFeature.
+- Allow http headers to be configured for bike rental updaters
+- The following bike updaters have been removed: *b-cycle*, *bicimad*, *bixi*, *city-bikes*, and *citi-bike-nyc*, *jcdecaux*, *keolis-rennes*, *kml*, *next-bike*, *ov-fiets*, *sf-bay-area*, *share-bike*, *smoove*, *uip-bike*, and *vcub*. Use the standard *gtfs* updater instead, or reintroduce your custom updater as a Sandbox module.
+

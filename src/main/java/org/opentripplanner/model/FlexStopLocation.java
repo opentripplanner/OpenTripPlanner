@@ -1,8 +1,8 @@
 package org.opentripplanner.model;
 
-import java.util.Optional;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the
@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.Point;
 public class FlexStopLocation extends TransitEntity implements StopLocation {
   private static final long serialVersionUID = 1L;
 
-  private String name;
+  private I18NString name;
 
   private String description;
 
@@ -20,7 +20,7 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
 
   private String zoneId;
 
-  private String url;
+  private I18NString url;
 
   private Point centroid;
 
@@ -33,10 +33,8 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
    * communication, eg. the name of the village where the service stops.
    */
   @Override
-  public String getName() {
-    // according to the spec stop location names are optional for flex zones so, we return the id
-    // when it's null. *shrug*
-    return Optional.ofNullable(name).orElse(getId().toString());
+  public I18NString getName() {
+    return name;
   }
 
   @Override
@@ -45,15 +43,15 @@ public class FlexStopLocation extends TransitEntity implements StopLocation {
   }
 
   @Override
-  public String getUrl() {
+  public I18NString getUrl() {
     return url;
   }
 
-  public void setUrl(String url) {
+  public void setUrl(I18NString url) {
     this.url = url;
   }
 
-  public void setName(String name) {
+  public void setName(I18NString name) {
     this.name = name;
   }
 

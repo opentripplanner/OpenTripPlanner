@@ -10,5 +10,5 @@ public enum ListSection {
     HEAD,
 
     /** The end of the list */
-    TAIL;
+    TAIL
 }

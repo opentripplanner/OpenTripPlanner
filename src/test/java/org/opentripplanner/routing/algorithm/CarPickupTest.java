@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.astar.AStar;
@@ -14,6 +11,10 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test CarPickup:
@@ -179,8 +180,7 @@ public class CarPickupTest extends GraphRoutingTest {
         carPickupOptions.setRoutingContext(graph, fromVertex, toVertex);
         var tree = new AStar().getShortestPathTree(carPickupOptions);
         var path = tree.getPath(
-                arriveBy ? fromVertex : toVertex,
-                false
+                arriveBy ? fromVertex : toVertex
         );
 
         return path != null ? path.states.stream().map(s -> String.format(
