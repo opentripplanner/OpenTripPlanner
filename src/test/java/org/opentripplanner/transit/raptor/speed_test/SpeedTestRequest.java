@@ -1,66 +1,81 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
 import java.time.Duration;
-import java.time.ZonedDateTime;
 import java.util.List;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
+
 
 public class SpeedTestRequest {
-
-    /**
-     * This is used to expand the search window for all test cases to test the effect of long windows.
-     * <p/>
-     * REMEMBER TO CHANGE IT BACK TO 0 BEFORE VCS COMMIT.
-     */
-    private static final int EXPAND_SEARCH_WINDOW_HOURS = 0;
-
     private final TestCase testCase;
-    private final SpeedTestConfig config;
-    private final ZonedDateTime departureTime;
     private final SpeedTestCmdLineOpts opts;
+    private final SpeedTestConfig config;
+    private final SpeedTestProfile profile;
+    private final ZoneId timeZoneId;
 
     SpeedTestRequest(
             TestCase testCase,
             SpeedTestCmdLineOpts opts,
             SpeedTestConfig config,
-            ZonedDateTime departureTime
+            SpeedTestProfile profile,
+            ZoneId timeZoneId
     ) {
         this.testCase = testCase;
-        this.config = config;
         this.opts = opts;
-        this.departureTime = departureTime;
+        this.config = config;
+        this.profile = profile;
+        this.timeZoneId = timeZoneId;
     }
 
-    public TestCase tc() { return testCase; }
-
-    ZonedDateTime getDepartureTime() {
-        return departureTime;
-    }
-
-    double walkSpeed() {
-        // 1.4 m/s = ~ 5.0 km/t
-        return config.walkSpeedMeterPrSecond;
+    public TestCase tc() {
+        return testCase;
     }
 
     RoutingRequest toRoutingRequest() {
-        var routingRequest = new RoutingRequest();
-        routingRequest.setDateTime(this.getDepartureTime().toInstant());
-        routingRequest.from = this.tc().fromPlace.toGenericLocation();
-        routingRequest.to = this.tc().toPlace.toGenericLocation();
-        routingRequest.walkSpeed = this.walkSpeed();
-        routingRequest.numItineraries = opts.numOfItineraries();
-        routingRequest.searchWindow = Duration.ofSeconds(this.tc().window);
-        routingRequest.modes = tc().getModes();
+        var request = config.request.clone();
 
-        return routingRequest;
+        if (testCase.departureTime != TestCase.NOT_SET) {
+            request.setDateTime(time(testCase.departureTime));
+            request.arriveBy = false;
+            if (testCase.arrivalTime != TestCase.NOT_SET) {
+                request.raptorOptions.withTimeLimit(time(testCase.arrivalTime));
+            }
+        } else if (testCase.arrivalTime != TestCase.NOT_SET) {
+            request.setDateTime(time(testCase.arrivalTime));
+            request.arriveBy = true;
+        }
+
+        if (testCase.window != TestCase.NOT_SET) {
+            request.searchWindow = Duration.ofSeconds(testCase.window);
+        }
+
+        request.from = testCase.fromPlace.toGenericLocation();
+        request.to = testCase.toPlace.toGenericLocation();
+        request.numItineraries = opts.numOfItineraries();
+        request.modes = testCase.getModes();
+
+        request.raptorOptions
+                .withProfile(profile.raptorProfile)
+                .withOptimizations(profile.optimizations)
+                .withSearchDirection(profile.direction);
+
+
+        if (profile.raptorProfile.isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
+            request.searchWindow = Duration.ZERO;
+        }
+
+        addDebugOptions(request, opts);
+
+        return request;
     }
 
     List<String> tags() {
@@ -68,28 +83,15 @@ public class SpeedTestRequest {
     }
 
     private static void addDebugOptions(
-            RaptorRequestBuilder<TripSchedule> builder,
+            RoutingRequest request,
             SpeedTestCmdLineOpts opts
     ) {
-        List<Integer> stops = opts.debugStops();
-        List<Integer> path = opts.debugPath();
+        request.raptorDebuging
+                .withStops(opts.debugStops())
+                .withPath(opts.debugPath());
+    }
 
-        boolean debugLoggerEnabled = opts.debugRequest() || opts.debug();
-
-        debugLoggerEnabled = debugLoggerEnabled || opts.compareHeuristics();
-
-        if(!debugLoggerEnabled && stops.isEmpty() && path.isEmpty()) {
-            return;
-        }
-
-        SystemErrDebugLogger logger = new SystemErrDebugLogger(debugLoggerEnabled);
-        builder.debug()
-                .stopArrivalListener(logger::stopArrivalLister)
-                .pathFilteringListener(logger::pathFilteringListener)
-                .logger(logger)
-                .setPath(path)
-                .debugPathFromStopIndex(opts.debugPathFromStopIndex())
-                .addStops(stops);
-
+    private Instant time(int time) {
+        return LocalTime.ofSecondOfDay(time).atDate(config.testDate).atZone(timeZoneId).toInstant();
     }
 }

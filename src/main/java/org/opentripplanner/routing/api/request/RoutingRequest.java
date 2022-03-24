@@ -779,7 +779,14 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /**
      * Raptor can print all events when arriving at stops to system error. For developers only.
      */
-    public DebugRaptor raptorDebuging = null;
+    public DebugRaptor raptorDebuging = new DebugRaptor();
+
+
+    /**
+     * Set of options to use with Raptor. These are available here for testing purposes.
+     */
+    public final RaptorOptions raptorOptions = new RaptorOptions();
+
 
 
     /* CONSTRUCTORS */

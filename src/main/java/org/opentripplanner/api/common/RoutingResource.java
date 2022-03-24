@@ -16,7 +16,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
-import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -945,11 +944,9 @@ public abstract class RoutingResource {
             request.itineraryFilters.debug = debugItineraryFilter;
         }
 
-        if(debugRaptorPath != null || debugRaptorStops != null) {
-            request.raptorDebuging = new DebugRaptor()
-                    .withStops(debugRaptorStops)
-                    .withPath(debugRaptorPath);
-        }
+        request.raptorDebuging
+                .withStops(debugRaptorStops)
+                .withPath(debugRaptorPath);
 
         if (useVehicleParkingAvailabilityInformation != null) {
             request.useVehicleParkingAvailabilityInformation = useVehicleParkingAvailabilityInformation;

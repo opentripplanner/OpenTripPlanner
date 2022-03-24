@@ -1,16 +1,15 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.io.File;
+import java.net.URI;
+import java.time.LocalDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.TransitRoutingConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.net.URI;
-import java.time.LocalDate;
 
 import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
 
@@ -29,7 +28,6 @@ public class SpeedTestConfig {
     /** The speed test run all its test on an existing pre-build graph. */
     public final URI graph;
 
-    public final double walkSpeedMeterPrSecond;
     public final TransitRoutingConfig transitRoutingParams;
     public final RoutingRequest request;
 
@@ -38,7 +36,6 @@ public class SpeedTestConfig {
         this.rawNode = node;
         testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
         graph = adapter.asUri("graph", null);
-        walkSpeedMeterPrSecond = adapter.asDouble("walkSpeedMeterPrSecond", 1.4);
         transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
         request = mapRoutingRequest(adapter.path("routingDefaults"));
     }

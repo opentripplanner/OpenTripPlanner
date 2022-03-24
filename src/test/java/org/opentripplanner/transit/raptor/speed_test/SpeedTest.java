@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -16,7 +14,6 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.time.Duration;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,13 +47,14 @@ import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.util.OtpAppException;
 
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+
 /**
  * Test response times for a large batch of origin/destination points.
  * Also demonstrates how to run basic searches without using the graphQL profile routing API.
  */
 public class SpeedTest {
 
-    private static final boolean TEST_NUM_OF_ADDITIONAL_TRANSFERS = false;
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
 
     // only useful for the console
@@ -82,7 +80,6 @@ public class SpeedTest {
 
     private final SpeedTestCmdLineOpts opts;
     private final SpeedTestConfig config;
-    private int nAdditionalTransfers;
     private SpeedTestProfile routeProfile;
     private final Router router;
     private final List<Integer> numOfPathsFound = new ArrayList<>();
@@ -93,32 +90,11 @@ public class SpeedTest {
         this.opts = opts;
         this.config = SpeedTestConfig.config(opts.rootDir());
         this.graph = loadGraph(opts.rootDir(), config.graph);
-        this.nAdditionalTransfers = opts.numOfExtraTransfers();
 
         this.router = new Router(graph, RouterConfig.DEFAULT);
         this.router.startup();
 
-        var measurementEnv = Optional.ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT")).orElse("local");
-        registry.config().commonTags(List.of(
-                Tag.of("measurement.environment", measurementEnv),
-                Tag.of("git.commit", projectInfo().versionControl.commit),
-                Tag.of("git.branch", projectInfo().versionControl.branch),
-                Tag.of("git.buildtime", projectInfo().versionControl.buildTime)
-        ));
-
-        // record the lowest percentile of times
-        registry.config().meterFilter(
-                new MeterFilter() {
-                    @Override
-                    public DistributionStatisticConfig configure(
-                            Id id, DistributionStatisticConfig config
-                    ) {
-                        return DistributionStatisticConfig.builder()
-                                .percentiles(0.01)
-                                .build()
-                                .merge(config);
-                    }
-                });
+        setupMicrometerRegistry();
     }
 
     public static void main(String[] args) {
@@ -230,10 +206,10 @@ public class SpeedTest {
         if (uploadRegistry != null) {
             registry.remove(uploadRegistry);
         }
+        double totalTime = totalTimer.totalTime(TimeUnit.SECONDS);
 
         ResultPrinter.logSingleTestResult(
-                routeProfile, numOfPathsFound, sample, nSamples, nSuccess, tcSize, totalTimer.totalTime(TimeUnit.SECONDS),
-                loggerRegistry
+                routeProfile, numOfPathsFound, sample, nSamples, nSuccess, tcSize, totalTime, loggerRegistry
         );
 
         tcIO.writeResultsToFile(testCases);
@@ -252,16 +228,11 @@ public class SpeedTest {
     }
 
     private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, boolean ignoreResults) {
-        RoutingRequest rr = new RoutingRequest();
+        RoutingRequest routingRequest = null;
         int nPathsFound = 0;
         long lapTime = 0;
         Timer.Sample sample = null;
-        final SpeedTestRequest request = new SpeedTestRequest(
-                testCase,
-                opts,
-                config,
-                LocalTime.ofSecondOfDay(testCase.departureTime).atDate(config.testDate).atZone(getTimeZoneId())
-        );
+        final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, config, routeProfile, getTimeZoneId());
 
         try {
 
@@ -275,7 +246,8 @@ public class SpeedTest {
             } else {
                 // Perform routing
                 sample = Timer.start(clock);
-                var routingResponse = route(request);
+                routingRequest = request.toRoutingRequest();
+                var routingResponse = route(routingRequest);
                 nPathsFound = routingResponse.getTripPlan().itineraries.size();
 
                 lapTime = sample.stop(timer) / nanosToMillis;
@@ -287,7 +259,7 @@ public class SpeedTest {
                     testCase.assertResult(routingResponse.getTripPlan().itineraries);
 
                     // Report success
-                    ResultPrinter.printResultOk(testCase, rr, lapTime, opts.verbose());
+                    ResultPrinter.printResultOk(testCase, routingRequest, lapTime, opts.verbose());
                     numOfPathsFound.add(nPathsFound);
 
                     recordSuccesses(routingResponse.getDebugTimingAggregator().getDebugOutput(), request.tags());
@@ -303,19 +275,18 @@ public class SpeedTest {
             }
             if (!ignoreResults) {
                 // Report failure
-                ResultPrinter.printResultFailed(testCase, rr, lapTime, e);
+                ResultPrinter.printResultFailed(testCase, routingRequest, lapTime, e);
                 numOfPathsFound.add(nPathsFound);
             }
             return false;
         }
     }
 
-    public RoutingResponse route(SpeedTestRequest request) {
-        var routingRequest = request.toRoutingRequest();
-        RoutingResponse response = null;
-        var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
-        response = worker.route();
-        return response;
+    public RoutingResponse route(RoutingRequest request) {
+
+        var worker = new RoutingWorker(this.router, request, getTimeZoneId());
+
+        return worker.route();
     }
 
     private void recordSuccesses(DebugOutput data, List<String> tags) {
@@ -361,17 +332,33 @@ public class SpeedTest {
         } else {
             routeProfile = profilesToRun[sample % profilesToRun.length];
         }
-
-        // Enable flag to test the effect of counting down the number of additional transfers limit
-        if (TEST_NUM_OF_ADDITIONAL_TRANSFERS) {
-            // sample start at 1 .. nSamples(inclusive)
-            nAdditionalTransfers = 1 + ((nSamples-1) - sample) / profilesToRun.length;
-            System.err.println("\n>>> Run test with " + nAdditionalTransfers + " number of additional transfers.\n");
-        }
     }
 
     private ZoneId getTimeZoneId() {
         return graph.getTimeZone().toZoneId();
+    }
+
+    private void setupMicrometerRegistry() {
+        var measurementEnv = Optional.ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT")).orElse("local");
+        registry.config().commonTags(List.of(
+                Tag.of("measurement.environment", measurementEnv),
+                Tag.of("git.commit", projectInfo().versionControl.commit),
+                Tag.of("git.branch", projectInfo().versionControl.branch),
+                Tag.of("git.buildtime", projectInfo().versionControl.buildTime)
+        ));
+
+        // record the lowest percentile of times
+        registry.config().meterFilter(
+                new MeterFilter() {
+                    @Override
+                    public DistributionStatisticConfig configure(Id id, DistributionStatisticConfig config) {
+                        return DistributionStatisticConfig.builder()
+                                .percentiles(0.01)
+                                .build()
+                                .merge(config);
+                    }
+                }
+        );
     }
 
     private void forceGCToAvoidGCLater() {

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -135,13 +136,13 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
     @Override
     public String toString() {
-        return "RaptorRequest{" +
-                "profile=" + profile +
-                ", searchForward=" + searchDirection +
-                ", optimizations=" + optimizations +
-                ", debug=" + debug +
-                ", searchParams=" + searchParams +
-                '}';
+        return ToStringBuilder.of(RaptorRequest.class)
+                .addEnum("profile",  profile)
+                .addBoolIfTrue("reverse",  searchDirection.isInReverse())
+                .addCol("optimizations",  optimizations)
+                .addObj("debug",  debug, DebugRequest.defaults())
+                .addObj("searchParams",  searchParams)
+                .toString();
     }
 
     @Override
