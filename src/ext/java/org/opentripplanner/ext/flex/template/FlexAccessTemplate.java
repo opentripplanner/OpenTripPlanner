@@ -8,8 +8,6 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -18,10 +16,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.spt.GraphPath;
 
 import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
-import java.util.TimeZone;
 
 public class FlexAccessTemplate extends FlexAccessEgressTemplate {
   public FlexAccessTemplate(
@@ -32,7 +28,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, flexParams);
   }
 
-  public Itinerary createDirectItinerary(
+  public GraphPath createDirectGraphPath(
       NearbyStop egress, boolean arriveBy, int departureTime, ZonedDateTime startOfTime
   ) {
     List<Edge> egressEdges = egress.edges;
@@ -57,7 +53,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     int flexTime = flexTimes[1];
     int postFlexTime = flexTimes[2];
 
-    Integer timeShift = null;
+    int timeShift;
 
     if (arriveBy) {
       int lastStopArrivalTime = departureTime - postFlexTime - secondsFromStartOfTime;
@@ -88,13 +84,13 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
       timeShift = secondsFromStartOfTime + earliestDepartureTime - preFlexTime;
     }
 
-    Itinerary itinerary = GraphPathToItineraryMapper.generateItinerary(new GraphPath(state));
+    State s = state;
+    while (s != null) {
+      s.timeshiftBySeconds(timeShift);
+      s = s.getBackState();
+    }
 
-    ZonedDateTime zdt = startOfTime.plusSeconds(timeShift);
-    Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));
-    c.setTimeInMillis(zdt.toInstant().toEpochMilli());
-    itinerary.timeShiftToStartAt(c);
-    return itinerary;
+    return new GraphPath(state);
   }
 
   protected List<Edge> getTransferEdges(PathTransfer transfer) {
