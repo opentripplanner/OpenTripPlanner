@@ -64,8 +64,8 @@ public class TripTimeOnDate {
         return Comparator.comparing(t -> t.getServiceDay() + t.getRealtimeDeparture());
     }
 
-    public FeedScopedId getStopId() {
-        return tripPattern.getStop(stopIndex).getId();
+    public StopLocation getStop() {
+        return tripPattern.getStop(stopIndex);
     }
 
     public int getStopIndex() {

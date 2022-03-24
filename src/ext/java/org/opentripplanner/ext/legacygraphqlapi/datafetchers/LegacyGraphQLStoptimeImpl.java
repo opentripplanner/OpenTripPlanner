@@ -13,7 +13,7 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
 
   @Override
   public DataFetcher<Object> stop() {
-    return environment -> getRoutingService(environment).getStopForId(getSource(environment).getStopId());
+    return environment -> getSource(environment).getStop();
   }
 
   @Override
