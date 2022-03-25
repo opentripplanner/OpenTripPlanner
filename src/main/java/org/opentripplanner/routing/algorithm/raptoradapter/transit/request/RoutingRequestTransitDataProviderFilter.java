@@ -22,7 +22,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final boolean requireBikesAllowed;
 
-  private final AccessibilityRequirements accessibilityRequirements;
+  private final AccessibilityRequirements.EvaluationType accessibility;
 
   private final boolean includePlannedCancellations;
 
@@ -34,14 +34,14 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   public RoutingRequestTransitDataProviderFilter(
       boolean requireBikesAllowed,
-      AccessibilityRequirements accessibilityRequirements,
+      AccessibilityRequirements.EvaluationType accessibility,
       boolean includePlannedCancellations,
       Set<AllowedTransitMode> allowedTransitModes,
       Set<FeedScopedId> bannedRoutes,
       Set<FeedScopedId> bannedTrips
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
-    this.accessibilityRequirements = accessibilityRequirements;
+    this.accessibility = accessibility;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
@@ -70,7 +70,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   ) {
     this(
         request.modes.transferMode == StreetMode.BIKE,
-        request.accessibilityRequirements,
+        request.accessibilityRequirements.evaluationType(),
         request.includePlannedCancellations,
         request.modes.transitModes,
         request.getBannedRoutes(graphIndex.getAllRoutes()),
@@ -98,7 +98,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (accessibilityRequirements.evaluationType() == EvaluationType.KNOWN_INFORMATION_ONLY
+    if (accessibility == EvaluationType.KNOWN_INFORMATION_ONLY
             && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE) {
       return false;
     }
