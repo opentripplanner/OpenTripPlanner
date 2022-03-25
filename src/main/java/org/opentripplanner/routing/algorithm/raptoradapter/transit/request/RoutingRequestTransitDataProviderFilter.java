@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
@@ -95,7 +97,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (requireWheelchairAccessible && trip.getWheelchairAccessible() != 1) {
+    if (requireWheelchairAccessible && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE) {
       return false;
     }
 

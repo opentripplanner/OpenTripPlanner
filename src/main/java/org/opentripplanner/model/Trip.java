@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 public final class Trip extends TransitEntity {
@@ -32,7 +33,7 @@ public final class Trip extends TransitEntity {
 
     private FeedScopedId shapeId;
 
-    private int wheelchairAccessible = 0;
+    private WheelChairBoarding wheelchairBoarding = WheelChairBoarding.NO_INFORMATION;
 
     /**
      * 0 = unknown / unspecified, 1 = bikes allowed, 2 = bikes NOT allowed
@@ -66,7 +67,7 @@ public final class Trip extends TransitEntity {
         this.direction = obj.direction;
         this.blockId = obj.blockId;
         this.shapeId = obj.shapeId;
-        this.wheelchairAccessible = obj.wheelchairAccessible;
+        this.wheelchairBoarding = obj.wheelchairBoarding;
         this.bikesAllowed = obj.bikesAllowed;
         this.fareId = obj.fareId;
     }
@@ -210,12 +211,13 @@ public final class Trip extends TransitEntity {
         this.shapeId = shapeId;
     }
 
-    public void setWheelchairAccessible(int wheelchairAccessible) {
-        this.wheelchairAccessible = wheelchairAccessible;
+    public void setWheelchairBoarding(WheelChairBoarding boarding) {
+        this.wheelchairBoarding =
+                Objects.requireNonNullElse(boarding, WheelChairBoarding.NO_INFORMATION);
     }
 
-    public int getWheelchairAccessible() {
-        return wheelchairAccessible;
+    public WheelChairBoarding getWheelchairBoarding() {
+        return wheelchairBoarding;
     }
 
     public BikeAccess getBikesAllowed() {
