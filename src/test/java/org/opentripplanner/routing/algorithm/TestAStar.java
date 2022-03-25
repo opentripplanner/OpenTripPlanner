@@ -24,7 +24,7 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 @Ignore
 public class TestAStar extends TestCase {
     
-    private final AStar aStar = new AStar();
+    private final AStar aStar = AStar.oneToOne();
 
     public void testBasic() throws Exception {
 

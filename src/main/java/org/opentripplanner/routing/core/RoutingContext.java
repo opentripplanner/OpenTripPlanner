@@ -61,8 +61,6 @@ public class RoutingContext implements Cloneable {
     // TODO(flamholz): figure out a better way.
     public Edge originBackEdge;
 
-    public RemainingWeightHeuristic remainingWeightHeuristic;
-
     /** Indicates that the search timed out or was otherwise aborted. */
     public boolean aborted;
 
@@ -158,9 +156,8 @@ public class RoutingContext implements Cloneable {
                 }
             }
         }
-
-        remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
     }
+
     private RoutingContext(
             RoutingRequest routingRequest,
             Graph graph,

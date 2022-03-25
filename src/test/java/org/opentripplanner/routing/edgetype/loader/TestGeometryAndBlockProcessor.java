@@ -46,7 +46,7 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 public class TestGeometryAndBlockProcessor extends TestCase {
 
     private Graph graph;
-    private final AStar aStar = new AStar();
+    private final AStar aStar = AStar.oneToOne();
     private GtfsContext context;
     private String feedId;
     private DataImportIssueStore issueStore;

@@ -185,13 +185,10 @@ public class NearbyStopFinder {
         } else {
             routingRequest.setRoutingContext(graph, null, originVertices);
         }
-        routingRequest.disableRemainingWeightHeuristic = true;
-        routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
 
-        var astar = new AStar();
         var skipEdgeStrategy = getSkipEdgeStrategy(reverseDirection, routingRequest);
-        astar.setSkipEdgeStrategy(skipEdgeStrategy);
+        var astar = AStar.allDirections(skipEdgeStrategy);
 
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 

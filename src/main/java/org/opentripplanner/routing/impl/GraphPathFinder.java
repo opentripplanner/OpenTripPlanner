@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.impl;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +65,7 @@ public class GraphPathFinder {
         }
 
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
-        AStar aStar = new AStar();
+        AStar aStar = AStar.oneToOne(Duration.ofSeconds((long) options.maxDirectStreetDurationSeconds));
         if (options.rctx == null) {
             options.setRoutingContext(router.graph);
             // The special long-distance heuristic should be sufficient to constrain the search to the right area.
@@ -78,15 +79,6 @@ public class GraphPathFinder {
         options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
-        // Choose an appropriate heuristic for goal direction.
-        RemainingWeightHeuristic heuristic;
-        if (options.disableRemainingWeightHeuristic || options.oneToMany) {
-            heuristic = new TrivialRemainingWeightHeuristic();
-        } else {
-            heuristic = new EuclideanRemainingWeightHeuristic();
-        }
-        options.rctx.remainingWeightHeuristic = heuristic;
-        
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
 
@@ -101,7 +93,6 @@ public class GraphPathFinder {
         }
         // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
         // Use the maxDirectStreetDurationSeconds as the limit here, as this class is used for point-to-point routing
-        aStar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(options.maxDirectStreetDurationSeconds));
         aStar.getShortestPathTree(options, timeout, null);
 
         List<GraphPath> paths = aStar.getPathsToTarget();

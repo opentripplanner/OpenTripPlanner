@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -31,7 +30,7 @@ import java.util.Map;
  */
 public class StreetFlexPathCalculator implements FlexPathCalculator {
 
-  private static final long MAX_FLEX_TRIP_DURATION_SECONDS = Duration.ofMinutes(45).toSeconds();
+  private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
 
   private final Graph graph;
   private final Map<Vertex, ShortestPathTree> cache = new HashMap<>();
@@ -80,12 +79,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     } else {
       routingRequest.setRoutingContext(graph, vertex, null);
     }
-    routingRequest.disableRemainingWeightHeuristic = true;
-    routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
     routingRequest.dominanceFunction = new DominanceFunction.EarliestArrival();
-    routingRequest.oneToMany = true;
-    AStar search = new AStar();
-    search.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(MAX_FLEX_TRIP_DURATION_SECONDS));
+    AStar search = AStar.allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION);
     ShortestPathTree spt = search.getShortestPathTree(routingRequest);
     routingRequest.cleanup();
     return spt;

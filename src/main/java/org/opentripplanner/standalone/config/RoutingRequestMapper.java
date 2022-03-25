@@ -61,7 +61,6 @@ public class RoutingRequestMapper {
         request.carSpeed = c.asDouble("carSpeed", dft.carSpeed);
         request.itineraryFilters = ItineraryFiltersMapper.map(c.path("itineraryFilters"));
         request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
-        request.disableRemainingWeightHeuristic = c.asBoolean("disableRemainingWeightHeuristic", dft.disableRemainingWeightHeuristic);
         request.elevatorBoardCost = c.asInt("elevatorBoardCost", dft.elevatorBoardCost);
         request.elevatorBoardTime = c.asInt("elevatorBoardTime", dft.elevatorBoardTime);
         request.elevatorHopCost = c.asInt("elevatorHopCost", dft.elevatorHopCost);

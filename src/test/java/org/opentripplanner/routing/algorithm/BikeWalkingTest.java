@@ -350,7 +350,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
         var bikeOptions = options.getStreetSearchRequest(streetMode);
         bikeOptions.setRoutingContext(graph, fromVertex, toVertex);
 
-        var tree = new AStar().getShortestPathTree(bikeOptions);
+        var tree = AStar.oneToOne().getShortestPathTree(bikeOptions);
         var path = tree.getPath(
                 arriveBy ? fromVertex : toVertex
         );

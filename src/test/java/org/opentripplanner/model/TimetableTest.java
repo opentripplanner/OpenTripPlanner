@@ -41,7 +41,7 @@ import static org.opentripplanner.util.TestUtils.AUGUST;
 public class TimetableTest {
     
     private static Graph graph;
-    private final AStar aStar = new AStar();
+    private final AStar aStar = AStar.oneToOne();
     private static Map<FeedScopedId, TripPattern> patternIndex;
     private static TripPattern pattern;
     private static Timetable timetable;

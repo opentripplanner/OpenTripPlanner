@@ -85,7 +85,7 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
         options.setRoutingContext(graph, graph.getVertex("56th_24th"), graph.getVertex("leary_20th"));
-        ShortestPathTree tree = new AStar().getShortestPathTree(options);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(graph.getVertex("leary_20th"));
 
@@ -110,7 +110,7 @@ public class AStarTest {
         options.setArriveBy(true);
         options.setRoutingContext(graph, graph.getVertex("56th_24th"),
                 graph.getVertex("leary_20th"));
-        ShortestPathTree tree = new AStar().getShortestPathTree(options);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(graph.getVertex("56th_24th"));
 
@@ -152,7 +152,7 @@ public class AStarTest {
         new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = new AStar().getShortestPathTree(options);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
         options.cleanup();
 
         GraphPath path = tree.getPath(to);
@@ -188,7 +188,7 @@ public class AStarTest {
         new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = new AStar().getShortestPathTree(options);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
         options.cleanup();
 
         GraphPath path = tree.getPath(from);
@@ -221,7 +221,7 @@ public class AStarTest {
         targets.add(graph.getVertex("leary_20th"));
 
         SearchTerminationStrategy strategy = new MultiTargetTerminationStrategy(targets);
-        ShortestPathTree tree = new AStar().getShortestPathTree(options, -1, strategy);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options, -1, strategy);
 
         for (Vertex v : targets) {
             GraphPath path = tree.getPath(v);

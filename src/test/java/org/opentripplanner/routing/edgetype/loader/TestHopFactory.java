@@ -30,7 +30,7 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 public class TestHopFactory extends TestCase {
     private final ZoneId zoneId = ZoneId.of("America/New_York");
 
-    private final AStar aStar = new AStar();
+    private final AStar aStar = AStar.oneToOne();
 
     private Graph graph;
 

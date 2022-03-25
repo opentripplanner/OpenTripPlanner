@@ -51,7 +51,7 @@ public class TestHalfEdges {
 
     Graph graph;
 
-    private final AStar aStar = new AStar();
+    private final AStar aStar = AStar.oneToOne();
 
     private StreetEdge top, bottom, left, right, leftBack, rightBack;
 

@@ -99,17 +99,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public GenericLocation to;
 
     /**
-     * If true, the tree will be allowed to grow in all directions, rather than being directed
-     * toward a single target. This parameter only apply to access/egress AStar searches,
-     * not transit searches in Raptor.
-     *
-     * @deprecated TODO OTP2 - This looks like an A Star implementation detail. Should be moved to
-     *                       - an A Star specific request class
-     */
-    @Deprecated
-    public boolean oneToMany = false;
-
-    /**
      * An ordered list of intermediate locations to be visited.
      *
      * @deprecated TODO OTP2 - Regression. Not currently working in OTP2. Must be re-implemented
@@ -664,16 +653,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * When true, trips cancelled in scheduled data are included in this search.
      */
     public boolean includePlannedCancellations = false;
-
-    /**
-     * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
-     * distance path service.
-     *
-     * This is used by the Street search only.
-     *
-     * TODO OTP2 Can we merge this with the 'oneToMany' option?
-     */
-    public boolean disableRemainingWeightHeuristic = false;
 
     /**
      * The routing context used to actually carry out this search. It is important to build States from TraverseOptions
