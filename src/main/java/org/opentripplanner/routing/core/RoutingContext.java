@@ -52,8 +52,6 @@ public class RoutingContext implements Cloneable {
 
     public final Set<Vertex> toVertices;
 
-    public final Set<FeedScopedId> bannedRoutes;
-
     private final Set<DisposableEdgeCollection> tempEdges;
     
     // The back edge associated with the origin - i.e. continuing a previous search.
@@ -144,12 +142,6 @@ public class RoutingContext implements Cloneable {
 
         this.fromVertices = routingRequest.arriveBy ? toVertices : fromVertices;
         this.toVertices = routingRequest.arriveBy ? fromVertices : toVertices;
-
-        if (graph.index != null) {
-            this.bannedRoutes = routingRequest.getBannedRoutes(graph.index.getAllRoutes());
-        } else {
-            this.bannedRoutes = Collections.emptySet();
-        }
 
         if (fromVertices != null && toVertices != null) {
             for (Vertex fromVertex : fromVertices) {
