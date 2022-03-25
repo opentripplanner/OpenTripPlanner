@@ -44,7 +44,7 @@ public class RoutingContext implements Cloneable {
 
     /* FINAL FIELDS */
 
-    public RoutingRequest opt; // not final so we can reverse-clone
+    public final RoutingRequest opt;
 
     public final Graph graph;
 
