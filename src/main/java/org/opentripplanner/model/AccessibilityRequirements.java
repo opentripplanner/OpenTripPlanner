@@ -1,9 +1,9 @@
 package org.opentripplanner.model;
 
-import static org.opentripplanner.model.AccessibilityRequirements.Strictness.ALLOW_UNKNOWN_INFORMATION;
-import static org.opentripplanner.model.AccessibilityRequirements.Strictness.KNOWN_INFORMATION_ONLY;
+import static org.opentripplanner.model.AccessibilityRequirements.EvaluationType.ALLOW_UNKNOWN_INFORMATION;
+import static org.opentripplanner.model.AccessibilityRequirements.EvaluationType.KNOWN_INFORMATION_ONLY;
 
-public record AccessibilityRequirements(Strictness strictness,
+public record AccessibilityRequirements(EvaluationType evaluationType,
                                         int unknownAccessibilityTripCost,
                                         int inaccessibleTripCost,
                                         int unknownStopCost) {
@@ -12,7 +12,7 @@ public record AccessibilityRequirements(Strictness strictness,
     public static final int INACCESSIBLE_TRIP_COST = 60 * 60;
     public static final int UNKNOWN_STOP_COST = 60 * 60;
 
-    public enum Strictness {
+    public enum EvaluationType {
         // accessibility information doesn't play a role in routing
         NOT_REQUIRED,
         // only routes and places, which are known to be wheelchair-accessible, should be used
@@ -25,12 +25,12 @@ public record AccessibilityRequirements(Strictness strictness,
     }
 
     public boolean requestsWheelchair() {
-        return strictness == KNOWN_INFORMATION_ONLY || strictness == ALLOW_UNKNOWN_INFORMATION;
+        return evaluationType == KNOWN_INFORMATION_ONLY || evaluationType == ALLOW_UNKNOWN_INFORMATION;
     }
 
-    public static AccessibilityRequirements makeDefault(Strictness strictness) {
+    public static AccessibilityRequirements makeDefault(EvaluationType evaluationType) {
         return new AccessibilityRequirements(
-                strictness,
+                evaluationType,
                 UNKNOWN_ACCESSIBILITY_TRIP_COST,
                 INACCESSIBLE_TRIP_COST,
                 UNKNOWN_STOP_COST

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.AccessibilityRequirements.Strictness;
+import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.model.AccessibilityRequirements;
@@ -110,9 +110,11 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
         options.carParkCost = 240;
         options.carParkTime = 180;
         if(requireWheelChairAccessible) {
-            options.accessibilityRequirements = AccessibilityRequirements.makeDefault(Strictness.KNOWN_INFORMATION_ONLY);
+            options.accessibilityRequirements = AccessibilityRequirements.makeDefault(
+                    EvaluationType.KNOWN_INFORMATION_ONLY);
         } else {
-            options.accessibilityRequirements = AccessibilityRequirements.makeDefault(Strictness.NOT_REQUIRED);
+            options.accessibilityRequirements = AccessibilityRequirements.makeDefault(
+                    EvaluationType.NOT_REQUIRED);
         }
         options.bannedVehicleParkingTags = bannedTags;
         options.requiredVehicleParkingTags = requiredTags;

@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.AccessibilityRequirements.Strictness;
+import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
@@ -98,7 +98,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (accessibilityRequirements.strictness() == Strictness.KNOWN_INFORMATION_ONLY
+    if (accessibilityRequirements.evaluationType() == EvaluationType.KNOWN_INFORMATION_ONLY
             && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE) {
       return false;
     }

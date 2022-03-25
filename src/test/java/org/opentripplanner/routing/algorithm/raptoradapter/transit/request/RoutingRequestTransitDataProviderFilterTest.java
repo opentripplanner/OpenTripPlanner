@@ -12,7 +12,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
-import org.opentripplanner.model.AccessibilityRequirements.Strictness;
+import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -39,7 +39,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   private static final Stop STOP_FOR_TEST = Stop.stopForTest("TEST:STOP", 0, 0);
 
-  private static final AccessibilityRequirements DEFAULT_ACCESSIBILITY_REQ = AccessibilityRequirements.makeDefault(Strictness.NOT_REQUIRED);
+  private static final AccessibilityRequirements DEFAULT_ACCESSIBILITY_REQ = AccessibilityRequirements.makeDefault(
+          EvaluationType.NOT_REQUIRED);
 
   @Test
   public void notFilteringExpectedTripPatternForDateTest() {
@@ -178,7 +179,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
-        AccessibilityRequirements.makeDefault(Strictness.KNOWN_INFORMATION_ONLY),
+        AccessibilityRequirements.makeDefault(EvaluationType.KNOWN_INFORMATION_ONLY),
         false,
         AllowedTransitMode.getAllTransitModes(),
         Set.of(),
@@ -198,7 +199,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
             false,
-            AccessibilityRequirements.makeDefault(Strictness.KNOWN_INFORMATION_ONLY),
+            AccessibilityRequirements.makeDefault(EvaluationType.KNOWN_INFORMATION_ONLY),
             false,
             Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
             Set.of(),
@@ -303,7 +304,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
             true,
-            AccessibilityRequirements.makeDefault(Strictness.KNOWN_INFORMATION_ONLY),
+            AccessibilityRequirements.makeDefault(EvaluationType.KNOWN_INFORMATION_ONLY),
             false,
             Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
             Set.of(),

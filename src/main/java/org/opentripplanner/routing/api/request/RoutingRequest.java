@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.model.AccessibilityRequirements.Strictness.ALLOW_UNKNOWN_INFORMATION;
-import static org.opentripplanner.model.AccessibilityRequirements.Strictness.NOT_REQUIRED;
+import static org.opentripplanner.model.AccessibilityRequirements.EvaluationType.ALLOW_UNKNOWN_INFORMATION;
+import static org.opentripplanner.model.AccessibilityRequirements.EvaluationType.NOT_REQUIRED;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 import java.io.Serializable;
@@ -27,7 +27,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.AccessibilityRequirements;
-import org.opentripplanner.model.AccessibilityRequirements.Strictness;
+import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -819,13 +819,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setAccessibility(boolean wheelchair) {
-        Strictness strictness = NOT_REQUIRED;
+        EvaluationType evaluationType = NOT_REQUIRED;
 
         if (wheelchair) {
-            strictness = ALLOW_UNKNOWN_INFORMATION;
+            evaluationType = ALLOW_UNKNOWN_INFORMATION;
         }
 
-        this.accessibilityRequirements = AccessibilityRequirements.makeDefault(strictness);
+        this.accessibilityRequirements = AccessibilityRequirements.makeDefault(evaluationType);
     }
 
     public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {

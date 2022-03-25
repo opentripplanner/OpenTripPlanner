@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.edgetype.loader;
 
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-import static org.opentripplanner.model.AccessibilityRequirements.Strictness.KNOWN_INFORMATION_ONLY;
+import static org.opentripplanner.model.AccessibilityRequirements.EvaluationType.KNOWN_INFORMATION_ONLY;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.AccessibilityRequirements;
-import org.opentripplanner.model.AccessibilityRequirements.Strictness;
+import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
@@ -16,7 +16,7 @@ public class WheelchairCostCalculatorTest {
     private final WheelchairCostCalculator subject = new WheelchairCostCalculator(
             new DummyCostCalculator(),
             new AccessibilityRequirements(
-                    Strictness.ALLOW_UNKNOWN_INFORMATION, UNKNOWN_ACCESSIBILITY_COST,
+                    EvaluationType.ALLOW_UNKNOWN_INFORMATION, UNKNOWN_ACCESSIBILITY_COST,
                     INACCESSIBLE_TRIP_COST,
                     UNKNOWN_ACCESSIBILITY_COST
             )

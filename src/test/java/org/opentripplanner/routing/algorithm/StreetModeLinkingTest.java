@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.AccessibilityRequirements.Strictness;
+import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.model.AccessibilityRequirements;
@@ -126,7 +126,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         assertLinking((rr) -> {
             rr.from = new GenericLocation(47.5010, 19.03);
             rr.to = new GenericLocation(47.5010, 19.03);
-            rr.accessibilityRequirements = AccessibilityRequirements.makeDefault(Strictness.KNOWN_INFORMATION_ONLY);
+            rr.accessibilityRequirements = AccessibilityRequirements.makeDefault(EvaluationType.KNOWN_INFORMATION_ONLY);
         }, "C1C2 street", "C1C2 street", StreetMode.WALK);
     }
 
