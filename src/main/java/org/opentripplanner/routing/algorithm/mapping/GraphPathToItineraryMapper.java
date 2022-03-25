@@ -48,8 +48,6 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class GraphPathToItineraryMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphPathToItineraryMapper.class);
-
     private final TimeZone timeZone;
     private final AlertToLegMapper alertToLegMapper;
     private final StreetNotesService streetNotesService;

@@ -180,7 +180,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
         false,
         AccessibilityRequirements.makeDefault(Strictness.KNOWN_INFORMATION_ONLY),
         false,
-        AllowedTransitMode.getAllTransitModes(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+        AllowedTransitMode.getAllTransitModes(),
         Set.of(),
         Set.of()
     );
@@ -192,8 +192,9 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   @Test
   public void keepAccessibleTrip() {
-    TripTimes tripTimes = createTestTripTimes();
-    tripTimes.getTrip().setWheelchairBoarding(WheelChairBoarding.POSSIBLE);
+    TripTimes wheelchairAccessibleTrip = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.BUS, null, POSSIBLE, TripAlteration.PLANNED
+    );
 
     var filter = new RoutingRequestTransitDataProviderFilter(
             false,
@@ -204,7 +205,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
             Set.of()
     );
 
-    boolean valid = filter.tripTimesPredicate(tripTimes);
+    boolean valid = filter.tripTimesPredicate(wheelchairAccessibleTrip);
 
     assertTrue(valid);
   }
@@ -302,7 +303,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
             true,
-            true,
+            AccessibilityRequirements.makeDefault(Strictness.KNOWN_INFORMATION_ONLY),
             false,
             Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
             Set.of(),

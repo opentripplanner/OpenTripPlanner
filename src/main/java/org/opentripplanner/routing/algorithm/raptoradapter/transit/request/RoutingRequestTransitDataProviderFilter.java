@@ -11,7 +11,6 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.model.AccessibilityRequirements;
@@ -99,20 +98,9 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (requireWheelchairAccessible && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE) {
+    if (accessibilityRequirements.strictness() == Strictness.KNOWN_INFORMATION_ONLY
+            && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE) {
       return false;
-    if (requireBikesAllowed) {
-      return bikeAccessForTrip(trip) == BikeAccess.ALLOWED;
-    }
-
-    if (accessibilityRequirements.strictness() == Strictness.KNOWN_INFORMATION_ONLY) {
-      // if the accessibility mode is STRICTLY_REQUIRED we only want trips of which we know that they
-      // are wheelchair accessible
-      return trip.getWheelchairBoarding() == WheelChairBoarding.POSSIBLE;
-    } else if (accessibilityRequirements.strictness() == Strictness.ALLOW_UNKNOWN_INFORMATION) {
-      // when it's PREFERRED we also allow trips with unknown accessibility, but remove
-      // those which are known to be inaccessible
-      return trip.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
     }
 
     //noinspection RedundantIfStatement
