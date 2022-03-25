@@ -10,8 +10,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
- * A Euclidean remaining weight strategy that takes into account transit boarding costs where applicable.
- * 
+ * A Euclidean remaining weight strategy.
  */
 public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
