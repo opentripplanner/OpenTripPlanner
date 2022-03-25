@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri;
 
 import static java.util.Collections.EMPTY_LIST;
+import static org.opentripplanner.model.PickDrop.CANCELLED;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 
@@ -9,9 +10,11 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.xml.datatype.Duration;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -636,40 +639,16 @@ public class TimetableHelper {
             CallStatusEnumeration arrivalStatus = estimatedCall.getArrivalStatus();
             if (arrivalStatus == CallStatusEnumeration.CANCELLED) {
               stopTime.cancelDropOff();
-            } else if (
-              estimatedCall.getArrivalBoardingActivity() ==
-              ArrivalBoardingActivityEnumeration.ALIGHTING
-            ) {
-              stopTime.setDropOffType(SCHEDULED);
-            } else if (
-              estimatedCall.getArrivalBoardingActivity() ==
-              ArrivalBoardingActivityEnumeration.NO_ALIGHTING
-            ) {
-              stopTime.setDropOffType(NONE);
-            } else if (estimatedCall.getArrivalBoardingActivity() == null && i == 0) {
-              //First stop - default no dropoff
-              stopTime.setDropOffType(NONE);
             }
+            var dropOffType = mapDropOffType(stopTime.getDropOffType(), estimatedCall.getArrivalBoardingActivity());
+            dropOffType.ifPresent(stopTime::setDropOffType);
 
             CallStatusEnumeration departureStatus = estimatedCall.getDepartureStatus();
             if (departureStatus == CallStatusEnumeration.CANCELLED) {
               stopTime.cancelPickup();
-            } else if (
-              estimatedCall.getDepartureBoardingActivity() ==
-              DepartureBoardingActivityEnumeration.BOARDING
-            ) {
-              stopTime.setPickupType(SCHEDULED);
-            } else if (
-              estimatedCall.getDepartureBoardingActivity() ==
-              DepartureBoardingActivityEnumeration.NO_BOARDING
-            ) {
-              stopTime.setPickupType(NONE);
-            } else if (
-              estimatedCall.getDepartureBoardingActivity() == null && i == (stops.size() - 1)
-            ) {
-              //Last stop - default no pickup
-              stopTime.setPickupType(NONE);
             }
+            var pickUpType = mapPickUpType(stopTime.getPickupType(), estimatedCall.getDepartureBoardingActivity());
+            pickUpType.ifPresent(stopTime::setPickupType);
 
             if (estimatedCall.isCancellation() != null && estimatedCall.isCancellation()) {
               stopTime.cancel();
@@ -808,6 +787,58 @@ public class TimetableHelper {
     }
 
     return newTimes;
+  }
+
+  /**
+   * This method maps an ArrivalBoardingActivity to a pick drop type.
+   *
+   * The Siri ArrivalBoardingActivity includes less information than the pick drop type, therefore is it only
+   * changed if routability has changed.
+   *
+   * @param currentValue The current pick drop value on a stopTime
+   * @param arrivalBoardingActivityEnumeration The incoming boardingActivity to be mapped
+   * @return Mapped PickDrop type, empty if routability is not changed.
+   */
+  public static Optional<PickDrop> mapDropOffType(PickDrop currentValue, ArrivalBoardingActivityEnumeration arrivalBoardingActivityEnumeration) {
+    switch (arrivalBoardingActivityEnumeration) {
+        case ALIGHTING:
+            if (currentValue.isNotRoutable()) {
+                return Optional.of(SCHEDULED);
+            }
+            return Optional.empty();
+        case NO_ALIGHTING:
+            return Optional.of(NONE);
+        case PASS_THRU:
+            return Optional.of(CANCELLED);
+        default:
+            return Optional.empty();
+    }
+  }
+
+  /**
+   * This method maps an departureBoardingActivity to a pick drop type.
+   *
+   * The Siri DepartureBoardingActivity includes less information than the planned data, therefore is it only
+   * changed if routability has changed.
+   *
+   * @param currentValue The current pick drop value on a stopTime
+   * @param departureBoardingActivityEnumeration The incoming departureBoardingActivityEnumeration to be mapped
+   * @return Mapped PickDrop type, empty if routability is not changed.
+   */
+  public static Optional<PickDrop> mapPickUpType(PickDrop currentValue, DepartureBoardingActivityEnumeration departureBoardingActivityEnumeration) {
+    switch (departureBoardingActivityEnumeration) {
+        case BOARDING:
+            if (currentValue.isNotRoutable()) {
+                return Optional.of(SCHEDULED);
+            }
+            return Optional.empty();
+        case NO_BOARDING:
+            return Optional.of(NONE);
+        case PASS_THRU:
+            return Optional.of(CANCELLED);
+        default:
+            return Optional.empty();
+    }
   }
 
   /**

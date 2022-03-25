@@ -249,7 +249,7 @@ public class TimetableSnapshot {
       (HashMap<TripIdAndServiceDate, TripPattern>) this.lastAddedTripPattern.clone();
 
     if (transitLayerUpdater != null) {
-      transitLayerUpdater.update(dirtyTimetables);
+      transitLayerUpdater.update(dirtyTimetables, timetables);
     }
 
     ret.lastAddedTripOnServiceDate =
@@ -424,7 +424,7 @@ public class TimetableSnapshot {
    * Class to use as key in HashMap containing feed id, trip id and service date
    * TODO shouldn't this be a static class?
    */
-  protected static class TripIdAndServiceDate {
+  public static class TripIdAndServiceDate {
 
     private final FeedScopedId tripId;
     private final ServiceDate serviceDate;
