@@ -16,9 +16,11 @@ public class WheelchairCostCalculatorTest {
     private final WheelchairCostCalculator subject = new WheelchairCostCalculator(
             new DummyCostCalculator(),
             new AccessibilityRequirements(
-                    EvaluationType.ALLOW_UNKNOWN_INFORMATION, UNKNOWN_ACCESSIBILITY_COST,
+                    EvaluationType.ALLOW_UNKNOWN_INFORMATION,
+                    UNKNOWN_ACCESSIBILITY_COST,
                     INACCESSIBLE_TRIP_COST,
-                    UNKNOWN_ACCESSIBILITY_COST
+                    UNKNOWN_ACCESSIBILITY_COST,
+                    INACCESSIBLE_TRIP_COST
             )
     );
 

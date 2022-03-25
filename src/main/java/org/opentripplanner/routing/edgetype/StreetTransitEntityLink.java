@@ -86,12 +86,15 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
-        var strictness = s0.getOptions().accessibilityRequirements.evaluationType();
-        if (strictness == KNOWN_INFORMATION_ONLY && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
+        var accessibility = s0.getOptions().accessibilityRequirements.evaluationType();
+        if (accessibility == KNOWN_INFORMATION_ONLY && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
             return null;
         }
-        else if(strictness == ALLOW_UNKNOWN_INFORMATION && wheelchairBoarding != WheelChairBoarding.NO_INFORMATION) {
-            s1.incrementWeight(req.unknownStopAccessibilityPenalty);
+        else if(accessibility == ALLOW_UNKNOWN_INFORMATION && wheelchairBoarding == WheelChairBoarding.NO_INFORMATION) {
+            s1.incrementWeight(req.accessibilityRequirements.unknownStopAccessibilityCost());
+        }
+        else if(accessibility == ALLOW_UNKNOWN_INFORMATION && wheelchairBoarding == WheelChairBoarding.NOT_POSSIBLE) {
+            s1.incrementWeight(req.accessibilityRequirements.inaccessibleStopCost());
         }
 
         switch (s0.getNonTransitMode()) {
