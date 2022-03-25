@@ -279,30 +279,6 @@ public class AStar {
         
         return spt;
     }
-    
-    /** Get an SPT, starting from a collection of states */
-    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeoutSeconds,
-            SearchTerminationStrategy terminationStrategy, Collection<State> initialStates) {
-        
-        ShortestPathTree spt = null;
-        long abortTime = DateUtils.absoluteTimeout(relTimeoutSeconds);
-
-        startSearch (options, terminationStrategy, abortTime, false);
-        
-        if (runState != null) {
-            for (State state : initialStates) {
-                runState.spt.add(state);
-                // TODO: hardwired for earliest arrival
-                // TODO: weights are seconds, no?
-                runState.pq.insert(state, state.getElapsedTimeSeconds());
-            }
-            
-            runSearch(abortTime);
-            spt = runState.spt;
-        }
-        
-        return spt;
-    }
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
