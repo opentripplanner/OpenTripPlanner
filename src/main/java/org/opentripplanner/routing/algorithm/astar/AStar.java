@@ -67,28 +67,15 @@ public class AStar {
     private RunState runState;
     
     /**
-     * Compute SPT using default timeout and termination strategy.
+     * Compute SPT without timeout and termination strategy.
      */
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
         return getShortestPathTree(req, -1, null); // negative timeout means no timeout
     }
     
-    /**
-     * Compute SPT using default termination strategy.
-     */
-    public ShortestPathTree getShortestPathTree(RoutingRequest req, double relTimeoutSeconds) {
-        return this.getShortestPathTree(req, relTimeoutSeconds, null);
-    }
-    
     /** set up a single-origin search */
-    public void startSearch(RoutingRequest options,
-            SearchTerminationStrategy terminationStrategy, long abortTime) {
-        startSearch(options, terminationStrategy, abortTime, true);
-    }
-    
-    /** set up the search, optionally not adding the initial state to the queue (for multi-state Dijkstra) */
     private void startSearch(RoutingRequest options,
-            SearchTerminationStrategy terminationStrategy, long abortTime, boolean addToQueue) {
+            SearchTerminationStrategy terminationStrategy, long abortTime) {
 
         runState = new RunState(options, terminationStrategy);
         runState.rctx = options.getRoutingContext();
@@ -116,12 +103,10 @@ public class AStar {
         runState.pq = new BinHeap<>(initialSize);
         runState.nVisited = 0;
         runState.targetAcceptedStates = Lists.newArrayList();
-        
-        if (addToQueue) {
-            for (State initialState : State.getInitialStates(options)) {
-                runState.spt.add(initialState);
-                runState.pq.insert(initialState, 0);
-            }
+
+        for (State initialState : State.getInitialStates(options)) {
+            runState.spt.add(initialState);
+            runState.pq.insert(initialState, 0);
         }
     }
 
