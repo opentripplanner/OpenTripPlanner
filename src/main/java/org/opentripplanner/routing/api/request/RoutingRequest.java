@@ -3,7 +3,6 @@ package org.opentripplanner.routing.api.request;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -1266,7 +1265,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     public void setRoutingContext(Graph graph, Edge fromBackEdge, Vertex from, Vertex to) {
         if (rctx != null) {
-            this.rctx.destroy();
+            this.rctx.close();
         }
         this.rctx = new RoutingContext(this, graph, from, to);
         this.rctx.originBackEdge = fromBackEdge;
@@ -1277,17 +1276,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     }
 
     public void setRoutingContext(Graph graph, Set<Vertex> from, Set<Vertex> to) {
-        setRoutingContext(graph, null, from, to);
-    }
-
-    public void setRoutingContext(Graph graph, Edge fromBackEdge, Set<Vertex> from, Set<Vertex> to) {
         // normally you would want to tear down the routing context...
         // but this method is mostly used in tests, and teardown interferes with testHalfEdges
         // FIXME here, or in test, and/or in other places like TSP that use this method
         if (rctx != null)
-            this.rctx.destroy();
+            this.rctx.close();
         this.rctx = new RoutingContext(this, graph, from, to);
-        this.rctx.originBackEdge = fromBackEdge;
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
@@ -1308,7 +1302,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public void cleanup() {
         if (this.rctx != null) {
             try {
-                rctx.destroy();
+                rctx.close();
             }
             catch (Exception e) {
                 LOG.error("Could not destroy the routing context", e);

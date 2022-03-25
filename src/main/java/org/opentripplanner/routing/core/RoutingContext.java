@@ -5,7 +5,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
@@ -38,7 +37,7 @@ import java.util.function.Predicate;
  * In addition, while the RoutingRequest should only carry parameters _in_ to the routing operation, the routing context
  * should be used to carry information back out, such as debug figures or flags that certain thresholds have been exceeded.
  */
-public class RoutingContext implements Cloneable {
+public class RoutingContext implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
 
@@ -200,7 +199,7 @@ public class RoutingContext implements Cloneable {
      * the "permanent" graph objects. This enables all temporary objects
      * for garbage collection.
      */
-    public void destroy() {
+    public void close() {
         this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
     }
 
