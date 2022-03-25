@@ -153,7 +153,7 @@ public class LineType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")
-                    .type(new GraphQLNonNull(new GraphQLList(noticeType)))
+                    .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
                     .dataFetcher(environment -> {
                         Route route = environment.getSource();
                       return GqlUtil.getRoutingService(environment).getNoticesByEntity(route);
@@ -162,7 +162,7 @@ public class LineType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("situations")
                     .description("Get all situations active for the line.")
-                    .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
+                    .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
                 .dataFetcher(environment -> GqlUtil.getRoutingService(environment)
                         .getTransitAlertService()
                         .getRouteAlerts(((Route) environment.getSource()).getId()))

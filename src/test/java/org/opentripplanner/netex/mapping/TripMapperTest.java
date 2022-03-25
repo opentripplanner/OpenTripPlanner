@@ -1,6 +1,10 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.Collections;
+import java.util.Map;
+import javax.xml.bind.JAXBElement;
 import org.junit.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
@@ -13,11 +17,6 @@ import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 
-import javax.xml.bind.JAXBElement;
-
-import java.util.Collections;
-import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
@@ -28,6 +27,7 @@ public class TripMapperTest {
     private static final String SERVICE_JOURNEY_ID = NetexTestDataSample.SERVICE_JOURNEY_ID;
     private static final String JOURNEY_PATTERN_ID = "RUT:JourneyPattern:1";
     private static final FeedScopedId SERVICE_ID = new FeedScopedId("F", "S001");
+    private static final DataImportIssueStore issueStore = new DataImportIssueStore(false);
 
     private static final JAXBElement<LineRefStructure> LINE_REF = MappingSupport.createWrappedRef(
             ROUTE_ID, LineRefStructure.class
@@ -41,6 +41,7 @@ public class TripMapperTest {
 
         TripMapper tripMapper = new TripMapper(
             ID_FACTORY,
+            issueStore,
             transitBuilder.getOperatorsById(),
             transitBuilder.getRoutes(),
             new HierarchicalMapById<>(),
@@ -83,6 +84,7 @@ public class TripMapperTest {
 
         TripMapper tripMapper = new TripMapper(
                 ID_FACTORY,
+                issueStore,
                 transitBuilder.getOperatorsById(),
                 transitBuilder.getRoutes(),
                 routeById,

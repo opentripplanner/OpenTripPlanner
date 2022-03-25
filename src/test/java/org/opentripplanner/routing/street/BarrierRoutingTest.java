@@ -19,6 +19,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -143,7 +144,14 @@ public class BarrierRoutingTest {
         var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT));
         var paths = gpf.graphPathFinderEntryPoint(request);
 
-        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
+        GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+                graph.getTimeZone(),
+                new AlertToLegMapper(graph.getTransitAlertService()),
+                graph.streetNotesService,
+                graph.ellipsoidToGeoidDifference
+        );
+
+        var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
 
         assertAll(assertions.apply(itineraries));
 

@@ -11,6 +11,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;
 import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
@@ -25,7 +26,7 @@ import java.util.List;
 public class GeometryUtils {
     private static final Logger LOG = LoggerFactory.getLogger(GeometryUtils.class);
 
-    private static final CoordinateSequenceFactory csf = new Serializable2DPackedCoordinateSequenceFactory();
+    private static final CoordinateSequenceFactory csf = new PackedCoordinateSequenceFactory();
     private static final GeometryFactory gf = new GeometryFactory(csf);
 
     /** A shared copy of the WGS84 CRS with longitude-first axis order. */

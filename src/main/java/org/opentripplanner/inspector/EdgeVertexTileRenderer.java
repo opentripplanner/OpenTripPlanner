@@ -123,7 +123,6 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         // since it's easier for the offset to work in pixel size.
         ShapeWriter shapeWriter = new ShapeWriter(new IdentityPointTransformation(),
                 new PointShapeFactory.Point());
-        GeometryFactory geomFactory = new GeometryFactory();
 
         Stroke stroke = new BasicStroke(lineWidth * 1.4f, BasicStroke.CAP_ROUND,
                 BasicStroke.JOIN_BEVEL);
@@ -175,7 +174,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
                     lineWidth * 0.4);
             if (coords.length < 2)
                 continue; // Can happen for very small edges (<1mm)
-            LineString offsetLine = geomFactory.createLineString(coords);
+            LineString offsetLine = GeometryUtils.makeLineString(coords);
             Shape midLineShape = shapeWriter.toShape(midLineGeom);
             Shape offsetShape = shapeWriter.toShape(offsetLine);
 
@@ -205,7 +204,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         for (Vertex vertex : vertices) {
             vvAttrs.color = null;
             vvAttrs.label = null;
-            Point point = geomFactory.createPoint(new Coordinate(vertex.getLon(), vertex.getLat()));
+            Point point = GeometryUtils.getGeometryFactory().createPoint(vertex.getCoordinate());
             boolean render = evRenderer.renderVertex(vertex, vvAttrs);
             if (!render)
                 continue;

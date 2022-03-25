@@ -1,27 +1,21 @@
 package org.opentripplanner.graph_builder.model;
 
-import org.apache.http.client.ClientProtocolException;
-import org.onebusaway.csv_entities.CsvInputSource;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.FileType;
-import org.opentripplanner.datastore.configure.DataStoreFactory;
-import org.opentripplanner.util.HttpUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import org.onebusaway.csv_entities.CsvInputSource;
+import org.opentripplanner.datastore.CompositeDataSource;
+import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.configure.DataStoreFactory;
+import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GtfsBundle {
 
     private static final Logger LOG = LoggerFactory.getLogger(GtfsBundle.class);
 
     private final CompositeDataSource dataSource;
-
-    private URL url;
 
     private GtfsFeedId feedId;
 
@@ -33,9 +27,9 @@ public class GtfsBundle {
      */
     public boolean parentStationTransfers = false;
 
-    /** 
-     * Connect parent station vertices to their constituent stops to allow beginning and 
-     * ending paths (itineraries) at them. 
+    /**
+     * Connect parent station vertices to their constituent stops to allow beginning and
+     * ending paths (itineraries) at them.
      */
     public boolean linkStopsToParentStations = false;
 
@@ -52,10 +46,6 @@ public class GtfsBundle {
 
     public GtfsBundle(CompositeDataSource dataSource) {
         this.dataSource = dataSource;
-    }
-
-    public void setUrl(URL url) {
-        this.url = url;
     }
 
     public CsvInputSource getCsvInputSource() {
@@ -94,7 +84,7 @@ public class GtfsBundle {
         }
         return "GTFS bundle at " + src;
     }
-    
+
     /**
      * So that we can load multiple gtfs feeds into the same database.
      */
@@ -119,14 +109,6 @@ public class GtfsBundle {
                         "GTFS Path " + dataSource.path() + " does not exist or "
                                 + "cannot be read."
                 );
-        } else if (url != null) {
-            try {
-                HttpUtils.testUrl(url.toExternalForm());
-            } catch (ClientProtocolException e) {
-                throw new RuntimeException("Error connecting to " + url.toExternalForm() + "\n" + e);
-            } catch (IOException e) {
-                throw new RuntimeException("GTFS url " + url.toExternalForm() + " cannot be read.\n" + e);
-            }
         }
     }
 

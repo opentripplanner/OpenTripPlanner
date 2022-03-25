@@ -20,6 +20,7 @@ import java.util.List;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -47,12 +48,8 @@ public class EstimatedCallType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("quay")
                     .type(quayType)
-                    .dataFetcher(environment -> {
-                      return GqlUtil.getRoutingService(environment).getStopForId((
-                          (TripTimeOnDate) environment.getSource()
-                      ).getStopId());
-                        }
-                    ).build())
+                    .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStop())
+                    .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                            .name("aimedArrivalTime")
                            .description("Scheduled time of arrival at quay. Not affected by read time updated")
@@ -150,7 +147,7 @@ public class EstimatedCallType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("stopPositionInPattern")
-                    .type(Scalars.GraphQLInt)
+                    .type(new GraphQLNonNull(Scalars.GraphQLInt))
                     .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getStopIndex())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -172,14 +169,12 @@ public class EstimatedCallType {
                     ((TripTimeOnDate) environment.getSource()).getDropoffType() != NONE
                 ).build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name("requestStop")
-                    .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-                    .description("Whether vehicle will only stop on request.")
-                    .dataFetcher(environment ->
-                        GqlUtil.getRoutingService(environment).getPatternForTrip()
-                            .get(((TripTimeOnDate) environment.getSource()).getTrip())
-                            .getAlightType(((TripTimeOnDate) environment.getSource()).getStopIndex()) == COORDINATE_WITH_DRIVER)
-                    .build())
+                .name("requestStop")
+                .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+                .description("Whether vehicle will only stop on request.")
+                .dataFetcher(environment ->
+                    ((TripTimeOnDate) environment.getSource()).getDropoffType() == COORDINATE_WITH_DRIVER)
+                .build())
 
             .field(GraphQLFieldDefinition
                     .newFieldDefinition()
@@ -222,11 +217,10 @@ public class EstimatedCallType {
                     .withDirective(gqlUtil.timingData)
                     .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
                     .description("Get all relevant situations for this EstimatedCall.")
-                    .dataFetcher(environment -> {
-                      return getAllRelevantAlerts(environment.getSource(),
-                          GqlUtil.getRoutingService(environment)
-                      );
-                    })
+                    .dataFetcher(environment -> getAllRelevantAlerts(
+                            environment.getSource(),
+                            GqlUtil.getRoutingService(environment))
+                    )
                     .build())
              .field(GraphQLFieldDefinition.newFieldDefinition()
                      .name("bookingArrangements")
@@ -257,9 +251,9 @@ public class EstimatedCallType {
     FeedScopedId tripId = trip.getId();
     FeedScopedId routeId = trip.getRoute().getId();
 
-    FeedScopedId stopId = tripTimeOnDate.getStopId();
+    StopLocation stop = tripTimeOnDate.getStop();
+    FeedScopedId stopId = stop.getId();
 
-    var stop = routingService.getStopForId(stopId);
     FeedScopedId parentStopId = stop.getParentStation().getId();
 
     Collection<TransitAlert> allAlerts = new HashSet<>();
@@ -309,19 +303,8 @@ public class EstimatedCallType {
       // Handle repeating validityPeriods
       alertPatches.removeIf(alertPatch -> !alertPatch.displayDuring(fromTime.getTime()/1000, toTime.getTime()/1000));
 
-      alertPatches.removeIf(alert -> {
-        boolean removeByStopCondition = false;
-
-        if (!alert.getStopConditions().isEmpty()) {
-          removeByStopCondition = true;
-          for (StopCondition stopCondition : stopConditions) {
-            if (alert.getStopConditions().contains(stopCondition)) {
-              removeByStopCondition = false;
-            }
-          }
-        }
-        return removeByStopCondition;
-      });
+      alertPatches.removeIf(alert -> !alert.getStopConditions().isEmpty() &&
+          stopConditions.stream().noneMatch(stopCondition -> alert.getStopConditions().contains(stopCondition)));
     }
   }
 }

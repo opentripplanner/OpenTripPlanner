@@ -12,6 +12,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -138,7 +139,13 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
-        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
+        GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+                graph.getTimeZone(),
+                new AlertToLegMapper(graph.getTransitAlertService()),
+                graph.streetNotesService,
+                graph.ellipsoidToGeoidDifference
+        );
+        List<Itinerary> itineraries = graphPathToItineraryMapper.mapItineraries(paths);
         // Stored in instance field for use in individual tests
         itinerary = itineraries.get(0);
 

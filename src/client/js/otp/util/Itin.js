@@ -310,6 +310,9 @@ otp.util.Itin = {
                             step.streetName + (asHtml ? "</b>" : "");
             }
         }
+        if (step.walkingBike) {
+            text += ' 🚶';
+        }
         return text;
     },
 

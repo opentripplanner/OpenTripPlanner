@@ -12,6 +12,8 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.routing.spt.GraphPath;
 
 public class FlexRouter {
 
@@ -40,6 +43,7 @@ public class FlexRouter {
   private final FlexIndex flexIndex;
   private final FlexPathCalculator accessFlexPathCalculator;
   private final FlexPathCalculator egressFlexPathCalculator;
+  private final GraphPathToItineraryMapper graphPathToItineraryMapper;
 
   /* Request data */
   private final ZonedDateTime startOfTime;
@@ -67,6 +71,12 @@ public class FlexRouter {
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = graph.index.getFlexIndex();
+    this.graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+            graph.getTimeZone(),
+            new AlertToLegMapper(graph.getTransitAlertService()),
+            graph.streetNotesService,
+            graph.ellipsoidToGeoidDifference
+    );
 
     if(graph.hasStreets) {
       this.accessFlexPathCalculator = new StreetFlexPathCalculator(graph, false);
@@ -114,8 +124,9 @@ public class FlexRouter {
       StopLocation transferStop = template.getTransferStop();
       if (this.flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))) {
         for(NearbyStop egress : streetEgressByStop.get(transferStop)) {
-          Itinerary itinerary = template.createDirectItinerary(egress, arriveBy, departureTime, startOfTime);
-          if (itinerary != null) {
+          GraphPath graphPath = template.createDirectGraphPath(egress, arriveBy, departureTime, startOfTime);
+          if (graphPath != null) {
+            Itinerary itinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
             var fareService = graph.getService(FareService.class);
             if(fareService != null) {
               itinerary.fare = fareService.getCost(itinerary);

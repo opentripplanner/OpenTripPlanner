@@ -72,7 +72,9 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   @Test
   public void bannedTripFilteringTest() {
-    TripTimes tripTimes = createTestTripTimes();
+    TripTimes tripTimes = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.BUS, null, 0, null
+    );
 
     var filter = new RoutingRequestTransitDataProviderFilter(
             false,
@@ -90,7 +92,10 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   @Test
   public void transitModeFilteringTest() {
-    TripTimes tripTimes = createTestTripTimes();
+    TripTimes tripTimes = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.BUS, TransmodelTransportSubmode.LOCAL_BUS.getValue(), 0, null
+    );
+
     final var BUS = TransitMode.BUS;
     final var RAIL = TransitMode.RAIL;
     final var LOCAL_BUS = TransmodelTransportSubmode.LOCAL_BUS.getValue();
@@ -119,7 +124,9 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   @Test
   public void notFilteringExpectedTripTimesTest() {
-    TripTimes tripTimes = createTestTripTimes();
+    TripTimes tripTimes = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.BUS, null, 0, null
+    );
 
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
@@ -137,13 +144,15 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   @Test
   public void bikesAllowedFilteringTest() {
-    TripTimes tripTimes = createTestTripTimes();
+    TripTimes tripTimes = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.BUS, null, 0, null
+    );
 
     var filter = new RoutingRequestTransitDataProviderFilter(
         true,
         false,
         false,
-        Set.of(),
+        AllowedTransitMode.getAllTransitModes(),
         Set.of(),
         Set.of()
     );
@@ -155,13 +164,15 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   @Test
   public void wheelchairAccessibleFilteringTest() {
-    TripTimes tripTimes = createTestTripTimes();
+    TripTimes tripTimes = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.BUS, null, 0, null
+    );
 
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
         true,
         false,
-        Set.of(),
+        AllowedTransitMode.getAllTransitModes(),
         Set.of(),
         Set.of()
     );
@@ -171,45 +182,14 @@ public class RoutingRequestTransitDataProviderFilterTest {
     assertFalse(valid);
   }
 
-  private TripPatternForDate createTestTripPatternForDate() {
-    Route route = new Route(TEST_ROUTE_ID);
-    route.setMode(TransitMode.BUS);
-
-    var stopTime = new StopTime();
-    stopTime.setStop(STOP_FOR_TEST);
-    StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    TripPattern pattern = new TripPattern(null, route, stopPattern);
-
-    TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
-            pattern, new int[0]
-    );
-
-    TripTimes tripTimes = Mockito.mock(TripTimes.class);
-
-    return new TripPatternForDate(tripPattern, List.of(tripTimes), List.of(), LocalDate.now());
-  }
-
-  private TripTimes createTestTripTimes() {
-    Trip trip = new Trip(TEST_TRIP_ID);
-    trip.setBikesAllowed(BikeAccess.NOT_ALLOWED);
-    trip.setRoute(new Route(TEST_ROUTE_ID));
-    trip.setMode(TransitMode.BUS);
-    trip.setNetexSubmode(TransmodelTransportSubmode.LOCAL_BUS.getValue());
-
-    StopTime stopTime = new StopTime();
-    stopTime.setStop(STOP_FOR_TEST);
-    stopTime.setArrivalTime(60);
-    stopTime.setDepartureTime(60);
-    stopTime.setStopSequence(0);
-
-    return new TripTimes(trip, List.of(stopTime), new Deduplicator());
-  }
   @Test
   public void includePlannedCancellationsTest() {
-    TripTimes tripTimesWithCancellation = createTestTripTimes();
-    TripTimes tripTimesWithReplaced = createTestTripTimes();
-    tripTimesWithCancellation.getTrip().setAlteration(TripAlteration.CANCELLATION);
-    tripTimesWithReplaced.getTrip().setAlteration(TripAlteration.REPLACED);
+    TripTimes tripTimesWithCancellation = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.BUS, null, 0, TripAlteration.CANCELLATION
+    );
+    TripTimes tripTimesWithReplaced = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.BUS, null, 0, TripAlteration.REPLACED
+    );
 
     // Given
     var filter1 = new RoutingRequestTransitDataProviderFilter(
@@ -270,5 +250,88 @@ public class RoutingRequestTransitDataProviderFilterTest {
     assertEquals(BikeAccess.ALLOWED, RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip));
     route.setBikesAllowed(BikeAccess.NOT_ALLOWED);
     assertEquals(BikeAccess.NOT_ALLOWED, RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip));
+  }
+
+  @Test
+  public void multipleFilteringTest() {
+    TripTimes matchingTripTimes = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.ALLOWED, TransitMode.BUS, null, 1, TripAlteration.PLANNED
+    );
+    TripTimes failingTripTimes1 = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.ALLOWED, TransitMode.RAIL, null, 1, TripAlteration.PLANNED
+    );
+    TripTimes failingTripTimes2 = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.RAIL, null, 1, TripAlteration.CANCELLATION
+    );
+    TripTimes failingTripTimes3 = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.NOT_ALLOWED, TransitMode.RAIL, null, 0, TripAlteration.CANCELLATION
+    );
+    TripTimes failingTripTimes4 = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.ALLOWED, TransitMode.BUS, null, 0, TripAlteration.PLANNED
+    );
+    TripTimes failingTripTimes5 = createTestTripTimes(
+            TEST_TRIP_ID, TEST_ROUTE_ID, BikeAccess.ALLOWED, TransitMode.BUS, null, 1, TripAlteration.CANCELLATION
+    );
+
+    var filter = new RoutingRequestTransitDataProviderFilter(
+            true,
+            true,
+            false,
+            Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
+            Set.of(),
+            Set.of()
+    );
+
+    assertTrue(filter.tripTimesPredicate(matchingTripTimes));
+
+    assertFalse(filter.tripTimesPredicate(failingTripTimes1));
+    assertFalse(filter.tripTimesPredicate(failingTripTimes2));
+    assertFalse(filter.tripTimesPredicate(failingTripTimes3));
+    assertFalse(filter.tripTimesPredicate(failingTripTimes4));
+    assertFalse(filter.tripTimesPredicate(failingTripTimes5));
+  }
+
+  private TripPatternForDate createTestTripPatternForDate() {
+    Route route = new Route(TEST_ROUTE_ID);
+    route.setMode(TransitMode.BUS);
+
+    var stopTime = new StopTime();
+    stopTime.setStop(STOP_FOR_TEST);
+    StopPattern stopPattern = new StopPattern(List.of(stopTime));
+    TripPattern pattern = new TripPattern(null, route, stopPattern);
+
+    TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
+            pattern, new int[0]
+    );
+
+    TripTimes tripTimes = Mockito.mock(TripTimes.class);
+
+    return new TripPatternForDate(tripPattern, List.of(tripTimes), List.of(), LocalDate.now());
+  }
+
+  private TripTimes createTestTripTimes(
+          FeedScopedId tripId,
+          FeedScopedId routeId,
+          BikeAccess bikeAccess,
+          TransitMode mode,
+          String submode,
+          int wheelchairAccessible,
+          TripAlteration tripAlteration
+  ) {
+    Trip trip = new Trip(tripId);
+    trip.setRoute(new Route(routeId));
+    trip.setMode(mode);
+    trip.setNetexSubmode(submode);
+    trip.setBikesAllowed(bikeAccess);
+    trip.setWheelchairAccessible(wheelchairAccessible);
+    trip.setAlteration(tripAlteration);
+
+    StopTime stopTime = new StopTime();
+    stopTime.setStop(STOP_FOR_TEST);
+    stopTime.setArrivalTime(60);
+    stopTime.setDepartureTime(60);
+    stopTime.setStopSequence(0);
+
+    return new TripTimes(trip, List.of(stopTime), new Deduplicator());
   }
 }
