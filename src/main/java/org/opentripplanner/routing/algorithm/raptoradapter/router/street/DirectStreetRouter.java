@@ -21,8 +21,6 @@ import java.util.List;
 
 public class DirectStreetRouter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DirectStreetRouter.class);
-
   public static List<Itinerary> route(Router router, RoutingRequest request) {
     if (request.modes.directMode == StreetMode.NOT_SET) {
       return Collections.emptyList();

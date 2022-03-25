@@ -3,7 +3,10 @@ package org.opentripplanner.standalone.config;
 import java.time.Duration;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opentripplanner.model.AccessibilityRequirements;
+import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.standalone.config.AccessibilityConfig.Evaluation;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 
@@ -110,6 +113,13 @@ public class NodeAdapterTest {
         assertEquals("Get existing property", AnEnum.A, subject.asEnum("key", AnEnum.B));
         assertEquals("Get default value", AnEnum.B, subject.asEnum("missing-key", AnEnum.B));
         assertEquals("Get existing property", AnEnum.A, subject.asEnum("key", AnEnum.class));
+    }
+
+    @Test
+    public void asAccessibilityEvaluation() {
+        NodeAdapter subject  = newNodeAdapterForTest("{ evaluation : 'KNOWN_INFORMATION_ONLY' }");
+
+        assertEquals(Evaluation.KNOWN_INFORMATION_ONLY, subject.asEnum("evaluation", Evaluation.KNOWN_INFORMATION_ONLY));
     }
 
     @Test(expected = OtpAppException.class)

@@ -790,10 +790,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /* ACCESSOR/SETTER METHODS */
 
-    public boolean transitAllowed() {
-        return streetSubRequestModes.isTransit();
-    }
-
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
     }
@@ -1196,6 +1192,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
             clone.raptorOptions = new RaptorOptions(this.raptorOptions);
             clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
+
+            // is immutable so can safely use the same reference
+            clone.accessibilityRequirements = accessibilityRequirements;
 
             return clone;
         } catch (CloneNotSupportedException e) {

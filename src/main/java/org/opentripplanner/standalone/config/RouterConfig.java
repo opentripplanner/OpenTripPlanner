@@ -41,6 +41,7 @@ public class RouterConfig implements Serializable {
     private final UpdatersParameters updatersParameters;
     private final VectorTileConfig vectorTileLayers;
     private final FlexConfig flexConfig;
+    private final AccessibilityConfig accessibilityConfig;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
@@ -56,6 +57,7 @@ public class RouterConfig implements Serializable {
         this.updatersParameters = new UpdatersConfig(adapter);
         this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
         this.flexConfig = new FlexConfig(adapter.path("flex"));
+        this.accessibilityConfig = new AccessibilityConfig(adapter.path("accessibility"));
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
@@ -115,6 +117,10 @@ public class RouterConfig implements Serializable {
         return flexConfig.toFlexParameters(request);
     }
 
+    public AccessibilityConfig accessibilityConfig() {
+        return accessibilityConfig;
+    }
+
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
      */
@@ -130,5 +136,6 @@ public class RouterConfig implements Serializable {
         // Print ONLY the values set, not deafult values
         return rawJson.toPrettyString();
     }
+
 
 }
