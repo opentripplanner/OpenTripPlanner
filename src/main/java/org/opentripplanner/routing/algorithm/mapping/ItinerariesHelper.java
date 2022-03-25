@@ -16,7 +16,7 @@ public class ItinerariesHelper {
         for (Itinerary it : itineraries) {
             // Communicate the fact that the only way we were able to get a response
             // was by removing a slope limit.
-            it.tooSloped = request.rctx.slopeRestrictionRemoved;
+            it.tooSloped = request.getRoutingContext().slopeRestrictionRemoved;
         }
     }
 }

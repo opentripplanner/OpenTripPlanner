@@ -171,7 +171,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
             StreetMode streetMode,
             RoutingRequest routingRequest
     ) {
-        var fromVertex = routingRequest.rctx.fromVertices.iterator().next();
+        var fromVertex = routingRequest.getRoutingContext().fromVertices.iterator().next();
         var outgoing = fromVertex.getOutgoing()
                 .iterator()
                 .next()
@@ -191,7 +191,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
             StreetMode streetMode,
             RoutingRequest routingRequest
     ) {
-        var toVertex = routingRequest.rctx.toVertices.iterator().next();
+        var toVertex = routingRequest.getRoutingContext().toVertices.iterator().next();
         var outgoing = toVertex.getIncoming()
                 .iterator()
                 .next()

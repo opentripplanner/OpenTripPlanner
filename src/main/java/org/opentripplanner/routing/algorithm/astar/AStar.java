@@ -74,11 +74,11 @@ public class AStar {
     }
     
     /** set up a single-origin search */
-    private void startSearch(RoutingRequest options,
+    private void startSearch(RoutingRequest options, RoutingContext rctx,
             SearchTerminationStrategy terminationStrategy, long abortTime) {
 
         runState = new RunState(options, terminationStrategy);
-        runState.rctx = options.getRoutingContext();
+        runState.rctx = rctx;
         runState.spt = options.getNewShortestPathTree();
 
         // We want to reuse the heuristic instance in a series of requests for the same target to avoid repeated work.
@@ -208,7 +208,7 @@ public class AStar {
                 // Rather than returning null to indicate that the search was aborted/timed out,
                 // we instead set a flag in the routing context and return the SPT anyway. This
                 // allows returning a partial list results even when a timeout occurs.
-                runState.options.rctx.aborted = true; // signal search cancellation up to higher stack frames
+                runState.rctx.aborted = true; // signal search cancellation up to higher stack frames
 
                 break;
             }
@@ -255,7 +255,7 @@ public class AStar {
         ShortestPathTree spt = null;
         long abortTime = DateUtils.absoluteTimeout(relTimeoutSeconds);
 
-        startSearch (options, terminationStrategy, abortTime);
+        startSearch(options, options.getRoutingContext(), terminationStrategy, abortTime);
 
         if (runState != null) {
             runSearch(abortTime);

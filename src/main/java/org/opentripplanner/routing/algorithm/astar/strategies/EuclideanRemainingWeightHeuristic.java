@@ -27,7 +27,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     //      not work correctly.
     @Override
     public void initialize(RoutingRequest req) {
-        Vertex target = req.rctx.toVertices.iterator().next();
+        Vertex target = req.getRoutingContext().toVertices.iterator().next();
         maxStreetSpeed = req.getStreetSpeedUpperBound();
         walkingSpeed = req.walkSpeed;
         arriveBy = req.arriveBy;

@@ -81,7 +81,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       routingRequest.setRoutingContext(graph, vertex, null);
     }
     routingRequest.disableRemainingWeightHeuristic = true;
-    routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+    routingRequest.getRoutingContext().remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
     routingRequest.dominanceFunction = new DominanceFunction.EarliestArrival();
     routingRequest.oneToMany = true;
     AStar search = new AStar();

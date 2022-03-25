@@ -186,7 +186,7 @@ public class NearbyStopFinder {
             routingRequest.setRoutingContext(graph, null, originVertices);
         }
         routingRequest.disableRemainingWeightHeuristic = true;
-        routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        routingRequest.getRoutingContext().remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
 
         var astar = new AStar();

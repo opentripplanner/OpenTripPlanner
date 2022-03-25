@@ -49,14 +49,14 @@ public class State implements Cloneable {
      */
     public static Collection<State> getInitialStates(RoutingRequest request) {
         Collection<State> states = new ArrayList<>();
-        for (Vertex vertex : request.rctx.fromVertices) {
+        for (Vertex vertex : request.getRoutingContext().fromVertices) {
             /* carPickup searches may end in two distinct states: IN_CAR and WALK_FROM_DROP_OFF/WALK_TO_PICKUP
                for forward/reverse searches to be symmetric both initial states need to be created. */
             if (request.carPickup) {
                 states.add(
                     new State(
                     vertex,
-                    request.rctx.originBackEdge,
+                    request.getRoutingContext().originBackEdge,
                     request.getDateTime().getEpochSecond(),
                     request,
                     true,
@@ -71,7 +71,7 @@ public class State implements Cloneable {
                 states.add(
                     new State(
                         vertex,
-                        request.rctx.originBackEdge,
+                        request.getRoutingContext().originBackEdge,
                         request.getDateTime().getEpochSecond(),
                         request,
                         false,
@@ -83,7 +83,7 @@ public class State implements Cloneable {
                     states.add(
                             new State(
                                     vertex,
-                                    request.rctx.originBackEdge,
+                                    request.getRoutingContext().originBackEdge,
                                     request.getDateTime().getEpochSecond(),
                                     request,
                                     false,
@@ -95,7 +95,7 @@ public class State implements Cloneable {
 
             states.add(new State(
                 vertex,
-                request.rctx.originBackEdge,
+                request.getRoutingContext().originBackEdge,
                 request.getDateTime().getEpochSecond(),
                 request
             ));
@@ -105,8 +105,8 @@ public class State implements Cloneable {
 
     public State(RoutingRequest opt) {
         this(
-                opt.rctx.fromVertices == null ? null : opt.rctx.fromVertices.iterator().next(),
-                opt.rctx.originBackEdge,
+                opt.getRoutingContext().fromVertices == null ? null : opt.getRoutingContext().fromVertices.iterator().next(),
+                opt.getRoutingContext().originBackEdge,
                 opt.getDateTime().getEpochSecond(),
                 opt
         );
@@ -427,10 +427,6 @@ public class State implements Cloneable {
         }
         next = existingResultChain;
         return this;
-    }
-
-    public RoutingContext getContext() {
-        return stateData.opt.rctx;
     }
 
     public RoutingRequest getOptions () {

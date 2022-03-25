@@ -687,7 +687,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * routing context becomes irrelevant at that point, since temporary graph elements have been removed and the graph
      * may have been reloaded.
      */
-    public RoutingContext rctx;
+    private RoutingContext rctx;
 
     /**
      * A transit stop that this trip must start from

@@ -65,7 +65,7 @@ public class GraphPathFinder {
 
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
         AStar aStar = new AStar();
-        if (options.rctx == null) {
+        if (options.getRoutingContext() == null) {
             options.setRoutingContext(router.graph);
             // The special long-distance heuristic should be sufficient to constrain the search to the right area.
         }
@@ -85,7 +85,7 @@ public class GraphPathFinder {
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
         }
-        options.rctx.remainingWeightHeuristic = heuristic;
+        options.getRoutingContext().remainingWeightHeuristic = heuristic;
         
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
@@ -96,7 +96,7 @@ public class GraphPathFinder {
         if (timeout <= 0) {
             // Catch the case where advancing to the next (lower) timeout value means the search is timed out
             // before it even begins. Passing a negative relative timeout in the SPT call would mean "no timeout".
-            options.rctx.aborted = true;
+            options.getRoutingContext().aborted = true;
             return null;
         }
         // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
@@ -130,7 +130,7 @@ public class GraphPathFinder {
                 // Try again without slope restrictions, and warn the user in the response.
                 RoutingRequest relaxedRequest = request.clone();
                 relaxedRequest.maxWheelchairSlope = Double.MAX_VALUE;
-                request.rctx.slopeRestrictionRemoved = true;
+                request.getRoutingContext().slopeRestrictionRemoved = true;
                 paths = getPaths(relaxedRequest);
             }
         } catch (RoutingValidationException e) {

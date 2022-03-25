@@ -387,7 +387,7 @@ public class WalkableAreaBuilder {
         Set<Edge> usedEdges = new HashSet<>();
         for (Vertex vertex : startingVertices) {
             options.setRoutingContext(graph, vertex, null);
-            options.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+            options.getRoutingContext().remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
             ShortestPathTree spt = search.getShortestPathTree(options);
             for (Vertex endVertex : startingVertices) {
                 GraphPath path = spt.getPath(endVertex);

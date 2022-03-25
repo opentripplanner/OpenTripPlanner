@@ -72,7 +72,7 @@ public class StreetGraphFinder implements GraphFinder {
       rr.setRoutingContext(graph);
       rr.walkSpeed = 1;
       rr.dominanceFunction = new DominanceFunction.LeastWalk();
-      rr.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+      rr.getRoutingContext().remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
       // RR dateTime defaults to currentTime.
       // If elapsed time is not capped, searches are very slow.
       AStar astar = new AStar();
@@ -81,7 +81,7 @@ public class StreetGraphFinder implements GraphFinder {
       astar.setSkipEdgeStrategy(skipEdgeStrategy);
       astar.getShortestPathTree(rr);
       // Destroy the routing context, to clean up the temporary edges & vertices
-      rr.rctx.close();
+      rr.getRoutingContext().close();
     }
   }
 }

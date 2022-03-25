@@ -32,7 +32,7 @@ public class StateEditorTest {
         request.parkAndRide = true;
         Graph graph = new Graph();
         graph.index = new GraphIndex(graph);
-        request.rctx = new RoutingContext(request, graph);
+        request.setRoutingContext(graph);
         State state = new State(request);
 
         state.stateData.vehicleParked = true;
