@@ -19,6 +19,8 @@ public record AccessibilityRequirements(Strictness strictness,
         KNOWN_INFORMATION_ONLY,
         // trips/stops that are known to be wheelchair-accessible are preferred but those with unknown
         // information are also allowed (but receive extra cost)
+        // it even allows you to use stops/trips which are known to be inaccessible (!) but at
+        // a very severe cost
         ALLOW_UNKNOWN_INFORMATION;
     }
 

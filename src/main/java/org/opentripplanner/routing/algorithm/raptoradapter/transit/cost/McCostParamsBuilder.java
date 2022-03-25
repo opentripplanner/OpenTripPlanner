@@ -10,8 +10,6 @@ import org.opentripplanner.model.AccessibilityRequirements;
 public class McCostParamsBuilder {
     private int boardCost;
     private int transferCost;
-    private int unknownTripAccessibilityCost;
-    private int inaccessibleTripCost;
     private double[] transitReluctanceFactors;
     private double waitReluctanceFactor;
     private AccessibilityRequirements accessibilityRequirements;
@@ -73,25 +71,7 @@ public class McCostParamsBuilder {
         return this;
     }
 
-    public int unknownAccessibilityCost() {
-        return unknownTripAccessibilityCost;
-    }
-
-    public void unknownAccessibilityCost(int unknownAccessibilityCost) {
-        this.unknownTripAccessibilityCost = unknownAccessibilityCost;
-    }
-
-    public int inaccessibleTripCost() {
-        return inaccessibleTripCost;
-    }
-
-    public void inaccessibleTripCost(int inaccessibleTripCost) {
-        this.inaccessibleTripCost = inaccessibleTripCost;
-    }
-
     public McCostParams build() {
         return new McCostParams(this);
     }
-
-
 }

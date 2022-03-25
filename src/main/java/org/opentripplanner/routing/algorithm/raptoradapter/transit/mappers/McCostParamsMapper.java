@@ -29,9 +29,6 @@ public class McCostParamsMapper {
 
         builder.accessibilityMode(request.accessibilityRequirements);
 
-        builder.unknownAccessibilityCost(request.unknownTripAccessibilityPenalty);
-        builder.inaccessibleTripCost(request.inaccessibleTripPenalty);
-
         return builder.build();
     }
 
