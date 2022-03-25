@@ -32,7 +32,6 @@ public class PlainStreetEdgeTest {
         v2 = vertex("maple_2nd", 1.0, 2.0);
         
         proto = new RoutingRequest();
-        proto.setDummyRoutingContext(graph);
         proto.carSpeed = 15.0f;
         proto.walkSpeed = 1.0;
         proto.bikeSpeed = 5.0f;

@@ -43,9 +43,11 @@ public class TestAStar extends TestCase {
 
         String feedId = gg.getFeedIds().iterator().next();
         options.setDateTime(TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0));
-        options.setRoutingContext(gg, feedId + ":Millbrae Caltrain", feedId + ":Mountain View Caltrain");
+        Vertex millbrae = gg.getVertex(feedId + ":Millbrae Caltrain");
+        Vertex mountainView = gg.getVertex(feedId + ":Mountain View Caltrain");
+        options.setRoutingContext(gg, millbrae, mountainView);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":Mountain View Caltrain"));
+        path = spt.getPath(mountainView);
 
         long endTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 13, 29, 0);
 
@@ -54,9 +56,9 @@ public class TestAStar extends TestCase {
         /* test backwards traversal */
         options.setArriveBy(true);
         options.setDateTime(Instant.ofEpochSecond(endTime));
-        options.setRoutingContext(gg, feedId + ":Millbrae Caltrain", feedId + ":Mountain View Caltrain");
+        options.setRoutingContext(gg, millbrae, mountainView);
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex(feedId + ":Millbrae Caltrain"));
+        path = spt.getPath(millbrae);
 
         long expectedStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 39, 0);
 

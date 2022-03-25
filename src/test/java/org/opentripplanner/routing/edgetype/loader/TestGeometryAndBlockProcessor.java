@@ -197,7 +197,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         // Saturday morning
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 0, 5, 0);
         options.setDateTime(Instant.ofEpochSecond(startTime));
-        options.setRoutingContext(graph, stop_g.getLabel(), stop_h.getLabel());
+        options.setRoutingContext(graph, stop_g, stop_h);
         spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_h);
@@ -369,7 +369,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
         startTime.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         options.setDateTime(startTime.toInstant());
-        options.setRoutingContext(graph, feedId + ":Q", destination.getLabel());
+        options.setRoutingContext(graph, graph.getVertex(feedId + ":Q"), destination);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
         GraphPath path = spt.getPath(destination);
 

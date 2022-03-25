@@ -24,7 +24,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DurationComparator;
@@ -1187,21 +1186,17 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             }
         }
 
-        streetRequest.resetRoutingContext();
+        // TODO OTP2 This is needed in order to find the correct from/to vertices for the mode
+        if (streetRequest.rctx != null) {
+            Graph graph = streetRequest.rctx.graph;
+            streetRequest.rctx = new RoutingContext(streetRequest, graph);
+            // check after back reference is established, to allow temp edge cleanup on exceptions
+            streetRequest.rctx.checkIfVerticesFound();
+        }
 
         return streetRequest;
     }
 
-    // TODO OTP2 This is needed in order to find the correct from/to vertices for the mode
-    private void resetRoutingContext() {
-        if (rctx != null) {
-            Graph graph = rctx.graph;
-            rctx = null;
-            setRoutingContext(graph);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     public RoutingRequest clone() {
         try {
@@ -1254,7 +1249,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             } else {
                 LOG.error("attempted to reset routing context using a different graph");
             }
-            return;
         }
     }
 
@@ -1263,16 +1257,11 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * TODO rename - this is not a "setter", it creates a new routingContext, which has side effects on Graph
      *               (Constructors with side effects on their parameters are a bad design).
      */
-    public void setRoutingContext(Graph graph, Edge fromBackEdge, Vertex from, Vertex to) {
+    public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
         if (rctx != null) {
             this.rctx.close();
         }
         this.rctx = new RoutingContext(this, graph, from, to);
-        this.rctx.originBackEdge = fromBackEdge;
-    }
-
-    public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
-        setRoutingContext(graph, null, from, to);
     }
 
     public void setRoutingContext(Graph graph, Set<Vertex> from, Set<Vertex> to) {
@@ -1282,16 +1271,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         if (rctx != null)
             this.rctx.close();
         this.rctx = new RoutingContext(this, graph, from, to);
-    }
-
-    /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
-    public void setRoutingContext(Graph graph, String from, String to) {
-        this.setRoutingContext(graph, graph.getVertex(from), graph.getVertex(to));
-    }
-
-    /** Used in internals API. Make a RoutingContext with no origin or destination vertices specified. */
-    public void setDummyRoutingContext(Graph graph) {
-        this.setRoutingContext(graph, "", "");
     }
 
     public RoutingContext getRoutingContext() {

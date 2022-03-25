@@ -381,7 +381,6 @@ public class WalkableAreaBuilder {
         }
         RoutingRequest options = new RoutingRequest(mode);
         options.dominanceFunction = new DominanceFunction.EarliestArrival();
-        options.setDummyRoutingContext(graph);
         AStar search = new AStar();
         search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
         Set<Edge> usedEdges = new HashSet<>();

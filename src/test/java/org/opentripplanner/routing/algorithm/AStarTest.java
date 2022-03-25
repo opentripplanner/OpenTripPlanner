@@ -84,10 +84,12 @@ public class AStarTest {
     public void testForward() {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
-        options.setRoutingContext(graph, graph.getVertex("56th_24th"), graph.getVertex("leary_20th"));
+        Vertex from = graph.getVertex("56th_24th");
+        Vertex to = graph.getVertex("leary_20th");
+        options.setRoutingContext(graph, from, to);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(graph.getVertex("leary_20th"));
+        GraphPath path = tree.getPath(to);
 
         List<State> states = path.states;
 
@@ -108,11 +110,12 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
         options.setArriveBy(true);
-        options.setRoutingContext(graph, graph.getVertex("56th_24th"),
-                graph.getVertex("leary_20th"));
+        Vertex from = graph.getVertex("56th_24th");
+        Vertex to = graph.getVertex("leary_20th");
+        options.setRoutingContext(graph, from, to);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(graph.getVertex("56th_24th"));
+        GraphPath path = tree.getPath(from);
 
         List<State> states = path.states;
 

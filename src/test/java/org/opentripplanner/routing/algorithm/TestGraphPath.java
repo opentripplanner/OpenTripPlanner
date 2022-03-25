@@ -54,7 +54,7 @@ public class TestGraphPath extends TestCase {
 
         RoutingRequest options = new RoutingRequest();
         options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 0, 0, 0));
-        options.setRoutingContext(graph, stop_a.getLabel(), stop_e.getLabel());
+        options.setRoutingContext(graph, stop_a, stop_e);
         spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_e); /* do not optimize yet, since we are testing optimization */
