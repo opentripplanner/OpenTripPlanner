@@ -866,7 +866,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
      *
      * @return true if successful
      */
-    private boolean addTripToGraphAndBuffer(final Graph graph, final Trip trip,
+    private boolean addTripToGraphAndBuffer(final String feedId, final Graph graph, final Trip trip,
                                             final List<StopTime> stopTimes, final List<StopLocation> stops, TripTimes updatedTripTimes,
                                             final ServiceDate serviceDate, EstimatedVehicleJourney estimatedVehicleJourney) {
 
