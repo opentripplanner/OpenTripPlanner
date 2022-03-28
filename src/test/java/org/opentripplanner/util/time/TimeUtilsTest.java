@@ -96,6 +96,14 @@ public class TimeUtilsTest {
         assertEquals(-3600, TimeUtils.time("-01:00:00"));
         assertEquals(-time(23, 59, 3), TimeUtils.time("-23:59:03"));
         assertEquals(-time(-2, 1, 2,3), TimeUtils.time("-1:02:03-2d"));
+
+        // With default value
+        assertEquals(time(12, 34, 0), TimeUtils.time("12:34", 7));
+        assertEquals(7, TimeUtils.time(null, 7));
+        assertEquals(7, TimeUtils.time("", 7));
+        assertEquals(7, TimeUtils.time("\t \n", 7));
+        assertEquals(time(12, 34, 15), TimeUtils.time(" \n 12:34:15 \t", 7));
+
     }
 
     @Test
