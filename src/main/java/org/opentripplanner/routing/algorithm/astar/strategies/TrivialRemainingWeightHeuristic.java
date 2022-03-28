@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 
 /**
@@ -12,7 +13,7 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void initialize(RoutingRequest options) {}
+    public void initialize(RoutingContext rctx) {}
 
     @Override
     public double estimateRemainingWeight (State s) {

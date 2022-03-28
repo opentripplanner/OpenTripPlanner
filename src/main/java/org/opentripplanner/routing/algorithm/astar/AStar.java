@@ -112,7 +112,7 @@ public class AStar {
         // Since initial states can be multiple, heuristic cannot depend on the initial state.
         // Initializing the bidirectional heuristic is a pretty complicated operation that involves searching through
         // the streets around the origin and destination.
-        runState.heuristic.initialize(runState.options);
+        runState.heuristic.initialize(runState.rctx);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of goal direction heuristic.");
             runState = null; // Search timed out
