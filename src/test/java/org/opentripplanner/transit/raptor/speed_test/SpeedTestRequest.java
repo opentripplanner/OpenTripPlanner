@@ -3,9 +3,7 @@ package org.opentripplanner.transit.raptor.speed_test;
 import java.time.Duration;
 import java.util.List;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
@@ -94,6 +92,7 @@ public class SpeedTestRequest {
     }
 
     private Instant time(int time) {
-        return LocalTime.ofSecondOfDay(time).atDate(config.testDate).atZone(timeZoneId).toInstant();
+        // Note time may be negative and exceed 24 hours
+        return config.testDate.atStartOfDay(timeZoneId).plusSeconds(time).toInstant();
     }
 }
