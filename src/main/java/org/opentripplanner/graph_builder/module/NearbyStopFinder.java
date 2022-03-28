@@ -4,6 +4,7 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.time.Duration;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -17,7 +18,6 @@ import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.ComposingSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
@@ -54,7 +54,7 @@ public class NearbyStopFinder {
 
     public  final boolean useStreets;
     private final Graph graph;
-    private final double durationLimitInSeconds;
+    private final Duration durationLimit;
 
     private DirectGraphFinder directGraphFinder;
 
@@ -63,18 +63,18 @@ public class NearbyStopFinder {
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
      * network or straight line distance based on the presence of OSM street data in the graph.
      */
-    public NearbyStopFinder(Graph graph, double durationLimitInSeconds) {
-        this (graph, durationLimitInSeconds, graph.hasStreets);
+    public NearbyStopFinder(Graph graph, Duration durationLimit) {
+        this (graph, durationLimit, graph.hasStreets);
     }
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius.
      * @param useStreets if true, search via the street network instead of using straight-line distance.
      */
-    public NearbyStopFinder(Graph graph, double durationLimitInSeconds, boolean useStreets) {
+    public NearbyStopFinder(Graph graph, Duration durationLimit, boolean useStreets) {
         this.graph = graph;
         this.useStreets = useStreets;
-        this.durationLimitInSeconds = durationLimitInSeconds;
+        this.durationLimit = durationLimit;
 
         if (!useStreets) {
             // We need to accommodate straight line distance (in meters) but when streets are present we use an
@@ -136,7 +136,7 @@ public class NearbyStopFinder {
             return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, true, routingRequest);
         }
         // It make sense for the directGraphFinder to use meters as a limit, so we convert first
-        double limitMeters = durationLimitInSeconds * new RoutingRequest(TraverseMode.WALK).walkSpeed;
+        double limitMeters = durationLimit.toSeconds() * new RoutingRequest(TraverseMode.WALK).walkSpeed;
         Coordinate c0 = vertex.getCoordinate();
         return directGraphFinder.findClosestStops(c0.y, c0.x, limitMeters);
     }
@@ -185,13 +185,10 @@ public class NearbyStopFinder {
         } else {
             routingRequest.setRoutingContext(graph, null, originVertices);
         }
-        routingRequest.disableRemainingWeightHeuristic = true;
-        routingRequest.getRoutingContext().remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
 
-        var astar = new AStar();
         var skipEdgeStrategy = getSkipEdgeStrategy(reverseDirection, routingRequest);
-        astar.setSkipEdgeStrategy(skipEdgeStrategy);
+        var astar = AStar.allDirections(skipEdgeStrategy);
 
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
@@ -249,7 +246,7 @@ public class NearbyStopFinder {
             boolean reverseDirection,
             RoutingRequest routingRequest
     ) {
-        var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimitInSeconds);
+        var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimit);
 
         // if we compute the accesses for Park+Ride, Bike+Ride and Bike+Transit we don't want to
         // search the full durationLimit as this returns way too many stops.

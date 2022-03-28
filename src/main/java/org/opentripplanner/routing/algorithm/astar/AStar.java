@@ -1,10 +1,14 @@
 package org.opentripplanner.routing.algorithm.astar;
 
 import com.beust.jcommander.internal.Lists;
+import java.time.Duration;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
+import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -36,11 +40,34 @@ public class AStar {
 
     private TraverseVisitor traverseVisitor;
 
+    private final SkipEdgeStrategy skipEdgeStrategy;
+    private final RemainingWeightHeuristic heuristic;
+
+    private AStar(RemainingWeightHeuristic heuristic, SkipEdgeStrategy skipEdgeStrategy) {
+        this.heuristic = heuristic;
+        this.skipEdgeStrategy = skipEdgeStrategy;
+    }
+
+    public static AStar oneToOne() {
+        return new AStar(new EuclideanRemainingWeightHeuristic(), null);
+    }
+
+    public static AStar oneToOne(Duration maxDuration) {
+        return new AStar(new EuclideanRemainingWeightHeuristic(), new DurationSkipEdgeStrategy(maxDuration));
+    }
+
+    public static AStar allDirectionsMaxDuration(Duration maxDuration) {
+        return allDirections(new DurationSkipEdgeStrategy(maxDuration));
+    }
+
+    public static AStar allDirections(SkipEdgeStrategy strategy) {
+        return new AStar(new TrivialRemainingWeightHeuristic(), strategy);
+    }
+
     enum RunStatus {
         RUNNING, STOPPED
     }
 
-    private SkipEdgeStrategy skipEdgeStrategy;
 
     /* TODO instead of having a separate class for search state, we should just make one GenericAStar per request. */
     static class RunState {
@@ -81,9 +108,7 @@ public class AStar {
         runState.rctx = rctx;
         runState.spt = options.getNewShortestPathTree();
 
-        // We want to reuse the heuristic instance in a series of requests for the same target to avoid repeated work.
-        runState.heuristic = runState.rctx.remainingWeightHeuristic;
-
+        runState.heuristic = heuristic;
         // Since initial states can be multiple, heuristic cannot depend on the initial state.
         // Initializing the bidirectional heuristic is a pretty complicated operation that involves searching through
         // the streets around the origin and destination.
@@ -281,9 +306,5 @@ public class AStar {
             }
         }
         return ret;
-    }
-
-    public void setSkipEdgeStrategy(SkipEdgeStrategy skipEdgeStrategy) {
-        this.skipEdgeStrategy = skipEdgeStrategy;
     }
 }

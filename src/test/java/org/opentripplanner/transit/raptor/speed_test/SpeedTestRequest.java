@@ -6,6 +6,7 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_T
 
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -80,8 +81,8 @@ public class SpeedTestRequest {
         return config.walkSpeedMeterPrSecond;
     }
 
-    public double getAccessEgressMaxWalkDurationSeconds() {
-        return config.maxWalkDurationSeconds;
+    public Duration getAccessEgressMaxWalkDuration() {
+        return Duration.ofSeconds(config.maxWalkDurationSeconds);
     }
 
 

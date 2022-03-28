@@ -113,7 +113,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
         options.arriveBy = arriveBy;
         options.setRoutingContext(graph, fromVertex, toVertex);
 
-        var tree = new AStar().getShortestPathTree(options);
+        var tree = AStar.oneToOne().getShortestPathTree(options);
         var path = tree.getPath(
                 arriveBy ? fromVertex : toVertex
         );

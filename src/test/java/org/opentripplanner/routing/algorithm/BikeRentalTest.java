@@ -542,7 +542,7 @@ public class BikeRentalTest extends GraphRoutingTest {
         var bikeRentalOptions = options.getStreetSearchRequest(streetMode);
         bikeRentalOptions.setRoutingContext(graph, fromVertex, toVertex);
 
-        var tree = new AStar().getShortestPathTree(bikeRentalOptions);
+        var tree = AStar.oneToOne().getShortestPathTree(bikeRentalOptions);
         var path = tree.getPath(
                 arriveBy ? fromVertex : toVertex
         );

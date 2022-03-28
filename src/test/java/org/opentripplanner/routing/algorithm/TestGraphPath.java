@@ -29,7 +29,7 @@ public class TestGraphPath extends TestCase {
     
     private Graph graph;
 
-    private final AStar aStar = new AStar();
+    private final AStar aStar = AStar.oneToOne();
 
     public void setUp() throws Exception {
         GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();

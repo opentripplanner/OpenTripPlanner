@@ -32,7 +32,7 @@ public class TestUnroutable {
 
     private final Graph graph = new Graph();
 
-    private final AStar aStar = new AStar();
+    private final AStar aStar = AStar.oneToOne();
 
     @BeforeEach
     public void setUp() throws Exception {

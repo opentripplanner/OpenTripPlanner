@@ -87,7 +87,7 @@ public class AStarTest {
         Vertex from = graph.getVertex("56th_24th");
         Vertex to = graph.getVertex("leary_20th");
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = new AStar().getShortestPathTree(options);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(to);
 
@@ -113,7 +113,7 @@ public class AStarTest {
         Vertex from = graph.getVertex("56th_24th");
         Vertex to = graph.getVertex("leary_20th");
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = new AStar().getShortestPathTree(options);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(from);
 
@@ -155,7 +155,7 @@ public class AStarTest {
         new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = new AStar().getShortestPathTree(options);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
         options.cleanup();
 
         GraphPath path = tree.getPath(to);
@@ -191,7 +191,7 @@ public class AStarTest {
         new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = new AStar().getShortestPathTree(options);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
         options.cleanup();
 
         GraphPath path = tree.getPath(from);
@@ -224,7 +224,7 @@ public class AStarTest {
         targets.add(graph.getVertex("leary_20th"));
 
         SearchTerminationStrategy strategy = new MultiTargetTerminationStrategy(targets);
-        ShortestPathTree tree = new AStar().getShortestPathTree(options, -1, strategy);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options, -1, strategy);
 
         for (Vertex v : targets) {
             GraphPath path = tree.getPath(v);

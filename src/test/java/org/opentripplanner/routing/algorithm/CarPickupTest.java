@@ -178,7 +178,7 @@ public class CarPickupTest extends GraphRoutingTest {
 
         var carPickupOptions = options.getStreetSearchRequest(StreetMode.CAR_PICKUP);
         carPickupOptions.setRoutingContext(graph, fromVertex, toVertex);
-        var tree = new AStar().getShortestPathTree(carPickupOptions);
+        var tree = AStar.oneToOne().getShortestPathTree(carPickupOptions);
         var path = tree.getPath(
                 arriveBy ? fromVertex : toVertex
         );

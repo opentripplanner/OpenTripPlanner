@@ -409,7 +409,7 @@ public abstract class GraphRoutingTest {
         request.setRoutingContext(graph, from, to);
         request.parkAndRide = true;
 
-        AStar aStar = new AStar();
+        AStar aStar = AStar.oneToOne();
         ShortestPathTree tree = aStar.getShortestPathTree(request);
         return tree.getPath(to);
     }

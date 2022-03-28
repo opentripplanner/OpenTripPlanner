@@ -381,12 +381,10 @@ public class WalkableAreaBuilder {
         }
         RoutingRequest options = new RoutingRequest(mode);
         options.dominanceFunction = new DominanceFunction.EarliestArrival();
-        AStar search = new AStar();
-        search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
+        AStar search = AStar.allDirections(new ListedEdgesOnly(edges));
         Set<Edge> usedEdges = new HashSet<>();
         for (Vertex vertex : startingVertices) {
             options.setRoutingContext(graph, vertex, null);
-            options.getRoutingContext().remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
             ShortestPathTree spt = search.getShortestPathTree(options);
             for (Vertex endVertex : startingVertices) {
                 GraphPath path = spt.getPath(endVertex);

@@ -102,7 +102,7 @@ public class TurnCostTest {
     }
     
     private GraphPath checkForwardRouteDuration(RoutingRequest options, int expectedDuration) {
-        ShortestPathTree tree = new AStar().getShortestPathTree(options);
+        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
         GraphPath path = tree.getPath(bottomLeft);
         assertNotNull(path);
         

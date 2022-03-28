@@ -105,7 +105,7 @@ public class TriangleInequalityTest {
         RoutingRequest options = prototypeOptions.clone();
         options.setRoutingContext(graph, start, end);
         
-        AStar aStar = new AStar();
+        AStar aStar = AStar.oneToOne();
         
         ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(end);

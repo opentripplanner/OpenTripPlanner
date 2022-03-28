@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
+import java.time.Duration;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -17,8 +18,8 @@ public class DurationSkipEdgeStrategy implements SkipEdgeStrategy {
 
   private final double durationInSeconds;
 
-  public DurationSkipEdgeStrategy(double durationInSeconds) {
-    this.durationInSeconds = durationInSeconds;
+  public DurationSkipEdgeStrategy(Duration duration) {
+    this.durationInSeconds = duration.toSeconds();
   }
 
   @Override

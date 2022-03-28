@@ -68,17 +68,15 @@ public class StreetGraphFinder implements GraphFinder {
     // TODO make a function that builds normal routing requests from profile requests
     try (RoutingRequest rr = new RoutingRequest(TraverseMode.WALK)) {
       rr.from = new GenericLocation(null, null, lat, lon);
-      rr.oneToMany = true;
       rr.setRoutingContext(graph);
       rr.walkSpeed = 1;
       rr.dominanceFunction = new DominanceFunction.LeastWalk();
-      rr.getRoutingContext().remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
       // RR dateTime defaults to currentTime.
       // If elapsed time is not capped, searches are very slow.
-      AStar astar = new AStar();
+
+      AStar astar = AStar.allDirections(skipEdgeStrategy);
       rr.setNumItineraries(1);
       astar.setTraverseVisitor(visitor);
-      astar.setSkipEdgeStrategy(skipEdgeStrategy);
       astar.getShortestPathTree(rr);
       // Destroy the routing context, to clean up the temporary edges & vertices
       rr.getRoutingContext().close();

@@ -316,7 +316,7 @@ public class DefaultRoutingRequestType {
                         .name("disableRemainingWeightHeuristic")
                         .description("If true, the remaining weight heuristic is disabled.")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.disableRemainingWeightHeuristic)
+                        .dataFetcher(env -> false)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()
