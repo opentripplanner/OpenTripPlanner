@@ -28,7 +28,7 @@ public class AStar {
 
     private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
-    private final boolean verbose = LOG.isDebugEnabled();
+    private static final boolean verbose = LOG.isDebugEnabled();
 
     private final RoutingRequest options;
     private final RoutingContext rctx;
@@ -128,16 +128,7 @@ public class AStar {
         Collection<Edge> edges = options.arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
         for (Edge edge : edges) {
 
-            if (skipEdgeStrategy != null &&
-                    skipEdgeStrategy.shouldSkipEdge(
-                        rctx.fromVertices,
-                        rctx.toVertices,
-                        u,
-                        edge,
-                        spt,
-                        options
-                    )
-            ) {
+            if (skipEdgeStrategy != null && skipEdgeStrategy.shouldSkipEdge(u, edge)) {
                 continue;
             }
 

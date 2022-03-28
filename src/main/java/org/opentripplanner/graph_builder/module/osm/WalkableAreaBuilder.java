@@ -19,7 +19,6 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -339,22 +338,10 @@ public class WalkableAreaBuilder {
         pruneAreaEdges(startingVertices, edges, ringEdges);
     }
 
-    static class ListedEdgesOnly implements SkipEdgeStrategy {
-        private final Set<Edge> edges;
-
-        public ListedEdgesOnly(Set<Edge> edges) {
-            this.edges = edges;
-        }
+    record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy {
 
         @Override
-        public boolean shouldSkipEdge(
-            Set<Vertex> origins,
-            Set<Vertex> targets,
-            State current,
-            Edge edge,
-            ShortestPathTree spt,
-            RoutingRequest traverseOptions
-        ) {
+        public boolean shouldSkipEdge(State current, Edge edge) {
             return !edges.contains(edge);
         }
     }

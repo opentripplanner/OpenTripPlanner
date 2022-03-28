@@ -1,13 +1,8 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import java.time.Duration;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.ShortestPathTree;
-
-import java.util.Set;
 
 /**
  * Skips edges when the specified number of seconds has elapsed. This does not guarantee
@@ -23,14 +18,7 @@ public class DurationSkipEdgeStrategy implements SkipEdgeStrategy {
   }
 
   @Override
-  public boolean shouldSkipEdge(
-      Set<Vertex> origins,
-      Set<Vertex> targets,
-      State current,
-      Edge edge, 
-      ShortestPathTree spt,
-      RoutingRequest traverseOptions
-  ) {
+  public boolean shouldSkipEdge(State current, Edge edge) {
     return current.getElapsedTimeSeconds() > durationInSeconds;
   }
 }
