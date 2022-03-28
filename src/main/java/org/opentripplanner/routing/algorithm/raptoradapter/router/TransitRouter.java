@@ -103,8 +103,9 @@ public class TransitRouter {
         );
 
         // Route transit
-        var transitResponse = new RaptorService<>(router.raptorConfig)
-                .route(raptorRequest, requestTransitDataProvider);
+        var raptorService = new RaptorService<>(router.raptorConfig);
+        var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
+        raptorService.shutdown();
 
         checkIfTransitConnectionExists(transitResponse);
 
@@ -294,6 +295,13 @@ public class TransitRouter {
             AdditionalSearchDays additionalSearchDays,
             DebugTimingAggregator debugTimingAggregator
     ) {
-        return new TransitRouter(request, router, transitSearchTimeZero, additionalSearchDays, debugTimingAggregator).route();
+        var transitRouter = new TransitRouter(
+                request,
+                router,
+                transitSearchTimeZero,
+                additionalSearchDays,
+                debugTimingAggregator
+        );
+        return transitRouter.route();
     }
 }
