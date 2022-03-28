@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -30,6 +31,11 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
 
         this.feedId = feedId;
         this.id = id;
+    }
+
+    @Nullable
+    public static FeedScopedId ofNullable(@NotNull String feedId, @Nullable String id) {
+        return id == null ? null : new FeedScopedId(feedId, id);
     }
 
     public String getFeedId() {
