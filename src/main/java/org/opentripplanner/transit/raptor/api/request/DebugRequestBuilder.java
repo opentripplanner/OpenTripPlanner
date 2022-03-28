@@ -125,6 +125,14 @@ public class DebugRequestBuilder {
     }
 
     public DebugRequest build() {
-        return new DebugRequest(this);
+        return new DebugRequest(
+                List.copyOf(stops),
+                List.copyOf(path),
+                debugPathFromStopIndex,
+                stopArrivalListener,
+                patternRideDebugListener,
+                pathFilteringListener,
+                logger
+        );
     }
 }
