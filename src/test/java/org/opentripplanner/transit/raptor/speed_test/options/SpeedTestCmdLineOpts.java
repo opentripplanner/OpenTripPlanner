@@ -4,13 +4,12 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.opentripplanner.transit.raptor.speed_test.SpeedTestProfile;
+import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 
 public class SpeedTestCmdLineOpts {
 

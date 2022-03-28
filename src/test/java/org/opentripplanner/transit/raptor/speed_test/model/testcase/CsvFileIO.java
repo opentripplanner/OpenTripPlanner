@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.testcase;
+package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
 import com.csvreader.CsvReader;
 import com.google.common.collect.ArrayListMultimap;
@@ -18,7 +18,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 import org.slf4j.Logger;

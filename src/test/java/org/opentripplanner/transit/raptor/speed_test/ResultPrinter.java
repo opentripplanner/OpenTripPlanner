@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestTimer;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseFailedException;
+import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
+import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseFailedException;
 import org.opentripplanner.util.TableFormatter;
 
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.testcase;
+package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
 import java.util.Collection;
 import java.util.List;

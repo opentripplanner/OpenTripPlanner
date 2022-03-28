@@ -5,9 +5,10 @@ import java.util.List;
 import java.time.Instant;
 import java.time.ZoneId;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
 
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
@@ -63,12 +64,12 @@ public class SpeedTestRequest {
         request.modes = input.modes();
 
         request.raptorOptions
-                .withProfile(profile.raptorProfile)
-                .withOptimizations(profile.optimizations)
-                .withSearchDirection(profile.direction);
+                .withProfile(profile.raptorProfile())
+                .withOptimizations(profile.optimizations())
+                .withSearchDirection(profile.direction());
 
 
-        if (profile.raptorProfile.isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
+        if (profile.raptorProfile().isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
             request.searchWindow = Duration.ZERO;
         }
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.model;
+package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
 import java.util.Optional;
 import org.opentripplanner.model.FeedScopedId;

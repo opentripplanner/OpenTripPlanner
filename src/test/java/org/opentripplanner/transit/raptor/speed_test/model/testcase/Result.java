@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.testcase;
+package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.CompositeComparator;

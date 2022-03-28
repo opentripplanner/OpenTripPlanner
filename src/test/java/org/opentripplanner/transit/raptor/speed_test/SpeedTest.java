@@ -19,12 +19,13 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestTimer;
+import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
+import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseInput;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.CsvFileIO;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseInput;
 import org.opentripplanner.util.OtpAppException;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;

@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.model;
+package org.opentripplanner.transit.raptor.speed_test.model.timer;
 
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter.Id;
