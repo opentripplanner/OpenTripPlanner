@@ -995,13 +995,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return Duration.between(dateTime, Instant.now()).abs().toSeconds() < NOW_THRESHOLD_SEC;
     }
 
-    /**
-     * Currently only one itinerary is returned for a direct street search
-     */
-    public int getNumItinerariesForDirectStreetSearch() {
-        return 1;
-    }
-
     public void setPageCursor(String pageCursor) {
         this.pageCursor = PageCursor.decode(pageCursor);
     }
@@ -1075,8 +1068,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public String toString(String sep) {
         return from + sep + to + sep + dateTime + sep
-                + arriveBy + sep + bicycleOptimizeType + sep + streetSubRequestModes.getAsStr() + sep
-                + getNumItinerariesForDirectStreetSearch();
+                + arriveBy + sep + bicycleOptimizeType + sep + streetSubRequestModes.getAsStr();
     }
 
     public void removeMode(TraverseMode mode) {

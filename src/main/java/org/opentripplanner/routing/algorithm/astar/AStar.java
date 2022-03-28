@@ -30,7 +30,7 @@ public class AStar {
 
     private static final boolean verbose = LOG.isDebugEnabled();
 
-    private final RoutingRequest options;
+    private final boolean arriveBy;
     private final RoutingContext rctx;
     private final RemainingWeightHeuristic heuristic;
     private final SkipEdgeStrategy skipEdgeStrategy;
@@ -56,13 +56,13 @@ public class AStar {
         this.heuristic = heuristic;
         this.skipEdgeStrategy = skipEdgeStrategy;
         this.traverseVisitor = traverseVisitor;
-        this.options = options;
+        this.arriveBy = options.arriveBy;
         this.terminationStrategy = terminationStrategy;
         this.timeout = timeout;
 
         this.rctx = options.getRoutingContext();
         this.spt = options.getNewShortestPathTree();
-        heuristic.initialize(rctx);
+        this.heuristic.initialize(rctx);
 
         // Priority Queue.
         // The queue is self-resizing, so we initialize it to have size = O(sqrt(|V|)) << |V|.
@@ -125,7 +125,7 @@ public class AStar {
             LOG.debug("   vertex " + u_vertex);
         }
         
-        Collection<Edge> edges = options.arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
+        Collection<Edge> edges = arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
         for (Edge edge : edges) {
 
             if (skipEdgeStrategy != null && skipEdgeStrategy.shouldSkipEdge(u, edge)) {
@@ -210,14 +210,11 @@ public class AStar {
             }
             if (rctx.toVertices != null && rctx.toVertices.contains(u.getVertex()) && u.isFinal()) {
                 targetAcceptedStates.add(u);
-                // new GraphPath(runState.u, false).dump();
 
-                /* Break out of the search if we've found the requested number of paths. */
-                // TODO Refactor. This check for getNumItineraries always returns 1
-                if (targetAcceptedStates.size() >= options.getNumItinerariesForDirectStreetSearch()) {
-                    LOG.debug("total vertices visited {}", nVisited);
-                    break;
-                }
+                // Break out of the search if we've found the requested number of paths.
+                // Currently,  we can only find one path per search.
+                LOG.debug("total vertices visited {}", nVisited);
+                break;
             }
         }
     }
