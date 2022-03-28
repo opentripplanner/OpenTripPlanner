@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.google.common.collect.Multimap;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +39,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  */
 class DirectTransferGeneratorTest extends GraphRoutingTest {
 
-    private static final double MAX_TRANSFER_DURATION = 3600;
+    private static final Duration MAX_TRANSFER_DURATION = Duration.ofSeconds(3600);
     private TransitStopVertex S0, S11, S12, S21, S22;
     private StreetVertex V0, V11, V12, V21, V22;
 

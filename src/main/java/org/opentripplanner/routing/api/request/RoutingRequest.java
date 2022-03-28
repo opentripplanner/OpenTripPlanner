@@ -3,7 +3,6 @@ package org.opentripplanner.routing.api.request;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -1405,11 +1404,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return bannedRoutes;
     }
 
-    public double getMaxAccessEgressDurationSecondsForMode(StreetMode mode) {
-        return maxAccessEgressDurationSecondsForMode.getOrDefault(
+    public Duration getMaxAccessEgressDuration(StreetMode mode) {
+        Double seconds = maxAccessEgressDurationSecondsForMode.getOrDefault(
             mode,
             maxAccessEgressDurationSeconds
         );
+        return Duration.ofSeconds(seconds.longValue());
     }
 
     /**

@@ -53,11 +53,11 @@ public class AStar {
     }
 
     public static AStar oneToOne(Duration maxDuration) {
-        return new AStar(new EuclideanRemainingWeightHeuristic(), new DurationSkipEdgeStrategy(maxDuration.toSeconds()));
+        return new AStar(new EuclideanRemainingWeightHeuristic(), new DurationSkipEdgeStrategy(maxDuration));
     }
 
     public static AStar allDirectionsMaxDuration(Duration maxDuration) {
-        return allDirections(new DurationSkipEdgeStrategy(maxDuration.toSeconds()));
+        return allDirections(new DurationSkipEdgeStrategy(maxDuration));
     }
 
     public static AStar allDirections(SkipEdgeStrategy strategy) {
