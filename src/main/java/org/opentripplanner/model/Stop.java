@@ -70,19 +70,38 @@ public final class Stop extends StationElement implements StopLocation {
 
   /** @see #stopForTest(String, double, double, Station) */
   public static Stop stopForTest(String idAndName, double lat, double lon) {
-    return stopForTest(idAndName, lat, lon, null);
+    return stopForTest(idAndName, null, lat, lon, null);
   }
 
-    /**
-     * Create a minimal Stop object for unit-test use, where the test only care about id, name and
-     * coordinate. The feedId is static set to "F"
-     */
+  /** @see #stopForTest(String, double, double, Station) */
+  public static Stop stopForTest(String idAndName, String desc, double lat, double lon) {
+    return stopForTest(idAndName, desc, lat, lon, null);
+  }
+
+  /**
+   * Create a minimal Stop object for unit-test use, where the test only care about id, name and
+   * coordinate. The feedId is static set to "F"
+   */
   public static Stop stopForTest(String idAndName, double lat, double lon, Station parent) {
+    return stopForTest(idAndName, null, lat, lon, parent);
+  }
+
+  /**
+   * Create a minimal Stop object for unit-test use, where the test only care about id, name,
+   * description and coordinate. The feedId is static set to "F"
+   */
+  public static Stop stopForTest(
+          String idAndName,
+          String desc,
+          double lat,
+          double lon,
+          Station parent
+  ) {
     var stop = new Stop(
         new FeedScopedId("F", idAndName),
         new NonLocalizedString(idAndName),
         idAndName,
-        null,
+        desc,
         new WgsCoordinate(lat, lon),
         null,
         null,
