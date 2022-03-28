@@ -3,18 +3,6 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.Iterables;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.OptionalInt;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -79,6 +67,19 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Builds a street graph from OpenStreetMap data.
@@ -662,7 +663,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 setWayName(way);
 
                 StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(way,
-                        wayData.getPermission(), graph, banDiscouragedWalking, banDiscouragedBiking,
+                        wayData.getPermission(), banDiscouragedWalking, banDiscouragedBiking,
                     issueStore
                 );
                 if (!OSMFilter.isWayRoutable(way) || permissions.allowsNothing())
@@ -957,7 +958,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         ) {
             ElevatorOffboardVertex offboardVertex = new ElevatorOffboardVertex(graph,
                     sourceVertexLabel + "_offboard", sourceVertex.getX(),
-                    sourceVertex.getY(), levelName
+                    sourceVertex.getY(), new NonLocalizedString(levelName)
             );
 
             new FreeEdge(sourceVertex, offboardVertex);
@@ -965,11 +966,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             ElevatorOnboardVertex onboardVertex = new ElevatorOnboardVertex(graph,
                     sourceVertexLabel + "_onboard", sourceVertex.getX(),
-                    sourceVertex.getY(), levelName
+                    sourceVertex.getY(), new NonLocalizedString(levelName)
             );
 
             new ElevatorBoardEdge(offboardVertex, onboardVertex);
-            new ElevatorAlightEdge(onboardVertex, offboardVertex, levelName);
+            new ElevatorAlightEdge(onboardVertex, offboardVertex, new NonLocalizedString(levelName));
 
             // accumulate onboard vertices to so they can be connected by hop edges later
             onboardVertices.add(onboardVertex);
@@ -1076,13 +1077,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 }
                                 break;
                             }
-                            TurnRestriction restriction = new TurnRestriction();
-                            restriction.from = from;
-                            restriction.to = to;
-                            restriction.type = restrictionTag.type;
-                            restriction.modes = restrictionTag.modes;
-                            restriction.time = restrictionTag.time;
-                            graph.addTurnRestriction(from, restriction);
+                            TurnRestriction restriction =
+                                    new TurnRestriction(
+                                            from,
+                                            to,
+                                            restrictionTag.type,
+                                            restrictionTag.modes,
+                                            restrictionTag.time
+                                    );
+                            from.addTurnRestriction(restriction);
                         }
                     }
                 }
@@ -1243,11 +1246,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             StreetTraversalPermission permissionsBack = permissionPair.second;
 
             if (permissionsFront.allowsAnything()) {
-                street = getEdgeForStreet(startEndpoint, endEndpoint, way, index, startNode, endNode, length,
+                street = getEdgeForStreet(startEndpoint, endEndpoint, way, index, length,
                         permissionsFront, geometry, false);
             }
             if (permissionsBack.allowsAnything()) {
-                backStreet = getEdgeForStreet(endEndpoint, startEndpoint, way, index, endNode, startNode, length,
+                backStreet = getEdgeForStreet(endEndpoint, startEndpoint, way, index, length,
                         permissionsBack, backGeometry, true);
             }
             if (street != null && backStreet != null) {
@@ -1266,18 +1269,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         private StreetEdge getEdgeForStreet(OsmVertex startEndpoint, OsmVertex endEndpoint,
-                                                 OSMWay way, int index, long startNode, long endNode, double length,
-                                                 StreetTraversalPermission permissions, LineString geometry, boolean back) {
+                                            OSMWay way, int index, double length,
+                                            StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
             String label = "way " + way.getId() + " from " + index;
             label = label.intern();
             I18NString name = getNameForWay(way, label);
-
-            // consider the elevation gain of stairs, roughly
-            boolean steps = way.isSteps();
-            if (steps) {
-                length *= 2;
-            }
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
@@ -1307,6 +1304,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             if (!way.hasTag("name") && !way.hasTag("ref")) {
                 street.setHasBogusName(true);
             }
+
+            boolean steps = way.isSteps();
             street.setStairs(steps);
 
             /* TODO: This should probably generalized somehow? */
@@ -1325,9 +1324,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             if (customNamer != null) {
                 customNamer.nameWithEdge(way, street);
             }
-
-            // save the way ID so we can match with OpenTraffic
-            street.wayId = way.getId();
 
             return street;
         }

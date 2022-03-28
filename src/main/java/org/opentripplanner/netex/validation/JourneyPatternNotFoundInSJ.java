@@ -7,10 +7,8 @@ import org.rutebanken.netex.model.ServiceJourney;
 class JourneyPatternNotFoundInSJ extends AbstractHMapValidationRule<String, ServiceJourney> {
 
   @Override
-  public Status validate(String key, ServiceJourney sj) {
-    return index.getJourneyPatternsById().lookup(getPatternId(sj)) == null
-        ?  Status.DISCARD
-        : Status.OK;
+  public Status validate(ServiceJourney sj) {
+    return index.getJourneyPatternsById().lookup(getPatternId(sj)) == null ? Status.DISCARD : Status.OK;
   }
 
   @Override

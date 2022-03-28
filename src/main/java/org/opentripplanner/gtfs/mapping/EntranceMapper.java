@@ -1,16 +1,25 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.Entrance;
-import org.opentripplanner.util.MapUtils;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.model.Entrance;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.TranslationHelper;
 
-/** Responsible for mapping GTFS Entrance into the OTP model. */
+/**
+ * Responsible for mapping GTFS Entrance into the OTP model.
+ */
 class EntranceMapper {
 
-    private Map<org.onebusaway.gtfs.model.Stop, Entrance> mappedEntrances = new HashMap<>();
+    private final Map<org.onebusaway.gtfs.model.Stop, Entrance> mappedEntrances = new HashMap<>();
+
+    private final TranslationHelper translationHelper;
+
+    EntranceMapper(TranslationHelper translationHelper) {
+        this.translationHelper = translationHelper;
+    }
 
     Collection<Entrance> map(Collection<org.onebusaway.gtfs.model.Stop> allEntrances) {
         return MapUtils.mapToList(allEntrances, this::map);
@@ -31,14 +40,20 @@ class EntranceMapper {
 
         StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
+        final I18NString name = translationHelper.getTranslation(
+                org.onebusaway.gtfs.model.Stop.class,
+                "name",
+                base.getId().getId(),
+                base.getName());
+
         return new Entrance(
-            base.getId(),
-            base.getName(),
-            base.getCode(),
-            base.getDescription(),
-            base.getCoordinate(),
-            base.getWheelchairBoarding(),
-            base.getLevel()
+                base.getId(),
+                name,
+                base.getCode(),
+                base.getDescription(),
+                base.getCoordinate(),
+                base.getWheelchairBoarding(),
+                base.getLevel()
         );
     }
 }

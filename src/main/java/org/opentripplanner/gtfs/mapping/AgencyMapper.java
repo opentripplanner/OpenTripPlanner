@@ -13,7 +13,7 @@ class AgencyMapper {
 
     private final Map<org.onebusaway.gtfs.model.Agency, Agency> mappedAgencies = new HashMap<>();
 
-    private String feedId;
+    private final String feedId;
 
     public AgencyMapper(String feedId) {
         this.feedId = feedId;

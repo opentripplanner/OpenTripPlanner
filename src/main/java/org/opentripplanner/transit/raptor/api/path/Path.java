@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.api.path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -263,6 +264,7 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
             buf.append("[")
                     .time(startTime, endTime)
                     .duration(endTime - startTime)
+                    .space().append(numberOfTransfers + "tx")
                     .generalizedCostSentiSec(generalizedCost);
 
             if(appendToSummary != null) {
@@ -327,9 +329,16 @@ public class Path<T extends RaptorTripSchedule> implements Comparable<Path<T>>{
     private static <S extends RaptorTripSchedule> int countNumberOfTransfers(
         AccessPathLeg<S> accessLeg, EgressPathLeg<S> egressPathLeg
     ) {
-        return accessLeg.access().numberOfRides()
-            // Skip first transit
-            + (int)accessLeg.nextLeg().nextLeg().stream().filter(PathLeg::isTransitLeg).count()
-            + egressPathLeg.egress().numberOfRides();
+        int nAccessRides = accessLeg.access().numberOfRides();
+        int nTransitRides = (int) accessLeg
+                .stream()
+                .filter(PathLeg::isTransitLeg)
+                .map(PathLeg::asTransitLeg)
+                .filter(Predicate.not(TransitPathLeg::isStaySeatedOntoNextLeg))
+                .count();
+        int nEgressRides = egressPathLeg.egress().numberOfRides();
+
+        // Remove one boarding to get the count of transfers only.
+        return nAccessRides + nTransitRides + nEgressRides - 1;
     }
 }

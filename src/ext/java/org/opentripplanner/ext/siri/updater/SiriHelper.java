@@ -16,7 +16,7 @@ import java.util.UUID;
 public class SiriHelper {
     private static final Logger LOG =  LoggerFactory.getLogger(SiriHelper.class);
 
-    private static DatatypeFactory datatypeFactory;
+    private static final DatatypeFactory datatypeFactory;
 
     static {
         try {

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Locale;
+import org.opentripplanner.util.I18NString;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances;
@@ -107,17 +107,17 @@ public abstract class Edge implements Serializable {
     public abstract State traverse(State s0);
 
     /**
-     * Gets english localized name
-     * @return english localized name
+     * Returns the default name of the edge
      */
-    public abstract String getName();
+    public String getDefaultName() {
+        I18NString name = getName();
+        return name != null ? name.toString() : null;
+    }
 
     /**
-     * Gets wanted localization
-     * @param locale wanted locale
-     * @return Localized in specified locale name
+     * Returns the name of the edge
      */
-    public abstract String getName(Locale locale);
+    public abstract I18NString getName();
 
     // TODO Add comments about what a "bogus name" is.
     public boolean hasBogusName() {

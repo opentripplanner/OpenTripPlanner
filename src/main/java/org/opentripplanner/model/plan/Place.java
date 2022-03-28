@@ -9,6 +9,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
+import org.opentripplanner.util.I18NString;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -18,7 +19,7 @@ public class Place {
     /** 
      * For transit stops, the name of the stop.  For points of interest, the name of the POI.
      */
-    public final String name;
+    public final I18NString name;
 
     /**
      * The coordinate of the place.
@@ -47,7 +48,7 @@ public class Place {
     public final VehicleParkingWithEntrance vehicleParkingWithEntrance;
 
     private Place(
-            String name,
+            I18NString name,
             WgsCoordinate coordinate,
             VertexType vertexType,
             StopLocation stop,
@@ -79,7 +80,7 @@ public class Place {
      * just the necessary information for a human to identify the place in a given the context.
      */
     public String toStringShort() {
-        StringBuilder buf = new StringBuilder(name);
+        StringBuilder buf = new StringBuilder(name.toString());
         if(stop != null) {
             buf.append(" (").append(stop.getId()).append(")");
         } else {
@@ -92,7 +93,7 @@ public class Place {
     @Override
     public String toString() {
         return ToStringBuilder.of(Place.class)
-                .addStr("name", name)
+                .addStr("name", name.toString())
                 .addObj("stop", stop)
                 .addObj("coordinate", coordinate)
                 .addEnum("vertexType", vertexType)
@@ -101,7 +102,7 @@ public class Place {
                 .toString();
     }
 
-    public static Place normal(Double lat, Double lon, String name) {
+    public static Place normal(Double lat, Double lon, I18NString name) {
         return new Place(
                 name,
                 WgsCoordinate.creatOptionalCoordinate(lat, lon),
@@ -110,7 +111,7 @@ public class Place {
         );
     }
 
-    public static Place normal(Vertex vertex, String name) {
+    public static Place normal(Vertex vertex, I18NString name) {
         return new Place(
                 name,
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
@@ -143,9 +144,9 @@ public class Place {
         );
     }
 
-    public static Place forVehicleRentalPlace(VehicleRentalStationVertex vertex, String name) {
+    public static Place forVehicleRentalPlace(VehicleRentalStationVertex vertex) {
         return new Place(
-                name,
+                vertex.getName(),
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.VEHICLERENTAL,
                 null,
@@ -154,7 +155,7 @@ public class Place {
         );
     }
 
-    public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, String name, RoutingRequest request) {
+    public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, RoutingRequest request) {
         TraverseMode traverseMode = null;
         if (request.streetSubRequestModes.getCar()) {
             traverseMode = TraverseMode.CAR;
@@ -165,7 +166,7 @@ public class Place {
         boolean realTime = request.useVehicleParkingAvailabilityInformation
                 && vertex.getVehicleParking().hasRealTimeDataForMode(traverseMode, request.wheelchairAccessible);
         return new Place(
-                name,
+                vertex.getName(),
                 WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),
                 VertexType.VEHICLEPARKING,
                 null,

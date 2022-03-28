@@ -8,6 +8,9 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.onebusaway.gtfs.model.Transfer;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.IgnoredGtfsTransfer;
+import org.opentripplanner.graph_builder.issues.InvalidGtfsTransfer;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -64,6 +67,21 @@ class TransferMapper {
    */
   private static final int FORBIDDEN = 3;
 
+  /**
+   * Passengers can transfer from one trip to another by staying onboard the same vehicle.
+   *
+   * @see <a href="https://github.com/google/transit/pull/303">GTFS proposal</a>
+   */
+  private static final int STAY_SEATED = 4;
+
+  /**
+   * In-seat transfers are not allowed between sequential trips. The passenger must alight from the
+   * vehicle and re-board.
+   *
+   * @see <a href="https://github.com/google/transit/pull/303">GTFS proposal</a>
+   */
+  private static final int STAY_SEATED_NOT_ALLOWED = 5;
+
 
   private final RouteMapper routeMapper;
 
@@ -74,22 +92,25 @@ class TransferMapper {
   private final TripMapper tripMapper;
 
   private final TripStopTimes stopTimesByTrip;
+  private final DataImportIssueStore issueStore;
 
   private final Multimap<Route, Trip> tripsByRoute = ArrayListMultimap.create();
 
 
   TransferMapper(
-      RouteMapper routeMapper,
-      StationMapper stationMapper,
-      StopMapper stopMapper,
-      TripMapper tripMapper,
-      TripStopTimes stopTimesByTrip
+          RouteMapper routeMapper,
+          StationMapper stationMapper,
+          StopMapper stopMapper,
+          TripMapper tripMapper,
+          TripStopTimes stopTimesByTrip,
+          DataImportIssueStore issueStore
   ) {
     this.routeMapper = routeMapper;
     this.stationMapper = stationMapper;
     this.stopMapper = stopMapper;
     this.tripMapper = tripMapper;
     this.stopTimesByTrip = stopTimesByTrip;
+    this.issueStore = issueStore;
   }
 
   static TransferPriority mapTypeToPriority(int type) {
@@ -98,6 +119,8 @@ class TransferMapper {
         return TransferPriority.NOT_ALLOWED;
       case GUARANTEED:
       case MIN_TIME:
+      case STAY_SEATED:
+      case STAY_SEATED_NOT_ALLOWED:
         return TransferPriority.ALLOWED;
       case RECOMMENDED:
         return TransferPriority.RECOMMENDED;
@@ -121,12 +144,22 @@ class TransferMapper {
 
     // If this transfer do not give any advantages in the routing, then drop it
     if(constraint.isRegularTransfer()) {
-      LOG.warn("Transfer skipped - no effect on routing: " + rhs);
+      issueStore.add(new IgnoredGtfsTransfer(rhs));
+      return null;
+    }
+
+    if (constraint.isStaySeated() && (fromTrip == null || toTrip == null)) {
+      issueStore.add(new InvalidGtfsTransfer("from_trip_id and to_trip_id must exist for in-seat transfer", rhs));
       return null;
     }
 
     TransferPoint fromPoint = mapTransferPoint(rhs.getFromStop(), rhs.getFromRoute(), fromTrip, false);
     TransferPoint toPoint = mapTransferPoint(rhs.getToStop(), rhs.getToRoute(), toTrip, true);
+
+    if (fromPoint == null || toPoint == null) {
+      issueStore.add(new InvalidGtfsTransfer("fromPoint / toPoint doesn't exist", rhs));
+      return null;
+    }
 
     return new ConstrainedTransfer(null, fromPoint, toPoint, constraint);
   }
@@ -143,7 +176,15 @@ class TransferMapper {
     var builder = TransferConstraint.create();
 
     builder.guaranteed(rhs.getTransferType() == GUARANTEED);
-    builder.staySeated(sameBlockId(fromTrip, toTrip));
+
+    // A transfer is stay seated, if it is either explicitly mapped as such, or in the same block
+    // and not explicitly disallowed.
+    builder.staySeated(
+            rhs.getTransferType() == STAY_SEATED ||
+            (rhs.getTransferType() != STAY_SEATED_NOT_ALLOWED && sameBlockId(fromTrip, toTrip))
+
+    );
+
     builder.priority(mapTypeToPriority(rhs.getTransferType()));
 
     if(rhs.isMinTransferTimeSet()) {
@@ -210,8 +251,8 @@ class TransferMapper {
 
     for (int i = firstStopPos; i < lastStopPos; i++) {
       StopTime stopTime = stopTimes.get(i);
-      if(boardTrip && !stopTime.getPickupType().isRoutable()) { continue; }
-      if(!boardTrip && !stopTime.getDropOffType().isRoutable()) { continue; }
+      if(boardTrip && stopTime.getPickupType().isNotRoutable()) { continue; }
+      if(!boardTrip && stopTime.getDropOffType().isNotRoutable()) { continue; }
 
       if(stopMatches.test(stopTime.getStop())) {
         return i;

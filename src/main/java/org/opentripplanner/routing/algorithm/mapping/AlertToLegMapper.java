@@ -15,12 +15,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 public class AlertToLegMapper {
 
-    public static void addTransitAlertPatchesToLeg(Graph graph, Leg leg, boolean isFirstLeg, Locale requestedLocale) {
+    public static void addTransitAlertPatchesToLeg(Graph graph, Leg leg, boolean isFirstLeg) {
 
         // Alert patches are only relevant for transit legs
         if (!leg.isTransitLeg()) { return; }
@@ -42,7 +41,7 @@ public class AlertToLegMapper {
                     leg.getServiceDate()
             ));
             alerts.addAll(getAlertsForStop(graph, (Stop) fromStop));
-            addTransitAlertPatchesToLeg(leg, departingStopConditions, alerts, requestedLocale, legStartTime, legEndTime);
+            addTransitAlertPatchesToLeg(leg, departingStopConditions, alerts, legStartTime, legEndTime);
         }
         if (toStop instanceof Stop) {
             Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, (Stop) toStop, routeId);
@@ -50,7 +49,7 @@ public class AlertToLegMapper {
                     leg.getServiceDate()
             ));
             alerts.addAll(getAlertsForStop(graph, (Stop) toStop));
-            addTransitAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, requestedLocale, legStartTime, legEndTime);
+            addTransitAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, legStartTime, legEndTime);
         }
 
         if (leg.getIntermediateStops() != null) {
@@ -64,7 +63,7 @@ public class AlertToLegMapper {
                     Date stopArrival = visit.arrival.getTime();
                     Date stopDepature = visit.departure.getTime();
 
-                    addTransitAlertPatchesToLeg(leg, StopCondition.PASSING, alerts, requestedLocale, stopArrival, stopDepature);
+                    addTransitAlertPatchesToLeg(leg, StopCondition.PASSING, alerts, stopArrival, stopDepature);
                 }
             }
         }
@@ -74,19 +73,19 @@ public class AlertToLegMapper {
         // trips - alerts tagged on ServiceDate
         patches = alertPatchService(graph)
                 .getTripAlerts(leg.getTrip().getId(), leg.getServiceDate());
-        addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
+        addTransitAlertPatchesToLeg(leg, patches, legStartTime, legEndTime);
 
         // trips - alerts tagged on any date
         patches = alertPatchService(graph).getTripAlerts(leg.getTrip().getId(), null);
-        addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
+        addTransitAlertPatchesToLeg(leg, patches, legStartTime, legEndTime);
 
         // route
         patches = alertPatchService(graph).getRouteAlerts(leg.getRoute().getId());
-        addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
+        addTransitAlertPatchesToLeg(leg, patches, legStartTime, legEndTime);
 
         // agency
         patches = alertPatchService(graph).getAgencyAlerts(leg.getAgency().getId());
-        addTransitAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
+        addTransitAlertPatchesToLeg(leg, patches, legStartTime, legEndTime);
 
         // Filter alerts when there are multiple timePeriods for each alert
         leg.getTransitAlerts().removeIf(alertPatch ->  
@@ -261,7 +260,7 @@ public class AlertToLegMapper {
     }
 
 
-    private static void addTransitAlertPatchesToLeg(Leg leg, Collection<StopCondition> stopConditions, Collection<TransitAlert> alertPatches, Locale requestedLocale, Date fromTime, Date toTime) {
+    private static void addTransitAlertPatchesToLeg(Leg leg, Collection<StopCondition> stopConditions, Collection<TransitAlert> alertPatches, Date fromTime, Date toTime) {
         if (alertPatches != null) {
             for (TransitAlert alert : alertPatches) {
                 if (alert.displayDuring(fromTime.getTime() / 1000, toTime.getTime() / 1000)) {
@@ -281,7 +280,7 @@ public class AlertToLegMapper {
         }
     }
 
-    private static void addTransitAlertPatchesToLeg(Leg leg, Collection<TransitAlert> alertPatches, Locale requestedLocale, Date fromTime, Date toTime) {
-        addTransitAlertPatchesToLeg(leg, null, alertPatches, requestedLocale, fromTime, toTime);
+    private static void addTransitAlertPatchesToLeg(Leg leg, Collection<TransitAlert> alertPatches, Date fromTime, Date toTime) {
+        addTransitAlertPatchesToLeg(leg, null, alertPatches, fromTime, toTime);
     }
 }

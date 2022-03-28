@@ -5,12 +5,16 @@ import static org.opentripplanner.common.geometry.GeometryUtils.getGeometryFacto
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
+import org.opentripplanner.util.I18NString;
 import java.util.stream.Collectors;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
+import org.opentripplanner.util.NonLocalizedString;
+import org.locationtech.jts.geom.Point;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
@@ -22,7 +26,7 @@ public class Station extends TransitEntity implements StopCollection {
   private static final long serialVersionUID = 1L;
   public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
 
-  private final String name;
+  private final I18NString name;
 
   private final String code;
 
@@ -37,7 +41,7 @@ public class Station extends TransitEntity implements StopCollection {
   /**
    * URL to a web page containing information about this particular station
    */
-  private final String url;
+  private final I18NString url;
 
   private final TimeZone timezone;
 
@@ -46,14 +50,14 @@ public class Station extends TransitEntity implements StopCollection {
   private final Set<StopLocation> childStops = new HashSet<>();
 
   public Station(
-      FeedScopedId id,
-      String name,
-      WgsCoordinate coordinate,
-      String code,
-      String description,
-      String url,
-      TimeZone timezone,
-      StopTransferPriority priority
+          FeedScopedId id,
+          I18NString name,
+          WgsCoordinate coordinate,
+          String code,
+          String description,
+          I18NString url,
+          TimeZone timezone,
+          StopTransferPriority priority
   ) {
     super(id);
     this.name = name;
@@ -74,7 +78,7 @@ public class Station extends TransitEntity implements StopCollection {
   public static Station stationForTest(String idAndName, double lat, double lon) {
     return new Station(
             new FeedScopedId("F", idAndName),
-            idAndName,
+            new NonLocalizedString(idAndName),
             new WgsCoordinate(lat, lon),
             idAndName,
             "Station " + idAndName,
@@ -99,7 +103,7 @@ public class Station extends TransitEntity implements StopCollection {
     return "<Station " + getId() + ">";
   }
 
-  public String getName() {
+  public I18NString getName() {
     return name;
   }
 
@@ -117,7 +121,7 @@ public class Station extends TransitEntity implements StopCollection {
     return description;
   }
 
-  public String getUrl() {
+  public I18NString getUrl() {
     return url;
   }
 
@@ -159,13 +163,16 @@ public class Station extends TransitEntity implements StopCollection {
   }
 
   private static GeometryCollection computeGeometry(WgsCoordinate coordinate, Set<StopLocation> childStops) {
-    var stationPoint =  getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
-    var childGeometries = childStops.stream().map(StopLocation::getGeometry).collect(Collectors.toList());
-    childGeometries.add(stationPoint);
-
+    Point stationPoint = null;
+    var childGeometries = childStops.stream().map(StopLocation::getGeometry).filter(Objects::nonNull).collect(Collectors.toList());
+    if(coordinate != null) {
+      stationPoint = getGeometryFactory().createPoint(coordinate.asJtsCoordinate());
+      childGeometries.add(stationPoint);
+    }
     var geometryCollection = getGeometryFactory().createGeometryCollection(childGeometries.toArray(new Geometry[]{}));
     var convexHull = new ConvexHull(geometryCollection).getConvexHull();
 
-    return getGeometryFactory().createGeometryCollection(new Geometry[]{ stationPoint, convexHull });
+    var geometries = stationPoint != null ? new Geometry[]{stationPoint, convexHull} : new Geometry[]{convexHull};
+    return getGeometryFactory().createGeometryCollection(geometries);
   }
 }

@@ -6,13 +6,14 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
 import io.micrometer.core.instrument.Metrics;
-import org.opentripplanner.ext.actuator.ActuatorAPI;
+import java.time.Instant;
+import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.inspector.TileRendererManager;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 public class Router {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
+    private final RoutingRequest defaultRoutingRequest;
     public final Graph graph;
     public final RouterConfig routerConfig;
     public final RaptorConfig<TripSchedule> raptorConfig;
@@ -47,18 +49,13 @@ public class Router {
     /** Inspector/debug services */
     public TileRendererManager tileRendererManager;
 
-    /**
-     * A RoutingRequest containing default parameters that will be cloned when handling each
-     * request.
-     */
-    public RoutingRequest defaultRoutingRequest;
-
     /** A graphical window that is used for visualizing search progress (debugging). */
     public GraphVisualizer graphVisualizer = null;
 
     public Router(Graph graph, RouterConfig routerConfig) {
         this.graph = graph;
         this.routerConfig = routerConfig;
+        this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
         this.raptorConfig = new RaptorConfig<>(
             routerConfig.raptorTuningParameters(),
             Metrics.globalRegistry
@@ -76,7 +73,6 @@ public class Router {
      */
     public void startup() {
         this.tileRendererManager = new TileRendererManager(this.graph);
-        this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
 
         if (routerConfig.requestLogFile() != null) {
             this.requestLogger = createLogger(routerConfig.requestLogFile());
@@ -123,6 +119,23 @@ public class Router {
                 defaultRoutingRequest
             );
         }
+    }
+
+    /**
+     * A RoutingRequest containing default parameters that will be cloned when handling each
+     * request.
+     */
+    public RoutingRequest copyDefaultRoutingRequest() {
+        var copy = this.defaultRoutingRequest.clone();
+        copy.setDateTime(Instant.now());
+        return copy;
+    }
+
+    /**
+     * Return the default routing request locale(without cloning the request).
+     */
+    public Locale getDefaultLocale() {
+        return this.defaultRoutingRequest.locale;
     }
 
     /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */

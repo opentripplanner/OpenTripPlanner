@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -79,19 +80,19 @@ public final class StopPattern implements Serializable {
     }
 
     int findBoardingPosition(StopLocation stop) {
-        return findStopPosition(0, stops.length-1, (s) -> s == stop, stop);
+        return findStopPosition(0, stops.length - 1, (s) -> s == stop);
     }
 
     int findAlightPosition(StopLocation stop) {
-        return findStopPosition(1, stops.length, (s) -> s == stop, stop);
+        return findStopPosition(1, stops.length, (s) -> s == stop);
     }
 
     int findBoardingPosition(Station station) {
-        return findStopPosition(0, stops.length-1, station::includes, station);
+        return findStopPosition(0, stops.length - 1, station::includes);
     }
 
     int findAlightPosition(Station station) {
-        return findStopPosition(1, stops.length, station::includes, station);
+        return findStopPosition(1, stops.length, station::includes);
     }
 
     public boolean equals(Object other) {
@@ -134,13 +135,12 @@ public final class StopPattern implements Serializable {
     HashCode semanticHash(HashFunction hashFunction) {
         Hasher hasher = hashFunction.newHasher();
         int size = stops.length;
-        for (int s = 0; s < size; s++) {
-            StopLocation stop = stops[s];
-            // Truncate the lat and lon to 6 decimal places in case they move slightly between
-            // feed versions
-            hasher.putLong((long) (stop.getLat() * 1000000));
-            hasher.putLong((long) (stop.getLon() * 1000000));
-        }
+      for (StopLocation stop : stops) {
+        // Truncate the lat and lon to 6 decimal places in case they move slightly between
+        // feed versions
+        hasher.putLong((long) (stop.getLat() * 1000000));
+        hasher.putLong((long) (stop.getLon() * 1000000));
+      }
         // Use hops rather than stops because drop-off at stop 0 and pick-up at last stop are
         // not important and have changed between OTP versions.
         for (int hop = 0; hop < size - 1; hop++) {
@@ -198,15 +198,18 @@ public final class StopPattern implements Serializable {
         else { return pickDrop; }
     }
 
+    /**
+     * Find the given stop position in the sequence according to match Predicate, return -1 if not
+     * found.
+     */
     private int findStopPosition(
             final int start,
             final int end,
-            final Predicate<StopLocation> match,
-            final Object entity
+            final Predicate<StopLocation> match
     ) {
-        for (int i=start; i<end; ++i) {
-            if(match.test(stops[i])) { return i; }
+        for (int i = start; i < end; ++i) {
+            if (match.test(stops[i])) { return i; }
         }
-        throw new IllegalArgumentException("Stop/Station not found: " + entity);
+        return -1;
     }
 }

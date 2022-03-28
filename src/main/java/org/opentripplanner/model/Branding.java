@@ -1,60 +1,63 @@
 package org.opentripplanner.model;
 
+import org.opentripplanner.model.base.ToStringBuilder;
+
 /**
  * OTP model for branding. Common for both NeTEx and GTFS.
  */
 public class Branding extends TransitEntity {
-    private String shortName;
-    private String name;
-    private String url;
-    private String description;
-    private String image;
 
-    public Branding(FeedScopedId id) {
+    private final String shortName;
+    private final String name;
+    private final String url;
+    private final String description;
+    private final String image;
+
+    public Branding(
+            FeedScopedId id,
+            String shortName,
+            String name,
+            String url,
+            String description,
+            String image
+    ) {
         super(id);
-    }
-
-    public Branding() {
-        super(null);
+        this.shortName = shortName;
+        this.name = name;
+        this.url = url;
+        this.description = description;
+        this.image = image;
     }
 
     public String getShortName() {
         return shortName;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public String getImage() {
         return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(this.getClass())
+                .addObj("id", this.getId())
+                .addStr("shortName", this.getShortName())
+                .addStr("name", this.getName())
+                .addStr("url", this.getUrl())
+                .addStr("description", this.getDescription())
+                .addStr("image", this.getImage())
+                .toString();
     }
 }

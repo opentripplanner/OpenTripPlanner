@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A vertex in the graph. Each vertex has a longitude/latitude location, as well as a set of
@@ -201,18 +200,15 @@ public abstract class Vertex implements Serializable, Cloneable {
         return y;
     }
 
-
-    /** If this vertex is located on only one street, get that street's name
-     * in english localization */
-    public String getName() {
-        return this.name.toString();
+    /** If this vertex is located on only one street, get that street's name */
+    public I18NString getName() {
+        return this.name;
     }
 
-    /** If this vertex is located on only one street, get that street's name
-     * in provided localization
-     * @param locale wanted localization */
-    public String getName(Locale locale) {
-        return this.name.toString(locale);
+    /** If this vertex is located on only one street, get that street's name in default localization
+     */
+    public String getDefaultName() {
+        return this.name.toString();
     }
 
     /** Get the corresponding StationElement if this is a transit vertex */
@@ -257,7 +253,7 @@ public abstract class Vertex implements Serializable, Cloneable {
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
 
     public List<Edge> getOutgoingStreetEdges() {
-        List<Edge> result = new ArrayList<Edge>();
+        List<Edge> result = new ArrayList<>();
         for (Edge out : this.getOutgoing()) {
             if (!(out instanceof StreetEdge)) {
                 continue;

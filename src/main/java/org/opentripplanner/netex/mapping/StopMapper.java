@@ -9,6 +9,7 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.rutebanken.netex.model.Quay;
@@ -20,8 +21,8 @@ class StopMapper {
   private final FeedScopedIdFactory idFactory;
 
   StopMapper(
-      FeedScopedIdFactory idFactory,
-      DataImportIssueStore issueStore
+          FeedScopedIdFactory idFactory,
+          DataImportIssueStore issueStore
   ) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
@@ -35,7 +36,8 @@ class StopMapper {
           Quay quay,
           Station parentStation,
           Collection<FareZone> fareZones,
-          T2<TransitMode, String> transitMode
+          T2<TransitMode, String> transitMode,
+          WheelChairBoarding wheelChairBoarding
   ) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
@@ -45,22 +47,25 @@ class StopMapper {
     }
 
     Stop stop = new Stop(
-        idFactory.createId(quay.getId()),
-        parentStation.getName(),
-        quay.getPublicCode(),
-        quay.getDescription() != null ? quay.getDescription().getValue() : null,
-        WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
-        null,
-        null,
-        null,
-        fareZones,
-        null,
-        null,
-        transitMode.first,
-        transitMode.second
+            idFactory.createId(quay.getId()),
+            parentStation.getName(),
+            quay.getPublicCode(),
+            quay.getDescription() != null ? quay.getDescription().getValue() : null,
+            WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
+            wheelChairBoarding,
+            null,
+            null,
+            fareZones,
+            null,
+            null,
+            transitMode.first,
+            transitMode.second
     );
+
     stop.setParentStation(parentStation);
 
     return stop;
   }
+
+
 }

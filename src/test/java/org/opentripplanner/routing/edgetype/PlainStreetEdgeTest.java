@@ -1,12 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -21,6 +14,8 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+
+import static org.junit.Assert.*;
 
 public class PlainStreetEdgeTest {
 
@@ -267,7 +262,7 @@ public class PlainStreetEdgeTest {
         State state = new State(v2, 0, proto.clone());
 
         state.getOptions().setArriveBy(true);
-        graph.addTurnRestriction(e1, new TurnRestriction(e1, e0, null, TraverseModeSet.allModes()));
+        e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
 
         assertNotNull(e0.traverse(e1.traverse(state)));
     }
@@ -285,8 +280,7 @@ public class PlainStreetEdgeTest {
      ****/
 
     private IntersectionVertex vertex(String label, double x, double y) {
-        IntersectionVertex v = new IntersectionVertex(graph, label, x, y);
-        return v;
+        return new IntersectionVertex(graph, label, x, y);
     }
 
     /**

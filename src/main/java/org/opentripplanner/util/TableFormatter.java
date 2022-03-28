@@ -25,7 +25,7 @@ public class TableFormatter {
 
         private final BiFunction<String, Integer, String> padFunction;
 
-        private Align(BiFunction<String, Integer, String> padFunction) {
+        Align(BiFunction<String, Integer, String> padFunction) {
             this.padFunction = padFunction;
         }
 

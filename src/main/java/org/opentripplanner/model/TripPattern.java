@@ -16,9 +16,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.CompactLineString;
@@ -82,7 +83,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     // TODO MOVE codes INTO Timetable or TripTimes
     private BitSet services;
 
-
     public TripPattern(FeedScopedId id, Route route, StopPattern stopPattern) {
         super(id);
         this.route = route;
@@ -112,7 +112,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         return route.getMode();
     }
 
-    public final String getNetexSubmode() {
+    public String getNetexSubmode() {
         return route.getNetexSubmode();
     }
 
@@ -146,8 +146,9 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
 
     /**
      * This will copy the geometry from another TripPattern to this one. It checks if each hop is
-     * between the same stops before copying that hop geometry. If the stops are different, a
-     * straight-line hop-geometry will be used instead.
+     * between the same stops before copying that hop geometry. If the stops are different but lie
+     * within same station, old geometry will be used with overwrite on first and last point
+     * (to match new stop places). Otherwise, it will default to straight lines between hops.
      *
      * @param other TripPattern to copy geometry from
      */
@@ -161,20 +162,58 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         int sizeOfShortestPattern = Math.min(numberOfStops(), other.numberOfStops());
 
         for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
-            if (other.getHopGeometry(i) != null
-                && other.getStop(i).equals(this.getStop(i))
-                && other.getStop(i + 1).equals(this.getStop(i + 1))) {
+
+            final StopLocation oldOriginStop = this.getStop(i);
+            final StopLocation oldDestinationStop = this.getStop(i + 1);
+            final Station oldOriginStation = this.getStop(i).getParentStation();
+            final Station oldDestinationStation = this.getStop(i + 1).getParentStation();
+
+            final StopLocation newOriginStop = other.getStop(i);
+            final StopLocation newDestinationStop = other.getStop(i + 1);
+            final Station newOriginStation = other.getStop(i).getParentStation();
+            final Station newDestinationStation = other.getStop(i + 1).getParentStation();
+
+            boolean stopsAreSame = oldOriginStop.equals(newOriginStop) && oldDestinationStop.equals(
+                    newDestinationStop);
+            boolean parentStationsAreSame =
+                    Objects.equals(oldOriginStation, newOriginStation) && Objects.equals(
+                            oldDestinationStation, newDestinationStation);
+
+            LineString hopGeometry = other.getHopGeometry(i);
+
+            if (hopGeometry != null && stopsAreSame) {
                 // Copy hop geometry from previous pattern
                 this.setHopGeometry(i, other.getHopGeometry(i));
-            } else {
+            }
+            else if (hopGeometry != null && parentStationsAreSame) {
+                // Use old geometry but patch first and last point with new stops
+                Coordinate newStart = new Coordinate(
+                        other.getStop(i).getCoordinate().longitude(),
+                        other.getStop(i).getCoordinate().latitude()
+                );
+
+                Coordinate newEnd = new Coordinate(
+                        other.getStop(i + 1).getCoordinate().longitude(),
+                        other.getStop(i + 1).getCoordinate().latitude()
+                );
+
+                Coordinate[] coordinates = other.getHopGeometry(i).getCoordinates().clone();
+                coordinates[0].setCoordinate(newStart);
+                coordinates[coordinates.length - 1].setCoordinate(newEnd);
+
+                this.setHopGeometry(
+                        i, GeometryUtils.getGeometryFactory().createLineString(coordinates));
+            }
+            else {
                 // Create new straight-line geometry for hop
-                this.setHopGeometry(i,
-                    GeometryUtils.getGeometryFactory().createLineString(
-                        new Coordinate[]{
-                            coordinate(stopPattern.getStop(i)),
-                            coordinate(stopPattern.getStop(i + 1))
-                        }
-                    )
+                this.setHopGeometry(
+                        i,
+                        GeometryUtils.getGeometryFactory().createLineString(
+                                new Coordinate[]{
+                                        coordinate(stopPattern.getStop(i)),
+                                        coordinate(stopPattern.getStop(i + 1))
+                                }
+                        )
                 );
             }
         }
@@ -215,22 +254,46 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         return stopPattern.getStops();
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code stop}. The search start at
+     * position {@code 0}. Return a negative number if not found. Use {@link
+     * #findAlightStopPositionInPattern(StopLocation)} or {@link #findBoardingStopPositionInPattern(StopLocation)}
+     * if possible.
+     */
     public int findStopPosition(StopLocation stop) {
         return stopPattern.findStopPosition(stop);
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code station} where it is
+     * allowed to board. The search start at position {@code 0}. Return a negative number if not
+     * found.
+     */
     public int findBoardingStopPositionInPattern(Station station) {
         return stopPattern.findBoardingPosition(station);
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code station} where it is
+     * allowed to alight. The search start at position {@code 1}. Return a negative number if not
+     * found.
+     */
     public int findAlightStopPositionInPattern(Station station) {
         return stopPattern.findAlightPosition(station);
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code stop} where it is allowed
+     * to board. The search start at position {@code 0}. Return a negative number if not found.
+     */
     public int findBoardingStopPositionInPattern(StopLocation stop) {
         return stopPattern.findBoardingPosition(stop);
     }
 
+    /**
+     * Find the first stop position in pattern matching the given {@code stop} where it is allowed
+     * to alight. The search start at position {@code 1}. Return a negative number if not found.
+     */
     public int findAlightStopPositionInPattern(StopLocation stop) {
         return stopPattern.findAlightPosition(stop);
     }
@@ -275,11 +338,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     }
 
     public Trip getTrip(int tripIndex) {
-        return getTrips().get(tripIndex);
-    }
-
-    public int getTripIndex(Trip trip) {
-        return getTrips().indexOf(trip);
+        return scheduledTimetable.getTripTimes(tripIndex).getTrip();
     }
 
     /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
@@ -313,7 +372,6 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * since it is redundant.
      */
     public void add(FrequencyEntry freq) {
-        getTrips().add(freq.tripTimes.getTrip());
         scheduledTimetable.addFrequencyEntry(freq);
         if (this.getRoute() != freq.tripTimes.getTrip().getRoute()) {
             LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.",
@@ -328,17 +386,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * @param removeTrip it the predicate returns true
      */
     public void removeTrips(Predicate<Trip> removeTrip) {
-        getTrips().removeIf(removeTrip);
-        if(getTrips().isEmpty()) {
-            scheduledTimetable.getTripTimes().clear();
-        }
-        else {
-            scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
-        }
-    }
-
-    public TripPattern getOriginalTripPattern() {
-        return originalTripPattern;
+        scheduledTimetable.getTripTimes().removeIf(tt -> removeTrip.test(tt.getTrip()));
     }
 
     public void setOriginalTripPattern(TripPattern originalTripPattern) {
@@ -349,7 +397,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * The direction for all the trips in this pattern.
      */
     public Direction getDirection() {
-        return getTrips().get(0).getDirection();
+        return scheduledTimetable.getDirection();
     }
 
     /**
@@ -358,8 +406,8 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      * this rule may arise if unscheduled trips are added to a Timetable. For that case we need
      * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
      */
-    public List<Trip> getTrips() {
-        return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList());
+    public Stream<Trip> scheduledTripsAsStream() {
+        return scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip).distinct();
     }
 
     /**
@@ -371,7 +419,10 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
         return scheduledTimetable;
     }
 
-    boolean isCreatedByRealtimeUpdater() {
+    /**
+     * Has the TripPattern been created by a real-time update.
+     */
+    public boolean isCreatedByRealtimeUpdater() {
         return createdByRealtimeUpdater;
     }
 
@@ -523,7 +574,17 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
                     sb.append(" express");
                 } else {
                     // The final fallback: reference a specific trip ID.
-                    sb.append(" like trip " + pattern.getTrips().get(0).getId());
+                    Trip trip = null;
+                    if (!pattern.scheduledTimetable.getTripTimes().isEmpty()) {
+                        trip = pattern.scheduledTimetable.getTripTimes().get(0).getTrip();
+                    } else if (!pattern.scheduledTimetable.getFrequencyEntries().isEmpty()) {
+                        trip = pattern.scheduledTimetable.getFrequencyEntries().get(0).tripTimes.getTrip();
+                    }
+
+                    if (trip != null) {
+                        sb.append(" like trip ").append(trip.getId());
+                    }
+
                 }
                 pattern.setName((sb.toString()));
             } // END foreach PATTERN
@@ -548,7 +609,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
      */
     public void setServiceCodes (Map<FeedScopedId, Integer> serviceCodes) {
         setServices(new BitSet());
-        for (Trip trip : getTrips()) {
+        scheduledTripsAsStream().forEach (trip -> {
             FeedScopedId serviceId = trip.getServiceId();
             if (serviceCodes.containsKey(serviceId)) {
                 services.set(serviceCodes.get(serviceId));
@@ -556,14 +617,13 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
             else {
                 LOG.warn("Service " + serviceId + " not found in service codes not found.");
             }
-        }
+        });
         scheduledTimetable.setServiceCodes (serviceCodes);
     }
-
     /**
      * A set of serviceIds with at least one trip in this pattern.
      * Trips in a pattern are no longer necessarily running on the same service ID.
-     */ /**
+     *
      * @return bitset of service codes
      */
     public BitSet getServices() {
@@ -578,7 +638,7 @@ public final class TripPattern extends TransitEntity implements Cloneable, Seria
     }
 
     public String getTripHeadsign() {
-        return getTrips().get(0).getTripHeadsign();
+        return scheduledTimetable.getTripTimes(0).getTrip().getTripHeadsign();
     }
 
     public static boolean idsAreUniqueAndNotNull(Collection<TripPattern> tripPatterns) {

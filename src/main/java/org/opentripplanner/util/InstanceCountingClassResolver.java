@@ -34,7 +34,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  */
 public class InstanceCountingClassResolver extends DefaultClassResolver {
 
-    private TObjectIntMap<Class<?>> instanceCounts = new TObjectIntHashMap<>();
+    private final TObjectIntMap<Class<?>> instanceCounts = new TObjectIntHashMap<>();
 
     public Registration getRegistration(Class type) {
         instanceCounts.adjustOrPutValue(type, 1, 1);

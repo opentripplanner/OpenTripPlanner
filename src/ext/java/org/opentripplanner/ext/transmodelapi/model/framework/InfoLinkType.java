@@ -2,6 +2,7 @@ package org.opentripplanner.ext.transmodelapi.model.framework;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 
@@ -12,7 +13,7 @@ public class InfoLinkType {
         .name("infoLink")
         .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("uri")
-                .type(Scalars.GraphQLString)
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .description("URI")
                 .dataFetcher(environment -> {
                     AlertUrl source = environment.getSource();

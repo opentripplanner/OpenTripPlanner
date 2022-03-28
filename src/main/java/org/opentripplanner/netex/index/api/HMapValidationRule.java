@@ -34,7 +34,7 @@ public interface HMapValidationRule<K, V> {
    * Validate and return status, the caller will take the appropriate acction according to  the
    * retuned status.
    */
-  Status validate(K key, V value);
+  Status validate(V value);
 
   /**
    * The rule should provide a log message to use if the validation fails.

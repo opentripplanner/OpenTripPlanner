@@ -90,7 +90,7 @@ public class OtpTransitServiceBuilderTest {
 
         // Supplement test data with at least one entity in all collections
         builder.getCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
-        builder.getFareAttributes().add(createFareAttribute(agency));
+        builder.getFareAttributes().add(createFareAttribute());
         builder.getFareRules().add(new FareRule());
         builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
 
@@ -101,9 +101,8 @@ public class OtpTransitServiceBuilderTest {
         return first(builder.getAgenciesById().values());
     }
 
-    private static FareAttribute createFareAttribute(Agency agency) {
-        FareAttribute fa = new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
-        return fa;
+    private static FareAttribute createFareAttribute() {
+        return new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
     }
 
     private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {

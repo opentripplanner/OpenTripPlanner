@@ -36,7 +36,7 @@ public class Ride {
     public StopLocation lastStop;
 
     public Ride() {
-        zones = new HashSet<String>();
+        zones = new HashSet<>();
     }
 
     public String toString() {

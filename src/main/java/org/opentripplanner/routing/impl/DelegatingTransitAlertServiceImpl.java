@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
-  private ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
+  private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
 
   public DelegatingTransitAlertServiceImpl(Graph graph) {
     if (graph.updaterManager != null) {

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
@@ -27,6 +27,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.PolylineEncoder;
 
 
 public class BarrierRoutingTest {
@@ -58,21 +59,17 @@ public class BarrierRoutingTest {
                 (rr) -> rr.bikeWalkingReluctance = 1,
                 (itineraries) -> itineraries.stream()
                         .flatMap(i -> Stream.of(
-                                () -> assertEquals(
-                                        List.of(BICYCLE, WALK, BICYCLE, WALK, BICYCLE),
-                                        i.legs.stream()
-                                                .map(leg -> leg.getMode())
-                                                .collect(Collectors.toList())
-                                ),
+                                () -> assertEquals(1, i.legs.size()),
+                                () -> assertEquals(BICYCLE, i.legs.get(0).getMode()),
                                 () -> assertEquals(
                                         List.of(false, true, false, true, false),
-                                        i.legs.stream()
-                                                .map(leg -> leg.getWalkingBike())
+                                        i.legs.get(0).getWalkSteps().stream()
+                                                .map(step -> step.walkingBike)
                                                 .collect(Collectors.toList())
                                 )
                         ))
         );
-        assertThatPolylinesAreEqual(polyline2, "o~qgH_ccu@Bi@Bk@Bi@Bg@");
+        assertThatPolylinesAreEqual(polyline2, "o~qgH_ccu@Bi@Bk@Bi@Bg@NaA@_@Dm@Dq@a@KJy@@I@M@E??");
     }
 
     /**
@@ -146,10 +143,11 @@ public class BarrierRoutingTest {
         var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT));
         var paths = gpf.graphPathFinderEntryPoint(request);
 
-        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
+        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
 
         assertAll(assertions.apply(itineraries));
 
-        return itineraries.get(0).legs.get(0).getLegGeometry().getPoints();
+        Geometry legGeometry = itineraries.get(0).legs.get(0).getLegGeometry();
+        return PolylineEncoder.createEncodings(legGeometry).getPoints();
     }
 }

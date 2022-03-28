@@ -3,8 +3,13 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -24,13 +29,6 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolylineBean;
-
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
 
@@ -258,13 +256,11 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<EncodedPolylineBean> tripGeometry() {
+  public DataFetcher<Geometry> tripGeometry() {
     return environment -> {
       TripPattern tripPattern = getTripPattern(environment);
       if (tripPattern == null) { return null; }
-      LineString geometry = tripPattern.getGeometry();
-      if (geometry == null) { return null; }
-      return PolylineEncoder.createEncodings(Arrays.asList(geometry.getCoordinates()));
+      return tripPattern.getGeometry();
     };
   }
 
@@ -280,13 +276,13 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case Trip:
+            case TRIP:
               alerts.addAll(alertService.getTripAlerts(getSource(environment).getId(), null));
               break;
-            case Agency:
+            case AGENCY:
               alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
               break;
-            case RouteType:
+            case ROUTE_TYPE:
               int routeType = getRoute(environment).getGtfsType();
               alerts.addAll(alertService.getRouteTypeAlerts(
                       routeType,
@@ -297,16 +293,16 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
                       getAgency(environment).getId()
               ));
               break;
-            case Route:
+            case ROUTE:
               alerts.addAll(alertService.getRouteAlerts(getRoute(environment).getId()));
               break;
-            case Pattern:
+            case PATTERN:
               alerts.addAll(alertService.getDirectionAndRouteAlerts(
                       getSource(environment).getDirection().gtfsCode,
                       getRoute(environment).getId()
               ));
               break;
-            case StopsOnTrip:
+            case STOPS_ON_TRIP:
               alerts.addAll(alertService.getAllAlerts()
                       .stream()
                       .filter(alert -> alert.getEntities()

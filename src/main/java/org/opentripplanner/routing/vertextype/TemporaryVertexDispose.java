@@ -23,13 +23,13 @@ class TemporaryVertexDispose {
     /**
      * A list of all Vertexes not jet processed.
      */
-    private List<Vertex> todo = new ArrayList<>();
+    private final List<Vertex> todo = new ArrayList<>();
 
     /**
      * Processed vertexes. To prevent looping and processing the same vertex twice we
      * keep all processed vertexes in the 'done' set.
      */
-    private Set<Vertex> done = new HashSet<>();
+    private final Set<Vertex> done = new HashSet<>();
 
     /** Intentionally private constructor to prevent instantiation outside of the class. */
     private TemporaryVertexDispose(Vertex tempVertex) {

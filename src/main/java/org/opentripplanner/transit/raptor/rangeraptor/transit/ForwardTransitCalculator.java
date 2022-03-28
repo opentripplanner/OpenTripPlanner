@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
@@ -11,6 +12,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -18,7 +20,10 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * Used to calculate times in a forward trip search.
  */
-final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements TransitCalculator<T> {
+final class ForwardTransitCalculator<T extends RaptorTripSchedule>
+        extends ForwardTimeCalculator
+        implements TransitCalculator<T>
+{
     private final int tripSearchBinarySearchThreshold;
     private final int earliestDepartureTime;
     private final int searchWindowInSeconds;
@@ -52,24 +57,6 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public boolean searchForward() { return true; }
-
-    @Override
-    public int plusDuration(final int time, final int delta) {
-        return time + delta;
-    }
-
-    @Override
-    public int minusDuration(final int time, final int delta) {
-        return time - delta;
-    }
-
-    @Override
-    public int duration(final int timeA, final int timeB) {
-        return timeB - timeA;
-    }
-
-    @Override
     public int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {
         return onTrip.arrival(stopPositionInPattern) + alightSlack;
     }
@@ -83,21 +70,6 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     public String exceedsTimeLimitReason() {
         return "The arrival time exceeds the time limit, arrive to late: " +
                 TimeUtils.timeToStrLong(latestAcceptableArrivalTime) + ".";
-    }
-
-    @Override
-    public boolean isBefore(final int subject, final int candidate) {
-        return subject < candidate;
-    }
-
-    @Override
-    public boolean isAfter(int subject, int candidate) {
-        return subject > candidate;
-    }
-
-    @Override
-    public int unreachedTime() {
-        return Integer.MAX_VALUE;
     }
 
     @Override
@@ -147,12 +119,15 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule> implements Tr
     }
 
     @Override
-    public TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+    public RaptorTripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
+        if (timeTable.useCustomizedTripSearch()) {
+            return timeTable.createCustomizedTripSearch(SearchDirection.FORWARD);
+        }
         return new TripScheduleBoardSearch<>(tripSearchBinarySearchThreshold, timeTable);
     }
 
     @Override
-    public TripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> pattern) {
+    public RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> pattern) {
         return new TripScheduleExactMatchSearch<>(
                 createTripSearch(pattern),
                 this,

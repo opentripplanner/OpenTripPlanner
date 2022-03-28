@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
@@ -23,10 +23,10 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TurnRestrictionTest {
 
@@ -38,7 +38,7 @@ public class TurnRestrictionTest {
     
     private StreetEdge maple_main1, broad1_2;
 
-    @Before
+    @BeforeEach
     public void before() {
         graph = new Graph();
 
@@ -90,8 +90,8 @@ public class TurnRestrictionTest {
 
     @Test
     public void testHasExplicitTurnRestrictions() {
-        assertFalse(graph.getTurnRestrictions(maple_main1).isEmpty());
-        assertTrue(graph.getTurnRestrictions(broad1_2).isEmpty());
+        assertFalse(maple_main1.getTurnRestrictions().isEmpty());
+        assertTrue(broad1_2.getTurnRestrictions().isEmpty());
     }
     
     @Test
@@ -103,7 +103,7 @@ public class TurnRestrictionTest {
         options.setRoutingContext(graph, topRight, bottomLeft);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(bottomLeft, false);
+        GraphPath path = tree.getPath(bottomLeft);
         assertNotNull(path);
 
         // Since there are no turn restrictions applied to the default modes (walking + transit)
@@ -128,7 +128,7 @@ public class TurnRestrictionTest {
         options.setRoutingContext(graph, topRight, bottomLeft);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(bottomLeft, false);
+        GraphPath path = tree.getPath(bottomLeft);
         assertNotNull(path);
 
         // Since there are no turn restrictions applied to the default modes (walking + transit)
@@ -153,7 +153,7 @@ public class TurnRestrictionTest {
         options.setRoutingContext(graph, topRight, bottomLeft);
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(bottomLeft, false);
+        GraphPath path = tree.getPath(bottomLeft);
         assertNotNull(path);
 
         // If not for turn restrictions, the shortest path would be to take 1st to Main,
@@ -176,8 +176,7 @@ public class TurnRestrictionTest {
      ****/
 
     private StreetVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
-        return v;
+        return new IntersectionVertex(graph, label, lat, lon);
     }
 
     /**
@@ -200,8 +199,8 @@ public class TurnRestrictionTest {
     private void DisallowTurn(StreetEdge from, StreetEdge to) {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
-        TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
-        graph.addTurnRestriction(from, restrict);
+        TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes, null);
+        from.addTurnRestriction(restrict);
     }
 
 }

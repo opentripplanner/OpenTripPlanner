@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -144,6 +145,15 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
         return new ServiceDate(year, month, day);
     }
 
+    public static Optional<ServiceDate> parseStringToOptional(String value) {
+        try {
+            return Optional.of(parseString(value));
+        }
+        catch (ParseException e) {
+            return Optional.empty();
+        }
+    }
+
     public int getYear() {
         return year;
     }
@@ -188,7 +198,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
         return getAsDate(TimeZone.getDefault());
     }
 
-    private LocalDate toLocalDate() {
+    public LocalDate toLocalDate() {
         return LocalDate.of(year, month, day);
     }
 

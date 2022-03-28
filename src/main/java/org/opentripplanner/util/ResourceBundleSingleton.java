@@ -1,11 +1,12 @@
 package org.opentripplanner.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -33,14 +34,13 @@ public enum ResourceBundleSingleton {
         }
         try {
             ResourceBundle resourceBundle = null;
-            if (key.equals("corner") || key.equals("unnamedStreet")) {
+            if (key.equals("corner") || key.equals("unnamedStreet") || key.equals("origin") || key.equals("destination")) {
                 resourceBundle = ResourceBundle.getBundle("internals", locale, noFallbackControl);
             } else {
                 resourceBundle = ResourceBundle.getBundle("WayProperties", locale, noFallbackControl);
             }
-            String retval = resourceBundle.getString(key);
             //LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
-            return retval;
+            return resourceBundle.getString(key);
         } catch (MissingResourceException e) {
             //LOG.debug("Missing translation for key: " + key);
             return key;

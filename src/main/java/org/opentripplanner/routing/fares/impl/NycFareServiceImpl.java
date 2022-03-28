@@ -1,11 +1,5 @@
 package org.opentripplanner.routing.fares.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Currency;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.Itinerary;
@@ -16,6 +10,13 @@ import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.fares.FareService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Currency;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 enum NycFareState {
 	INIT, 
@@ -359,7 +360,7 @@ public class NycFareServiceImpl implements FareService {
 
 	private static List<FeedScopedId> makeMtaStopList(String... stops) {
 
-		ArrayList<FeedScopedId> out = new ArrayList<FeedScopedId>();
+		ArrayList<FeedScopedId> out = new ArrayList<>();
 		for (String stop : stops) {
 			out.add(new FeedScopedId("MTA NYCT", stop));
 			out.add(new FeedScopedId("MTA NYCT", stop + "N"));

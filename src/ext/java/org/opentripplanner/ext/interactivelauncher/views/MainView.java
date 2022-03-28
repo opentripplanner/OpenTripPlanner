@@ -4,7 +4,6 @@ import org.opentripplanner.ext.interactivelauncher.Model;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.GridBagConstraints.CENTER;
@@ -94,7 +93,7 @@ public class MainView extends JFrame {
     add(statusBarTxt, STATUS_BAR_CONSTRAINTS);
 
     // Setup action listeners
-    startOtpButtonView.addActionListener(this::startOtp);
+    startOtpButtonView.addActionListener(e -> startOtp());
 
     debugLayout(
             dataSourcesView.panel(),
@@ -103,6 +102,8 @@ public class MainView extends JFrame {
             statusBarTxt
     );
     model.subscribeCmdLineUpdates(statusBarTxt::setText);
+
+    statusBarTxt.setText(model.toCliString());
   }
 
   public void onRootDirChanged(String newRootDir) {
@@ -122,7 +123,7 @@ public class MainView extends JFrame {
     setVisible(true);
   }
 
-  private void startOtp(ActionEvent e) {
+  private void startOtp() {
     setVisible(false);
     dispose();
     otpStarter.run();

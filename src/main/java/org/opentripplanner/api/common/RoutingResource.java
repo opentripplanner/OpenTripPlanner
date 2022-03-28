@@ -2,7 +2,6 @@ package org.opentripplanner.api.common;
 
 import java.time.Duration;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -17,7 +16,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
-import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -166,10 +164,11 @@ public abstract class RoutingResource {
     /**
      * The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.
      *
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
      *                       old functionality the same way, but we will try to map this parameter
      *                       so it does work similar as before.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxWalkDistance")
@@ -179,8 +178,9 @@ public abstract class RoutingResource {
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
      *
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxPreTransitTime")
@@ -342,16 +342,12 @@ public abstract class RoutingResource {
 
     /**
      * The comma-separated list of banned agencies.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("bannedAgencies")
     protected String bannedAgencies;
 
     /**
      * Functions the same as banned agencies, except only the listed agencies are allowed.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("whiteListedAgencies")
     protected String whiteListedAgencies;
@@ -422,8 +418,6 @@ public abstract class RoutingResource {
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
      * TriMet_100 (100 is route short name) or Trimet__42 (two underscores, 42 is the route
      * internal ID).
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @Deprecated
     @QueryParam("bannedRoutes")
@@ -431,8 +425,6 @@ public abstract class RoutingResource {
 
     /**
      * Functions the same as bannnedRoutes, except only the listed routes are allowed.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("whiteListedRoutes")
     @Deprecated
@@ -469,12 +461,8 @@ public abstract class RoutingResource {
     protected Integer otherThanPreferredRoutesPenalty;
 
     /**
-     * The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
-     * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     * The comma-separated list of banned trips.  The format is feedId:tripId
      */
-    @Deprecated
     @QueryParam("bannedTrips")
     protected String bannedTrips;
 
@@ -540,6 +528,8 @@ public abstract class RoutingResource {
      *
      * Consider using the {@link #transferPenalty} instead of this parameter.
      *
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated  TODO OTP2 Regression. A maxTransfers should be set in the router config, not
      *                        here. Instead the client should be able to pass in a parameter for
      *                        the max number of additional/extra transfers relative to the best
@@ -549,7 +539,6 @@ public abstract class RoutingResource {
      *                        might stick to the old limit, but that have side-effects that you
      *                        might not find any trips on a day where a critical part of the
      *                        trip is not available, because of some real-time disruption.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxTransfers")
@@ -656,18 +645,20 @@ public abstract class RoutingResource {
     protected Boolean disableRemainingWeightHeuristic;
 
     /**
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated TODO OTP2 This is not useful as a search parameter, but could be used as a
      *                       post search filter to reduce number of itineraries down to an
      *                       acceptable number, but there are probably better ways to do that.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @Deprecated
     @QueryParam("maxHours")
     private Double maxHours;
 
     /**
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     *
      * @deprecated see {@link #maxHours}
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     @QueryParam("useRequestedDateTimeInMaxHours")
     @Deprecated
@@ -718,12 +709,11 @@ public abstract class RoutingResource {
     /**
      * Range/sanity check the query parameter fields and build a Request object from them.
      *
-     * @throws ParameterException when there is a problem interpreting a query parameter
      * @param queryParameters incoming request parameters
      */
-    protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) throws ParameterException {
+    protected RoutingRequest buildRequest(MultivaluedMap<String, String> queryParameters) {
         Router router = otpServer.getRouter();
-        RoutingRequest request = router.defaultRoutingRequest.clone();
+        RoutingRequest request = router.copyDefaultRoutingRequest();
 
         // The routing request should already contain defaults, which are set when it is initialized or in the JSON
         // router configuration and cloned. We check whether each parameter was supplied before overwriting the default.
@@ -885,18 +875,12 @@ public abstract class RoutingResource {
         if (whiteListedAgencies != null) {
             request.setWhiteListedAgenciesFromSting(whiteListedAgencies);
         }
-        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
-      
-        if (bannedTripMap != null) {
-            request.bannedTrips = bannedTripMap;
+        if (bannedTrips != null) {
+            request.setBannedTripsFromString(bannedTrips);
         }
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
         if (transferPenalty != null) { request.transferCost = transferPenalty; }
-        if (optimize == BicycleOptimizeType.TRANSFERS) {
-            optimize = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
-        }
 
         if (optimize != null) {
             request.setBicycleOptimizeType(optimize);
@@ -983,38 +967,4 @@ public abstract class RoutingResource {
 
         return request;
     }
-
-    /**
-     * Take a string in the format agency:id or agency:id:1:2:3:4.
-     * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
-     * Convert to a Map from trip --> set of int.
-     */
-    public HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
-        if (banned == null) {
-            return null;
-        }
-        
-        HashMap<FeedScopedId, BannedStopSet> bannedTripMap = new HashMap<FeedScopedId, BannedStopSet>();
-        String[] tripStrings = banned.split(",");
-        for (String tripString : tripStrings) {
-            // TODO this apparently allows banning stops within a trip with integers. Why?
-            String[] parts = tripString.split(":");
-            if (parts.length < 2) continue; // throw exception?
-            String agencyIdString = parts[0];
-            String tripIdString = parts[1];
-            FeedScopedId tripId = new FeedScopedId(agencyIdString, tripIdString);
-            BannedStopSet bannedStops;
-            if (parts.length == 2) {
-                bannedStops = BannedStopSet.ALL;
-            } else {
-                bannedStops = new BannedStopSet();
-                for (int i = 2; i < parts.length; ++i) {
-                    bannedStops.add(Integer.parseInt(parts[i]));
-                }
-            }
-            bannedTripMap.put(tripId, bannedStops);
-        }
-        return bannedTripMap;
-    }
-
 }

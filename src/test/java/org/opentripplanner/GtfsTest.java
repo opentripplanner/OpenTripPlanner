@@ -3,13 +3,6 @@ package org.opentripplanner;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import junit.framework.TestCase;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -31,6 +24,14 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest extends TestCase {
@@ -83,7 +84,7 @@ public abstract class GtfsTest extends TestCase {
             InputStream inputStream = new FileInputStream(gtfsRealTime);
             FeedMessage feedMessage = FeedMessage.PARSER.parseFrom(inputStream);
             List<FeedEntity> feedEntityList = feedMessage.getEntityList();
-            List<TripUpdate> updates = new ArrayList<TripUpdate>(feedEntityList.size());
+            List<TripUpdate> updates = new ArrayList<>(feedEntityList.size());
             for (FeedEntity feedEntity : feedEntityList) {
                 updates.add(feedEntity.getTripUpdate());
             }
@@ -137,9 +138,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
-        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(
-                paths, routingRequest
-        );
+        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
         // Stored in instance field for use in individual tests
         itinerary = itineraries.get(0);
 

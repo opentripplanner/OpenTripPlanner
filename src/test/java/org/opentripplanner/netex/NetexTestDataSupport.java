@@ -32,7 +32,7 @@ public final class NetexTestDataSupport {
   /* XML TYPES */
 
   public static <T> JAXBElement<T> jaxbElement(T e, Class<T> clazz) {
-    return new JAXBElement<T>(new QName("x"), clazz, e);
+    return new JAXBElement<>(new QName("x"), clazz, e);
   }
 
 
@@ -66,7 +66,7 @@ public final class NetexTestDataSupport {
     return new DayTypeRefStructure().withRef(id);
   }
 
-  public static DayTypeRefs_RelStructure createDayTypeRefList(String id, String ... dayTypeIds) {
+  public static DayTypeRefs_RelStructure createDayTypeRefList(String... dayTypeIds) {
     var list = new DayTypeRefs_RelStructure();
     for (String it : dayTypeIds) {
       list.getDayTypeRef().add(jaxbElement(createDayTypeRef(it), DayTypeRefStructure.class));

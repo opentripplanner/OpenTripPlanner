@@ -1,20 +1,19 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import org.locationtech.jts.operation.distance.DistanceOp;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.operation.distance.DistanceOp;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This is a representation of a set of contiguous OSM areas, used for various tasks related to edge splitting, such as start/endpoint snapping and
@@ -32,7 +31,7 @@ public class AreaEdgeList implements Serializable {
     // to fix up areas after network linking.
     private final Polygon originalEdges;
 
-    private final List<NamedArea> areas = new ArrayList<NamedArea>();
+    private final List<NamedArea> areas = new ArrayList<>();
 
     public AreaEdgeList(Polygon originalEdges) {
         this.originalEdges = originalEdges;
@@ -92,7 +91,7 @@ public class AreaEdgeList implements Serializable {
         LineString line = geometryFactory.createLineString(new Coordinate[] { from.getCoordinate(),
                 to.getCoordinate() });
 
-        List<NamedArea> intersects = new ArrayList<NamedArea>();
+        List<NamedArea> intersects = new ArrayList<>();
         for (NamedArea area : areas) {
             Geometry polygon = area.getPolygon();
             Geometry intersection = polygon.intersection(line);
@@ -106,10 +105,10 @@ public class AreaEdgeList implements Serializable {
 
             double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
 
-            AreaEdge forward = new AreaEdge(from, to, line, area.getRawName(), length,
+            AreaEdge forward = new AreaEdge(from, to, line, area.getName(), length,
                     area.getPermission(), false, this);
             forward.setStreetClass(area.getStreetClass());
-            AreaEdge backward = new AreaEdge(to, from, (LineString) line.reverse(), area.getRawName(),
+            AreaEdge backward = new AreaEdge(to, from, (LineString) line.reverse(), area.getName(),
                     length, area.getPermission(), true, this);
             backward.setStreetClass(area.getStreetClass());
         }

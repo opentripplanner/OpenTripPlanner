@@ -54,6 +54,11 @@ public class SortOrderComparator extends CompositeComparator<Itinerary> {
           NUM_OF_TRANSFERS_COMP
   );
 
+  private static final SortOrderComparator NUM_TRANSFERS = new SortOrderComparator(
+          NUM_OF_TRANSFERS_COMP,
+          GENERALIZED_COST_COMP
+  );
+
   /** Return the default comparator for a depart-after search. */
   public static SortOrderComparator defaultComparatorDepartAfter() {
     return STREET_AND_ARRIVAL_TIME;
@@ -70,6 +75,14 @@ public class SortOrderComparator extends CompositeComparator<Itinerary> {
    */
   public static SortOrderComparator generalizedCostComparator() {
     return GENERALIZED_COST;
+  }
+
+  /**
+   * This comparator sorts itineraries based on the fewest number-of-transfers. If the number is the
+   * same then the filter pick the itinerary with the lowest generalized-cost.
+   */
+    public static SortOrderComparator numberOfTransfersComparator() {
+    return NUM_TRANSFERS;
   }
 
   public static SortOrderComparator comparator(SortOrder sortOrder) {

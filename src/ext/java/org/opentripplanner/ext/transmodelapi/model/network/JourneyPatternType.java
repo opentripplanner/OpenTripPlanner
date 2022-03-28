@@ -53,7 +53,7 @@ public class JourneyPatternType {
             .name("serviceJourneys")
             .withDirective(gqlUtil.timingData)
             .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
-            .dataFetcher(environment -> ((TripPattern) environment.getSource()).getTrips())
+            .dataFetcher(e -> ((TripPattern) e.getSource()).scheduledTripsAsStream().collect(Collectors.toList()))
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("serviceJourneysForDate")
@@ -100,7 +100,7 @@ public class JourneyPatternType {
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("situations")
             .description("Get all situations active for the journey pattern.")
-            .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
+            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
             .dataFetcher(environment -> {
                 TripPattern tripPattern = environment.getSource();
                 return GqlUtil.getRoutingService(environment)
@@ -113,7 +113,7 @@ public class JourneyPatternType {
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("notices")
-            .type(new GraphQLNonNull(new GraphQLList(noticeType)))
+            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
             .dataFetcher(environment -> {
               TripPattern tripPattern = environment.getSource();
               return GqlUtil.getRoutingService(environment).getNoticesByEntity(tripPattern);

@@ -124,9 +124,7 @@ public class SiriTripPatternCache {
          */
         TripServiceDateKey tripServiceDateKey = new TripServiceDateKey(trip, serviceDate);
         if (updatedTripPatternsForTripCache.containsKey(tripServiceDateKey)) {
-            /**
-             * Remove previously added TripPatterns for the trip currently being updated - if the stopPattern does not match
-             */
+            // Remove previously added TripPatterns for the trip currently being updated - if the stopPattern does not match
             TripPattern cachedTripPattern = updatedTripPatternsForTripCache.get(tripServiceDateKey);
             if (
                     cachedTripPattern != null &&
@@ -152,9 +150,7 @@ public class SiriTripPatternCache {
             }
         }
 
-        /**
-         * Cache the last added tripPattern that has been used to update a specific trip
-         */
+        // Cache the last added tripPattern that has been used to update a specific trip
         updatedTripPatternsForTripCache.put(tripServiceDateKey, tripPattern);
 
         return tripPattern;

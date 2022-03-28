@@ -21,7 +21,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
  */
 public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
 
-    private ScalarColorPalette palette = new DefaultScalarColorPalette(1.0, 3.0, 10.0);
+    private final ScalarColorPalette palette = new DefaultScalarColorPalette(1.0, 3.0, 10.0);
 
     private static final Color VEHICLE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
 
@@ -53,7 +53,7 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
     public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
         if (v instanceof VehicleRentalStationVertex) {
             attrs.color = VEHICLE_RENTAL_COLOR_VERTEX;
-            attrs.label = v.getName();
+            attrs.label = v.getDefaultName();
         } else if (v instanceof IntersectionVertex) {
             attrs.color = Color.DARK_GRAY;
         } else {

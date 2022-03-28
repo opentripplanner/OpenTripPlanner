@@ -1,35 +1,10 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import javax.annotation.Nonnull;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.common.LocationStringParser;
-import org.opentripplanner.api.common.Message;
-import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
@@ -63,6 +38,28 @@ import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
  * itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide a
@@ -92,7 +89,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
     /** The complete list of incoming query parameters. */
-    public final HashMap<String, String> parameters = new HashMap<String, String>();
+    public final HashMap<String, String> parameters = new HashMap<>();
 
     /** The start location */
     public GenericLocation from;
@@ -331,7 +328,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * This is a scalar multiplied with the time in second on board the transit vehicle. Default
      * value is not-set(empty map).
      */
-    private Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
+    private final Map<TransitMode, Double> transitReluctanceForMode = new HashMap<>();
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
@@ -345,6 +342,18 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public double bikeReluctance = 2.0;
 
     public double carReluctance = 2.0;
+
+
+    /**
+     * How much more time does it take to walk a flight of stairs compared to walking a similar
+     * horizontal length
+     *
+     * Default value is based on:
+     * Fujiyama, T., & Tyler, N. (2010).
+     * Predicting the walking speed of pedestrians on stairs.
+     * Transportation Planning and Technology, 33(2), 177–202.
+     */
+    public double stairsTimeFactor = 3.0;
 
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
@@ -530,11 +539,8 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     /**
      * Do not use certain trips
-     *
-     * @deprecated TODO OTP2: Needs to be implemented
      */
-    @Deprecated
-    public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
+    public Set<FeedScopedId> bannedTrips = Set.of();
 
     /**
      * A global minimum transfer time (in seconds) that specifies the minimum amount of time that
@@ -599,7 +605,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * old limit, but that have side-effects that you might not find any trips on a day where a
      * critical part of the trip is not available, because of some real-time disruption.
      *
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
     public Integer maxTransfers = 12;
 
@@ -960,6 +966,17 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         whiteListedRoutes = RouteMatcher.idMatcher(routeIds);
     }
 
+    public void setBannedTrips(List<FeedScopedId> ids) {
+        if (ids != null) {
+            bannedTrips = Set.copyOf(ids);
+        }
+    }
+
+    public void setBannedTripsFromString(String ids) {
+        if (!ids.isEmpty()) {
+            bannedTrips = FeedScopedId.parseListOfIds(ids);
+        }
+    }
 
     public void setFromString(String from) {
         this.from = LocationStringParser.fromOldStyleString(from);
@@ -1093,7 +1110,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * Sets intermediatePlaces by parsing GenericLocations from a list of string.
      */
     public void setIntermediatePlacesFromStrings(List<String> intermediates) {
-        this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
+        this.intermediatePlaces = new ArrayList<>(intermediates.size());
         for (String place : intermediates) {
             intermediatePlaces.add(LocationStringParser.fromOldStyleString(place));
         }
@@ -1118,7 +1135,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      */
     public void addIntermediatePlace(GenericLocation location) {
         if (this.intermediatePlaces == null) {
-            this.intermediatePlaces = new ArrayList<GenericLocation>();
+            this.intermediatePlaces = new ArrayList<>();
         }
         this.intermediatePlaces.add(location);
     }
@@ -1207,7 +1224,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             clone.preferredRoutes = preferredRoutes.clone();
             clone.unpreferredRoutes = unpreferredRoutes.clone();
 
-            clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
+            clone.bannedTrips = Set.copyOf(bannedTrips);
 
             clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
 
@@ -1234,11 +1251,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         } else {
             if (rctx.graph == graph) {
                 LOG.debug("keeping existing routing context");
-                return;
             } else {
                 LOG.error("attempted to reset routing context using a different graph");
-                return;
             }
+            return;
         }
     }
 
@@ -1514,25 +1530,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     private double setMinValue(double value) {
         return Math.max(0, value);
-    }
-
-    public static void assertTriangleParameters(
-            Double triangleSafetyFactor,
-            Double triangleTimeFactor,
-            Double triangleSlopeFactor
-    )
-            throws ParameterException
-    {
-        if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
-            throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
-        }
-        if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
-            throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
-        }
-        // FIXME couldn't this be simplified by only specifying TWO of the values?
-        if (Math.abs(triangleSafetyFactor + triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
-            throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
-        }
     }
 
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */

@@ -11,7 +11,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
  */
 public class ConstantIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel {
     
-    private double cost;
+    private final double cost;
     
     /**
      * All traversal costs are equal to the passed-in constant.

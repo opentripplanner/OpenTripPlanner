@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -10,6 +9,8 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 
 /**
@@ -26,7 +27,7 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
      * It's generally a polyline with two coincident points, but some elevators have horizontal
      * dimension, e.g. the ones on the Eiffel Tower.
      */
-    private LineString the_geom;
+    private final LineString the_geom;
 
     public ElevatorBoardEdge(ElevatorOffboardVertex from, ElevatorOnboardVertex to) {
         super(from, to);
@@ -63,9 +64,9 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
     }
 
     @Override
-    public String getName() {
+    public I18NString getName() {
         // TODO: i18n
-        return "Elevator";
+        return new NonLocalizedString( "Elevator");
     }
 
     /** 
@@ -80,11 +81,5 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
     
     public String toString() {
         return "ElevatorBoardEdge(" + fromv + " -> " + tov + ")";
-    }
-
-    @Override
-    public String getName(Locale locale) {
-        //TODO: localize
-        return this.getName();
     }
 }

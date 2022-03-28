@@ -11,8 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Model implements Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Model.class);
 
     private static final File MODEL_FILE = new File("interactive_otp_main.json");
 
@@ -27,6 +31,7 @@ public class Model implements Serializable {
     private boolean buildTransit = true;
     private boolean saveGraph = false;
     private boolean serveGraph = true;
+    private boolean visualizer = false;
 
 
     public Model() {
@@ -83,11 +88,19 @@ public class Model implements Serializable {
         List<String> dataSourceOptions = new ArrayList<>();
         File rootDir = new File(getRootDirectory());
         List<File> dirs = SearchForOtpConfig.search(rootDir);
-        // Add 1 char for the path separator character
+        // Add 1 char for the path-separator-character
         int length = rootDir.getAbsolutePath().length() + 1;
 
         for (File dir : dirs) {
-            dataSourceOptions.add(dir.getAbsolutePath().substring(length));
+            var path = dir.getAbsolutePath();
+            if(path.length() <= length) {
+                LOG.warn(
+                        "The root directory contains a config file, choose " +
+                        "the parent directory or delete the config file."
+                );
+                continue;
+            }
+            dataSourceOptions.add(path.substring(length));
         }
         return dataSourceOptions;
     }
@@ -128,6 +141,15 @@ public class Model implements Serializable {
         notifyChangeListener();
     }
 
+    public boolean isVisualizer() {
+        return visualizer;
+    }
+
+    public void setVisualizer(boolean visualizer) {
+        this.visualizer = visualizer;
+        notifyChangeListener();
+    }
+
     public Map<String, Boolean> getDebugLogging() {
         return debugLogging;
     }
@@ -149,6 +171,7 @@ public class Model implements Serializable {
                 + (buildTransit ? ", buildTransit" : "")
                 + (saveGraph ? ", saveGraph" : "")
                 + (serveGraph ? ", serveGraph" : "")
+                + (visualizer ? ", visualizer" : "")
                 + ')';
     }
 
@@ -191,6 +214,7 @@ public class Model implements Serializable {
 
         if (saveGraph && (buildTransit || buildStreet)) { args.add("--save"); }
         if (serveGraph && !buildStreetOnly()) { args.add("--serve"); }
+        if (serveGraph && !buildStreetOnly() && visualizer) { args.add("--visualize"); }
 
         args.add(getDataSourceDirectory());
 

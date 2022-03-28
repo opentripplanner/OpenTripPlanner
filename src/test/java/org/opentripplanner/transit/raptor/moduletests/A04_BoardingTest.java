@@ -54,14 +54,14 @@ public class A04_BoardingTest implements RaptorTestConstants {
           + "~ BUS L1_2 0:14 0:18 ~ C "
           + "~ BUS L2 0:21 0:31 ~ F "
           + "~ BUS L3_2 0:35 0:40 ~ H "
-          + "~ Walk 1m [0:13 0:41 28m";
+          + "~ Walk 1m [0:13 0:41 28m 2tx";
 
   /** Board L2 at first possible stop B (not C) and arrive at F (the earliest arrival time) */
   public static final String EXP_PATH_BEST_ARRIVAL_TIME = "Walk 1m ~ A "
           + "~ BUS L1_1 0:10 0:18 ~ B "
           + "~ BUS L2 0:20 0:31 ~ F "
           + "~ BUS L3_2 0:35 0:40 ~ H "
-          + "~ Walk 1m [0:09 0:41 32m]";
+          + "~ Walk 1m [0:09 0:41 32m 2tx]";
 
   /**
    * Searching in REVERSE we will "board" L2 at the first possible stop G and "alight" at the
@@ -71,7 +71,7 @@ public class A04_BoardingTest implements RaptorTestConstants {
           + "~ BUS L1_2 0:14 0:18 ~ C "
           + "~ BUS L2 0:21 0:32 ~ G "
           + "~ BUS L3_3 0:35 0:44 ~ H "
-          + "~ Walk 1m [0:13 0:45 32m]";
+          + "~ Walk 1m [0:13 0:45 32m 2tx]";
 
   /** Expect the optimal path to be found. */
   private final String EXP_PATH_MIN_TRAVEL_DURATION = OPTIMAL_PATH + "]";

@@ -1,18 +1,18 @@
 package org.opentripplanner.api.resource;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Envelope;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /** An instance of CoordinateSequence that can be efficiently extended */
 public class CoordinateArrayListSequence implements CoordinateSequence, Cloneable {
     ArrayList<Coordinate> coordinates;
     
     public CoordinateArrayListSequence() {
-        coordinates = new ArrayList<Coordinate>();
+        coordinates = new ArrayList<>();
     }
     
     @SuppressWarnings("unchecked")
@@ -122,7 +122,7 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
     }
 
     public void clear() {
-    	coordinates = new ArrayList<Coordinate>();
+    	coordinates = new ArrayList<>();
     }
 
     @Override

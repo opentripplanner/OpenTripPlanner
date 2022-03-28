@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 public class ServiceLinkMapperTest {
 
-  private static Double[] COORDINATES = { 59.90929, 10.74527, 59.90893, 10.74493, 59.90870, 10.74585 };
+  private static final Double[] COORDINATES = { 59.90929, 10.74527, 59.90893, 10.74493, 59.90870, 10.74585 };
 
   @Test
   public void mapServiceLinks() {

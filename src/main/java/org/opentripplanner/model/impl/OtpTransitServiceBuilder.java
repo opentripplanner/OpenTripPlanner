@@ -6,10 +6,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
+import org.opentripplanner.model.Branding;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
@@ -19,6 +22,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Frequency;
+import org.opentripplanner.model.GroupOfRoutes;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
@@ -35,7 +39,6 @@ import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.model.Branding;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
@@ -43,6 +46,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +113,10 @@ public class OtpTransitServiceBuilder {
     private final EntityById<FlexTrip> flexTripsById = new EntityById<>();
 
     private final EntityById<Branding> brandingsById = new EntityById<>();
+
+    private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId = ArrayListMultimap.create();
+
+    private final EntityById<GroupOfRoutes> groupOfRouteById = new EntityById<>();
 
     public OtpTransitServiceBuilder() {
     }
@@ -229,6 +237,14 @@ public class OtpTransitServiceBuilder {
         return brandingsById;
     }
 
+    public Multimap<FeedScopedId, GroupOfRoutes> getGroupsOfRoutesByRouteId() {
+        return groupsOfRoutesByRouteId;
+    }
+
+    public EntityById<GroupOfRoutes> getGroupOfRouteById() {
+        return groupOfRouteById;
+    }
+
     /**
      * Find all serviceIds in both CalendarServices and CalendarServiceDates.
      */
@@ -260,7 +276,7 @@ public class OtpTransitServiceBuilder {
      * outside the period. If a service is start before and/or ends after the period
      * then the service is modified to match the period.
      */
-    public void limitServiceDays(ServiceDateInterval periodLimit) {
+    public void limitServiceDays(ServiceDateInterval periodLimit, DataImportIssueStore issues) {
         if(periodLimit.isUnbounded()) {
             LOG.info("Limiting transit service is skipped, the period is unbounded.");
             return;
@@ -286,8 +302,22 @@ public class OtpTransitServiceBuilder {
             calendars.addAll(keepCal);
             logRemove("ServiceCalendar", orgSize, calendars.size(), "Outside time period.");
         }
-        removeEntitiesWithInvalidReferences();
+        final int originalNumOfTrips = numberOfTrips();
+        removeEntitiesWithInvalidReferences(issues);
+
+        // All trips are removed, then exit with error
+        if(originalNumOfTrips > 0 && numberOfTrips() == 0) {
+            throw new OtpAppException(
+                    "The provided transit date have no trips within the configured transit " +
+                    "service period. See build config 'transitServiceStart' and " +
+                    "'transitServiceEnd': " + periodLimit
+            );
+        }
         LOG.info("Limiting transit service days to time period complete.");
+    }
+
+    private int numberOfTrips() {
+        return tripsById.size() + flexTripsById.size();
     }
 
     /**
@@ -295,11 +325,26 @@ public class OtpTransitServiceBuilder {
      * may happen as a result of inconsistent data or by deliberate removal of elements in the
      * builder.
      */
-    private void removeEntitiesWithInvalidReferences() {
+    private void removeEntitiesWithInvalidReferences(DataImportIssueStore issues) {
         removeTripsWithNoneExistingServiceIds();
+        removeInvalidShapeIds(issues);
         removeStopTimesForNoneExistingTrips();
         fixOrRemovePatternsWhichReferenceNoneExistingTrips();
         removeTransfersForNoneExistingTrips();
+    }
+
+    private void removeInvalidShapeIds(DataImportIssueStore issues) {
+        tripsById.values().forEach(t -> {
+            var shapeId = t.getShapeId();
+            boolean shapeMissing = Objects.nonNull(shapeId) && !shapePoints.containsKey(shapeId);
+            if (shapeMissing) {
+                issues.add(
+                        "InvalidShapeReference", "Trip %s contains invalid reference to shape %s",
+                        t.getId(), shapeId
+                );
+                t.setShapeId(null);
+            }
+        });
     }
 
     /** Remove all trips which reference none existing service ids */
@@ -325,7 +370,7 @@ public class OtpTransitServiceBuilder {
         for (Map.Entry<StopPattern, TripPattern> e : tripPatterns.entries()) {
             TripPattern ptn = e.getValue();
             ptn.removeTrips(t -> !tripsById.containsKey(t.getId()));
-            if(ptn.getTrips().isEmpty()) {
+            if(ptn.scheduledTripsAsStream().findAny().isEmpty()) {
                 removePatterns.add(e);
             }
         }

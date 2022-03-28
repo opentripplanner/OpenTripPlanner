@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.module.ned;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.geotools.geometry.DirectPosition2D;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.operation.TransformException;
@@ -44,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
-import static org.opentripplanner.util.logging.ThrottleLogger.*;
+import static org.opentripplanner.util.logging.ThrottleLogger.throttle;
 
 /**
  * THIS CLASS IS MULTI-THREADED
@@ -306,7 +306,7 @@ public class ElevationModule implements GraphBuilderModule {
 
         LOG.debug("Assigning missing elevations");
 
-        BinHeap<ElevationRepairState> pq = new BinHeap<ElevationRepairState>();
+        BinHeap<ElevationRepairState> pq = new BinHeap<>();
 
         // elevation for each vertex (known or interpolated)
         // knownElevations will be null if there are no ElevationPoints in the data
@@ -315,7 +315,7 @@ public class ElevationModule implements GraphBuilderModule {
         if (knownElevations != null)
             elevations = (HashMap<Vertex, Double>) knownElevations.clone();
         else
-            elevations = new HashMap<Vertex, Double>();
+            elevations = new HashMap<>();
 
         // If including the EllipsoidToGeoidDifference, subtract these from the known elevations found in OpenStreetMap
         // data.
@@ -335,7 +335,7 @@ public class ElevationModule implements GraphBuilderModule {
             });
         }
 
-        HashSet<Vertex> closed = new HashSet<Vertex>();
+        HashSet<Vertex> closed = new HashSet<>();
 
         // initialize queue with all vertices which already have known elevation
         for (StreetEdge e : edgesWithElevation) {
@@ -556,7 +556,7 @@ public class ElevationModule implements GraphBuilderModule {
         try {
             Coordinate[] coords = edgeGeometry.getCoordinates();
 
-            List<Coordinate> coordList = new LinkedList<Coordinate>();
+            List<Coordinate> coordList = new LinkedList<>();
 
             // initial sample (x = 0)
             coordList.add(new Coordinate(0, getElevation(coverage, coords[0])));
@@ -607,7 +607,7 @@ public class ElevationModule implements GraphBuilderModule {
             coordList.add(new Coordinate(edgeLenM, getElevation(coverage, coords[coords.length - 1])));
 
             // construct the PCS
-            Coordinate coordArr[] = new Coordinate[coordList.size()];
+            Coordinate[] coordArr = new Coordinate[coordList.size()];
             PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
                     coordList.toArray(coordArr));
 
@@ -694,7 +694,7 @@ public class ElevationModule implements GraphBuilderModule {
     /**
      * A custom exception wrapper for all known elevation lookup exceptions
      */
-    class ElevationLookupException extends Exception {
+    static class ElevationLookupException extends Exception {
         public ElevationLookupException(Exception e) {
             super(e);
         }
@@ -709,7 +709,7 @@ public class ElevationModule implements GraphBuilderModule {
      * @return elevation in meters
      */
     private double getElevation(Coverage coverage, double x, double y) throws PointOutsideCoverageException, TransformException {
-        double values[] = new double[1];
+        double[] values = new double[1];
         try {
             // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's native CRS.
             // That assumption is fine when the coverage happens to be in longitude-first WGS84 but we want to support

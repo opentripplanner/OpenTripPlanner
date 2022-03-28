@@ -7,23 +7,21 @@ on:
 
 jobs:
   changelog-entry:
+    if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner'
     runs-on: ubuntu-latest
     steps:
 
       - name: Checkout
-        if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner'
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
 
       - name: Configure Git User
-        if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner'
         run: |
           git config --global user.name 'OTP Changelog Bot'
           git config --global user.email 'changelog-bot@opentripplanner.org'
 
       - name: Generate changelog entry from PR information
-        if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner'
         run: |
           # if the title contains "changelog skip" we don't generate an entry
           TITLE_LOWER_CASE=`echo $TITLE | awk '{print tolower($0)}'`

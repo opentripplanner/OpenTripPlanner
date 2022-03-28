@@ -16,7 +16,7 @@ import java.util.List;
  */
 public final class TravelOptionsMaker {
 
-    private static List<TravelOption> staticTravelOptions;
+    private static final List<TravelOption> staticTravelOptions;
 
     static {
         staticTravelOptions = new ArrayList<>(3);

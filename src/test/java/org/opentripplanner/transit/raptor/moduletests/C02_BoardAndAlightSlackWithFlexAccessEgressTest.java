@@ -39,7 +39,7 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
       = "Flex 2m 1x ~ B ~ "
       + "BUS R1 0:04 0:06 ~ C ~ "
       + "Flex 2m 1x "
-      + "[0:00:30 0:09:10 8m40s]";
+      + "[0:00:30 0:09:10 8m40s 2tx]";
 
   @BeforeEach
   public void setup() {
@@ -79,7 +79,11 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
 
   @Test
   public void standard() {
-    var request = requestBuilder.profile(RaptorProfile.STANDARD).build();
+    var request = requestBuilder
+            .profile(RaptorProfile.STANDARD)
+            .searchParams().searchOneIterationOnly()
+            .build();
+
     var response = raptorService.route(request, data);
     assertEquals(EXPECTED_RESULT, pathsToString(response));
   }
@@ -87,8 +91,9 @@ public class C02_BoardAndAlightSlackWithFlexAccessEgressTest implements RaptorTe
   @Test
   public void standardReverse() {
     var request = requestBuilder
-        .searchDirection(SearchDirection.REVERSE)
-        .profile(RaptorProfile.STANDARD)
+            .profile(RaptorProfile.STANDARD)
+            .searchDirection(SearchDirection.REVERSE)
+            .searchParams().searchOneIterationOnly()
         .build();
     var response = raptorService.route(request, data);
     assertEquals(EXPECTED_RESULT, pathsToString(response));

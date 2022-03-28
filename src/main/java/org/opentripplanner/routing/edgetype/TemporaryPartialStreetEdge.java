@@ -2,15 +2,11 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.I18NString;
-
-import java.util.List;
 
 
 final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge implements TemporaryEdge {
@@ -85,14 +81,6 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     }
 
     /**
-     * Have the turn restrictions of  their parent.
-     */
-    @Override
-    protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
-        return graph.getTurnRestrictions(parentEdge);
-    }
-
-    /**
      * This implementation makes it so that TurnRestrictions on the parent edge are applied to this edge as well.
      */
     @Override
@@ -131,7 +119,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
 
     @Override
     public String toString() {
-        return "TemporaryPartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
+        return "TemporaryPartialStreetEdge(" + this.getDefaultName() + ", " + this.getFromVertex() + " -> "
                 + this.getToVertex() + " length=" + this.getDistanceMeters() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
     }

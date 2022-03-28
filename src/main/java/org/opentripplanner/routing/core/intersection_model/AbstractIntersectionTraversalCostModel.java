@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.core.intersection_model;
 
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
@@ -22,8 +22,7 @@ public abstract class AbstractIntersectionTraversalCostModel implements
      * 
      * TODO(flamholz): this should probably account for whether there is a traffic light?
      */
-    protected double computeNonDrivingTraversalCost(IntersectionVertex v, StreetEdge from,
-            StreetEdge to, float fromSpeed, float toSpeed) {
+    protected double computeNonDrivingTraversalCost(StreetEdge from, StreetEdge to, float toSpeed) {
         int outAngle = to.getOutAngle();
         int inAngle = from.getInAngle();
         int turnCost = Math.abs(outAngle - inAngle);
@@ -40,8 +39,7 @@ public abstract class AbstractIntersectionTraversalCostModel implements
      * 
      * Corrects for the side of the street they are driving on.
      */
-    protected int calculateTurnAngle(StreetEdge from, StreetEdge to,
-            RoutingRequest options) {
+    protected int calculateTurnAngle(StreetEdge from, StreetEdge to) {
         int angleOutOfIntersection = to.getInAngle();
         int angleIntoIntersection = from.getOutAngle();
         
@@ -56,8 +54,13 @@ public abstract class AbstractIntersectionTraversalCostModel implements
 
     /* Concrete subclasses must implement this */
     @Override
-    public abstract double computeTraversalCost(IntersectionVertex v, StreetEdge from,
-            StreetEdge to, TraverseMode mode, RoutingRequest options, float fromSpeed,
-            float toSpeed);
-
+    public abstract double computeTraversalCost(
+      IntersectionVertex v,
+      StreetEdge from,
+      StreetEdge to,
+      TraverseMode mode,
+      RoutingRequest options,
+      float fromSpeed,
+      float toSpeed
+    );
 }

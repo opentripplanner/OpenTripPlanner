@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.TimeZone;
 import javax.validation.constraints.NotNull;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryUtils;
 
@@ -28,7 +30,7 @@ public final class Stop extends StationElement implements StopLocation {
   /**
    * URL to a web page containing information about this particular stop.
    */
-  private final String url;
+  private final I18NString url;
 
   private final TimeZone timeZone;
 
@@ -44,7 +46,7 @@ public final class Stop extends StationElement implements StopLocation {
 
   public Stop(
       FeedScopedId id,
-      String name,
+      I18NString name,
       String code,
       String description,
       WgsCoordinate coordinate,
@@ -52,7 +54,7 @@ public final class Stop extends StationElement implements StopLocation {
       StopLevel level,
       String platformCode,
       Collection<FareZone> fareZones,
-      String url,
+      I18NString url,
       TimeZone timeZone,
       TransitMode vehicleType,
       String netexSubmode
@@ -78,7 +80,7 @@ public final class Stop extends StationElement implements StopLocation {
   public static Stop stopForTest(String idAndName, double lat, double lon, Station parent) {
     var stop = new Stop(
         new FeedScopedId("F", idAndName),
-        idAndName,
+        new NonLocalizedString(idAndName),
         idAndName,
         null,
         new WgsCoordinate(lat, lon),
@@ -111,7 +113,7 @@ public final class Stop extends StationElement implements StopLocation {
     return platformCode;
   }
 
-  public String getUrl() {
+  public I18NString getUrl() {
     return url;
   }
 

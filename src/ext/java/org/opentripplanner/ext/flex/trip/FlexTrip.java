@@ -2,7 +2,6 @@ package org.opentripplanner.ext.flex.trip;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
@@ -12,6 +11,7 @@ import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
@@ -62,6 +62,10 @@ public abstract class FlexTrip extends TransitEntity {
 
   public abstract BookingInfo getPickupBookingInfo(int i);
 
+  public abstract PickDrop getBoardRule(int i);
+
+  public abstract PickDrop getAlightRule(int i);
+
   public abstract boolean isBoardingPossible(NearbyStop stop);
 
   public abstract boolean isAlightingPossible(NearbyStop stop);
@@ -73,4 +77,5 @@ public abstract class FlexTrip extends TransitEntity {
   public static boolean isFlexStop(StopLocation stop) {
     return stop instanceof FlexLocationGroup || stop instanceof FlexStopLocation;
   }
+
 }

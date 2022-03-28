@@ -24,7 +24,7 @@ public class StopLinkedTooFar implements DataImportIssue {
 
     @Override
     public String getHTMLMessage() {
-        return String.format(HTMLFMT, stop.getStop().getLat(), stop.getStop().getLon(), stop.getName(), stop.getStop().getId(), Integer.toString(distance));
+        return String.format(HTMLFMT, stop.getStop().getLat(), stop.getStop().getLon(), stop.getDefaultName(), stop.getStop().getId(), Integer.toString(distance));
     }
 
     @Override

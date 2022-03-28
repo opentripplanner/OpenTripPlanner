@@ -1,13 +1,7 @@
 package org.opentripplanner.routing.graph;
 
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import gnu.trove.list.TDoubleList;
@@ -45,7 +39,6 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -70,22 +63,21 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.model.transfer.TransferService;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -112,10 +104,6 @@ public class Graph implements Serializable {
 
     public static final IntersectionTraversalCostModel DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL
         = new SimpleIntersectionTraversalCostModel(DEFAULT_DRIVING_DIRECTION);
-
-    private final OtpProjectInfo projectInfo = projectInfo();
-
-    private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
     public final StreetNotesService streetNotesService = new StreetNotesService();
 
@@ -250,9 +238,6 @@ public class Graph implements Serializable {
      */
     public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
 
-    /** Interlining relationships between trips. */
-    public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
-
     /** Pre-generated transfers between all stops. */
     public final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
@@ -275,6 +260,8 @@ public class Graph implements Serializable {
     public transient TransitLayerUpdater transitLayerUpdater;
 
     private transient TransitAlertService transitAlertService;
+
+    private transient RealtimeVehiclePositionService vehiclePositionService;
 
     private DrivingDirection drivingDirection = DEFAULT_DRIVING_DIRECTION;
 
@@ -356,20 +343,26 @@ public class Graph implements Serializable {
      */
     public void removeEdge(Edge e) {
         if (e != null) {
-            turnRestrictions.remove(e);
             streetNotesService.removeStaticNotes(e);
 
+            if (e instanceof StreetEdge) {
+                ((StreetEdge) e).removeAllTurnRestrictions();
+            }
+
             if (e.fromv != null) {
+                e.fromv.getIncoming()
+                        .stream()
+                        .filter(StreetEdge.class::isInstance)
+                        .map(StreetEdge.class::cast)
+                        .forEach(otherEdge -> {
+                            for (TurnRestriction turnRestriction : otherEdge.getTurnRestrictions()) {
+                                if (turnRestriction.to == e) {
+                                    otherEdge.removeTurnRestriction(turnRestriction);
+                                }
+                            }
+                        });
+
                 e.fromv.removeOutgoing(e);
-
-                for (Edge otherEdge : e.fromv.getIncoming()) {
-                    for (TurnRestriction turnRestriction : getTurnRestrictions(otherEdge)) {
-                        if (turnRestriction.to == e) {
-                            removeTurnRestriction(otherEdge, turnRestriction);
-                        }
-                    }
-                }
-
                 e.fromv = null;
             }
 
@@ -422,51 +415,7 @@ public class Graph implements Serializable {
             .collect(Collectors.toList());
     }
 
-    /**
-     * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} belonging to an
-     * {@link Edge}. This method is not thread-safe.
-     */
-    public void addTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
-        if (edge == null || turnRestriction == null) return;
-        List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
-        if (turnRestrictions == null) {
-            turnRestrictions = Lists.newArrayList();
-            this.turnRestrictions.put(edge, turnRestrictions);
-        }
-        turnRestrictions.add(turnRestriction);
-    }
 
-    /**
-     * Remove a {@link TurnRestriction} from the {@link TurnRestriction} {@link List} belonging to
-     * an {@link Edge}. This method is not thread-safe.
-     */
-    public void removeTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
-        if (edge == null || turnRestriction == null) return;
-        List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
-        if (turnRestrictions != null && turnRestrictions.contains(turnRestriction)) {
-            if (turnRestrictions.size() < 2) {
-                this.turnRestrictions.remove(edge);
-            } else {
-                turnRestrictions.remove(turnRestriction);
-            }
-        }
-    }
-
-    /**
-     * Get the {@link TurnRestriction} {@link List} that belongs to an {@link Edge} and return an
-     * immutable copy. This method is thread-safe when used by itself, but not if addTurnRestriction
-     * or removeTurnRestriction is called concurrently.
-     * @return The {@link TurnRestriction} {@link List} that belongs to the {@link Edge}
-     */
-    public List<TurnRestriction> getTurnRestrictions(Edge edge) {
-        if (edge != null) {
-            List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
-            if (turnRestrictions != null) {
-                return ImmutableList.copyOf(turnRestrictions);
-            }
-        }
-        return Collections.emptyList();
-    }
 
     /**
      * Return only the StreetEdges in the graph.
@@ -922,6 +871,13 @@ public class Graph implements Serializable {
             transitAlertService = new DelegatingTransitAlertServiceImpl(this);
         }
         return transitAlertService;
+    }
+
+    public RealtimeVehiclePositionService getVehiclePositionService() {
+        if (vehiclePositionService == null) {
+            vehiclePositionService = new RealtimeVehiclePositionService();
+        }
+        return vehiclePositionService;
     }
 
     private Collection<StopLocation> getStopsForId(FeedScopedId id) {

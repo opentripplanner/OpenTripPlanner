@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 
@@ -27,9 +26,9 @@ public class TransitStopVertex extends Vertex {
 
     private static final long serialVersionUID = 1L;
 
-    private boolean wheelchairEntrance;
+    private final boolean wheelchairEntrance;
 
-    private Stop stop;
+    private final Stop stop;
 
     /**
      * For stops that are deep underground, there is a time cost to entering and exiting the stop;
@@ -44,7 +43,13 @@ public class TransitStopVertex extends Vertex {
      * @param modes Set of modes for all Routes using this stop. If {@code null} an empty set is used.
      */
     public TransitStopVertex (Graph graph, Stop stop, Set<TransitMode> modes) {
-        super(graph, stop.getId().toString(), stop.getLon(), stop.getLat());
+        super(
+                graph,
+                stop.getId().toString(),
+                stop.getLon(),
+                stop.getLat(),
+                stop.getName()
+        );
         this.stop = stop;
         this.modes = modes != null ? modes : new HashSet<>();
         this.wheelchairEntrance = stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
@@ -89,16 +94,6 @@ public class TransitStopVertex extends Vertex {
 
     public Stop getStop() {
             return this.stop;
-    }
-
-    @Override
-    public String getName() {
-        return stop.getName();
-    }
-
-    @Override
-    public String getName(Locale locale) {
-        return stop.getName();
     }
 
     @Override

@@ -1,15 +1,25 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.PathwayNode;
-import org.opentripplanner.util.MapUtils;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import org.opentripplanner.model.PathwayNode;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Node into the OTP model. */
 class PathwayNodeMapper {
-    private Map<org.onebusaway.gtfs.model.Stop, PathwayNode> mappedNodes = new HashMap<>();
+    static final String DEFAULT_NAME = "Pathway node";
+
+    private final Map<org.onebusaway.gtfs.model.Stop, PathwayNode> mappedNodes = new HashMap<>();
+
+    private final TranslationHelper translationHelper;
+
+    PathwayNodeMapper(TranslationHelper translationHelper) {
+        this.translationHelper = translationHelper;
+    }
 
     Collection<PathwayNode> map(Collection<org.onebusaway.gtfs.model.Stop> allNodes) {
         return MapUtils.mapToList(allNodes, this::map);
@@ -29,9 +39,17 @@ class PathwayNodeMapper {
 
         StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
+        final I18NString name = translationHelper.getTranslation(
+            org.onebusaway.gtfs.model.Stop.class,
+            "name",
+            base.getId().getId(),
+            Optional.ofNullable(base.getName()).orElse(DEFAULT_NAME)
+        );
+
+
         return new PathwayNode(
             base.getId(),
-            base.getName(),
+            name,
             base.getCode(),
             base.getDescription(),
             base.getCoordinate(),

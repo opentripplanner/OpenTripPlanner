@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.Collections;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,24 +29,24 @@ import java.util.regex.Pattern;
  * number of exact, partial, and wildcard tag matches. See OSMSpecifier for more details on the matching process.
  */
 public class WayPropertySet {
-    private static Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
-    private List<WayPropertyPicker> wayProperties;
+    private final List<WayPropertyPicker> wayProperties;
 
     /** Assign names to ways that do not have them based on OSM tags. */
-    private List<CreativeNamerPicker> creativeNamers;
+    private final List<CreativeNamerPicker> creativeNamers;
 
-    private List<SlopeOverridePicker> slopeOverrides;
+    private final List<SlopeOverridePicker> slopeOverrides;
     
     /** Assign automobile speeds based on OSM tags. */
-    private List<SpeedPicker> speedPickers;
+    private final List<SpeedPicker> speedPickers;
     
     /** The automobile speed for street segments that do not match any SpeedPicker. */
     public Float defaultSpeed;
 
-    private List<NotePicker> notes;
+    private final List<NotePicker> notes;
     
-    private Pattern maxSpeedPattern;
+    private final Pattern maxSpeedPattern;
 
     /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
     public WayProperties defaultProperties;
@@ -54,17 +54,17 @@ public class WayPropertySet {
     public WayPropertySet() {
         /* sensible defaults */
         defaultProperties = new WayProperties();
-        defaultProperties.setSafetyFeatures(new P2<Double>(1.0, 1.0));
+        defaultProperties.setSafetyFeatures(new P2<>(1.0, 1.0));
         defaultProperties.setPermission(StreetTraversalPermission.ALL);
         defaultSpeed = 11.2f; // 11.2 m/s ~= 25 mph ~= 40 kph, standard speed limit in the US
-        wayProperties = new ArrayList<WayPropertyPicker>();
-        creativeNamers = new ArrayList<CreativeNamerPicker>();
-        slopeOverrides = new ArrayList<SlopeOverridePicker>();
-        speedPickers = new ArrayList<SpeedPicker>();
-        notes = new ArrayList<NotePicker>();
+        wayProperties = new ArrayList<>();
+        creativeNamers = new ArrayList<>();
+        slopeOverrides = new ArrayList<>();
+        speedPickers = new ArrayList<>();
+        notes = new ArrayList<>();
         // regex courtesy http://wiki.openstreetmap.org/wiki/Key:maxspeed
         // and edited
-        maxSpeedPattern = Pattern.compile("^([0-9][\\.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$");
+        maxSpeedPattern = Pattern.compile("^([0-9][.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$");
     }
 
     /**
@@ -76,8 +76,8 @@ public class WayPropertySet {
         WayProperties rightResult = defaultProperties;
         int bestLeftScore = 0;
         int bestRightScore = 0;
-        List<WayProperties> leftMixins = new ArrayList<WayProperties>();
-        List<WayProperties> rightMixins = new ArrayList<WayProperties>();
+        List<WayProperties> leftMixins = new ArrayList<>();
+        List<WayProperties> rightMixins = new ArrayList<>();
         for (WayPropertyPicker picker : wayProperties) {
             OSMSpecifier specifier = picker.getSpecifier();
             WayProperties wayProperties = picker.getProperties();
@@ -105,8 +105,8 @@ public class WayPropertySet {
         }
 
         WayProperties result = rightResult.clone();
-        result.setSafetyFeatures(new P2<Double>(rightResult.getSafetyFeatures().first,
-                leftResult.getSafetyFeatures().second));
+        result.setSafetyFeatures(new P2<>(rightResult.getSafetyFeatures().first,
+          leftResult.getSafetyFeatures().second));
 
         /* apply mixins */
         if (leftMixins.size() > 0) {
@@ -151,7 +151,7 @@ public class WayPropertySet {
                 first *= properties.getSafetyFeatures().first;
             }
         }
-        result.setSafetyFeatures(new P2<Double>(first, second));
+        result.setSafetyFeatures(new P2<>(first, second));
     }
 
     public I18NString getCreativeNameForWay(OSMWithTags way) {
@@ -348,15 +348,13 @@ public class WayPropertySet {
     }
     
 	public void createNames(String spec, String patternKey) {
-		String pattern = patternKey;
-		CreativeNamer namer = new CreativeNamer(pattern);
+        CreativeNamer namer = new CreativeNamer(patternKey);
 		addCreativeNamer(new OSMSpecifier(spec), namer);
 	}
 
 	public  void createNotes(String spec, String patternKey, NoteMatcher matcher) {
-		String pattern = patternKey;
-		// TODO: notes aren't localized
-		NoteProperties properties = new NoteProperties(pattern, matcher);
+        // TODO: notes aren't localized
+		NoteProperties properties = new NoteProperties(patternKey, matcher);
 		addNote(new OSMSpecifier(spec), properties);
 	}
 
@@ -378,7 +376,7 @@ public class WayPropertySet {
 			StreetTraversalPermission permission, double safety, double safetyBack, boolean mixin) {
 		WayProperties properties = new WayProperties();
 		properties.setPermission(permission);
-		properties.setSafetyFeatures(new P2<Double>(safety, safetyBack));
+		properties.setSafetyFeatures(new P2<>(safety, safetyBack));
 		addProperties(new OSMSpecifier(spec), properties, mixin);
 	}
 

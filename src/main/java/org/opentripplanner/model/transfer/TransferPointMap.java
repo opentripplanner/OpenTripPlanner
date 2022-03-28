@@ -1,5 +1,11 @@
 package org.opentripplanner.model.transfer;
 
+import org.opentripplanner.common.model.T2;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.Trip;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,11 +13,6 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 
 /**
  * A map from any TransferPoint to an instances of type E. This is used to look up
@@ -77,7 +78,7 @@ class TransferPointMap<E> {
      * List all elements witch matches any of the transfer points added to the map.
      */
     List<E> get(Trip trip, StopLocation stop, int stopPointInPattern) {
-        var list = Stream.of(
+        return Stream.of(
                         tripMap.get(tripKey(trip, stopPointInPattern)),
                         routeStopMap.get(routeStopKey(trip.getRoute(), stop)),
                         routeStationMap.get(routeStationKey(trip.getRoute(), stop.getParentStation())),
@@ -86,7 +87,6 @@ class TransferPointMap<E> {
                 )
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        return list;
     }
 
     private static T2<Trip, Integer> tripKey(Trip trip, int stopPositionInPattern) {

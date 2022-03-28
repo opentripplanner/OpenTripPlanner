@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
@@ -86,7 +85,7 @@ public abstract class SnapshotTestBase {
     protected RoutingRequest createTestRequest(int year, int month, int day, int hour, int minute, int second) {
         Router router = getRouter();
 
-        RoutingRequest request = router.defaultRoutingRequest.clone();
+        RoutingRequest request = router.copyDefaultRoutingRequest();
         request.setDateTime(TestUtils.dateInstant(router.graph.getTimeZone().getID(), year, month, day, hour, minute, second));
         request.maxTransfers = 6;
         request.numItineraries = 6;
@@ -160,10 +159,6 @@ public abstract class SnapshotTestBase {
     }
 
     protected void expectArriveByToMatchDepartAtAndSnapshot(RoutingRequest request) {
-        expectArriveByToMatchDepartAtAndSnapshot(request, (departAt, arriveBy) -> {});
-    }
-
-    protected void expectArriveByToMatchDepartAtAndSnapshot(RoutingRequest request, BiConsumer<Itinerary, Itinerary> arriveByCorrecter) {
         Router router = getRouter();
 
         RoutingRequest departAt = request.clone();
@@ -182,7 +177,6 @@ public abstract class SnapshotTestBase {
         var departAtItinerary = departByItineraries.get(0);
         var arriveByItinerary = arriveByItineraries.get(0);
 
-        arriveByCorrecter.accept(departAtItinerary, arriveByItinerary);
         logDebugInformationOnFailure(arriveBy, () -> assertEquals(
                 asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
                 asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
@@ -356,18 +350,5 @@ public abstract class SnapshotTestBase {
         public String getOutputFormat() {
             return SerializerType.JSON.name();
         }
-    }
-
-    /**
-     * The generalizedCost for non-transit legs may differ for departAt / arriveBy searches,
-     * depending on where the costs were applied.
-     */
-    public static void handleGeneralizedCost(Itinerary departAt, Itinerary arriveBy) {
-        departAt.legs.stream()
-                .filter(l -> !l.getMode().isTransit())
-                .forEach(l -> l.setGeneralizedCost(0));
-        arriveBy.legs.stream()
-                .filter(l -> !l.getMode().isTransit())
-                .forEach(l -> l.setGeneralizedCost(0));
     }
 }

@@ -9,9 +9,9 @@ import org.opentripplanner.routing.graph.Vertex;
 public class TransitBoardingAreaVertex extends Vertex {
   private static final long serialVersionUID = 1L;
 
-  private boolean wheelchairAccessible;
+  private final boolean wheelchairAccessible;
 
-  private BoardingArea boardingArea;
+  private final BoardingArea boardingArea;
 
   /**
    * @param boardingArea The transit model boarding area reference.
@@ -21,17 +21,13 @@ public class TransitBoardingAreaVertex extends Vertex {
         graph,
         boardingArea.getId().toString(),
         boardingArea.getCoordinate().longitude(),
-        boardingArea.getCoordinate().latitude()
+        boardingArea.getCoordinate().latitude(),
+        boardingArea.getName()
     );
     this.boardingArea = boardingArea;
     this.wheelchairAccessible = boardingArea.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
     //Adds this vertex into graph envelope so that we don't need to loop over all vertices
     graph.expandToInclude(boardingArea.getCoordinate().longitude(), boardingArea.getCoordinate().latitude());
-  }
-
-  @Override
-  public String getName() {
-    return boardingArea.getName();
   }
 
   public boolean isWheelchairAccessible() {

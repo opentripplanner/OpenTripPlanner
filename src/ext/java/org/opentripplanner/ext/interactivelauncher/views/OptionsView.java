@@ -1,18 +1,15 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
+import org.opentripplanner.ext.interactivelauncher.Model;
 
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
+import javax.swing.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.swing.Box;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import org.opentripplanner.ext.interactivelauncher.Model;
+
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
+import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
 
 class OptionsView {
   private final Box panel = Box.createVerticalBox();
@@ -20,6 +17,7 @@ class OptionsView {
   private final JCheckBox buildTransitGraphChk;
   private final JCheckBox saveGraphChk;
   private final JCheckBox startOptServerChk;
+  private final JCheckBox startOptVisualizerChk;
   private final Model model;
 
   OptionsView(Model model) {
@@ -28,6 +26,7 @@ class OptionsView {
     this.buildTransitGraphChk = new JCheckBox("Transit graph", model.isBuildTransit());
     this.saveGraphChk = new JCheckBox("Save graph", model.isSaveGraph());
     this.startOptServerChk = new JCheckBox("Serve graph", model.isServeGraph());
+    this.startOptVisualizerChk = new JCheckBox("Visualizer", model.isVisualizer());
 
     addComp(new JLabel("Build graph"), panel);
     addSectionSpace(panel);
@@ -36,13 +35,15 @@ class OptionsView {
     addSectionDoubleSpace(panel);
 
     // Toggle [ ] save on/off
-    buildStreetGraphChk.addActionListener(this::onBuildGraphChkChanged);
-    buildTransitGraphChk.addActionListener(this::onBuildGraphChkChanged);
+    buildStreetGraphChk.addActionListener(e -> onBuildGraphChkChanged());
+    buildTransitGraphChk.addActionListener(e -> onBuildGraphChkChanged());
+    startOptServerChk.addActionListener(e -> onStartOptServerChkChanged());
 
     addComp(new JLabel("Actions"), panel);
     addSectionSpace(panel);
     addComp(saveGraphChk, panel);
     addComp(startOptServerChk, panel);
+    addComp(startOptVisualizerChk, panel);
 
     addDebugCheckBoxes(model);
     addSectionDoubleSpace(panel);
@@ -54,7 +55,7 @@ class OptionsView {
   }
 
   void initState() {
-    onBuildGraphChkChanged(null);
+    onBuildGraphChkChanged();
   }
 
   private void addDebugCheckBoxes(Model model) {
@@ -75,6 +76,7 @@ class OptionsView {
     bind(buildTransitGraphChk, model::setBuildTransit);
     bind(saveGraphChk, model::setSaveGraph);
     bind(startOptServerChk, model::setServeGraph);
+    bind(startOptVisualizerChk, model::setVisualizer);
   }
 
   void bind(JCheckBox box, Consumer<Boolean> modelUpdate) {
@@ -89,8 +91,13 @@ class OptionsView {
     return buildTransitGraphChk.isSelected();
   }
 
-  private void onBuildGraphChkChanged(ActionEvent e) {
+  private void onBuildGraphChkChanged() {
     saveGraphChk.setEnabled(buildStreet() || buildTransit());
     startOptServerChk.setEnabled(buildTransit() || !buildStreet());
+    startOptVisualizerChk.setEnabled(buildTransit() || !buildStreet());
+  }
+
+  private void onStartOptServerChkChanged() {
+    startOptVisualizerChk.setEnabled(startOptServerChk.isEnabled() && startOptServerChk.isSelected());
   }
 }

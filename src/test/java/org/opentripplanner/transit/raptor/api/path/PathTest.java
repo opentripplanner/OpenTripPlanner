@@ -10,15 +10,21 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.RAPTOR_ITERATION_START_TIME;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.basicTripStops;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.util.time.TimeUtils.time;
 import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.util.time.TimeUtils;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 
 
 public class PathTest implements RaptorTestConstants {
@@ -99,7 +105,7 @@ public class PathTest implements RaptorTestConstants {
 
     @Test
     public void waitTime() {
-        assertEquals(TimeUtils.time("0:39:15"), subject.waitTime());
+        assertEquals(time("0:39:15"), subject.waitTime());
     }
 
     @Test
@@ -133,8 +139,80 @@ public class PathTest implements RaptorTestConstants {
         // Order: < EndTime, > StartTime, < Cost, < Transfers
         List<Path<?>> expected = List.of(p2, p1, p4, p3, p0);
 
-        List<Path<?>> paths = List.of(p4, p3, p2, p1, p0).stream().sorted().collect(Collectors.toList());
+        List<Path<?>> paths = Stream.of(p4, p3, p2, p1, p0).sorted().collect(Collectors.toList());
 
         assertEquals(expected, paths);
+    }
+
+    @Test
+    public void testCountTransfersWithStaySeated() {
+        int egressStart = time("09:30");
+        int egressEnd = time("09:40");
+        RaptorTransfer egress = walk(STOP_C, egressEnd - egressStart);
+        PathLeg<TestTripSchedule> leg4 = new EgressPathLeg<>(
+                egress, egressStart, egressEnd, egress.generalizedCost()
+        );
+
+        var trip3 = TestTripSchedule
+                .schedule(pattern("L1", STOP_B, STOP_C))
+                .times(time("09:20"), egressStart)
+                .build();
+        var times3 = new BoardAndAlightTime(trip3, 0, 1);
+        TransitPathLeg<TestTripSchedule> leg3 = new TransitPathLeg<>(trip3, times3, null, 600, leg4
+        );
+
+        var trip2 = TestTripSchedule
+                .schedule(pattern("L1", STOP_A, STOP_B))
+                .times(time("09:10"), time("09:20"))
+                .build();
+        var times2 = new BoardAndAlightTime(trip2, 0, 1);
+
+        var tx = TransferConstraint.create().staySeated().build();
+        TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(trip2, times2, () -> tx, 600, leg3);
+
+        int accessStart = time("09:00");
+        int accessEnd = time("09:10");
+        RaptorTransfer access = walk(STOP_A, accessEnd - accessStart);
+        AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
+                access, accessStart, accessEnd, access.generalizedCost(), leg2.asTransitLeg()
+        );
+        Path<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST);
+        assertEquals(0, path.numberOfTransfers());
+    }
+
+    @Test
+    public void testCountTransfersWithTransfer() {
+        int egressStart = time("09:30");
+        int egressEnd = time("09:40");
+        RaptorTransfer egress = walk(STOP_C, egressEnd - egressStart);
+        PathLeg<TestTripSchedule> leg4 = new EgressPathLeg<>(
+                egress, egressStart, egressEnd, egress.generalizedCost()
+        );
+
+        var trip3 = TestTripSchedule
+                .schedule(pattern("L1", STOP_B, STOP_C))
+                .times(time("09:20"), egressStart)
+                .build();
+        var times3 = new BoardAndAlightTime(trip3, 0, 1);
+        TransitPathLeg<TestTripSchedule> leg3 = new TransitPathLeg<>(trip3, times3, null, 600, leg4
+        );
+
+        var trip2 = TestTripSchedule
+                .schedule(pattern("L1", STOP_A, STOP_B))
+                .times(time("09:10"), time("09:20"))
+                .build();
+        var times2 = new BoardAndAlightTime(trip2, 0, 1);
+
+        var tx = TransferConstraint.create().staySeated().build();
+        TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(trip2, times2, null, 600, leg3);
+
+        int accessStart = time("09:00");
+        int accessEnd = time("09:10");
+        RaptorTransfer access = walk(STOP_A, accessEnd - accessStart);
+        AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
+                access, accessStart, accessEnd, access.generalizedCost(), leg2.asTransitLeg()
+        );
+        Path<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST);
+        assertEquals(1, path.numberOfTransfers());
     }
 }

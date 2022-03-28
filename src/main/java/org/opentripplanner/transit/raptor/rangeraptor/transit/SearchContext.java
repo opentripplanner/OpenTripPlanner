@@ -56,6 +56,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
     private final PathMapper<T> pathMapper;
     private final WorkerPerformanceTimers timers;
     private final DebugHandlerFactory<T> debugFactory;
+    private final EgressPaths egressPaths;
+    private final AccessPaths accessPaths;
 
     private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
@@ -68,6 +70,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.request = request;
         this.tuningParameters = tuningParameters;
         this.transit = transit;
+        this.accessPaths = accessPaths(request);
+        this.egressPaths = egressPaths(request);
+
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
         this.costCalculator = request.profile().is(RaptorProfile.MULTI_CRITERIA)
@@ -88,28 +93,16 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
 
-    public Collection<RaptorTransfer> accessPaths() {
-        return accessOrEgressPaths(
-                request.searchDirection().isForward(),
-                profile(),
-                request.searchParams()
-        );
-
+    public AccessPaths accessPaths() {
+        return accessPaths;
     }
 
-    public Collection<RaptorTransfer> egressPaths() {
-        return accessOrEgressPaths(
-                request.searchDirection().isInReverse(),
-                profile(),
-                request.searchParams()
-        );
+    public EgressPaths egressPaths() {
+        return egressPaths;
     }
 
     public int[] egressStops() {
-        return egressPaths().stream()
-                .mapToInt(RaptorTransfer::stop)
-                .distinct()
-                .toArray();
+        return egressPaths().stops();
     }
 
     public SearchParams searchParams() {
@@ -131,12 +124,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
     /**
      * Create new slack-provider for use in Raptor, handles reverse and forward
      * search as well as including transfer-slack into board-slack between transits.
-     * <p>
-     * The {@code SlackProvider} is stateful, so this method create a new instance
-     * every time it is called, so each consumer could have their own instance and
-     * not get surprised by the life-cycle update. Remember to call the
-     * {@link SlackProvider#setCurrentPattern(RaptorTripPattern)} before retriving
-     * slack values.
      */
     public SlackProvider slackProvider() {
         return createSlackProvider(request, lifeCycle());
@@ -273,11 +260,29 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return transit.stopNameResolver();
     }
 
+
+    private static AccessPaths accessPaths(RaptorRequest<?> request) {
+        boolean forward = request.searchDirection().isForward();
+        var params = request.searchParams();
+        var paths = forward ? params.accessPaths() : params.egressPaths();
+        return AccessPaths.create(paths, request.profile());
+    }
+
+    private static EgressPaths egressPaths(RaptorRequest<?> request) {
+        boolean forward = request.searchDirection().isForward();
+        var params = request.searchParams();
+        var paths = forward ? params.egressPaths() : params.accessPaths();
+        return EgressPaths.create(paths, request.profile());
+    }
+
     /**
      * The multi-criteria state can handle multiple access/egress paths to a single stop, but the
-     * Standard and BestTime states do not. To get a deterministic behaviour we filter the
-     * paths and return the paths with the shortest duration for none multi-criteria search. If two
-     * paths have the same duration the first one is picked.
+     * Standard and BestTime states do not. To get a deterministic behaviour we filter the paths
+     * and return the paths with the shortest duration for none multi-criteria search. If two
+     * paths have the same duration the first one is picked. Note! If the access/egress paths
+     * contains flex as well, then we need to look at mode for arriving at tha stop as well.
+     * A Flex arrive-on-board can be used with a transfer even if the time is worse compared with
+     * walking.
      * <p>
      * This method is static and package local to enable unit-testing.
      */

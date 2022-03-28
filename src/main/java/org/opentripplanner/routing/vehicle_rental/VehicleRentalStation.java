@@ -2,7 +2,6 @@ package org.opentripplanner.routing.vehicle_rental;
 
 import static java.util.Locale.ROOT;
 
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.model.FeedScopedId;

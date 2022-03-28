@@ -40,7 +40,7 @@ public class C03_OnStreetTransfersTest implements RaptorTestConstants {
       + "Walk 30s ~ D ~ "
       + "BUS R2 0:04 0:05 ~ E ~ "
       + "Walk 20s "
-      + "[0:01:30 0:05:20 3m50s]";
+      + "[0:01:30 0:05:20 3m50s 1tx]";
 
   @BeforeEach
   public void setup() {

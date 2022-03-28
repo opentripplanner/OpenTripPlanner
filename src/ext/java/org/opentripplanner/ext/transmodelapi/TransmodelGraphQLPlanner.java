@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi;
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 
 import graphql.GraphQLException;
+import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
@@ -10,15 +11,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.DoubleFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
@@ -31,7 +29,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
-import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -47,13 +44,12 @@ public class TransmodelGraphQLPlanner {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraphQLPlanner.class);
 
-    public PlanResponse plan(DataFetchingEnvironment environment) {
+    public DataFetcherResult<PlanResponse> plan(DataFetchingEnvironment environment) {
         PlanResponse response = new PlanResponse();
+        TransmodelRequestContext ctx = environment.getContext();
+        Router router = ctx.getRouter();
         RoutingRequest request = null;
         try {
-            TransmodelRequestContext ctx = environment.getContext();
-            Router router = ctx.getRouter();
-
             request = createRequest(environment);
 
             RoutingResponse res = ctx.getRoutingService().route(request, router);
@@ -65,16 +61,16 @@ public class TransmodelGraphQLPlanner {
             response.previousPageCursor = res.getPreviousPageCursor();
             response.nextPageCursor = res.getNextPageCursor();
         }
-        catch (ParameterException e) {
-            var msg = e.message.get();
-            throw new GraphQLException(msg, e);
-        }
         catch (Exception e) {
             LOG.error("System error: " + e.getMessage(), e);
             response.plan = TripPlanMapper.mapTripPlan(request, List.of());
             response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
         }
-        return response;
+        Locale locale = request == null ? router.getDefaultLocale() : request.locale;
+        return DataFetcherResult.<PlanResponse>newResult()
+                .data(response)
+                .localContext(Map.of("locale", locale))
+                .build();
     }
 
     private GenericLocation toGenericLocation(Map<String, Object> m) {
@@ -94,11 +90,10 @@ public class TransmodelGraphQLPlanner {
         return new GenericLocation(name, stopId, lat, lon);
     }
 
-    private RoutingRequest createRequest(DataFetchingEnvironment environment)
-    throws ParameterException {
+    private RoutingRequest createRequest(DataFetchingEnvironment environment) {
         TransmodelRequestContext context = environment.getContext();
         Router router = context.getRouter();
-        RoutingRequest request = router.defaultRoutingRequest.clone();
+        RoutingRequest request = router.copyDefaultRoutingRequest();
 
         DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
@@ -111,7 +106,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
         callWith.argument("pageCursor", request::setPageCursor);
         callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
-        callWith.argument("wheelchair", request::setWheelchairAccessible);
+        callWith.argument("wheelchairAccessible", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
         callWith.argument("transitGeneralizedCostLimit", (DoubleFunction<Double> it) -> request.itineraryFilters.transitGeneralizedCostLimit = it);
 //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
@@ -144,11 +139,6 @@ public class TransmodelGraphQLPlanner {
             request.setTriangleNormalized(args[0], args[1], args[2]);
         }
 
-        if (bicycleOptimizeType == BicycleOptimizeType.TRANSFERS) {
-            bicycleOptimizeType = BicycleOptimizeType.QUICK;
-            request.transferCost += 1800;
-        }
-
         if (bicycleOptimizeType != null) {
             request.bicycleOptimizeType = bicycleOptimizeType;
         }
@@ -168,7 +158,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("whiteListed.lines", (List<String> lines) -> request.setWhiteListedRoutes(mapIDsToDomain(lines)));
         callWith.argument("banned.lines", (List<String> lines) -> request.setBannedRoutes(mapIDsToDomain(lines)));
 
-        callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) -> request.bannedTrips = toBannedTrips(serviceJourneys));
+        callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) -> request.setBannedTrips(mapIDsToDomain(serviceJourneys)));
 
 //        callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
 //        callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
@@ -272,14 +262,6 @@ public class TransmodelGraphQLPlanner {
             );
         }
         return null;
-    }
-
-    private HashMap<FeedScopedId, BannedStopSet> toBannedTrips(Collection<String> serviceJourneyIds) {
-        Map<FeedScopedId, BannedStopSet> bannedTrips = serviceJourneyIds
-            .stream()
-            .map(TransitIdMapper::mapIDToDomain)
-            .collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));
-        return new HashMap<>(bannedTrips);
     }
 
     /**

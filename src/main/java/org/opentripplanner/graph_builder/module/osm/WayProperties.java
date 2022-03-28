@@ -22,7 +22,7 @@ public class WayProperties implements Cloneable {
      * TODO change the identifiers to make it clear that this reflects danger, not safety.
      * TODO I believe the weights are rescaled later in graph building to be >= 1, but verify.
      */
-    private static final P2<Double> defaultSafetyFeatures = new P2<Double>(1.0, 1.0);
+    private static final P2<Double> defaultSafetyFeatures = new P2<>(1.0, 1.0);
 
     private P2<Double> safetyFeatures = defaultSafetyFeatures;
 
@@ -46,7 +46,7 @@ public class WayProperties implements Cloneable {
         WayProperties result;
         try {
             result = (WayProperties) super.clone();
-            result.setSafetyFeatures(new P2<Double>(safetyFeatures.first, safetyFeatures.second));
+            result.setSafetyFeatures(new P2<>(safetyFeatures.first, safetyFeatures.second));
             return result;
         } catch (CloneNotSupportedException e) {
             // unreached

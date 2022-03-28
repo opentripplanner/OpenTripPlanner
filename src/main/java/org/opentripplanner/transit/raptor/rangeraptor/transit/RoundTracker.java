@@ -40,14 +40,14 @@ public class RoundTracker implements RoundProvider {
         // The 'roundMaxLimit' is inclusive, while the 'nRounds' is exclusive; Hence subtract 1.
         this.roundMaxLimit = nRounds;
         this.numberOfAdditionalTransfers = numberOfAdditionalTransfers;
-        lifeCycle.onSetupIteration(this::setupIteration);
+        lifeCycle.onSetupIteration(t -> setupIteration());
         lifeCycle.onRoundComplete(this::roundComplete);
     }
 
     /**
      * Before each iteration, initialize the round to 0.
      */
-    private void setupIteration(int ignoreIterationDepartureTime) {
+    private void setupIteration() {
         round = 0;
     }
 

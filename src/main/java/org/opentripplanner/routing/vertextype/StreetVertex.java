@@ -10,7 +10,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
-import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.*;
 
@@ -42,27 +41,28 @@ public abstract class StreetVertex extends Vertex {
      *  - unnamedStreed (localized in requested language) if it doesn't have a name
      *  - corner of 0 and 1 (localized corner of zero and first street in the corner)
      *
-     * @param locale Wanted locale
      * @return already localized street names and non-localized corner of x and unnamedStreet
      */
-    public I18NString getIntersectionName(Locale locale) {
+    public I18NString getIntersectionName() {
         I18NString calculatedName = null;
         // generate names for corners when no name was given
-        Set<String> uniqueNameSet = new HashSet<String>();
+        Set<I18NString> uniqueNameSet = new HashSet<>();
         for (Edge e : getOutgoing()) {
             if (e instanceof StreetEdge) {
-                uniqueNameSet.add(e.getName(locale));
+                uniqueNameSet.add(e.getName());
             }
         }
-        List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
+        List<I18NString> uniqueNames = new ArrayList<>(uniqueNameSet);
 
         if (uniqueNames.size() > 1) {
-            calculatedName = new LocalizedString("corner", new String[]{uniqueNames.get(0),
-                uniqueNames.get(1)});
+            calculatedName = locale -> new LocalizedString("corner", new String[]{
+                    uniqueNames.get(0).toString(locale),
+                    uniqueNames.get(1).toString(locale)
+            }).toString(locale);
         } else if (uniqueNames.size() == 1) {
-            calculatedName = new NonLocalizedString(uniqueNames.get(0));
+            calculatedName = uniqueNames.get(0);
         } else {
-            calculatedName = new LocalizedString("unnamedStreet", (String[]) null);
+            calculatedName = new LocalizedString("unnamedStreet");
         }
         return calculatedName;
     }

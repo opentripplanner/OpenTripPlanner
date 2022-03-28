@@ -1,21 +1,22 @@
 package org.opentripplanner.util;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.util.model.EncodedPolylineBean;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class PolylineEncoderTest {
 
     @Test
     public void testCreateEncodingsIterableOfCoordinate() {
         // test taken from example usage
-        List<Coordinate> points = new ArrayList<Coordinate>();
+        List<Coordinate> points = new ArrayList<>();
         points.add(new Coordinate(-73.85062, 40.903125, Double.NaN));
         points.add(new Coordinate(-73.85136, 40.902261, Double.NaN));
         points.add(new Coordinate(-73.85151, 40.902066, Double.NaN));

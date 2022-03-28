@@ -1,17 +1,5 @@
 package org.opentripplanner.routing;
 
-import static com.google.common.collect.Iterables.filter;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-
-import java.time.Instant;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,11 +35,23 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TestUtils;
 
+import java.time.Instant;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.google.common.collect.Iterables.filter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 public class TestHalfEdges {
 
     Graph graph;
 
-    private AStar aStar = new AStar();
+    private final AStar aStar = new AStar();
 
     private StreetEdge top, bottom, left, right, leftBack, rightBack;
 
@@ -131,7 +131,7 @@ public class TestHalfEdges {
 
         RoutingRequest options = new RoutingRequest();
 
-        HashSet<Edge> turns = new HashSet<Edge>();
+        HashSet<Edge> turns = new HashSet<>();
         turns.add(left);
         turns.add(leftBack);
 
@@ -140,7 +140,7 @@ public class TestHalfEdges {
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), false, tempEdges);
 
-        HashSet<Edge> endTurns = new HashSet<Edge>();
+        HashSet<Edge> endTurns = new HashSet<>();
         endTurns.add(right);
         endTurns.add(rightBack);
 
@@ -161,13 +161,13 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, br, end);
         ShortestPathTree spt1 = aStar.getShortestPathTree(options);
 
-        GraphPath pathBr = spt1.getPath(end, false);
+        GraphPath pathBr = spt1.getPath(end);
         assertNotNull("There must be a path from br to end", pathBr);
 
         options.setRoutingContext(graph, tr, end);
         ShortestPathTree spt2 = aStar.getShortestPathTree(options);
 
-        GraphPath pathTr = spt2.getPath(end, false);
+        GraphPath pathTr = spt2.getPath(end);
         assertNotNull("There must be a path from tr to end", pathTr);
         assertTrue("path from bottom to end must be longer than path from top to end",
                 pathBr.getWeight() > pathTr.getWeight());
@@ -175,7 +175,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
-        GraphPath path = spt.getPath(end, false);
+        GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);
 
         // the bottom is not part of the shortest path
@@ -188,7 +188,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(start, false);
+        path = spt.getPath(start);
         assertNotNull("There must be a path from start to end (looking back)", path);
 
         // the bottom edge is not part of the shortest path
@@ -221,7 +221,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(start, false);
+        path = spt.getPath(start);
         assertNotNull("There must be a path from top to bottom along the right", path);
 
         // the left edge is not part of the shortest path (even though the bike must be walked along the right)
@@ -248,7 +248,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(start, false);
+        path = spt.getPath(start);
         assertNotNull("There must be a path from top to bottom", path);
 
         // the right edge is not part of the shortest path, e
@@ -269,7 +269,7 @@ public class TestHalfEdges {
         RoutingRequest options = new RoutingRequest();
         DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
-        HashSet<Edge> turns = new HashSet<Edge>();
+        HashSet<Edge> turns = new HashSet<>();
         turns.add(left);
         turns.add(leftBack);
 
@@ -295,7 +295,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
-        GraphPath path = spt.getPath(end, false);
+        GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);        
         assertEquals(1, path.edges.size());
         options.cleanup();
@@ -308,7 +308,7 @@ public class TestHalfEdges {
         DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
         // Sits only on the leftmost edge, not on its reverse.
-        HashSet<Edge> turns = new HashSet<Edge>();
+        HashSet<Edge> turns = new HashSet<>();
         turns.add(left);
 
         TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocationForTest(
@@ -332,7 +332,7 @@ public class TestHalfEdges {
         options.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
-        GraphPath path = spt.getPath(end, false);
+        GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);        
         assertTrue(path.edges.size() > 1);
         options.cleanup();
@@ -347,7 +347,7 @@ public class TestHalfEdges {
     public void testStreetSplittingAlerts() {
         DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
-        HashSet<Edge> turns = new HashSet<Edge>();
+        HashSet<Edge> turns = new HashSet<>();
         turns.add(left);
         turns.add(leftBack);
 
@@ -416,6 +416,7 @@ public class TestHalfEdges {
 
     @Test
     public void testStreetLocationFinder() {
+        RoutingRequest options = new RoutingRequest();
         StreetVertexIndex finder = graph.getStreetIndex();
         Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
         // test that the local stop finder finds stops
@@ -424,12 +425,12 @@ public class TestHalfEdges {
 
         // test that the closest vertex finder returns the closest vertex
         TemporaryStreetLocation some = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
-                new GenericLocation(40.00, -74.00), null, true, tempEdges);
+                new GenericLocation(40.00, -74.00), options, true, tempEdges);
         assertNotNull(some);
 
         // test that the closest vertex finder correctly splits streets
         TemporaryStreetLocation start = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
-                new GenericLocation(40.004, -74.01), null, false, tempEdges);
+                new GenericLocation(40.004, -74.01), options, false, tempEdges);
         assertNotNull(start);
         assertTrue("wheelchair accessibility is correctly set (splitting)",
                 start.isWheelchairAccessible());
@@ -456,9 +457,9 @@ public class TestHalfEdges {
         // The visibility for temp edges for start and end is set in the setRoutingContext call
         walking.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(walking);
-        GraphPath path = spt.getPath(end, false);
+        GraphPath path = spt.getPath(end);
         for (State s : path.states) {
-            assertFalse(s.getBackEdge() == top);
+          assertNotSame(s.getBackEdge(), top);
         }
         walking.cleanup();
         tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
@@ -468,7 +469,7 @@ public class TestHalfEdges {
     public void testNetworkLinker() {
         int numVerticesBefore = graph.getVertices().size();
         StreetLinkerModule ttsnm = new StreetLinkerModule();
-        ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
+        ttsnm.buildGraph(graph, new HashMap<>());
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();

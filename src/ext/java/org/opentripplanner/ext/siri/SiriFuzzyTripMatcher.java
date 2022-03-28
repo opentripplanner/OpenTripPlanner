@@ -15,7 +15,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,16 +41,16 @@ import uk.org.siri.siri20.VehicleModesEnumeration;
 public class SiriFuzzyTripMatcher {
     private static final Logger LOG = LoggerFactory.getLogger(SiriFuzzyTripMatcher.class);
 
-    private RoutingService routingService;
+    private final RoutingService routingService;
 
-    private static Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
-    private static Map<String, Set<Trip>> mappedVehicleRefCache = new HashMap<>();
-    private static Map<String, Set<Route>> mappedRoutesCache = new HashMap<>();
-    private static Map<String, Set<Trip>> start_stop_tripCache = new HashMap<>();
+    private static final Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
+    private static final Map<String, Set<Trip>> mappedVehicleRefCache = new HashMap<>();
+    private static final Map<String, Set<Route>> mappedRoutesCache = new HashMap<>();
+    private static final Map<String, Set<Trip>> start_stop_tripCache = new HashMap<>();
 
-    private static Map<String, Trip> vehicleJourneyTripCache = new HashMap<>();
+    private static final Map<String, Trip> vehicleJourneyTripCache = new HashMap<>();
 
-    private static Set<String> nonExistingStops = new HashSet<>();
+    private static final Set<String> nonExistingStops = new HashSet<>();
 
     public SiriFuzzyTripMatcher(RoutingService routingService) {
         this.routingService = routingService;

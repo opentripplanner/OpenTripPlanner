@@ -34,24 +34,6 @@ public class ReverseTransitCalculatorTest {
     }
 
     @Test
-    public void isBefore() {
-        var subject = create();
-
-        assertTrue(subject.isBefore(11, 10));
-        assertFalse(subject.isBefore(10, 11));
-        assertFalse(subject.isBefore(10, 10));
-    }
-
-    @Test
-    public void isAfter() {
-        var subject = create();
-
-        assertTrue(subject.isAfter(10, 11));
-        assertFalse(subject.isAfter(11, 10));
-        assertFalse(subject.isAfter(10, 10));
-    }
-
-    @Test
     public void exceedsTimeLimit() {
         earliestAcceptableDepartureTime = 1200;
         var subject = create();
@@ -83,18 +65,6 @@ public class ReverseTransitCalculatorTest {
         subject = create();
 
         assertTrue(subject.oneIterationOnly());
-    }
-
-    @Test
-    public void duration() {
-        assertEquals(400, create().plusDuration(500, 100));
-        assertEquals(600, create().minusDuration(500, 100));
-        assertEquals(400, create().duration(500, 100));
-    }
-
-    @Test
-    public void unreachedTime() {
-        assertEquals(Integer.MIN_VALUE, create().unreachedTime());
     }
 
     @Test

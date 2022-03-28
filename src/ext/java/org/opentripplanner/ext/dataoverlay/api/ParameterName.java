@@ -24,5 +24,5 @@ public enum ParameterName {
     LEAD,
     TEMPERATURE,
     HUMIDITY,
-    WIND_SPEED;
+    WIND_SPEED
 }

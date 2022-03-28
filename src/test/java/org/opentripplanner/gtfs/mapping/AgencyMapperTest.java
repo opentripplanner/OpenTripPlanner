@@ -10,6 +10,7 @@ import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class AgencyMapperTest {
@@ -44,7 +45,7 @@ public class AgencyMapperTest {
         AGENCY.setBrandingUrl(BRANDING_URL);
     }
 
-    private AgencyMapper subject = new AgencyMapper(FEED_ID);
+    private final AgencyMapper subject = new AgencyMapper(FEED_ID);
 
     @Test
     public void testMapCollection() throws Exception {
@@ -89,6 +90,6 @@ public class AgencyMapperTest {
         org.opentripplanner.model.Agency result1 = subject.map(AGENCY);
         org.opentripplanner.model.Agency result2 = subject.map(AGENCY);
 
-        assertTrue(result1 == result2);
+        assertSame(result1, result2);
     }
 }

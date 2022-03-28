@@ -19,8 +19,9 @@ public class RouteDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private JTextField fromField, toField;
-    private JButton goButton;
+    private final JTextField fromField;
+    private final JTextField toField;
+    private final JButton goButton;
     
     public String from, to;
     

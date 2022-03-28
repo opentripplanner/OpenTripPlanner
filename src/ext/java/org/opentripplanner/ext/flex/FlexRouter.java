@@ -12,7 +12,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -74,8 +74,8 @@ public class FlexRouter {
     } else {
       // this is only really useful in tests. in real world scenarios you're unlikely to get useful
       // results if you don't have streets
-      this.accessFlexPathCalculator = new DirectFlexPathCalculator(graph);
-      this.egressFlexPathCalculator = new DirectFlexPathCalculator(graph);
+      this.accessFlexPathCalculator = new DirectFlexPathCalculator();
+      this.egressFlexPathCalculator = new DirectFlexPathCalculator();
     }
 
 
@@ -118,8 +118,7 @@ public class FlexRouter {
           if (itinerary != null) {
             var fareService = graph.getService(FareService.class);
             if(fareService != null) {
-              var fare = fareService.getCost(itinerary);
-              itinerary.fare = fare;
+              itinerary.fare = fareService.getCost(itinerary);
             }
             itineraries.add(itinerary);
           }
@@ -183,7 +182,7 @@ public class FlexRouter {
                 egressFlexPathCalculator,
                 config
             )))
-        .collect(Collectors.toList());;
+        .collect(Collectors.toList());
   }
 
   private Stream<T2<NearbyStop, FlexTrip>> getClosestFlexTrips(Collection<NearbyStop> nearbyStops, boolean pickup) {

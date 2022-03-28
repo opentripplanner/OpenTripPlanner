@@ -1,18 +1,18 @@
 package org.opentripplanner.routing.algorithm;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -24,8 +24,8 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TurnCostTest {
 
@@ -39,7 +39,7 @@ public class TurnCostTest {
     
     private RoutingRequest proto;
 
-    @Before
+    @BeforeEach
     public void before() {
         graph = new Graph();
 
@@ -103,7 +103,7 @@ public class TurnCostTest {
     
     private GraphPath checkForwardRouteDuration(RoutingRequest options, int expectedDuration) {
         ShortestPathTree tree = new AStar().getShortestPathTree(options);
-        GraphPath path = tree.getPath(bottomLeft, false);
+        GraphPath path = tree.getPath(bottomLeft);
         assertNotNull(path);
         
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
@@ -207,8 +207,7 @@ public class TurnCostTest {
      ****/
 
     private StreetVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
-        return v;
+        return new IntersectionVertex(graph, label, lat, lon);
     }
 
     /**
@@ -237,8 +236,8 @@ public class TurnCostTest {
     private void DisallowTurn(StreetEdge from, StreetEdge to) {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
-        TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
-        graph.addTurnRestriction(from, restrict);
+        TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes, null);
+        from.addTurnRestriction(restrict);
     }
 
 }

@@ -20,9 +20,9 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
 
     // Each entry is <max time, cents at that time>; the list is sorted in
     // ascending time order
-    private List<P2<Integer>> pricing_by_second;
+    private final List<P2<Integer>> pricing_by_second;
 
-    private Currency currency;
+    private final Currency currency;
 
     protected TimeBasedVehicleRentalFareService(Currency currency, List<P2<Integer>> pricingBySecond) {
         this.currency = currency;

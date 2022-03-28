@@ -1,6 +1,6 @@
 package org.opentripplanner.api.common;
 
-import org.opentripplanner.util.Properties;
+import org.opentripplanner.util.ResourceBundleAdaptor;
 
 import java.util.Locale;
 
@@ -25,21 +25,17 @@ public enum Message {
     TOO_CLOSE(409),
     LOCATION_NOT_ACCESSIBLE(470),
 
-    GEOCODE_FROM_AMBIGUOUS(340),
-    GEOCODE_TO_AMBIGUOUS(350),
-    GEOCODE_FROM_TO_AMBIGUOUS(360), 
-    
     UNDERSPECIFIED_TRIANGLE(370),
     TRIANGLE_NOT_AFFINE(371),
     TRIANGLE_OPTIMIZE_TYPE_NOT_SET(372),
     TRIANGLE_VALUES_NOT_SET(373),
     ;
 
-    private Properties config = getConfig();
+    private final ResourceBundleAdaptor config = new ResourceBundleAdaptor(Message.class);
     private final int m_id;
 
     /** enum constructors are private -- see values above */
-    private Message(int id) {
+    Message(int id) {
         m_id = id;
     }
 
@@ -47,28 +43,18 @@ public enum Message {
         return m_id;
     }
 
-    /** simple checker / getter of the config */
-    public Properties getConfig() {
-        if(config == null) {
-            config = new Properties(Message.class);
-        }
-        return config;
-    }
 
-    public String get(String def, Locale l) {
+    public String get(Locale l) {
         try {
-            getConfig();
             return config.get(name(), l);
         }
         catch(Exception e) {
-            Properties.LOG.warn("No entry in Message.properties file could be found for string " + name());
+            ResourceBundleAdaptor.LOG.warn("No entry in Message.properties file could be found for string " + name());
+            return "";
         }
-        return def;
     }
-    public String get(Locale l) {
-        return get("", l);
-    }
+
     public String get() {
-        return get("", Locale.getDefault());
+        return get(Locale.getDefault());
     }
 }
