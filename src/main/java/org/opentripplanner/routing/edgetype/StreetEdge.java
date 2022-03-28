@@ -17,7 +17,9 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
@@ -441,18 +443,19 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
              * that during reverse traversal, we must also use the speed for the mode of
              * the backEdge, rather than of the current edge.
              */
-            if (options.arriveBy && tov instanceof IntersectionVertex) { // arrive-by search
-                IntersectionVertex traversedVertex = ((IntersectionVertex) tov);
-
-                realTurnCost = backOptions.getIntersectionTraversalCostModel().computeTraversalCost(
-                        traversedVertex, this, backPSE, backMode, backOptions, (float) speed,
-                        (float) backSpeed);
-            } else if (!options.arriveBy && fromv instanceof IntersectionVertex) { // depart-after search
-                IntersectionVertex traversedVertex = ((IntersectionVertex) fromv);
-
-                realTurnCost = options.getIntersectionTraversalCostModel().computeTraversalCost(
-                        traversedVertex, backPSE, this, traverseMode, options, (float) backSpeed,
-                        (float) speed);
+            if (options.arriveBy && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
+                realTurnCost = s0.getRoutingContext().graph.getIntersectionTraversalModel()
+                        .computeTraversalCost(
+                                traversedVertex, this, backPSE, backMode, backOptions,
+                                (float) speed, (float) backSpeed
+                        );
+            }
+            else if (!options.arriveBy && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
+                realTurnCost = s0.getRoutingContext().graph.getIntersectionTraversalModel()
+                        .computeTraversalCost(
+                                traversedVertex, backPSE, this, traverseMode, options,
+                                (float) backSpeed, (float) speed
+                        );
             } else {
                 // In case this is a temporary edge not connected to an IntersectionVertex
                 LOG.debug("Not computing turn cost for edge {}", this);

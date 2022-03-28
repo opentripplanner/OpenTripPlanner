@@ -1583,17 +1583,4 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
         return env;
     }
-
-    /**
-     * This method is needed because we sometimes traverse edges with no graph. It returns a
-     * default intersection traversal model if no graph is present.
-     */
-    public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-        if (this.rctx != null && this.rctx.graph != null) {
-            return this.rctx.graph.getIntersectionTraversalModel();
-        } else {
-            // This is only to maintain compatibility with existing tests
-            return Graph.DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
-        }
-    }
 }

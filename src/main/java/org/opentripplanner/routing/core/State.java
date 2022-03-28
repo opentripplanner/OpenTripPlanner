@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Objects;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -172,9 +173,6 @@ public class State implements Cloneable {
         this.backEdge = backEdge;
         this.backState = null;
         this.stateData = new StateData(options);
-        // note that here we are breaking the circular reference between rctx and options
-        // this should be harmless since reversed clones are only used when routing has finished
-        this.stateData.opt = options;
         this.stateData.startTime = startTime;
         if (options.vehicleRental) {
             if (options.arriveBy) {
@@ -432,7 +430,11 @@ public class State implements Cloneable {
     public RoutingRequest getOptions () {
         return stateData.opt;
     }
-    
+
+    public RoutingContext getRoutingContext () {
+        return stateData.rctx;
+    }
+
     /**
      * This method is on State rather than RoutingRequest because we care whether the user is in
      * possession of a rented bike.

@@ -258,7 +258,9 @@ public class PlainStreetEdgeTest {
     public void testTurnRestriction() {
         StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
         StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
-        State state = new State(v2, 0, proto.clone());
+        RoutingRequest routingRequest = proto.clone();
+        routingRequest.setRoutingContext(graph, v0, v2);
+        State state = new State(v2, 0, routingRequest);
 
         state.getOptions().setArriveBy(true);
         e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));

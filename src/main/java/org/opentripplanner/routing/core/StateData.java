@@ -26,6 +26,8 @@ public class StateData implements Cloneable {
 
     protected RoutingRequest opt;
 
+    protected RoutingContext rctx;
+
     /**
      * The preferred mode, which may differ from backMode when for example walking with a bike.
      * It may also change during traversal when switching between modes as in the case of Park & Ride or Kiss & Ride.
@@ -47,6 +49,8 @@ public class StateData implements Cloneable {
     protected boolean enteredNoThroughTrafficArea;
 
     public StateData(RoutingRequest options) {
+        this.opt = options;
+        this.rctx = options.getRoutingContext();
         TraverseModeSet modes = options.streetSubRequestModes;
         if (modes.getCar())
             currentMode = TraverseMode.CAR;
