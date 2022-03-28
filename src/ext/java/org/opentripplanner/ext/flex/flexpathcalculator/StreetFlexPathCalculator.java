@@ -1,7 +1,9 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -9,10 +11,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
@@ -80,8 +78,12 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       routingRequest.setRoutingContext(graph, vertex, null);
     }
     routingRequest.dominanceFunction = new DominanceFunction.EarliestArrival();
-    AStar search = AStar.allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION);
-    ShortestPathTree spt = search.getShortestPathTree(routingRequest);
+
+    ShortestPathTree spt = AStarBuilder
+            .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
+            .setRoutingRequest(routingRequest)
+            .getShortestPathTree();
+
     routingRequest.cleanup();
     return spt;
   }

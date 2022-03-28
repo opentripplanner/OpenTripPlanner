@@ -2,13 +2,13 @@ package org.opentripplanner.routing.algorithm.astar;
 
 import com.beust.jcommander.internal.Lists;
 import java.time.Duration;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -20,164 +20,122 @@ import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Find the shortest path between graph vertices using A*.
  * A basic Dijkstra search is a special case of AStar where the heuristic is always zero.
- *
- * NOTE this is now per-request scoped, which has caused some threading problems in the past.
- * Always make one new instance of this class per request, it contains a lot of state fields.
  */
 public class AStar {
 
     private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
-    private final boolean verbose = false;
+    private final boolean verbose = LOG.isDebugEnabled();
 
-    private TraverseVisitor traverseVisitor;
-
-    private final SkipEdgeStrategy skipEdgeStrategy;
+    private final RoutingRequest options;
+    private final RoutingContext rctx;
     private final RemainingWeightHeuristic heuristic;
+    private final SkipEdgeStrategy skipEdgeStrategy;
+    private final SearchTerminationStrategy terminationStrategy;
+    private final TraverseVisitor traverseVisitor;
+    private final Duration timeout;
 
-    private AStar(RemainingWeightHeuristic heuristic, SkipEdgeStrategy skipEdgeStrategy) {
+    private final ShortestPathTree spt;
+    private final BinHeap<State> pq;
+    private final List<State> targetAcceptedStates;
+
+    private State u;
+    private int nVisited;
+
+    protected AStar(
+            RemainingWeightHeuristic heuristic,
+            SkipEdgeStrategy skipEdgeStrategy,
+            TraverseVisitor traverseVisitor,
+            RoutingRequest options,
+            SearchTerminationStrategy terminationStrategy,
+            Duration timeout
+    ) {
         this.heuristic = heuristic;
         this.skipEdgeStrategy = skipEdgeStrategy;
-    }
+        this.traverseVisitor = traverseVisitor;
+        this.options = options;
+        this.terminationStrategy = terminationStrategy;
+        this.timeout = timeout;
 
-    public static AStar oneToOne() {
-        return new AStar(new EuclideanRemainingWeightHeuristic(), null);
-    }
-
-    public static AStar oneToOne(Duration maxDuration) {
-        return new AStar(new EuclideanRemainingWeightHeuristic(), new DurationSkipEdgeStrategy(maxDuration));
-    }
-
-    public static AStar allDirectionsMaxDuration(Duration maxDuration) {
-        return allDirections(new DurationSkipEdgeStrategy(maxDuration));
-    }
-
-    public static AStar allDirections(SkipEdgeStrategy strategy) {
-        return new AStar(new TrivialRemainingWeightHeuristic(), strategy);
-    }
-
-    enum RunStatus {
-        RUNNING, STOPPED
-    }
-
-
-    /* TODO instead of having a separate class for search state, we should just make one GenericAStar per request. */
-    static class RunState {
-
-        public State u;
-        public ShortestPathTree spt;
-        BinHeap<State> pq;
-        RemainingWeightHeuristic heuristic;
-        public RoutingContext rctx;
-        public int nVisited;
-        public List<State> targetAcceptedStates;
-        public RunStatus status;
-        private final RoutingRequest options;
-        private final SearchTerminationStrategy terminationStrategy;
-        public Vertex u_vertex;
-
-        public RunState(RoutingRequest options, SearchTerminationStrategy terminationStrategy) {
-            this.options = options;
-            this.terminationStrategy = terminationStrategy;
-        }
-
-    }
-    
-    private RunState runState;
-    
-    /**
-     * Compute SPT without timeout and termination strategy.
-     */
-    public ShortestPathTree getShortestPathTree(RoutingRequest req) {
-        return getShortestPathTree(req, -1, null); // negative timeout means no timeout
-    }
-    
-    /** set up a single-origin search */
-    private void startSearch(RoutingRequest options, RoutingContext rctx,
-            SearchTerminationStrategy terminationStrategy, long abortTime) {
-
-        runState = new RunState(options, terminationStrategy);
-        runState.rctx = rctx;
-        runState.spt = options.getNewShortestPathTree();
-
-        runState.heuristic = heuristic;
-        // Since initial states can be multiple, heuristic cannot depend on the initial state.
-        // Initializing the bidirectional heuristic is a pretty complicated operation that involves searching through
-        // the streets around the origin and destination.
-        runState.heuristic.initialize(runState.rctx);
-        if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-            LOG.warn("Timeout during initialization of goal direction heuristic.");
-            runState = null; // Search timed out
-            return;
-        }
+        this.rctx = options.getRoutingContext();
+        this.spt = options.getNewShortestPathTree();
+        heuristic.initialize(rctx);
 
         // Priority Queue.
         // The queue is self-resizing, so we initialize it to have size = O(sqrt(|V|)) << |V|.
         // For reference, a random, undirected search on a uniform 2d grid will examine roughly sqrt(|V|) vertices
         // before reaching its target.
-        int initialSize = runState.rctx.graph.getVertices().size();
+        int initialSize = rctx.graph.getVertices().size();
         initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
-        runState.pq = new BinHeap<>(initialSize);
-        runState.nVisited = 0;
-        runState.targetAcceptedStates = Lists.newArrayList();
+        this.pq = new BinHeap<>(initialSize);
+        this.nVisited = 0;
+        this.targetAcceptedStates = Lists.newArrayList();
 
         for (State initialState : State.getInitialStates(options)) {
-            runState.spt.add(initialState);
-            runState.pq.insert(initialState, 0);
+            spt.add(initialState);
+            pq.insert(initialState, 0);
         }
     }
 
-    boolean iterate(){
+    protected ShortestPathTree getShortestPathTree() {
+        runSearch();
+
+        return spt;
+    }
+
+    protected List<GraphPath> getPathsToTarget() {
+        runSearch();
+
+        return targetAcceptedStates.stream()
+                .filter(State::isFinal)
+                .map(GraphPath::new)
+                .collect(Collectors.toList());
+    }
+
+    private boolean iterate(){
         // print debug info
         if (verbose) {
-            double w = runState.pq.peek_min_key();
-            System.out.println("pq min key = " + w);
+            double w = pq.peek_min_key();
+            LOG.debug("pq min key = " + w);
         }
 
-        // interleave some heuristic-improving work (single threaded)
-        runState.heuristic.doSomeWork();
-
         // get the lowest-weight state in the queue
-        runState.u = runState.pq.extract_min();
+        u = pq.extract_min();
         
         // check that this state has not been dominated
         // and mark vertex as visited
-        if (!runState.spt.visit(runState.u)) {
+        if (!spt.visit(u)) {
             // state has been dominated since it was added to the priority queue, so it is
             // not in any optimal path. drop it on the floor and try the next one.
             return false;
         }
         
         if (traverseVisitor != null) {
-            traverseVisitor.visitVertex(runState.u);
+            traverseVisitor.visitVertex(u);
+        }
+
+        nVisited += 1;
+
+        Vertex u_vertex = u.getVertex();
+
+        if (verbose) {
+            LOG.debug("   vertex " + u_vertex);
         }
         
-        runState.u_vertex = runState.u.getVertex();
-
-        if (verbose)
-            System.out.println("   vertex " + runState.u_vertex);
-
-        runState.nVisited += 1;
-        
-        Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
+        Collection<Edge> edges = options.arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
         for (Edge edge : edges) {
 
             if (skipEdgeStrategy != null &&
                     skipEdgeStrategy.shouldSkipEdge(
-                        runState.rctx.fromVertices,
-                        runState.rctx.toVertices,
-                        runState.u,
+                        rctx.fromVertices,
+                        rctx.toVertices,
+                        u,
                         edge,
-                        runState.spt,
-                        runState.options
+                        spt,
+                        options
                     )
             ) {
                 continue;
@@ -185,14 +143,14 @@ public class AStar {
 
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
             // returning NULL), the iteration is over.
-            for (State v = edge.traverse(runState.u); v != null; v = v.getNextResult()) {
+            for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
                 // Could be: for (State v : traverseEdge...)
 
                 if (traverseVisitor != null) {
                     traverseVisitor.visitEdge(edge);
                 }
 
-                double remaining_w = runState.heuristic.estimateRemainingWeight(v);
+                double remaining_w = heuristic.estimateRemainingWeight(v);
 
 //                LOG.info("{} {}", v, remaining_w);
 
@@ -202,19 +160,20 @@ public class AStar {
                 double estimate = v.getWeight() + remaining_w;
 
                 if (verbose) {
-                    System.out.println("      edge " + edge);
-                    System.out.println("      " + runState.u.getWeight() + " -> " + v.getWeight()
+                    LOG.debug("      edge " + edge);
+                    LOG.debug("      " + u.getWeight() + " -> " + v.getWeight()
                             + "(w) + " + remaining_w + "(heur) = " + estimate + " vert = "
                             + v.getVertex());
                 }
                 
                 // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
-                if (runState.spt.add(v)) {
+                if (spt.add(v)) {
                     // report to the visitor if there is one
-                    if (traverseVisitor != null)
+                    if (traverseVisitor != null) {
                         traverseVisitor.visitEnqueue();
+                    }
                     //LOG.info("u.w={} v.w={} h={}", runState.u.weight, v.weight, remaining_w);
-                    runState.pq.insert(v, estimate);
+                    pq.insert(v, estimate);
                 } 
             }
         }
@@ -222,18 +181,20 @@ public class AStar {
         return true;
     }
     
-    void runSearch(long abortTime){
+    private void runSearch() {
+        long abortTime = DateUtils.absoluteTimeout(timeout);
+
         /* the core of the A* algorithm */
-        while (!runState.pq.empty()) { // Until the priority queue is empty:
+        while (!pq.empty()) { // Until the priority queue is empty:
             /*
              * Terminate based on timeout?
              */
-            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-                LOG.warn("Search timeout. origin={} target={}", runState.rctx.fromVertices, runState.rctx.toVertices);
+            if (timeout != null && System.currentTimeMillis() > abortTime) {
+                LOG.warn("Search timeout. origin={} target={}", rctx.fromVertices, rctx.toVertices);
                 // Rather than returning null to indicate that the search was aborted/timed out,
                 // we instead set a flag in the routing context and return the SPT anyway. This
                 // allows returning a partial list results even when a timeout occurs.
-                runState.rctx.aborted = true; // signal search cancellation up to higher stack frames
+                rctx.aborted = true; // signal search cancellation up to higher stack frames
 
                 break;
             }
@@ -251,60 +212,22 @@ public class AStar {
                 continue;
             }
             
-            if (runState.terminationStrategy != null) {
-                if (runState.terminationStrategy.shouldSearchTerminate(
-                  runState.u)) {
+            if (terminationStrategy != null) {
+                if (terminationStrategy.shouldSearchTerminate(u)) {
                     break;
                 }
             }
-            if (runState.rctx.toVertices != null
-                    && runState.rctx.toVertices.contains(runState.u_vertex)
-                    && runState.u.isFinal()) {
-                runState.targetAcceptedStates.add(runState.u);
+            if (rctx.toVertices != null && rctx.toVertices.contains(u.getVertex()) && u.isFinal()) {
+                targetAcceptedStates.add(u);
                 // new GraphPath(runState.u, false).dump();
 
                 /* Break out of the search if we've found the requested number of paths. */
                 // TODO Refactor. This check for getNumItineraries always returns 1
-                if (runState.targetAcceptedStates.size() >= runState.options.getNumItinerariesForDirectStreetSearch()) {
-                    LOG.debug("total vertices visited {}", runState.nVisited);
+                if (targetAcceptedStates.size() >= options.getNumItinerariesForDirectStreetSearch()) {
+                    LOG.debug("total vertices visited {}", nVisited);
                     break;
                 }
             }
-
         }
-    }
-
-    /** @return the shortest path, or null if none is found */
-    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeoutSeconds,
-            SearchTerminationStrategy terminationStrategy) {
-        ShortestPathTree spt = null;
-        long abortTime = DateUtils.absoluteTimeout(relTimeoutSeconds);
-
-        startSearch(options, options.getRoutingContext(), terminationStrategy, abortTime);
-
-        if (runState != null) {
-            runSearch(abortTime);
-            spt = runState.spt;
-        }
-        
-        return spt;
-    }
-
-    public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
-        this.traverseVisitor = traverseVisitor;
-    }
-
-    public List<GraphPath> getPathsToTarget() {
-        if (runState == null) {
-            return Collections.emptyList();
-        }
-
-        List<GraphPath> ret = new LinkedList<>();
-        for (State s : runState.targetAcceptedStates) {
-            if (s.isFinal()) {
-                ret.add(new GraphPath(s));
-            }
-        }
-        return ret;
     }
 }

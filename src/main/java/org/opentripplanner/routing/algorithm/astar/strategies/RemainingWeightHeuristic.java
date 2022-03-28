@@ -20,20 +20,4 @@ public interface RemainingWeightHeuristic extends Serializable {
     void initialize(RoutingContext routingContext);
 
     double estimateRemainingWeight(State s);
-
-    /** Reset any cached data in the heuristic, before reuse in a search with the same destination. */
-    void reset();
-    
-    /** 
-     * Call to cause the heuristic to perform some predetermined amount of work improving its 
-     * estimate. Avoids thread synchronization evil by interleaving forward and backward searches. 
-     */
-    void doSomeWork();
-    
 }
-
-
-// Perhaps directionality should also be defined during the setup,
-// instead of having two separate methods for the two directions.
-// We might not even need a setup method if the routing options are just passed into the
-// constructor.

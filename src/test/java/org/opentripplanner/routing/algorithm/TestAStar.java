@@ -7,6 +7,7 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcess
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -23,8 +24,6 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
  */
 @Ignore
 public class TestAStar extends TestCase {
-    
-    private final AStar aStar = AStar.oneToOne();
 
     public void testBasic() throws Exception {
 
@@ -46,7 +45,7 @@ public class TestAStar extends TestCase {
         Vertex millbrae = gg.getVertex(feedId + ":Millbrae Caltrain");
         Vertex mountainView = gg.getVertex(feedId + ":Mountain View Caltrain");
         options.setRoutingContext(gg, millbrae, mountainView);
-        spt = aStar.getShortestPathTree(options);
+        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
         path = spt.getPath(mountainView);
 
         long endTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 13, 29, 0);
@@ -57,7 +56,7 @@ public class TestAStar extends TestCase {
         options.setArriveBy(true);
         options.setDateTime(Instant.ofEpochSecond(endTime));
         options.setRoutingContext(gg, millbrae, mountainView);
-        spt = aStar.getShortestPathTree(options);
+        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
         path = spt.getPath(millbrae);
 
         long expectedStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 39, 0);
@@ -79,12 +78,12 @@ public class TestAStar extends TestCase {
         // one hour is more than enough time
         options.setRoutingContext(graph, start, end);
 
-        ShortestPathTree spt = aStar.getShortestPathTree(options);
+        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
         GraphPath path = spt.getPath(end);
         assertNotNull(path);
         
         // but one minute is not enough
-        spt = aStar.getShortestPathTree(options);
+        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
         path = spt.getPath(end);
         assertNull(path);        
     }

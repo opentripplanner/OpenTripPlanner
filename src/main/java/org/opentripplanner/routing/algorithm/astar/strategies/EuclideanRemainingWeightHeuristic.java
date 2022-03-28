@@ -65,11 +65,4 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
         final double streetSpeed = useWalkSpeed ? walkingSpeed : maxStreetSpeed;
         return euclideanDistance / streetSpeed;
     }
-
-    @Override
-    public void reset() {}
-
-    @Override
-    public void doSomeWork() {}
-
 }

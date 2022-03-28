@@ -1,22 +1,20 @@
 package org.opentripplanner.routing.graphfinder;
 
+import static java.lang.Integer.min;
+
+import java.util.Comparator;
+import java.util.List;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.DominanceFunction;
-
-import java.util.Comparator;
-import java.util.List;
-
-import static java.lang.Integer.min;
 
 /**
  * A GraphFinder which uses the street network to traverse the graph in order to find the nearest
@@ -71,13 +69,15 @@ public class StreetGraphFinder implements GraphFinder {
       rr.setRoutingContext(graph);
       rr.walkSpeed = 1;
       rr.dominanceFunction = new DominanceFunction.LeastWalk();
+      rr.setNumItineraries(1);
       // RR dateTime defaults to currentTime.
       // If elapsed time is not capped, searches are very slow.
 
-      AStar astar = AStar.allDirections(skipEdgeStrategy);
-      rr.setNumItineraries(1);
-      astar.setTraverseVisitor(visitor);
-      astar.getShortestPathTree(rr);
+      AStarBuilder.allDirections(skipEdgeStrategy)
+              .setTraverseVisitor(visitor)
+              .setRoutingRequest(rr)
+              .getShortestPathTree();
+
       // Destroy the routing context, to clean up the temporary edges & vertices
       rr.getRoutingContext().close();
     }

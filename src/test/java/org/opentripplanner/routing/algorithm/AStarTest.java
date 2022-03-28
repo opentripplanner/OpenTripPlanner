@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm;
 import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -87,7 +87,7 @@ public class AStarTest {
         Vertex from = graph.getVertex("56th_24th");
         Vertex to = graph.getVertex("leary_20th");
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
+        ShortestPathTree tree = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         GraphPath path = tree.getPath(to);
 
@@ -113,7 +113,7 @@ public class AStarTest {
         Vertex from = graph.getVertex("56th_24th");
         Vertex to = graph.getVertex("leary_20th");
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
+        ShortestPathTree tree = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         GraphPath path = tree.getPath(from);
 
@@ -155,7 +155,7 @@ public class AStarTest {
         new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
+        ShortestPathTree tree = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
         options.cleanup();
 
         GraphPath path = tree.getPath(to);
@@ -191,7 +191,7 @@ public class AStarTest {
         new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(graph, from, to);
-        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options);
+        ShortestPathTree tree = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
         options.cleanup();
 
         GraphPath path = tree.getPath(from);
@@ -224,7 +224,11 @@ public class AStarTest {
         targets.add(graph.getVertex("leary_20th"));
 
         SearchTerminationStrategy strategy = new MultiTargetTerminationStrategy(targets);
-        ShortestPathTree tree = AStar.oneToOne().getShortestPathTree(options, -1, strategy);
+
+        ShortestPathTree tree = AStarBuilder.oneToOne()
+                .setTerminationStrategy(strategy)
+                .setRoutingRequest(options)
+                .getShortestPathTree();
 
         for (Vertex v : targets) {
             GraphPath path = tree.getPath(v);

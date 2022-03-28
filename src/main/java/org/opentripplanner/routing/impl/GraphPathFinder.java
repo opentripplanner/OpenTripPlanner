@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.impl;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -61,7 +60,8 @@ public class GraphPathFinder {
         }
 
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
-        AStar aStar = AStar.oneToOne(Duration.ofSeconds((long) options.maxDirectStreetDurationSeconds));
+        AStarBuilder aStar = AStarBuilder
+                .oneToOneMaxDuration(Duration.ofSeconds((long) options.maxDirectStreetDurationSeconds));
         if (options.getRoutingContext() == null) {
             options.setRoutingContext(router.graph);
             // The special long-distance heuristic should be sufficient to constrain the search to the right area.
@@ -78,7 +78,7 @@ public class GraphPathFinder {
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
 
-        double timeout = searchBeginTime + router.streetRoutingTimeoutSeconds() * 1000;
+        long timeout = searchBeginTime + (long) (router.streetRoutingTimeoutSeconds() * 1000);
         timeout -= System.currentTimeMillis(); // Convert from absolute to relative time
         timeout /= 1000; // Convert milliseconds to seconds
         if (timeout <= 0) {
@@ -87,15 +87,14 @@ public class GraphPathFinder {
             options.getRoutingContext().aborted = true;
             return null;
         }
-        // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
-        // Use the maxDirectStreetDurationSeconds as the limit here, as this class is used for point-to-point routing
-        aStar.getShortestPathTree(options, timeout, null);
+        aStar.setTimeout(Duration.ofSeconds(timeout));
+        aStar.setRoutingRequest(options);
 
         List<GraphPath> paths = aStar.getPathsToTarget();
 
         LOG.debug("we have {} paths", paths.size());
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        Collections.sort(paths, options.getPathComparator(options.arriveBy));
+        paths.sort(options.getPathComparator(options.arriveBy));
         return paths;
     }
 

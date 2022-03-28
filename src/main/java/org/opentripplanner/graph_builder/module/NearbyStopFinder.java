@@ -14,7 +14,7 @@ import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.ComposingSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
@@ -188,9 +188,10 @@ public class NearbyStopFinder {
         routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
 
         var skipEdgeStrategy = getSkipEdgeStrategy(reverseDirection, routingRequest);
-        var astar = AStar.allDirections(skipEdgeStrategy);
-
-        ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
+        ShortestPathTree spt = AStarBuilder
+                .allDirections(skipEdgeStrategy)
+                .setRoutingRequest(routingRequest)
+                .getShortestPathTree();
 
         // Only used if OTPFeature.FlexRouting.isOn()
         Multimap<FlexStopLocation, State> locationsMap = ArrayListMultimap.create();

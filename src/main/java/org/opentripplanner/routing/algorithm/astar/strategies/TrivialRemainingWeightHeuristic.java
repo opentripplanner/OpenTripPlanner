@@ -19,11 +19,4 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
     public double estimateRemainingWeight (State s) {
         return 0;
     }
-
-    @Override
-    public void reset() {}
-    
-    @Override
-    public void doSomeWork() {}
-
 }
