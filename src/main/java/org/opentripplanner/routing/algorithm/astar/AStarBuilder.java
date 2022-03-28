@@ -11,6 +11,7 @@ import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -22,6 +23,7 @@ public class AStarBuilder {
     private RoutingRequest options;
     private SearchTerminationStrategy terminationStrategy;
     private Duration timeout;
+    private Edge originBackEdge;
 
     public AStarBuilder(
             RemainingWeightHeuristic remainingWeightHeuristic,
@@ -70,6 +72,11 @@ public class AStarBuilder {
         return this;
     }
 
+    public AStarBuilder setOriginBackEdge(Edge originBackEdge) {
+        this.originBackEdge = originBackEdge;
+        return this;
+    }
+
     private AStar build() {
         return new AStar(
                 heuristic,
@@ -77,7 +84,8 @@ public class AStarBuilder {
                 traverseVisitor,
                 options,
                 terminationStrategy,
-                timeout
+                timeout,
+                originBackEdge
         );
     }
 

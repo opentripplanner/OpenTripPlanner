@@ -51,7 +51,8 @@ public class AStar {
             TraverseVisitor traverseVisitor,
             RoutingRequest options,
             SearchTerminationStrategy terminationStrategy,
-            Duration timeout
+            Duration timeout,
+            Edge originBackEdge
     ) {
         this.heuristic = heuristic;
         this.skipEdgeStrategy = skipEdgeStrategy;
@@ -75,6 +76,9 @@ public class AStar {
         this.targetAcceptedStates = Lists.newArrayList();
 
         for (State initialState : State.getInitialStates(options)) {
+            if (originBackEdge != null) {
+                initialState.backEdge = originBackEdge;
+            }
             spt.add(initialState);
             pq.insert(initialState, 0);
         }

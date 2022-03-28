@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Objects;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -57,7 +56,6 @@ public class State implements Cloneable {
                 states.add(
                     new State(
                     vertex,
-                    request.getRoutingContext().originBackEdge,
                     request.getDateTime().getEpochSecond(),
                     request,
                     true,
@@ -72,7 +70,6 @@ public class State implements Cloneable {
                 states.add(
                     new State(
                         vertex,
-                        request.getRoutingContext().originBackEdge,
                         request.getDateTime().getEpochSecond(),
                         request,
                         false,
@@ -84,7 +81,6 @@ public class State implements Cloneable {
                     states.add(
                             new State(
                                     vertex,
-                                    request.getRoutingContext().originBackEdge,
                                     request.getDateTime().getEpochSecond(),
                                     request,
                                     false,
@@ -94,12 +90,7 @@ public class State implements Cloneable {
                 }
             }
 
-            states.add(new State(
-                vertex,
-                request.getRoutingContext().originBackEdge,
-                request.getDateTime().getEpochSecond(),
-                request
-            ));
+            states.add(new State(vertex, request.getDateTime().getEpochSecond(), request));
         }
         return states;
     }
@@ -107,7 +98,6 @@ public class State implements Cloneable {
     public State(RoutingRequest opt) {
         this(
                 opt.getRoutingContext().fromVertices == null ? null : opt.getRoutingContext().fromVertices.iterator().next(),
-                opt.getRoutingContext().originBackEdge,
                 opt.getDateTime().getEpochSecond(),
                 opt
         );
@@ -123,20 +113,11 @@ public class State implements Cloneable {
     }
 
     /**
-     * Create an initial state, forcing vertex and time to the specified values. Useful for reusing 
-     * a RoutingContext in TransitIndex, tests, etc.
-     */
-    public State(Vertex vertex, long timeSeconds, RoutingRequest options) {
-        // Since you explicitly specify, the vertex, we don't set the backEdge.
-        this(vertex, null, timeSeconds, options);
-    }
-    
-    /**
      * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing 
      * a RoutingContext in TransitIndex, tests, etc.
      */
-    public State(Vertex vertex, Edge backEdge, long timeSeconds, RoutingRequest options) {
-        this(vertex, backEdge, timeSeconds, timeSeconds, options, false, false, false);
+    public State(Vertex vertex, long timeSeconds, RoutingRequest options) {
+        this(vertex, timeSeconds, timeSeconds, options, false, false, false);
     }
 
     /**
@@ -145,13 +126,12 @@ public class State implements Cloneable {
      */
     public State(
         Vertex vertex,
-        Edge backEdge,
         long timeSeconds,
         RoutingRequest options,
         boolean carPickupStateInCar,
         boolean bikeRentalFloatingState,
         boolean keptRentedVehicleAtDestination) {
-        this(vertex, backEdge, timeSeconds, timeSeconds, options, carPickupStateInCar, bikeRentalFloatingState, keptRentedVehicleAtDestination);
+        this(vertex, timeSeconds, timeSeconds, options, carPickupStateInCar, bikeRentalFloatingState, keptRentedVehicleAtDestination);
     }
 
     /**
@@ -160,7 +140,6 @@ public class State implements Cloneable {
      */
     public State(
         Vertex vertex,
-        Edge backEdge,
         long timeSeconds,
         long startTime,
         RoutingRequest options,
@@ -170,7 +149,6 @@ public class State implements Cloneable {
     ) {
         this.weight = 0;
         this.vertex = vertex;
-        this.backEdge = backEdge;
         this.backState = null;
         this.stateData = new StateData(options);
         this.stateData.startTime = startTime;

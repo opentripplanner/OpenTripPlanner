@@ -49,11 +49,6 @@ public class RoutingContext implements AutoCloseable {
     public final Set<Vertex> toVertices;
 
     private final Set<DisposableEdgeCollection> tempEdges;
-    
-    // The back edge associated with the origin - i.e. continuing a previous search.
-    // NOTE: not final so that it can be modified post-construction for testing.
-    // TODO(flamholz): figure out a better way.
-    public Edge originBackEdge;
 
     /** Indicates that the search timed out or was otherwise aborted. */
     public boolean aborted;

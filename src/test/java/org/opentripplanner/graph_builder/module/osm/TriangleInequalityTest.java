@@ -66,9 +66,9 @@ public class TriangleInequalityTest {
     private GraphPath getPath(RoutingRequest proto, Edge startBackEdge, Vertex u, Vertex v) {
         RoutingRequest options = proto.clone();
         options.setRoutingContext(graph, u, v);
-        options.getRoutingContext().originBackEdge = startBackEdge;
 
         ShortestPathTree tree = AStarBuilder.oneToOne()
+                .setOriginBackEdge(startBackEdge)
                 .setRoutingRequest(options)
                 .getShortestPathTree();
 
