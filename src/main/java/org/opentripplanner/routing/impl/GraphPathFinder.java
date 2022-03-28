@@ -75,20 +75,11 @@ public class GraphPathFinder {
         options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
+        aStar.setRoutingRequest(options);
+        aStar.setTimeout(Duration.ofMillis((long) (router.streetRoutingTimeoutSeconds() * 1000)));
+
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
-
-        long timeout = searchBeginTime + (long) (router.streetRoutingTimeoutSeconds() * 1000);
-        timeout -= System.currentTimeMillis(); // Convert from absolute to relative time
-        timeout /= 1000; // Convert milliseconds to seconds
-        if (timeout <= 0) {
-            // Catch the case where advancing to the next (lower) timeout value means the search is timed out
-            // before it even begins. Passing a negative relative timeout in the SPT call would mean "no timeout".
-            options.getRoutingContext().aborted = true;
-            return null;
-        }
-        aStar.setTimeout(Duration.ofSeconds(timeout));
-        aStar.setRoutingRequest(options);
 
         List<GraphPath> paths = aStar.getPathsToTarget();
 
