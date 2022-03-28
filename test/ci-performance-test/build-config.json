@@ -1,4 +1,6 @@
 {
+  "transitServiceStart" : "2021-12-01",
+  "transitServiceEnd": "2022-12-31",
   "dataImportReport": true,
   "transit": true,
   "useTransfersTxt": false,

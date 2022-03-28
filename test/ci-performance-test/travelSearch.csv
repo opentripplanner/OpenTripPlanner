@@ -1,44 +1,45 @@
-testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon,destination,toPlace,toLat,toLon
-1,Fylkeskryssende,08:00,12:00,2:00,Notodden Skysstasjon,NSR:StopPlace:20762,59.556698,9.25651,Oslo Bussterminal,NSR:StopPlace:6505,59.91177,10.757994
-2,NSB,11:00,15:00,1:00,Gol,NSR:StopPlace:324,60.69917,8.97123,Billingstad,NSR:StopPlace:577,59.874783,10.483057
-3,Ruter,15:00,17:00,1:30,IKEA Slependen,NSR:StopPlace:4401,59.87577,10.500488,Oslo Bussterminal,NSR:StopPlace:6505,59.91177,10.757994
-4,Østold,16:00,20:30,1:00,Sponvika,NSR:StopPlace:3009,59.09267,11.229988,Skjærhalden,NSR:StopPlace:1845,59.025497,11.036771
-5,Østold,13:00,14:30,1:00,Ørje busstorg,NSR:StopPlace:911,59.480717,11.656314,Skjønhaug torv,NSR:StopPlace:1005,59.641224,11.315405
-6,Akershus,13:30,15:30,1:00,Borud,NSR:StopPlace:5300,59.700043,11.196891,Lillestrøm terminal,NSR:StopPlace:4489,59.953896,11.043521
-7,Oslo,17:00,20:00,2:00,Prinsdal,NSR:StopPlace:6740,59.834175,10.807415,Solemskogen,NSR:StopPlace:6626,59.979305,10.817612
-8,Hedmark,08:00,16:00,2:00,Drevsjø,NSR:StopPlace:8674,61.886,12.030646,Dalsbygda sentrum,NSR:StopPlace:8189,62.527782,11.108747
-9,Oppland,15:00,17:00,1:30,Steinvegen,NSR:StopPlace:14093,61.13245,10.454416,Holsjordet,NSR:StopPlace:14320,61.099922,10.47955
-10,Buskerud,08:00,15:00,5:00,Hokksund stasjon,NSR:StopPlace:245,59.767204,9.910567,Fossekallveien,NSR:StopPlace:15726,60.178715,10.257535
-11,Vestfold,13:00,16:00,1:00,Torggata,NSR:StopPlace:17452,59.417572,10.482581,Høyjord,NSR:StopPlace:18872,59.366146,10.120965
-12,Telemark,10:00,11:30,1:00,Meieritorvet,NSR:StopPlace:20257,59.13879,9.648428,Skien sykehjem,NSR:StopPlace:19979,59.213493,9.596075
-13,Aust_Agder,09:30,11:30,1:00,Hastensund,NSR:StopPlace:21979,58.50631,8.922674,Kolbjørnsvik,NSR:StopPlace:24171,58.451637,8.76895
-14,Rogaland,08:00,15:16,4:00,Hauge i Dalane,NSR:StopPlace:26062,58.343338,6.29508,Heskestad,NSR:StopPlace:26370,58.490974,6.361217
-15,Hordaland,16:00,18:00,1:30,Melkeplassen,NSR:StopPlace:31882,60.376045,5.303988,Starefossbakken,NSR:StopPlace:29147,60.387913,5.35192
-16,Sogn og Fjordane,14:00,17:00,2:00,Helgheim,NSR:StopPlace:34066,61.231983,7.115655,Vik kommunehus,NSR:StopPlace:37210,61.08844,6.579569
-17,Møre og Romsdal,08:00,10:00,1:15,Slinningsodden,NSR:StopPlace:41499,62.461693,6.16515,Kråmyra,NSR:StopPlace:40181,62.47539,6.191737
-18,Sør Trøndelag,07:00,20:00,8:00,Meldal sentrum,NSR:StopPlace:42516,63.04669,9.713128,Fillan busstasjon,NSR:StopPlace:43785,63.60113,8.973342
-19,Nord Trøndelag,06:00,18:00,4:00,Verrabotn,NSR:StopPlace:45683,63.802647,10.581465,Snåsa,NSR:StopPlace:673,64.245766,12.380184
-20,Troms,15:00,17:00,1:50,Harstad kirke,NSR:StopPlace:52154,68.801636,16.534492,Lamoveien,NSR:StopPlace:53953,68.81136,16.507952
-21,Finnmark,08:00,18:00,8:00,Indre Billefjord,NSR:StopPlace:57518,70.31518,25.046686,Karasjok bussterminal,NSR:StopPlace:56754,69.472664,25.5169
-22,Fylkeskryssende,09:00,16:00,3:00,Hjellum,NSR:StopPlace:11701,61.768383,9.527959,Lyngveien,NSR:StopPlace:6645,59.897415,10.792623
-23,Fylkeskryssende,04:00,26:00,12:00,Trondheim S,NSR:StopPlace:659,63.436462,10.398694,Brønnøysund sentrum,NSR:StopPlace:51790,65.4755,12.211214
-24,Fly,08:00,22:00,4:00,Sogndal Lufthamn,NSR:StopPlace:750,61.157547,7.137634,Molde Lufthavn,NSR:StopPlace:735,62.746407,7.260933
-25,Ekspressbuss,00:01,26:00,10:00,Haugesund bussterminal,NSR:StopPlace:26084,59.416233,5.27443,Trysil busstasjon,NSR:StopPlace:7310,61.318344,12.260398
-26,Ekspressbuss,08:00,23:00,7:00,Skjærhalden,NSR:StopPlace:1845,59.025497,11.036771,Lærdal rådhus,NSR:StopPlace:34505,61.09855,7.480798
-27,Ekspressbuss,15:00,26:00,3:00,Tromsø Prostneset,NSR:StopPlace:52273,69.647705,18.959843,Hammerfest bussterminal,NSR:StopPlace:56676,70.66445,23.680502
-28,Oslo høyfrekvens,16:05,18:05,2:00,Marienlyst,,59.932322,10.724663,Kjøbenhavngata,,59.928979,10.769432
-29,Too high heuristic cost OTP#3835,19:30,21:00,00:30,Hauketo stasjon,NSR:StopPlace:6710,59.845947,10.803125,Steinberg stasjon,NSR:StopPlace:58839,59.75957,9.961188
-101,Crossing Oslo 1,09:00,"",2:00,Lillestrøm,,59.9559,11.0509,Asker,,59.8367,10.4249,transit,"TRANSIT,WALK"
-102,Crossing Oslo 2,09:00,"",2:00,Lillestrøm,,59.9559,11.0509,Hokksund,,59.7705,9.9088,transit,"TRANSIT,WALK"
-103,Sarpsbord to Bergen,09:00,"",2:00,Sarpsborg,,59.2771080105117,11.1401367,Bergen,,60.3920207,5.329484,transit,"TRANSIT,WALK"
-104,Stavanger to Bergen,09:00,"",2:00,Stavanger,,58.96983560365735,5.72782516,Bergen,,60.3920207,5.329484,transit,"TRANSIT,WALK"
-105,Trondheim to Oslo,09:00,"",12:00,Trondheim,,63.421030654,10.50292,Oslo,,59.8889368967,10.78857421,transit,"TRANSIT,WALK"
-106,Oslo to Tromso,09:00,"",12:00,Oslo,,59.9299041,9.9088,Tromso,,69.65517655,18.9486,transit,"TRANSIT,WALK"
-107,Drammen to Alesund,10:00,,12:00,Drammen,,59.71763761778773,10.26123046,Alesund,,62.4869530212,6.1303710,transit,"TRANSIT,WALK"
-201,P+R into Oslo #1,10:00,,3:00,Slemmestad,,59.779213,10.495719,Oslo,,59.9299041,10.74874,p-and-r,"CAR_PARK,TRANSIT,WALK"
-202,P+R into Bergen,14:00,,3:00,Norvik,,60.234250,5.3580665,Bergen,,60.388416016070,5.321159,p-and-r,"CAR_PARK,TRANSIT,WALK"
-203,P+R into Trondheim,14:00,,3:00,Venn,,63.251093811782034,10.0528335,Trondheim,,63.4291709,10.40096,p-and-r,"CAR_PARK,TRANSIT,WALK"
-204,P+R into Stavanger,10:00,,3:00,Verdalen,,58.785018355267404,5.6150436401,Stavanger,,58.969835603,5.72782516,p-and-r,"CAR_PARK,TRANSIT,WALK"
-205,P+R into Oslo #2,10:00,,3:00,Honefoss,,60.16884161373975,10.26123046,Oslo,,59.9299041,10.74874,p-and-r,"CAR_PARK,TRANSIT,WALK"
-206,P+R into Oslo #3,10:00,,3:00,Moss,,59.43180799259034,10.66497802734375,Oslo,,59.9299041,10.74874,p-and-r,"CAR_PARK,TRANSIT,WALK"
-207,P+R Drammen to Alesund,10:00,,3:00,Drammen,,59.71763761778773,10.26123046,Alesund,,62.4869530212,6.1303710,p-and-r,"CAR_PARK,TRANSIT,WALK"
+testCaseId,description,departure,arrival,window,origin,fromPlace,fromLat,fromLon,destination,toPlace,toLat,toLon,tags,modes
+1,"Bus/Rail, Notodden - Oslo",08:00,12:00,2h,Notodden Skysstasjon,NSR:StopPlace:20762,59.556698,9.25651,Oslo Bussterminal,NSR:StopPlace:6505,59.91177,10.757994,transit,TRANSIT WALK
+2,"Rail, Gol - Oslo",11:00,15:00,1h,Gol,NSR:StopPlace:324,60.69917,8.97123,Billingstad,NSR:StopPlace:577,59.874783,10.483057,transit,TRANSIT WALK
+3,"Medium long local - Oslo",15:00,17:00,1h30m,IKEA Slependen,NSR:StopPlace:4401,59.87577,10.500488,Oslo Bussterminal,NSR:StopPlace:6505,59.91177,10.757994,transit,TRANSIT WALK
+4,"Rural, Østold",16:00,20:30,1h,Sponvika,NSR:StopPlace:3009,59.09267,11.229988,Skjærhalden,NSR:StopPlace:1845,59.025497,11.036771,transit,TRANSIT WALK
+5,"Rural towns, Østold",13:00,14:30,1h10m,Ørje busstorg,NSR:StopPlace:911,59.480717,11.656314,Skjønhaug torv,NSR:StopPlace:1005,59.641224,11.315405,transit,TRANSIT WALK
+6,"Rural to access point - Akershus",13:30,15:30,1h,Borud,NSR:StopPlace:5300,59.700043,11.196891,Lillestrøm terminal,NSR:StopPlace:4489,59.953896,11.043521,transit,TRANSIT WALK
+7,"Outskirts Oslo",17:00,20:00,2h,Prinsdal,NSR:StopPlace:6740,59.834175,10.807415,Solemskogen,NSR:StopPlace:6626,59.979305,10.817612,transit,TRANSIT WALK
+8,"Rural Hedmark",08:00,16:00,2h,Drevsjø,NSR:StopPlace:8674,61.886,12.030646,Dalsbygda sentrum,NSR:StopPlace:8189,62.527782,11.108747,transit,TRANSIT WALK
+9,"Oppland",15:00,17:00,1h30m,Steinvegen,NSR:StopPlace:14093,61.13245,10.454416,Holsjordet,NSR:StopPlace:14320,61.099922,10.47955,transit,TRANSIT WALK
+10,"Buskerud",08:00,15:00,5h,Hokksund stasjon,NSR:StopPlace:245,59.767204,9.910567,Fossekallveien,NSR:StopPlace:15726,60.178715,10.257535,transit,TRANSIT WALK
+11,"Vestfold",13:00,16:00,1h,Torggata,NSR:StopPlace:17452,59.417572,10.482581,Høyjord,NSR:StopPlace:18872,59.366146,10.120965,transit,TRANSIT WALK
+12,"Telemark",10:00,11:30,1h,Meieritorvet,NSR:StopPlace:20257,59.13879,9.648428,Skien sykehjem,NSR:StopPlace:19979,59.213493,9.596075,transit,TRANSIT WALK
+13,"Aust-Agder",09:30,11:30,1h,Hastensund,NSR:StopPlace:21979,58.50631,8.922674,Kolbjørnsvik,NSR:StopPlace:24171,58.451637,8.76895,transit,TRANSIT WALK
+14,"Rogaland    ",08:00,15:16,4h,Hauge i Dalane,NSR:StopPlace:26062,58.343338,6.29508,Heskestad,NSR:StopPlace:26370,58.490974,6.361217,transit,TRANSIT WALK
+15,"Hordaland",16:00,18:00,1h30m,Melkeplassen,NSR:StopPlace:31882,60.376045,5.303988,Starefossbakken,NSR:StopPlace:29147,60.387913,5.35192,transit,TRANSIT WALK
+16,"Sogn og Fjordane",14:00,17:00,2h,Helgheim,NSR:StopPlace:34066,61.231983,7.115655,Vik kommunehus,NSR:StopPlace:37210,61.08844,6.579569,transit,TRANSIT WALK
+17,"Møre og Romsdal",08:00,10:00,1h15m,Slinningsodden,NSR:StopPlace:41499,62.461693,6.16515,Kråmyra,NSR:StopPlace:40181,62.47539,6.191737,transit,TRANSIT WALK
+18,"Sør Trøndelag",07:00,20:00,8h,Meldal sentrum,NSR:StopPlace:42516,63.04669,9.713128,Fillan busstasjon,NSR:StopPlace:43785,63.60113,8.973342,transit,TRANSIT WALK
+19,"Nord Trøndelag",06:00,18:00,4h,Verrabotn,NSR:StopPlace:45683,63.802647,10.581465,Snåsa,NSR:StopPlace:673,64.245766,12.380184,transit,TRANSIT WALK
+20,"Troms",15:00,17:00,1h50m,Harstad kirke,NSR:StopPlace:52154,68.801636,16.534492,Lamoveien,NSR:StopPlace:53953,68.81136,16.507952,transit,TRANSIT WALK
+21,"Finnmark",08:00,18:00,8h,Indre Billefjord,NSR:StopPlace:57518,70.31518,25.046686,Karasjok bussterminal,NSR:StopPlace:56754,69.472664,25.5169,transit,TRANSIT WALK
+22,"Fylkeskryssende",09:00,16:00,3h,Hjellum,NSR:StopPlace:11701,61.768383,9.527959,Lyngveien,NSR:StopPlace:6645,59.897415,10.792623,transit,TRANSIT WALK
+23,"Fylkeskryssende",04:00,26:00,12h,Trondheim S,NSR:StopPlace:659,63.436462,10.398694,Brønnøysund sentrum,NSR:StopPlace:51790,65.4755,12.211214,transit,TRANSIT WALK
+24,"Fly",08:00,22:00,4h,Sogndal Lufthamn,NSR:StopPlace:750,61.157547,7.137634,Molde Lufthavn,NSR:StopPlace:735,62.746407,7.260933,transit,TRANSIT WALK
+25,"Ekspressbuss",00:01,26:00,10h,Haugesund bussterminal,NSR:StopPlace:26084,59.416233,5.27443,Trysil busstasjon,NSR:StopPlace:7310,61.318344,12.260398,transit,TRANSIT WALK
+26,"Ekspressbuss",08:00,23:00,7h,Skjærhalden,NSR:StopPlace:1845,59.025497,11.036771,Lærdal rådhus,NSR:StopPlace:34505,61.09855,7.480798,transit,TRANSIT WALK
+27,"Ekspressbuss",15:00,26:00,3h,Tromsø Prostneset,NSR:StopPlace:52273,69.647705,18.959843,Hammerfest bussterminal,NSR:StopPlace:56676,70.66445,23.680502,transit,TRANSIT WALK
+28,"Oslo høyfrekvens",16:05,18:05,2h,Marienlyst,,59.932322,10.724663,Kjøbenhavngata,,59.928979,10.769432,transit,TRANSIT WALK
+29,"Too high heuristic cost OTP#3835",19:30,21:00,0h30m,Hauketo stasjon,NSR:StopPlace:6710,59.845947,10.803125,Steinberg stasjon,NSR:StopPlace:58839,59.75957,9.961188,transit,TRANSIT WALK
+30,"Crossing Oslo 1",09:00,,2h,Lillestrøm,,59.9559,11.0509,Asker,,59.8367,10.4249,transit,TRANSIT WALK
+31,"Crossing Oslo 2",09:00,,2h,Lillestrøm,,59.9559,11.0509,Hokksund,,59.7705,9.9088,transit,TRANSIT WALK
+32,"Sarpsbord to Bergen",09:00,,2h,Sarpsborg,,59.2771080,11.1401367,Bergen,,60.3920207,5.329484,transit,TRANSIT WALK
+33,"Stavanger to Bergen",09:00,,2h,Stavanger,,58.9698356,5.7278252,Bergen,,60.3920207,5.329484,transit,TRANSIT WALK
+34,"Trondheim to Oslo",09:00,,12h,Trondheim,,63.4210307,10.50292,Oslo,,59.8889369,10.7885742,transit,TRANSIT WALK
+# The next case fails if run with case 28 !!!
+35,"Oslo to Tromsø",09:00,,12h,Oslo,,59.9299041,9.9088,Tromsø,,69.6551766,18.9486,transit,TRANSIT WALK
+36,"Drammen to Ålesund",10:00,,12h,Drammen,,59.7176376,10.2612305,Ålesund,,62.4869530,6.1303710,transit,TRANSIT WALK
+101,"P+R into Oslo #1",10:00,,3h,Slemmestad,,59.779213,10.495719,Oslo,,59.9299041,10.74874,p-and-r,CAR_PARK TRANSIT WALK
+102,"P+R into Bergen",14:00,,3h,Norvik,,60.234250,5.3580665,Bergen,,60.3884160,5.321159,p-and-r,CAR_PARK TRANSIT WALK
+103,"P+R into Trondheim",14:00,,3h,Venn,,63.2510938,10.0528335,Trondheim,,63.4291709,10.40096,p-and-r,CAR_PARK TRANSIT WALK
+104,"P+R into Stavanger",10:00,,3h,Verdalen,,58.7850184,5.6150436,Stavanger,,58.9698356,5.72782516,p-and-r,CAR_PARK TRANSIT WALK
+105,"P+R into Oslo #2",10:00,,3h,Hønefoss,,60.1688416,10.2612305,Oslo,,59.9299041,10.74874,p-and-r,CAR_PARK TRANSIT WALK
+106,"P+R into Oslo #3",10:00,,3h,Moss,,59.4318080,10.6649780,Oslo,,59.9299041,10.74874,p-and-r,CAR_PARK TRANSIT WALK
+107,"P+R Drammen to Ålesund",10:00,,3h,Drammen,,59.7176376,10.2612305,Ålesund,,62.4869530,6.1303710,p-and-r,CAR_PARK TRANSIT WALK
