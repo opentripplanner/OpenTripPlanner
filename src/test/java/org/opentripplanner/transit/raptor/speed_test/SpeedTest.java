@@ -16,6 +16,7 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpt
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseInput;
 import org.opentripplanner.util.OtpAppException;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
@@ -80,16 +82,24 @@ public class SpeedTest {
 
     private final SpeedTestCmdLineOpts opts;
     private final SpeedTestConfig config;
+    private final List<TestCaseInput> testCaseInputs;
     private SpeedTestProfile routeProfile;
     private final Router router;
+    private final List<String> testCaseIds = new ArrayList<>();
     private final List<Integer> numOfPathsFound = new ArrayList<>();
     private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
     private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
+    private final CsvFileIO tcIO;
 
     private SpeedTest(SpeedTestCmdLineOpts opts) {
         this.opts = opts;
         this.config = SpeedTestConfig.config(opts.rootDir());
         this.graph = loadGraph(opts.rootDir(), config.graph);
+
+        this.tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
+
+        // Read Test-case definitions and expected results from file
+        this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
         this.router = new Router(graph, RouterConfig.DEFAULT);
         this.router.startup();
@@ -154,33 +164,23 @@ public class SpeedTest {
     private void runSingleTest(int sample, int nSamples) throws Exception {
         System.err.println("Run a single test sample (all test cases once)");
 
-        CsvFileIO tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME, opts.skipCost());
-        List<TestCase> testCases = tcIO.readTestCasesFromFile();
+        List<TestCase> testCases = createNewSetOfTestCases();
         List<TripPlan> tripPlans = new ArrayList<>();
 
         int nSuccess = 0;
+        testCaseIds.clear();
         numOfPathsFound.clear();
 
         // Force GC to avoid GC during the test
         forceGCToAvoidGCLater();
 
-        List<String> testCaseIds = opts.testCaseIds();
-        List<TestCase> testCasesToRun;
-
-        if(testCaseIds.isEmpty()) {
-            testCasesToRun = testCases;
-        }
-        else {
-            testCasesToRun = testCases.stream().filter(it -> testCaseIds.contains(it.id)).collect(Collectors.toList());
-        }
-
         // We assume we are debugging and not measuring performance if we only run 1 test-case
         // one time; Hence skip JIT compiler warm-up.
         int samplesPrProfile = opts.numberOfTestsSamplesToRun() / opts.profiles().length;
-        if(testCasesToRun.size() > 1 || samplesPrProfile > 1) {
+        if(testCases.size() > 1 || samplesPrProfile > 1) {
             // Warm-up JIT compiler, run the second test-case if it exist to avoid the same
             // test case from being repeated. If there is just one case, then run it.
-            int index = testCasesToRun.size() == 1 ? 0 : 1;
+            int index = testCases.size() == 1 ? 0 : 1;
             runSingleTestCase(tripPlans, testCases.get(index), true);
         }
 
@@ -195,11 +195,11 @@ public class SpeedTest {
 
         Timer totalTimer = Timer.builder(SPEED_TEST_ROUTE).register(registry);
 
-        for (TestCase testCase : testCasesToRun) {
+        for (TestCase testCase : testCases) {
             nSuccess += runSingleTestCase(tripPlans, testCase, false) ? 1 : 0;
         }
 
-        int tcSize = testCasesToRun.size();
+        int tcSize = testCases.size();
         workerResults.get(routeProfile).add((int) Timer.builder(ROUTE_WORKER).register(registry).mean(TimeUnit.MILLISECONDS));
         totalResults.get(routeProfile).add((int) totalTimer.mean(TimeUnit.MILLISECONDS));
 
@@ -276,7 +276,7 @@ public class SpeedTest {
             if (!ignoreResults) {
                 // Report failure
                 ResultPrinter.printResultFailed(testCase, routingRequest, lapTime, e);
-                numOfPathsFound.add(nPathsFound);
+                addTestCaseSummaryInfo(testCase.id(), nPathsFound);
             }
             return false;
         }
@@ -366,5 +366,31 @@ public class SpeedTest {
         while (ref.get() != null) {
             System.gc();
         }
+    }
+
+    private void addTestCaseSummaryInfo(String id, int nPathsFound) {
+        testCaseIds.add(id);
+        numOfPathsFound.add(nPathsFound);
+    }
+
+    private List<TestCase> createNewSetOfTestCases() {
+        return testCaseInputs.stream()
+                .map(in -> in.createTestCase(opts.skipCost()))
+                .toList();
+    }
+
+    /**
+     * Filter test-cases based on ids and tags
+     */
+    private static List<TestCaseInput> filterTestCases(SpeedTestCmdLineOpts opts, List<TestCaseInput> cases) {
+        // Filter test-cases based on ids
+        var includeIds = opts.testCaseIds();
+
+        if(!includeIds.isEmpty()) {
+            cases = cases.stream()
+                    .filter(it ->includeIds.contains(it.definition().id()))
+                    .toList();
+        }
+        return cases;
     }
 }

@@ -2,77 +2,31 @@ package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.transit.raptor.speed_test.model.Place;
-import org.opentripplanner.util.time.DurationUtils;
-import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
  * Hold all information about a test case and its results.
  */
-public class TestCase {
+public record TestCase(TestCaseDefinition definition, TestCaseResults results) {
     public static final int NOT_SET = -1;
 
-    private static final String FEED_ID = "EN";
-    public final String id;
-    public final String description;
-    public final int departureTime;
-    public final int arrivalTime;
-    public final int window;
-    public final Place fromPlace;
-    public final Place toPlace;
-    public final List<String> tags;
-    final TestCaseResults results;
-    private final RequestModes modes;
 
-    TestCase(
-            String id, int departureTime, int arrivalTime, int window, String description,
-            String origin, String fromPlace, double fromLat, double fromLon,
-            String destination, String toPlace, double toLat, double toLon, List<String> tags,
-            String modes, TestCaseResults testCaseResults
-    ) {
-        this.id = id;
-        this.departureTime = departureTime;
-        this.arrivalTime = arrivalTime;
-        this.window = window;
-        this.description = description;
-        this.fromPlace = new Place(origin, FEED_ID, fromPlace, fromLat, fromLon);
-        this.toPlace = new Place(destination, FEED_ID, toPlace, toLat, toLon);
-        this.results = testCaseResults;
-        this.tags = tags;
-        this.modes = (new QualifiedModeSet(modes)).getRequestModes();
+    public String id() {
+        return definition.id();
     }
 
-    @Override
-    public String toString() {
-        return toString(NOT_SET, NOT_SET, NOT_SET);
+    /**
+     * All test results are OK.
+     */
+    public boolean success() {
+        return results.success();
     }
 
-    public String toString(int departureTime, int arrivalTime, int window) {
-        return String.format(
-                "#%s %s - %s, %s - %s, %s-%s(%s)",
-                id, fromPlace.name, toPlace.name,
-                fromPlace.coordinate,
-                toPlace.coordinate,
-                timeToString(this.departureTime, departureTime),
-                timeToString(this.arrivalTime, arrivalTime),
-                durationToString(this.window, window)
-        );
-    }
-
-    private String timeToString(int orgTime, int calcTime) {
-        return orgTime == NOT_SET && calcTime > 0
-                ? TimeUtils.timeToStrCompact(calcTime) + "*"
-                : TimeUtils.timeToStrCompact(orgTime);
-    }
-
-    private String durationToString(int orgTime, int calcTime) {
-      return orgTime == NOT_SET && calcTime > 0
-            ? DurationUtils.durationToStr(calcTime) + "*"
-            : DurationUtils.durationToStr(orgTime);
+    public void printResults() {
+        if(!results.actualResults().isEmpty()) {
+            System.err.println(results);
+        }
     }
 
     /**
@@ -86,23 +40,15 @@ public class TestCase {
         }
     }
 
-    /**
-     * All test results are OK.
-     */
-    public boolean success() {
-        return results.success();
-    }
-
-    public void printResults() {
-        if(!results.actualResults().isEmpty()) {
-            System.err.println(results.toString());
-        }
+    @Override
+    public String toString() {
+        return definition.toString();
     }
 
     /**
      * The test case is not run or no itineraries found.
      */
-    boolean notRun() {
+    boolean notRunOrNoResults() {
         return results.noResults();
     }
 
@@ -111,9 +57,5 @@ public class TestCase {
      */
     List<Result> actualResults() {
         return results.actualResults();
-    }
-
-    public RequestModes getModes() {
-        return modes;
     }
 }

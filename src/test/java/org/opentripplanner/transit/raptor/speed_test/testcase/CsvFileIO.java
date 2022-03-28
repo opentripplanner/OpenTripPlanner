@@ -1,24 +1,37 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import com.csvreader.CsvReader;
-import java.nio.charset.StandardCharsets;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.util.time.TimeUtils;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.raptor.speed_test.model.Place;
+import org.opentripplanner.util.time.DurationUtils;
+import org.opentripplanner.util.time.TimeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * This class is responsible for reading and writing test cases and test case results to CSV files.
  */
 public class CsvFileIO {
+    private static final Logger LOG = LoggerFactory.getLogger(CsvFileIO.class);
+    private static final String FEED_ID = "EN";
+
     private static final Charset CHARSET_UTF_8 = StandardCharsets.UTF_8;
     private static final char CSV_DELIMITER = ',';
     private static boolean printResultsForFirstStrategyRun = true;
@@ -26,76 +39,96 @@ public class CsvFileIO {
     private final File testCasesFile;
     private final File expectedResultsFile;
     private final File expectedResultsOutputFile;
-    private final boolean skipCost;
 
 
-    public CsvFileIO(File dir, String testSetName, boolean skipCost) {
+    public CsvFileIO(File dir, String testSetName) {
         testCasesFile = new File(dir, testSetName + ".csv");
         expectedResultsFile = new File(dir, testSetName + "-expected-results.csv");
         expectedResultsOutputFile = new File(dir, testSetName + "-results.csv");
-        this.skipCost = skipCost;
     }
 
-    /**
-     * CSV input order matches constructor:
-     * <pre>
-     *   id, description,fromPlace,fromLat,fromLon,origin,toPlace,toLat,toLon,destination,transportType,expectedResult
-     * </pre>
-     */
-    public List<TestCase> readTestCasesFromFile() throws IOException {
-        Map<String, TestCaseResults> expectedResults = readExpectedResultsFromFile();
-        List<TestCase> testCases = new ArrayList<>();
+    public List<TestCaseInput> readTestCasesFromFile() {
+        try {
+            final var expectedResults = readExpectedResultsFromFile();
+            List<TestCaseDefinition> definitions = readTestCaseDefinitionsFromFile();
+
+            return definitions.stream().map(def -> new TestCaseInput(def, expectedResults.get(def.id()))).toList();
+        }
+        catch (IOException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+    }
+
+    private List<TestCaseDefinition> readTestCaseDefinitionsFromFile() throws IOException {
+        List<TestCaseDefinition> testCases = new ArrayList<>();
         CsvReader csvReader = new CsvReader(testCasesFile.getAbsolutePath(), CSV_DELIMITER, CHARSET_UTF_8);
         csvReader.readHeaders(); // Skip header
 
         while (csvReader.readRecord()) {
-            if (isCommentOrEmpty(csvReader.getRawRecord())) {
-                continue;
+            try {
+                if (isCommentOrEmpty(csvReader.getRawRecord())) {
+                    continue;
+                }
+                var tc = new TestCaseDefinition(
+                        csvReader.get("testCaseId"),
+                        csvReader.get("description"),
+                        parseTime(csvReader.get("departure")),
+                        parseTime(csvReader.get("arrival")),
+                        parseDuration(csvReader.get("window")),
+                        new Place(
+                                csvReader.get("origin"),
+                                FeedScopedId.ofNullable(FEED_ID, csvReader.get("fromPlace")),
+                                new WgsCoordinate(
+                                    Double.parseDouble(csvReader.get("fromLat")),
+                                    Double.parseDouble(csvReader.get("fromLon"))
+                                )
+                        ),
+                        new Place(
+                                csvReader.get("destination"),
+                                FeedScopedId.ofNullable(FEED_ID, csvReader.get("toPlace")),
+                                new WgsCoordinate(
+                                    Double.parseDouble(csvReader.get("toLat")),
+                                    Double.parseDouble(csvReader.get("toLon"))
+                                )
+                        ),
+                        asSortedList(split(csvReader.get("tags"))),
+                        new QualifiedModeSet(split(csvReader.get("modes"))).getRequestModes()
+                );
+                testCases.add(tc);
             }
-            String id = csvReader.get("testCaseId");
-            TestCaseResults testCaseResults = expectedResults.get(id);
-            if(testCaseResults == null) {
-                testCaseResults = new TestCaseResults(id, skipCost);
+            catch (RuntimeException e) {
+                LOG.error("Parse error! Test-case: " + csvReader.getRawRecord());
+                throw e;
             }
-
-            TestCase tc = new TestCase(
-                    id,
-                    parseTime(csvReader.get("departure"), TestCase.NOT_SET),
-                    parseTime(csvReader.get("arrival"), TestCase.NOT_SET),
-                    parseTime(csvReader.get("window"), TestCase.NOT_SET),
-                    csvReader.get("description"),
-                    csvReader.get("origin"),
-                    csvReader.get("fromPlace"),
-                    Double.parseDouble(csvReader.get("fromLat")),
-                    Double.parseDouble(csvReader.get("fromLon")),
-                    csvReader.get("destination"),
-                    csvReader.get("toPlace"),
-                    Double.parseDouble(csvReader.get("toLat")),
-                    Double.parseDouble(csvReader.get("toLon")),
-                    Arrays.stream(csvReader.get("tags").split(" ")).collect(Collectors.toList()),
-                    csvReader.get("modes"),
-                    testCaseResults
-            );
-            testCases.add(tc);
         }
         return testCases;
     }
+
 
     /**
      * Write all results to a CSV file. This file can be renamed and used as expected-result input file.
      */
     public void writeResultsToFile(List<TestCase> testCases) {
-        if (!printResultsForFirstStrategyRun || testCases.stream().anyMatch(TestCase::notRun)) {
+        if(!printResultsForFirstStrategyRun) { return; }
+
+        printResultsForFirstStrategyRun = false;
+
+        var tcIds = testCases.stream().filter(TestCase::notRunOrNoResults).map(TestCase::id).toList();
+
+        if (!tcIds.isEmpty()) {
+            LOG.warn(
+                    "No results file written, at least one test-case is not run or returned without any result!" +
+                    " Test-Cases: " + tcIds
+            );
             return;
         }
-        printResultsForFirstStrategyRun = false;
 
         try (PrintWriter out = new PrintWriter(expectedResultsOutputFile, CHARSET_UTF_8.name())) {
             out.println("tcId,transfers,duration,cost,walkDistance,startTime,endTime,modes,agencies,routes,details");
 
             for (TestCase tc : testCases) {
                 for (Result result : tc.actualResults()) {
-                    out.print(tc.id);
+                    out.print(tc.id());
                     out.print(CSV_DELIMITER);
                     out.print(result.transfers);
                     out.print(CSV_DELIMITER);
@@ -122,28 +155,27 @@ public class CsvFileIO {
             out.flush();
             System.err.println("\nINFO - New CSV file with results is saved to '" + expectedResultsOutputFile.getAbsolutePath() + "'.");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to store results: " + e.getMessage(), e);
         }
     }
 
 
     /* private methods */
 
-    private Map<String, TestCaseResults> readExpectedResultsFromFile() throws IOException {
+    private Multimap<String, Result> readExpectedResultsFromFile() throws IOException {
+        Multimap<String, Result> results = ArrayListMultimap.create();
+
         if (!expectedResultsFile.exists()) {
-            return Collections.emptyMap();
+            return results;
         }
 
-        Map<String, TestCaseResults> results = new HashMap<>();
         CsvReader csvReader = new CsvReader(expectedResultsFile.getAbsolutePath(), CSV_DELIMITER, CHARSET_UTF_8);
         csvReader.readHeaders();
 
         while (csvReader.readRecord()) {
             if (isCommentOrEmpty(csvReader.getRawRecord())) { continue; }
             Result expRes = readExpectedResult(csvReader);
-            results
-                .computeIfAbsent(expRes.testCaseId, id -> new TestCaseResults(id, skipCost))
-                .addExpectedResult(expRes);
+            results.put(expRes.testCaseId, expRes);
         }
         return results;
     }
@@ -178,21 +210,31 @@ public class CsvFileIO {
         return TimeUtils.timeToStrLong(timeOrDuration);
     }
 
-    static Integer parseTime(String timeOrDuration) {
-        return TimeUtils.time(timeOrDuration);
+    static Integer parseTime(String time) {
+        return TimeUtils.time(time, TestCase.NOT_SET);
     }
 
-    static Integer parseTime(String timeOrDuration, int defaultValue) {
-        if(timeOrDuration.isBlank()) { return defaultValue; }
-        return TimeUtils.time(timeOrDuration);
+    static Integer parseDuration(String timeOrDuration) {
+        if(timeOrDuration.isBlank()) { return TestCase.NOT_SET; }
+        return DurationUtils.durationInSeconds(timeOrDuration);
+    }
+
+    static String[] split(String value) {
+        return value.split("[\s,;]");
+    }
+
+    static List<String> asSortedList(String[] values) {
+        return Arrays.stream(values).sorted().distinct().toList();
     }
 
     static String col2Str(Collection<?> c) {
         return c.stream().map(Object::toString).collect(Collectors.joining(" "));
     }
+
     static List<String> str2Col(String elements) {
         return str2Col(elements, s -> s);
     }
+
     static <T> List<T> str2Col(String elements, Function<String, T> mapFunction) {
         if(elements == null || elements.isBlank()) { return List.of(); }
         return Arrays.stream(elements.split(" ")).map(mapFunction).collect(Collectors.toList());

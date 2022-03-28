@@ -19,19 +19,16 @@ import java.util.List;
  */
 class TestCaseResults {
     private final String testCaseId;
-    private final List<DiffTool.Entry<Result>> matchedResults = new ArrayList<>();
-    private final List<Result> expected = new ArrayList<>();
-    private final List<Result> actual = new ArrayList<>();
-    private TestStatus status = TestStatus.NA;
     private final boolean skipCost;
+    private final List<Result> expected;
+    private final List<Result> actual = new ArrayList<>();
+    private final List<DiffTool.Entry<Result>> matchedResults = new ArrayList<>();
+    private TestStatus status = TestStatus.NA;
 
-    TestCaseResults(String testCaseId, boolean skipCost) {
+    TestCaseResults(String testCaseId, boolean skipCost, Collection<Result> expected) {
         this.testCaseId = testCaseId;
         this.skipCost  = skipCost;
-    }
-
-    void addExpectedResult(Result expectedResult) {
-        this.expected.add(expectedResult);
+        this.expected = List.copyOf(expected);
     }
 
     void matchItineraries(Collection<Itinerary> itineraries) {
@@ -60,7 +57,7 @@ class TestCaseResults {
     }
 
     /**
-     * No test results is found. This indicate that the test is not run or
+     * No test results is found. This indicates that the test is not run or
      * that the route had no itineraries.
      */
     public boolean noResults() {

@@ -42,26 +42,27 @@ public class SpeedTestRequest {
 
     RoutingRequest toRoutingRequest() {
         var request = config.request.clone();
+        var input = testCase.definition();
 
-        if (testCase.departureTime != TestCase.NOT_SET) {
-            request.setDateTime(time(testCase.departureTime));
+        if (input.departureTime() != TestCase.NOT_SET) {
+            request.setDateTime(time(input.departureTime()));
             request.arriveBy = false;
-            if (testCase.arrivalTime != TestCase.NOT_SET) {
-                request.raptorOptions.withTimeLimit(time(testCase.arrivalTime));
+            if (input.arrivalTime() != TestCase.NOT_SET) {
+                request.raptorOptions.withTimeLimit(time(input.arrivalTime()));
             }
-        } else if (testCase.arrivalTime != TestCase.NOT_SET) {
-            request.setDateTime(time(testCase.arrivalTime));
+        } else if (input.arrivalTime() != TestCase.NOT_SET) {
+            request.setDateTime(time(input.arrivalTime()));
             request.arriveBy = true;
         }
 
-        if (testCase.window != TestCase.NOT_SET) {
-            request.searchWindow = Duration.ofSeconds(testCase.window);
+        if (input.window() != TestCase.NOT_SET) {
+            request.searchWindow = Duration.ofSeconds(input.window());
         }
 
-        request.from = testCase.fromPlace.toGenericLocation();
-        request.to = testCase.toPlace.toGenericLocation();
+        request.from = input.fromPlace().toGenericLocation();
+        request.to = input.toPlace().toGenericLocation();
         request.numItineraries = opts.numOfItineraries();
-        request.modes = testCase.getModes();
+        request.modes = input.modes();
 
         request.raptorOptions
                 .withProfile(profile.raptorProfile)
@@ -79,7 +80,8 @@ public class SpeedTestRequest {
     }
 
     List<String> tags() {
-        return testCase.tags.stream().distinct().sorted().collect(Collectors.toList());
+        // Tags are unique and sorted
+        return testCase.definition().tags();
     }
 
     private static void addDebugOptions(

@@ -123,17 +123,11 @@ class ResultPrinter {
                     "SpeedTest %-7s  %4d ms  %-66s %s %n",
                     status,
                     lapTime,
-                    toString(tc, request),
+                    tc.toString(),
                     errorDetails
             );
             tc.printResults();
         }
-    }
-
-    private static String toString(TestCase tc, RoutingRequest request) {
-        if(request == null) { return tc.toString(); }
-        //SearchParams r = request.searchParams();
-        return tc.toString(0,0,0);
     }
 
     private static List<String> listResults(MeterRegistry registry) {
@@ -164,7 +158,7 @@ class ResultPrinter {
         }
 
 
-        result.addAll(metricsResults.stream().sorted().collect(Collectors.toList()));
+        result.addAll(metricsResults.stream().sorted().toList());
         return result;
     }
 
