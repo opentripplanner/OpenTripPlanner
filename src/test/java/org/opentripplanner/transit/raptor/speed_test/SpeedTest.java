@@ -140,7 +140,7 @@ public class SpeedTest {
         return graph;
     }
 
-    private void runTest() throws Exception {
+    private void runTest() {
         System.err.println("Run Speed Test");
         final SpeedTestProfile[] speedTestProfiles = opts.profiles();
         final int nSamples = opts.numberOfTestsSamplesToRun();
@@ -148,7 +148,7 @@ public class SpeedTest {
         initProfileStatistics();
 
         for (int i = 0; i < nSamples; ++i) {
-            setupSingleTest(speedTestProfiles, i, nSamples);
+            setupSingleTest(speedTestProfiles, i);
             runSingleTest(i+1, nSamples);
         }
         printProfileStatistics();
@@ -161,7 +161,8 @@ public class SpeedTest {
         System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
     }
 
-    private void runSingleTest(int sample, int nSamples) throws Exception {
+    /* Run a single test with all testcases */
+    private void runSingleTest(int sample, int nSamples) {
         System.err.println("Run a single test sample (all test cases once)");
 
         List<TestCase> testCases = createNewSetOfTestCases();
@@ -240,30 +241,25 @@ public class SpeedTest {
             addTagsToTimer(request.tags(), builder);
             var timer = builder.register(registry);
 
-            if (opts.compareHeuristics()) {
-                sample = Timer.start(clock);
-                sample.stop(timer);
-            } else {
-                // Perform routing
-                sample = Timer.start(clock);
-                routingRequest = request.toRoutingRequest();
-                var routingResponse = route(routingRequest);
-                nPathsFound = routingResponse.getTripPlan().itineraries.size();
+            // Perform routing
+            sample = Timer.start(clock);
+            routingRequest = request.toRoutingRequest();
+            var routingResponse = route(routingRequest);
+            nPathsFound = routingResponse.getTripPlan().itineraries.size();
 
-                lapTime = sample.stop(timer) / nanosToMillis;
+            lapTime = sample.stop(timer) / nanosToMillis;
 
-                if (!ignoreResults) {
-                    tripPlans.add(routingResponse.getTripPlan());
+            if (!ignoreResults) {
+                tripPlans.add(routingResponse.getTripPlan());
 
-                    // assert throws Exception on failure
-                    testCase.assertResult(routingResponse.getTripPlan().itineraries);
+                // assert throws Exception on failure
+                testCase.assertResult(routingResponse.getTripPlan().itineraries);
 
-                    // Report success
-                    ResultPrinter.printResultOk(testCase, routingRequest, lapTime, opts.verbose());
-                    numOfPathsFound.add(nPathsFound);
+                // Report success
+                ResultPrinter.printResultOk(testCase, routingRequest, lapTime, opts.verbose());
+                numOfPathsFound.add(nPathsFound);
 
-                    recordSuccesses(routingResponse.getDebugTimingAggregator().getDebugOutput(), request.tags());
-                }
+                recordSuccesses(routingResponse.getDebugTimingAggregator().getDebugOutput(), request.tags());
             }
             return true;
         } catch (Exception e) {
@@ -321,17 +317,8 @@ public class SpeedTest {
         }
     }
 
-    private void setupSingleTest(
-            SpeedTestProfile[] profilesToRun,
-            int sample,
-            int nSamples
-    ) {
-        System.err.println("Set up test");
-        if (opts.compareHeuristics()) {
-            routeProfile = profilesToRun[1 + sample % (profilesToRun.length - 1)];
-        } else {
-            routeProfile = profilesToRun[sample % profilesToRun.length];
-        }
+    private void setupSingleTest(SpeedTestProfile[] profilesToRun, int sample) {
+        routeProfile = profilesToRun[sample % profilesToRun.length];
     }
 
     private ZoneId getTimeZoneId() {
@@ -389,6 +376,14 @@ public class SpeedTest {
         if(!includeIds.isEmpty()) {
             cases = cases.stream()
                     .filter(it ->includeIds.contains(it.definition().id()))
+                    .toList();
+        }
+
+        // Filter test-cases based on tags. Include all test-cases which include ALL listed tags.
+        Collection<String> includeTags = opts.includeTags();
+        if(!includeTags.isEmpty()) {
+            cases = cases.stream()
+                    .filter(tc -> tc.definition().tags().containsAll(includeTags))
                     .toList();
         }
         return cases;

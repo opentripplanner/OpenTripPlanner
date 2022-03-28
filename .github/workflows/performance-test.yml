@@ -61,7 +61,7 @@ jobs:
           MEASUREMENT_ENVIRONMENT: CI
         run: |
           mv graph/graph.obj test/ci-performance-test/
-          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/ci-performance-test/ -p md -n 4"
+          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/ci-performance-test/ -p md -n 4 -i 3 -0"
 
       - name: Archive travel results file
         uses: actions/upload-artifact@v2

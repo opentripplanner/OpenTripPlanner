@@ -19,9 +19,9 @@ public class SpeedTestCmdLineOpts {
     private static final String ROOT_DIR = "d";
     private static final String PROFILES = "p";
     private static final String TEST_CASES = "c";
+    private static final String TAGS = "t";
     private static final String NUM_OF_ITINERARIES = "i";
     private static final String SAMPLE_TEST_N_TIMES = "n";
-    private static final String COMPARE_HEURISTICS = "q";
     private static final String SKIP_COST = "0";
     private static final String DEBUG_STOPS = "S";
     private static final String DEBUG_PATH = "P";
@@ -75,21 +75,16 @@ public class SpeedTestCmdLineOpts {
     }
 
     public int numOfItineraries() {
-        return Integer.parseInt(cmd.getOptionValue(NUM_OF_ITINERARIES, "60"));
+        return Integer.parseInt(cmd.getOptionValue(NUM_OF_ITINERARIES, "50"));
     }
 
     public int numberOfTestsSamplesToRun() {
-        int dftLen = profiles().length - (compareHeuristics() ? 1 : 0);
-        String dftLenAsStr = Integer.toString(dftLen);
-        return Integer.parseInt(cmd.getOptionValue(SAMPLE_TEST_N_TIMES, dftLenAsStr));
+        String defaultValue = Integer.toString(profiles().length);
+        return Integer.parseInt(cmd.getOptionValue(SAMPLE_TEST_N_TIMES, defaultValue));
     }
 
     public SpeedTestProfile[] profiles() {
         return cmd.hasOption(PROFILES) ? SpeedTestProfile.parse(cmd.getOptionValue(PROFILES)) : SpeedTestProfile.values();
-    }
-
-    public boolean compareHeuristics() {
-        return cmd.hasOption(COMPARE_HEURISTICS);
     }
 
     public boolean skipCost() {
@@ -98,6 +93,10 @@ public class SpeedTestCmdLineOpts {
 
     public List<String> testCaseIds() {
         return parseCSVList(TEST_CASES);
+    }
+
+    public List<String> includeTags() {
+        return parseCSVList(TAGS);
     }
 
     private Options options() {
@@ -111,11 +110,11 @@ public class SpeedTestCmdLineOpts {
         // Search options
         options.addOption(PROFILES, "profiles", true, "A coma separated list of configuration profiles:\n" + String.join("\n", SpeedTestProfile.options()));
         options.addOption(TEST_CASES, "testCases", true, "A coma separated list of test case ids to run.");
+        options.addOption(TAGS, "tags", true, "A coma separated list of tags to filter the testcases by - all tags must match.");
         options.addOption(SAMPLE_TEST_N_TIMES, "sampleTestNTimes", true, "Repeat the test N times. Profiles are altered in a round robin fashion.");
 
         // Result options
         options.addOption(NUM_OF_ITINERARIES, "numOfItineraries", true, "Number of itineraries to return.");
-        options.addOption(COMPARE_HEURISTICS, "compare", false, "Compare heuristics for the listed profiles. The 1st profile is compared with 2..n listed profiles.");
 
         options.addOption(SKIP_COST, "skipCost", false, "Skip cost when comparing results.");
         // Debug options
@@ -129,12 +128,6 @@ public class SpeedTestCmdLineOpts {
     List<String> parseCSVList(String opt) {
         return cmd.hasOption(opt)
                 ? Arrays.asList(cmd.getOptionValue(opt).split("\\s*,\\s*"))
-                : Collections.emptyList();
-    }
-
-    private List<Integer> parseCSVToInt(String opt) {
-        return cmd.hasOption(opt)
-                ? parseCSVList(opt).stream().map(Integer::valueOf).collect(Collectors.toList())
                 : Collections.emptyList();
     }
 
