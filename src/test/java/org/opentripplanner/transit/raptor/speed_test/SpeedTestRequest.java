@@ -87,7 +87,7 @@ public class SpeedTestRequest {
             RoutingRequest request,
             SpeedTestCmdLineOpts opts
     ) {
-        request.raptorDebuging
+        request.raptorDebugging
                 .withStops(opts.debugStops())
                 .withPath(opts.debugPath());
     }

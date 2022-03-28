@@ -123,8 +123,6 @@ public class SpeedTest {
 
     /* Run a single test with all testcases */
     private void runSingleTest(int sample, int nSamples) {
-        System.err.println("Run a single test sample (all test cases once)");
-
         List<TestCase> testCases = createNewSetOfTestCases();
         List<TripPlan> tripPlans = new ArrayList<>();
 
@@ -150,6 +148,7 @@ public class SpeedTest {
         timer.startTest();
 
         for (TestCase testCase : testCases) {
+            System.err.println(ResultPrinter.headerLine("Run test-case " + testCase.id()));
             nSuccess += runSingleTestCase(tripPlans, testCase, false) ? 1 : 0;
         }
 

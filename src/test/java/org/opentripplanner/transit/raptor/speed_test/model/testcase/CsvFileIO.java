@@ -61,7 +61,7 @@ public class CsvFileIO {
     private List<TestCaseDefinition> readTestCaseDefinitionsFromFile() throws IOException {
         List<TestCaseDefinition> testCases = new ArrayList<>();
         CsvReader csvReader = new CsvReader(testCasesFile.getAbsolutePath(), CSV_DELIMITER, CHARSET_UTF_8);
-        csvReader.readHeaders(); // Skip header
+        csvReader.readHeaders();
 
         while (csvReader.readRecord()) {
             try {

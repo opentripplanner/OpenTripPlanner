@@ -944,7 +944,7 @@ public abstract class RoutingResource {
             request.itineraryFilters.debug = debugItineraryFilter;
         }
 
-        request.raptorDebuging
+        request.raptorDebugging
                 .withStops(debugRaptorStops)
                 .withPath(debugRaptorPath);
 

@@ -58,7 +58,7 @@ class ResultPrinter {
         int totalNumOfResults = numOfPathsFound.stream().mapToInt((it) -> it).sum();
         var summary = TableFormatter.formatTableAsTextLines(List.of(testCaseIds, numOfPathsFound), " ", false);
         System.err.println(
-                "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ SUMMARY " + profile + " ]" +
+                "\n" + headerLine("SUMMARY " + profile) +
                 "\n" + String.join("\n", listResults(timer)) +
                 "\n" +
                 logLine("Test case ids", "     [%s]", summary.get(0)) +
@@ -71,7 +71,7 @@ class ResultPrinter {
     }
 
     static void logSingleTestHeader(SpeedTestProfile profile) {
-        System.err.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ START " + profile + " ]");
+        System.err.println("\n" + headerLine("START " + profile));
     }
 
     static void printProfileResults(String header, SpeedTestProfile[] profiles, Map<SpeedTestProfile, List<Integer>> result) {
@@ -84,6 +84,15 @@ class ResultPrinter {
                 printProfileResultLine(p.name(), v, labelMaxLen);
             }
         }
+    }
+
+    public static String headerLine(String label) {
+        // Make a header width is 100
+        int prefixLen = (100 - label.length() - 4);
+        var buf = new StringBuilder(100);
+        buf.append("- ".repeat(prefixLen/2));
+        if(label.length() % 2 == 1) { buf.append(' '); }
+        return buf.append("[ ").append(label).append(" ]").toString();
     }
 
     private static void printResult(

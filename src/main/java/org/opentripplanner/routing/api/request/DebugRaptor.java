@@ -49,6 +49,15 @@ public class DebugRaptor implements Serializable {
     private int debugPathFromStopIndex = 0;
 
 
+    public DebugRaptor() { }
+
+    /** Avoid using clone(), use copy-constructor instead(Josh Bloch). */
+    public DebugRaptor(DebugRaptor other) {
+        this.stops = List.copyOf(other.stops);
+        this.path = List.copyOf(other.path);
+        this.debugPathFromStopIndex = other.debugPathFromStopIndex;
+    }
+
     public boolean isEnabled() {
         return !stops.isEmpty() || !path.isEmpty();
     }

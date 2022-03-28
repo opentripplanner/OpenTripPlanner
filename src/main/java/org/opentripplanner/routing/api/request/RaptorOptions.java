@@ -32,6 +32,15 @@ public class RaptorOptions implements Serializable {
      */
     private Instant timeLimit = null;
 
+    public RaptorOptions() {
+    }
+
+    public RaptorOptions(RaptorOptions other) {
+        withOptimizations(other.optimizations);
+        withProfile(other.profile);
+        withSearchDirection(other.searchDirection);
+        withTimeLimit(other.timeLimit);
+    }
 
     public Set<Optimization>getOptimizations() {
         return optimizations;

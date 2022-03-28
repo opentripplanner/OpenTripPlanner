@@ -105,13 +105,13 @@ public class RaptorRequestMapper {
                 .addAccessPaths(accessPaths)
                 .addEgressPaths(egressPaths);
 
-        if(request.raptorDebuging.isEnabled()) {
+        if(request.raptorDebugging.isEnabled()) {
             var debug = builder.debug();
             var debugLogger = new SystemErrDebugLogger(true);
 
-            debug.addStops(request.raptorDebuging.stops())
-                    .setPath(request.raptorDebuging.path())
-                    .debugPathFromStopIndex(request.raptorDebuging.debugPathFromStopIndex())
+            debug.addStops(request.raptorDebugging.stops())
+                    .setPath(request.raptorDebugging.path())
+                    .debugPathFromStopIndex(request.raptorDebugging.debugPathFromStopIndex())
                     .stopArrivalListener(debugLogger::stopArrivalLister)
                     .patternRideDebugListener(debugLogger::patternRideLister)
                     .pathFilteringListener(debugLogger::pathFilteringListener)

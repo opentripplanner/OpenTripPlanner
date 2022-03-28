@@ -779,13 +779,13 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /**
      * Raptor can print all events when arriving at stops to system error. For developers only.
      */
-    public DebugRaptor raptorDebuging = new DebugRaptor();
+    public DebugRaptor raptorDebugging = new DebugRaptor();
 
 
     /**
      * Set of options to use with Raptor. These are available here for testing purposes.
      */
-    public final RaptorOptions raptorOptions = new RaptorOptions();
+    public RaptorOptions raptorOptions = new RaptorOptions();
 
 
 
@@ -1242,6 +1242,9 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             clone.bannedTrips = Set.copyOf(bannedTrips);
 
             clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
+
+            clone.raptorOptions = new RaptorOptions(this.raptorOptions);
+            clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
 
             return clone;
         } catch (CloneNotSupportedException e) {
