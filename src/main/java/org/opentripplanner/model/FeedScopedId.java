@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.io.Serial;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -19,6 +20,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
      */
     private static final char ID_SEPARATOR = ':';
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String feedId;
@@ -33,9 +35,12 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
         this.id = id;
     }
 
+    /**
+     * Return a new FeedId if the id is not {@code null}, an empty string or contains whitespace only.
+     */
     @Nullable
     public static FeedScopedId ofNullable(@NotNull String feedId, @Nullable String id) {
-        return id == null ? null : new FeedScopedId(feedId, id);
+        return id == null || id.isBlank() ? null :  new FeedScopedId(feedId, id);
     }
 
     public String getFeedId() {
@@ -71,9 +76,8 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     public boolean equals(Object obj) {
         if (this == obj) { return true; }
         if (obj == null) { return false; }
-        if (!(obj instanceof FeedScopedId)) { return false; }
+        if (!(obj instanceof FeedScopedId other)) { return false; }
 
-        FeedScopedId other = (FeedScopedId) obj;
         return feedId.equals(other.feedId) && id.equals(other.id);
     }
 
