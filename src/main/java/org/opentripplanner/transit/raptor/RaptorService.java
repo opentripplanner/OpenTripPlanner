@@ -48,6 +48,11 @@ public class RaptorService<T extends RaptorTripSchedule> {
         return response;
     }
 
+    /**
+     * TODO Add back the possibility to compare heuristics using a test - like the SpeedTest,
+     *      but maybe better to make a separate test.
+     */
+    @SuppressWarnings("unused")
     public void compareHeuristics(
             RaptorRequest<T> r1,
             RaptorRequest<T> r2,
@@ -69,7 +74,6 @@ public class RaptorService<T extends RaptorTripSchedule> {
     /* private methods */
 
     private RaptorResponse<T> routeUsingStdWorker(RaptorTransitDataProvider<T> transitData, RaptorRequest<T> request) {
-        LOG.debug("Run query: {}", request);
         Collection<Path<T>> paths = config.createStdWorker(transitData, request).route();
         return new RaptorResponse<>(paths, request, request);
     }
