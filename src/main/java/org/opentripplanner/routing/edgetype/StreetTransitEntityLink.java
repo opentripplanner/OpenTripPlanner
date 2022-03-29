@@ -4,6 +4,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -22,18 +23,18 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
 
     private final T transitEntityVertex;
 
-    private final boolean wheelchairAccessible;
+    private final WheelChairBoarding wheelchairBoarding;
 
-    public StreetTransitEntityLink(StreetVertex fromv, T tov, boolean wheelchairAccessible) {
+    public StreetTransitEntityLink(StreetVertex fromv, T tov, WheelChairBoarding wheelchairBoarding) {
         super(fromv, tov);
         this.transitEntityVertex = tov;
-        this.wheelchairAccessible = wheelchairAccessible;
+        this.wheelchairBoarding = wheelchairBoarding;
     }
 
-    public StreetTransitEntityLink(T fromv, StreetVertex tov, boolean wheelchairAccessible) {
+    public StreetTransitEntityLink(T fromv, StreetVertex tov, WheelChairBoarding wheelchairBoarding) {
         super(fromv, tov);
         this.transitEntityVertex = fromv;
-        this.wheelchairAccessible = wheelchairAccessible;
+        this.wheelchairBoarding = wheelchairBoarding;
     }
 
     protected abstract int getStreetToStopTime();
@@ -76,7 +77,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         }
 
         RoutingRequest req = s0.getOptions();
-        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
+        if (s0.getOptions().wheelchairAccessible && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
             return null;
         }
 

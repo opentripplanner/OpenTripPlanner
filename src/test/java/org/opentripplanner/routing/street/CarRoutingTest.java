@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -127,7 +128,14 @@ public class CarRoutingTest {
         ));
         var paths = gpf.graphPathFinderEntryPoint(request);
 
-        var itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
+        GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+                graph.getTimeZone(),
+                new AlertToLegMapper(graph.getTransitAlertService()),
+                graph.streetNotesService,
+                graph.ellipsoidToGeoidDifference
+        );
+
+        var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
         // make sure that we only get CAR legs
         itineraries.forEach(
                 i -> i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.CAR)));

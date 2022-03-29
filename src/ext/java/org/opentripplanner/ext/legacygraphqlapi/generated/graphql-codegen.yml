@@ -85,3 +85,4 @@ config:
     SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice
     VehiclePosition: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition#RealtimeVehiclePosition
     StopRelationship: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship#StopRelationship
+    WheelchairBoarding: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding

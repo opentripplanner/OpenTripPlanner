@@ -1,5 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.Collections;
+import java.util.Map;
+import javax.xml.bind.JAXBElement;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
@@ -13,11 +16,6 @@ import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
-
-import javax.xml.bind.JAXBElement;
-
-import java.util.Collections;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;

@@ -155,10 +155,6 @@ otp.config = {
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
             defaultBaseLayer : 'OSM Standard Tiles',
             isDefault: true
-        },
-        {
-            id : 'analyst',
-            className : 'otp.modules.analyst.AnalystModule'
         }
     ],
     

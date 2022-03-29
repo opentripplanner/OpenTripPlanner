@@ -58,10 +58,15 @@ public class TimetableSnapshotTest {
         Timetable b = new Timetable(orig, new ServiceDate());
         assertTrue(new TimetableSnapshot.SortedTimetableComparator().compare(a, b) < 0);
     }
-    
+
     private boolean updateResolver(TimetableSnapshot resolver, TripPattern pattern, TripUpdate tripUpdate, ServiceDate serviceDate) {
-        TripTimes updatedTripTimes = pattern.getScheduledTimetable().createUpdatedTripTimes(tripUpdate,
-                timeZone, serviceDate);
+        TripTimesPatch tripTimesPatch =
+                pattern.getScheduledTimetable().createUpdatedTripTimes(
+                        tripUpdate,
+                        timeZone,
+                        serviceDate
+                );
+        TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
         return resolver.update(pattern, updatedTripTimes, serviceDate);
     }
 

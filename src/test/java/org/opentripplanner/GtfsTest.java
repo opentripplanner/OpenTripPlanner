@@ -10,17 +10,21 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
@@ -33,6 +37,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest extends TestCase {
@@ -89,7 +94,19 @@ public abstract class GtfsTest extends TestCase {
             for (FeedEntity feedEntity : feedEntityList) {
                 updates.add(feedEntity.getTripUpdate());
             }
-            timetableSnapshotSource.applyTripUpdates(graph, fullDataset, updates, feedId.getId());
+            CalendarService calendarService = graph.getCalendarService();
+            Deduplicator deduplicator = graph.deduplicator;
+            GraphIndex graphIndex = graph.index;
+            Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
+            timetableSnapshotSource.applyTripUpdates(
+                    calendarService,
+                    deduplicator,
+                    graphIndex,
+                    serviceCodes,
+                    fullDataset,
+                    updates,
+                    feedId.getId()
+            );
             alertsUpdateHandler.update(feedMessage);
         } catch (Exception exception) {}
     }
@@ -125,7 +142,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
         // TODO route matcher still using underscores because it's quite nonstandard and should be eliminated from the 1.0 release rather than reworked
         if (excludedRoute != null && !excludedRoute.isEmpty()) {
-            routingRequest.setBannedRoutesFromSting(feedId.getId() + "__" + excludedRoute);
+            routingRequest.setBannedRoutesFromString(feedId.getId() + "__" + excludedRoute);
         }
         if (excludedStop != null && !excludedStop.isEmpty()) {
             throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
@@ -139,7 +156,13 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
-        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
+        GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+                graph.getTimeZone(),
+                new AlertToLegMapper(graph.getTransitAlertService()),
+                graph.streetNotesService,
+                graph.ellipsoidToGeoidDifference
+        );
+        List<Itinerary> itineraries = graphPathToItineraryMapper.mapItineraries(paths);
         // Stored in instance field for use in individual tests
         itinerary = itineraries.get(0);
 

@@ -16,8 +16,8 @@ import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalStationVertex;
 
@@ -33,7 +33,9 @@ public class StatesToWalkStepsMapper {
      */
     private static final double MAX_ZAG_DISTANCE = 30;
 
-    private final Graph graph;
+    private final double ellipsoidToGeoidDifference;
+    private final StreetNotesService streetNotesService;
+
     private final List<State> states;
     private final WalkStep previous;
     private final List<WalkStep> steps = new ArrayList<>();
@@ -58,10 +60,16 @@ public class StatesToWalkStepsMapper {
      * @param previousStep the last walking step of a non-transit leg that immediately precedes this
        one or null, if first leg
      */
-    public StatesToWalkStepsMapper(Graph graph, List<State> states, WalkStep previousStep) {
-        this.graph = graph;
+    public StatesToWalkStepsMapper(
+            List<State> states,
+            WalkStep previousStep,
+            StreetNotesService streetNotesService,
+            double ellipsoidToGeoidDifference
+    ) {
         this.states = states;
         this.previous = previousStep;
+        this.streetNotesService = streetNotesService;
+        this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
     }
 
     public List<WalkStep> generateWalkSteps() {
@@ -136,7 +144,7 @@ public class StatesToWalkStepsMapper {
             }
 
             // start a new step
-            current = createWalkStep(graph, forwardState, backState);
+            current = createWalkStep(forwardState, backState);
             createdNewStep = true;
             steps.add(current);
 
@@ -171,7 +179,7 @@ public class StatesToWalkStepsMapper {
                 // to see if we should generate a "left to continue" instruction.
                 if (isPossibleToTurnToOtherStreet(backState, edge, streetName, thisAngle)) {
                     // turn to stay on same-named street
-                    current = createWalkStep(graph, forwardState, backState);
+                    current = createWalkStep(forwardState, backState);
                     createdNewStep = true;
                     steps.add(current);
                     current.setDirections(lastAngle, thisAngle, false);
@@ -217,7 +225,7 @@ public class StatesToWalkStepsMapper {
 
         // increment the total length for this step
         current.distance += edge.getDistanceMeters();
-        current.addStreetNotes(graph.streetNotesService.getNotes(forwardState));
+        current.addStreetNotes(streetNotesService.getNotes(forwardState));
         lastAngle = DirectionUtils.getLastAngle(geom);
 
         current.edges.add(edge);
@@ -225,7 +233,7 @@ public class StatesToWalkStepsMapper {
 
     private void updateElevationProfile(State backState, Edge edge) {
         List<P2<Double>> s = encodeElevationProfile(edge, distance,
-                backState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0
+                backState.getOptions().geoidElevation ? -ellipsoidToGeoidDifference : 0
         );
         if (current.elevation != null && current.elevation.size() > 0) {
             current.elevation.addAll(s);
@@ -368,7 +376,7 @@ public class StatesToWalkStepsMapper {
     }
 
     private void createFirstStep(State backState, State forwardState) {
-        current = createWalkStep(graph, forwardState, backState);
+        current = createWalkStep(forwardState, backState);
         steps.add(current);
 
         Edge edge = forwardState.getBackEdge();
@@ -386,7 +394,7 @@ public class StatesToWalkStepsMapper {
 
     private void createElevatorWalkStep(State backState, State forwardState, Edge edge) {
         // don't care what came before or comes after
-        current = createWalkStep(graph, forwardState, backState);
+        current = createWalkStep(forwardState, backState);
 
         // tell the user where to get off the elevator using the exit notation, so the
         // i18n interface will say 'Elevator to <exit>'
@@ -401,7 +409,7 @@ public class StatesToWalkStepsMapper {
         steps.add(current);
     }
 
-    private static WalkStep createWalkStep(Graph graph, State forwardState, State backState) {
+    private WalkStep createWalkStep(State forwardState, State backState) {
         Edge en = forwardState.getBackEdge();
         WalkStep step;
         step = new WalkStep();
@@ -409,10 +417,10 @@ public class StatesToWalkStepsMapper {
         step.startLocation =
                 new WgsCoordinate(backState.getVertex().getLat(), backState.getVertex().getLon());
         step.elevation = encodeElevationProfile(forwardState.getBackEdge(), 0,
-                forwardState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0
+                forwardState.getOptions().geoidElevation ? -ellipsoidToGeoidDifference : 0
         );
         step.bogusName = en.hasBogusName();
-        step.addStreetNotes(graph.streetNotesService.getNotes(forwardState));
+        step.addStreetNotes(streetNotesService.getNotes(forwardState));
         step.angle = DirectionUtils.getFirstAngle(forwardState.getBackEdge().getGeometry());
         step.walkingBike = forwardState.isBackWalkingBike();
         if (forwardState.getBackEdge() instanceof AreaEdge) {
@@ -453,10 +461,9 @@ public class StatesToWalkStepsMapper {
     private static List<P2<Double>> encodeElevationProfile(
             Edge edge, double distanceOffset, double heightOffset
     ) {
-        if (!(edge instanceof StreetEdge)) {
+        if (!(edge instanceof StreetEdge elevEdge)) {
             return new ArrayList<>();
         }
-        StreetEdge elevEdge = (StreetEdge) edge;
         if (elevEdge.getElevationProfile() == null) {
             return new ArrayList<>();
         }

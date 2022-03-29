@@ -1,5 +1,25 @@
 package org.opentripplanner.index;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.mapping.AgencyMapper;
 import org.opentripplanner.api.mapping.AlertMapper;
@@ -40,46 +60,25 @@ import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
-@Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
+@Path("/routers/{ignoreRouterId}/index")  // It would be nice to get rid of the final /index.
+@Produces(MediaType.APPLICATION_JSON)  // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
     private static final double MAX_STOP_SEARCH_RADIUS = 5000;
 
-    /** Choose short or long form of results. */
-    @QueryParam("detail")
-    private boolean detail = false;
-
-    /** Include GTFS entities referenced by ID in the result. */
-    @QueryParam("refs")
-    private boolean refs = false;
-
     private final OTPServer otpServer;
 
-    public IndexAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
+    public IndexAPI(
+            @Context
+            OTPServer otpServer,
+            /**
+             * @deprecated The support for multiple routers are removed from OTP2.
+             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+             */
+            @PathParam("ignoreRouterId") String ignoreRouterId
+    ) {
         this.otpServer = otpServer;
     }
 
@@ -129,7 +128,10 @@ public class IndexAPI {
     @GET
     @Path("/agencies/{feedId}/{agencyId}/routes")
     public Response getAgencyRoutes(
-            @PathParam("feedId") String feedId, @PathParam("agencyId") String agencyId
+            @PathParam("feedId") String feedId,
+            @PathParam("agencyId") String agencyId,
+            /** Choose short or long form of results. */
+            @QueryParam("detail") @DefaultValue("false") Boolean detail
     ) {
         RoutingService routingService = createRoutingService();
         Agency agency = getAgency(routingService, feedId, agencyId);
@@ -443,7 +445,7 @@ public class IndexAPI {
         Trip trip = getTrip(routingService, tripId);
         TripPattern pattern = getTripPattern(routingService, trip);
         // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
-        Timetable table = routingService.getTimetableForTripPattern(pattern);
+        Timetable table = routingService.getTimetableForTripPattern(pattern, null);
         return TripTimeOnDate.fromTripTimes(table, trip);
     }
 

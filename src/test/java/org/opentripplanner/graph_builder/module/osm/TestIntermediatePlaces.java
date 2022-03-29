@@ -18,6 +18,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
+import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -45,6 +46,8 @@ public class TestIntermediatePlaces {
 
     private static GraphPathFinder graphPathFinder;
 
+    private static GraphPathToItineraryMapper graphPathToItineraryMapper;
+
     @BeforeClass public static void setUp() {
         try {
             Graph graph = FakeGraph.buildGraphNoTransit();
@@ -55,6 +58,14 @@ public class TestIntermediatePlaces {
             router.startup();
             TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
             timeZone = graph.getTimeZone();
+
+            graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+                    graph.getTimeZone(),
+                    new AlertToLegMapper(graph.getTransitAlertService()),
+                    graph.streetNotesService,
+                    graph.ellipsoidToGeoidDifference
+            );
+
         } catch (Exception e) {
             e.printStackTrace();
             assert false : "Could not add transit data: " + e.toString();
@@ -142,8 +153,7 @@ public class TestIntermediatePlaces {
 
         assertNotNull(paths);
         assertFalse(paths.isEmpty());
-
-        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths);
+        List<Itinerary> itineraries = graphPathToItineraryMapper.mapItineraries(paths);
         TripPlan plan = TripPlanMapper.mapTripPlan(request, itineraries);
         assertLocationIsVeryCloseToPlace(from, plan.from);
         assertLocationIsVeryCloseToPlace(to, plan.to);

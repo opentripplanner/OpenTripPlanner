@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -75,7 +77,7 @@ public class TripCalendarBuilder {
 
   void addDatedServiceJourneys(
       ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById,
-      Map<String, List<DatedServiceJourney>> datedServiceJourneyBySJId
+      Multimap<String, DatedServiceJourney> datedServiceJourneyBySJId
   ) {
     for (String sjId : datedServiceJourneyBySJId.keySet()) {
 

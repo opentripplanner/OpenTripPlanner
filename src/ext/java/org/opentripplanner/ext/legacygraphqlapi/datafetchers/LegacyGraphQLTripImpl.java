@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
+import graphql.GraphQL;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -12,13 +13,16 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -97,15 +101,8 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Object> wheelchairAccessible() {
-    return environment -> {
-      switch (getSource(environment).getWheelchairAccessible()) {
-        case 0: return "NO_INFORMATION";
-        case 1: return "POSSIBLE";
-        case 2: return "NOT_POSSIBLE";
-        default: return null;
-      }
-    };
+  public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairAccessible() {
+    return environment -> LegacyGraphQLUtils.toGraphQL(getSource(environment).getWheelchairBoarding());
   }
 
   @Override
@@ -214,14 +211,23 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
       try {
         RoutingService routingService = getRoutingService(environment);
         Trip trip = getSource(environment);
-        TripPattern tripPattern = getTripPattern(environment);
-        if (tripPattern == null) { return List.of(); }
-
         var args = new LegacyGraphQLTypes.LegacyGraphQLTripStoptimesForDateArgs(environment.getArguments());
 
-
         ServiceDate serviceDate = args.getLegacyGraphQLServiceDate() != null
-            ? ServiceDate.parseString(args.getLegacyGraphQLServiceDate()) : new ServiceDate();
+                ? ServiceDate.parseString(args.getLegacyGraphQLServiceDate()) : new ServiceDate();
+
+        TripPattern tripPattern = null;
+        TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+        if (timetableSnapshot != null) {
+          tripPattern = timetableSnapshot
+                  .getLastAddedTripPattern(trip.getId(), serviceDate);
+        }
+        // timetableSnapshot is null or no realtime added pattern found
+        if (tripPattern == null) {
+          tripPattern = getTripPattern(environment);
+        }
+        // no matching pattern found anywhere
+        if (tripPattern == null) { return List.of(); }
 
         ServiceDay serviceDay = new ServiceDay(
             routingService.getServiceCodes(),
@@ -230,8 +236,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
             trip.getRoute().getAgency().getId()
         );
 
-        //TODO: Pass serviceDate
-        Timetable timetable = routingService.getTimetableForTripPattern(tripPattern);
+        Timetable timetable = routingService.getTimetableForTripPattern(tripPattern, serviceDate);
         return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDay);
       } catch (ParseException e) {
         return null; // Invalid date format

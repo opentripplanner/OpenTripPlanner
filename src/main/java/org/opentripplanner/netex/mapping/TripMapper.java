@@ -1,5 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
+import javax.xml.bind.JAXBElement;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
@@ -16,11 +20,6 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.xml.bind.JAXBElement;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This maps a NeTEx ServiceJourney to an OTP Trip. A ServiceJourney can be connected to a Line (OTP

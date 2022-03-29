@@ -38,7 +38,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author abyrd
  */
-public abstract class RoutingResource { 
+@SuppressWarnings("FieldMayBeFinal")
+public abstract class RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
 
@@ -842,7 +843,7 @@ public abstract class RoutingResource {
             request.setIntermediatePlacesFromStrings(intermediatePlaces);
         }
         if (preferredRoutes != null) {
-            request.setPreferredRoutesFromSting(preferredRoutes);
+            request.setPreferredRoutesFromString(preferredRoutes);
         }
         if (otherThanPreferredRoutesPenalty != null) {
             request.setOtherThanPreferredRoutesPenalty(otherThanPreferredRoutesPenalty);
@@ -851,7 +852,7 @@ public abstract class RoutingResource {
             request.setPreferredAgenciesFromString(preferredAgencies);
         }
         if (unpreferredRoutes != null) {
-            request.setUnpreferredRoutesFromSting(unpreferredRoutes);
+            request.setUnpreferredRoutesFromString(unpreferredRoutes);
         }
         if (unpreferredAgencies != null) {
             request.setUnpreferredAgenciesFromString(unpreferredAgencies);
@@ -863,10 +864,10 @@ public abstract class RoutingResource {
             request.setBikeBoardCost(bikeBoardCost);
         }
         if (bannedRoutes != null) {
-            request.setBannedRoutesFromSting(bannedRoutes);
+            request.setBannedRoutesFromString(bannedRoutes);
         }
         if (whiteListedRoutes != null) {
-            request.setWhiteListedRoutesFromSting(whiteListedRoutes);
+            request.setWhiteListedRoutesFromString(whiteListedRoutes);
         }
         if (bannedAgencies != null) {
             request.setBannedAgenciesFromSting(bannedAgencies);
