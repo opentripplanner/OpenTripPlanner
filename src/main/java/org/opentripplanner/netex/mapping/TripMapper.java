@@ -38,6 +38,7 @@ class TripMapper {
     private final Set<FeedScopedId> shapePointIds;
     private final EntityById<Operator> operatorsById;
     private final TransportModeMapper transportModeMapper = new TransportModeMapper();
+    private final EntityById<Trip> mappedTrips = new EntityById<>();
 
   TripMapper(
             FeedScopedIdFactory idFactory,
@@ -80,8 +81,13 @@ class TripMapper {
             return null;
         }
 
-        Trip trip = new Trip(idFactory.createId(serviceJourney.getId()));
+        FeedScopedId id = idFactory.createId(serviceJourney.getId());
 
+        if (mappedTrips.containsKey(id)) {
+            return mappedTrips.get(id);
+        }
+
+        Trip trip = new Trip(id);
         trip.setRoute(route);
         trip.setServiceId(serviceId);
         trip.setShapeId(getShapeId(serviceJourney));
@@ -119,6 +125,7 @@ class TripMapper {
             TripServiceAlterationMapper.mapAlteration(serviceJourney.getServiceAlteration())
         );
 
+        mappedTrips.add(trip);
         return trip;
     }
 

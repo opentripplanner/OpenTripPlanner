@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import java.util.List;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
@@ -10,12 +11,20 @@ public class TripOnServiceDate extends TransitEntity {
     private final Trip trip;
     private final ServiceDate serviceDate;
     private final TripAlteration tripAlteration;
+    private final List<TripOnServiceDate> replacementFor;
 
-    public TripOnServiceDate(FeedScopedId id, Trip trip, ServiceDate serviceDate, TripAlteration tripAlteration) {
+    public TripOnServiceDate(
+            FeedScopedId id,
+            Trip trip,
+            ServiceDate serviceDate,
+            TripAlteration tripAlteration,
+            List<TripOnServiceDate> replacementFor
+    ) {
         super(id);
         this.trip = trip;
         this.serviceDate = serviceDate;
         this.tripAlteration = tripAlteration;
+        this.replacementFor = replacementFor;
     }
 
     public Trip getTrip() {
@@ -30,4 +39,7 @@ public class TripOnServiceDate extends TransitEntity {
         return tripAlteration;
     }
 
+    public List<TripOnServiceDate> getReplacementFor() {
+        return replacementFor;
+    }
 }

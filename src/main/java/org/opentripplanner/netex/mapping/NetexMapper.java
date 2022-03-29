@@ -402,6 +402,7 @@ public class NetexMapper {
                 currentNetexIndex.getServiceJourneyById(),
                 currentNetexIndex.getFlexibleLineById(),
                 currentNetexIndex.getOperatingDayById(),
+                currentNetexIndex.getDatedServiceJourneys(),
                 currentMapperIndexes.getDatedServiceJourneysBySjId(),
                 serviceIds,
                 deduplicator
