@@ -11,6 +11,7 @@ import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.util.NonLocalizedString;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.StopPlaceRefStructure;
 import org.rutebanken.netex.model.StopPlaceRefs_RelStructure;
@@ -42,7 +43,7 @@ class GroupOfStationsMapper {
         GroupOfStations groupOfStations = new GroupOfStations(
             idFactory.createId(groupOfStopPlaces.getId())
         );
-        groupOfStations.setName(groupOfStopPlaces.getName().getValue());
+        groupOfStations.setName(NonLocalizedString.ofNullable(groupOfStopPlaces.getName().getValue()));
         WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(groupOfStopPlaces.getCentroid());
 
         if (coordinate == null) {

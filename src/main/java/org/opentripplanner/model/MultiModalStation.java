@@ -44,12 +44,9 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
         this.name = name;
     }
 
-    public double getLat() {
-        return coordinate.latitude();
-    }
-
-    public double getLon() {
-        return coordinate.longitude();
+    @Override
+    public WgsCoordinate getCoordinate() {
+        return coordinate;
     }
 
     public void setCoordinate(WgsCoordinate coordinate) {
