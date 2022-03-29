@@ -9,11 +9,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -29,6 +31,7 @@ import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseInpu
 import org.opentripplanner.util.OtpAppException;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+import static org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer.nanosToMillisecond;
 
 /**
  * Test response times for a large batch of origin/destination points.
@@ -153,8 +156,8 @@ public class SpeedTest {
         }
 
         int tcSize = testCases.size();
-        workerResults.get(routeProfile).add(timer.routingWorkerMean());
-        totalResults.get(routeProfile).add(timer.totalTimerMean());
+        workerResults.get(routeProfile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_RAPTOR));
+        totalResults.get(routeProfile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_TOTAL));
 
         timer.lapTest();
 
@@ -178,23 +181,19 @@ public class SpeedTest {
     }
 
     private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, boolean ignoreResults) {
-        RoutingRequest routingRequest = null;
-        RoutingResponse routingResponse = null;
         int nPathsFound = 0;
         final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, config, routeProfile, getTimeZoneId());
 
-
+        DebugOutput times = null;
         try {
-            timer.startTestCase(request.tags());
-
             // Perform routing
-            routingRequest = request.toRoutingRequest();
+            RoutingRequest routingRequest = request.toRoutingRequest();
 
-            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
-            routingResponse = worker.route();
+            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId(), request.tags());
+            RoutingResponse routingResponse = worker.route();
 
-            int lapTime = timer.lapTestCaseOk();
             nPathsFound = routingResponse.getTripPlan().itineraries.size();
+            times = routingResponse.getDebugTimingAggregator().finishedRendering();
 
             if (!ignoreResults) {
                 tripPlans.add(routingResponse.getTripPlan());
@@ -203,21 +202,15 @@ public class SpeedTest {
                 testCase.assertResult(routingResponse.getTripPlan().itineraries);
 
                 // Report success
-                ResultPrinter.printResultOk(testCase, routingRequest, lapTime, opts.verbose());
+                ResultPrinter.printResultOk(testCase, nanosToMillisecond(times.totalTime), opts.verbose());
                 addTestCaseSummaryInfo(testCase.id(), nPathsFound);
-
-                this.timer.recordResults(routingResponse.getDebugTimingAggregator().getDebugOutput(), request.tags(), false);
             }
             return true;
         } catch (Exception e) {
-            if(routingResponse != null) {
-                timer.recordResults(routingResponse.getDebugTimingAggregator().getDebugOutput(), request.tags(), true);
-            }
-            int lapTime = timer.lapTestCaseFailed();
-
             if (!ignoreResults) {
                 // Report failure
-                ResultPrinter.printResultFailed(testCase, routingRequest, lapTime, e);
+                int lapTime = times == null ? 0 : nanosToMillisecond(times.totalTime);
+                ResultPrinter.printResultFailed(testCase, lapTime, e);
                 addTestCaseSummaryInfo(testCase.id(), nPathsFound);
             }
             return false;

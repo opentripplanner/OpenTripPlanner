@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
+import io.micrometer.core.instrument.Tag;
 import java.time.Duration;
 import java.util.List;
 import java.time.Instant;
@@ -78,9 +79,13 @@ public class SpeedTestRequest {
         return request;
     }
 
-    List<String> tags() {
+    List<Tag> tags() {
         // Tags are unique and sorted
-        return testCase.definition().tags();
+        if (testCase.definition().tags().isEmpty()) {
+            return List.of();
+        } else {
+            return List.of(Tag.of("tags", String.join(" ", testCase.definition().tags())));
+        }
     }
 
     private static void addDebugOptions(

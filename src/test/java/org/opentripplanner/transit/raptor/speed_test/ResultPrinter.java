@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.speed_test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
@@ -17,11 +16,11 @@ import org.opentripplanner.util.TableFormatter;
  *
 
  * <pre>
- *       METHOD CALLS DURATION |              SUCCESS               |         FAILURE
- *                             |  Min   Max  Avg     Count   Total  | Average  Count   Total
- *       AvgTimer:main t1      | 1345  3715 2592 ms     50  129,6 s | 2843 ms      5   14,2 s
- *       AvgTimer:main t2      |   45   699  388 ms     55   21,4 s |    0 ms      0    0,0 s
- *       AvgTimer:main t3      |    4   692  375 ms    110   41,3 s |    0 ms      0    0,0 s
+ *       METHOD CALLS DURATION |
+ *                             |  Min   Max  Avg     Count   Total
+ *       AvgTimer:main t1      | 1345  3715 2592 ms     50  129,6 s
+ *       AvgTimer:main t2      |   45   699  388 ms     55   21,4 s
+ *       AvgTimer:main t3      |    4   692  375 ms    110   41,3 s
  * </pre>
  */
 class ResultPrinter {
@@ -29,15 +28,15 @@ class ResultPrinter {
 
     private ResultPrinter() { }
 
-    static void printResultOk(TestCase testCase, RoutingRequest request, long lapTime, boolean printItineraries) {
-        printResult("SUCCESS", request, testCase, lapTime, printItineraries, "");
+    static void printResultOk(TestCase testCase, long lapTime, boolean printItineraries) {
+        printResult("SUCCESS", testCase, lapTime, printItineraries, "");
     }
 
-    static void printResultFailed(TestCase testCase, RoutingRequest request, long lapTime, Exception e) {
+    static void printResultFailed(TestCase testCase, long lapTime, Exception e) {
         boolean testError = e instanceof TestCaseFailedException;
         String errorDetails = " - " + e.getMessage() + (testError ? "" : "  (" + e.getClass().getSimpleName() + ")");
 
-        printResult("FAILED", request, testCase, lapTime,true, errorDetails);
+        printResult("FAILED", testCase, lapTime,true, errorDetails);
 
         if(!testError) {
             e.printStackTrace();
@@ -54,7 +53,7 @@ class ResultPrinter {
             int tcSize,
             SpeedTestTimer timer
     ) {
-        double totalTimeMs = timer.testTotalTimeMs() / 1000.0;
+        double totalTimeMs = timer.testTotalTimeMs("routing.total") / 1000.0;
         int totalNumOfResults = numOfPathsFound.stream().mapToInt((it) -> it).sum();
         var summary = TableFormatter.formatTableAsTextLines(List.of(testCaseIds, numOfPathsFound), " ", false);
         System.err.println(
@@ -97,7 +96,6 @@ class ResultPrinter {
 
     private static void printResult(
             String status,
-            RoutingRequest request,
             TestCase tc,
             long lapTime,
             boolean printItineraries,
@@ -109,7 +107,7 @@ class ResultPrinter {
                     tc.id(),
                     status,
                     lapTime,
-                    tc.toString(),
+                    tc,
                     errorDetails
             );
             tc.printResults();
@@ -139,8 +137,7 @@ class ResultPrinter {
         return formatLine(
                 RESULT_TABLE_TITLE,
                 width,
-                "             SUCCESS",
-                "        FAILURE"
+                ""
         );
     }
 
@@ -148,7 +145,7 @@ class ResultPrinter {
         return formatLine(
                 "",
                 width,
-                columnHeaderAvg(), columnFailureHeader()
+                columnHeaderAvg()
         );
     }
 
@@ -156,8 +153,7 @@ class ResultPrinter {
         return formatLine(
                 r.name(),
                 width,
-                formatResultOk(r),
-                formatResultFailure(r)
+                formatResultOk(r)
         );
     }
 
@@ -173,30 +169,16 @@ class ResultPrinter {
         );
     }
 
-    private static String formatResultFailure(SpeedTestTimer.Result r) {
-        return String.format(
-                "%4d %s %6d %6.1f s",
-                r.meanFailure(),
-                "ms",
-                r.countFailure(),
-                r.totTime()/1000.0
-        );
-    }
-
     private static String str(long value) {
         return value < 10_000 ? Long.toString(value) : (value/1000) + "'";
     }
 
-    private static String formatLine(String label, int labelWidth, String column1, String column2) {
-        return String.format("%-" + labelWidth + "s | %-35s| %-24s", label, column1, column2);
+    private static String formatLine(String label, int labelWidth, String column) {
+        return String.format("%-" + labelWidth + "s | %-35s", label, column);
     }
 
     private static String columnHeaderAvg() {
-        return " Min   Max  Avg     Count   Total";
-    }
-
-    private static String columnFailureHeader() {
-        return "Average  Count   Total";
+        return " Min   Avg  Max     Count   Total";
     }
 
     private static void printProfileResultLine(String label, List<Integer> v, int labelMaxLen) {

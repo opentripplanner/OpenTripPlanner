@@ -35,6 +35,7 @@ public class Router {
     private final RoutingRequest defaultRoutingRequest;
     public final Graph graph;
     public final RouterConfig routerConfig;
+    public final MeterRegistry meterRegistry;
     public final RaptorConfig<TripSchedule> raptorConfig;
 
     /**
@@ -56,6 +57,7 @@ public class Router {
         this.graph = graph;
         this.routerConfig = routerConfig;
         this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
+        this.meterRegistry = meterRegistry;
         this.raptorConfig = new RaptorConfig<>(
             routerConfig.raptorTuningParameters(),
             meterRegistry

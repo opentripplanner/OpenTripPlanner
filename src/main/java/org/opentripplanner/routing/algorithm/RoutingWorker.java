@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
 
+import io.micrometer.core.instrument.Tag;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -46,7 +47,7 @@ public class RoutingWorker {
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
     /** An object that accumulates profiling and debugging info for inclusion in the response. */
-    public final DebugTimingAggregator debugTimingAggregator = new DebugTimingAggregator();
+    public final DebugTimingAggregator debugTimingAggregator;
     public final PagingSearchWindowAdjuster pagingSearchWindowAdjuster;
 
     private final RoutingRequest request;
@@ -66,9 +67,14 @@ public class RoutingWorker {
     private final AdditionalSearchDays additionalSearchDays;
 
     public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
+        this(router, request, zoneId, List.of());
+    }
+
+    public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId, List<Tag> timingTags) {
         request.applyPageCursor();
         this.request = request;
         this.router = router;
+        this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, timingTags);
         this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
         this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
         this.additionalSearchDays = createAdditionalSearchDays(

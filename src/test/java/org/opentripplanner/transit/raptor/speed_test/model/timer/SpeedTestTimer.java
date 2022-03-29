@@ -4,14 +4,12 @@ import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.config.NamingConvention;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,61 +17,34 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.opentripplanner.api.resource.DebugOutput;
+import java.util.stream.Stream;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 public class SpeedTestTimer {
-    // only useful for the console
-    private static final String SPEED_TEST_ROUTE = "speedTest.route";
-
-    // router
-    private static final String ROUTE_WORKER = "speedTest.route.worker";
-    private static final String STREET_ROUTE = "speedTest.street.route";
-    private static final String DIRECT_STREET_ROUTE = "speedTest.direct.street.route";
-    private static final String TRANSIT_PATTERN_FILTERING = "speedTest.transit.data";
-    private static final String TRANSIT_ROUTING = "speedTest.transit.routing";
-    private static final String RAPTOR_SEARCH = "speedTest.transit.raptor";
-    private static final String COLLECT_RESULTS = "speedTest.collect.results";
-
     private static final NamingConvention NAMING_CONVENTION = createNamingConvention();
 
     private static final long NANOS_TO_MILLIS = 1000000;
 
-    public record Result(String name, int min, int max, int mean, int totTime, int count, int meanFailure, int totTimeFailure, int countFailure) {}
+    public record Result(String name, int min, int max, int mean, int totTime, int count) {}
 
     private final Clock clock = Clock.SYSTEM;
     private final MeterRegistry loggerRegistry = new SimpleMeterRegistry();
     private final CompositeMeterRegistry registry = new CompositeMeterRegistry(clock, List.of(loggerRegistry));
     private final MeterRegistry uploadRegistry = MeterRegistrySetup.getRegistry().orElse(null);
 
-    private Timer testTimer;
-    private Timer tcTimer;
-    private Timer.Sample tcSample = null;
-    private List<String> tcTags;
-
     public List<Result> getResults() {
         var results = new ArrayList<Result>();
         for (Meter meter : registry.getMeters()) {
-            if(meter instanceof Timer okTimer
-                    && ((Timer) meter).count() > 0
-                    && !"false".equals(meter.getId().getTag("success"))
-            ) {
-                Timer failureTimer = registry.timer(
-                        meter.getId().getName(),
-                        Tags.of("success", "false")
-                );
+            if(meter instanceof Timer timer && ((Timer) meter).count() > 0) {
                 results.add(
                         new Result(
                                 getFullName(meter),
-                                (int )okTimer.percentile(0.01, TimeUnit.MILLISECONDS),
-                                (int)okTimer.max(TimeUnit.MILLISECONDS),
-                                (int)okTimer.mean(TimeUnit.MILLISECONDS),
-                                (int)okTimer.totalTime(TimeUnit.MILLISECONDS),
-                                (int)okTimer.count(),
-                                (int)failureTimer.mean(TimeUnit.MILLISECONDS),
-                                (int)failureTimer.totalTime(TimeUnit.MILLISECONDS),
-                                (int)failureTimer.count()
+                                (int)timer.percentile(0.01, TimeUnit.MILLISECONDS),
+                                (int)timer.max(TimeUnit.MILLISECONDS),
+                                (int)timer.mean(TimeUnit.MILLISECONDS),
+                                (int)timer.totalTime(TimeUnit.MILLISECONDS),
+                                (int)timer.count()
                     )
                 );
             }
@@ -119,34 +90,6 @@ public class SpeedTestTimer {
         if (uploadRegistry != null) {
             registry.add(uploadRegistry);
         }
-        testTimer = testTimer();
-        clearTesetCaseTimers();
-    }
-
-    /** Called before each test-case */
-    public void startTestCase(List<String> tags) {
-        tcTags = tags;
-        tcTimer = testCaseTimer(tags);
-        tcSample = Timer.start(clock);
-    }
-
-    /** Called before each test-case */
-    public int lapTestCaseOk() {
-        return nanosToMillisecond(tcSample.stop(tcTimer));
-    }
-
-    public int lapTestCaseFailed() {
-        if(tcSample == null) {
-            return 0;
-        }
-        var builder = Timer.builder(SPEED_TEST_ROUTE);
-        addTagsToTimer(tcTags, builder);
-        var timer = builder.tag("success", "false").register(registry);
-
-        int lapTime = nanosToMillisecond(tcSample.stop(timer));
-
-        tcSample = null;
-        return lapTime;
     }
 
     public void lapTest() {
@@ -162,73 +105,38 @@ public class SpeedTestTimer {
         }
     }
 
-    public void recordResults(DebugOutput data, List<String> tags, boolean isFailure) {
-        record(STREET_ROUTE, data.transitRouterTimes.accessEgressTime, tags, isFailure);
-        record(TRANSIT_PATTERN_FILTERING, data.transitRouterTimes.tripPatternFilterTime, tags, isFailure);
-        record(DIRECT_STREET_ROUTE, data.directStreetRouterTime, tags, isFailure);
-        record(COLLECT_RESULTS, data.transitRouterTimes.itineraryCreationTime, tags, isFailure);
-        record(RAPTOR_SEARCH, data.transitRouterTimes.raptorSearchTime, tags, isFailure);
-        record(TRANSIT_ROUTING, data.transitRouterTime, tags, isFailure);
-    }
-    public Timer testCaseTimer(List<String> tags) {
-        var builder = Timer.builder(SPEED_TEST_ROUTE);
-        addTagsToTimer(tags, builder);
-        return builder.register(registry);
+    public int totalTimerMean(String timerName) {
+        long count = getTotalTimers(timerName).mapToLong(Timer::count).sum();
+        return (int) (testTotalTimeMs(timerName) / count);
     }
 
-    public int routingWorkerMean() {
-        return (int) routingWorker().mean(TimeUnit.MILLISECONDS);
+    public int testTotalTimeMs(String timerName) {
+        return getTotalTimers(timerName)
+                .mapToInt(timer -> (int) timer.totalTime(TimeUnit.MILLISECONDS))
+                .sum();
     }
 
-    public int totalTimerMean() {
-        return (int) testTimer.mean(TimeUnit.MILLISECONDS);
+    private Stream<Timer> getTotalTimers(String timerName) {
+        return registry.find(timerName)
+                .meters()
+                .stream()
+                .filter(Timer.class::isInstance)
+                .map(Timer.class::cast);
     }
 
-    private Timer testTimer() {
-        return Timer.builder(SPEED_TEST_ROUTE).register(registry);
-    }
-
-    private Timer routingWorker() {
-        return Timer.builder(ROUTE_WORKER).register(registry);
-    }
-
-    public int testTotalTimeMs() {
-        return (int)testTimer.totalTime(TimeUnit.MILLISECONDS);
-    }
-
-    private void record(String name, long nanos, List<String> tags, boolean isFailure) {
-        var timer = Timer.builder(name);
-        addTagsToTimer(tags, timer);
-        if(isFailure) {
-            timer.tag("success", "false");
-        }
-        timer.register(registry).record(Duration.ofNanos(nanos));
-    }
-
-    private void addTagsToTimer(List<String> tags, Timer.Builder timer) {
-        if (!tags.isEmpty()) {
-            timer.tag("tags", String.join(" ", tags));
-        }
-    }
-
-    private void clearTesetCaseTimers() {
-        tcTimer = null;
-        tcSample = null;
-    }
-    private int nanosToMillisecond(long nanos) {
+    public static int nanosToMillisecond(long nanos) {
         return (int) (nanos / NANOS_TO_MILLIS);
     }
 
-
-
-    public List<String> listMeterNames() {
-        return registry.getMeters().stream()
-                .map(SpeedTestTimer::getFullName)
-                .toList();
-    }
-
     private static String getFullName(Meter timer) {
-        return timer.getId().getConventionName(NAMING_CONVENTION) + " [" + timer.getId().getTag("tags") + "]";
+        var sb = new StringBuilder(timer.getId().getConventionName(NAMING_CONVENTION));
+        if (timer.getId().getTag("tags") != null) {
+            sb.append(" [");
+            sb.append(timer.getId().getTag("tags"));
+            sb.append("]");
+        }
+
+        return sb.toString();
     }
 
     private static NamingConvention createNamingConvention() {
