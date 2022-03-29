@@ -594,7 +594,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     public void setBicycleSafetyFactor(float bicycleSafetyFactor) {
         if (hasElevationExtension()) {
-            throw new IllegalStateException("A bicycle safety factor may not be set if an elevatione extension is set.");
+            throw new IllegalStateException("A bicycle safety factor may not be set if an elevation extension is set.");
         }
         if (!Float.isFinite(bicycleSafetyFactor) || bicycleSafetyFactor <= 0) {
             throw new IllegalArgumentException("Invalid bicycleSafetyFactor: " + bicycleSafetyFactor);
