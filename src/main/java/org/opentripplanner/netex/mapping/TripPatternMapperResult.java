@@ -2,12 +2,14 @@ package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 
 /**
@@ -29,4 +31,6 @@ class TripPatternMapperResult {
      * stopTimes by the timetabled-passing-time id
      */
     final Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
+
+    final ArrayList<TripOnServiceDate> tripOnServiceDates = new ArrayList<>();
 }

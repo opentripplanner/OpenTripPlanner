@@ -63,6 +63,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.CalendarService;
@@ -237,6 +238,8 @@ public class Graph implements Serializable {
      * vertices/edges anymore.
      */
     public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
+
+    public Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = Maps.newHashMap();
 
     /** Pre-generated transfers between all stops. */
     public final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
@@ -953,6 +956,10 @@ public class Graph implements Serializable {
 
     public Collection<TripPattern> getTripPatterns() {
         return tripPatternForId.values();
+    }
+
+    public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDates() {
+        return tripOnServiceDates;
     }
 
     public Collection<Notice> getNotices() {
