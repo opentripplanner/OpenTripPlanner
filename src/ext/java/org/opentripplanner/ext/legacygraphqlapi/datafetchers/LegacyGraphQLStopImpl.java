@@ -9,6 +9,7 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
@@ -137,8 +138,11 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Object> wheelchairBoarding() {
-    return environment -> getValue(environment, StopLocation::getWheelchairBoarding, station -> null);
+  public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairBoarding() {
+    return environment -> {
+      var boarding = getValue(environment, StopLocation::getWheelchairBoarding, station -> null);
+      return LegacyGraphQLUtils.toGraphQL(boarding);
+    };
   }
 
   // TODO

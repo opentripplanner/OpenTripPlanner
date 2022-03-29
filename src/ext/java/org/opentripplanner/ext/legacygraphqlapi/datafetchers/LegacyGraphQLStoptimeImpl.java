@@ -8,6 +8,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 
 public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStoptime {
 
@@ -58,7 +59,9 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
 
   @Override
   public DataFetcher<String> realtimeState() {
-    return environment -> getSource(environment).getRealtimeState().name();
+    return environment -> getSource(environment).isCanceledEffectively()
+            ? RealTimeState.CANCELED.name()
+            : getSource(environment).getRealtimeState().name();
   }
 
   @Override

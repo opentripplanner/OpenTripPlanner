@@ -4,17 +4,23 @@ import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
+import com.google.common.collect.ArrayListMultimap;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeRefStructure;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
@@ -25,11 +31,14 @@ import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.MultilingualString;
+import org.rutebanken.netex.model.OperatingDay;
+import org.rutebanken.netex.model.OperatingDayRefStructure;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
+import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
@@ -40,6 +49,8 @@ import org.rutebanken.netex.model.Vias_RelStructure;
 
 class NetexTestDataSample {
     public static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";
+    public static final List<String> DATED_SERVICE_JOURNEY_ID = List.of("RUT:DatedServiceJourney:1", "RUT:DatedServiceJourney:2");
+    public static final List<String> OPERATING_DAYS = List.of("2022-02-28", "2022-02-29");
     private static final DayType EVERYDAY = new DayType()
             .withId("EVERYDAY")
             .withName(new MultilingualString().withValue("everyday"));
@@ -52,6 +63,8 @@ class NetexTestDataSample {
     private final List<TimetabledPassingTime> timetabledPassingTimes = new ArrayList<>();
     private final HierarchicalMapById<ServiceJourney> serviceJourneyById = new HierarchicalMapById<>();
     private final HierarchicalMapById<Route> routesById = new HierarchicalMapById<>();
+    private final HierarchicalMapById<OperatingDay> operatingDaysById = new HierarchicalMapById<>();
+    private final ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneyBySjId = ArrayListMultimap.create();
 
     private final EntityById<org.opentripplanner.model.Route> otpRouteByid = new EntityById<>();
 
@@ -139,6 +152,23 @@ class NetexTestDataSample {
                             new TimetabledPassingTimes_RelStructure().withTimetabledPassingTime(timetabledPassingTimes)
                     );
             serviceJourneyById.add(serviceJourney);
+
+            for(int i=0; i<DATED_SERVICE_JOURNEY_ID.size(); i++) {
+                OperatingDay operatingDay = new OperatingDay()
+                        .withId(OPERATING_DAYS.get(i))
+                                .withCalendarDate(
+                                        LocalDate.parse(OPERATING_DAYS.get(i), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
+                operatingDaysById.add(operatingDay);
+
+                DatedServiceJourney datedServiceJourney = new DatedServiceJourney()
+                        .withId(DATED_SERVICE_JOURNEY_ID.get(i))
+                        .withServiceAlteration(ServiceAlterationEnumeration.PLANNED)
+                        .withOperatingDayRef(
+                                new OperatingDayRefStructure().withRef(operatingDay.getId()));
+
+                datedServiceJourneyBySjId.put(SERVICE_JOURNEY_ID, datedServiceJourney);
+
+            }
         }
 
         // Setup stops
@@ -193,6 +223,14 @@ class NetexTestDataSample {
 
     EntityById<org.opentripplanner.model.Route> getOtpRouteByid() {
         return otpRouteByid;
+    }
+
+    HierarchicalMapById<OperatingDay> getOperatingDaysById() {
+        return operatingDaysById;
+    }
+
+    ArrayListMultimap<String, DatedServiceJourney> getDatedServiceJourneyBySjId() {
+        return datedServiceJourneyBySjId;
     }
 
 

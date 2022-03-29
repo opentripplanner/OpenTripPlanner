@@ -2,7 +2,12 @@ package org.opentripplanner.updater.stoptime;
 
 import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import java.util.Map;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +48,19 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
         // TimetableSnapshotSource should already be set up
         TimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(null);
         if (snapshotSource != null) {
-            snapshotSource.applyTripUpdates(graph, fullDataset, updates, feedId);
+            CalendarService calendarService = graph.getCalendarService();
+            Deduplicator deduplicator = graph.deduplicator;
+            GraphIndex graphIndex = graph.index;
+            Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
+            snapshotSource.applyTripUpdates(
+                    calendarService,
+                    deduplicator,
+                    graphIndex,
+                    serviceCodes,
+                    fullDataset,
+                    updates,
+                    feedId
+            );
         } else {
             LOG.error("Could not find realtime data snapshot source in graph."
                     + " The following updates are not applied: {}", updates);

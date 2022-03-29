@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.siri;
 
 import com.google.common.base.Preconditions;
+import java.util.Optional;
+import java.util.function.Supplier;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
@@ -14,6 +16,8 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripAlteration;
+import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
@@ -27,11 +31,13 @@ import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
+import uk.org.siri.siri20.DatedVehicleJourneyRef;
 import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
+import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityCancellationStructure;
@@ -656,7 +662,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         Preconditions.checkState(tripTimes.timesIncreasing(), "Non-increasing triptimes for added trip");
 
-        return addTripToGraphAndBuffer(graph, trip, aimedStopTimes, addedStops, tripTimes, serviceDate);
+        return addTripToGraphAndBuffer(feedId, graph, trip, aimedStopTimes, addedStops, tripTimes, serviceDate, estimatedVehicleJourney);
     }
 
     /**
@@ -813,7 +819,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                             tripTimes.cancelTrip();
                         } else {
                             // Add new trip
-                            result = result | addTripToGraphAndBuffer(graph, trip, modifiedStopTimes, modifiedStops, tripTimes, serviceDate);
+                            result = result | addTripToGraphAndBuffer(feedId, graph, trip, modifiedStopTimes, modifiedStops, tripTimes, serviceDate, estimatedVehicleJourney);
                         }
                     } else {
                         result = result | buffer.update(pattern, tripTimes, serviceDate);
@@ -860,9 +866,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
      *
      * @return true if successful
      */
-    private boolean addTripToGraphAndBuffer(final Graph graph, final Trip trip,
+    private boolean addTripToGraphAndBuffer(final String feedId, final Graph graph, final Trip trip,
                                             final List<StopTime> stopTimes, final List<StopLocation> stops, TripTimes updatedTripTimes,
-                                            final ServiceDate serviceDate) {
+                                            final ServiceDate serviceDate, EstimatedVehicleJourney estimatedVehicleJourney) {
 
         // Preconditions
         Preconditions.checkNotNull(stops);
@@ -877,12 +883,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Add service code to bitset of pattern if needed (using copy on write)
         final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
-        if (!pattern.getServices().get(serviceCode)) {
-            final BitSet services = (BitSet) pattern.getServices().clone();
-            services.set(serviceCode);
-            pattern.setServices(services);
-        }
-
+        pattern.setServiceCode(serviceCode);
 
         /*
          * Update pattern with triptimes so get correct dwell times and lower bound on running times.
@@ -896,7 +897,26 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         pattern.getScheduledTimetable().getTripTimes().clear();
 
         // Add to buffer as-is to include it in the 'lastAddedTripPattern'
+        //TODO - Should this update be done twice?
         buffer.update(pattern, updatedTripTimes, serviceDate);
+
+        // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
+        Supplier<Optional<String>> framedVehicleJourneySupplier = () ->
+                Optional.ofNullable(estimatedVehicleJourney.getFramedVehicleJourneyRef())
+                        .map(FramedVehicleJourneyRefStructure::getDatedVehicleJourneyRef);
+        Optional<String> dsjId = Optional.ofNullable(estimatedVehicleJourney.getDatedVehicleJourneyRef())
+                .map(DatedVehicleJourneyRef::getValue)
+                .or(framedVehicleJourneySupplier);
+
+        if(dsjId.isPresent()) {
+            FeedScopedId datedServiceJourneyId = new FeedScopedId(feedId, dsjId.get());
+            var tripOnServiceDate = new TripOnServiceDate(datedServiceJourneyId,
+                            trip,
+                            serviceDate,
+                    null);
+
+            buffer.addLastAddedTripOnServiceDate(trip, serviceDate,datedServiceJourneyId, tripOnServiceDate);
+        }
 
         //TODO - SIRI: Add pattern to index?
 

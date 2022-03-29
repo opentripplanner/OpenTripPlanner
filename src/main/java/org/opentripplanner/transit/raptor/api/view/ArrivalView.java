@@ -80,15 +80,15 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
     ArrivalView<T> previous();
 
     /**
-     * If it exist, return the most resent transit arrival visited. For a transit-stop-arrival
-     * this is it self, for a transfer-stop-arrival it is the previous stop-arrival.
+     * If it exists, return the most recent transit arrival visited. For a transit-stop-arrival
+     * this is itself, for a transfer-stop-arrival it is the previous stop-arrival.
      * <p>
      * For access- and egress-arrivals, including flex this method return {@code null}.
      * <p>
      * The method should be as light as possible, since it is used during routing.
      */
     @Nullable
-    default TransitArrival<T> mostResentTransitArrival() {
+    default TransitArrival<T> mostRecentTransitArrival() {
         return null;
     }
 
