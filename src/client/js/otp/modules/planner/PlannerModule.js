@@ -516,7 +516,10 @@ otp.modules.planner.PlannerModule =
             var weight = 8;
             var legColor = otp.util.Itin.getLegBackgroundColor(leg);
 
-            polyline.setStyle({ color : legColor, weight: weight});
+            var style = otp.util.Itin.getLineStyle(leg);
+            style.color = legColor;
+            polyline.setStyle(style);
+
             this.pathLayer.addLayer(polyline);
             polyline.leg = leg;
             polyline.bindPopup("("+leg.routeShortName+") "+leg.routeLongName);
@@ -629,19 +632,6 @@ otp.modules.planner.PlannerModule =
                 this.drawStartBubble(leg, false);
             }
         }
-    },
-
-    getModeColor : function(mode) {
-        if(mode === "WALK") return '#444';
-        if(mode === "BICYCLE") return '#0073e5';
-        if(mode === "SCOOTER") return '#88f';
-        if(mode === "SUBWAY") return '#f00';
-        if(mode === "RAIL") return '#b00';
-        if(mode === "BUS") return '#080';
-        if(mode === "TRAM") return '#800';
-        if(mode === "CAR") return '#444';
-        if(mode === "AIRPLANE") return '#f0f';
-        return '#aaa';
     },
 
     clearTrip : function() {
