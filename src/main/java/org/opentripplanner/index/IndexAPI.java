@@ -445,7 +445,7 @@ public class IndexAPI {
         Trip trip = getTrip(routingService, tripId);
         TripPattern pattern = getTripPattern(routingService, trip);
         // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
-        Timetable table = routingService.getTimetableForTripPattern(pattern);
+        Timetable table = routingService.getTimetableForTripPattern(pattern, null);
         return TripTimeOnDate.fromTripTimes(table, trip);
     }
 

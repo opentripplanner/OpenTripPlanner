@@ -3,6 +3,8 @@ package org.opentripplanner.ext.legacygraphqlapi;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Locale;
 import java.util.Map;
+import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.util.I18NString;
 
 public class LegacyGraphQLUtils {
@@ -24,5 +26,14 @@ public class LegacyGraphQLUtils {
     public static String getTranslation(I18NString input, DataFetchingEnvironment environment) {
       if (input == null) { return null; }
       return input.toString(getLocale(environment));
+    }
+
+    public static LegacyGraphQLWheelchairBoarding toGraphQL(WheelChairBoarding boarding) {
+        if(boarding == null) return null;
+        return switch (boarding) {
+            case NO_INFORMATION -> LegacyGraphQLWheelchairBoarding.NO_INFORMATION;
+            case POSSIBLE -> LegacyGraphQLWheelchairBoarding.POSSIBLE;
+            case NOT_POSSIBLE -> LegacyGraphQLWheelchairBoarding.NOT_POSSIBLE;
+        };
     }
 }

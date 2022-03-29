@@ -778,7 +778,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<Integer> vehicleType();
 
-        public DataFetcher<Object> wheelchairBoarding();
+        public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding> wheelchairBoarding();
 
         public DataFetcher<String> zoneId();
     }
@@ -954,7 +954,7 @@ public class LegacyGraphQLDataFetchers {
 
         public DataFetcher<String> tripShortName();
 
-        public DataFetcher<Object> wheelchairAccessible();
+        public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding> wheelchairAccessible();
     }
 
     /**

@@ -41,8 +41,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         /* no bicycle tags */
 
         /* NONE */
-        props.setProperties("highway=raceway", StreetTraversalPermission.NONE);
-        props.setProperties("highway=construction", StreetTraversalPermission.NONE);
         props.setProperties("mtb:scale=3", StreetTraversalPermission.NONE);
         props.setProperties("mtb:scale=4", StreetTraversalPermission.NONE);
         props.setProperties("mtb:scale=5", StreetTraversalPermission.NONE);
@@ -471,6 +469,16 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
                 1.45, true);
 
         props.defaultProperties.setPermission(StreetTraversalPermission.ALL);
+        populateNotesAndNames(props);
+
+        // slope overrides
+        props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
+        props.setSlopeOverride(new OSMSpecifier("embankment=*"), true);
+        props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
+
+    }
+
+        public void populateNotesAndNames(WayPropertySet props) {
 
         /* and the notes */
         // TODO: The curly brackets in the string below mean that the CreativeNamer should substitute in OSM tag values.
@@ -557,11 +565,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         props.createNames("amenity=parking;name=*", "name.park_and_ride_name");
         props.createNames("amenity=parking", "name.park_and_ride_station");
-
-        // slope overrides
-        props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
-        props.setSlopeOverride(new OSMSpecifier("embankment=*"), true);
-        props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
 
     }
 

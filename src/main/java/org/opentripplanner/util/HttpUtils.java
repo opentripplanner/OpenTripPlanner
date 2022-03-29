@@ -4,18 +4,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 public class HttpUtils {
     
-    private static final long TIMEOUT_CONNECTION = 5000;
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
 
     public static InputStream getData(URI uri) throws IOException {
         return getData(uri, null);
@@ -30,15 +30,26 @@ public class HttpUtils {
     }
 
     public static InputStream getData(
-        URI uri, long timeout, Map<String, String> requestHeaderValues
+        URI uri, Duration timeout, Map<String, String> requestHeaderValues
     ) throws IOException {
+
+        var to = (int) timeout.toMillis();
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(to)
+                .setConnectTimeout(to)
+                .setConnectionRequestTimeout(to)
+                .build();
+
         HttpGet httpget = new HttpGet(uri);
+        httpget.setConfig(requestConfig);
+
         if (requestHeaderValues != null) {
             for (Map.Entry<String, String> entry : requestHeaderValues.entrySet()) {
                 httpget.addHeader(entry.getKey(), entry.getValue());
             }
         }
-        HttpClient httpclient = getClient(timeout, timeout);
+
+        HttpClient httpclient = HttpClientBuilder.create().build();
         HttpResponse response = httpclient.execute(httpget);
         if(response.getStatusLine().getStatusCode() != 200) {
             return null;
@@ -52,14 +63,7 @@ public class HttpUtils {
     }
 
     public static InputStream getData(URI uri, Map<String, String> requestHeaderValues) throws IOException {
-        return getData(uri, TIMEOUT_CONNECTION, requestHeaderValues);
-    }
-
-    private static HttpClient getClient(long timeoutConnection, long timeoutSocket) {
-        return HttpClientBuilder.create()
-                .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout((int)timeoutSocket).build())
-                .setConnectionTimeToLive(timeoutConnection, TimeUnit.MILLISECONDS)
-                .build();
+        return getData(uri, DEFAULT_TIMEOUT, requestHeaderValues);
     }
 
     public static InputStream openInputStream(String url, Map<String, String> headers) throws IOException {
