@@ -58,13 +58,13 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
 
     @Override
     public Iterable<T2<Double, Color>> edgeSegments(Edge edge) {
-        if (edge instanceof StreetEdge) {
-            if (((StreetEdge) edge).hasElevationExtension()) {
+        if (edge instanceof StreetEdge streetEdge) {
+            if (streetEdge.hasElevationExtension()) {
                 var edgeLength = edge.getDistanceMeters();
                 var color = Color.DARK_GRAY;
 
                 var t2 = new ArrayList<T2<Double, Color>>();
-                var profile = ((StreetEdge) edge).getElevationProfile();
+                var profile = streetEdge.getElevationProfile();
                 for(int i = 0; i < profile.size(); ++i) {
                     var point = profile.getCoordinate(i);
                     if (i != 0) {
