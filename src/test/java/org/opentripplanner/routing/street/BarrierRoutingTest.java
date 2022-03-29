@@ -142,9 +142,9 @@ public class BarrierRoutingTest {
 
         request.setRoutingContext(graph);
 
-        var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT,
-                Metrics.globalRegistry
-        ));
+        var gpf = new GraphPathFinder(
+                new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry)
+        );
         var paths = gpf.graphPathFinderEntryPoint(request);
 
         GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(

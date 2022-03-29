@@ -69,9 +69,9 @@ public class BicycleRoutingTest {
         request.streetSubRequestModes = new TraverseModeSet(TraverseMode.BICYCLE);
         request.setRoutingContext(graph);
 
-        var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT,
-                Metrics.globalRegistry
-        ));
+        var gpf = new GraphPathFinder(
+                new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry)
+        );
         var paths = gpf.graphPathFinderEntryPoint(request);
 
         GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
