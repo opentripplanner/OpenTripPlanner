@@ -4,6 +4,7 @@ package org.opentripplanner.model;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -105,10 +106,20 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     /**
      * Parses a string consisting of concatenated FeedScopedIds to a Set
      */
-    public static Set<FeedScopedId> parseListOfIds(String s) {
+    public static Set<FeedScopedId> parseSetOfIds(String s) {
         return Arrays
             .stream(s.split(","))
             .map(FeedScopedId::parseId)
             .collect(Collectors.toSet());
+    }
+
+    /**
+     * Parses a string consisting of concatenated FeedScopedIds to a List
+     */
+    public static List<FeedScopedId> parseListOfIds(String s) {
+        return Arrays
+                .stream(s.split(","))
+                .map(FeedScopedId::parseId)
+                .collect(Collectors.toList());
     }
 }

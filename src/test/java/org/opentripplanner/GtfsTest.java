@@ -125,7 +125,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
         // TODO route matcher still using underscores because it's quite nonstandard and should be eliminated from the 1.0 release rather than reworked
         if (excludedRoute != null && !excludedRoute.isEmpty()) {
-            routingRequest.setBannedRoutesFromSting(feedId.getId() + "__" + excludedRoute);
+            routingRequest.setBannedRoutesFromString(feedId.getId() + "__" + excludedRoute);
         }
         if (excludedStop != null && !excludedStop.isEmpty()) {
             throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
