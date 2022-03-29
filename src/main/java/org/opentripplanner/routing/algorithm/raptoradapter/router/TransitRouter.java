@@ -105,7 +105,6 @@ public class TransitRouter {
         // Route transit
         var raptorService = new RaptorService<>(router.raptorConfig);
         var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
-        raptorService.shutdown();
 
         checkIfTransitConnectionExists(transitResponse);
 

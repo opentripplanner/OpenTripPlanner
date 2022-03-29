@@ -67,9 +67,6 @@ public class RaptorService<T extends RaptorTripSchedule> {
         fwdHeur.debugCompareResult(revHeur);
     }
 
-    public void shutdown() {
-        config.shutdown();
-    }
 
     /* private methods */
 

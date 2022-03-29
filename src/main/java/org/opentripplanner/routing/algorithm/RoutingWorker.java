@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
-
 import io.micrometer.core.instrument.Tag;
 import java.time.Duration;
 import java.time.Instant;

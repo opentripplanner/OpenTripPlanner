@@ -143,6 +143,7 @@ public class Router {
     /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */
     public void shutdown() {
         GraphUpdaterConfigurator.shutdownGraph(this.graph);
+        raptorConfig.shutdown();
     }
 
     /**
