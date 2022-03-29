@@ -25,6 +25,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Don't try to repair trips with negative dwell or driving times, drop them instead [#4019](https://github.com/opentripplanner/OpenTripPlanner/pull/4019)
 - Add support for NeTex DatedServiceJourneys [#3889](https://github.com/opentripplanner/OpenTripPlanner/pull/3889)
 - Add support for SKIPPED stop time updates in SCHEDULED update handling [#3960](https://github.com/opentripplanner/OpenTripPlanner/pull/3960)
+- New Norwegian way properties profile  [#3728](https://github.com/opentripplanner/OpenTripPlanner/pull/3728)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
