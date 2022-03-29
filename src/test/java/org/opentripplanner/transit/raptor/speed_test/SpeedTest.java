@@ -64,7 +64,7 @@ public class SpeedTest {
         // Read Test-case definitions and expected results from file
         this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
-        this.router = new Router(graph, RouterConfig.DEFAULT);
+        this.router = new Router(graph, RouterConfig.DEFAULT, timer.getRegistry());
         this.router.startup();
 
         timer.setUp();
@@ -116,7 +116,7 @@ public class SpeedTest {
         }
         printProfileStatistics();
 
-        timer.finnishUp();
+        timer.finishUp();
 
         System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
     }

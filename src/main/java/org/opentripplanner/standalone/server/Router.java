@@ -5,7 +5,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
@@ -52,13 +52,13 @@ public class Router {
     /** A graphical window that is used for visualizing search progress (debugging). */
     public GraphVisualizer graphVisualizer = null;
 
-    public Router(Graph graph, RouterConfig routerConfig) {
+    public Router(Graph graph, RouterConfig routerConfig, MeterRegistry meterRegistry) {
         this.graph = graph;
         this.routerConfig = routerConfig;
         this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
         this.raptorConfig = new RaptorConfig<>(
             routerConfig.raptorTuningParameters(),
-            Metrics.globalRegistry
+            meterRegistry
         );
     }
 

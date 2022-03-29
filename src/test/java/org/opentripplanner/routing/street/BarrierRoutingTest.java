@@ -6,6 +6,7 @@ import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 
+import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
@@ -140,7 +141,9 @@ public class BarrierRoutingTest {
 
         request.setRoutingContext(graph);
 
-        var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT));
+        var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT,
+                Metrics.globalRegistry
+        ));
         var paths = gpf.graphPathFinderEntryPoint(request);
 
         var itineraries = GraphPathToItineraryMapper.mapItineraries(paths);

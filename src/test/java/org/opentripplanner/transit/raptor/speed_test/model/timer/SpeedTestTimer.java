@@ -55,11 +55,10 @@ public class SpeedTestTimer {
     public List<Result> getResults() {
         var results = new ArrayList<Result>();
         for (Meter meter : registry.getMeters()) {
-            if(meter instanceof Timer
+            if(meter instanceof Timer okTimer
                     && ((Timer) meter).count() > 0
                     && !"false".equals(meter.getId().getTag("success"))
             ) {
-                Timer okTimer = (Timer) meter;
                 Timer failureTimer = registry.timer(
                         meter.getId().getName(),
                         Tags.of("success", "false")
@@ -108,6 +107,10 @@ public class SpeedTestTimer {
 
     }
 
+    public MeterRegistry getRegistry() {
+        return registry;
+    }
+
     /** Called before each run with all test-cases */
     public void startTest() {
         // Clear registry after first run
@@ -152,7 +155,7 @@ public class SpeedTestTimer {
         }
     }
 
-    public void finnishUp() {
+    public void finishUp() {
         // close() sends the results to influxdb
         if(uploadRegistry != null) {
             uploadRegistry.close();

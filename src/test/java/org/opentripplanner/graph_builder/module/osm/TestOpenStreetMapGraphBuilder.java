@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import io.micrometer.core.instrument.Metrics;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
@@ -168,7 +169,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.buildGraph(graph, extra);
         graph.getStreetIndex();
 
-        Router router = new Router(graph, RouterConfig.DEFAULT);
+        Router router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
         router.startup();
 
         RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));

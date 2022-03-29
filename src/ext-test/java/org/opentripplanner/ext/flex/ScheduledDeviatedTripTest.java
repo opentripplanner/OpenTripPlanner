@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
+import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -157,7 +158,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     public void flexTripInTransitMode() {
         var feedId = graph.getFeedIds().iterator().next();
 
-        var router = new Router(graph, RouterConfig.DEFAULT);
+        var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
         router.startup();
 
         // from zone 3 to zone 2
