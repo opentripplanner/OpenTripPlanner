@@ -21,7 +21,7 @@ public class DatedServiceJourneyType {
     private static final String NAME = "DatedServiceJourney";
     public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-    public static GraphQLObjectType create(GraphQLOutputType serviceJourneyType) {
+    public static GraphQLObjectType create(GraphQLOutputType serviceJourneyType, GqlUtil gqlUtil) {
         return GraphQLObjectType.newObject()
                 .name(NAME)
                 .description("A planned journey on a specific day")
@@ -29,10 +29,12 @@ public class DatedServiceJourneyType {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("operatingDay")
                         .description("The date this service runs. The date used is based on the service date as opposed to calendar date.")
-                        .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> (
-                                tripOnServiceDate(environment).getServiceDate().toString()
-                        ))
+                        .type(gqlUtil.dateScalar)
+                        .dataFetcher(environment ->
+                                gqlUtil.serviceDateMapper.serviceDateToSecondsSinceEpoch(
+                                        tripOnServiceDate(environment).getServiceDate()
+                                )
+                        )
                 )
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("serviceJourney")
