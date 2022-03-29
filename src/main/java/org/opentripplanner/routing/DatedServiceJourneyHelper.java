@@ -2,6 +2,7 @@ package org.opentripplanner.routing;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 
@@ -51,15 +52,12 @@ public class DatedServiceJourneyHelper {
             RoutingService routingService,
             FeedScopedId datedServiceJourneyId
     ) {
-        if (routingService
-                .getTimetableSnapshot()
+        TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+        if (timetableSnapshot != null && timetableSnapshot
                 .getLastAddedTripOnServiceDate()
                 .containsKey(datedServiceJourneyId)
         ) {
-
-            return routingService
-                    .getTimetableSnapshot()
-                    .getLastAddedTripOnServiceDate().get(datedServiceJourneyId);
+            return timetableSnapshot.getLastAddedTripOnServiceDate().get(datedServiceJourneyId);
         }
 
         return routingService
