@@ -22,6 +22,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -210,14 +211,23 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
       try {
         RoutingService routingService = getRoutingService(environment);
         Trip trip = getSource(environment);
-        TripPattern tripPattern = getTripPattern(environment);
-        if (tripPattern == null) { return List.of(); }
-
         var args = new LegacyGraphQLTypes.LegacyGraphQLTripStoptimesForDateArgs(environment.getArguments());
 
-
         ServiceDate serviceDate = args.getLegacyGraphQLServiceDate() != null
-            ? ServiceDate.parseString(args.getLegacyGraphQLServiceDate()) : new ServiceDate();
+                ? ServiceDate.parseString(args.getLegacyGraphQLServiceDate()) : new ServiceDate();
+
+        TripPattern tripPattern = null;
+        TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
+        if (timetableSnapshot != null) {
+          tripPattern = timetableSnapshot
+                  .getLastAddedTripPattern(trip.getId(), serviceDate);
+        }
+        // timetableSnapshot is null or no realtime added pattern found
+        if (tripPattern == null) {
+          tripPattern = getTripPattern(environment);
+        }
+        // no matching pattern found anywhere
+        if (tripPattern == null) { return List.of(); }
 
         ServiceDay serviceDay = new ServiceDay(
             routingService.getServiceCodes(),
@@ -226,8 +236,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
             trip.getRoute().getAgency().getId()
         );
 
-        //TODO: Pass serviceDate
-        Timetable timetable = routingService.getTimetableForTripPattern(tripPattern);
+        Timetable timetable = routingService.getTimetableForTripPattern(tripPattern, serviceDate);
         return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDay);
       } catch (ParseException e) {
         return null; // Invalid date format

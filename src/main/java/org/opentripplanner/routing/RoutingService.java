@@ -204,11 +204,11 @@ public class RoutingService {
      * probably be a less awkward way to do this that just gets the latest entry from the resolver
      * without making a fake routing request.
      */
-    public Timetable getTimetableForTripPattern(TripPattern tripPattern) {
+    public Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate) {
         TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
         return timetableSnapshot != null ? timetableSnapshot.resolve(
                 tripPattern,
-                new ServiceDate(Calendar.getInstance().getTime())
+                serviceDate == null ? new ServiceDate(Calendar.getInstance().getTime()) : serviceDate
         ) : tripPattern.getScheduledTimetable();
     }
 

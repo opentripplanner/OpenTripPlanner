@@ -9,6 +9,7 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -18,9 +19,11 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
@@ -33,6 +36,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest extends TestCase {
@@ -89,7 +93,19 @@ public abstract class GtfsTest extends TestCase {
             for (FeedEntity feedEntity : feedEntityList) {
                 updates.add(feedEntity.getTripUpdate());
             }
-            timetableSnapshotSource.applyTripUpdates(graph, fullDataset, updates, feedId.getId());
+            CalendarService calendarService = graph.getCalendarService();
+            Deduplicator deduplicator = graph.deduplicator;
+            GraphIndex graphIndex = graph.index;
+            Map<FeedScopedId, Integer> serviceCodes = graph.getServiceCodes();
+            timetableSnapshotSource.applyTripUpdates(
+                    calendarService,
+                    deduplicator,
+                    graphIndex,
+                    serviceCodes,
+                    fullDataset,
+                    updates,
+                    feedId.getId()
+            );
             alertsUpdateHandler.update(feedMessage);
         } catch (Exception exception) {}
     }
