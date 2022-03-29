@@ -125,34 +125,22 @@ public class CsvFileIO {
         }
 
         try (PrintWriter out = new PrintWriter(expectedResultsOutputFile, CHARSET_UTF_8.name())) {
-            out.println("tcId,transfers,duration,cost,walkDistance,startTime,endTime,modes,agencies,routes,details");
+            out.println("tcId,nTransfers,duration,cost,walkDistance,startTime,endTime,agencies,modes,routes,stops,details");
 
             for (TestCase tc : testCases) {
                 for (Result result : tc.actualResults()) {
-                    out.print(tc.id());
-                    out.print(CSV_DELIMITER);
-                    out.print(result.nTransfers);
-                    out.print(CSV_DELIMITER);
-                    out.print(time2str(result.duration));
-                    out.print(CSV_DELIMITER);
-                    out.print(result.cost);
-                    out.print(CSV_DELIMITER);
-                    out.print(result.walkDistance);
-                    out.print(CSV_DELIMITER);
-                    out.print(time2str(result.startTime));
-                    out.print(CSV_DELIMITER);
-                    out.print(time2str(result.endTime));
-                    out.print(CSV_DELIMITER);
-                    out.print(col2Str(result.modes));
-                    out.print(CSV_DELIMITER);
-                    out.print(col2Str(result.agencies));
-                    out.print(CSV_DELIMITER);
-                    out.print(col2Str(result.routes));
-                    out.print(CSV_DELIMITER);
-                    out.print(col2Str(result.modes));
-                    out.print(CSV_DELIMITER);
-                    out.print(col2Str(result.stops));
-                    out.print(CSV_DELIMITER);
+                    write(out, tc.id());
+                    write(out, result.nTransfers);
+                    write(out, time2str(result.duration));
+                    write(out, result.cost);
+                    write(out, result.walkDistance);
+                    write(out, time2str(result.startTime));
+                    write(out, time2str(result.endTime));
+                    write(out, col2Str(result.agencies));
+                    write(out, col2Str(result.modes));
+                    write(out, col2Str(result.routes));
+                    write(out, col2Str(result.stops));
+                    // Skip delimiter for the last value
                     out.print(result.details);
                     out.println();
                 }
@@ -189,7 +177,7 @@ public class CsvFileIO {
         try {
             return new Result(
                     csvReader.get("tcId"),
-                    Integer.parseInt(csvReader.get("transfers")),
+                    Integer.parseInt(csvReader.get("nTransfers")),
                     parseTime(csvReader.get("duration")),
                     Integer.parseInt(csvReader.get("cost")),
                     Integer.parseInt(csvReader.get("walkDistance")),
@@ -252,4 +240,15 @@ public class CsvFileIO {
         if(elements == null || elements.isBlank()) { return List.of(); }
         return Arrays.stream(elements.split(Pattern.quote(ARRAY_DELIMITER))).map(mapFunction).collect(Collectors.toList());
     }
+
+    private static void write(PrintWriter out, String value) {
+        out.print(value);
+        out.print(CSV_DELIMITER);
+    }
+
+    private static void write(PrintWriter out, Integer value) {
+        out.print(value);
+        out.print(CSV_DELIMITER);
+    }
+
 }
