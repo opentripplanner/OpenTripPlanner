@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
@@ -33,6 +34,7 @@ public class CsvFileIO {
 
     private static final Charset CHARSET_UTF_8 = StandardCharsets.UTF_8;
     private static final char CSV_DELIMITER = ',';
+    private static final String ARRAY_DELIMITER = "|";
     private static boolean printResultsForFirstStrategyRun = true;
 
     private final File testCasesFile;
@@ -129,7 +131,7 @@ public class CsvFileIO {
                 for (Result result : tc.actualResults()) {
                     out.print(tc.id());
                     out.print(CSV_DELIMITER);
-                    out.print(result.transfers);
+                    out.print(result.nTransfers);
                     out.print(CSV_DELIMITER);
                     out.print(time2str(result.duration));
                     out.print(CSV_DELIMITER);
@@ -146,6 +148,10 @@ public class CsvFileIO {
                     out.print(col2Str(result.agencies));
                     out.print(CSV_DELIMITER);
                     out.print(col2Str(result.routes));
+                    out.print(CSV_DELIMITER);
+                    out.print(col2Str(result.modes));
+                    out.print(CSV_DELIMITER);
+                    out.print(col2Str(result.stops));
                     out.print(CSV_DELIMITER);
                     out.print(result.details);
                     out.println();
@@ -181,7 +187,7 @@ public class CsvFileIO {
 
     private Result readExpectedResult(CsvReader csvReader) throws IOException {
         try {
-            Result r  = new Result(
+            return new Result(
                     csvReader.get("tcId"),
                     Integer.parseInt(csvReader.get("transfers")),
                     parseTime(csvReader.get("duration")),
@@ -189,12 +195,12 @@ public class CsvFileIO {
                     Integer.parseInt(csvReader.get("walkDistance")),
                     parseTime(csvReader.get("startTime")),
                     parseTime(csvReader.get("endTime")),
+                    str2Col(csvReader.get("agencies")),
+                    str2Col(csvReader.get("modes"), TraverseMode::valueOf),
+                    str2Col(csvReader.get("routes")),
+                    str2Col(csvReader.get("stops")),
                     csvReader.get("details")
             );
-            r.modes.addAll(str2Col(csvReader.get("modes"), TraverseMode::valueOf));
-            r.agencies.addAll(str2Col(csvReader.get("agencies")));
-            r.routes.addAll(str2Col(csvReader.get("routes")));
-            return r;
         }
         catch (RuntimeException e) {
             throw new java.lang.IllegalStateException(e.getMessage() + ". Line: " + csvReader.getRawRecord(), e);
@@ -227,7 +233,15 @@ public class CsvFileIO {
     }
 
     static String col2Str(Collection<?> c) {
-        return c.stream().map(Object::toString).collect(Collectors.joining(" "));
+        return c.stream()
+                .map(Object::toString)
+                .peek(s -> {
+                    // Prevent serialization if it can not be deserialized
+                    if(s.contains(ARRAY_DELIMITER)) {
+                        throw new IllegalArgumentException("Element contains " + ARRAY_DELIMITER + ": " + s);
+                    }
+                })
+                .collect(Collectors.joining(ARRAY_DELIMITER));
     }
 
     static List<String> str2Col(String elements) {
@@ -236,6 +250,6 @@ public class CsvFileIO {
 
     static <T> List<T> str2Col(String elements, Function<String, T> mapFunction) {
         if(elements == null || elements.isBlank()) { return List.of(); }
-        return Arrays.stream(elements.split(" ")).map(mapFunction).collect(Collectors.toList());
+        return Arrays.stream(elements.split(Pattern.quote(ARRAY_DELIMITER))).map(mapFunction).collect(Collectors.toList());
     }
 }

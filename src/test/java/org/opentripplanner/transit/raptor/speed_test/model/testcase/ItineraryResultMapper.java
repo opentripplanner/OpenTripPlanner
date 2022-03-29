@@ -1,6 +1,11 @@
 package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Itinerary;
 
@@ -9,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -71,7 +77,23 @@ class ItineraryResultMapper {
     }
 
     private Result map(Itinerary itinerary) {
-        Result result = new Result(
+        List<String> agencies = new ArrayList<>();
+        List<String> routes = new ArrayList<>();
+        Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
+        List<String> stops = new ArrayList<>();
+
+        for (Leg it : itinerary.legs) {
+            if (it.isTransitLeg()) {
+                agencies.add(agencyShortName(it.getAgency()));
+                routes.add(it.getRoute().getName());
+                modes.add(it.getMode());
+            }
+            if(it.getTo().stop != null) {
+                stops.add(it.getTo().stop.getId().toString());
+            }
+        }
+
+        return new Result(
                 testCaseId,
                 itinerary.nTransfers,
                 itinerary.durationSeconds,
@@ -79,18 +101,12 @@ class ItineraryResultMapper {
                 itinerary.legs.stream().filter(Leg::isWalkingLeg).mapToInt(l -> (int)Math.round(l.getDistanceMeters())).sum(),
                 TimeUtils.localTime(itinerary.startTime()).toSecondOfDay(),
                 TimeUtils.localTime(itinerary.endTime()).toSecondOfDay(),
+                agencies,
+                modes,
+                routes,
+                stops,
                 details(itinerary)
         );
-
-        for (Leg it : itinerary.legs) {
-            if (it.isTransitLeg()) {
-                var route = Optional.ofNullable(it.getRoute().getShortName()).orElse(it.getRoute().getLongName());
-                result.agencies.add(AGENCY_NAMES_SHORT.getOrDefault(it.getAgency().getName(), it.getAgency().getName()));
-                result.modes.add(it.getMode());
-                result.routes.add(route);
-            }
-        }
-        return result;
     }
 
     public static String details(Itinerary itin) {
@@ -115,5 +131,10 @@ class ItineraryResultMapper {
 
     private static String formatStop(StopLocation s) {
         return s.getName() + "(" + s.getId().getId() + ")";
+    }
+
+
+    private static String agencyShortName(Agency agency) {
+        return AGENCY_NAMES_SHORT.getOrDefault(agency.getName(), agency.getName());
     }
 }

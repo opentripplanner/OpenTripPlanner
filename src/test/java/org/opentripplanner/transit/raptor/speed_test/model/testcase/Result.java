@@ -1,52 +1,72 @@
 package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.CompositeComparator;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 /**
  * This class is responsible for holding information about a test result - a single
  * itinerary. The result can be expected or actual, both represented by this class.
+ * <p>
+ * Implementation details: This is NOT converted into a record, because it is hard to
+ * enforce the restrictions on agencies, modes, routes and stops. Second, it is not
+ * much simpler/less code.
  */
 class Result {
-    private static final Pattern STOPS_PATTERN = Pattern.compile(" ~ (\\.+) ~ ");
+
     /**
      * The status is not final; This allows to update the status when matching expected and actual results.
      */
     final String testCaseId;
-    final Integer transfers;
+    final Integer nTransfers;
     final Integer duration;
     final Integer cost;
     final Integer walkDistance;
     final Integer startTime;
     final Integer endTime;
-    final Set<String> agencies = new TreeSet<>();
-    final Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
-    final List<String> routes = new ArrayList<>();
-    final List<String> stops = new ArrayList<>();
+
+    /** Alphabetical distinct list of agencies. A {@code List} is used because the order is important. */
+    final List<String> agencies;
+    /** Alphabetical distinct list of modes. A {@code List} is used because the order is important. */
+    final List<TraverseMode> modes;
+    /** A list of routes in tha same order as they appear in the journey. */
+    final List<String> routes;
+    /** A list of stops in tha same order as they appear in the journey. */
+    final List<String> stops;
+    /** Summary description of the journey, like: "Walk 2m ~ Stop A ~ Route L1 12:00 - 12:30 ~ Stop B ~ Walk 3m" */
     final String details;
 
-    Result(String testCaseId, Integer transfers, Integer duration, Integer cost, Integer walkDistance, Integer startTime, Integer endTime, String details) {
+    Result(
+            String testCaseId,
+            Integer nTransfers,
+            Integer duration,
+            Integer cost,
+            Integer walkDistance,
+            Integer startTime,
+            Integer endTime,
+            Collection<String> agencies,
+            Collection<TraverseMode> modes,
+            Collection<String> routes,
+            Collection<String> stops,
+            String details
+    ) {
         this.testCaseId = testCaseId;
-        this.transfers = transfers;
+        this.nTransfers = nTransfers;
         this.duration = duration;
         this.cost = cost;
         this.walkDistance = walkDistance;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.agencies = sortedList(agencies);
+        this.modes = sortedList(modes);
+        this.routes = List.copyOf(routes);
+        this.stops = List.copyOf(stops);
         this.details = details;
-        this.stops.addAll(parseStops(details));
     }
 
     public static Comparator<Result> comparator(boolean skipCost) {
@@ -73,7 +93,7 @@ class Result {
     public String toString() {
         return String.format(
                 "%d %s %d %dm %s %s -- %s",
-                transfers,
+                nTransfers,
                 durationAsStr(),
                 cost,
                 walkDistance,
@@ -81,17 +101,6 @@ class Result {
                 TimeUtils.timeToStrCompact(endTime),
                 details
         );
-    }
-
-    private static List<String> parseStops(String details) {
-        List<String> stops = new ArrayList<>();
-        // WALK 0:44 ~ 87540 ~ BUS NX1 06:25 08:50 ~ 87244  WALK 0:20
-        Matcher m = STOPS_PATTERN.matcher(details);
-
-        while (m.find()) {
-            stops.add(m.group(1));
-        }
-        return stops;
     }
 
     public String durationAsStr() {
@@ -107,5 +116,9 @@ class Result {
             }
         }
         return a.size() - b.size();
+    }
+
+    private static <T> List<T> sortedList(Collection<T> values) {
+        return values.stream().sorted().distinct().toList();
     }
 }
