@@ -3,8 +3,6 @@ package org.opentripplanner.standalone.config;
 import java.time.Duration;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.model.AccessibilityRequirements;
-import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.standalone.config.AccessibilityConfig.Evaluation;
 import org.opentripplanner.util.OtpAppException;

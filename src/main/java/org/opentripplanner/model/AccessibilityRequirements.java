@@ -9,10 +9,10 @@ public record AccessibilityRequirements(EvaluationType evaluationType,
                                         int unknownStopAccessibilityCost,
                                         int inaccessibleStopCost) {
 
-    public static final int UNKNOWN_ACCESSIBILITY_TRIP_COST = 10 * 60;
-    public static final int INACCESSIBLE_TRIP_COST = 60 * 60;
-    public static final int UNKNOWN_STOP_ACCESSIBILITY_COST = 10 * 60;
-    public static final int INACCESSIBLE_STOP_COST = 30 * 60;
+    public static final int DEFAULT_UNKNOWN_ACCESSIBILITY_TRIP_COST = 10 * 60;
+    public static final int DEFAULT_INACCESSIBLE_TRIP_COST = 60 * 60;
+    public static final int DEFAULT_UNKNOWN_STOP_ACCESSIBILITY_COST = 10 * 60;
+    public static final int DEFAULT_INACCESSIBLE_STOP_COST = 30 * 60;
 
     public enum EvaluationType {
         // accessibility information doesn't play a role in routing
@@ -33,10 +33,10 @@ public record AccessibilityRequirements(EvaluationType evaluationType,
     public static AccessibilityRequirements makeDefault(EvaluationType evaluationType) {
         return new AccessibilityRequirements(
                 evaluationType,
-                UNKNOWN_ACCESSIBILITY_TRIP_COST,
-                INACCESSIBLE_TRIP_COST,
-                UNKNOWN_STOP_ACCESSIBILITY_COST,
-                INACCESSIBLE_STOP_COST
+                DEFAULT_UNKNOWN_ACCESSIBILITY_TRIP_COST,
+                DEFAULT_INACCESSIBLE_TRIP_COST,
+                DEFAULT_UNKNOWN_STOP_ACCESSIBILITY_COST,
+                DEFAULT_INACCESSIBLE_STOP_COST
         );
     }
 }
