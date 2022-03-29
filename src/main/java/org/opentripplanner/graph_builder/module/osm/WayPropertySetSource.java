@@ -73,7 +73,7 @@ public interface WayPropertySetSource {
          */
         default boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
                 String motorVehicle = way.getTag("motor_vehicle");
-                return isGeneralNoThroughTraffic(way) || "destination".equals(motorVehicle);
+                return isVehicleThroughTrafficExplicitlyDisallowed(way) || doesTagValueDisallowThroughTraffic(motorVehicle);
         }
 
         /**
@@ -81,7 +81,7 @@ public interface WayPropertySetSource {
          */
         default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
                 String bicycle = way.getTag("bicycle");
-                return isGeneralNoThroughTraffic(way) || "destination".equals(bicycle);
+                return isVehicleThroughTrafficExplicitlyDisallowed(way) || doesTagValueDisallowThroughTraffic(bicycle);
         }
 
         /**
@@ -89,12 +89,6 @@ public interface WayPropertySetSource {
          */
         default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
                 String foot = way.getTag("foot");
-                return isGeneralNoThroughTraffic(way) || "destination".equals(foot);
-        }
-
-        default boolean isGeneralNoThroughTraffic(OSMWithTags way) {
-                String access = way.getTag("access");
-                return "destination".equals(access) || "private".equals(access)
-                                || "customers".equals(access) || "delivery".equals(access);
+                return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
         }
 }
