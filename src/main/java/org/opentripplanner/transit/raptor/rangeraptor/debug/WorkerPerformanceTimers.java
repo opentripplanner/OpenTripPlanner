@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor.debug;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
-import java.util.List;
+import java.util.Collection;
+import org.opentripplanner.routing.framework.MicrometerUtils;
 
 public class WorkerPerformanceTimers {
     // Variables to track time spent
@@ -13,20 +13,21 @@ public class WorkerPerformanceTimers {
 
     public WorkerPerformanceTimers(
             String namePrefix,
-            List<Tag> timingTags,
+            Collection<String> timingTags,
             MeterRegistry registry
     ) {
+        var tags = MicrometerUtils.mapTimingTags(timingTags);
         timerRoute = Timer
                 .builder("raptor." + namePrefix + ".route")
-                .tags(timingTags)
+                .tags(tags)
                 .register(registry);
         timerByMinuteScheduleSearch = Timer
                 .builder("raptor." + namePrefix + ".minute.transit")
-                .tags(timingTags)
+                .tags(tags)
                 .register(registry);
         timerByMinuteTransfers = Timer
                 .builder("raptor." + namePrefix + ".minute.transfers")
-                .tags(timingTags)
+                .tags(tags)
                 .register(registry);
     }
 

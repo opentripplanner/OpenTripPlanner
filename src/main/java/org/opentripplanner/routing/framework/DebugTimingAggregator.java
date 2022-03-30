@@ -4,9 +4,9 @@ import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.api.resource.TransitTimingOutput;
@@ -84,28 +84,29 @@ public class DebugTimingAggregator {
    * Record the time when we first began calculating a path for this request. Note that timings will not
    * include network and server request queue overhead, which is what we want.
    */
-  public DebugTimingAggregator(MeterRegistry registry, List<Tag> timingTags) {
+  public DebugTimingAggregator(MeterRegistry registry, Collection<String> timingTags) {
+    var tags = MicrometerUtils.mapTimingTags(timingTags);
     clock = registry.config().clock();
     startedCalculating = Timer.start(this.clock);
 
-    requestTotalTimer = Timer.builder(ROUTING_TOTAL).tags(timingTags).register(registry);
-    routingTotalTimer = Timer.builder("routing.router").tags(timingTags).register(registry);
-    renderingTimer = Timer.builder("routing.rendering").tags(timingTags).register(registry);
-    filteringTimer = Timer.builder("routing.filtering").tags(timingTags).register(registry);
-    transitRouterTimer = Timer.builder("routing.transit").tags(timingTags).register(registry);
-    itineraryCreationTimer = Timer.builder("routing.itineraryCreation").tags(timingTags).register(registry);
-    raptorSearchTimer = Timer.builder(ROUTING_RAPTOR).tags(timingTags).register(registry);
-    accessEgressTimer = Timer.builder("routing.accessEgress").tags(timingTags).register(registry);
-    tripPatternFilterTimer = Timer.builder("routing.tripPatternFiltering").tags(timingTags).register(registry);
-    preCalculationTimer = Timer.builder("routing.preCalculation").tags(timingTags).register(registry);
+    requestTotalTimer = Timer.builder(ROUTING_TOTAL).tags(tags).register(registry);
+    routingTotalTimer = Timer.builder("routing.router").tags(tags).register(registry);
+    renderingTimer = Timer.builder("routing.rendering").tags(tags).register(registry);
+    filteringTimer = Timer.builder("routing.filtering").tags(tags).register(registry);
+    transitRouterTimer = Timer.builder("routing.transit").tags(tags).register(registry);
+    itineraryCreationTimer = Timer.builder("routing.itineraryCreation").tags(tags).register(registry);
+    raptorSearchTimer = Timer.builder(ROUTING_RAPTOR).tags(tags).register(registry);
+    accessEgressTimer = Timer.builder("routing.accessEgress").tags(tags).register(registry);
+    tripPatternFilterTimer = Timer.builder("routing.tripPatternFiltering").tags(tags).register(registry);
+    preCalculationTimer = Timer.builder("routing.preCalculation").tags(tags).register(registry);
 
-    numEgressesDistribution = DistributionSummary.builder("routing.numEgress").tags(timingTags).register(registry);
-    numAccessesDistribution = DistributionSummary.builder("routing.numAccess").tags(timingTags).register(registry);
+    numEgressesDistribution = DistributionSummary.builder("routing.numEgress").tags(tags).register(registry);
+    numAccessesDistribution = DistributionSummary.builder("routing.numAccess").tags(tags).register(registry);
 
-    egressTimer = Timer.builder("routing.egress").tags(timingTags).register(registry);
-    accessTimer = Timer.builder("routing.access").tags(timingTags).register(registry);
-    directFlexRouterTimer = Timer.builder("routing.directFlex").tags(timingTags).register(registry);
-    directStreetRouterTimer = Timer.builder("routing.directStreet").tags(timingTags).register(registry);
+    egressTimer = Timer.builder("routing.egress").tags(tags).register(registry);
+    accessTimer = Timer.builder("routing.access").tags(tags).register(registry);
+    directFlexRouterTimer = Timer.builder("routing.directFlex").tags(tags).register(registry);
+    directStreetRouterTimer = Timer.builder("routing.directStreet").tags(tags).register(registry);
   }
 
   public DebugTimingAggregator() {

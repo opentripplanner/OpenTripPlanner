@@ -1,10 +1,8 @@
 package org.opentripplanner.routing.api.request;
 
-import io.micrometer.core.instrument.Tag;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -790,10 +788,10 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public RaptorOptions raptorOptions = new RaptorOptions();
 
     /**
-     * List of micrometer tags to be added to all the timer instances for this request.
+     * List of OTP request tags, these are used to cross-cutting concerns like logging and
+     * micrometer tags. Currently, all tags are added to all the timer instances for this request.
      */
-    public List<Tag> timingTags = List.of();
-
+    public Tags tags = Tags.of();
 
 
     /* CONSTRUCTORS */

@@ -58,7 +58,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
             transit,
             new WorkerPerformanceTimers(
                     RequestAlias.alias(request, isMultiThreaded()),
-                    request.debug().timingTags(),
+                    request.timingTags(),
                     registry
             )
         );

@@ -1,11 +1,10 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import io.micrometer.core.instrument.Tag;
 import java.time.Duration;
-import java.util.List;
 import java.time.Instant;
 import java.time.ZoneId;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.Tags;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
@@ -75,18 +74,9 @@ public class SpeedTestRequest {
         }
 
         addDebugOptions(request, opts);
-        request.timingTags = tags();
+        request.tags = Tags.of(testCase.definition().tags());
 
         return request;
-    }
-
-    List<Tag> tags() {
-        // Tags are unique and sorted
-        if (testCase.definition().tags().isEmpty()) {
-            return List.of();
-        } else {
-            return List.of(Tag.of("tags", String.join(" ", testCase.definition().tags())));
-        }
     }
 
     private static void addDebugOptions(

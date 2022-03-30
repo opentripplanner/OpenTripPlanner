@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import io.micrometer.core.instrument.Tag;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -68,7 +67,7 @@ public class RoutingWorker {
         request.applyPageCursor();
         this.request = request;
         this.router = router;
-        this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, request.timingTags);
+        this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, request.tags.getTimingTags());
         this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
         this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
         this.additionalSearchDays = createAdditionalSearchDays(

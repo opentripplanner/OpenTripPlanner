@@ -1,7 +1,9 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import io.micrometer.core.instrument.Tag;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.model.base.ToStringBuilder;
@@ -27,6 +29,8 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     private final Set<Optimization> optimizations;
     private final DebugRequest debug;
     private final RaptorSlackProvider slackProvider;
+    private final Set<String> timingTags;
+
 
 
     static <T extends RaptorTripSchedule> RaptorRequest<T> defaults() {
@@ -40,6 +44,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         optimizations = Collections.emptySet();
         // Slack defaults: 1 minute for transfer-slack, 0 minutes for board- and alight-slack.
         slackProvider = RaptorSlackProvider.defaultSlackProvider(60, 0, 0);
+        timingTags = Set.of();
         debug = DebugRequest.defaults();
     }
 
@@ -49,6 +54,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         this.searchDirection = builder.searchDirection();
         this.optimizations = Set.copyOf(builder.optimizations());
         this.slackProvider = builder.slackProvider();
+        this.timingTags = builder.timingTags();
         this.debug = builder.debug().build();
         verify();
     }
@@ -125,6 +131,10 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         return optimizationEnabled(Optimization.PARALLEL);
     }
 
+    public Set<String> timingTags() {
+        return timingTags;
+    }
+
     /**
      * Specify what to debug in the debug request.
      * <p/>
@@ -137,11 +147,12 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     @Override
     public String toString() {
         return ToStringBuilder.of(RaptorRequest.class)
-                .addEnum("profile",  profile)
-                .addBoolIfTrue("reverse",  searchDirection.isInReverse())
-                .addCol("optimizations",  optimizations)
-                .addObj("debug",  debug, DebugRequest.defaults())
-                .addObj("searchParams",  searchParams)
+                .addEnum("profile", profile)
+                .addBoolIfTrue("reverse", searchDirection.isInReverse())
+                .addCol("optimizations", optimizations)
+                .addObj("debug", debug, DebugRequest.defaults())
+                .addObj("searchParams", searchParams)
+                .addCol("timingTags", timingTags)
                 .toString();
     }
 

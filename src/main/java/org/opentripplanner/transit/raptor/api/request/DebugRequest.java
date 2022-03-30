@@ -55,11 +55,10 @@ public record DebugRequest(
         Consumer<DebugEvent<ArrivalView<?>>> stopArrivalListener,
         Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener,
         Consumer<DebugEvent<Path<?>>> pathFilteringListener,
-        DebugLogger logger,
-        List<Tag> timingTags
+        DebugLogger logger
 ) {
     private static final DebugRequest DEFAULT_DEBUG_REQUEST = new DebugRequest(
-            List.of(), List.of(), 0, null, null, null, DebugLogger.noop(), List.of()
+            List.of(), List.of(), 0, null, null, null, DebugLogger.noop()
     );
 
     /**
@@ -78,7 +77,6 @@ public record DebugRequest(
                 .addBoolIfTrue("stopArrivalListener", stopArrivalListener != null)
                 .addBoolIfTrue("pathFilteringListener", pathFilteringListener != null)
                 .addBoolIfTrue("logger", logger != DEFAULT_DEBUG_REQUEST.logger())
-                .addCol("timingTags", timingTags)
                 .toString();
     }
 
