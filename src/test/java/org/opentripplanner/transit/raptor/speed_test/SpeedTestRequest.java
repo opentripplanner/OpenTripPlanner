@@ -75,6 +75,7 @@ public class SpeedTestRequest {
         }
 
         addDebugOptions(request, opts);
+        request.timingTags = tags();
 
         return request;
     }

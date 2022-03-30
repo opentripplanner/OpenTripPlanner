@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import io.micrometer.core.instrument.Tag;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +27,7 @@ public class DebugRequestBuilder {
     private Consumer<DebugEvent<PatternRide<?>>> patternRideDebugListener;
     private Consumer<DebugEvent<Path<?>>> pathFilteringListener;
     private DebugLogger logger;
+    private List<Tag> timingTags;
 
 
     DebugRequestBuilder(DebugRequest debug) {
@@ -36,6 +38,7 @@ public class DebugRequestBuilder {
         this.patternRideDebugListener = debug.patternRideDebugListener();
         this.pathFilteringListener = debug.pathFilteringListener();
         this.logger = debug.logger();
+        this.timingTags = debug.timingTags();
     }
 
     /** Read-only view to stops added sorted in ascending order.  */
@@ -119,6 +122,16 @@ public class DebugRequestBuilder {
         return this;
     }
 
+    public List<Tag> timingTags() {
+        return timingTags;
+    }
+
+    public DebugRequestBuilder timingTags(List<Tag> timingTags) {
+        this.timingTags = timingTags;
+        return this;
+    }
+
+
     public DebugRequestBuilder reverseDebugRequest() {
         Collections.reverse(this.path);
         return this;
@@ -132,7 +145,8 @@ public class DebugRequestBuilder {
                 stopArrivalListener,
                 patternRideDebugListener,
                 pathFilteringListener,
-                logger
+                logger,
+                timingTags
         );
     }
 }

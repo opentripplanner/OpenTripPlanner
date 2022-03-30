@@ -171,7 +171,7 @@ public class SpeedTest {
             var speedTestRequest = new SpeedTestRequest(testCase, opts, config, routeProfile, getTimeZoneId());
             var routingRequest = speedTestRequest.toRoutingRequest();
 
-            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId(), speedTestRequest.tags());
+            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
             RoutingResponse routingResponse = worker.route();
 
             var times = routingResponse.getDebugTimingAggregator().finishedRendering();

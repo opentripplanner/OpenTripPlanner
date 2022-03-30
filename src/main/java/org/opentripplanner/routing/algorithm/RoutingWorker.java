@@ -65,14 +65,10 @@ public class RoutingWorker {
     private final AdditionalSearchDays additionalSearchDays;
 
     public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId) {
-        this(router, request, zoneId, List.of());
-    }
-
-    public RoutingWorker(Router router, RoutingRequest request, ZoneId zoneId, List<Tag> timingTags) {
         request.applyPageCursor();
         this.request = request;
         this.router = router;
-        this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, timingTags);
+        this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, request.timingTags);
         this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
         this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
         this.additionalSearchDays = createAdditionalSearchDays(

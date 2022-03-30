@@ -118,6 +118,8 @@ public class RaptorRequestMapper {
                     .logger(debugLogger);
         }
 
+        builder.debug().timingTags(request.timingTags);
+
         if(!request.timetableView && request.arriveBy) {
             builder.searchParams().preferLateArrival(true);
         }
