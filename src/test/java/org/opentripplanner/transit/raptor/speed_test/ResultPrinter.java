@@ -8,6 +8,9 @@ import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseFailedException;
 import org.opentripplanner.util.TableFormatter;
+import org.opentripplanner.util.time.DurationUtils;
+
+import static org.opentripplanner.util.time.DurationUtils.msToSecondsStr;
 
 
 /**
@@ -28,15 +31,15 @@ class ResultPrinter {
 
     private ResultPrinter() { }
 
-    static void printResultOk(TestCase testCase, long lapTime, boolean printItineraries) {
-        printResult("SUCCESS", testCase, lapTime, printItineraries, "");
+    static void printResultOk(TestCase testCase, boolean printItineraries) {
+        printResult("SUCCESS", testCase, printItineraries, "");
     }
 
-    static void printResultFailed(TestCase testCase, long lapTime, Exception e) {
+    static void printResultFailed(TestCase testCase, Exception e) {
         boolean testError = e instanceof TestCaseFailedException;
         String errorDetails = " - " + e.getMessage() + (testError ? "" : "  (" + e.getClass().getSimpleName() + ")");
 
-        printResult("FAILED", testCase, lapTime,true, errorDetails);
+        printResult("FAILED", testCase, true, errorDetails);
 
         if(!testError) {
             e.printStackTrace();
@@ -45,26 +48,35 @@ class ResultPrinter {
 
     static void logSingleTestResult(
             SpeedTestProfile profile,
-            List<String> testCaseIds,
-            List<Integer> numOfPathsFound,
+            List<TestCase> testCases,
             int sample,
             int nSamples,
             int nSuccess,
-            int tcSize,
             SpeedTestTimer timer
     ) {
-        double totalTimeMs = timer.testTotalTimeMs("routing.total") / 1000.0;
-        int totalNumOfResults = numOfPathsFound.stream().mapToInt((it) -> it).sum();
-        var summary = TableFormatter.formatTableAsTextLines(List.of(testCaseIds, numOfPathsFound), " ", false);
+        int tcSize = testCases.size();
+        String totalTimeSec = msToSecondsStr(testCases.stream().mapToInt(TestCase::totalTimeMs).sum());
+        var summary = TableFormatter.formatTableAsTextLines(
+                List.of(
+                        testCases.stream().map(TestCase::id).toList(),
+                        testCases.stream().map(TestCase::numberOfResults).toList(),
+                        testCases.stream().map(TestCase::transitTimeMs).toList(),
+                        testCases.stream().map(TestCase::totalTimeMs).toList()
+                ),
+                " ",
+                false
+        );
         System.err.println(
                 "\n" + headerLine("SUMMARY " + profile) +
                 "\n" + String.join("\n", listResults(timer)) +
                 "\n" +
-                logLine("Test case ids", "     [%s]", summary.get(0)) +
-                logLine("Number of Paths", "%3d  [%s]", totalNumOfResults, summary.get(1)) +
+                logLine("Test case ids", "[%s]", summary.get(0)) +
+                logLine("Number of paths", "[%s]", summary.get(1)) +
+                logLine("Transit times(ms)", "[%s]", summary.get(2)) +
+                logLine("Total times(ms)", "[%s]", summary.get(3)) +
                 logLine("Successful searches", "%d / %d", nSuccess, tcSize) +
-                logLine(nSamples > 1, "Sample", "%d / %d",  sample ,nSamples) +
-                logLine("Time total", "%.2f seconds", totalTimeMs) +
+                logLine(nSamples > 1, "Sample", "%d / %d", sample, nSamples) +
+                logLine("Time total", "%s", totalTimeSec) +
                 logLine(nSuccess != tcSize, "!!! UNEXPECTED RESULTS", "%d OF %d FAILED. SEE LOG ABOVE FOR ERRORS !!!", tcSize - nSuccess, tcSize)
         );
     }
@@ -97,7 +109,6 @@ class ResultPrinter {
     private static void printResult(
             String status,
             TestCase tc,
-            long lapTime,
             boolean printItineraries,
             String errorDetails
     ) {
@@ -106,7 +117,7 @@ class ResultPrinter {
                     "TC %-4s %-7s  %4d ms  %-66s %s %n",
                     tc.id(),
                     status,
-                    lapTime,
+                    tc.totalTimeMs(),
                     tc,
                     errorDetails
             );

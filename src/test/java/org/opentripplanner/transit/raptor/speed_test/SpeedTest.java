@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
@@ -51,8 +50,6 @@ public class SpeedTest {
     private final List<TestCaseInput> testCaseInputs;
     private SpeedTestProfile routeProfile;
     private final Router router;
-    private final List<String> testCaseIds = new ArrayList<>();
-    private final List<Integer> numOfPathsFound = new ArrayList<>();
     private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
     private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
     private final CsvFileIO tcIO;
@@ -127,11 +124,8 @@ public class SpeedTest {
     /* Run a single test with all testcases */
     private void runSingleTest(int sample, int nSamples) {
         List<TestCase> testCases = createNewSetOfTestCases();
-        List<TripPlan> tripPlans = new ArrayList<>();
 
         int nSuccess = 0;
-        testCaseIds.clear();
-        numOfPathsFound.clear();
 
         // Force GC to avoid GC during the test
         forceGCToAvoidGCLater();
@@ -143,7 +137,7 @@ public class SpeedTest {
             // Warm-up JIT compiler, run the second test-case if it exist to avoid the same
             // test case from being repeated. If there is just one case, then run it.
             int index = testCases.size() == 1 ? 0 : 1;
-            runSingleTestCase(tripPlans, testCases.get(index), true);
+            runSingleTestCase(testCases.get(index), true);
         }
 
         ResultPrinter.logSingleTestHeader(routeProfile);
@@ -151,21 +145,55 @@ public class SpeedTest {
         timer.startTest();
 
         for (TestCase testCase : testCases) {
-            System.err.println(ResultPrinter.headerLine("Run test-case " + testCase.id()));
-            nSuccess += runSingleTestCase(tripPlans, testCase, false) ? 1 : 0;
+            nSuccess += runSingleTestCase(testCase, false) ? 1 : 0;
         }
 
-        int tcSize = testCases.size();
         workerResults.get(routeProfile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_RAPTOR));
         totalResults.get(routeProfile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_TOTAL));
 
         timer.lapTest();
 
-        ResultPrinter.logSingleTestResult(
-                routeProfile, testCaseIds, numOfPathsFound, sample, nSamples, nSuccess, tcSize, timer
-        );
+        ResultPrinter.logSingleTestResult(routeProfile, testCases, sample, nSamples, nSuccess, timer);
 
         tcIO.writeResultsToFile(testCases);
+    }
+
+    private void setupSingleTest(SpeedTestProfile[] profilesToRun, int sample) {
+        routeProfile = profilesToRun[sample % profilesToRun.length];
+    }
+
+    private boolean runSingleTestCase(TestCase testCase, boolean ignoreResults) {
+        if (!ignoreResults) {
+            System.err.println(ResultPrinter.headerLine("Run test-case " + testCase.id()));
+        }
+        final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, config, routeProfile, getTimeZoneId());
+
+        try {
+            // Perform routing
+            RoutingRequest routingRequest = request.toRoutingRequest();
+
+            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId(), request.tags());
+            RoutingResponse routingResponse = worker.route();
+
+            var times = routingResponse.getDebugTimingAggregator().finishedRendering();
+
+            if (!ignoreResults) {
+                int totalTime = nanosToMillisecond(times.totalTime);
+                int transitTime = nanosToMillisecond(times.transitRouterTime);
+
+                // assert throws Exception on failure
+                testCase.assertResult(routingResponse.getTripPlan().itineraries, transitTime, totalTime);
+
+                // Report success
+                ResultPrinter.printResultOk(testCase, opts.verbose());
+            }
+            return true;
+        } catch (Exception e) {
+            if (!ignoreResults) {
+                ResultPrinter.printResultFailed(testCase, e);
+            }
+            return false;
+        }
     }
 
     private void initProfileStatistics() {
@@ -180,47 +208,6 @@ public class SpeedTest {
         ResultPrinter.printProfileResults("Total:  ", opts.profiles(), totalResults);
     }
 
-    private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, boolean ignoreResults) {
-        int nPathsFound = 0;
-        final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, config, routeProfile, getTimeZoneId());
-
-        DebugOutput times = null;
-        try {
-            // Perform routing
-            RoutingRequest routingRequest = request.toRoutingRequest();
-
-            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId(), request.tags());
-            RoutingResponse routingResponse = worker.route();
-
-            nPathsFound = routingResponse.getTripPlan().itineraries.size();
-            times = routingResponse.getDebugTimingAggregator().finishedRendering();
-
-            if (!ignoreResults) {
-                tripPlans.add(routingResponse.getTripPlan());
-
-                // assert throws Exception on failure
-                testCase.assertResult(routingResponse.getTripPlan().itineraries);
-
-                // Report success
-                ResultPrinter.printResultOk(testCase, nanosToMillisecond(times.totalTime), opts.verbose());
-                addTestCaseSummaryInfo(testCase.id(), nPathsFound);
-            }
-            return true;
-        } catch (Exception e) {
-            if (!ignoreResults) {
-                // Report failure
-                int lapTime = times == null ? 0 : nanosToMillisecond(times.totalTime);
-                ResultPrinter.printResultFailed(testCase, lapTime, e);
-                addTestCaseSummaryInfo(testCase.id(), nPathsFound);
-            }
-            return false;
-        }
-    }
-
-    private void setupSingleTest(SpeedTestProfile[] profilesToRun, int sample) {
-        routeProfile = profilesToRun[sample % profilesToRun.length];
-    }
-
     private ZoneId getTimeZoneId() {
         return graph.getTimeZone().toZoneId();
     }
@@ -230,11 +217,6 @@ public class SpeedTest {
         while (ref.get() != null) {
             System.gc();
         }
-    }
-
-    private void addTestCaseSummaryInfo(String id, int nPathsFound) {
-        testCaseIds.add(id);
-        numOfPathsFound.add(nPathsFound);
     }
 
     private List<TestCase> createNewSetOfTestCases() {

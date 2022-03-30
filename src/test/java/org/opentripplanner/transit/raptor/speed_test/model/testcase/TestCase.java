@@ -32,8 +32,9 @@ public record TestCase(TestCaseDefinition definition, TestCaseResults results) {
     /**
      * Verify the result by matching it with the {@code expectedResult} from the csv file.
      */
-    public void assertResult(Collection<Itinerary> itineraries) {
+    public void assertResult(Collection<Itinerary> itineraries, int transitTimeMs, int totalTimeMs) {
         results.matchItineraries(itineraries);
+        results.addTimes(transitTimeMs, totalTimeMs);
 
         if (results.failed()) {
             throw new TestCaseFailedException();
@@ -58,4 +59,18 @@ public record TestCase(TestCaseDefinition definition, TestCaseResults results) {
     List<Result> actualResults() {
         return results.actualResults();
     }
+
+
+    public int numberOfResults() {
+        return results.actualResults().size();
+    }
+
+    public int transitTimeMs() {
+        return results.transitTimeMs();
+    }
+
+    public int totalTimeMs() {
+        return results.totalTimeMs();
+    }
+
 }

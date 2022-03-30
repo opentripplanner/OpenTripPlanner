@@ -24,11 +24,26 @@ class TestCaseResults {
     private final List<Result> actual = new ArrayList<>();
     private final List<DiffTool.Entry<Result>> matchedResults = new ArrayList<>();
     private TestStatus status = TestStatus.NA;
+    private int transitTimeMs = 0;
+    private int totalTimeMs = 0;
 
     TestCaseResults(String testCaseId, boolean skipCost, Collection<Result> expected) {
         this.testCaseId = testCaseId;
         this.skipCost  = skipCost;
         this.expected = List.copyOf(expected);
+    }
+
+    void addTimes(int transitTimeMs, int totalTimeMs) {
+        this.transitTimeMs = transitTimeMs;
+        this.totalTimeMs = totalTimeMs;
+    }
+
+    public int transitTimeMs() {
+        return transitTimeMs;
+    }
+
+    public int totalTimeMs() {
+        return totalTimeMs;
     }
 
     void matchItineraries(Collection<Itinerary> itineraries) {
