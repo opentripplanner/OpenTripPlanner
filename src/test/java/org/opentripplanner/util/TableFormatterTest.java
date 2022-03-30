@@ -1,10 +1,10 @@
 package org.opentripplanner.util;
 
-import org.junit.Test;
 
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.util.TableFormatter.Align.Center;
 import static org.opentripplanner.util.TableFormatter.Align.Left;
 import static org.opentripplanner.util.TableFormatter.Align.Right;
@@ -36,5 +36,25 @@ public class TableFormatterTest {
     assertEquals("LEFT  |   CENTER   | RIGHT", table.printHeader());
     assertEquals("AAA   | Long-value |     2", table.printRow("AAA", "Long-value", 2));
     assertEquals("BB    |    Short   |    12", table.printRow("BB", "Short", 12));
+  }
+
+  @Test
+  public void simpleTableFormatted() {
+    List<List<?>> input = List.of(
+            List.of("A", "B", "Total"),
+            List.of(100, 2, 102)
+    );
+
+    var table = TableFormatter.formatTableAsTextLines(
+            input,
+            " | ", false
+    );
+    assertEquals(
+        List.of(
+            "  A | B | Total",
+            "100 | 2 |   102"
+        ),
+        table
+    );
   }
 }

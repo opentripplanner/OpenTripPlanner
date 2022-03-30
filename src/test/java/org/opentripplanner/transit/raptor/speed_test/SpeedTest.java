@@ -1,57 +1,36 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.core.instrument.Meter.Id;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
-import io.micrometer.core.instrument.config.MeterFilter;
-import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransitDataProviderFilter;
+import org.opentripplanner.model.plan.TripPlan;
+import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.standalone.OtpStartupInfo;
-import org.opentripplanner.transit.raptor.RaptorService;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
-import org.opentripplanner.transit.raptor.speed_test.model.TripPlan;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
+import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
-import org.opentripplanner.transit.raptor.speed_test.testcase.NoResultFound;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
-import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.CsvFileIO;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseInput;
 import org.opentripplanner.util.OtpAppException;
+
+import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
+import static org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer.nanosToMillisecond;
 
 /**
  * Test response times for a large batch of origin/destination points.
@@ -59,70 +38,36 @@ import org.opentripplanner.util.OtpAppException;
  */
 public class SpeedTest {
 
-    private static final boolean TEST_NUM_OF_ADDITIONAL_TRANSFERS = false;
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
-    private static final String SPEED_TEST_ROUTE = "speedTest.route";
-    private static final String STREET_ROUTE = "speedTest.street.route";
-    private static final String TRANSIT_DATA = "speedTest.transit.data";
-    private static final String ROUTE_WORKER = "speedTest.route.worker";
-    private static final String COLLECT_RESULTS = "speedTest.collect.results";
 
-    private static final long nanosToMillis = 1000000;
 
     private final Graph graph;
-    private final TransitLayer transitLayer;
 
-    private final Clock clock = Clock.SYSTEM;
-    private final MeterRegistry loggerRegistry = new SimpleMeterRegistry();
-    private final CompositeMeterRegistry registry = new CompositeMeterRegistry(clock, List.of(loggerRegistry));
-    private final MeterRegistry uploadRegistry = RegistrySetup.getRegistry().orElse(null);
+    private final SpeedTestTimer timer = new SpeedTestTimer();
 
     private final SpeedTestCmdLineOpts opts;
     private final SpeedTestConfig config;
-    private int nAdditionalTransfers;
+    private final List<TestCaseInput> testCaseInputs;
     private SpeedTestProfile routeProfile;
-    private SpeedTestProfile heuristicProfile;
-    private final EgressAccessRouter streetRouter;
-    private final List<Integer> numOfPathsFound = new ArrayList<>();
+    private final Router router;
     private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
     private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
-
-    /**
-     * Init profile used by the HttpServer
-     */
-    private final RaptorService<TripSchedule> service;
-
+    private final CsvFileIO tcIO;
 
     private SpeedTest(SpeedTestCmdLineOpts opts) {
         this.opts = opts;
         this.config = SpeedTestConfig.config(opts.rootDir());
         this.graph = loadGraph(opts.rootDir(), config.graph);
-        this.transitLayer = TransitLayerMapper.map(config.transitRoutingParams, graph);
-        this.streetRouter = new EgressAccessRouter(graph, transitLayer, registry);
-        this.nAdditionalTransfers = opts.numOfExtraTransfers();
-        this.service = new RaptorService<>(new RaptorConfig<>(config.transitRoutingParams, registry));
 
-        var measurementEnv = Optional.ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT")).orElse("local");
-        registry.config().commonTags(List.of(
-                Tag.of("measurement.environment", measurementEnv),
-                Tag.of("git.commit", projectInfo().versionControl.commit),
-                Tag.of("git.branch", projectInfo().versionControl.branch),
-                Tag.of("git.buildtime", projectInfo().versionControl.buildTime)
-        ));
+        this.tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
 
-        // record the lowest percentile of times
-        loggerRegistry.config().meterFilter(
-                new MeterFilter() {
-                    @Override
-                    public DistributionStatisticConfig configure(
-                            Id id, DistributionStatisticConfig config
-                    ) {
-                        return DistributionStatisticConfig.builder()
-                                .percentiles(0.01)
-                                .build()
-                                .merge(config);
-                    }
-                });
+        // Read Test-case definitions and expected results from file
+        this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
+
+        this.router = new Router(graph, RouterConfig.DEFAULT, timer.getRegistry());
+        this.router.startup();
+
+        timer.setUp();
     }
 
     public static void main(String[] args) {
@@ -158,7 +103,7 @@ public class SpeedTest {
         return graph;
     }
 
-    private void runTest() throws Exception {
+    private void runTest() {
         System.err.println("Run Speed Test");
         final SpeedTestProfile[] speedTestProfiles = opts.profiles();
         final int nSamples = opts.numberOfTestsSamplesToRun();
@@ -166,87 +111,88 @@ public class SpeedTest {
         initProfileStatistics();
 
         for (int i = 0; i < nSamples; ++i) {
-            setupSingleTest(speedTestProfiles, i, nSamples);
+            setupSingleTest(speedTestProfiles, i);
             runSingleTest(i+1, nSamples);
         }
         printProfileStatistics();
 
-        // close() sends the results to influxdb
-        if(uploadRegistry != null) {
-            uploadRegistry.close();
-        }
+        timer.finishUp();
 
-        service.shutdown();
         System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
     }
 
-    private void runSingleTest(int sample, int nSamples) throws Exception {
-        System.err.println("Run a single test sample (all test cases once)");
-
-        CsvFileIO tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME, opts.skipCost());
-        List<TestCase> testCases = tcIO.readTestCasesFromFile();
-        List<TripPlan> tripPlans = new ArrayList<>();
+    /* Run a single test with all testcases */
+    private void runSingleTest(int sample, int nSamples) {
+        List<TestCase> testCases = createNewSetOfTestCases();
 
         int nSuccess = 0;
-        numOfPathsFound.clear();
 
         // Force GC to avoid GC during the test
         forceGCToAvoidGCLater();
 
-        List<String> testCaseIds = opts.testCaseIds();
-        List<TestCase> testCasesToRun;
-
-        if(testCaseIds.isEmpty()) {
-            testCasesToRun = testCases;
-        }
-        else {
-            testCasesToRun = testCases.stream().filter(it -> testCaseIds.contains(it.id)).collect(Collectors.toList());
-        }
-
         // We assume we are debugging and not measuring performance if we only run 1 test-case
         // one time; Hence skip JIT compiler warm-up.
         int samplesPrProfile = opts.numberOfTestsSamplesToRun() / opts.profiles().length;
-        if(testCasesToRun.size() > 1 || samplesPrProfile > 1) {
+        if(testCases.size() > 1 || samplesPrProfile > 1) {
             // Warm-up JIT compiler, run the second test-case if it exist to avoid the same
             // test case from being repeated. If there is just one case, then run it.
-            int index = testCasesToRun.size() == 1 ? 0 : 1;
-            runSingleTestCase(tripPlans, testCases.get(index), true);
+            int index = testCases.size() == 1 ? 0 : 1;
+            runSingleTestCase(testCases.get(index), true);
         }
 
         ResultPrinter.logSingleTestHeader(routeProfile);
 
-        // Clear registry after first run
-        registry.clear();
+        timer.startTest();
 
-        if (uploadRegistry != null) {
-            registry.add(uploadRegistry);
+        for (TestCase testCase : testCases) {
+            nSuccess += runSingleTestCase(testCase, false) ? 1 : 0;
         }
 
-        Timer totalTimer = Timer.builder(SPEED_TEST_ROUTE).register(registry);
+        workerResults.get(routeProfile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_RAPTOR));
+        totalResults.get(routeProfile).add(timer.totalTimerMean(DebugTimingAggregator.ROUTING_TOTAL));
 
-        for (TestCase testCase : testCasesToRun) {
-            nSuccess += runSingleTestCase(tripPlans, testCase, false) ? 1 : 0;
-        }
+        timer.lapTest();
 
-        int tcSize = testCasesToRun.size();
-        workerResults.get(routeProfile).add((int) Timer.builder(ROUTE_WORKER).register(registry).mean(TimeUnit.MILLISECONDS));
-        totalResults.get(routeProfile).add((int) totalTimer.mean(TimeUnit.MILLISECONDS));
-
-        if (uploadRegistry != null) {
-            registry.remove(uploadRegistry);
-        }
-
-        ResultPrinter.logSingleTestResult(
-                routeProfile, numOfPathsFound, sample, nSamples, nSuccess, tcSize, totalTimer.totalTime(TimeUnit.SECONDS),
-                loggerRegistry
-        );
+        ResultPrinter.logSingleTestResult(routeProfile, testCases, sample, nSamples, nSuccess, timer);
 
         tcIO.writeResultsToFile(testCases);
     }
 
-    private void printProfileStatistics() {
-        ResultPrinter.printProfileResults("Worker: ", opts.profiles(), workerResults);
-        ResultPrinter.printProfileResults("Total:  ", opts.profiles(), totalResults);
+    private void setupSingleTest(SpeedTestProfile[] profilesToRun, int sample) {
+        routeProfile = profilesToRun[sample % profilesToRun.length];
+    }
+
+    private boolean runSingleTestCase(TestCase testCase, boolean ignoreResults) {
+        try {
+            if (!ignoreResults) {
+                System.err.println(ResultPrinter.headerLine("Run test-case " + testCase.id()));
+            }
+
+            var speedTestRequest = new SpeedTestRequest(testCase, opts, config, routeProfile, getTimeZoneId());
+            var routingRequest = speedTestRequest.toRoutingRequest();
+
+            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId());
+            RoutingResponse routingResponse = worker.route();
+
+            var times = routingResponse.getDebugTimingAggregator().finishedRendering();
+
+            if (!ignoreResults) {
+                int totalTime = nanosToMillisecond(times.totalTime);
+                int transitTime = nanosToMillisecond(times.transitRouterTime);
+
+                // assert throws Exception on failure
+                testCase.assertResult(routingResponse.getTripPlan().itineraries, transitTime, totalTime);
+
+                // Report success
+                ResultPrinter.printResultOk(testCase, opts.verbose());
+            }
+            return true;
+        } catch (Exception e) {
+            if (!ignoreResults) {
+                ResultPrinter.printResultFailed(testCase, e);
+            }
+            return false;
+        }
     }
 
     private void initProfileStatistics() {
@@ -256,223 +202,13 @@ public class SpeedTest {
         }
     }
 
-    private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, boolean ignoreResults) {
-        RaptorRequest<?> rReqUsed = null;
-        int nPathsFound = 0;
-        long lapTime = 0;
-        Timer.Sample sample = null;
-        try {
-            final SpeedTestRequest request = new SpeedTestRequest(
-                    testCase, opts, config, getTimeZoneId()
-            );
-
-            final Timer timer = Timer.builder(SPEED_TEST_ROUTE).register(registry);
-
-            if (opts.compareHeuristics()) {
-                sample = Timer.start(clock);
-                SpeedTestRequest heurReq = new SpeedTestRequest(
-                        testCase, opts, config, getTimeZoneId()
-                );
-                compareHeuristics(heurReq, request);
-                sample.stop(timer);
-            } else {
-                // Perform routing
-                sample = Timer.start(clock);
-                TripPlan route = route(request);
-                rReqUsed = route.response.requestUsed();
-                nPathsFound = route.response.paths().size();
-                lapTime = sample.stop(timer) / nanosToMillis;
-
-                if (!ignoreResults) {
-                    tripPlans.add(route);
-
-                    // assert throws Exception on failure
-                    testCase.assertResult(route.getItineraries());
-
-                    // Report success
-                    ResultPrinter.printResultOk(testCase, route.response.requestUsed(), lapTime, opts.verbose());
-                    numOfPathsFound.add(nPathsFound);
-                }
-            }
-            return true;
-        } catch (Exception e) {
-            if (sample != null) {
-                final Timer timer = Timer
-                    .builder(SPEED_TEST_ROUTE)
-                    .tag("success", "false")
-                    .register(registry);
-                lapTime = sample.stop(timer) / nanosToMillis;
-            }
-            if (!ignoreResults) {
-                // Report failure
-                ResultPrinter.printResultFailed(testCase, rReqUsed, lapTime, e);
-                numOfPathsFound.add(nPathsFound);
-            }
-            return false;
-        }
-    }
-
-
-    public TripPlan route(SpeedTestRequest request) {
-        RaptorTransitDataProvider<TripSchedule> transitData;
-        RaptorRequest<TripSchedule> rRequest;
-        RaptorResponse<TripSchedule> response;
-
-        Timer.Sample streetTimer = null;
-        Timer.Sample transitDataTimer = null;
-        Timer.Sample workerTimer = null;
-        Timer.Sample collectResultsTimer = null;
-
-        try {
-            streetTimer = Timer.start(clock);
-            streetRouter.route(request);
-            streetTimer.stop(Timer.builder(STREET_ROUTE).register(registry));
-            streetTimer = null;
-
-            transitDataTimer = Timer.start(clock);
-            transitData = transitData(request);
-            transitDataTimer.stop(Timer.builder(TRANSIT_DATA).register(registry));
-            transitDataTimer = null;
-
-            workerTimer = Timer.start(clock);
-            rRequest = rangeRaptorRequest(routeProfile, request, streetRouter);
-            response = service.route(rRequest, transitData);
-            workerTimer.stop(Timer.builder(ROUTE_WORKER).register(registry));
-            workerTimer = null;
-
-            collectResultsTimer = Timer.start(clock);
-            if (response.paths().isEmpty()) {
-                throw new NoResultFound();
-            }
-            TripPlan tripPlan = mapToTripPlan(request, response, streetRouter);
-            collectResultsTimer.stop(Timer.builder(COLLECT_RESULTS).register(registry));
-            collectResultsTimer = null;
-
-            return tripPlan;
-        } finally {
-            if (streetTimer != null) {
-                streetTimer.stop(Timer.builder(STREET_ROUTE).tag("success", "false").register(registry));
-            } else if (transitDataTimer != null) {
-                transitDataTimer.stop(Timer.builder(TRANSIT_DATA).tag("success", "false").register(registry));
-            } else if (workerTimer != null) {
-                workerTimer.stop(Timer.builder(ROUTE_WORKER).tag("success", "false").register(registry));
-            } else if (collectResultsTimer != null) {
-                collectResultsTimer.stop(Timer.builder(COLLECT_RESULTS).tag("success", "false").register(registry));
-            }
-        }
-    }
-
-    private void compareHeuristics(SpeedTestRequest heurReq, SpeedTestRequest routeReq) {
-        streetRouter.route(heurReq);
-        RaptorTransitDataProvider<TripSchedule> transitData = transitData(heurReq);
-
-        RaptorRequest<TripSchedule> req1 = heuristicRequest(
-                heuristicProfile, heurReq, streetRouter
-        );
-        RaptorRequest<TripSchedule> req2 = heuristicRequest(
-                routeProfile, routeReq, streetRouter
-        );
-
-        var timer = Timer.start(clock);
-        service.compareHeuristics(req1, req2, transitData);
-        timer.stop(Timer.builder(ROUTE_WORKER).register(registry));
-    }
-
-    private void setupSingleTest(
-            SpeedTestProfile[] profilesToRun,
-            int sample,
-            int nSamples
-    ) {
-        System.err.println("Set up test");
-        if (opts.compareHeuristics()) {
-            heuristicProfile = profilesToRun[0];
-            routeProfile = profilesToRun[1 + sample % (profilesToRun.length - 1)];
-        } else {
-            heuristicProfile = null;
-            routeProfile = profilesToRun[sample % profilesToRun.length];
-        }
-
-        // Enable flag to test the effect of counting down the number of additional transfers limit
-        if (TEST_NUM_OF_ADDITIONAL_TRANSFERS) {
-            // sample start at 1 .. nSamples(inclusive)
-            nAdditionalTransfers = 1 + ((nSamples-1) - sample) / profilesToRun.length;
-            System.err.println("\n>>> Run test with " + nAdditionalTransfers + " number of additional transfers.\n");
-        }
+    private void printProfileStatistics() {
+        ResultPrinter.printProfileResults("Worker: ", opts.profiles(), workerResults);
+        ResultPrinter.printProfileResults("Total:  ", opts.profiles(), totalResults);
     }
 
     private ZoneId getTimeZoneId() {
         return graph.getTimeZone().toZoneId();
-    }
-
-    private RaptorRequest<TripSchedule> heuristicRequest(
-            SpeedTestProfile profile,
-            SpeedTestRequest request,
-            EgressAccessRouter streetRouter
-    ) {
-        return request.createRangeRaptorRequest(
-                profile,
-                nAdditionalTransfers,
-                true,
-                streetRouter
-        );
-    }
-
-
-    private RaptorRequest<TripSchedule> rangeRaptorRequest(
-            SpeedTestProfile profile,
-            SpeedTestRequest request,
-            EgressAccessRouter streetRouter
-    ) {
-        return request.createRangeRaptorRequest(
-                profile, nAdditionalTransfers, false, streetRouter
-        );
-    }
-
-    private TripPlan mapToTripPlan(
-            SpeedTestRequest request,
-            RaptorResponse<TripSchedule> response,
-            EgressAccessRouter streetRouter
-    ) {
-        List<Itinerary> itineraries = ItineraryMapper.mapItineraries(
-                request, response.paths(), streetRouter, transitLayer
-        );
-
-        // Filter away similar itineraries for easier reading
-        // itineraries.filter();
-
-        return new TripPlan(
-                request.getDepartureTimestamp(),
-                request.tc().fromPlace,
-                request.tc().toPlace,
-                response,
-                itineraries
-        );
-    }
-
-    private RaptorTransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
-        TransitDataProviderFilter transitDataProviderFilter = new RoutingRequestTransitDataProviderFilter(
-                false,
-                false,
-                false,
-                request.getTransitModes(),
-                Set.of(),
-                Set.of()
-        );
-
-        RoutingRequest routingRequest = config.request.clone();
-        routingRequest.walkSpeed = config.walkSpeedMeterPrSecond;
-        RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
-        transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
-
-        return new RaptorRoutingRequestTransitData(
-                null,
-                transitLayer,
-                DateMapper.asStartOfService(request.getDepartureDateWithZone()),
-                0,
-                1,
-                transitDataProviderFilter,
-                transferRoutingRequest
-        );
     }
 
     private void forceGCToAvoidGCLater() {
@@ -480,5 +216,34 @@ public class SpeedTest {
         while (ref.get() != null) {
             System.gc();
         }
+    }
+
+    private List<TestCase> createNewSetOfTestCases() {
+        return testCaseInputs.stream()
+                .map(in -> in.createTestCase(opts.skipCost()))
+                .toList();
+    }
+
+    /**
+     * Filter test-cases based on ids and tags
+     */
+    private static List<TestCaseInput> filterTestCases(SpeedTestCmdLineOpts opts, List<TestCaseInput> cases) {
+        // Filter test-cases based on ids
+        var includeIds = opts.testCaseIds();
+
+        if(!includeIds.isEmpty()) {
+            cases = cases.stream()
+                    .filter(it ->includeIds.contains(it.definition().id()))
+                    .toList();
+        }
+
+        // Filter test-cases based on tags. Include all test-cases which include ALL listed tags.
+        Collection<String> includeTags = opts.includeTags();
+        if(!includeTags.isEmpty()) {
+            cases = cases.stream()
+                    .filter(tc -> tc.definition().tags().containsAll(includeTags))
+                    .toList();
+        }
+        return cases;
     }
 }

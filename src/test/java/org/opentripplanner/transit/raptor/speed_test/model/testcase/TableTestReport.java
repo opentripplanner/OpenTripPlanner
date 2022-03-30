@@ -1,16 +1,15 @@
-package org.opentripplanner.transit.raptor.speed_test.testcase;
-
-import org.opentripplanner.routing.util.DiffTool;
-import org.opentripplanner.util.TableFormatter;
-import org.opentripplanner.util.time.TimeUtils;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
 import static org.opentripplanner.util.TableFormatter.Align.Center;
 import static org.opentripplanner.util.TableFormatter.Align.Left;
 import static org.opentripplanner.util.TableFormatter.Align.Right;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.opentripplanner.routing.util.DiffTool;
+import org.opentripplanner.util.TableFormatter;
+import org.opentripplanner.util.time.TimeUtils;
 
 
 /**
@@ -46,7 +45,7 @@ public class TableTestReport {
         Result result = e.element();
         table.addRow(
             e.status(TestStatus.OK.label, TestStatus.FAILED.label, TestStatus.WARN.label),
-            result.transfers,
+            result.nTransfers,
             result.durationAsStr(),
             result.cost,
             TimeUtils.timeToStrLong(result.startTime),
@@ -54,7 +53,7 @@ public class TableTestReport {
             toStr(result.modes),
             toStr(result.agencies),
             toStr(result.routes),
-            intsToStr(result.stops),
+            toStr(result.stops),
             result.details
         );
     }
@@ -67,6 +66,11 @@ public class TableTestReport {
         return list.isEmpty()
                 ? "-"
                 : list.stream()
+                        .peek(s -> {
+                            if(s == null) {
+                                throw new IllegalArgumentException("null value in list " + list);
+                            }
+                        })
                         .map(Object::toString)
                         .collect(Collectors.joining(" "));
     }

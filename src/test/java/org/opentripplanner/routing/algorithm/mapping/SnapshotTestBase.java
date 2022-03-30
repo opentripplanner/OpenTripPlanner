@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.micrometer.core.instrument.Metrics;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -67,19 +68,27 @@ public abstract class SnapshotTestBase {
 
     protected Router router;
 
-    public static void loadGraphBeforeClass() {
-        ConstantsForTests.getInstance().getCachedPortlandGraph();
+    public static void loadGraphBeforeClass(boolean withElevation) {
+        if (withElevation) {
+            ConstantsForTests.getInstance().getCachedPortlandGraphWithElevation();
+        } else {
+            ConstantsForTests.getInstance().getCachedPortlandGraph();
+        }
     }
 
     protected Router getRouter() {
         if (router == null) {
-            Graph graph = ConstantsForTests.getInstance().getCachedPortlandGraph();
+            Graph graph = getGraph();
 
-            router = new Router(graph, RouterConfig.DEFAULT);
+            router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
             router.startup();
         }
 
         return router;
+    }
+
+    protected Graph getGraph() {
+        return ConstantsForTests.getInstance().getCachedPortlandGraph();
     }
 
     protected RoutingRequest createTestRequest(int year, int month, int day, int hour, int minute, int second) {
@@ -113,7 +122,7 @@ public abstract class SnapshotTestBase {
 
             for (int j = 0; j < itinerary.legs.size(); j++) {
                 Leg leg = itinerary.legs.get(j);
-                String mode = leg.getMode().name().substring(0, 1);
+                String mode = leg.getMode().isTransit() ? "T" : leg.getMode().name().substring(0, 1);
                 System.out.printf(" - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n", j, leg.getFrom()
                                 .toStringShort(),
                         dtf.format(leg.getStartTime().toInstant().atZone(zoneId)), mode,

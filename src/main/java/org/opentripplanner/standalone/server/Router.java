@@ -5,7 +5,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
-import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
@@ -35,6 +35,7 @@ public class Router {
     private final RoutingRequest defaultRoutingRequest;
     public final Graph graph;
     public final RouterConfig routerConfig;
+    public final MeterRegistry meterRegistry;
     public final RaptorConfig<TripSchedule> raptorConfig;
 
     /**
@@ -52,13 +53,14 @@ public class Router {
     /** A graphical window that is used for visualizing search progress (debugging). */
     public GraphVisualizer graphVisualizer = null;
 
-    public Router(Graph graph, RouterConfig routerConfig) {
+    public Router(Graph graph, RouterConfig routerConfig, MeterRegistry meterRegistry) {
         this.graph = graph;
         this.routerConfig = routerConfig;
         this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
+        this.meterRegistry = meterRegistry;
         this.raptorConfig = new RaptorConfig<>(
             routerConfig.raptorTuningParameters(),
-            Metrics.globalRegistry
+            meterRegistry
         );
     }
 
@@ -141,6 +143,7 @@ public class Router {
     /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */
     public void shutdown() {
         GraphUpdaterConfigurator.shutdownGraph(this.graph);
+        raptorConfig.shutdown();
     }
 
     /**

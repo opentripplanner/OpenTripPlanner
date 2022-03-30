@@ -131,6 +131,14 @@ public class ToStringBuilderTest {
   @Test
   public void addCollection() {
     assertEquals(
+            "ToStringBuilderTest{}",
+            subject().addCol("c", null).toString()
+    );
+    assertEquals(
+            "ToStringBuilderTest{}",
+            subject().addCol("c", List.of()).toString()
+    );
+    assertEquals(
         "ToStringBuilderTest{c: [1, 3.0, true]}",
         subject().addCol("c", List.of(1, 3d, true)).toString()
     );

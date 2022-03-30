@@ -28,7 +28,7 @@ public class QualifiedModeSetTest {
 
     @Test
     public void multipleWalks() {
-        QualifiedModeSet modeSet = new QualifiedModeSet("WALK,WALK,WALK");
+        QualifiedModeSet modeSet = new QualifiedModeSet(new String[] { "WALK", "WALK","WALK"});
         assertEquals(Set.of(new QualifiedMode("WALK")), modeSet.qModes);
         assertEquals(new RequestModes(WALK, WALK, WALK, WALK, Set.of()), modeSet.getRequestModes());
     }
@@ -45,7 +45,7 @@ public class QualifiedModeSetTest {
 
     @Test
     public void singleWalkAndBicycleRental() {
-        QualifiedModeSet modeSet = new QualifiedModeSet("WALK,BICYCLE_RENT");
+        QualifiedModeSet modeSet = new QualifiedModeSet(new String[] {"WALK", "BICYCLE_RENT"});
         assertEquals(Set.of(
                 new QualifiedMode("WALK"),
                 new QualifiedMode("BICYCLE_RENT")

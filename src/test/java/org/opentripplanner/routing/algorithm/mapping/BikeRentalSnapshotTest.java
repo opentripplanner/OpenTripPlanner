@@ -37,7 +37,7 @@ public class BikeRentalSnapshotTest
     @BeforeAll
     public static void beforeClass() {
         Locale.setDefault(Locale.US);
-        loadGraphBeforeClass();
+        loadGraphBeforeClass(false);
     }
 
     @AfterAll

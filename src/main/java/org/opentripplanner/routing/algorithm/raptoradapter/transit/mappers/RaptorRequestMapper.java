@@ -10,6 +10,7 @@ import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.util.OTPFeature;
@@ -53,11 +54,16 @@ public class RaptorRequestMapper {
 
         if(request.pageCursor ==  null) {
             int time = relativeTime(request.getDateTime());
+
+            int timeLimit = relativeTime(request.raptorOptions.getTimeLimit());
+
             if (request.arriveBy) {
                 searchParams.latestArrivalTime(time);
+                searchParams.earliestDepartureTime(timeLimit);
             }
             else {
                 searchParams.earliestDepartureTime(time);
+                searchParams.latestArrivalTime(timeLimit);
             }
             searchParams.searchWindow(request.searchWindow);
         }
@@ -77,6 +83,10 @@ public class RaptorRequestMapper {
             searchParams.maxNumberOfTransfers(request.maxTransfers);
         }
 
+        request.raptorOptions.getOptimizations().forEach(builder::enableOptimization);
+        builder.profile(request.raptorOptions.getProfile());
+        builder.searchDirection(request.raptorOptions.getSearchDirection());
+
         builder
                 .profile(RaptorProfile.MULTI_CRITERIA)
                 .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION)
@@ -95,18 +105,20 @@ public class RaptorRequestMapper {
                 .addAccessPaths(accessPaths)
                 .addEgressPaths(egressPaths);
 
-        if(request.raptorDebuging != null) {
+        if(request.raptorDebugging.isEnabled()) {
             var debug = builder.debug();
             var debugLogger = new SystemErrDebugLogger(true);
 
-            debug.addStops(request.raptorDebuging.stops())
-                    .setPath(request.raptorDebuging.path())
-                    .debugPathFromStopIndex(request.raptorDebuging.debugPathFromStopIndex())
+            debug.addStops(request.raptorDebugging.stops())
+                    .setPath(request.raptorDebugging.path())
+                    .debugPathFromStopIndex(request.raptorDebugging.debugPathFromStopIndex())
                     .stopArrivalListener(debugLogger::stopArrivalLister)
                     .patternRideDebugListener(debugLogger::patternRideLister)
                     .pathFilteringListener(debugLogger::pathFilteringListener)
                     .logger(debugLogger);
         }
+
+        builder.addTimingTags(request.tags.getTimingTags());
 
         if(!request.timetableView && request.arriveBy) {
             builder.searchParams().preferLateArrival(true);
@@ -116,6 +128,7 @@ public class RaptorRequestMapper {
     }
 
     private int relativeTime(Instant time) {
+        if(time == null) { return SearchParams.TIME_NOT_SET; }
         return (int)(time.getEpochSecond() - transitSearchTimeZeroEpocSecond);
     }
 }

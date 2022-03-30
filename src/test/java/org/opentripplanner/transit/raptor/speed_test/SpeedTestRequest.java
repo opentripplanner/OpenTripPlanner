@@ -1,192 +1,95 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.Tags;
+import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
+
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION_BEST_TIME;
 
-import gnu.trove.iterator.TIntIntIterator;
-import gnu.trove.map.TIntIntMap;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import org.opentripplanner.model.modes.AllowedTransitMode;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
-import org.opentripplanner.transit.raptor.api.request.Optimization;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
-import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
-
 
 public class SpeedTestRequest {
-
-    /**
-     * This is used to expand the search window for all test cases to test the effect of long windows.
-     * <p/>
-     * REMEMBER TO CHANGE IT BACK TO 0 BEFORE VCS COMMIT.
-     */
-    private static final int EXPAND_SEARCH_WINDOW_HOURS = 0;
-
     private final TestCase testCase;
     private final SpeedTestCmdLineOpts opts;
     private final SpeedTestConfig config;
-    private final ZoneId inputZoneId;
-    private final LocalDate date;
+    private final SpeedTestProfile profile;
+    private final ZoneId timeZoneId;
 
     SpeedTestRequest(
             TestCase testCase,
             SpeedTestCmdLineOpts opts,
             SpeedTestConfig config,
-            ZoneId inputZoneId
+            SpeedTestProfile profile,
+            ZoneId timeZoneId
     ) {
         this.testCase = testCase;
         this.opts = opts;
         this.config = config;
-        this.date = config.testDate;
-        this.inputZoneId = inputZoneId;
+        this.profile = profile;
+        this.timeZoneId = timeZoneId;
     }
 
-    public TestCase tc() { return testCase; }
-    public LocalDate getDepartureDate() {
-        return date;
-    }
-    public Date getDepartureTimestamp() {
-        return new Date(
-                date.atStartOfDay(inputZoneId).toInstant().toEpochMilli()
-                        + testCase.departureTime * 1000L
-        );
+    public TestCase tc() {
+        return testCase;
     }
 
-    ZonedDateTime getDepartureDateWithZone() {
-        return ZonedDateTime.of(date, LocalTime.MIDNIGHT, inputZoneId);
-    }
+    RoutingRequest toRoutingRequest() {
+        var request = config.request.clone();
+        var input = testCase.definition();
 
-    Set<AllowedTransitMode> getTransitModes() {
-        return AllowedTransitMode.getAllTransitModesExceptAirplane();
-    }
-
-    double getWalkSpeedMeterPrSecond() {
-        // 1.4 m/s = ~ 5.0 km/t
-        return config.walkSpeedMeterPrSecond;
-    }
-
-    public double getAccessEgressMaxWalkDurationSeconds() {
-        return config.maxWalkDurationSeconds;
-    }
-
-
-    RaptorRequest<TripSchedule> createRangeRaptorRequest(
-            SpeedTestProfile profile,
-            int numOfExtraTransfers,
-            boolean oneIterationOnly,
-            EgressAccessRouter streetRouter
-    ) {
-        // Add half of the extra time to departure and half to the arrival
-        int expandSearchSec = EXPAND_SEARCH_WINDOW_HOURS * 3600/2;
-
-
-        RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
-        builder.searchParams()
-                .timetableEnabled(true)
-                .numberOfAdditionalTransfers(numOfExtraTransfers);
-
-        if(testCase.departureTime != TestCase.NOT_SET) {
-            builder.searchParams().earliestDepartureTime(testCase.departureTime - expandSearchSec);
+        if (input.departureTime() != TestCase.NOT_SET) {
+            request.setDateTime(time(input.departureTime()));
+            request.arriveBy = false;
+            if (input.arrivalTime() != TestCase.NOT_SET) {
+                request.raptorOptions.withTimeLimit(time(input.arrivalTime()));
+            }
+        } else if (input.arrivalTime() != TestCase.NOT_SET) {
+            request.setDateTime(time(input.arrivalTime()));
+            request.arriveBy = true;
         }
 
-        if(testCase.arrivalTime != TestCase.NOT_SET) {
-            builder.searchParams().latestArrivalTime(testCase.arrivalTime + expandSearchSec);
+        if (input.window() != TestCase.NOT_SET) {
+            request.searchWindow = Duration.ofSeconds(input.window());
         }
 
-        if(testCase.window != TestCase.NOT_SET) {
-            builder.searchParams().searchWindowInSeconds(testCase.window + 2 * expandSearchSec);
+        request.from = input.fromPlace();
+        request.to = input.toPlace();
+        request.numItineraries = opts.numOfItineraries();
+        request.modes = input.modes();
+
+        request.raptorOptions
+                .withProfile(profile.raptorProfile())
+                .withOptimizations(profile.optimizations())
+                .withSearchDirection(profile.direction());
+
+
+        if (profile.raptorProfile().isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
+            request.searchWindow = Duration.ZERO;
         }
 
-        if(oneIterationOnly) {
-            builder.searchParams().searchOneIterationOnly();
-        }
+        addDebugOptions(request, opts);
+        request.tags = Tags.of(testCase.definition().tags());
 
-        builder.enableOptimization(Optimization.PARALLEL);
-
-        builder.profile(profile.raptorProfile);
-        for (Optimization it : profile.optimizations) {
-            builder.enableOptimization(it);
-        }
-        if(profile.raptorProfile.isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
-            builder.searchParams().searchOneIterationOnly();
-        }
-
-        builder.slackProvider(new SlackProvider(
-                config.request.transferSlack,
-                config.request.boardSlack,
-                config.request.boardSlackForMode,
-                config.request.alightSlack,
-                config.request.alightSlackForMode
-        ));
-
-        builder.searchDirection(profile.direction);
-
-        builder.searchParams().addAccessPaths(
-            mapToAccessEgress(streetRouter.getAccessTimesInSecondsByStopIndex())
-        );
-        builder.searchParams().addEgressPaths(
-            mapToAccessEgress(streetRouter.getEgressTimesInSecondsByStopIndex())
-        );
-
-        addDebugOptions(builder, opts);
-
-        RaptorRequest<TripSchedule> req = builder.build();
-
-        if (opts.debugRequest()) {
-            System.err.println("-> Request: " + req);
-        }
-
-        return req;
-    }
-
-    private static List<RaptorTransfer> mapToAccessEgress(TIntIntMap timesToStopsInSeconds) {
-        List<RaptorTransfer> paths = new ArrayList<>();
-        TIntIntIterator it = timesToStopsInSeconds.iterator();
-        while (it.hasNext()) {
-            it.advance();
-            paths.add(walk(it.key(), it.value()));
-        }
-        return paths;
+        return request;
     }
 
     private static void addDebugOptions(
-            RaptorRequestBuilder<TripSchedule> builder,
+            RoutingRequest request,
             SpeedTestCmdLineOpts opts
     ) {
-        List<Integer> stops = opts.debugStops();
-        List<Integer> path = opts.debugPath();
+        request.raptorDebugging
+                .withStops(opts.debugStops())
+                .withPath(opts.debugPath());
+    }
 
-        boolean debugLoggerEnabled = opts.debugRequest() || opts.debug();
-
-        debugLoggerEnabled = debugLoggerEnabled || opts.compareHeuristics();
-
-        if(!debugLoggerEnabled && stops.isEmpty() && path.isEmpty()) {
-            return;
-        }
-
-        SystemErrDebugLogger logger = new SystemErrDebugLogger(debugLoggerEnabled);
-        builder.debug()
-                .stopArrivalListener(logger::stopArrivalLister)
-                .pathFilteringListener(logger::pathFilteringListener)
-                .logger(logger)
-                .setPath(path)
-                .debugPathFromStopIndex(opts.debugPathFromStopIndex())
-                .addStops(stops);
-
+    private Instant time(int time) {
+        // Note time may be negative and exceed 24 hours
+        return config.testDate.atStartOfDay(timeZoneId).plusSeconds(time).toInstant();
     }
 }

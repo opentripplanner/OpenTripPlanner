@@ -5,6 +5,7 @@ import org.geotools.util.factory.Hints;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
@@ -39,8 +40,10 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
      * Wraps the underlying grid coverage instance with an interpolator that can be used in a specific thread.
      */
     @Override
-    public GridCoverage2D getGridCoverage() {
-        return Interpolator2D.create(getUninterpolatedGridCoverage(), new InterpolationBilinear());
+    public GridCoverage getGridCoverage() {
+        return NoDataGridCoverage.create(
+                Interpolator2D.create(getUninterpolatedGridCoverage(), new InterpolationBilinear())
+        );
     }
 
     /**

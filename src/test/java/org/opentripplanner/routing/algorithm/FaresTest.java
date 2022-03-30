@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -39,7 +40,7 @@ public class FaresTest {
 
         var feedId = graph.getFeedIds().iterator().next();
 
-        var router = new Router(graph, RouterConfig.DEFAULT);
+        var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
         router.startup();
 
         var start = TestUtils.dateInstant("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
@@ -56,7 +57,7 @@ public class FaresTest {
         Graph graph = ConstantsForTests.getInstance().getCachedPortlandGraph();
         var portlandId = graph.getFeedIds().iterator().next();
 
-        var router = new Router(graph, RouterConfig.DEFAULT);
+        var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
         router.startup();
 
         // from zone 3 to zone 2
@@ -109,7 +110,7 @@ public class FaresTest {
         );
         var feedId = graph.getFeedIds().iterator().next();
 
-        var router = new Router(graph, RouterConfig.DEFAULT);
+        var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
         router.startup();
 
         var from = GenericLocation.fromStopId("Origin", feedId, "2010");
@@ -136,7 +137,7 @@ public class FaresTest {
         Graph graph = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
         String feedId = graph.getFeedIds().iterator().next();
 
-        var router = new Router(graph, RouterConfig.DEFAULT);
+        var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
         router.startup();
 
         Money tenUSD = new Money(USD, 1000);

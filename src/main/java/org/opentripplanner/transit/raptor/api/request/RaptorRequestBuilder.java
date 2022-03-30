@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.api.request;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
@@ -28,6 +29,8 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     private RaptorProfile profile;
     private final Set<Optimization> optimizations = EnumSet.noneOf(Optimization.class);
 
+    // Timer
+    private final Set<String> timingTags;
 
     // Debug
     private final DebugRequestBuilder debug;
@@ -44,6 +47,9 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
         // Algorithm
         this.profile = defaults.profile();
         this.optimizations.addAll(defaults.optimizations());
+
+        // Timer
+        timingTags = new HashSet<>(defaults.timingTags());
 
         // Debug
         this.debug = new DebugRequestBuilder(defaults.debug());
@@ -96,6 +102,15 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     public RaptorRequestBuilder<T> disableOptimization(Optimization optimization) {
         this.optimizations.remove(optimization);
         return this;
+    }
+
+    public RaptorRequestBuilder<T> addTimingTags(Collection<String> tags) {
+        this.timingTags.addAll(tags);
+        return this;
+    }
+
+    public Set<String> timingTags() {
+        return timingTags;
     }
 
     public DebugRequestBuilder debug() {

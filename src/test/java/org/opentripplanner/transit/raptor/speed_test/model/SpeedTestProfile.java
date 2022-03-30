@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test;
+package org.opentripplanner.transit.raptor.speed_test.model;
 
 import java.util.Arrays;
 import java.util.List;
@@ -93,6 +93,17 @@ public enum SpeedTestProfile {
         return Arrays.stream(values()).map(SpeedTestProfile::description).collect(Collectors.toList());
     }
 
+    public RaptorProfile raptorProfile() {
+        return raptorProfile;
+    }
+
+    public SearchDirection direction() {
+        return direction;
+    }
+
+    public List<Optimization> optimizations() {
+        return optimizations;
+    }
 
     /* private methods */
 

@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.StreetNote;
@@ -220,6 +223,7 @@ public class GraphPathToItineraryMapper {
     /**
      * Generate one leg of an itinerary from a list of {@link State}.
      *
+     *
      * @param states The list of states to base the leg on
      * @param previousStep the previous walk step, so that the first relative turn direction is
      *                     calculated correctly
@@ -264,6 +268,7 @@ public class GraphPathToItineraryMapper {
                 distanceMeters,
                 (int) (lastState.getWeight() - firstState.getWeight()),
                 geometry,
+                makeElevation(edges, firstState.getOptions().geoidElevation),
                 walkSteps
         );
 
@@ -365,6 +370,73 @@ public class GraphPathToItineraryMapper {
                 }
             }
         }
+    }
+
+    private List<P2<Double>> makeElevation(
+            List<Edge> edges,
+            boolean geoidElevation
+    ) {
+        ArrayList<P2<Double>> elevationProfile = new ArrayList<>();
+
+        double heightOffset = geoidElevation ? ellipsoidToGeoidDifference : 0;
+
+        double distanceOffset = 0;
+        for (final Edge edge : edges) {
+            if (edge.getDistanceMeters() > 0) {
+                elevationProfile.addAll(
+                        encodeElevationProfileWithNaN(edge, distanceOffset, heightOffset));
+                distanceOffset += edge.getDistanceMeters();
+            }
+        }
+
+        // Remove repeated values, preserving the first and last value
+        for (int i = elevationProfile.size() - 3; i >= 0; i--) {
+            var first = elevationProfile.get(i);
+            var second = elevationProfile.get(i + 1);
+            var third = elevationProfile.get(i + 2);
+
+            if (Objects.equals(first.second, second.second) && Objects.equals(second.second, third.second)) {
+                elevationProfile.remove(i + 1);
+            }
+            else if (first.second.isNaN() && second.second.isNaN() && third.second.isNaN()) {
+                elevationProfile.remove(i + 1);
+            }
+            else if (Objects.equals(first, second)) {
+                elevationProfile.remove(i + 1);
+            }
+        }
+
+        if (elevationProfile.stream().allMatch(p2 -> p2.second.isNaN())) {
+            return null;
+        }
+
+        return elevationProfile;
+    }
+
+    private static List<P2<Double>> encodeElevationProfileWithNaN(Edge edge, double distanceOffset, double heightOffset) {
+        var elevations = encodeElevationProfile(edge, distanceOffset, heightOffset);
+        if (elevations.isEmpty()) {
+            return List.of(new P2<>(distanceOffset, Double.NaN), new P2<>(distanceOffset + edge.getDistanceMeters(), Double.NaN));
+        }
+        return elevations;
+    }
+
+    private static List<P2<Double>> encodeElevationProfile(Edge edge, double distanceOffset, double heightOffset) {
+        ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
+
+        if (!(edge instanceof StreetEdge elevEdge)) {
+            return out;
+        }
+        if (elevEdge.getElevationProfile() == null) {
+            return out;
+        }
+
+        Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
+        for (final Coordinate coordinate : coordArr) {
+            out.add(new P2<>(coordinate.x + distanceOffset, coordinate.y + heightOffset));
+        }
+
+        return out;
     }
 
     /**

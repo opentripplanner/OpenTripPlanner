@@ -219,6 +219,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
             speed(mode) * (endTime - startTime),
             legCost,
             null,
+            null,
             List.of()
     );
 
