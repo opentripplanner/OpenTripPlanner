@@ -10,6 +10,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -75,19 +76,28 @@ class TripMapper {
 
         org.opentripplanner.model.Route route = resolveRoute(serviceJourney);
 
-        if(route == null) {
-            LOG.warn("Unable to map ServiceJourney, missing serviceId. SJ id: {}", serviceJourney.getId());
+        if (route == null) {
+            LOG.warn(
+                    "Unable to map ServiceJourney, missing serviceId. SJ id: {}",
+                    serviceJourney.getId()
+            );
             return null;
         }
+
+        var wheelChairBoarding = WheelChairMapper.wheelChairBoarding(
+                serviceJourney.getAccessibilityAssessment(),
+                WheelChairBoarding.NO_INFORMATION
+        );
 
         Trip trip = new Trip(idFactory.createId(serviceJourney.getId()));
 
         trip.setRoute(route);
         trip.setServiceId(serviceId);
         trip.setShapeId(getShapeId(serviceJourney));
+        trip.setWheelchairBoarding(wheelChairBoarding);
 
         if (serviceJourney.getPrivateCode() != null) {
-          trip.setInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
+            trip.setInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
         }
 
         trip.setTripShortName(serviceJourney.getPublicCode());

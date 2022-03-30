@@ -1,25 +1,31 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
+import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
+
 import java.util.Collections;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.rutebanken.netex.model.AccessibilityAssessment;
+import org.rutebanken.netex.model.AccessibilityLimitation;
+import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
+import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LineRefStructure;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
-
-import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
-import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
 public class TripMapperTest {
 
@@ -34,20 +40,56 @@ public class TripMapperTest {
     );
 
     @Test
+    public void mapTripWithWheelchairAccess() {
+        var serviceJourney = createExampleServiceJourney();
+        var wheelchairLimitation = LimitationStatusEnumeration.TRUE;
+        var limitation = new AccessibilityLimitation();
+        var limitations = new AccessibilityLimitations_RelStructure();
+        var access = new AccessibilityAssessment();
+
+        var transitBuilder = new OtpTransitServiceBuilder();
+        var route = new Route(ID_FACTORY.createId(ROUTE_ID));
+        transitBuilder.getRoutes().add(route);
+
+        TripMapper tripMapper = new TripMapper(
+                ID_FACTORY,
+                issueStore,
+                transitBuilder.getOperatorsById(),
+                transitBuilder.getRoutes(),
+                new HierarchicalMapById<>(),
+                new HierarchicalMap<>(),
+                Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
+                Collections.emptySet()
+        );
+
+        limitation.withWheelchairAccess(wheelchairLimitation);
+        limitations.withAccessibilityLimitation(limitation);
+        access.withLimitations(limitations);
+        serviceJourney.withAccessibilityAssessment(access);
+        serviceJourney.setLineRef(LINE_REF);
+        var trip = tripMapper.mapServiceJourney(serviceJourney);
+        assertNotNull(trip, "trip must not be null");
+        assertEquals(
+                trip.getWheelchairBoarding(), WheelChairBoarding.POSSIBLE,
+                "Wheelchair accessibility not possible on trip"
+        );
+    }
+
+    @Test
     public void mapTrip() {
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
         Route route = new Route(ID_FACTORY.createId(ROUTE_ID));
         transitBuilder.getRoutes().add(route);
 
         TripMapper tripMapper = new TripMapper(
-            ID_FACTORY,
-            issueStore,
-            transitBuilder.getOperatorsById(),
-            transitBuilder.getRoutes(),
-            new HierarchicalMapById<>(),
-            new HierarchicalMap<>(),
-            Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-            Collections.emptySet()
+                ID_FACTORY,
+                issueStore,
+                transitBuilder.getOperatorsById(),
+                transitBuilder.getRoutes(),
+                new HierarchicalMapById<>(),
+                new HierarchicalMap<>(),
+                Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
+                Collections.emptySet()
         );
 
         ServiceJourney serviceJourney = createExampleServiceJourney();
