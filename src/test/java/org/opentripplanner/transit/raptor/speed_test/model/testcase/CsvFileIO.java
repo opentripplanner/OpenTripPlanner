@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.time.DurationUtils;
@@ -76,21 +77,17 @@ public class CsvFileIO {
                         parseTime(csvReader.get("departure")),
                         parseTime(csvReader.get("arrival")),
                         parseDuration(csvReader.get("window")),
-                        new Place(
+                        new GenericLocation(
                                 csvReader.get("origin"),
                                 FeedScopedId.ofNullable(FEED_ID, csvReader.get("fromPlace")),
-                                new WgsCoordinate(
-                                    Double.parseDouble(csvReader.get("fromLat")),
-                                    Double.parseDouble(csvReader.get("fromLon"))
-                                )
+                                Double.parseDouble(csvReader.get("fromLat")),
+                                Double.parseDouble(csvReader.get("fromLon"))
                         ),
-                        new Place(
+                        new GenericLocation(
                                 csvReader.get("destination"),
                                 FeedScopedId.ofNullable(FEED_ID, csvReader.get("toPlace")),
-                                new WgsCoordinate(
-                                    Double.parseDouble(csvReader.get("toLat")),
-                                    Double.parseDouble(csvReader.get("toLon"))
-                                )
+                                Double.parseDouble(csvReader.get("toLat")),
+                                Double.parseDouble(csvReader.get("toLon"))
                         ),
                         asSortedList(split(csvReader.get("tags"))),
                         new QualifiedModeSet(split(csvReader.get("modes"))).getRequestModes()

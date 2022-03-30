@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
 import java.util.List;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -11,8 +12,8 @@ public record TestCaseDefinition(
         int departureTime,
         int arrivalTime,
         int window,
-        Place fromPlace,
-        Place toPlace,
+        GenericLocation fromPlace,
+        GenericLocation toPlace,
         List<String>tags,
         RequestModes modes
 ) {
@@ -23,9 +24,9 @@ public record TestCaseDefinition(
     public String toString() {
         return String.format(
                 "#%s %s - %s, %s - %s, %s-%s(%s)",
-                id, fromPlace.name(), toPlace.name(),
-                fromPlace.coordinate(),
-                toPlace.coordinate(),
+                id, fromPlace.label, toPlace.label,
+                fromPlace.getCoordinate(),
+                toPlace.getCoordinate(),
                 TimeUtils.timeToStrCompact(departureTime, TestCase.NOT_SET),
                 TimeUtils.timeToStrCompact(arrivalTime, TestCase.NOT_SET),
                 DurationUtils.durationToStr(window, TestCase.NOT_SET)

@@ -59,8 +59,8 @@ public class SpeedTestRequest {
             request.searchWindow = Duration.ofSeconds(input.window());
         }
 
-        request.from = input.fromPlace().toGenericLocation();
-        request.to = input.toPlace().toGenericLocation();
+        request.from = input.fromPlace();
+        request.to = input.toPlace();
         request.numItineraries = opts.numOfItineraries();
         request.modes = input.modes();
 
