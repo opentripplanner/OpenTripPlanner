@@ -23,6 +23,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DurationComparator;
@@ -1369,7 +1370,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return bannedRoutes;
     }
 
-    public Duration getMaxAccessEgressDurationForMode(StreetMode mode) {
+    public Duration getMaxAccessEgressDuration(StreetMode mode) {
         Double seconds = maxAccessEgressDurationSecondsForMode.getOrDefault(
             mode,
             maxAccessEgressDurationSeconds
