@@ -61,7 +61,7 @@ public class DatedServiceJourneyQuery {
                         .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString))))
                 .argument(GraphQLArgument.newArgument()
                         .name("operatingDays")
-                        .type(new GraphQLList(new GraphQLNonNull(gqlUtil.dateScalar))))
+                        .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(gqlUtil.dateScalar)))))
                 .argument(GraphQLArgument.newArgument()
                         .name("alterations")
                         .type(new GraphQLList(new GraphQLNonNull(SERVICE_ALTERATION))))
@@ -98,15 +98,14 @@ public class DatedServiceJourneyQuery {
                         );
                     }
 
-                    if (operatingDays != null && !operatingDays.isEmpty()) {
-                        var days = operatingDays.stream()
-                                .map(gqlUtil.serviceDateMapper::secondsSinceEpochToServiceDate)
-                                .toList();
+                    // At least one operationg day is required
+                    var days = operatingDays.stream()
+                            .map(gqlUtil.serviceDateMapper::secondsSinceEpochToServiceDate)
+                            .toList();
 
-                        stream = stream.filter(tripOnServiceDate ->
-                                days.contains(tripOnServiceDate.getServiceDate())
-                        );
-                    }
+                    stream = stream.filter(tripOnServiceDate ->
+                            days.contains(tripOnServiceDate.getServiceDate())
+                    );
 
                     if (alterations != null && !alterations.isEmpty()) {
                         stream = stream.filter(tripOnServiceDate ->
