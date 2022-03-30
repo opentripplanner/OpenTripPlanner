@@ -163,16 +163,15 @@ public class SpeedTest {
     }
 
     private boolean runSingleTestCase(TestCase testCase, boolean ignoreResults) {
-        if (!ignoreResults) {
-            System.err.println(ResultPrinter.headerLine("Run test-case " + testCase.id()));
-        }
-        final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, config, routeProfile, getTimeZoneId());
-
         try {
-            // Perform routing
-            RoutingRequest routingRequest = request.toRoutingRequest();
+            if (!ignoreResults) {
+                System.err.println(ResultPrinter.headerLine("Run test-case " + testCase.id()));
+            }
 
-            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId(), request.tags());
+            var speedTestRequest = new SpeedTestRequest(testCase, opts, config, routeProfile, getTimeZoneId());
+            var routingRequest = speedTestRequest.toRoutingRequest();
+
+            var worker = new RoutingWorker(this.router, routingRequest, getTimeZoneId(), speedTestRequest.tags());
             RoutingResponse routingResponse = worker.route();
 
             var times = routingResponse.getDebugTimingAggregator().finishedRendering();
