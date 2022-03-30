@@ -19,38 +19,58 @@ public final class DiffTool {
     public boolean isEqual() { return stream().allMatch(Entry::isEqual); }
   }
 
-  public static class Entry<T> {
-    public final T left;
-    public final T right;
+  public record Entry<T>(T left, T right) {
 
-    private Entry(T left, T right) {
-      this.left = left;
-      this.right = right;
+    static <T> Entry<T> ofLeft(T left) {
+      return new Entry<T>(left, null);
+    }
+
+    static <T> Entry<T> ofRight(T right) {
+      return new Entry<T>(null, right);
+    }
+
+    static <T> Entry<T> ofEqual(T left, T right) {
+      return new Entry<T>(left, right);
     }
 
     /**
      * Return the left instance if it exist, if not return the right instance.
      * If both exist(left equals right) then left is returned.
      */
-    public T element() { return rightOnly() ? right : left; }
+    public T element() {
+      return rightOnly() ? right : left;
+    }
 
     /* The element exist in the left collection, not in the right. */
-    public boolean leftOnly() { return right == null; }
+    public boolean leftOnly() {
+      return right == null;
+    }
 
     /* The element exist in the right collection, not in the left. */
-    public boolean rightOnly() { return left == null; }
+    public boolean rightOnly() {
+      return left == null;
+    }
 
     /* The element exist in both collections. Element left equals the right instance. */
-    public boolean isEqual() { return left != null && right != null; }
+    public boolean isEqual() {
+      return left != null && right != null;
+    }
 
     /**
-     *  Return a status message based on the element existence:
-     *  - exist in left and right collection
-     *  - exist left only
-     *  - or, exist right only
+     * Return a status message based on the element existence:
+     * - exist in left and right collection
+     * - exist left only
+     * - or, exist right only
      */
     public String status(String equal, String left, String right) {
       return leftOnly() ? left : (rightOnly() ? right : equal);
+    }
+
+    @Override
+    public String toString() {
+      if (isEqual()) return "(eq: " + element() + ")";
+      if (leftOnly()) return "(left: " + left + ")";
+      return "(right: " + right + ")";
     }
   }
 
@@ -67,32 +87,38 @@ public final class DiffTool {
   ) {
     Diff<T> result = new Diff<>();
 
-    Iterator<T> iLeft = left.stream().sorted(comparator).iterator();
-    Iterator<T> iRight = right.stream().sorted(comparator).iterator();
-    T l = next(iLeft);
-    T r = next(iRight);
+    Iterator<T> leftIterator = left.stream().sorted(comparator).iterator();
+    Iterator<T> rightIterator = right.stream().sorted(comparator).iterator();
+
+    T l = next(leftIterator);
+    T r = next(rightIterator);
 
     while (l != null && r != null) {
       int c = comparator.compare(l, r);
       if(c < 0) {
-        result.add(new Entry<>(l, null));
-        l = next(iLeft);
+        result.add(Entry.ofLeft(l));
+        l = next(leftIterator);
       }
       else if(c > 0) {
-        result.add(new Entry<>(null, r));
-        r = next(iRight);
+        result.add(Entry.ofRight(r));
+        r = next(rightIterator);
       }
       // c == 0
       else {
-        result.add(new Entry<>(l, r));
-        l = next(iLeft);
-        r = next(iRight);
+        result.add(Entry.ofEqual(l, r));
+        l = next(leftIterator);
+        r = next(rightIterator);
       }
     }
-    while (iLeft.hasNext()) { result.add(new Entry<>(iLeft.next(), null)); }
-    while (iRight.hasNext()) { result.add(new Entry<>(null, iRight.next())); }
 
-    result.sort((o1, o2) -> -comparator.compare(o1.element(), o2.element()));
+    while (l != null) {
+      result.add(Entry.ofLeft(l));
+      l = next(leftIterator);
+    }
+    while (r != null) {
+      result.add(Entry.ofRight(r));
+      r = next(rightIterator);
+    }
 
     return result;
   }

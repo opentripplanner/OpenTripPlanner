@@ -45,7 +45,9 @@ public class DebugOutput {
     public final TransitTimingOutput transitRouterTimes;
 
     public DebugOutput(
-        long precalculationTime, long directStreetRouterTime, long transitRouterTime,
+        long precalculationTime,
+        long directStreetRouterTime,
+        long transitRouterTime,
         long filteringTime, long renderingTime, long totalTime,
         TransitTimingOutput transitRouterTimes
     ) {

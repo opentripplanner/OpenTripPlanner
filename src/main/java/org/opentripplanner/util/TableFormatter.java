@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -71,6 +72,45 @@ public class TableFormatter {
             int width = Math.max(this.headers.get(i).length(), widths[i]);
             this.widths.add(width);
         }
+    }
+
+
+    /**
+     * This static method take a table as input and format each row in equally wide columns. It is
+     * a simpler alternative to the {@link TableFormatter} class.
+     * <p>
+     * It formats each row with identical width using the maximum width of all elements in that column:
+     * <pre>
+     * Input:
+     * [
+     *   ["A", "B", "Total"],
+     *   ["100", "2", "102"]
+     * ]
+     * Result (leftJustify=false, colSep=" | "):
+     * [
+     *   "  A | B | Total",
+     *   "100 | 2 |   102"
+     * ]
+     * </pre>
+     * All columns are left or right justified, depending on the given {@code leftJustify} input variable.
+     */
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    public static List<String> formatTableAsTextLines(List<List<?>> table, String colSep, boolean leftJustify) {
+        final int nColumns = table.get(0).size();
+        var buf = table.stream().map(i -> new StringBuilder()).toList();
+
+        for(int i=0; i< nColumns; ++i) {
+            final int columnIndex = i;
+            var col = table.stream().map(r -> r.get(columnIndex)).map(Object::toString).toList();
+            var width = col.stream().mapToInt(String::length).max().getAsInt();
+            var f = (leftJustify ? "%-" : "%") + width + "s";
+
+            for(int j=0; j< buf.size(); ++j) {
+                if(i>0) { buf.get(j).append(colSep); }
+                buf.get(j).append(f.formatted(col.get(j)));
+            }
+        }
+        return buf.stream().map(Objects::toString).toList();
     }
 
     public String printHeader() {

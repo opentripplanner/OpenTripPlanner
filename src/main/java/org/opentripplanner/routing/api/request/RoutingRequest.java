@@ -265,14 +265,30 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /** Whether the planner should return intermediate stops lists for transit legs. */
     public boolean showIntermediateStops = false;
 
-    /** max walk/bike speed along streets, in meters per second */
-    public double walkSpeed;
+    /**
+     * Human walk speed along streets, in meters per second.
+     *
+     * Default: 1.33 m/s ~ 3mph, <a href="http://en.wikipedia.org/wiki/Walking">avg. human walk speed</a>
+     */
+    public double walkSpeed = 1.33;
 
-    public double bikeSpeed;
+    /**
+     * Default: 5 m/s, ~11 mph, a random bicycling speed
+     */
+    public double bikeSpeed = 5;
 
-    public double bikeWalkingSpeed;
+    /**
+     * Default: 1.33 m/s ~ Same as walkSpeed
+     */
+    public double bikeWalkingSpeed = 1.33;
 
-    public double carSpeed;
+    /**
+     * Max car speed along streets, in meters per second.
+     *
+     * Default: 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide.
+     */
+    public double carSpeed = 40.0;
+
 
     public Locale locale = new Locale("en", "US");
 
@@ -741,21 +757,25 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     /**
      * Raptor can print all events when arriving at stops to system error. For developers only.
      */
-    public DebugRaptor raptorDebuging = null;
+    public DebugRaptor raptorDebugging = new DebugRaptor();
+
+
+    /**
+     * Set of options to use with Raptor. These are available here for testing purposes.
+     */
+    public RaptorOptions raptorOptions = new RaptorOptions();
+
+    /**
+     * List of OTP request tags, these are used to cross-cutting concerns like logging and
+     * micrometer tags. Currently, all tags are added to all the timer instances for this request.
+     */
+    public Tags tags = Tags.of();
 
 
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */
     public RoutingRequest() {
-        // http://en.wikipedia.org/wiki/Walking
-        walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
-        bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
-        bikeWalkingSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
-        // http://en.wikipedia.org/wiki/Speed_limit
-        carSpeed = 40; // 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide
-        // Default to walk for access/egress/direct modes and all transit modes
-
         // So that they are never null.
         from = new GenericLocation(null, null);
         to = new GenericLocation(null, null);
@@ -1194,6 +1214,9 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
             clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
 
+            clone.raptorOptions = new RaptorOptions(this.raptorOptions);
+            clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
+
             return clone;
         } catch (CloneNotSupportedException e) {
             /* this will never happen since our super is the cloneable object */
@@ -1285,16 +1308,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * The road speed for a specific traverse mode.
      */
     public double getSpeed(TraverseMode mode, boolean walkingBike) {
-        switch (mode) {
-        case WALK:
-            return walkingBike ? bikeWalkingSpeed : walkSpeed;
-        case BICYCLE:
-            return bikeSpeed;
-        case CAR:
-            return carSpeed;
-        default:
-            throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
-        }
+        return switch (mode) {
+            case WALK -> walkingBike ? bikeWalkingSpeed : walkSpeed;
+            case BICYCLE -> bikeSpeed;
+            case CAR -> carSpeed;
+            default -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
+        };
     }
 
     /** @return The highest speed for all possible road-modes. */

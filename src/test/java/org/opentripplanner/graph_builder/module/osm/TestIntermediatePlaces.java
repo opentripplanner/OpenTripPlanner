@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import io.micrometer.core.instrument.Metrics;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -53,7 +54,7 @@ public class TestIntermediatePlaces {
             FakeGraph.addPerpendicularRoutes(graph);
             FakeGraph.link(graph);
             graph.index();
-            Router router = new Router(graph, RouterConfig.DEFAULT);
+            Router router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
             router.startup();
             TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
             timeZone = graph.getTimeZone();

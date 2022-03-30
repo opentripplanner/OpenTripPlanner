@@ -2,6 +2,7 @@ package org.opentripplanner.standalone;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import io.micrometer.core.instrument.Metrics;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -163,7 +164,7 @@ public class OTPMain {
         // publishing the config version info make it available to the APIs
         app.setOtpConfigVersionsOnServerInfo();
 
-        Router router = new Router(graph, app.config().routerConfig());
+        Router router = new Router(graph, app.config().routerConfig(), Metrics.globalRegistry);
         router.startup();
 
         /* Start visualizer if requested. */

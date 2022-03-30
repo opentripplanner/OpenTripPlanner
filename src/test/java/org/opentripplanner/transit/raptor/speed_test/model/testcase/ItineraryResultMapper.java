@@ -1,12 +1,22 @@
-package org.opentripplanner.transit.raptor.speed_test.testcase;
+package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
-import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
-import org.opentripplanner.transit.raptor.speed_test.model.Leg;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.plan.Itinerary;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary
@@ -61,30 +71,70 @@ class ItineraryResultMapper {
         this.testCaseId = testCaseId;
     }
 
-    static Collection<Result> map(final String testCaseId, Collection<Itinerary> itineraries, boolean skipCost) {
+    static Collection<Result> map(final String testCaseId, Collection<org.opentripplanner.model.plan.Itinerary> itineraries, boolean skipCost) {
         var mapper = new ItineraryResultMapper(skipCost, testCaseId);
         return itineraries.stream().map(mapper::map).collect(Collectors.toList());
     }
 
     private Result map(Itinerary itinerary) {
-        Result result = new Result(
-                testCaseId,
-                itinerary.transfers,
-                itinerary.duration,
-                (int)itinerary.weight,
-                itinerary.walkDistance.intValue(),
-                itinerary.startTime,
-                itinerary.endTime,
-                itinerary.details()
-        );
+        List<String> agencies = new ArrayList<>();
+        List<String> routes = new ArrayList<>();
+        Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
+        List<String> stops = new ArrayList<>();
 
         for (Leg it : itinerary.legs) {
             if (it.isTransitLeg()) {
-                result.agencies.add(AGENCY_NAMES_SHORT.getOrDefault(it.agencyName, it.agencyName));
-                result.modes.add(it.mode);
-                result.routes.add(it.routeShortName);
+                agencies.add(agencyShortName(it.getAgency()));
+                routes.add(it.getRoute().getName());
+                modes.add(it.getMode());
+            }
+            if(it.getTo().stop != null) {
+                stops.add(it.getTo().stop.getId().toString());
             }
         }
-        return result;
+
+        return new Result(
+                testCaseId,
+                itinerary.nTransfers,
+                itinerary.durationSeconds,
+                itinerary.generalizedCost,
+                itinerary.legs.stream().filter(Leg::isWalkingLeg).mapToInt(l -> (int)Math.round(l.getDistanceMeters())).sum(),
+                TimeUtils.localTime(itinerary.startTime()).toSecondOfDay(),
+                TimeUtils.localTime(itinerary.endTime()).toSecondOfDay(),
+                agencies,
+                modes,
+                routes,
+                stops,
+                details(itinerary)
+        );
+    }
+
+    public static String details(Itinerary itin) {
+        PathStringBuilder buf = new PathStringBuilder(Integer::toString, true);
+
+        for (Leg leg : itin.legs) {
+
+            Optional.ofNullable(leg.getFrom().stop).map(ItineraryResultMapper::formatStop).map(id -> buf.sep().stop(id).sep());
+
+            if(leg.isWalkingLeg()) {
+                buf.walk((int) leg.getDuration());
+            }
+            else if(leg.isTransitLeg()) {
+                buf.transit(
+                        leg.getMode().name() + " " + leg.getRoute().getShortName(),
+                        TimeUtils.localTime(leg.getStartTime()).toSecondOfDay(),
+                        TimeUtils.localTime(leg.getEndTime()).toSecondOfDay());
+            }
+        }
+        return buf.toString();
+    }
+
+    private static String formatStop(StopLocation s) {
+        return s.getName() + "(" + s.getId().getId() + ")";
+    }
+
+
+    private static String agencyShortName(Agency agency) {
+        return AGENCY_NAMES_SHORT.getOrDefault(agency.getName(), agency.getName());
     }
 }

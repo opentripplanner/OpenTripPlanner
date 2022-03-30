@@ -1,7 +1,7 @@
-package org.opentripplanner.transit.raptor.speed_test.testcase;
+package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.util.DiffTool;
-import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,19 +19,31 @@ import java.util.List;
  */
 class TestCaseResults {
     private final String testCaseId;
-    private final List<DiffTool.Entry<Result>> matchedResults = new ArrayList<>();
-    private final List<Result> expected = new ArrayList<>();
-    private final List<Result> actual = new ArrayList<>();
-    private TestStatus status = TestStatus.NA;
     private final boolean skipCost;
+    private final List<Result> expected;
+    private final List<Result> actual = new ArrayList<>();
+    private final List<DiffTool.Entry<Result>> matchedResults = new ArrayList<>();
+    private TestStatus status = TestStatus.NA;
+    private int transitTimeMs = 0;
+    private int totalTimeMs = 0;
 
-    TestCaseResults(String testCaseId, boolean skipCost) {
+    TestCaseResults(String testCaseId, boolean skipCost, Collection<Result> expected) {
         this.testCaseId = testCaseId;
         this.skipCost  = skipCost;
+        this.expected = List.copyOf(expected);
     }
 
-    void addExpectedResult(Result expectedResult) {
-        this.expected.add(expectedResult);
+    void addTimes(int transitTimeMs, int totalTimeMs) {
+        this.transitTimeMs = transitTimeMs;
+        this.totalTimeMs = totalTimeMs;
+    }
+
+    public int transitTimeMs() {
+        return transitTimeMs;
+    }
+
+    public int totalTimeMs() {
+        return totalTimeMs;
     }
 
     void matchItineraries(Collection<Itinerary> itineraries) {
@@ -60,7 +72,7 @@ class TestCaseResults {
     }
 
     /**
-     * No test results is found. This indicate that the test is not run or
+     * No test results is found. This indicates that the test is not run or
      * that the route had no itineraries.
      */
     public boolean noResults() {

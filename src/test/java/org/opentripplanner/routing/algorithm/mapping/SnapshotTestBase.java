@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.micrometer.core.instrument.Metrics;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -79,7 +80,7 @@ public abstract class SnapshotTestBase {
         if (router == null) {
             Graph graph = getGraph();
 
-            router = new Router(graph, RouterConfig.DEFAULT);
+            router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
             router.startup();
         }
 

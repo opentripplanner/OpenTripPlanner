@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.testcase;
+package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
 /**
  * The purpose of this exception is to signal that a testcase failed.
@@ -6,9 +6,5 @@ package org.opentripplanner.transit.raptor.speed_test.testcase;
 public class TestCaseFailedException extends RuntimeException {
     TestCaseFailedException() {
         super("Test assert errors");
-    }
-
-    public TestCaseFailedException(String message) {
-        super(message);
     }
 }

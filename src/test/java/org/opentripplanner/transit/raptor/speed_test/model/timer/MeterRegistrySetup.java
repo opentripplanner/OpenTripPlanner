@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test;
+package org.opentripplanner.transit.raptor.speed_test.model.timer;
 
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter.Id;
@@ -13,7 +13,7 @@ import io.micrometer.influx.InfluxMeterRegistry;
 import java.time.Duration;
 import java.util.Optional;
 
-public class RegistrySetup {
+class MeterRegistrySetup {
 
     public static final String influxPasswordEnvVariable = "PERFORMANCE_INFLUX_DB_PASSWORD";
 
@@ -61,11 +61,11 @@ public class RegistrySetup {
         return new CustomInfluxRegistry(influxConfig, Clock.SYSTEM);
     }
 
-    static Optional<MeterRegistry> getRegistry() {
+    public static Optional<MeterRegistry> getRegistry() {
         return influxPassword()
                 .map(password -> {
                     System.err.println("Selecting InfluxDB as metrics registry. Sending data at end of speed test.");
-                    return RegistrySetup.influxRegistry(password);
+                    return MeterRegistrySetup.influxRegistry(password);
                 });
     }
 

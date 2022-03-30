@@ -27,6 +27,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add support for SKIPPED stop time updates in SCHEDULED update handling [#3960](https://github.com/opentripplanner/OpenTripPlanner/pull/3960)
 - New Norwegian way properties profile  [#3728](https://github.com/opentripplanner/OpenTripPlanner/pull/3728)
 - Elevation handling improvements [#4033](https://github.com/opentripplanner/OpenTripPlanner/pull/4033)
+- NeTEx mapping of WheelchairBoarding from ServiceJourney to Trip [#4043](https://github.com/opentripplanner/OpenTripPlanner/pull/4043)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

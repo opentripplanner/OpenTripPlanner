@@ -93,16 +93,15 @@ public class TimeUtils {
         return negative ? -seconds : seconds;
     }
 
-    public static int parseHHMM(String hhmm, int defaultValue) {
-        String[] tokens = hhmm.split(":");
-        if(tokens.length != 2) {
+    /**
+     * Same as {@link #time(String)}, but returns default value if input is {@code null}, an empty string or
+     * only contains whitespace.
+     */
+    public static int time(String hhmmss, int defaultValue) {
+        if(hhmmss == null || hhmmss.isBlank()) {
             return defaultValue;
         }
-
-        int hh = Integer.parseInt(tokens[0]);
-        int mm = Integer.parseInt(tokens[1]);
-
-        return hm2time(hh, mm);
+        return time(hhmmss.trim());
     }
 
     /**
@@ -141,6 +140,10 @@ public class TimeUtils {
         return RelativeTime.from(time).toLongStr();
     }
 
+    public static String timeToStrLong(LocalTime time) {
+        return time.toString();
+    }
+
     public static Calendar midnightOf(Calendar time) {
         final Calendar midnight = (Calendar) time.clone();
         midnight.set(Calendar.HOUR, 0);
@@ -166,5 +169,13 @@ public class TimeUtils {
      */
     public static ZonedDateTime zonedDateTime(LocalDate date, int seconds, ZoneId zoneId) {
         return RelativeTime.ofSeconds(seconds).toZonedDateTime(date, zoneId);
+    }
+
+    public static ZonedDateTime zonedDateTime(Calendar time) {
+        return time.toInstant().atZone(time.getTimeZone().toZoneId());
+    }
+
+    public static LocalTime localTime(Calendar time) {
+        return zonedDateTime(time).toLocalTime();
     }
 }
