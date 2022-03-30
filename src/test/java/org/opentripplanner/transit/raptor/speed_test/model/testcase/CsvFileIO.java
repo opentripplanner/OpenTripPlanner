@@ -89,8 +89,8 @@ public class CsvFileIO {
                                 Double.parseDouble(csvReader.get("toLat")),
                                 Double.parseDouble(csvReader.get("toLon"))
                         ),
-                        asSortedList(split(csvReader.get("tags"))),
-                        new QualifiedModeSet(split(csvReader.get("modes"))).getRequestModes()
+                        asSortedList(toArray(csvReader.get("tags"))),
+                        new QualifiedModeSet(toArray(csvReader.get("modes"))).getRequestModes()
                 );
                 testCases.add(tc);
             }
@@ -193,31 +193,31 @@ public class CsvFileIO {
     }
 
     private boolean isCommentOrEmpty(String line) {
-        return line.startsWith("#") || line.matches("[\\s,;]*");
+        return line.startsWith("#") || line.matches("[\\s,;|]*");
     }
 
-    static String time2str(Integer timeOrDuration) {
+    private static String time2str(Integer timeOrDuration) {
         return TimeUtils.timeToStrLong(timeOrDuration);
     }
 
-    static Integer parseTime(String time) {
+    private static Integer parseTime(String time) {
         return TimeUtils.time(time, TestCase.NOT_SET);
     }
 
-    static Integer parseDuration(String timeOrDuration) {
+    private static Integer parseDuration(String timeOrDuration) {
         if(timeOrDuration.isBlank()) { return TestCase.NOT_SET; }
         return DurationUtils.durationInSeconds(timeOrDuration);
     }
 
-    static String[] split(String value) {
-        return value.split("[\s,;]");
+    private static String[] toArray(String value) {
+        return value.split(Pattern.quote(ARRAY_DELIMITER));
     }
 
-    static List<String> asSortedList(String[] values) {
+    private static List<String> asSortedList(String[] values) {
         return Arrays.stream(values).sorted().distinct().toList();
     }
 
-    static String col2Str(Collection<?> c) {
+    private static String col2Str(Collection<?> c) {
         return c.stream()
                 .map(Object::toString)
                 .peek(s -> {
@@ -229,13 +229,15 @@ public class CsvFileIO {
                 .collect(Collectors.joining(ARRAY_DELIMITER));
     }
 
-    static List<String> str2Col(String elements) {
+    private static List<String> str2Col(String elements) {
         return str2Col(elements, s -> s);
     }
 
-    static <T> List<T> str2Col(String elements, Function<String, T> mapFunction) {
+    private static <T> List<T> str2Col(String elements, Function<String, T> mapFunction) {
         if(elements == null || elements.isBlank()) { return List.of(); }
-        return Arrays.stream(elements.split(Pattern.quote(ARRAY_DELIMITER))).map(mapFunction).collect(Collectors.toList());
+
+        return Arrays.stream(toArray(elements))
+            .map(mapFunction).collect(Collectors.toList());
     }
 
     private static void write(PrintWriter out, String value) {
@@ -247,5 +249,4 @@ public class CsvFileIO {
         out.print(value);
         out.print(CSV_DELIMITER);
     }
-
 }
