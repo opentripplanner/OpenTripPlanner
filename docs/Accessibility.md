@@ -40,17 +40,56 @@ The possible values of `evaluation` are:
 - `KNOWN_INFORMATION_ONLY` (default)
 - `ALLOW_UNKNOWN_INFORMATION`
 
+### Costs
+
+If you configure `evaluation` to `ALLOW_UNKNOWN_INFORMATION`, request a trip with `wheelchair=true`
+and this uses a trip or stop whose accessibility is not set to `POSSIBLE` an extra cost is added to
+the route instead of the possibility being completely excluded.
+
+Those costs can be configured as follows in `router-config.json`:
+
+```json
+{
+  "routingDefaults": {},
+  "accessibility": {
+    "evaluation": "ALLOW_UNKNOWN_INFORMATION",
+    "unknownStopAccessibilityCost": 600,
+    "inaccessibleStopCost": 3600,
+    "unknownTripAccessibilityCost": 1200,
+    "inaccessibleTripCost": 3600
+  },
+  "updaters": []
+}
+```
+
+The parameters mean the following:
+
+| name                           |                                                                |
+|--------------------------------|----------------------------------------------------------------|
+| `unknownStopAccessibilityCost` | The cost to add if a stop has unknown wheelchair-accessibility |
+| `inaccessibleStopCost`         | The cost to add if a stop is known to be inaccessible          |
+| `unknownTripAccessibilityCost` | The cost to add if a trip has unknown wheelchair accessibility |
+| `inaccessibleTripCost`         | The cost to add id a trip is known to be inaccessible          |
+
 ## Accessible transfers
 
-By default OTP only pre-calculates transfers between stops for able-bodied walkers. If they have
-no obstacles wheelchair users can use them, too, but there won't be guaranteed to be one.
+By default OTP only pre-calculates transfers between stops for able-bodied walkers. If they have no
+obstacles wheelchair users can use them, too, but there won't be guaranteed to be one.
 
 If you want OTP to also pre-generate wheelchair-accessible transfers use the following configuration
 in `build-settings.json`:
 
 ```json
 {
-  "transferRequests": [ { "modes": "WALK" }, { "modes": "WALK", "wheelchair": true } ]
+  "transferRequests": [
+    {
+      "modes": "WALK"
+    },
+    {
+      "modes": "WALK",
+      "wheelchair": true
+    }
+  ]
 }
 ```
 

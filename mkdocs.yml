@@ -5,7 +5,7 @@
 
 site_name: OpenTripPlanner 2
 site_url: http://docs.opentripplanner.org
-repo_url: http://github.com/opentripplanner/OpenTripPlanner
+repo_url: https://github.com/opentripplanner/OpenTripPlanner
 docs_dir: docs
 site_dir: target/mkdocs
 
@@ -30,6 +30,7 @@ pages:
         - Introduction: 'Configuration.md'
         - Build: 'BuildConfiguration.md'
         - Router: 'RouterConfiguration.md'
+        - Accessibility: 'Accessibility.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
