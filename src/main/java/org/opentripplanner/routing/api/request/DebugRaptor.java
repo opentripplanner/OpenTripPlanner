@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.api.request;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,10 @@ import org.slf4j.LoggerFactory;
  *     research.
  * </ol>
  */
-public class DebugRaptor {
+public class DebugRaptor implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(DebugRaptor.class);
     private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("(\\d+)\\*");
@@ -45,11 +48,26 @@ public class DebugRaptor {
     private List<Integer> path = List.of();
     private int debugPathFromStopIndex = 0;
 
+
+    public DebugRaptor() { }
+
+    /** Avoid using clone(), use copy-constructor instead(Josh Bloch). */
+    public DebugRaptor(DebugRaptor other) {
+        this.stops = List.copyOf(other.stops);
+        this.path = List.copyOf(other.path);
+        this.debugPathFromStopIndex = other.debugPathFromStopIndex;
+    }
+
+    public boolean isEnabled() {
+        return !stops.isEmpty() || !path.isEmpty();
+    }
+
     public List<Integer> stops() {
         return stops;
     }
 
     public DebugRaptor withStops(String stops) {
+        if(stops == null) { return this; }
         this.stops = split(stops);
         return this;
     }
@@ -59,6 +77,8 @@ public class DebugRaptor {
     }
 
     public DebugRaptor withPath(String path) {
+        if(path == null) { return this; }
+
         this.path = split(path);
         this.debugPathFromStopIndex = firstStopIndexToDebug(this.path, path);
         return this;
@@ -73,8 +93,7 @@ public class DebugRaptor {
             if(stops == null) { return List.of(); }
 
             return Arrays.stream(stops.split("[\\s,;_*]+"))
-                    .map(Integer::parseInt)
-                    .collect(Collectors.toUnmodifiableList());
+                    .map(Integer::parseInt).toList();
         }
         catch (NumberFormatException e) {
             LOG.error(e.getMessage(), e);

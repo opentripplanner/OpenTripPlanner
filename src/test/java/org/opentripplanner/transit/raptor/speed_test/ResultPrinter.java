@@ -1,23 +1,16 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Meter.Type;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.config.NamingConvention;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseFailedException;
-
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
+import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseFailedException;
+import org.opentripplanner.util.TableFormatter;
+import org.opentripplanner.util.time.DurationUtils;
+
+import static org.opentripplanner.util.time.DurationUtils.msToSecondsStr;
 
 
 /**
@@ -26,47 +19,27 @@ import java.util.Map;
  *
 
  * <pre>
- *       METHOD CALLS DURATION |              SUCCESS               |         FAILURE
- *                             |  Min   Max  Avg     Count   Total  | Average  Count   Total
- *       AvgTimer:main t1      | 1345  3715 2592 ms     50  129,6 s | 2843 ms      5   14,2 s
- *       AvgTimer:main t2      |   45   699  388 ms     55   21,4 s |    0 ms      0    0,0 s
- *       AvgTimer:main t3      |    4   692  375 ms    110   41,3 s |    0 ms      0    0,0 s
+ *       METHOD CALLS DURATION |
+ *                             |  Min   Max  Avg     Count   Total
+ *       AvgTimer:main t1      | 1345  3715 2592 ms     50  129,6 s
+ *       AvgTimer:main t2      |   45   699  388 ms     55   21,4 s
+ *       AvgTimer:main t3      |    4   692  375 ms    110   41,3 s
  * </pre>
  */
 class ResultPrinter {
     private static final String RESULT_TABLE_TITLE = "METHOD CALLS DURATION";
 
-    private static final NamingConvention NAMING_CONVENTION = new NamingConvention() {
-        @Override
-        public String name(String name, Type type, String unit) {
-            return Arrays.stream(name.split("\\."))
-                    .filter(Objects::nonNull)
-                    .map(this::capitalize)
-                    .collect(Collectors.joining(" "));
-        }
-
-        private String capitalize(String name) {
-            if (name.length() != 0 && !Character.isUpperCase(name.charAt(0))) {
-                char[] chars = name.toCharArray();
-                chars[0] = Character.toUpperCase(chars[0]);
-                return new String(chars);
-            } else {
-                return name;
-            }
-        }
-    };
-
     private ResultPrinter() { }
 
-    static void printResultOk(TestCase testCase, RaptorRequest<?> request, long lapTime, boolean printItineraries) {
-        printResult("SUCCESS", request, testCase, lapTime, printItineraries, "");
+    static void printResultOk(TestCase testCase, boolean printItineraries) {
+        printResult("SUCCESS", testCase, printItineraries, "");
     }
 
-    static void printResultFailed(TestCase testCase, RaptorRequest<?> request, long lapTime, Exception e) {
+    static void printResultFailed(TestCase testCase, Exception e) {
         boolean testError = e instanceof TestCaseFailedException;
         String errorDetails = " - " + e.getMessage() + (testError ? "" : "  (" + e.getClass().getSimpleName() + ")");
 
-        printResult("FAILED", request, testCase, lapTime,true, errorDetails);
+        printResult("FAILED", testCase, true, errorDetails);
 
         if(!testError) {
             e.printStackTrace();
@@ -75,28 +48,41 @@ class ResultPrinter {
 
     static void logSingleTestResult(
             SpeedTestProfile profile,
-            List<Integer> numOfPathsFound,
+            List<TestCase> testCases,
             int sample,
             int nSamples,
             int nSuccess,
-            int tcSize,
-            double totalTimeInSeconds,
-            MeterRegistry registry
+            SpeedTestTimer timer
     ) {
+        int tcSize = testCases.size();
+        String totalTimeSec = msToSecondsStr(testCases.stream().mapToInt(TestCase::totalTimeMs).sum());
+        var summary = TableFormatter.formatTableAsTextLines(
+                List.of(
+                        testCases.stream().map(TestCase::id).toList(),
+                        testCases.stream().map(TestCase::numberOfResults).toList(),
+                        testCases.stream().map(TestCase::transitTimeMs).toList(),
+                        testCases.stream().map(TestCase::totalTimeMs).toList()
+                ),
+                " ",
+                false
+        );
         System.err.println(
-                "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ SUMMARY " + profile + " ]" +
-                "\n" + String.join("\n", listResults(registry)) +
+                "\n" + headerLine("SUMMARY " + profile) +
+                "\n" + String.join("\n", listResults(timer)) +
                 "\n" +
-                logLine("Paths found", "%d %s", numOfPathsFound.stream().mapToInt((it) -> it).sum(), numOfPathsFound) +
+                logLine("Test case ids", "[%s]", summary.get(0)) +
+                logLine("Number of paths", "[%s]", summary.get(1)) +
+                logLine("Transit times(ms)", "[%s]", summary.get(2)) +
+                logLine("Total times(ms)", "[%s]", summary.get(3)) +
                 logLine("Successful searches", "%d / %d", nSuccess, tcSize) +
-                logLine(nSamples > 1, "Sample", "%d / %d",  sample ,nSamples) +
-                logLine("Time total", "%.2f seconds",  totalTimeInSeconds) +
+                logLine(nSamples > 1, "Sample", "%d / %d", sample, nSamples) +
+                logLine("Time total", "%s", totalTimeSec) +
                 logLine(nSuccess != tcSize, "!!! UNEXPECTED RESULTS", "%d OF %d FAILED. SEE LOG ABOVE FOR ERRORS !!!", tcSize - nSuccess, tcSize)
         );
     }
 
     static void logSingleTestHeader(SpeedTestProfile profile) {
-        System.err.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ START " + profile + " ]");
+        System.err.println("\n" + headerLine("START " + profile));
     }
 
     static void printProfileResults(String header, SpeedTestProfile[] profiles, Map<SpeedTestProfile, List<Integer>> result) {
@@ -111,65 +97,58 @@ class ResultPrinter {
         }
     }
 
+    public static String headerLine(String label) {
+        // Make a header width is 100
+        int prefixLen = (100 - label.length() - 4);
+        var buf = new StringBuilder(100);
+        buf.append("- ".repeat(prefixLen/2));
+        if(label.length() % 2 == 1) { buf.append(' '); }
+        return buf.append("[ ").append(label).append(" ]").toString();
+    }
+
     private static void printResult(
             String status,
-            RaptorRequest<?> request,
             TestCase tc,
-            long lapTime,
             boolean printItineraries,
             String errorDetails
     ) {
         if(printItineraries || !tc.success()) {
             System.err.printf(
-                    "SpeedTest %-7s  %4d ms  %-66s %s %n",
+                    "TC %-4s %-7s  %4d ms  %-66s %s %n",
+                    tc.id(),
                     status,
-                    lapTime,
-                    toString(tc, request),
+                    tc.totalTimeMs(),
+                    tc,
                     errorDetails
             );
             tc.printResults();
         }
     }
 
-    private static String toString(TestCase tc, RaptorRequest<?> request) {
-        if(request == null) { return tc.toString(); }
-        SearchParams r = request.searchParams();
-        return tc.toString(r.earliestDepartureTime(), r.latestArrivalTime(), r.searchWindowInSeconds());
-    }
+    private static List<String> listResults(SpeedTestTimer timer) {
+        var times = timer.getResults();
 
-    private static List<String> listResults(MeterRegistry registry) {
-        final int width = Math.max(
-                RESULT_TABLE_TITLE.length(),
-                registry.getMeters()
-                        .stream()
-                        .mapToInt(it -> it.getId().getConventionName(NAMING_CONVENTION).length())
-                        .max()
-                        .orElse(0)
-        );
-        final List<String> result = new ArrayList<>();
-        result.add(header1(width));
-        result.add(header2(width));
-        for (Meter meter : registry.getMeters()) {
-            if(meter instanceof Timer
-                && ((Timer) meter).count() > 0
-                && !"false".equals(meter.getId().getTag("success"))
-            ) {
-                Timer failureTimer = registry.timer(
-                        meter.getId().getName(),
-                        Tags.of("success", "false")
-                );
-                result.add(timerToString((Timer) meter, failureTimer, width));
-            }
+
+        int namesMaxLen = times.stream().map(SpeedTestTimer.Result::name).mapToInt(String::length).max().orElse(0);
+        final int width = Math.max(RESULT_TABLE_TITLE.length(), namesMaxLen);
+        final List<String> resultTable = new ArrayList<>();
+        resultTable.add(header1(width));
+        resultTable.add(header2(width));
+
+        var results = new ArrayList<String>();
+        for (SpeedTestTimer.Result t : times) {
+            results.add(timerToString(t, width));
         }
-        return result;
+
+        resultTable.addAll(results.stream().sorted().toList());
+        return resultTable;
     }
 
     private static String header1(int width) {
         return formatLine(
                 RESULT_TABLE_TITLE,
                 width,
-                "             SUCCESS",
-                "        FAILURE"
+                ""
         );
     }
 
@@ -177,38 +156,27 @@ class ResultPrinter {
         return formatLine(
                 "",
                 width,
-                columnHeaderAvg(), columnFailureHeader()
+                columnHeaderAvg()
         );
     }
 
-    private static String timerToString(Timer successTimer, Timer failureTimer, int width) {
+    private static String timerToString(SpeedTestTimer.Result r, int width) {
         return formatLine(
-                successTimer.getId().getConventionName(NAMING_CONVENTION),
+                r.name(),
                 width,
-                formatResultAvg(successTimer),
-                formatResult(failureTimer)
+                formatResultOk(r)
         );
     }
 
-    private static String formatResultAvg(Timer timer) {
+    private static String formatResultOk(SpeedTestTimer.Result r) {
         return String.format(
                 "%4s %5s %4s %s %6s %6.1f s",
-                str((long) timer.percentile(0.01, TimeUnit.MILLISECONDS)),
-                str((long) timer.max(TimeUnit.MILLISECONDS)),
-                str((long) timer.mean(TimeUnit.MILLISECONDS)),
+                str(r.min()),
+                str(r.mean()),
+                str(r.max()),
                 "ms",
-                str(timer.count()),
-                timer.totalTime(TimeUnit.SECONDS)
-        );
-    }
-
-    private static String formatResult(Timer timer) {
-        return String.format(
-                "%4d %s %6d %6.1f s",
-                (long) timer.mean(TimeUnit.MILLISECONDS),
-                "ms",
-                timer.count(),
-                timer.totalTime(TimeUnit.SECONDS)
+                str(r.count()),
+                r.totTime()/1000.0
         );
     }
 
@@ -216,16 +184,12 @@ class ResultPrinter {
         return value < 10_000 ? Long.toString(value) : (value/1000) + "'";
     }
 
-    private static String formatLine(String label, int labelWidth, String column1, String column2) {
-        return String.format("%-" + labelWidth + "s | %-35s| %-24s", label, column1, column2);
+    private static String formatLine(String label, int labelWidth, String column) {
+        return String.format("%-" + labelWidth + "s | %-35s", label, column);
     }
 
     private static String columnHeaderAvg() {
-        return " Min   Max  Avg     Count   Total";
-    }
-
-    private static String columnFailureHeader() {
-        return "Average  Count   Total";
+        return " Min   Avg  Max     Count   Total";
     }
 
     private static void printProfileResultLine(String label, List<Integer> v, int labelMaxLen) {

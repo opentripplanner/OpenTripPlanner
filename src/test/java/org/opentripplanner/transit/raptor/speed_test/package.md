@@ -1,6 +1,6 @@
 # SpeedTest
 
-This package contain the MANUAL SpeedTest used to performance tune the Raptor algorithm. Code
+This package contains the MANUAL SpeedTest used to performance tune the Raptor algorithm. Code
 inside this package should not be used outside this package.
 
 When changing the core logic of Raptor this test can be used to detect changes in the result and
@@ -11,12 +11,12 @@ documentation on this tool, hopefully with time, we will add more doc and maybe 
 this test.
 
 Example input files and setup is included in the resource test folder:
- - {@code /raptor/speedtest/norway}.
+ - {@code test/ci-performance-test/}.
 
 ## Running 
 
 ```
-mvn compiler:testCompile exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.arguments="--dir=src/test/resources/raptor/speedtest/norway"
+mvn compiler:testCompile exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/ci-performance-test/ -p md -n 4"
 ```
 
 ## CI

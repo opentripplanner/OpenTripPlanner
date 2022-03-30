@@ -41,4 +41,8 @@ public interface DebugLogger {
             debug(topic, String.format(format, args));
         }
     }
+
+    static DebugLogger noop() {
+        return (topic, message) -> {};
+    }
 }

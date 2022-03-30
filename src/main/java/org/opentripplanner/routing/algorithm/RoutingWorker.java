@@ -44,7 +44,7 @@ public class RoutingWorker {
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
     /** An object that accumulates profiling and debugging info for inclusion in the response. */
-    public final DebugTimingAggregator debugTimingAggregator = new DebugTimingAggregator();
+    public final DebugTimingAggregator debugTimingAggregator;
     public final PagingSearchWindowAdjuster pagingSearchWindowAdjuster;
 
     private final RoutingRequest request;
@@ -67,6 +67,7 @@ public class RoutingWorker {
         request.applyPageCursor();
         this.request = request;
         this.router = router;
+        this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, request.tags.getTimingTags());
         this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
         this.pagingSearchWindowAdjuster = createPagingSearchWindowAdjuster(router.routerConfig);
         this.additionalSearchDays = createAdditionalSearchDays(

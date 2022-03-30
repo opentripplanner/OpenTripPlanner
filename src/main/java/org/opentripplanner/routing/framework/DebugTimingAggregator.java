@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.api.resource.TransitTimingOutput;
@@ -21,32 +22,29 @@ public class DebugTimingAggregator {
   private static final Logger LOG = LoggerFactory.getLogger(DebugTimingAggregator.class);
 
   private static final long nanosToMillis = 1000000;
+  public static final String ROUTING_TOTAL = "routing.total";
+  public static final String ROUTING_RAPTOR = "routing.raptor";
 
-  private static final Clock clock = Clock.SYSTEM;
-  private static final MeterRegistry registry = Metrics.globalRegistry;
+  private final Clock clock;
 
-  private static final Timer directStreetRouterTimer = Timer.builder("routing.directStreet").register(registry);
-  private static final Timer directFlexRouterTimer =  Timer.builder("routing.directFlex").register(registry);
+  private final Timer directStreetRouterTimer;
+  private final Timer directFlexRouterTimer;
 
-  private static final Timer accessTimer = Timer.builder("routing.access").register(registry);
-  private static final Timer egressTimer = Timer.builder("routing.egress").register(registry);
-  private static final DistributionSummary numAccessesDistribution = DistributionSummary
-          .builder("routing.numAccess")
-          .register(registry);
-  private static final DistributionSummary numEgressesDistribution = DistributionSummary
-          .builder("routing.numEgress")
-          .register(registry);
+  private final Timer accessTimer;
+  private final Timer egressTimer;
+  private final DistributionSummary numAccessesDistribution;
+  private final DistributionSummary numEgressesDistribution;
 
-  private static final Timer preCalculationTimer = Timer.builder("routing.preCalculation").register(registry);
-  private static final Timer tripPatternFilterTimer = Timer.builder("routing.tripPatternFiltering").register(registry);
-  private static final Timer accessEgressTimer = Timer.builder("routing.accessEgress").register(registry);
-  private static final Timer raptorSearchTimer = Timer.builder("routing.raptor").register(registry);
-  private static final Timer itineraryCreationTimer = Timer.builder("routing.itineraryCreation").register(registry);
-  private static final Timer transitRouterTimer = Timer.builder("routing.transit").register(registry);
-  private static final Timer filteringTimer = Timer.builder("routing.filtering").register(registry);
-  private static final Timer renderingTimer = Timer.builder("routing.rendering").register(registry);
-  private static final Timer routingTotalTimer = Timer.builder("routing.router").register(registry);
-  private static final Timer requestTotalTimer = Timer.builder("routing.total").register(registry);
+  private final Timer preCalculationTimer;
+  private final Timer tripPatternFilterTimer;
+  private final Timer accessEgressTimer;
+  private final Timer raptorSearchTimer;
+  private final Timer itineraryCreationTimer;
+  private final Timer transitRouterTimer;
+  private final Timer filteringTimer;
+  private final Timer renderingTimer;
+  private final Timer routingTotalTimer;
+  private final Timer requestTotalTimer;
 
   private final Timer.Sample startedCalculating;
 
@@ -86,8 +84,33 @@ public class DebugTimingAggregator {
    * Record the time when we first began calculating a path for this request. Note that timings will not
    * include network and server request queue overhead, which is what we want.
    */
+  public DebugTimingAggregator(MeterRegistry registry, Collection<String> timingTags) {
+    var tags = MicrometerUtils.mapTimingTags(timingTags);
+    clock = registry.config().clock();
+    startedCalculating = Timer.start(this.clock);
+
+    requestTotalTimer = Timer.builder(ROUTING_TOTAL).tags(tags).register(registry);
+    routingTotalTimer = Timer.builder("routing.router").tags(tags).register(registry);
+    renderingTimer = Timer.builder("routing.rendering").tags(tags).register(registry);
+    filteringTimer = Timer.builder("routing.filtering").tags(tags).register(registry);
+    transitRouterTimer = Timer.builder("routing.transit").tags(tags).register(registry);
+    itineraryCreationTimer = Timer.builder("routing.itineraryCreation").tags(tags).register(registry);
+    raptorSearchTimer = Timer.builder(ROUTING_RAPTOR).tags(tags).register(registry);
+    accessEgressTimer = Timer.builder("routing.accessEgress").tags(tags).register(registry);
+    tripPatternFilterTimer = Timer.builder("routing.tripPatternFiltering").tags(tags).register(registry);
+    preCalculationTimer = Timer.builder("routing.preCalculation").tags(tags).register(registry);
+
+    numEgressesDistribution = DistributionSummary.builder("routing.numEgress").tags(tags).register(registry);
+    numAccessesDistribution = DistributionSummary.builder("routing.numAccess").tags(tags).register(registry);
+
+    egressTimer = Timer.builder("routing.egress").tags(tags).register(registry);
+    accessTimer = Timer.builder("routing.access").tags(tags).register(registry);
+    directFlexRouterTimer = Timer.builder("routing.directFlex").tags(tags).register(registry);
+    directStreetRouterTimer = Timer.builder("routing.directStreet").tags(tags).register(registry);
+  }
+
   public DebugTimingAggregator() {
-    startedCalculating = Timer.start(clock);
+    this(Metrics.globalRegistry, List.of());
   }
 
   /**
@@ -234,7 +257,7 @@ public class DebugTimingAggregator {
   }
 
   /** Summarize and calculate elapsed times. */
-  private DebugOutput getDebugOutput() {
+  public DebugOutput getDebugOutput() {
 
     return new DebugOutput(
         precalculationTime,

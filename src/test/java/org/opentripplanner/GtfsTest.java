@@ -3,6 +3,7 @@ package org.opentripplanner;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import io.micrometer.core.instrument.Metrics;
 import junit.framework.TestCase;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -70,7 +71,7 @@ public abstract class GtfsTest extends TestCase {
 
         alertsUpdateHandler = new AlertsUpdateHandler();
         graph = new Graph();
-        router = new Router(graph, RouterConfig.DEFAULT);
+        router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
 
         gtfsGraphBuilderImpl.buildGraph(graph, null);
         // Set the agency ID to be used for tests to the first one in the feed.
