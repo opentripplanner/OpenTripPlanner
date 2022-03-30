@@ -60,7 +60,7 @@ public class SpeedTestTimer {
                 Tag.of("measurement.environment", measurementEnv),
                 Tag.of("git.commit", projectInfo().versionControl.commit),
                 Tag.of("git.branch", projectInfo().versionControl.branch),
-                Tag.of("git.buildtime", projectInfo().versionControl.buildTime)
+                Tag.of("git.buildtime", projectInfo().versionControl.buildTime),
                 Tag.of("location", location)
         ));
 
