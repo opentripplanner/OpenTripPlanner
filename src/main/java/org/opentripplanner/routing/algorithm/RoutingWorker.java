@@ -67,7 +67,7 @@ public class RoutingWorker {
         request.applyPageCursor();
         this.request = request;
         request.accessibilityRequirements = router.routerConfig.accessibilityConfig()
-                .toRequirements(request.accessibilityRequirements);
+                .toRequirements(request.accessibilityRequirements.requestsWheelchair());
         this.router = router;
         this.debugTimingAggregator = new DebugTimingAggregator(router.meterRegistry, request.tags.getTimingTags());
         this.transitSearchTimeZero = DateMapper.asStartOfService(request.getDateTime(), zoneId);
