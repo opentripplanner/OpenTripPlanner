@@ -59,7 +59,7 @@ jobs:
       - name: Copy graph, run speed test
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
-          MEASUREMENT_ENVIRONMENT: test-tags
+          MEASUREMENT_ENVIRONMENT: CI
         run: |
           mv graph/graph.obj test/ci-performance-test/
           mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/ci-performance-test/ -p md -n 4 -i 3 -0"
