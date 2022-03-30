@@ -93,9 +93,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     final String reportType = "incident";
     ptSituation.setReportType(reportType);
-
-    final SeverityEnumeration severity = SeverityEnumeration.SEVERE;
-    ptSituation.setSeverity(severity);
+    ptSituation.setSeverity(SeverityEnumeration.SEVERE);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
     alertsUpdateHandler.update(serviceDelivery);
@@ -291,9 +289,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     final String reportType = "incident";
     ptSituation.setReportType(reportType);
-
-    final SeverityEnumeration severity = SeverityEnumeration.SEVERE;
-    ptSituation.setSeverity(severity);
+    ptSituation.setSeverity(SeverityEnumeration.SEVERE);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
     alertsUpdateHandler.update(serviceDelivery);
