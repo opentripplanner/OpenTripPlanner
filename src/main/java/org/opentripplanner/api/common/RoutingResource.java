@@ -929,9 +929,6 @@ public abstract class RoutingResource {
         if (ignoreRealtimeUpdates != null)
             request.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
 
-        if (disableRemainingWeightHeuristic != null)
-            request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
-
         if (disableAlertFiltering != null)
             request.disableAlertFiltering = disableAlertFiltering;
 

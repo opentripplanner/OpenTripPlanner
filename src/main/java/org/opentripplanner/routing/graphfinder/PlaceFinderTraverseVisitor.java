@@ -159,7 +159,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
    */
   public SkipEdgeStrategy getSkipEdgeStrategy() {
 
-    return (origin, target, current, edge, spt, traverseOptions) -> {
+    return (current, edge) -> {
 
       double furthestDistance = radiusMeters;
 

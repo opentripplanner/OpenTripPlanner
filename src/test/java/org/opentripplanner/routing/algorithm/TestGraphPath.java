@@ -8,6 +8,7 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcess
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -28,8 +29,6 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 public class TestGraphPath extends TestCase {
     
     private Graph graph;
-
-    private final AStar aStar = new AStar();
 
     public void setUp() throws Exception {
         GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
@@ -54,8 +53,8 @@ public class TestGraphPath extends TestCase {
 
         RoutingRequest options = new RoutingRequest();
         options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 0, 0, 0));
-        options.setRoutingContext(graph, stop_a.getLabel(), stop_e.getLabel());
-        spt = aStar.getShortestPathTree(options);
+        options.setRoutingContext(graph, stop_a, stop_e);
+        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         path = spt.getPath(stop_e); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);

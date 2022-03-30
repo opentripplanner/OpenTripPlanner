@@ -62,15 +62,6 @@ public class ShortestPathTree {
         return ret;
     }
 
-    /** @return a default set of back-optimized paths to the target vertex. */
-    public List<GraphPath> getPaths() {
-        List<GraphPath> graphPaths = new ArrayList<>();
-        for (Vertex vertex : options.getRoutingContext().toVertices) {
-            graphPaths.addAll(getPaths(vertex));
-        }
-        return graphPaths;
-    }
-
     /** @return a single optimal, optionally back-optimized path to the given vertex. */
     public GraphPath getPath(Vertex dest) {
         State s = getState(dest);

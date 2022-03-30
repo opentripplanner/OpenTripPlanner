@@ -13,6 +13,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
@@ -409,8 +410,6 @@ public abstract class GraphRoutingTest {
         request.setRoutingContext(graph, from, to);
         request.parkAndRide = true;
 
-        AStar aStar = new AStar();
-        ShortestPathTree tree = aStar.getShortestPathTree(request);
-        return tree.getPath(to);
+        return AStarBuilder.oneToOne().setRoutingRequest(request).getShortestPathTree().getPath(to);
     }
 }

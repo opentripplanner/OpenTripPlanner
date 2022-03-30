@@ -9,7 +9,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 import net.objecthunter.exp4j.tokenizer.UnknownFunctionOrVariableException;
 import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
 import org.opentripplanner.ext.dataoverlay.routing.Parameter;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdgeCostExtension;
 import org.slf4j.Logger;
@@ -47,12 +47,12 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
 
     @Override
     public double calculateExtraCost(
-            RoutingRequest options,
+            RoutingContext context,
             int edgeLength,
             TraverseMode traverseMode
     ) {
         if (traverseMode.isWalking() || traverseMode.isCycling()) {
-            return calculateDataOverlayPenalties(options) * edgeLength/1000;
+            return calculateDataOverlayPenalties(context) * edgeLength/1000;
         }
         return 0d;
     }
@@ -60,14 +60,13 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
     /**
      * Calculates the total penalties based on request parameters and overlay data
      *
-     * @param requestOptions request options
      * @return total penalty
      */
-    private double calculateDataOverlayPenalties(RoutingRequest requestOptions) {
+    private double calculateDataOverlayPenalties(RoutingContext routingContext) {
         if(variableValues == null) { return 0d; }
         double totalPenalty = 0d;
-        Instant requestInstant = requestOptions.getDateTime();
-        var context = requestOptions.getRoutingContext().dataOverlayContext;
+        Instant requestInstant = routingContext.opt.getDateTime();
+        var context = routingContext.dataOverlayContext;
 
         for (Parameter parameter : context.getParameters()) {
             var threshold = parameter.getThreshold();

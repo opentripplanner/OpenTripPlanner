@@ -49,14 +49,13 @@ public class State implements Cloneable {
      */
     public static Collection<State> getInitialStates(RoutingRequest request) {
         Collection<State> states = new ArrayList<>();
-        for (Vertex vertex : request.rctx.fromVertices) {
+        for (Vertex vertex : request.getRoutingContext().fromVertices) {
             /* carPickup searches may end in two distinct states: IN_CAR and WALK_FROM_DROP_OFF/WALK_TO_PICKUP
                for forward/reverse searches to be symmetric both initial states need to be created. */
             if (request.carPickup) {
                 states.add(
                     new State(
                     vertex,
-                    request.rctx.originBackEdge,
                     request.getDateTime().getEpochSecond(),
                     request,
                     true,
@@ -71,7 +70,6 @@ public class State implements Cloneable {
                 states.add(
                     new State(
                         vertex,
-                        request.rctx.originBackEdge,
                         request.getDateTime().getEpochSecond(),
                         request,
                         false,
@@ -83,7 +81,6 @@ public class State implements Cloneable {
                     states.add(
                             new State(
                                     vertex,
-                                    request.rctx.originBackEdge,
                                     request.getDateTime().getEpochSecond(),
                                     request,
                                     false,
@@ -93,20 +90,14 @@ public class State implements Cloneable {
                 }
             }
 
-            states.add(new State(
-                vertex,
-                request.rctx.originBackEdge,
-                request.getDateTime().getEpochSecond(),
-                request
-            ));
+            states.add(new State(vertex, request.getDateTime().getEpochSecond(), request));
         }
         return states;
     }
 
     public State(RoutingRequest opt) {
         this(
-                opt.rctx.fromVertices == null ? null : opt.rctx.fromVertices.iterator().next(),
-                opt.rctx.originBackEdge,
+                opt.getRoutingContext().fromVertices == null ? null : opt.getRoutingContext().fromVertices.iterator().next(),
                 opt.getDateTime().getEpochSecond(),
                 opt
         );
@@ -122,20 +113,11 @@ public class State implements Cloneable {
     }
 
     /**
-     * Create an initial state, forcing vertex and time to the specified values. Useful for reusing 
-     * a RoutingContext in TransitIndex, tests, etc.
-     */
-    public State(Vertex vertex, long timeSeconds, RoutingRequest options) {
-        // Since you explicitly specify, the vertex, we don't set the backEdge.
-        this(vertex, null, timeSeconds, options);
-    }
-    
-    /**
      * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing 
      * a RoutingContext in TransitIndex, tests, etc.
      */
-    public State(Vertex vertex, Edge backEdge, long timeSeconds, RoutingRequest options) {
-        this(vertex, backEdge, timeSeconds, timeSeconds, options, false, false, false);
+    public State(Vertex vertex, long timeSeconds, RoutingRequest options) {
+        this(vertex, timeSeconds, timeSeconds, options, false, false, false);
     }
 
     /**
@@ -144,13 +126,12 @@ public class State implements Cloneable {
      */
     public State(
         Vertex vertex,
-        Edge backEdge,
         long timeSeconds,
         RoutingRequest options,
         boolean carPickupStateInCar,
         boolean bikeRentalFloatingState,
         boolean keptRentedVehicleAtDestination) {
-        this(vertex, backEdge, timeSeconds, timeSeconds, options, carPickupStateInCar, bikeRentalFloatingState, keptRentedVehicleAtDestination);
+        this(vertex, timeSeconds, timeSeconds, options, carPickupStateInCar, bikeRentalFloatingState, keptRentedVehicleAtDestination);
     }
 
     /**
@@ -159,7 +140,6 @@ public class State implements Cloneable {
      */
     public State(
         Vertex vertex,
-        Edge backEdge,
         long timeSeconds,
         long startTime,
         RoutingRequest options,
@@ -169,12 +149,8 @@ public class State implements Cloneable {
     ) {
         this.weight = 0;
         this.vertex = vertex;
-        this.backEdge = backEdge;
         this.backState = null;
         this.stateData = new StateData(options);
-        // note that here we are breaking the circular reference between rctx and options
-        // this should be harmless since reversed clones are only used when routing has finished
-        this.stateData.opt = options;
         this.stateData.startTime = startTime;
         if (options.vehicleRental) {
             if (options.arriveBy) {
@@ -429,14 +405,14 @@ public class State implements Cloneable {
         return this;
     }
 
-    public RoutingContext getContext() {
-        return stateData.opt.rctx;
-    }
-
     public RoutingRequest getOptions () {
         return stateData.opt;
     }
-    
+
+    public RoutingContext getRoutingContext () {
+        return stateData.rctx;
+    }
+
     /**
      * This method is on State rather than RoutingRequest because we care whether the user is in
      * possession of a rented bike.
@@ -459,16 +435,6 @@ public class State implements Cloneable {
         newState.stateData.vehicleParked = stateData.vehicleParked;
         newState.stateData.carPickupState = stateData.carPickupState;
         return newState;
-    }
-
-    public void dumpPath() {
-        System.out.printf("---- FOLLOWING CHAIN OF STATES ----\n");
-        State s = this;
-        while (s != null) {
-            System.out.printf("%s via %s by %s\n", s, s.backEdge, s.getBackMode());
-            s = s.backState;
-        }
-        System.out.printf("---- END CHAIN OF STATES ----\n");
     }
 
     public long getTimeInMillis() {
@@ -598,13 +564,6 @@ public class State implements Cloneable {
         }
 
         return ret;
-    }
-
-    /**
-     * Reverse-optimize a path after it is complete, by default
-     */
-    public State optimize() {
-        return reverse();
     }
 
     public boolean hasEnteredNoThruTrafficArea() {

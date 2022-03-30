@@ -16,6 +16,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -50,8 +51,6 @@ import static org.junit.Assert.assertTrue;
 public class TestHalfEdges {
 
     Graph graph;
-
-    private final AStar aStar = new AStar();
 
     private StreetEdge top, bottom, left, right, leftBack, rightBack;
 
@@ -159,13 +158,13 @@ public class TestHalfEdges {
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.setDateTime(Instant.ofEpochSecond(startTime));
         options.setRoutingContext(graph, br, end);
-        ShortestPathTree spt1 = aStar.getShortestPathTree(options);
+        ShortestPathTree spt1 = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         GraphPath pathBr = spt1.getPath(end);
         assertNotNull("There must be a path from br to end", pathBr);
 
         options.setRoutingContext(graph, tr, end);
-        ShortestPathTree spt2 = aStar.getShortestPathTree(options);
+        ShortestPathTree spt2 = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         GraphPath pathTr = spt2.getPath(end);
         assertNotNull("There must be a path from tr to end", pathTr);
@@ -173,7 +172,7 @@ public class TestHalfEdges {
                 pathBr.getWeight() > pathTr.getWeight());
 
         options.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = aStar.getShortestPathTree(options);
+        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);
@@ -186,7 +185,7 @@ public class TestHalfEdges {
 
         options.setArriveBy(true);
         options.setRoutingContext(graph, start, end);
-        spt = aStar.getShortestPathTree(options);
+        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         path = spt.getPath(start);
         assertNotNull("There must be a path from start to end (looking back)", path);
@@ -219,7 +218,7 @@ public class TestHalfEdges {
                 new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()), true, tempEdges);
 
         options.setRoutingContext(graph, start, end);
-        spt = aStar.getShortestPathTree(options);
+        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         path = spt.getPath(start);
         assertNotNull("There must be a path from top to bottom along the right", path);
@@ -246,7 +245,7 @@ public class TestHalfEdges {
                 new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()), true, tempEdges);
 
         options.setRoutingContext(graph, start, end);
-        spt = aStar.getShortestPathTree(options);
+        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         path = spt.getPath(start);
         assertNotNull("There must be a path from top to bottom", path);
@@ -293,7 +292,7 @@ public class TestHalfEdges {
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.setDateTime(Instant.ofEpochSecond(startTime));
         options.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = aStar.getShortestPathTree(options);
+        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);        
@@ -330,7 +329,7 @@ public class TestHalfEdges {
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.setDateTime(Instant.ofEpochSecond(startTime));
         options.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = aStar.getShortestPathTree(options);
+        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
 
         GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);        
@@ -456,7 +455,7 @@ public class TestHalfEdges {
         assertNotNull(end);
         // The visibility for temp edges for start and end is set in the setRoutingContext call
         walking.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = aStar.getShortestPathTree(walking);
+        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(walking).getShortestPathTree();
         GraphPath path = spt.getPath(end);
         for (State s : path.states) {
           assertNotSame(s.getBackEdge(), top);

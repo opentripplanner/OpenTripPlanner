@@ -28,9 +28,8 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -334,22 +333,10 @@ public class WalkableAreaBuilder {
         pruneAreaEdges(startingVertices, edges, ringEdges);
     }
 
-    static class ListedEdgesOnly implements SkipEdgeStrategy {
-        private final Set<Edge> edges;
-
-        public ListedEdgesOnly(Set<Edge> edges) {
-            this.edges = edges;
-        }
+    record ListedEdgesOnly(Set<Edge> edges) implements SkipEdgeStrategy {
 
         @Override
-        public boolean shouldSkipEdge(
-            Set<Vertex> origins,
-            Set<Vertex> targets,
-            State current,
-            Edge edge,
-            ShortestPathTree spt,
-            RoutingRequest traverseOptions
-        ) {
+        public boolean shouldSkipEdge(State current, Edge edge) {
             return !edges.contains(edge);
         }
     }
@@ -376,14 +363,14 @@ public class WalkableAreaBuilder {
         }
         RoutingRequest options = new RoutingRequest(mode);
         options.dominanceFunction = new DominanceFunction.EarliestArrival();
-        options.setDummyRoutingContext(graph);
-        AStar search = new AStar();
-        search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
         Set<Edge> usedEdges = new HashSet<>();
         for (Vertex vertex : startingVertices) {
             options.setRoutingContext(graph, vertex, null);
-            options.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
-            ShortestPathTree spt = search.getShortestPathTree(options);
+            ShortestPathTree spt = AStarBuilder
+                    .allDirections(new ListedEdgesOnly(edges))
+                    .setRoutingRequest(options)
+                    .getShortestPathTree();
+
             for (Vertex endVertex : startingVertices) {
                 GraphPath path = spt.getPath(endVertex);
                 if (path != null) {

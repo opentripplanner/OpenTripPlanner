@@ -960,7 +960,6 @@ public class LegacyGraphQLQueryTypeImpl
       //callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
       //callWith.argument("omitCanceled", (Boolean v) -> request.omitCanceled = v);
       callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
-      callWith.argument("disableRemainingWeightHeuristic", (Boolean v) -> request.disableRemainingWeightHeuristic = v);
 
       callWith.argument("locale", (String v) -> request.locale = ResourceBundleSingleton.INSTANCE.getLocale(v));
       RoutingResponse res = context.getRoutingService().route(request, context.getRouter());
