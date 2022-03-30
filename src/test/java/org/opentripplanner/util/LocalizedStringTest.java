@@ -11,15 +11,15 @@ class LocalizedStringTest {
     public void locale() {
         assertEquals(
                 "corner of First and Second",
-                new LocalizedString("corner", new String[] {"First", "Second"}).toString()
+                new LocalizedString("corner", TranslatedString.getI18NString("First", "de", "erste"), TranslatedString.getI18NString("Second", "de", "zweite")).toString()
         );
     }
 
     @Test
     public void localeWithTranslation() {
         assertEquals(
-                "Kreuzung First mit Second",
-                new LocalizedString("corner", new String[] {"First", "Second"}).toString(Locale.GERMANY)
+                "Kreuzung Erste mit Zweite",
+                new LocalizedString("corner", TranslatedString.getI18NString("First", "de", "Erste"), TranslatedString.getI18NString("Second", "de", "Zweite")).toString(Locale.GERMANY)
         );
     }
 
@@ -27,7 +27,7 @@ class LocalizedStringTest {
     public void localeWithoutTranslation() {
         assertEquals(
                 "corner of First and Second",
-                new LocalizedString("corner", new String[] {"First", "Second"}).toString(Locale.CHINESE)
+                new LocalizedString("corner", TranslatedString.getI18NString("First", "de", "erste"), TranslatedString.getI18NString("Second", "de", "zweite")).toString(Locale.CHINESE)
         );
     }
 

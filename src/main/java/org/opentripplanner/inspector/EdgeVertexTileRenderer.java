@@ -2,25 +2,37 @@ package org.opentripplanner.inspector;
 
 import com.jhlabs.awt.ShapeStroke;
 import com.jhlabs.awt.TextStroke;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Polygon;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import org.locationtech.jts.awt.IdentityPointTransformation;
 import org.locationtech.jts.awt.PointShapeFactory;
 import org.locationtech.jts.awt.ShapeWriter;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.linearref.LengthLocationMap;
+import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.locationtech.jts.operation.buffer.OffsetCurveBuilder;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import java.awt.Polygon;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.stream.Collectors;
 
 /**
  * A TileRenderer implementation which get all edges/vertex in the bounding box of the tile, and
@@ -67,6 +79,14 @@ public class EdgeVertexTileRenderer implements TileRenderer {
          */
         String getName();
 
+        default boolean hasEdgeSegments(Edge edge) {
+            return false;
+        }
+
+        default Iterable<T2<Double, Color>> edgeSegments(Edge edge) {
+            return List.of();
+        }
+
         default int vertexSorter(Vertex v1, Vertex v2) {
             return defaultVertexComparator.compare(v1, v2);
         }
@@ -111,13 +131,13 @@ public class EdgeVertexTileRenderer implements TileRenderer {
                 .getVerticesForEnvelope(bboxWithMargins)
                 .stream()
                 .sorted(evRenderer::vertexSorter)
-                .collect(Collectors.toList());
+                .toList();
 
         Collection<Edge> edges = context.graph.getStreetIndex().getEdgesForEnvelope(bboxWithMargins)
                 .stream()
                 .distinct()
                 .sorted(evRenderer::edgeSorter)
-                .collect(Collectors.toList());
+                .toList();
 
         // Note: we do not use the transform inside the shapeWriter, but do it ourselves
         // since it's easier for the offset to work in pixel size.
@@ -179,8 +199,26 @@ public class EdgeVertexTileRenderer implements TileRenderer {
             Shape offsetShape = shapeWriter.toShape(offsetLine);
 
             context.graphics.setStroke(hasGeom ? halfStroke : halfDashedStroke);
-            context.graphics.setColor(evAttrs.color);
-            context.graphics.draw(offsetShape);
+
+            if (evRenderer.hasEdgeSegments(edge)) {
+                LocationIndexedLine line = new LocationIndexedLine(offsetLine);
+                LengthLocationMap locater = new LengthLocationMap(offsetLine);
+                var offsetLength = offsetLine.getLength();
+
+                var previousLocation = line.getStartIndex();
+                for (var p2 : evRenderer.edgeSegments(edge)) {
+                    var currentLocation = locater.getLocation(offsetLength * p2.first);
+                    var segmentGeometry = line.extractLine(previousLocation, currentLocation);
+                    var segmentShape = shapeWriter.toShape(segmentGeometry);
+                    context.graphics.setColor(p2.second);
+                    context.graphics.draw(segmentShape);
+
+                    previousLocation = currentLocation;
+                }
+            } else {
+                context.graphics.setColor(evAttrs.color);
+                context.graphics.draw(offsetShape);
+            }
             if (lineWidth > 6.0f) {
                 context.graphics.setColor(Color.WHITE);
                 context.graphics.setStroke(arrowStroke);

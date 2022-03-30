@@ -11,16 +11,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.graph.Graph;
 
 @ExtendWith(SnapshotExtension.class)
 @ResourceLock(Resources.LOCALE)
-public class BikeRentalSnapshotTest
+public class ElevationSnapshotTest
         extends SnapshotTestBase {
 
     private static final Locale DEFAULT_LOCALE = Locale.getDefault();
@@ -34,15 +37,34 @@ public class BikeRentalSnapshotTest
     static GenericLocation p3 = new GenericLocation("NW Everett St. & NW 5th Ave. (P3)", null,
             45.52523, -122.67525);
 
+    static GenericLocation p4 = new GenericLocation("Sulzer Pump (P4)", null,
+            45.54549, -122.69659);
+
     @BeforeAll
     public static void beforeClass() {
         Locale.setDefault(Locale.US);
-        loadGraphBeforeClass(false);
+        loadGraphBeforeClass(true);
     }
 
     @AfterAll
     public static void afterClass() {
         Locale.setDefault(DEFAULT_LOCALE);
+    }
+
+    @Override
+    protected Graph getGraph() {
+        return ConstantsForTests.getInstance().getCachedPortlandGraphWithElevation();
+    }
+
+    @DisplayName("Direct WALK")
+    @Test public void directWalk() {
+        RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+
+        request.modes = new RequestModes(null, null, null, StreetMode.WALK, Set.of());
+        request.from = p1;
+        request.to = p4;
+
+        expectRequestResponseToMatchSnapshot(request);
     }
 
     @DisplayName("Direct BIKE_RENTAL")
@@ -57,35 +79,17 @@ public class BikeRentalSnapshotTest
         expectArriveByToMatchDepartAtAndSnapshot(request);
     }
 
-    /**
-     * The next to two tests are an example where departAt and arriveBy searches return different
-     * (but still correct) results.
-     *
-     * It's probably down to the intersection traversal because when you use a constant cost
-     * they become the same route again.
-     *
-     * More discussion: https://github.com/opentripplanner/OpenTripPlanner/pull/3574
-     */
-    @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with departAt")
-    @Test public void directBikeRentalArrivingAtDestinationWithDepartAt() {
+    @DisplayName("Direct BIKE")
+    @Test public void directBike() {
         RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+        request.bicycleOptimizeType = BicycleOptimizeType.TRIANGLE;
+        request.bikeTriangleSafetyFactor = 0.3;
+        request.bikeTriangleTimeFactor = 0.3;
+        request.bikeTriangleSlopeFactor = 0.4;
 
-        request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
-        request.allowKeepingRentedVehicleAtDestination = true;
+        request.modes = new RequestModes(null, null, null, StreetMode.BIKE, Set.of());
         request.from = p1;
-        request.to = p2;
-
-        expectRequestResponseToMatchSnapshot(request);
-    }
-
-    @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with arriveBy")
-    @Test public void directBikeRentalArrivingAtDestinationWithArriveBy() {
-        RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-        request.modes = new RequestModes(null, null, null, StreetMode.BIKE_RENTAL, Set.of());
-        request.allowKeepingRentedVehicleAtDestination = true;
-        request.from = p1;
-        request.to = p2;
+        request.to = p4;
         request.arriveBy = true;
 
         expectRequestResponseToMatchSnapshot(request);
@@ -106,11 +110,11 @@ public class BikeRentalSnapshotTest
         }
     }
 
-    @DisplayName("Egress BIKE_RENTAL")
-    @Test public void egressBikeRental() {
+    @DisplayName("TRANSIT")
+    @Test public void transit() {
         RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-        request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.BIKE_RENTAL, null, AllowedTransitMode.getAllTransitModes());
+        request.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, null, AllowedTransitMode.getAllTransitModes());
         request.from = p3;
         request.to = p1;
 

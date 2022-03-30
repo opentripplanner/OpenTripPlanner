@@ -1,8 +1,10 @@
 package org.opentripplanner.graph_builder.linking;
 
 import com.google.common.collect.Sets;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
@@ -10,12 +12,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.util.NonLocalizedString;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class SameEdgeAdjuster {
 
@@ -118,37 +114,7 @@ public class SameEdgeAdjuster {
   private static void makePartialEdgeAlong(
       StreetEdge streetEdge, StreetVertex from, StreetVertex to, DisposableEdgeCollection tempEdges
   ) {
-    LineString parent = streetEdge.getGeometry();
-    LineString head = GeometryUtils.getInteriorSegment(
-        parent,
-        streetEdge.getFromVertex().getCoordinate(),
-        from.getCoordinate()
-    );
-    LineString tail = GeometryUtils.getInteriorSegment(
-        parent,
-        to.getCoordinate(),
-        streetEdge.getToVertex().getCoordinate()
-    );
-
-    if (parent.getLength() > head.getLength() + tail.getLength()) {
-      LineString partial = GeometryUtils.getInteriorSegment(parent,
-          from.getCoordinate(),
-          to.getCoordinate()
-      );
-
-      double lengthRatio = partial.getLength() / parent.getLength();
-      double length = streetEdge.getDistanceMeters() * lengthRatio;
-
-      //TODO: localize this
-      String name = from.getLabel() + " to " + to.getLabel();
-      tempEdges.addEdge(new TemporaryPartialStreetEdge(
-          streetEdge,
-          from,
-          to,
-          partial,
-          new NonLocalizedString(name),
-          length
-      ));
-    }
+    streetEdge.createPartialEdge(from, to)
+            .ifPresent(tempEdges::addEdge);
   }
 }

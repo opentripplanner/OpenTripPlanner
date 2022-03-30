@@ -47,6 +47,20 @@ public class TranslatedString implements I18NString, Serializable {
         return Objects.hash(translations);
     }
 
+    public static I18NString getI18NString(String untranslated, String... translations) {
+        if (translations.length % 2 != 0) {
+            throw new IllegalStateException("An even number of translations must be supplied.");
+        }
+
+        var map = new HashMap<String, String>();
+        map.put(null, untranslated);
+
+        for (int i = 0; i < translations.length - 1; i += 2) {
+            map.put(translations[i], translations[i + 1]);
+        }
+        return getI18NString(map);
+    }
+
     /**
      * Gets an interned I18NString.
      * If the translations only have a single value, return a NonTranslatedString, otherwise a TranslatedString

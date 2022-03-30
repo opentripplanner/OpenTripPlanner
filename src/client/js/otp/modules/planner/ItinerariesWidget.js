@@ -148,6 +148,11 @@ otp.widgets.ItinerariesWidget =
                 var itin = $(this).data('itin');
                 this_.module.drawItinerary(itin);
                 this_.activeIndex = $(this).data('index');
+
+                // Wait for the SVG element to be resized, before re-rendering
+                setTimeout(function () {
+                    this_.renderElevationGraphContent(itin, this_.activeIndex);
+                }, 0);
             });
 
             $('<div id="'+divId+'-'+i+'"></div>')
@@ -167,15 +172,16 @@ otp.widgets.ItinerariesWidget =
             this.renderHeaderContent(itineraries[i], i, header);
         }*/
         this.renderHeaders();
-        this_.itinsAccord.accordion("resize");
+        this.renderElevationGraphContent(this.itineraries[this.activeIndex], this.activeIndex);
+        this.itinsAccord.accordion("resize");
 
         this.$().resize(_.throttle(function(){
             this_.itinsAccord.accordion("resize");
             this_.renderHeaders();
+            this_.renderElevationGraphContent(this_.itineraries[this_.activeIndex], this_.activeIndex);
         }, 100, {leading: false}));
 
         this.$().draggable({ cancel: "#"+divId });
-
     },
 
     clear : function() {
@@ -299,6 +305,244 @@ otp.widgets.ItinerariesWidget =
             .appendTo(div);
         }
 
+    },
+
+    renderElevationGraphContent : function(itin, index) {
+        if (!itin) {
+            return;
+        }
+
+        var graph = $("#" + this.id + '-itinElevationGraph-' + index);
+        var width = graph.width();
+        var graphSegments = [];
+        var transitParts = 0;
+        var onStreetLength = 0;
+        var hasElevation = false;
+        var minElevation = Number.MAX_VALUE;
+        var maxElevation = Number.MIN_VALUE;
+        for (var l = 0; l < itin.itinData.legs.length; l++) {
+            var leg = itin.itinData.legs[l];
+            if (otp.util.Itin.isTransit(leg.mode)) {
+                graphSegments.push({
+                    leg: leg,
+                    mode: leg.mode,
+                    textColor: otp.util.Itin.getLegTextColor(leg),
+                    backgroundColor: otp.util.Itin.getLegBackgroundColor(leg),
+                    transit: true,
+                    distance: onStreetLength,
+                    transitParts: transitParts,
+                });
+                transitParts++;
+            } else {
+                var graphPoints = [];
+                if (leg.legElevation) {
+                    var regex = /([0-9.]+),([0-9.]+|NaN)/g;
+                    var m;
+                    while (m = regex.exec(leg.legElevation)) {
+                        var elevation = Number.parseFloat(m[2]);
+                        if (!Number.isNaN(elevation)) {
+                            minElevation = Math.min(minElevation, elevation);
+                            maxElevation = Math.max(maxElevation, elevation);
+                        }
+                        graphPoints.push({
+                            elevation: elevation,
+                            distance: onStreetLength + Number.parseFloat(m[1])
+                        });
+                    }
+                    hasElevation = true;
+                }
+
+                graphSegments.push({
+                    leg: leg,
+                    transit: false,
+                    mode: leg.mode,
+                    textColor: otp.util.Itin.getLegTextColor(leg),
+                    backgroundColor: otp.util.Itin.getLegBackgroundColor(leg),
+                    fromDistance: onStreetLength,
+                    toDistance: onStreetLength + leg.distance,
+                    graphPoints: graphPoints,
+                    transitParts: transitParts,
+                })
+                onStreetLength += leg.distance;
+            }
+        }
+
+        var elevationBuffer = (maxElevation - minElevation) * 0.1;
+        minElevation = Math.floor((minElevation - elevationBuffer) / 10) * 10;
+        maxElevation = Math.ceil((maxElevation + elevationBuffer) / 10) * 10;
+
+        graph.empty();
+        graph.css({display: hasElevation ? 'inline' : 'none'});
+
+        if (hasElevation) {
+            // jquery has problems handling alternate namespaces, so elements are created explicitly
+            var svg = function (elementName, attributes, content) {
+                var element = document.createElementNS('http://www.w3.org/2000/svg', elementName)
+                for (var attr in attributes) if (attributes.hasOwnProperty(attr)) {
+                    element.setAttribute(attr, attributes[attr]);
+                }
+                element.textContent = content || "";
+                return element;
+            };
+            var graphX = function (transitParts, distance) {
+                return labelWidth + Math.round(distance * pm + transitParts * iconWidth);
+            };
+            var drawMode = function (point, fromX, toX) {
+                graph.append(svg('rect', {
+                    class: "mode",
+                    x: fromX + 1,
+                    y: 119,
+                    width: toX - fromX - 2,
+                    height: iconWidth - 2,
+                    rx: 2,
+                    fill: point.backgroundColor,
+                }));
+
+                if (toX - fromX >= iconWidth) {
+                    graph.append(svg('rect', {
+                        class: "mode",
+                        x: fromX + 1,
+                        y: 119,
+                        width: toX - fromX - 2,
+                        height: iconWidth - 2,
+                        rx: 2,
+                        fill: point.textColor,
+                        style: "mask: url(" + otp.config.resourcePath
+                            + 'images/mode/'
+                            + point.mode.toLowerCase() + '.png'
+                            + ") center no-repeat",
+                    }));
+                }
+            };
+
+            var labelWidth = 50;
+            var iconWidth = 22;
+            var endPadding = 10;
+            var streetPixels = width - labelWidth - endPadding - (iconWidth * transitParts);
+            var pm = streetPixels / onStreetLength;
+
+            _(graphSegments).each(function (segment) {
+                if (segment.transit) {
+                    var pointX = graphX(segment.transitParts, segment.distance);
+                    drawMode(segment, pointX, pointX + iconWidth);
+                } else {
+                    var firstPointX = graphX(segment.transitParts, segment.fromDistance);
+                    var lastPointX = graphX(segment.transitParts, segment.toDistance);
+
+                    drawMode(segment, firstPointX, lastPointX);
+
+                    function finishGraphSegment() {
+                        if (firstPoint && lastPoint) {
+                            path += ' L ' + lastPoint.x + ',115';
+                            path += ' L ' + firstPoint.x + ',115 Z';
+
+                            graph.append(svg('path', {
+                                style: 'elevation',
+                                d: path,
+                                fill: segment.backgroundColor,
+                            }));
+
+                            firstPoint = null;
+                            lastPoint = null;
+                            path = '';
+                        }
+                    }
+
+                    var path = '', firstPoint, lastPoint;
+                    _(segment.graphPoints).each(function (graphPoint) {
+                        graphPoint.x = graphX(segment.transitParts, graphPoint.distance);
+                        if (Number.isNaN(graphPoint.elevation)) {
+                            finishGraphSegment();
+                        } else {
+                            graphPoint.y = Math.round(10 + 105 * (1 - (graphPoint.elevation - minElevation) / (maxElevation - minElevation)));
+                            if (firstPoint) {
+                                path += ' L';
+                                lastPoint = graphPoint;
+                            } else {
+                                firstPoint = lastPoint = graphPoint;
+                                path = ' M';
+                            }
+
+                            path += ' ' + graphPoint.x + ',' + graphPoint.y;
+                        }
+                    });
+
+                    finishGraphSegment();
+                }
+            });
+
+            // Render step backgrounds
+            var stepTransitParts = 0;
+            var stepTotalDistance = 0;
+            var stepCounter = 0;
+            _(itin.itinData.legs).each(function (leg) {
+                if (otp.util.Itin.isTransit(leg.mode)) {
+                    stepTransitParts++;
+                } else {
+                    var lastX = graphX(stepTransitParts, stepTotalDistance);
+                    _(leg.steps).each(function (step) {
+                        stepTotalDistance += step.distance;
+
+                        step.graphX1 = lastX;
+                        step.graphX2 = graphX(stepTransitParts, stepTotalDistance);
+                        step.graphY1 = 10;
+                        step.graphY2 = 115;
+
+                        graph.append(step.graphElement = svg('rect', {
+                            class: "step",
+                            x: step.graphX1,
+                            y: step.graphY1,
+                            width: Math.max(1, step.graphX2 - step.graphX1),
+                            height: step.graphY2 - step.graphY1,
+                        }));
+
+                        lastX = step.graphX2;
+                    });
+                }
+            });
+
+            graph.append(svg('line', {
+                class: "line",
+                x1: labelWidth - 1, y1: 10,
+                x2: labelWidth - 1, y2: 115
+            }));
+            graph.append(svg('line', {
+                class: "line",
+                x1: labelWidth - 1, y1: 10,
+                x2: width - endPadding, y2: 10,
+                "stroke-dasharray": "5,5"
+            }));
+            graph.append(svg('line', {
+                class: "line",
+                x1: labelWidth - 1, y1: 65,
+                x2: width - endPadding, y2: 65,
+                "stroke-dasharray": "5,5"
+            }));
+            graph.append(svg('line', {
+                class: "line",
+                x1: labelWidth - 1, y1: 115,
+                x2: width - endPadding, y2: 115,
+                "stroke-dasharray": "5,5"
+            }));
+            graph.append(svg('text', {
+                class: "label",
+                "text-anchor": "end",
+                x: 45,
+                y: 15
+            }, otp.util.Itin.distanceString(maxElevation)));
+            graph.append(svg('text', {
+                class: "label",
+                "text-anchor": "end",
+                x: 45,
+                y: 65
+            }, otp.util.Itin.distanceString(Math.round(minElevation + (maxElevation - minElevation) / 2))));
+            graph.append(svg('text', {
+                class: "label",
+                "text-anchor": "end",
+                x: 45,
+                y: 115
+            }, otp.util.Itin.distanceString(minElevation)));
+        }
     },
 
     municoderResultId : 0,
@@ -431,6 +675,8 @@ otp.widgets.ItinerariesWidget =
         //TRANSLATORS: End: Time and date (Shown after path itinerary)
         itinDiv.append("<div class='otp-itinEndRow'><b>" + _tr("End") + "</b>: "+itin.getEndTimeStr()+"</div>");
 
+        itinDiv.append("<svg id='" + this.id + "-itinElevationGraph-" + index + "' class='otp-itinElevationGraph' width='100%' height='145px' xmlns='http://www.w3.org/2000/svg'></svg>");
+
         // add trip summary
 
         var tripSummary = $('<div class="otp-itinTripSummary" />')
@@ -464,6 +710,11 @@ otp.widgets.ItinerariesWidget =
             tripSummary.append('<div class="otp-itinTripSummaryLabel">' + _tr("Total drive") + '</div><div class="otp-itinTripSummaryText">' +
                 otp.util.Itin.distanceString(carDistance) + '</div>')
         }
+
+        tripSummary.append('<div class="otp-itinTripSummaryLabel">' + _tr("Elevation Gained") + '</div><div class="otp-itinTripSummaryText">' +
+            otp.util.Itin.distanceString(itin.itinData.elevationGained) + '</div>')
+        tripSummary.append('<div class="otp-itinTripSummaryLabel">' + _tr("Elevation Lost") + '</div><div class="otp-itinTripSummaryText">' +
+            otp.util.Itin.distanceString(itin.itinData.elevationLost) + '</div>')
 
         if(itin.hasTransit) {
             //TRANSLATORS: how many public transit transfers in a trip
@@ -748,12 +999,15 @@ otp.widgets.ItinerariesWidget =
                     }).hover(function(evt) {
                         var step = $(this).data("step");
                         $(this).css('background', '#f0f0f0');
+                        $(step.graphElement).css({display: 'inline'});
                         var popup = L.popup()
                             .setLatLng(new L.LatLng(step.lat, step.lon))
                             .setContent($(this).data("stepText"))
                             .openOn(this_.module.webapp.map.lmap);
                     }, function(evt) {
+                        var step = $(this).data("step");
                         $(this).css('background', '#e8e8e8');
+                        $(step.graphElement).css({display: 'none'});
                         this_.module.webapp.map.lmap.closePopup();
                     });
                 }

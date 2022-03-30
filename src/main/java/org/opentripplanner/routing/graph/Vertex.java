@@ -1,14 +1,5 @@
 package org.opentripplanner.routing.graph;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.common.geometry.DirectionUtils;
-import org.opentripplanner.model.StationElement;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,6 +8,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.model.StationElement;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A vertex in the graph. Each vertex has a longitude/latitude location, as well as a set of
@@ -252,8 +251,19 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
 
-    public List<Edge> getOutgoingStreetEdges() {
-        List<Edge> result = new ArrayList<>();
+    public List<StreetEdge> getIncomingStreetEdges() {
+        List<StreetEdge> result = new ArrayList<>();
+        for (Edge out : this.getIncoming()) {
+            if (!(out instanceof StreetEdge)) {
+                continue;
+            }
+            result.add((StreetEdge) out);
+        }
+        return result;
+    }
+
+    public List<StreetEdge> getOutgoingStreetEdges() {
+        List<StreetEdge> result = new ArrayList<>();
         for (Edge out : this.getOutgoing()) {
             if (!(out instanceof StreetEdge)) {
                 continue;

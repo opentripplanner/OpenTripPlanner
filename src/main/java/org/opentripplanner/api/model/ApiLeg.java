@@ -188,6 +188,12 @@ public class ApiLeg {
     public EncodedPolylineBean legGeometry;
 
     /**
+     * The elevation profile as a comma-separated list of x,y values. x is the distance from the start of the leg, y is the elevation at this
+     * distance.
+     */
+    public String legElevation;
+
+    /**
      * A series of turn by turn instructions used for walking, biking and driving.
      */
     public List<ApiWalkStep> steps;

@@ -249,6 +249,7 @@ public class RaptorPathToItineraryMapper {
                     transfer.getDistanceMeters(),
                     toOtpDomainCost(pathLeg.generalizedCost()),
                     GeometryUtils.makeLineString(transfer.getCoordinates()),
+                    null,
                     List.of()
             ));
         } else {

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -253,6 +254,30 @@ public interface Leg {
      * The leg's geometry.
      */
     LineString getLegGeometry();
+
+    /**
+     * The leg's elevation profile.
+     */
+    default List<P2<Double>> getLegElevation() {
+        return null;
+    }
+
+    /**
+     * How much elevation is gained, in total, over the course of the leg, in meters. See
+     * elevationLost.
+     */
+    default Double getElevationGained() {
+        return null;
+    }
+
+    /**
+     * How much elevation is lost, in total, over the course of the leg, in meters. As an example,
+     * a trip that went from the top of Mount Everest straight down to sea level, then back up K2,
+     * then back down again would have an elevationLost of Everest + K2.
+     */
+    default Double getElevationLost() {
+        return null;
+    }
 
     /**
      * A series of turn by turn instructions used for walking, biking and driving.

@@ -44,7 +44,7 @@ public class TransitSnapshotTest
 
     @BeforeAll
     public static void beforeClass() {
-        loadGraphBeforeClass();
+        loadGraphBeforeClass(false);
     }
 
     @Test

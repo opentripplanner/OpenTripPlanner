@@ -91,7 +91,7 @@ public class TriangleTest {
 
         double length = 650.0;
 
-        StreetWithElevationEdge testStreet = new StreetWithElevationEdge(v1, v2, geometry, "Test Lane", length,
+        StreetEdge testStreet = new StreetEdge(v1, v2, geometry, "Test Lane", length,
                 StreetTraversalPermission.ALL, false);
         testStreet.setBicycleSafetyFactor(0.74f); // a safe street
 
@@ -101,7 +101,7 @@ public class TriangleTest {
                 new Coordinate(length, 0) // slope = -0.1
         };
         PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
-        testStreet.setElevationProfile(elev, false);
+        StreetElevationExtension.addToEdge(testStreet, elev, false);
 
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
         double trueLength = costs.lengthMultiplier * length;
