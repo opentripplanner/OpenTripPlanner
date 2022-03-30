@@ -1,6 +1,14 @@
 package org.opentripplanner.routing.graph;
 
+import static org.junit.Assert.assertFalse;
+
 import com.conveyal.object_differ.ObjectDiffer;
+import java.io.File;
+import java.lang.ref.SoftReference;
+import java.lang.reflect.Method;
+import java.util.BitSet;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.jar.JarFile;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
 import org.junit.Test;
@@ -13,15 +21,6 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-
-import java.io.File;
-import java.lang.ref.SoftReference;
-import java.lang.reflect.Method;
-import java.util.BitSet;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.jar.JarFile;
-
-import static org.junit.Assert.assertFalse;
 
 
 /**
@@ -40,7 +39,7 @@ public class GraphSerializationTest {
      */
     @Test
     public void testRoundTripSerializationForGTFSGraph() throws Exception {
-        testRoundTrip(ConstantsForTests.buildNewPortlandGraph());
+        testRoundTrip(ConstantsForTests.buildNewPortlandGraph(true));
     }
 
     /**

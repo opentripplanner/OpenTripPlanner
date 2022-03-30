@@ -13,7 +13,11 @@ public class ElevationMapper {
         for (P2<Double> pair : pairs) {
             str.append(Math.round(pair.first));
             str.append(",");
-            str.append(Math.round(pair.second * 10.0) / 10.0);
+            if (Double.isNaN(pair.second)) {
+                str.append("NaN");
+            } else {
+                str.append(Math.round(pair.second * 10.0) / 10.0);
+            }
             str.append(",");
         }
         if (str.length() > 0) {

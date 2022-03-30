@@ -304,7 +304,7 @@ public class PlainStreetEdgeTest {
         return new StreetEdge(vA, vB, geom, name, length, perm, false);
     }
 
-    private StreetWithElevationEdge edge(
+    private StreetEdge edge(
             StreetVertex vA,
             StreetVertex vB,
             double length,
@@ -319,8 +319,8 @@ public class PlainStreetEdgeTest {
         coords[1] = vB.getCoordinate();
         LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-        var edge = new StreetWithElevationEdge(vA, vB, geom, name, length, perm, false);
-        edge.setElevationProfile(elevationProfile, false);
+        var edge = new StreetEdge(vA, vB, geom, name, length, perm, false);
+        StreetElevationExtension.addToEdge(edge, elevationProfile, false);
         return edge;
     }
 }

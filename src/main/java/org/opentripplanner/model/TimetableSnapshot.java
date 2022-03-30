@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -111,6 +112,9 @@ public class TimetableSnapshot {
      * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      */
     private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
+
+    private HashMap<FeedScopedId, TripOnServiceDate> lastAddedTripOnServiceDate = new HashMap<>();
+    private HashMap<TripIdAndServiceDate, TripOnServiceDate> lastAddedTripOnServiceDateByTripIdAndServiceDate = new HashMap<>();
 
     /**
      * This maps contains all of the new or updated TripPatterns added by realtime data indexed on
@@ -261,7 +265,7 @@ public class TimetableSnapshot {
 
         // To make these trip patterns visible for departureRow searches.
         addPatternToIndex(pattern);
-        
+
         // The time tables are finished during the commit
         
         return true;
@@ -300,6 +304,10 @@ public class TimetableSnapshot {
             transitLayerUpdater.update(dirtyTimetables);
         }
 
+        ret.lastAddedTripOnServiceDate =
+                (HashMap<FeedScopedId, TripOnServiceDate>) this.lastAddedTripOnServiceDate.clone();
+        ret.lastAddedTripOnServiceDateByTripIdAndServiceDate =
+                (HashMap<TripIdAndServiceDate, TripOnServiceDate>) this.lastAddedTripOnServiceDateByTripIdAndServiceDate.clone();
         this.dirtyTimetables.clear();
         this.dirty = false;
 
@@ -429,5 +437,19 @@ public class TimetableSnapshot {
 
     public void setPatternsForStop(SetMultimap<StopLocation, TripPattern> patternsForStop) {
         this.patternsForStop = patternsForStop;
+    }
+
+    public void addLastAddedTripOnServiceDate(Trip trip, ServiceDate serviceDate, FeedScopedId datedServiceJourneyId, TripOnServiceDate tripOnServiceDate) {
+        lastAddedTripOnServiceDate.put(datedServiceJourneyId, tripOnServiceDate);
+        lastAddedTripOnServiceDateByTripIdAndServiceDate.put(
+                new TripIdAndServiceDate(trip.getId(), serviceDate), tripOnServiceDate);
+    }
+
+    public HashMap<FeedScopedId, TripOnServiceDate> getLastAddedTripOnServiceDate() {
+        return lastAddedTripOnServiceDate;
+    }
+
+    public HashMap<TripIdAndServiceDate, TripOnServiceDate> getLastAddedTripOnServiceDateByTripIdAndServiceDate() {
+        return lastAddedTripOnServiceDateByTripIdAndServiceDate;
     }
 }

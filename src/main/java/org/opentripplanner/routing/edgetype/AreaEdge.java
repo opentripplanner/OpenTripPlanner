@@ -5,7 +5,7 @@ import org.opentripplanner.util.I18NString;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 
-public class AreaEdge extends StreetWithElevationEdge{
+public class AreaEdge extends StreetEdge {
     private static final long serialVersionUID = 6761687673982054612L;
     private final AreaEdgeList area;
 

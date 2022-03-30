@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import com.google.common.collect.ArrayListMultimap;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
@@ -127,11 +128,13 @@ public class TripCalendarBuilderTest {
         .toString();
   }
 
-  private Map<String, List<DatedServiceJourney>> dsj_2020_11_02(String sjId) {
+  private ArrayListMultimap<String, DatedServiceJourney> dsj_2020_11_02(String sjId) {
     var dsj = new DatedServiceJourney();
     dsj.withOperatingDayRef(new OperatingDayRefStructure().withRef(OD_1));
     dsj.getJourneyRef().add(jaxbElement(new JourneyRefStructure().withRef(sjId), JourneyRefStructure.class));
-    return Map.of(sjId, List.of(dsj));
+    ArrayListMultimap<String, DatedServiceJourney> map = ArrayListMultimap.create();
+    map.put(sjId, dsj);
+    return map;
   }
 
   private static HierarchicalMapById<OperatingDay> operatingDays_2020_11_02() {

@@ -96,7 +96,8 @@ public class TimetableTest {
         tripUpdateBuilder = TripUpdate.newBuilder();
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         tripUpdate = tripUpdateBuilder.build();
-        TripTimes updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        TripTimesPatch tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNull(updatedTripTimes);
 
         // update trip with bad data
@@ -110,7 +111,8 @@ public class TimetableTest {
         stopTimeUpdateBuilder.setStopSequence(0);
         stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
         tripUpdate = tripUpdateBuilder.build();
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNull(updatedTripTimes);
 
         // update trip with non-increasing data
@@ -130,7 +132,8 @@ public class TimetableTest {
         stopTimeEventBuilder.setTime(TestUtils.dateInSeconds(
                 "America/New_York", 2009, AUGUST, 7, 0, 10, 0));
         tripUpdate = tripUpdateBuilder.build();
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNull(updatedTripTimes);
 
         //---
@@ -168,7 +171,8 @@ public class TimetableTest {
                 "America/New_York", 2009, AUGUST, 7, 0, 2, 0));
         tripUpdate = tripUpdateBuilder.build();
         assertEquals(20*60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNotNull(updatedTripTimes);
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
         assertEquals(20*60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
@@ -192,7 +196,8 @@ public class TimetableTest {
         tripUpdateBuilder = TripUpdate.newBuilder();
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         tripUpdate = tripUpdateBuilder.build();
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNotNull(updatedTripTimes);
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
@@ -231,7 +236,8 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
         stopTimeEventBuilder.setDelay(0);
         tripUpdate = tripUpdateBuilder.build();
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNotNull(updatedTripTimes);
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
@@ -249,7 +255,8 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
         stopTimeEventBuilder.setDelay(1);
         tripUpdate = tripUpdateBuilder.build();
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNotNull(updatedTripTimes);
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
@@ -267,7 +274,8 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
         stopTimeEventBuilder.setDelay(-1);
         tripUpdate = tripUpdateBuilder.build();
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNotNull(updatedTripTimes);
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
@@ -285,7 +293,8 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
         stopTimeEventBuilder.setDelay(-1);
         tripUpdate = tripUpdateBuilder.build();
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNotNull(updatedTripTimes);
         timetable.setTripTimes(trip_1_1_index, updatedTripTimes);
 
@@ -309,7 +318,8 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
         stopTimeEventBuilder.setDelay(-1);
         tripUpdate = tripUpdateBuilder.build();
-        updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        tripTimesPatch = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+        updatedTripTimes = tripTimesPatch.getTripTimes();
         assertNull(updatedTripTimes);
     }
 }

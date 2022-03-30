@@ -31,6 +31,7 @@ import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.WgsCoordinate;
@@ -203,11 +204,11 @@ public class RoutingService {
      * probably be a less awkward way to do this that just gets the latest entry from the resolver
      * without making a fake routing request.
      */
-    public Timetable getTimetableForTripPattern(TripPattern tripPattern) {
+    public Timetable getTimetableForTripPattern(TripPattern tripPattern, ServiceDate serviceDate) {
         TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
         return timetableSnapshot != null ? timetableSnapshot.resolve(
                 tripPattern,
-                new ServiceDate(Calendar.getInstance().getTime())
+                serviceDate == null ? new ServiceDate(Calendar.getInstance().getTime()) : serviceDate
         ) : tripPattern.getScheduledTimetable();
     }
 
@@ -629,4 +630,21 @@ public class RoutingService {
         }
         return this.timetableSnapshot;
     }
+    
+    public TripOnServiceDate getTripOnServiceDateForTripAndDay(FeedScopedId tripId, ServiceDate serviceDate) {
+        return DatedServiceJourneyHelper.getTripOnServiceDate(this, tripId, serviceDate);
+    }
+    
+    public TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId) {
+        return DatedServiceJourneyHelper.getTripOnServiceDate(this, datedServiceJourneyId);
+    }
+
+    public Map<T2<FeedScopedId, ServiceDate>, TripOnServiceDate> getTripOnServiceDateForTripAndDay() {
+        return graphIndex.getTripOnServiceDateForTripAndDay();
+    }
+
+    public Map<FeedScopedId, TripOnServiceDate> getTripOnServiceDateById() {
+        return graphIndex.getTripOnServiceDateById();
+    }
+
 }

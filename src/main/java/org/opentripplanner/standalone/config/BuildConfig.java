@@ -215,6 +215,12 @@ public class BuildConfig {
     public double distanceBetweenElevationSamples;
 
     /**
+     * The maximum distance to propagate elevation to vertices which have no elevation. By default, this
+     * is 2000 meters.
+     */
+    public double maxElevationPropagationMeters;
+
+    /**
      * When set to true (it is by default), the elevation module will attempt to read this file in order to reuse
      * calculations of elevation data for various coordinate sequences instead of recalculating them all over again.
      */
@@ -363,6 +369,7 @@ public class BuildConfig {
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
         writeCachedElevations = c.asBoolean("writeCachedElevations", false);
         maxAreaNodes = c.asInt("maxAreaNodes", 500);
+        maxElevationPropagationMeters = c.asInt("maxElevationPropagationMeters", 2000);
 
         // List of complex parameters
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));

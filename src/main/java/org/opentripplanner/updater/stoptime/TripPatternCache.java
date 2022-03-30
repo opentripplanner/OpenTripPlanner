@@ -25,20 +25,23 @@ public class TripPatternCache {
      * from the scheduled GTFS.
      */
     private final Map<StopPattern, TripPattern> cache = new HashMap<>();
-    
+
     /**
-     * Get cached trip pattern or create one if it doesn't exist yet. If a trip pattern is created, vertices
-     * and edges for this trip pattern are also created in the graph.
-     * 
-     * @param stopPattern stop pattern to retrieve/create trip pattern
-     * @param trip the trip the new trip pattern will be created for
-     * @param graph graph to add vertices and edges in case a new trip pattern will be created
+     * Get cached trip pattern or create one if it doesn't exist yet. If a trip pattern is created,
+     * vertices and edges for this trip pattern are also created in the graph.
+     *
+     * @param stopPattern         stop pattern to retrieve/create trip pattern
+     * @param trip                the trip the new trip pattern will be created for
+     * @param serviceCodes        graph's service codes
+     * @param originalTripPattern the trip pattern the new pattern is based. If the pattern is
+     *                            completely new, this will be null
      * @return cached or newly created trip pattern
      */
     public synchronized TripPattern getOrCreateTripPattern(
             @NotNull final StopPattern stopPattern,
             @NotNull final Trip trip,
-            @NotNull final Graph graph) {
+            @NotNull final Map<FeedScopedId, Integer> serviceCodes,
+            final TripPattern originalTripPattern) {
         Route route = trip.getRoute();
         // Check cache for trip pattern
         TripPattern tripPattern = cache.get(stopPattern);
@@ -51,12 +54,10 @@ public class TripPatternCache {
             tripPattern = new TripPattern(id, route, stopPattern);
             
             // Create an empty bitset for service codes (because the new pattern does not contain any trips)
-            tripPattern.setServiceCodes(graph.getServiceCodes());
+            tripPattern.setServiceCodes(serviceCodes);
             
             // Finish scheduled time table
             tripPattern.getScheduledTimetable().finish();
-
-            TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
 
             tripPattern.setCreatedByRealtimeUpdater();
 

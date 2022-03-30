@@ -1,5 +1,12 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
@@ -20,6 +27,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
@@ -29,13 +37,6 @@ import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * This represents a street segment.
@@ -114,6 +115,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
 
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
+
+    private StreetElevationExtension elevationExtension;
 
     /**
      * The set of turn restrictions of this edge. Since most instances don't have any, we reuse
@@ -254,16 +257,26 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         return permission.allows(mode);
     }
 
+    public void setElevationExtension(StreetElevationExtension streetElevationExtension) {
+        this.elevationExtension = streetElevationExtension;
+    }
+
+    public boolean hasElevationExtension() {
+        return elevationExtension != null;
+    }
+
     public PackedCoordinateSequence getElevationProfile() {
-        return null;
+        return hasElevationExtension()
+                ? elevationExtension.getElevationProfile()
+                : null;
     }
 
     public boolean isElevationFlattened() {
-        return false;
+        return hasElevationExtension() && elevationExtension.isFlattened();
     }
 
     public float getMaxSlope() {
-        return 0.0f;
+        return hasElevationExtension() ? elevationExtension.getMaxSlope() : 0.0f;
     }
 
     @Override
@@ -356,9 +369,6 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             case BICYCLE:
                 time = getEffectiveBikeDistance() / speed;
                 switch (options.bicycleOptimizeType) {
-                    case SAFE:
-                        weight = bicycleSafetyFactor * getDistanceMeters() / speed;
-                        break;
                     case GREENWAYS:
                         weight = bicycleSafetyFactor * getDistanceMeters() / speed;
                         if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
@@ -366,21 +376,23 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                             weight *= 0.66;
                         }
                         break;
+                    case SAFE:
+                        weight = getEffectiveBicycleSafetyDistance() / speed;
+                        break;
                     case FLAT:
                         /* see notes in StreetVertex on speed overhead */
-                        weight = getDistanceMeters() / speed + getEffectiveBikeWorkCost();
+                        weight = getEffectiveBikeWorkCost() / speed;
                         break;
                     case QUICK:
                         weight = getEffectiveBikeDistance() / speed;
                         break;
                     case TRIANGLE:
                         double quick = getEffectiveBikeDistance();
-                        double safety = bicycleSafetyFactor * getDistanceMeters();
-                        // TODO This computation is not coherent with the one for FLAT
+                        double safety = getEffectiveBicycleSafetyDistance();
                         double slope = getEffectiveBikeWorkCost();
-                        weight = quick * options.bikeTriangleTimeFactor + slope
-                                * options.bikeTriangleSlopeFactor + safety
-                                * options.bikeTriangleSafetyFactor;
+                        weight = quick * options.bikeTriangleTimeFactor
+                                + slope * options.bikeTriangleSlopeFactor
+                                + safety * options.bikeTriangleSafetyFactor;
                         weight /= speed;
                         break;
                     default:
@@ -561,7 +573,9 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * can be divided by the speed on a flat surface to get the duration.
      */
     public double getEffectiveBikeDistance() {
-        return getDistanceMeters();
+        return hasElevationExtension()
+                ? elevationExtension.getEffectiveBikeDistance()
+                : getDistanceMeters();
     }
 
     /**
@@ -569,20 +583,36 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * slopes into account.
      */
     public double getEffectiveBikeWorkCost() {
-        return getDistanceMeters();
+        return hasElevationExtension()
+                ? elevationExtension.getEffectiveBikeWorkCost()
+                : getDistanceMeters();
     }
 
     @Override
     public double getEffectiveWalkDistance() {
-        return getDistanceMeters();
+        return hasElevationExtension()
+                ? elevationExtension.getEffectiveWalkDistance()
+                : getDistanceMeters();
     }
 
     public void setBicycleSafetyFactor(float bicycleSafetyFactor) {
+        if (hasElevationExtension()) {
+            throw new IllegalStateException("A bicycle safety factor may not be set if an elevation extension is set.");
+        }
+        if (!Float.isFinite(bicycleSafetyFactor) || bicycleSafetyFactor <= 0) {
+            throw new IllegalArgumentException("Invalid bicycleSafetyFactor: " + bicycleSafetyFactor);
+        }
         this.bicycleSafetyFactor = bicycleSafetyFactor;
     }
 
     public float getBicycleSafetyFactor() {
         return bicycleSafetyFactor;
+    }
+
+    public double getEffectiveBicycleSafetyDistance() {
+        return elevationExtension != null
+                ? elevationExtension.getEffectiveBicycleSafetyDistance()
+                : bicycleSafetyFactor * getDistanceMeters();
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -817,13 +847,8 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
             throw new IllegalStateException("Split street is longer than original street!");
         }
 
-        for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
-            e.setBicycleSafetyFactor(getBicycleSafetyFactor());
-            e.setHasBogusName(hasBogusName());
-            e.setStairs(isStairs());
-            e.setWheelchairAccessible(isWheelchairAccessible());
-            e.setBack(isBack());
-        }
+        copyPropertiesToSplitEdge(e1, 0, e1.getDistanceMeters());
+        copyPropertiesToSplitEdge(e2, e1.getDistanceMeters(), getDistanceMeters());
 
         var splitEdges = new P2<>(e1, e2);
         copyRestrictionsToSplitEdges(this, splitEdges);
@@ -843,27 +868,79 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
         StreetEdge e2 = null;
 
         if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
-            e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
-            e1.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
-            e1.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
-            e1.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
-            e1.setStreetClass(this.getStreetClass());
-            e1.setStairs(this.isStairs());
+            e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name, this.isBack());
+            copyPropertiesToSplitEdge(e1, 0, e1.getDistanceMeters());
             tempEdges.addEdge(e1);
         }
         if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
-            e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
-            e2.setMotorVehicleNoThruTraffic(this.isMotorVehicleNoThruTraffic());
-            e2.setBicycleNoThruTraffic(this.isBicycleNoThruTraffic());
-            e2.setWalkNoThruTraffic(this.isWalkNoThruTraffic());
-            e2.setStreetClass(this.getStreetClass());
-            e2.setStairs(this.isStairs());
+            e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name, this.isBack());
+            copyPropertiesToSplitEdge(e2, getDistanceMeters() - e2.getDistanceMeters(), getDistanceMeters());
             tempEdges.addEdge(e2);
         }
 
         var splitEdges = new P2<>(e1, e2);
         copyRestrictionsToSplitEdges(this, splitEdges);
         return splitEdges;
+    }
+
+    public Optional<Edge> createPartialEdge(StreetVertex from, StreetVertex to) {
+        LineString parent = getGeometry();
+        LineString head = GeometryUtils.getInteriorSegment(
+                parent,
+                getFromVertex().getCoordinate(),
+                from.getCoordinate()
+        );
+        LineString tail = GeometryUtils.getInteriorSegment(
+                parent,
+                to.getCoordinate(),
+                getToVertex().getCoordinate()
+        );
+
+        if (parent.getLength() > head.getLength() + tail.getLength()) {
+            LineString partial = GeometryUtils.getInteriorSegment(
+                    parent,
+                    from.getCoordinate(),
+                    to.getCoordinate()
+            );
+
+            double startRatio = head.getLength() / parent.getLength();
+            double start = getDistanceMeters() * startRatio;
+            double lengthRatio = partial.getLength() / parent.getLength();
+            double length = getDistanceMeters() * lengthRatio;
+
+            var tempEdge = new TemporaryPartialStreetEdge(
+                    this,
+                    from,
+                    to,
+                    partial,
+                    getName(),
+                    length
+            );
+            copyPropertiesToSplitEdge(tempEdge, start, start + length);
+            return Optional.of(tempEdge);
+        }
+        else {
+            return Optional.empty();
+        }
+    }
+
+    protected void copyPropertiesToSplitEdge(StreetEdge splitEdge, double fromDistance, double toDistance) {
+        splitEdge.flags = this.flags;
+        splitEdge.setBicycleSafetyFactor(bicycleSafetyFactor);
+        splitEdge.setStreetClass(getStreetClass());
+        splitEdge.setCarSpeed(getCarSpeed());
+        splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);
+    }
+
+    protected void setElevationExtensionUsingParent(
+            StreetEdge parentEdge,
+            double fromDistance,
+            double toDistance
+    ) {
+        var profile = ElevationUtils.getPartialElevationProfile(
+                parentEdge.getElevationProfile(), fromDistance, toDistance
+        );
+        StreetElevationExtension.addToEdge(this, profile, true);
     }
 
     /**

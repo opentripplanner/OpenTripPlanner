@@ -20,7 +20,6 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
@@ -103,7 +102,6 @@ public class GraphBuilder implements Runnable {
     ) {
 
         boolean hasOsm  = dataSources.has(OSM);
-        boolean hasDem  = dataSources.has(DEM);
         boolean hasGtfs = dataSources.has(GTFS);
         boolean hasNetex = dataSources.has(NETEX);
         boolean hasTransitData = hasGtfs || hasNetex;
@@ -118,9 +116,6 @@ public class GraphBuilder implements Runnable {
                 );
             }
             OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProviders);
-            DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
-            streetEdgeFactory.useElevationData = hasDem;
-            osmModule.edgeFactory = streetEdgeFactory;
             osmModule.customNamer = config.customNamer;
             osmModule.setDefaultWayPropertySetSource(config.osmWayPropertySet);
             osmModule.skipVisibility = !config.areaVisibility;
@@ -210,6 +205,7 @@ public class GraphBuilder implements Runnable {
                     config.writeCachedElevations,
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples,
+                    config.maxElevationPropagationMeters,
                     config.includeEllipsoidToGeoidDifference,
                     config.multiThreadElevationCalculations
                 )

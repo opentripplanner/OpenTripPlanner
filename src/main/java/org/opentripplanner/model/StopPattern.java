@@ -50,6 +50,12 @@ public final class StopPattern implements Serializable {
         dropoffs  = new PickDrop[size];
     }
 
+    private StopPattern(StopLocation[] stops, PickDrop[] pickups, PickDrop[] dropoffs) {
+        this.stops = stops;
+        this.pickups = pickups;
+        this.dropoffs = dropoffs;
+    }
+
     /** Assumes that stopTimes are already sorted by time. */
     public StopPattern (Collection<StopTime> stopTimes) {
         this (stopTimes.size());
@@ -64,6 +70,47 @@ public final class StopPattern implements Serializable {
             // pick/drop messages could be stored in individual trips
             pickups[i] = computePickDrop(stopTime.getStop(), stopTime.getPickupType());
             dropoffs[i] = computePickDrop(stopTime.getStop(), stopTime.getDropOffType());
+        }
+    }
+
+    public StopPatternBuilder mutate() {
+        return new StopPatternBuilder(this);
+    }
+
+    /**
+     * For creating StopTimes without StopTime, for example for unit testing.
+     */
+    public static StopPatternBuilder create(int length) {
+        return new StopPatternBuilder(new StopPattern(length));
+    }
+
+    public static class StopPatternBuilder {
+
+        public final StopLocation[] stops;
+        public final PickDrop[] pickups;
+        public final PickDrop[] dropoffs;
+
+        public StopPatternBuilder(StopPattern original) {
+            stops = Arrays.copyOf(original.stops, original.stops.length);
+            pickups = Arrays.copyOf(original.pickups, original.pickups.length);
+            dropoffs = Arrays.copyOf(original.dropoffs, original.dropoffs.length);
+        }
+
+        /**
+         * Sets pickup and dropoff at given stop indices as CANCELLED.
+         *
+         * @return StopPatternBuilder
+         */
+        public StopPatternBuilder cancelStops(List<Integer> cancelledStopIndices) {
+            cancelledStopIndices.forEach(index -> {
+                pickups[index] = PickDrop.CANCELLED;
+                dropoffs[index] = PickDrop.CANCELLED;
+            });
+            return this;
+        }
+
+        public StopPattern build() {
+            return new StopPattern(stops, pickups, dropoffs);
         }
     }
 

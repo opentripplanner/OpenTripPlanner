@@ -22,14 +22,14 @@ public class NorwayWayPropertySetSourceTest {
     way1.addTag("mtb:scale", "3");
 
     assertEquals(
-        wps.getDataForWay(way1).getPermission(), StreetTraversalPermission.NONE);
+            StreetTraversalPermission.NONE, wps.getDataForWay(way1).getPermission());
 
     var way2 = new OSMWithTags();
     way2.addTag("highway", "track");
     way2.addTag("mtb:scale", "3");
 
     assertEquals(
-        wps.getDataForWay(way2).getPermission(), StreetTraversalPermission.NONE);
+            StreetTraversalPermission.NONE, wps.getDataForWay(way2).getPermission());
   }
 
   @Test
@@ -39,13 +39,30 @@ public class NorwayWayPropertySetSourceTest {
     way1.addTag("mtb:scale", "1");
 
     assertEquals(
-        wps.getDataForWay(way1).getPermission(), StreetTraversalPermission.PEDESTRIAN);
+            StreetTraversalPermission.PEDESTRIAN, wps.getDataForWay(way1).getPermission());
 
     var way2 = new OSMWithTags();
     way2.addTag("highway", "track");
     way2.addTag("mtb:scale", "1");
 
     assertEquals(
-        wps.getDataForWay(way2).getPermission(), StreetTraversalPermission.PEDESTRIAN);
+            StreetTraversalPermission.PEDESTRIAN, wps.getDataForWay(way2).getPermission());
+  }
+
+  @Test
+  public void testMotorroad() {
+    var way1 = new OSMWithTags();
+    way1.addTag("highway", "trunk");
+    way1.addTag("motorroad", "yes");
+
+    assertEquals(
+            StreetTraversalPermission.CAR, wps.getDataForWay(way1).getPermission());
+
+    var way2 = new OSMWithTags();
+    way2.addTag("highway", "primary");
+    way2.addTag("motorroad", "yes");
+
+    assertEquals(
+            StreetTraversalPermission.CAR, wps.getDataForWay(way2).getPermission());
   }
 }

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.base.ToStringBuilder;
@@ -30,6 +31,12 @@ public class StreetLeg implements Leg {
 
     private final LineString legGeometry;
 
+    private List<P2<Double>> legElevation;
+
+    private Double elevationLost = null;
+
+    private Double elevationGained = null;
+
     private final List<WalkStep> walkSteps;
 
     private final Set<StreetNote> streetNotes = new HashSet<>();
@@ -53,6 +60,7 @@ public class StreetLeg implements Leg {
             double distanceMeters,
             int generalizedCost,
             LineString geometry,
+            List<P2<Double>> elevation,
             List<WalkStep> walkSteps
     ) {
         if (mode.isTransit()) {
@@ -66,9 +74,11 @@ public class StreetLeg implements Leg {
         this.from = from;
         this.to = to;
         this.generalizedCost = generalizedCost;
+        this.legElevation = elevation;
         this.legGeometry = geometry;
         this.walkSteps = walkSteps;
 
+        updateElevationChanges();
     }
 
     @Override
@@ -139,6 +149,21 @@ public class StreetLeg implements Leg {
     }
 
     @Override
+    public List<P2<Double>> getLegElevation() {
+        return legElevation;
+    }
+
+    @Override
+    public Double getElevationGained() {
+        return elevationGained;
+    }
+
+    @Override
+    public Double getElevationLost() {
+        return elevationLost;
+    }
+
+    @Override
     public List<WalkStep> getWalkSteps() {
         return walkSteps;
     }
@@ -191,11 +216,39 @@ public class StreetLeg implements Leg {
                 .addNum("cost", generalizedCost)
                 .addObj("gtfsPathwayId", pathwayId)
                 .addObj("legGeometry", legGeometry)
+                .addStr("legElevation", legElevation != null ? legElevation.toString() : null)
+                .addNum("elevationGained", elevationGained, "m")
+                .addNum("elevationLost", elevationLost, "m")
                 .addCol("walkSteps", walkSteps)
                 .addCol("streetNotes", streetNotes)
                 .addBool("walkingBike", walkingBike)
                 .addBool("rentedVehicle", rentedVehicle)
                 .addStr("bikeRentalNetwork", vehicleRentalNetwork)
                 .toString();
+    }
+
+    private void updateElevationChanges() {
+        if (legElevation != null) {
+            double elevationGained = 0.0;
+            double elevationLost = 0.0;
+
+            Double lastElevation = null;
+            for (final P2<Double> p2 : legElevation) {
+                double elevation = p2.second;
+                if (lastElevation != null) {
+                    double change = elevation - lastElevation;
+                    if (change > 0) {
+                        elevationGained += change;
+                    }
+                    else if (change < 0) {
+                        elevationLost -= change;
+                    }
+                }
+                lastElevation = elevation;
+            }
+
+            this.elevationGained = elevationGained;
+            this.elevationLost = elevationLost;
+        }
     }
 }

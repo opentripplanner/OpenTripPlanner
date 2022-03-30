@@ -42,6 +42,7 @@ public class TileRendererManager {
         renderers.put("traversal", new EdgeVertexTileRenderer(
                 new TraversalPermissionsEdgeRenderer()));
         renderers.put("wheelchair", new EdgeVertexTileRenderer(new WheelchairEdgeRenderer()));
+        renderers.put("elevation", new EdgeVertexTileRenderer(new ElevationEdgeRenderer(graph)));
     }
 
     public void registerRenderer(String layer, TileRenderer tileRenderer) {
