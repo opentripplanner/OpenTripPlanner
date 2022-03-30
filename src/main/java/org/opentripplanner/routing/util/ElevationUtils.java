@@ -270,53 +270,60 @@ public class ElevationUtils {
         if (elevationProfile == null) {
             return null;
         }
-        List<Coordinate> coordList = new LinkedList<>();
 
-        if (start < 0)
+        if (start < 0) {
             start = 0;
+        }
 
         Coordinate[] coordinateArray = elevationProfile.toCoordinateArray();
         double length = coordinateArray[coordinateArray.length - 1].x;
-        if (end > length)
+        if (end > length) {
             end = length;
+        }
+
+        double newLength = end - start;
 
         boolean started = false;
-        boolean finished = false;
         Coordinate lastCoord = null;
+        List<Coordinate> coordList = new LinkedList<>();
         for (Coordinate coord : coordinateArray) {
-            if (coord.x >= start && coord.x <= end) {
-                coordList.add(new Coordinate(coord.x - start, coord.y));
-                if (!started) {
-                    started = true;
-                    if (lastCoord == null) {
-                       //no need to interpolate as this is the first coordinate
-                        continue;
-                    }
-                    // interpolate start coordinate 
+            if (coord.x >= start && !started) {
+                started = true;
+
+                if (lastCoord != null) {
                     double run = coord.x - lastCoord.x;
-                    if (run < 1) {
-                        //tiny runs are likely to lead to errors, so we'll skip them
-                        continue;
-                    }
-                    double p = (coord.x - start) / run;
+                    double p = (start - lastCoord.x) / run;
                     double rise = coord.y - lastCoord.y;
-                    Coordinate interpolatedStartCoordinate = new Coordinate(0, lastCoord.y + p * rise);
-                    coordList.add(0, interpolatedStartCoordinate);
+                    double newX = lastCoord.x + p * run - start;
+                    double newY = lastCoord.y + p * rise;
+
+                    if (p > 0 && p < 1) {
+                        coordList.add(new Coordinate(newX, newY));
+                    }
                 }
-            } else if (coord.x > end && !finished && started && lastCoord != null) {
-                finished = true;
-                // interpolate end coordinate
-                double run = coord.x - lastCoord.x;
-                if (run < 1) {
-                    //tiny runs are likely to lead to errors, so we'll skip them
-                    continue;
-                }
-                double p = (end - lastCoord.x) / run;
-                double rise = coord.y - lastCoord.y;
-                Coordinate interpolatedEndCoordinate = new Coordinate(end, lastCoord.y + p * rise);
-                coordList.add(interpolatedEndCoordinate);
             }
+
+            if (started && coord.x >= start && coord.x <= end) {
+                coordList.add(new Coordinate(coord.x - start, coord.y));
+            }
+
+            if (started && coord.x >= end) {
+                if (lastCoord != null && lastCoord.x < end && coord.x > end) {
+                    double run = coord.x - lastCoord.x;
+                    // interpolate end coordinate
+                    double p = (end - lastCoord.x) / run;
+                    double rise = coord.y - lastCoord.y;
+                    double newY = lastCoord.y + p * rise;
+                    coordList.add(new Coordinate(newLength, newY));
+                }
+                break;
+            }
+
             lastCoord = coord;
+        }
+
+        if (coordList.size() < 2) {
+            return null;
         }
 
         Coordinate[] coordArr = new Coordinate[coordList.size()];

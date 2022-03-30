@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import io.micrometer.core.instrument.Metrics;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
@@ -168,7 +170,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.buildGraph(graph, extra);
         graph.getStreetIndex();
 
-        Router router = new Router(graph, RouterConfig.DEFAULT);
+        Router router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
         router.startup();
 
         RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
@@ -298,8 +300,11 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
     @Test
     public void testLocalizedString() {
-        LocalizedString localizedString = new LocalizedString("corner",
-                new String[]{"first", "second"});
+        LocalizedString localizedString = new LocalizedString(
+                "corner",
+                new NonLocalizedString("first"),
+                new NonLocalizedString("second")
+        );
 
         assertEquals("Kreuzung first mit second",
                 localizedString.toString(new Locale("de")));

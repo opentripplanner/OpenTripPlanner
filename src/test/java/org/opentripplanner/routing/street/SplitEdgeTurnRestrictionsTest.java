@@ -2,6 +2,7 @@ package org.opentripplanner.routing.street;
 
 import static org.opentripplanner.PolylineAssert.assertThatPolylinesAreEqual;
 
+import io.micrometer.core.instrument.Metrics;
 import java.io.IOException;
 import java.time.Instant;
 import org.junit.jupiter.api.Assertions;
@@ -152,7 +153,9 @@ public class SplitEdgeTurnRestrictionsTest {
 
         request.setRoutingContext(graph);
 
-        var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT));
+        var gpf = new GraphPathFinder(
+                new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry)
+        );
         var paths = gpf.graphPathFinderEntryPoint(request);
 
         GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(

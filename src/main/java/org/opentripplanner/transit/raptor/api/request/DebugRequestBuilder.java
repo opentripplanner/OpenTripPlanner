@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import io.micrometer.core.instrument.Tag;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -125,6 +126,14 @@ public class DebugRequestBuilder {
     }
 
     public DebugRequest build() {
-        return new DebugRequest(this);
+        return new DebugRequest(
+                List.copyOf(stops),
+                List.copyOf(path),
+                debugPathFromStopIndex,
+                stopArrivalListener,
+                patternRideDebugListener,
+                pathFilteringListener,
+                logger
+        );
     }
 }

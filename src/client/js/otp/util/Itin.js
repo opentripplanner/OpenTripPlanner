@@ -340,7 +340,7 @@ otp.util.Itin = {
     },
 
     getModeColor : function(mode) {
-        if(mode === "WALK") return '#bbb';
+        if(mode === "WALK") return '#444';
         if(mode === "BICYCLE") return '#44f';
         if(mode === "SCOOTER") return '#88f';
         if(mode === "CAR") return '#444';
@@ -367,16 +367,28 @@ otp.util.Itin = {
     getLegTextColor : function (leg) {
         if (leg.routeTextColor) {
             return '#' + leg.routeTextColor;
-        } else {
+        }
+        else if(leg.mode === "WALK") {
+            return '#fff';
+        }
+        else {
             return '#000000';
         }
     },
 
-    getLegBackgroundColor : function (leg) {
+    getLegBackgroundColor: function (leg) {
         if (leg.routeColor) {
             return '#' + leg.routeColor;
         } else {
             return this.getModeColor(leg.mode);
+        }
+    },
+
+    getLineStyle: function (leg) {
+        if (leg.mode === "WALK") {
+            return { weight: 4, opacity: 0.8}
+        } else {
+            return { weight: 8, opacity: 0.6}
         }
     },
 }

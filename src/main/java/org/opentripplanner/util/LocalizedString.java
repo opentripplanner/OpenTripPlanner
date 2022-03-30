@@ -38,7 +38,7 @@ public class LocalizedString implements I18NString, Serializable {
     //Key which specifies translation
     private final String key;
     //Values with which tagNames are replaced in translations.
-    private final String[] params;
+    private final I18NString[] params;
 
     /**
      * Creates String which can be localized
@@ -54,7 +54,7 @@ public class LocalizedString implements I18NString, Serializable {
      * @param key key of translation for this way set in {@link org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource} and translations read from from properties Files
      * @param params Values with which tagNames are replaced in translations.
      */
-    public LocalizedString(String key, String[] params) {
+    public LocalizedString(String key, I18NString ... params) {
         this.key = key;
         this.params = params;
     }
@@ -74,20 +74,15 @@ public class LocalizedString implements I18NString, Serializable {
      */
     public LocalizedString(String key, OSMWithTags way) {
         this.key = key;
-        List<String> lparams = new ArrayList<>(4);
+        List<I18NString> lparams = new ArrayList<>(4);
         //Which tags do we want from way
         List<String> tag_names = getTagNames();
-        if (tag_names != null) {
-            for(String tag_name: tag_names) {
-                String param = way.getTag(tag_name);
-                if (param != null) {
-                    lparams.add(param);
-                } else {
-                    lparams.add("");
-                }
-            }
+        for (String tag_name : tag_names) {
+            String param = way.getTag(tag_name);
+            lparams.add(new NonLocalizedString(Objects.requireNonNullElse(param, "")));
         }
-        this.params = lparams.toArray(new String[lparams.size()]);
+
+        this.params = lparams.toArray(new I18NString[0]);
     }
     
     /**
@@ -151,20 +146,23 @@ public class LocalizedString implements I18NString, Serializable {
      * with tag_names replaced with values
      * @return 
      */
-    @Override
-    public String toString(Locale locale) {
-        if (this.key == null) {
-            return null;
-        }
-        //replaces {name}, {ref} etc with %s to be used as parameters
-        //in string formatting with values from way tags values
-        String translation = ResourceBundleSingleton.INSTANCE.localize(this.key, locale);
-        if (this.params != null) {
-            translation = patternMatcher.matcher(translation).replaceAll("%s");
-            return String.format(translation, (Object[]) params);
-        } else {
-            return translation;
-        }
-    }
-
+     @Override
+     public String toString(Locale locale) {
+         if (this.key == null) {
+             return null;
+         }
+         //replaces {name}, {ref} etc with %s to be used as parameters
+         //in string formatting with values from way tags values
+         String translation = ResourceBundleSingleton.INSTANCE.localize(this.key, locale);
+         if (this.params != null) {
+             translation = patternMatcher.matcher(translation).replaceAll("%s");
+             return String.format(
+                     translation,
+                     Arrays.stream(params).map(i -> i.toString(locale)).toArray(Object[]::new)
+             );
+         }
+         else {
+             return translation;
+         }
+     }
 }

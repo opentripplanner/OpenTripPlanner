@@ -145,6 +145,8 @@ public class Itinerary {
         this.waitingTimeSeconds = totals.waitingTimeSeconds;
         this.walkOnly = totals.walkOnly;
         this.streetOnly = totals.streetOnly;
+        this.elevationGained = totals.totalElevationGained;
+        this.elevationLost = totals.totalElevationLost;
     }
 
     /**

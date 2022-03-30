@@ -25,6 +25,8 @@ public class OSMFilter {
      * But not conveyers, proposed highways/roads or those still under construction, and raceways
      * (as well as ways where all access is specifically forbidden to the public).
      * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dproposed
+     *
+     * A whitelist for highway tags is an alternative to a blacklist.
      */
     static boolean isWayRoutable(OSMWithTags way) {
         if (!isOsmEntityRoutable(way)) {
@@ -34,12 +36,19 @@ public class OSMFilter {
         String highway = way.getTag("highway");
         if (highway != null) {
             if(
-                    highway.equals("conveyer") ||
                     highway.equals("proposed") ||
+                    highway.equals("planned") ||
                     highway.equals("construction") ||
                     highway.equals("razed") ||
                     highway.equals("raceway") ||
-                    highway.equals("unbuilt")
+                    highway.equals("abandoned") ||
+                    highway.equals("historic") ||
+                    highway.equals("no") ||
+                    highway.equals("emergency_bay") ||
+                    highway.equals("rest_area") ||
+                    highway.equals("services") ||
+                    highway.equals("bus_guideway") ||
+                    highway.equals("escape")
             ) {
                 return false;
             }
@@ -47,8 +56,9 @@ public class OSMFilter {
 
         if (way.isGeneralAccessDenied()) {
             // There are exceptions.
-            return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
-                    .isPedestrianExplicitlyAllowed() || way.isMotorVehicleExplicitlyAllowed());
+            return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() ||
+                    way.isPedestrianExplicitlyAllowed() || way.isMotorVehicleExplicitlyAllowed() ||
+                    way.isVehicleExplicitlyAllowed());
         }
         return true;
     }
@@ -87,17 +97,14 @@ public class OSMFilter {
         if (entity.isGeneralAccessDenied()) {
             // this can actually be overridden
             permission = StreetTraversalPermission.NONE;
-            if (entity.isMotorcarExplicitlyAllowed() || entity.isMotorVehicleExplicitlyAllowed()) {
-                permission = permission.add(StreetTraversalPermission.CAR);
-            }
-            if (entity.isBicycleExplicitlyAllowed()) {
-                permission = permission.add(StreetTraversalPermission.BICYCLE);
-            }
-            if (entity.isPedestrianExplicitlyAllowed()) {
-                permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
-            }
         } else {
             permission = def;
+        }
+
+        if (entity.isVehicleExplicitlyDenied()) {
+            permission = permission.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+        } else if (entity.isVehicleExplicitlyAllowed()) {
+            permission = permission.add(StreetTraversalPermission.BICYCLE_AND_CAR);
         }
 
         if (entity.isMotorcarExplicitlyDenied() || entity.isMotorVehicleExplicitlyDenied()) {

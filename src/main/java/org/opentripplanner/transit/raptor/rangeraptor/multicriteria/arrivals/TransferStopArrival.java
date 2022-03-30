@@ -39,7 +39,7 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
     }
 
     @Override
-    public TransitArrival<T> mostResentTransitArrival() {
-        return previous().mostResentTransitArrival();
+    public TransitArrival<T> mostRecentTransitArrival() {
+        return previous().mostRecentTransitArrival();
     }
 }

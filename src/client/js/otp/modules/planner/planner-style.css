@@ -434,3 +434,18 @@ h3.sysNotice {
 .otp-itin-print-step {
     margin-top: .5em;
 }
+
+.otp-itinElevationGraph .line {
+    stroke: black;
+}
+
+.otp-itinElevationGraph .label {
+    font-size: 10px;
+}
+
+.otp-itinElevationGraph .step {
+    fill: #fcefa160;
+    stroke: #fcefa1;
+    stroke-width: 1px;
+    display: none;
+}

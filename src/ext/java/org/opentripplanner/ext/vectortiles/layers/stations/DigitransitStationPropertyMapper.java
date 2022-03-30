@@ -28,7 +28,8 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
 
     return List.of(
       new T2<>("gtfsId", station.getId().toString()),
-      new T2<>("name", station.getName()),
+      // Name is I18NString now, we return default name
+      new T2<>("name", station.getName().toString()),
       new T2<>("type", childStops
         .stream()
         .flatMap(stop -> graph.index.getPatternsForStop(stop).stream())

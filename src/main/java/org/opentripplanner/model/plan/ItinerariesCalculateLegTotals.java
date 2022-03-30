@@ -16,6 +16,8 @@ class ItinerariesCalculateLegTotals {
     int waitingTimeSeconds;
     boolean walkOnly = true;
     boolean streetOnly = true;
+    double totalElevationGained = 0.0;
+    double totalElevationLost = 0.0;
 
     public ItinerariesCalculateLegTotals(List<Leg> legs) {
         if (legs.isEmpty()) { return; }
@@ -44,6 +46,10 @@ class ItinerariesCalculateLegTotals {
             }
             if (!leg.isOnStreetNonTransit()) {
                 this.streetOnly = false;
+            }
+            if (leg.getElevationGained() != null && leg.getElevationLost() != null) {
+                this.totalElevationGained += leg.getElevationGained();
+                this.totalElevationLost += leg.getElevationLost();
             }
         }
         this.waitingTimeSeconds = totalDurationSeconds

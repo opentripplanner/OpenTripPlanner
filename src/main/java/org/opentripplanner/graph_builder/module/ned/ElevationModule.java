@@ -1,32 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.geotools.geometry.DirectPosition2D;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opengis.coverage.Coverage;
-import org.opengis.coverage.PointOutsideCoverageException;
-import org.opengis.referencing.operation.TransformException;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.ElevationFlattened;
-import org.opentripplanner.graph_builder.issues.ElevationPropagationLimit;
-import org.opentripplanner.graph_builder.issues.Graphwide;
-import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.ProgressTracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -36,15 +10,39 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
-import static org.opentripplanner.util.logging.ThrottleLogger.throttle;
+import org.geotools.geometry.DirectPosition2D;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opengis.coverage.Coverage;
+import org.opengis.coverage.PointOutsideCoverageException;
+import org.opengis.referencing.operation.TransformException;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.ElevationFlattened;
+import org.opentripplanner.graph_builder.issues.ElevationProfileFailure;
+import org.opentripplanner.graph_builder.issues.Graphwide;
+import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetElevationExtension;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.PolylineEncoder;
+import org.opentripplanner.util.ProgressTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * THIS CLASS IS MULTI-THREADED
@@ -61,12 +59,6 @@ public class ElevationModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(ElevationModule.class);
 
-    /**
-     * Wrap LOG with a Throttle logger for elevation edge warnings, this will prevent thousands
-     * of log events, and just log one message every 3 second.
-     */
-    private static final Logger ELEVATION_EDGE_ERROR_LOG = throttle(LOG);
-
 
     /** The elevation data to be used in calculating elevations. */
     private final ElevationGridCoverageFactory gridCoverageFactory;
@@ -76,6 +68,7 @@ public class ElevationModule implements GraphBuilderModule {
     private final boolean writeCachedElevations;
     /* The file of cached elevations */
     private final File cachedElevationsFile;
+    private final double maxElevationPropagationMeters;
     /* Whether or not to include geoid difference values in individual elevation calculations */
     private final boolean includeEllipsoidToGeoidDifference;
     /*
@@ -111,9 +104,6 @@ public class ElevationModule implements GraphBuilderModule {
      */
     private final double elevationUnitMultiplier;
 
-    /** the graph being built */
-    private Graph graph;
-
     /** A concurrent hashmap used for storing geoid difference values at various coordinates */
     private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
 
@@ -121,6 +111,9 @@ public class ElevationModule implements GraphBuilderModule {
     private Coverage singleThreadedCoverageInterpolator;
 
     private final ThreadLocal<Coverage> coverageInterpolatorThreadLocal = new ThreadLocal<>();
+
+    private double minElevation = Double.MAX_VALUE;
+    private double maxElevation = Double.MIN_VALUE;
 
     /** used only for testing purposes */
     public ElevationModule(ElevationGridCoverageFactory factory) {
@@ -131,6 +124,7 @@ public class ElevationModule implements GraphBuilderModule {
             false,
             1,
             10,
+            2000,
             true,
             false
         );
@@ -143,6 +137,7 @@ public class ElevationModule implements GraphBuilderModule {
         boolean writeCachedElevations,
         double elevationUnitMultiplier,
         double distanceBetweenSamplesM,
+        double maxElevationPropagationMeters,
         boolean includeEllipsoidToGeoidDifference,
         boolean multiThreadElevationCalculations
     ) {
@@ -151,20 +146,10 @@ public class ElevationModule implements GraphBuilderModule {
         this.readCachedElevations = readCachedElevations;
         this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
+        this.maxElevationPropagationMeters = maxElevationPropagationMeters;
         this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
         this.multiThreadElevationCalculations = multiThreadElevationCalculations;
         this.distanceBetweenSamplesM = distanceBetweenSamplesM;
-    }
-
-    /**
-     * Gets the desired amount of processors to use for elevation calculations from the build-config setting. It will
-     * return at least 1 processor and no more than the maximum available processors. The default return value is 1
-     * processor.
-     */
-    public static int fromConfig(JsonNode elevationModuleParallelism) {
-        int maxProcessors = Runtime.getRuntime().availableProcessors();
-        int minimumProcessors = 1;
-        return Math.max(minimumProcessors, Math.min(elevationModuleParallelism.asInt(minimumProcessors), maxProcessors));
     }
 
     @Override
@@ -173,8 +158,8 @@ public class ElevationModule implements GraphBuilderModule {
             HashMap<Class<?>, Object> extra,
             DataImportIssueStore issueStore
     ) {
+        Instant start = Instant.now();
         this.issueStore = issueStore;
-        this.graph = graph;
         gridCoverageFactory.fetchData(graph);
 
         graph.setDistanceBetweenElevationSamples(this.distanceBetweenSamplesM);
@@ -193,11 +178,11 @@ public class ElevationModule implements GraphBuilderModule {
         }
         LOG.info("Setting street elevation profiles from digital elevation model...");
 
-        List<StreetWithElevationEdge> streetsWithElevationEdges = new LinkedList<>();
+        List<StreetEdge> streetsWithElevationEdges = new LinkedList<>();
 
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
-                if (ee instanceof StreetWithElevationEdge) {
+                if (ee instanceof StreetEdge) {
                     if (multiThreadElevationCalculations) {
                         // Multi-threaded execution requested, check and prepare a few things that are used only during
                         // multi-threaded runs.
@@ -207,7 +192,7 @@ public class ElevationModule implements GraphBuilderModule {
                             examplarCoordinate = ee.getGeometry().getCoordinates()[0];
                         }
                     }
-                    streetsWithElevationEdges.add((StreetWithElevationEdge) ee);
+                    streetsWithElevationEdges.add((StreetEdge) ee);
                 }
             }
         }
@@ -222,12 +207,12 @@ public class ElevationModule implements GraphBuilderModule {
             streetsWithElevationEdges.parallelStream().forEach(ee -> processEdgeWithProgress(ee, progress));
         } else {
             // If using just a single thread, process each edge inline
-            for (StreetWithElevationEdge ee : streetsWithElevationEdges) {
+            for (StreetEdge ee : streetsWithElevationEdges) {
                 processEdgeWithProgress(ee, progress);
             }
         }
 
-        int nPoints = nPointsEvaluated.get();
+        int nPoints = nPointsEvaluated.get() + nPointsOutsideDEM.get();
         if(nPoints > 0) {
             double failurePercentage = (double) nPointsOutsideDEM.get() / nPoints * 100.0;
             if (failurePercentage > 50) {
@@ -248,8 +233,8 @@ public class ElevationModule implements GraphBuilderModule {
 
         // Iterate again to find edges that had elevation calculated.
         LinkedList<StreetEdge> edgesWithCalculatedElevations = new LinkedList<>();
-        for (StreetWithElevationEdge edgeWithElevation : streetsWithElevationEdges) {
-            if (edgeWithElevation.hasPackedElevationProfile() && !edgeWithElevation.isElevationFlattened()) {
+        for (StreetEdge edgeWithElevation : streetsWithElevationEdges) {
+            if (edgeWithElevation.hasElevationExtension() && !edgeWithElevation.isElevationFlattened()) {
                 edgesWithCalculatedElevations.add(edgeWithElevation);
             }
         }
@@ -267,253 +252,82 @@ public class ElevationModule implements GraphBuilderModule {
                 out.writeObject(newCachedElevations);
                 out.close();
             } catch (IOException e) {
-                LOG.error(e.getMessage());
-                issueStore.add(new Graphwide("Failed to write cached elevation file!"));
+                issueStore.add(new Graphwide("Failed to write cached elevation file: " + e.getMessage()));
             }
         }
+
         @SuppressWarnings("unchecked")
-        HashMap<Vertex, Double> extraElevation = (HashMap<Vertex, Double>) extra.get(ElevationPoint.class);
-        assignMissingElevations(graph, edgesWithCalculatedElevations, extraElevation);
+        Map<Vertex, Double> extraElevation = (Map<Vertex, Double>) extra.get(ElevationPoint.class);
+        var elevationsForVertices = collectKnownElevationsForVertices(extraElevation, edgesWithCalculatedElevations);
+
+        new MissingElevationHandler(
+                issueStore, elevationsForVertices, maxElevationPropagationMeters
+        )
+                .run();
+
+        updateElevationMetadata(graph);
+
+        LOG.info("Finished elevation processing in {}s", Duration.between(start, Instant.now()).toSeconds());
     }
 
-    static class ElevationRepairState {
-        /* This uses an intuitionist approach to elevation inspection */
-        public StreetEdge backEdge;
-
-        public ElevationRepairState backState;
-
-        public Vertex vertex;
-
-        public double distance;
-
-        public double initialElevation;
-
-        public ElevationRepairState(StreetEdge backEdge, ElevationRepairState backState,
-                Vertex vertex, double distance, double initialElevation) {
-            this.backEdge = backEdge;
-            this.backState = backState;
-            this.vertex = vertex;
-            this.distance = distance;
-            this.initialElevation = initialElevation;
+    private void updateElevationMetadata(Graph graph) {
+        if (nPointsOutsideDEM.get() < nPointsEvaluated.get()) {
+            graph.hasElevation = true;
+            graph.minElevation = minElevation;
+            graph.maxElevation = maxElevation;
         }
     }
 
-    /**
-     * Assign missing elevations by interpolating from nearby points with known
-     * elevation; also handle osm ele tags
-     */
-    private void assignMissingElevations(Graph graph, List<StreetEdge> edgesWithElevation, HashMap<Vertex, Double> knownElevations) {
-
-        LOG.debug("Assigning missing elevations");
-
-        BinHeap<ElevationRepairState> pq = new BinHeap<>();
-
-        // elevation for each vertex (known or interpolated)
+    private Map<Vertex, Double> collectKnownElevationsForVertices(
+            Map<Vertex, Double> knownElevations,
+            List<StreetEdge> edgesWithElevation
+    ) {
         // knownElevations will be null if there are no ElevationPoints in the data
         // for instance, with the Shapefile loader.)
-        HashMap<Vertex, Double> elevations; 
-        if (knownElevations != null)
-            elevations = (HashMap<Vertex, Double>) knownElevations.clone();
-        else
-            elevations = new HashMap<>();
+        var elevations = knownElevations != null
+                ? new HashMap<>(knownElevations)
+                : new HashMap<Vertex, Double>();
 
-        // If including the EllipsoidToGeoidDifference, subtract these from the known elevations found in OpenStreetMap
-        // data.
+        // If including the EllipsoidToGeoidDifference, subtract these from the known elevations
+        // found in OpenStreetMap data.
         if (includeEllipsoidToGeoidDifference) {
             elevations.forEach((vertex, elevation) -> {
                 try {
                     elevations.put(
-                        vertex, elevation - getApproximateEllipsoidToGeoidDifference(vertex.getY(), vertex.getX())
+                            vertex, elevation - getApproximateEllipsoidToGeoidDifference(vertex.getY(), vertex.getX())
                     );
                 } catch (TransformException e) {
                     LOG.error(
-                        "Error processing elevation for known elevation at vertex: {} due to error: {}",
-                        vertex,
-                        e
+                            "Error processing elevation for known elevation at vertex: {} due to error: {}",
+                            vertex,
+                            e
                     );
                 }
             });
         }
 
-        HashSet<Vertex> closed = new HashSet<>();
-
-        // initialize queue with all vertices which already have known elevation
+        // add all vertices which known elevation
         for (StreetEdge e : edgesWithElevation) {
             PackedCoordinateSequence profile = e.getElevationProfile();
 
             if (!elevations.containsKey(e.getFromVertex())) {
                 double firstElevation = profile.getOrdinate(0, 1);
-                ElevationRepairState state = new ElevationRepairState(
-                    null,
-                    null,
-                    e.getFromVertex(),
-                    0,
-                    firstElevation
-                );
-                pq.insert(state, 0);
                 elevations.put(e.getFromVertex(), firstElevation);
             }
 
             if (!elevations.containsKey(e.getToVertex())) {
                 double lastElevation = profile.getOrdinate(profile.size() - 1, 1);
-                ElevationRepairState state = new ElevationRepairState(
-                    null,
-                    null,
-                    e.getToVertex(),
-                    0,
-                    lastElevation
-                );
-                pq.insert(state, 0);
                 elevations.put(e.getToVertex(), lastElevation);
             }
         }
 
-        // Grow an SPT outward from vertices with known elevations into regions where the
-        // elevation is not known. when a branch hits a region with known elevation, follow the
-        // back pointers through the region of unknown elevation, setting elevations via interpolation.
-        while (!pq.empty()) {
-            ElevationRepairState state = pq.extract_min();
-
-            if (closed.contains(state.vertex)) continue;
-            closed.add(state.vertex);
-
-            ElevationRepairState curState = state;
-            Vertex initialVertex = null;
-            while (curState != null) {
-                initialVertex = curState.vertex;
-                curState = curState.backState;
-            }
-
-            double bestDistance = Double.MAX_VALUE;
-            double bestElevation = 0;
-            for (Edge e : state.vertex.getOutgoing()) {
-                if (!(e instanceof StreetEdge)) {
-                    continue;
-                }
-                StreetEdge edge = (StreetEdge) e;
-                Vertex tov = e.getToVertex();
-                if (tov == initialVertex)
-                    continue;
-
-                Double elevation = elevations.get(tov);
-                if (elevation != null) {
-                    double distance = e.getDistanceMeters();
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestElevation = elevation;
-                    }
-                } else {
-                    // continue
-                    ElevationRepairState newState = new ElevationRepairState(
-                        edge,
-                        state,
-                        tov,
-                        e.getDistanceMeters() + state.distance,
-                        state.initialElevation
-                    );
-                    pq.insert(newState, e.getDistanceMeters() + state.distance);
-                }
-            } // end loop over outgoing edges
-
-            for (Edge e : state.vertex.getIncoming()) {
-                if (!(e instanceof StreetEdge)) {
-                    continue;
-                }
-                StreetEdge edge = (StreetEdge) e;
-                Vertex fromv = e.getFromVertex();
-                if (fromv == initialVertex)
-                    continue;
-                Double elevation = elevations.get(fromv);
-                if (elevation != null) {
-                    double distance = e.getDistanceMeters();
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestElevation = elevation;
-                    }
-                } else {
-                    // continue
-                    ElevationRepairState newState = new ElevationRepairState(
-                        edge,
-                        state,
-                        fromv,
-                        e.getDistanceMeters() + state.distance,
-                        state.initialElevation
-                    );
-                    pq.insert(newState, e.getDistanceMeters() + state.distance);
-                }
-            } // end loop over incoming edges
-
-            //limit elevation propagation to at max 2km; this prevents an infinite loop
-            //in the case of islands missing elevation (and some other cases)
-            if (bestDistance == Double.MAX_VALUE && state.distance > 2000) {
-                issueStore.add(new ElevationPropagationLimit(state.vertex));
-                bestDistance = state.distance;
-                bestElevation = state.initialElevation;
-            }
-            if (bestDistance != Double.MAX_VALUE) {
-                // we have found a second vertex with elevation, so we can interpolate the elevation
-                // for this point
-                double totalDistance = bestDistance + state.distance;
-                // trace backwards, setting states as we go
-                while (true) {
-                    // watch out for division by 0 here, which will propagate NaNs 
-                    // all the way out to edge lengths 
-                    if (totalDistance == 0)
-                        elevations.put(state.vertex, bestElevation);
-                    else {
-                        double elevation = (bestElevation * state.distance + 
-                               state.initialElevation * bestDistance) / totalDistance;
-                        elevations.put(state.vertex, elevation);
-                    }
-                    if (state.backState == null)
-                        break;
-                    bestDistance += state.backEdge.getDistanceMeters();
-                    state = state.backState;
-                    if (elevations.containsKey(state.vertex))
-                        break;
-                }
-
-            }
-        } // end loop over states
-
-        // do actual assignments
-        for (Vertex v : graph.getVertices()) {
-            Double fromElevation = elevations.get(v);
-            for (Edge e : v.getOutgoing()) {
-                if (e instanceof StreetWithElevationEdge) {
-                    StreetWithElevationEdge edge = ((StreetWithElevationEdge) e);
-
-                    Double toElevation = elevations.get(edge.getToVertex());
-
-                    if (fromElevation == null || toElevation == null) {
-                        if (!edge.isElevationFlattened() && !edge.isSlopeOverride()) {
-                            LOG.warn("Unexpectedly missing elevation for edge " + edge);
-                        }
-                        continue;
-                    }
-
-                    if (edge.getElevationProfile() != null && edge.getElevationProfile().size() > 2) {
-                        continue;
-                    }
-
-                    Coordinate[] coords = new Coordinate[2];
-                    coords[0] = new Coordinate(0, fromElevation);
-                    coords[1] = new Coordinate(edge.getDistanceMeters(), toElevation);
-
-                    PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
-
-                    if (edge.setElevationProfile(profile, true)) {
-                        issueStore.add(new ElevationFlattened(edge));
-                    }
-                }
-            }
-        }
+        return elevations;
     }
 
     /**
      * Calculate the elevation for a single street edge. After the calculation is complete, update the current progress.
      */
-    private void processEdgeWithProgress(StreetWithElevationEdge ee, ProgressTracker progress) {
+    private void processEdgeWithProgress(StreetEdge ee, ProgressTracker progress) {
         processEdge(ee);
         // Keep lambda to get correct line number in log
         //noinspection Convert2MethodRef
@@ -525,11 +339,11 @@ public class ElevationModule implements GraphBuilderModule {
      *
      * @param ee the street edge
      */
-    private void processEdge(StreetWithElevationEdge ee) {
+    private void processEdge(StreetEdge ee) {
         // First, check if the edge already has been calculated or if it exists in a pre-calculated cache. Checking
         // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
         // coverage.
-        if (ee.hasPackedElevationProfile()) {
+        if (ee.hasElevationExtension()) {
             return; /* already set up */
         }
 
@@ -541,7 +355,7 @@ public class ElevationModule implements GraphBuilderModule {
             );
             if (coordinateSequence != null) {
                 // found a cached value! Set the elevation profile with the pre-calculated data.
-                setEdgeElevationProfile(ee, coordinateSequence, graph);
+                setEdgeElevationProfile(ee, coordinateSequence);
                 return;
             }
         }
@@ -611,12 +425,9 @@ public class ElevationModule implements GraphBuilderModule {
             PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
                     coordList.toArray(coordArr));
 
-            setEdgeElevationProfile(ee, elevPCS, graph);
+            setEdgeElevationProfile(ee, elevPCS);
         } catch (ElevationLookupException e) {
-            // only catch known elevation lookup exceptions
-            ELEVATION_EDGE_ERROR_LOG.warn(
-                    "Error processing elevation for edge: {} due to error: {}", ee, e
-            );
+            issueStore.add(new ElevationProfileFailure(ee, e.getMessage()));
         }
     }
 
@@ -645,7 +456,7 @@ public class ElevationModule implements GraphBuilderModule {
                     try {
                         getElevation(coverage, examplarCoordinate);
                     } catch (ElevationLookupException e) {
-                        ELEVATION_EDGE_ERROR_LOG.warn(
+                        LOG.warn(
                             "Error processing elevation for coordinate: {} due to error: {}",
                             examplarCoordinate,
                             e
@@ -663,11 +474,17 @@ public class ElevationModule implements GraphBuilderModule {
         }
     }
 
-    private void setEdgeElevationProfile(StreetWithElevationEdge ee, PackedCoordinateSequence elevPCS, Graph graph) {
-        if(ee.setElevationProfile(elevPCS, false)) {
-            synchronized (graph) {
+    private void setEdgeElevationProfile(
+            StreetEdge ee,
+            PackedCoordinateSequence elevPCS
+    ) {
+        try {
+            StreetElevationExtension.addToEdge(ee, elevPCS, false);
+            if (ee.isElevationFlattened()) {
                 issueStore.add(new ElevationFlattened(ee));
             }
+        } catch (Exception e) {
+            issueStore.add(new ElevationProfileFailure(ee, e.getMessage()));
         }
     }
 
@@ -721,9 +538,16 @@ public class ElevationModule implements GraphBuilderModule {
             nPointsOutsideDEM.incrementAndGet();
             throw e;
         }
+
+        var elevation = (values[0] * elevationUnitMultiplier) -
+                (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
+
+        minElevation = Math.min(minElevation, elevation);
+        maxElevation = Math.max(maxElevation, elevation);
+
         nPointsEvaluated.incrementAndGet();
-        return (values[0] * elevationUnitMultiplier) -
-            (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
+
+        return elevation;
     }
 
     /**

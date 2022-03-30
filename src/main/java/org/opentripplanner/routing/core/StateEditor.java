@@ -139,8 +139,8 @@ public class StateEditor {
     /* Incrementors */
 
     public void incrementWeight(double weight) {
-        if (Double.isNaN(weight)) {
-            LOG.warn("A state's weight is being incremented by NaN while traversing edge "
+        if (Double.isInfinite(weight) || Double.isNaN(weight)) {
+            LOG.warn("A state's weight is being incremented by " + weight + " while traversing edge "
                     + child.backEdge);
             defectiveTraversal = true;
             return;

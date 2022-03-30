@@ -1,13 +1,12 @@
 package org.opentripplanner.routing.fares.impl;
 
-import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Convert an OTP2 Itinerary to a list of Ride objects used by the fare calculators.
@@ -51,16 +50,12 @@ public class RideMapper {
         ride.route = leg.getRoute().getId();
         ride.trip = leg.getTrip().getId();
 
-        ride.startTime = toZonedDateTime(leg.getStartTime());
-        ride.endTime = toZonedDateTime(leg.getEndTime());
+        ride.startTime = TimeUtils.zonedDateTime(leg.getStartTime());
+        ride.endTime = TimeUtils.zonedDateTime(leg.getEndTime());
 
         // In the default fare service, we classify rides by mode.
         ride.classifier = leg.getMode();
         return ride;
-    }
-
-    private static ZonedDateTime toZonedDateTime(Calendar time) {
-        return time.toInstant().atZone(time.getTimeZone().toZoneId());
     }
 
 }

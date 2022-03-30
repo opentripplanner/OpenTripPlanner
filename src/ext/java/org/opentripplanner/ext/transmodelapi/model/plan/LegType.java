@@ -32,6 +32,7 @@ public class LegType {
       GraphQLOutputType estimatedCallType,
       GraphQLOutputType lineType,
       GraphQLOutputType serviceJourneyType,
+      GraphQLOutputType datedServiceJourneyType,
       GraphQLOutputType ptSituationElementType,
       GraphQLObjectType placeType,
       GraphQLObjectType pathGuidanceType,
@@ -220,6 +221,22 @@ public class LegType {
             .type(serviceJourneyType)
             .dataFetcher(env -> leg(env).getTrip())
             .build())
+        .field(GraphQLFieldDefinition
+            .newFieldDefinition()
+            .name("datedServiceJourney")
+            .description("The dated service journey used for this leg.")
+            .type(datedServiceJourneyType)
+            .dataFetcher(env -> {
+                var trip = leg(env).getTrip();
+                if(trip == null) {
+                    return null;
+                }
+                var tripId = leg(env).getTrip().getId();
+                var serviceDate = leg(env).getServiceDate();
+
+                return GqlUtil.getRoutingService(env)
+                        .getTripOnServiceDateForTripAndDay(tripId, serviceDate);
+            }).build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("intermediateQuays")

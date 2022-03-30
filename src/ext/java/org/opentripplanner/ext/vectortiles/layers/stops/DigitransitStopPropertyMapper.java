@@ -52,7 +52,8 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
 
     return List.of(
       new T2<>("gtfsId", stop.getId().toString()),
-      new T2<>("name", stop.getName()),
+      // Name is I18NString now, we return default name
+      new T2<>("name", stop.getName().toString()),
       new T2<>("code", stop.getCode()),
       new T2<>("platform", stop.getPlatformCode()),
       new T2<>("desc", stop.getDescription()),

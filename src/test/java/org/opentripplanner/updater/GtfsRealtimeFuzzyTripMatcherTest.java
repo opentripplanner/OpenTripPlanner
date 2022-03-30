@@ -35,6 +35,6 @@ public class GtfsRealtimeFuzzyTripMatcherTest extends GtfsTest {
 
     @Override
     public String getFeedName() {
-        return "gtfs/portland.gtfs.zip";
+        return "portland/portland.gtfs.zip";
     }
 }

@@ -104,7 +104,11 @@ public class ToStringBuilder {
     }
 
     public ToStringBuilder addObj(String name, Object obj) {
-        return addIfNotNull(name, obj);
+        return addObj(name, obj, null);
+    }
+
+    public ToStringBuilder addObj(String name, Object value, Object ignoreValue) {
+        return addIfNotIgnored(name, value, ignoreValue, Object::toString);
     }
 
     public ToStringBuilder addEntityId(String name, TransitEntity entity) {
@@ -121,8 +125,9 @@ public class ToStringBuilder {
         return addIt(name, Arrays.toString(value));
     }
 
+    /** Add collection if not null or not empty, all elements are added */
     public ToStringBuilder addCol(String name, Collection<?> c) {
-        return addIfNotNull(name, c);
+        return addIfNotNull(name, c==null || c.isEmpty() ? null : c);
     }
 
     public ToStringBuilder addColSize(String name, Collection<?> c) {

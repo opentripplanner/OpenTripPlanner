@@ -1,6 +1,7 @@
 package org.opentripplanner.api.parameter;
 
 import com.beust.jcommander.internal.Sets;
+import java.io.Serial;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -22,14 +23,19 @@ import java.util.function.Predicate;
  * into more efficient and useful representation in the routing request.
  */
 public class QualifiedModeSet implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     
     public Set<QualifiedMode> qModes = Sets.newHashSet();
 
-    public QualifiedModeSet(String s) {
-        for (String qMode : s.split(",")) {
+    public QualifiedModeSet(String[] modes) {
+        for (String qMode : modes) {
             qModes.add(new QualifiedMode(qMode));
         }
+    }
+
+    public QualifiedModeSet(String s) {
+        this(s.split(","));
     }
 
     public RequestModes getRequestModes() {
