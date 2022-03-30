@@ -4,10 +4,13 @@ package org.opentripplanner.model.plan;
 import static java.util.Locale.ROOT;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.core.Fare;
@@ -224,6 +227,21 @@ public class Itinerary {
     /** Get the first transit leg if one exist */
     public Optional<Leg> firstTransitLeg() {
         return legs.stream().filter(Leg::isTransitLeg).findFirst();
+    }
+
+    public Float accessibilityScore() {
+        var scores = legs.stream()
+                .map(Leg::accessibilityScore)
+                .filter(Objects::nonNull)
+                .mapToDouble(Float::doubleValue)
+                .toArray();
+
+        var sum = Arrays.stream(scores).sum();
+        if(scores.length > 0) {
+            return (float) sum / scores.length;
+        } else {
+            return null;
+        }
     }
 
     /**

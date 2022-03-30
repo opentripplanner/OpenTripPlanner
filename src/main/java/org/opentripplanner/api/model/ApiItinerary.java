@@ -110,4 +110,9 @@ public class ApiItinerary {
      * is set than it is possible to end a trip without dropping off the rented bicycle.
      */
     public boolean arrivedAtDestinationWithRentedBicycle = false;
+
+    /**
+     * On a scale from 0 to 1, how accessible is this route.
+     */
+    public Float accessibilityScore;
 }
