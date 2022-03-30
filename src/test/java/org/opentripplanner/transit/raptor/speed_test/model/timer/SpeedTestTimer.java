@@ -55,11 +55,13 @@ public class SpeedTestTimer {
 
     public void setUp() {
         var measurementEnv = Optional.ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT")).orElse("local");
+        var location = Optional.ofNullable(System.getenv("SPEEDTEST_LOCATION")).orElse("norway");
         registry.config().commonTags(List.of(
                 Tag.of("measurement.environment", measurementEnv),
                 Tag.of("git.commit", projectInfo().versionControl.commit),
                 Tag.of("git.branch", projectInfo().versionControl.branch),
                 Tag.of("git.buildtime", projectInfo().versionControl.buildTime)
+                Tag.of("location", location)
         ));
 
         // record the lowest percentile of times

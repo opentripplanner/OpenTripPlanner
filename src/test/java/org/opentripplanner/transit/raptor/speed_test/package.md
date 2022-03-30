@@ -1,6 +1,6 @@
 # SpeedTest
 
-This package contain the MANUAL SpeedTest used to performance tune the Raptor algorithm. Code
+This package contains the MANUAL SpeedTest used to performance tune the Raptor algorithm. Code
 inside this package should not be used outside this package.
 
 When changing the core logic of Raptor this test can be used to detect changes in the result and
