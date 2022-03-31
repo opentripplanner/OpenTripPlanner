@@ -24,7 +24,7 @@ class NetexMapperIndexesTest {
     private static final String SJ_1 = "SJ-1";
     private static final String SJ_2 = "SJ-2";
 
-    @org.junit.Test
+    @Test
     public void indexDSJBySJIdWithEmptyInput() {
         assertEquals(ArrayListMultimap.create(), NetexMapperIndexes.indexDSJBySJId(new HierarchicalMapById<>()));
     }
