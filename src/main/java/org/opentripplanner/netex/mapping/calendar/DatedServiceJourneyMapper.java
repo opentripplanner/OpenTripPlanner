@@ -23,15 +23,6 @@ import static org.opentripplanner.netex.mapping.support.ServiceAlterationFilter.
  */
 public class DatedServiceJourneyMapper {
 
-  public static Multimap<String, DatedServiceJourney> indexDSJBySJId(
-      ReadOnlyHierarchicalMapById<DatedServiceJourney> datedServiceJourneys
-  ) {
-    Multimap<String, DatedServiceJourney> dsjBySJId = ArrayListMultimap.create();
-    for (DatedServiceJourney dsj : datedServiceJourneys.localValues()) {
-      dsjBySJId.put(dsj.getJourneyRef().get(0).getValue().getRef(), dsj);
-    }
-    return dsjBySJId;
-  }
 
   /**
    * Map a list of DSJs to a set of service days.

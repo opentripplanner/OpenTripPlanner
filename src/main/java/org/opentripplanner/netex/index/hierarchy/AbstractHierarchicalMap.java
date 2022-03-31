@@ -34,6 +34,7 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
      * NB! elements of this class and its parents are NOT merged, the closest win.
      * @return an empty collection if no element are found.
      */
+    @Override
     public V lookup(K key) {
         return (localContainsKey(key) || isRoot()) ? localGet(key) : parent.lookup(key);
     }
@@ -41,6 +42,7 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
     /**
      * The key exist in this Collection or one of the parents (parent, parent´s parent and so on)
      */
+    @Override
     public boolean containsKey(K key) {
         return localContainsKey(key) || parentContainsKey(key);
     }

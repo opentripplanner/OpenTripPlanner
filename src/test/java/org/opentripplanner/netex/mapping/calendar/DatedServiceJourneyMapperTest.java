@@ -29,36 +29,13 @@ public class DatedServiceJourneyMapperTest {
 
   private final static ServiceDate SD1 = new ServiceDate(LD1);
   private final static ServiceDate SD2 = new ServiceDate(LD2);
-  private final static ServiceDate SD3 = new ServiceDate(LD3);
 
   private static final String OP_DAY_1 = "OD-1";
   private static final String OP_DAY_2 = "OD-2";
   private static final String OP_DAY_3 = "OD-3";
 
   private static final String SJ_1 = "SJ-1";
-  private static final String SJ_2 = "SJ-2";
 
-
-  @Test
-  public void indexDSJBySJIdWithEmptyInput() {
-    assertEquals(ArrayListMultimap.create(), DatedServiceJourneyMapper.indexDSJBySJId(new HierarchicalMapById<>()));
-  }
-
-  @Test
-  public void indexDSJBySJId() {
-    DatedServiceJourney dsj1 = createDatedServiceJourney("DSJ-1", OP_DAY_1, SJ_1);
-    DatedServiceJourney dsj2 = createDatedServiceJourney("DSJ-2", OP_DAY_1, SJ_2);
-    DatedServiceJourney dsj3 = createDatedServiceJourney("DSJ-3", OP_DAY_2, SJ_1);
-
-    HierarchicalMapById<DatedServiceJourney> input = new HierarchicalMapById<>();
-    input.addAll(List.of(dsj1, dsj2, dsj3));
-
-    Multimap<String, DatedServiceJourney> result = DatedServiceJourneyMapper.indexDSJBySJId(input);
-
-    assertEquals("DSJ-1, DSJ-3", listIdsSortedAsStr(result.get(SJ_1)));
-    assertEquals("DSJ-2", listIdsSortedAsStr(result.get(SJ_2)));
-    assertEquals(Set.of(SJ_1, SJ_2), result.keySet());
-  }
 
   @Test
   public void mapToServiceDatesForEmptyList() {
@@ -93,13 +70,6 @@ public class DatedServiceJourneyMapperTest {
 
     // Then
     assertEquals(List.of(SD1, SD2), sort(result));
-  }
-
-  private static String listIdsSortedAsStr(Collection<DatedServiceJourney> list) {
-    return list.stream()
-        .map(EntityStructure::getId)
-        .sorted()
-        .collect(Collectors.joining(", "));
   }
 
   private <T> List<T> sort(Collection<T> input) {

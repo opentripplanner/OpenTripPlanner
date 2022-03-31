@@ -59,6 +59,11 @@ public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collec
     }
 
     @Override
+    public boolean localIsEmpty() {
+        return map.isEmpty();
+    }
+
+    @Override
     Collection<V> localGet(K key) {
         return map.get(key);
     }

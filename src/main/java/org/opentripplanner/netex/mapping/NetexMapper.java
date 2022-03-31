@@ -1,11 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,28 +11,15 @@ import java.util.Optional;
 import java.util.Set;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.FlexStopLocation;
-import org.opentripplanner.model.GroupOfRoutes;
-import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
-import org.opentripplanner.netex.mapping.calendar.DatedServiceJourneyMapper;
+import org.opentripplanner.netex.mapping.support.NetexMapperIndexes;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.Branding;
-import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
@@ -66,7 +51,6 @@ public class NetexMapper {
     private final OtpTransitServiceBuilder transitBuilder;
     private final Deduplicator deduplicator;
     private final DataImportIssueStore issueStore;
-    private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
     private final CalendarServiceBuilder calendarServiceBuilder;
     private final TripCalendarBuilder tripCalendarBuilder;
     private final Set<String> ferryIdsNotAllowedForBicycle;
@@ -74,16 +58,20 @@ public class NetexMapper {
     /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
     private GroupNetexMapper groupMapper;
 
+    /** All read netex entities by their id */
     private NetexEntityIndexReadOnlyView currentNetexIndex;
-    private int level = LEVEL_SHARED;
 
     /**
-     * This is needed to assign a notice to a stop time. It is not part of the target
-     * OTPTransitService, so we need to temporally cash this here.
+     * Shared/cashed entity index, used by more than one mapper. This index provides alternative indexes to
+     * netex entites, as well as global indexes to OTP domain objects needed in the mapping process. Some of
+     * these indexes are feed scoped, and some are file group level scoped. As a rule of tomb the indexes for
+     * OTP Model entities are global(small memory overhead), while the indexes for the Netex entities follow
+     * the main index {@link  #currentNetexIndex}, hence sopped by file group.
      */
-    private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
+    private NetexMapperIndexes currentMapperIndexes = null;
 
-    private final Multimap<String, DatedServiceJourney> datedServiceJourneysBySjId = ArrayListMultimap.create();
+    private int level = LEVEL_SHARED;
+
 
 
     public NetexMapper(
@@ -122,6 +110,8 @@ public class NetexMapper {
     public NetexMapper pop() {
         performGroupMapping();
         this.tripCalendarBuilder.pop();
+        // A new mapper is created for every call to {@link #mapNetexToOtp}
+        this.currentMapperIndexes = currentMapperIndexes.getParent();
         --level;
         return this;
     }
@@ -132,19 +122,6 @@ public class NetexMapper {
      * accessible any more.
      */
     public void finnishUp() {
-        // Add Calendar data created during the mapping of dayTypes, dayTypeAssignments,
-        // datedServiceJourney and ServiceJourneys
-        transitBuilder.getCalendarDates().addAll(
-                calendarServiceBuilder.createServiceCalendar()
-        );
-    }
-
-    /**
-     * Any post processing step in the mapping is done in this method for a . The method is called
-     * ONCE after all other mapping is complete. Note! Hierarchical data structures are not
-     * accessible any more.
-     */
-    public void finnishUpGroup() {
         // Add Calendar data created during the mapping of dayTypes, dayTypeAssignments,
         // datedServiceJourney and ServiceJourneys
         transitBuilder.getCalendarDates().addAll(
@@ -166,9 +143,13 @@ public class NetexMapper {
      * @param netexIndex The parsed Netex entities to be mapped
      */
     public void mapNetexToOtp(NetexEntityIndexReadOnlyView netexIndex) {
+        this.currentNetexIndex = netexIndex;
+        this.currentMapperIndexes = new NetexMapperIndexes(netexIndex, currentMapperIndexes);
+
+
         // Be careful, the order matter. For example a Route has a reference to Agency; Hence Agency must be mapped
         // before Route - if both entities are defined in the same file.
-        this.currentNetexIndex = netexIndex;
+
         mapAuthorities();
         mapOperators();
         mapShapePoints();
@@ -182,7 +163,7 @@ public class NetexMapper {
         mapMultiModalStopPlaces();
         mapGroupsOfStopPlaces();
         mapFlexibleStopPlaces();
-        mapDatedServiceJourneys();
+        addDatedServiceJourneysToTripCalendar();
         mapDayTypeAssignments();
 
         // DayType and DSJ is mapped to a service calendar and a serviceId is generated
@@ -306,19 +287,18 @@ public class NetexMapper {
         }
         transitBuilder.getStops().addAll(stopMapper.resultStops);
         transitBuilder.getStations().addAll(stopMapper.resultStations);
-        stationsByMultiModalStationRfs.putAll(stopMapper.resultStationByMultiModalStationRfs);
+        currentMapperIndexes.addStationByMultiModalStationRfs(stopMapper.resultStationByMultiModalStationRfs);
 
     }
 
     private void mapMultiModalStopPlaces() {
         MultiModalStationMapper mapper = new MultiModalStationMapper(issueStore, idFactory);
+
         for (StopPlace multiModalStopPlace : currentNetexIndex.getMultiModalStopPlaceById().localValues()) {
-            transitBuilder.getMultiModalStationsById().add(
-                mapper.map(
-                    multiModalStopPlace,
-                    stationsByMultiModalStationRfs.get(multiModalStopPlace.getId())
-                )
-            );
+            var stations = currentMapperIndexes.getStationsByMultiModalStationRfs().get(multiModalStopPlace.getId());
+            var multiModalStation = mapper.map(multiModalStopPlace, stations);
+
+            transitBuilder.getMultiModalStationsById().add(multiModalStation);
         }
     }
 
@@ -355,13 +335,10 @@ public class NetexMapper {
         }
     }
 
-    private void mapDatedServiceJourneys() {
-        datedServiceJourneysBySjId.putAll(DatedServiceJourneyMapper.indexDSJBySJId(
-                currentNetexIndex.getDatedServiceJourneys()
-        ));
+    private void addDatedServiceJourneysToTripCalendar() {
         tripCalendarBuilder.addDatedServiceJourneys(
             currentNetexIndex.getOperatingDayById(),
-            datedServiceJourneysBySjId
+            currentMapperIndexes.getDatedServiceJourneysBySjId()
         );
     }
 
@@ -425,7 +402,8 @@ public class NetexMapper {
                 currentNetexIndex.getServiceJourneyById(),
                 currentNetexIndex.getFlexibleLineById(),
                 currentNetexIndex.getOperatingDayById(),
-                datedServiceJourneysBySjId,
+                currentNetexIndex.getDatedServiceJourneys(),
+                currentMapperIndexes.getDatedServiceJourneysBySjId(),
                 serviceIds,
                 deduplicator
         );
@@ -440,7 +418,7 @@ public class NetexMapper {
             for (var it : result.tripPatterns.entries()) {
                 transitBuilder.getTripPatterns().put(it.getKey(), it.getValue());
             }
-            stopTimesByNetexId.putAll(result.stopTimeByNetexId);
+            currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId);
             groupMapper.scheduledStopPointsIndex.putAll(result.scheduledStopPointsIndex);
             transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates);
         }
@@ -454,7 +432,7 @@ public class NetexMapper {
                 currentNetexIndex.getNoticeById(),
                 transitBuilder.getRoutes(),
                 transitBuilder.getTripsById(),
-                stopTimesByNetexId
+                currentMapperIndexes.getStopTimesByNetexId()
         );
         for (NoticeAssignment noticeAssignment : currentNetexIndex.getNoticeAssignmentById().localValues()) {
             Multimap<TransitEntity, Notice> noticesByElementId;
