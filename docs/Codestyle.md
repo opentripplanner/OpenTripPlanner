@@ -2,134 +2,89 @@
 
 We use the following code conventions for [Java](#Java) and [JavaScript](#JavaScript).
 
-## Java
-The OpenTripPlanner Java code style is revised in OTP v2.2. We use the
-[Prettier Java](https://github.com/jhipster/prettier-java) as is. 
 
-### IntellJ Code Style formatter 
-If you use IntelliJ, the code-style is automatically imported when you first 
+## Java
+
+The OpenTripPlanner Java code style is revised in OTP v2.2. We use the
+[Prettier Java](https://github.com/jhipster/prettier-java) as is. Maven is
+setup to run `prettier-maven-plugin`. A check is run in the CI build, which 
+fails the build preventing merging a PR if the code-style is incorrect.
+
+There is two ways to format the code before checkin it in. You may run a normal
+build with maven - it takes a bit of time, but reformat the entire codebase. 
+Only code you have changed should be formatted, since the existing code is 
+already formatted. The second way is to set up prettier and run it manually 
+or hick it into your IDE, so it runs every time a file is changed. 
+
+
+### How to run Prittier with Maven
+
+
+Format all code is done in the validate phase (run before test, package, install)
+
+```
+% mvn test
+```
+To skip the prettier formating use profile `prettierSkip`:
+
+```
+% mvn test -P prettierSkip
+```
+
+The check for formatting errors use profile `prettierCheck`:
+
+```
+% mvn test -P prettierSkip
+```
+
+The check is run by the CI server and will fail the build if the code is 
+incorrectly formatted.
+
+### IntellJ and Code Style Formatting
+
+If you use IntelliJ, the code-style is automatically imported when you first
 import the project. If you have set a custom code-style in your settings (as we
 used in v2.1.0 of OTP), then you should need to change to the _Project_ Code
-Style. Open the `Preferences` from the menu and select _Editor > Code Style_. 
+Style. Open the `Preferences` from the menu and select _Editor > Code Style_.
 Then select **Project** in the _Scheme drop down.
 
-Note that the IntelliJ formatter will not always format the code according to
-the _Prettier Java_. Run `mvn validate` to format all code int the project.
+
+#### Install File Watchers Plugin in IntelliJ
+
+1. In the menyopen _Prefernces..._ and select _Plugins_.
+2. Search for "File Watchers" in Marketplace
+3. Run _Install_
+
+
+##### Configure File Watcher
+
+You can run Prettier on every file save in Intellij using the File Watcher plugin.
+There is several ways to set it up. Below is hwo to configure it using Maven to
+run the formatter. The Maven way work without any installation of other 
+components, but might be a bit slow. So, you might want to install
+[prettier-java](https://github.com/jhipster/prettier-java/) in 
+your shell and run it instead.
+
+
+> *Name:* Format files with Prettier
+>
+> *File type:* Java
+>
+> *Scope:* Project Files
+> 
+> *Program:* mvn
+> 
+> *Arguments:* prettier:write -Dprettier.inputGlobs=$FilePathRelativeToProjectRoot$
+>
+> *Working Directory:* $ProjectFileDir$
 
 
 ### Other IDEs
 We do not have support for other IDEs at the moment. If you use another editor
 and make one please feel free to share it.  
 
-### Code Style
 
-Our style differs in the following ways from the Google guide. Each point references the section of
-the original document that is modified.
-
-  - 4.5.1 We apply the same line breaking rules to parentheses as to curly braces. Any time the
-    contents of the parentheses are not all placed on one line, we insert a line break after the
-    opening paren, and place the closing one at the beginning of a new line. 
-    ```java
-    // 
-    int value = calculateSomeValue(
-        arg1, 
-        arg2, 
-        arg3
-    );
-
-    // Also Ok
-    int value = calculateSomeValue(
-        arg1, arg2, arg3 
-    );
-
-    // Avoid this
-    int value = calculateSomeValue(arg1,
-        arg2, arg3 
-    );
-    // and this
-    int value = calculateSomeValue(
-        arg1, arg2, arg3) 
-        
-    ```
-    
-  - 4.6.1 We insert double empty lines before comments that introduce the highest level groupings of
-    methods or fields within a class, for example `/* private methods */`, 
-    `/* symbolic constants */`. 
-    ```
-    public foo() { 
-    }
-    
-    
-    /* private methods */
-    
-    private bar() ...
-    ```
-  - 4.8.3 the final example is not allowed. All opening brackets or parens should be on the same
-    line as the identifier or other construct that they follow.
-  - 4.8.5 All annotations on classes, fields, and methods should always have a newline after the
-    last annotation, i.e. they should not appear on the same line as the identifier they annotate,
-    and should only appear on the same line as other annotations. Series of multiple annotations may
-    each appear on a separate line, or may all be grouped together on the same line.
-  - 4.8.6.1 On multi-line `/* ... */` comments we do not begin the intermediate lines with asterisks
-    `*`.
-  - 5.2.8 We only use single capital letters (single characters) for generic type parameters.
-  - 7.2 We do not begin Javadoc with summary fragments. This is because will no longer generate and
-    publish Javadoc pages, the Javadoc will only be used within IDEs.
-  - 7.3.1 The item in the original document implies that trivial Javadoc like `/** Returns the 
-    canonical name. */` should still be included. There is almost always something more to explain
-    to someone who is seeing this method or class for the first time.
-
-### Notes on breaking lines
-The eye scan the code much faster if there is less need of horizontal movement, so formatting the 
-code becomes a balance on how long the lies should be and how to break it. Try to brake the code
-at the outer-most scope aligning expressions with the same scope. Consider to chop down all 
-expressions with the same scope and indent them, do not align code further to the right than the
-indentation margin.
-```
-  // Conider this code:
-  xxxx xxx = xxx + xxx * xxx - ( x.xxxx().xx().xxx() - xxx ) / xxx;
-
-  // Break tha line as every operator, pharenphasis and method chanin.
-  // This is a bit extrem, but illustrates the correct way to break the lines.
-  xxxx xxx 
-      = xxx 
-      + 
-          xxx 
-          * xxx 
-      - 
-          ( 
-              x.xxxx()
-                  .xx()
-                  .xxx() 
-              - xxx 
-          ) 
-          / xxx
-      ;
-
-  // Prefered compromize
-  xxxx xxx = xxx + xxx * xxx 
-      - ( x.xxxx().xx().xxx() - xxx ) / xxx
-
-  // or 
-  xxxx xxx 
-      = xxx + xxx * xxx 
-      - ( 
-          x.xxxx().xx().xxx() 
-          - xxx 
-      ) / xxx
-```
-```
-  // Right alignment not allowed
-  xxxx xxx = xxx 
-           + xxx * xxx; 
-  
-  // use indentation margin instead
-  xxxx xxx = xxx
-      + xxx * xxx; 
-
-```
-
-### Sorting class members
+### Sorting Class Members
 Some of the classes in OTP have a lot of fields and methods. Keeping members sorted reduce the
 merge conflicts. Adding fields and methods to the end of the list will cause merge conflicts 
 more often than inserting methods and fields in an ordered list. Fields and methods can be sorted
