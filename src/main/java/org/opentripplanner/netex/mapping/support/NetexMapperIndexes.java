@@ -14,13 +14,12 @@ import java.util.Map;
 
 
 /**
- * The responsibility of this class is to cache and index NeTEx entities uses be more than one mapper.
- * It supports the same hierarchical as the li
+ * The responsibility of this class is to cache and index NeTEx entities used by more than one mapper.
  * <p>
- * The typical use case is that tha same index is used in several mappers, so to avoid repeating the
- * same logic and create same index twice, we instead cache it here.
+ * The typical use case is that the same index is used in several mappers, so to avoid repeating the
+ * same logic and create the same index twice, we instead cache it here.
  * <p>
- * Only local current level entities are cashed, and the cache is thrown away for each set of files loaded
+ * Only local current level entities are cached, and the cache is thrown away for each set of files loaded
  * (shared files, shared group files and group files).
  *
  */
