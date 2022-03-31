@@ -144,11 +144,11 @@ class TripPatternMapper {
         for (ServiceJourney serviceJourney : serviceJourneys) {
             Trip trip = tripMapper.mapServiceJourney(serviceJourney);
 
-            // Add the dated service journey to the model for this trip [if it exists]
-            mapDatedServiceJourney(serviceJourney, trip);
-
             // Unable to map ServiceJourney, problem logged by the mapper above
             if(trip == null) { continue; }
+
+            // Add the dated service journey to the model for this trip [if it exists]
+            mapDatedServiceJourney(serviceJourney, trip);
 
             StopTimesMapperResult stopTimes = stopTimesMapper.mapToStopTimes(
                     journeyPattern,
