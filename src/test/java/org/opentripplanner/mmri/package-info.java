@@ -13,5 +13,8 @@
  * approximation of reality, but several minor shortcuts have been taken, like applying trip updates
  * directly to the graph instead of going through the thread-safe graph writer framework. Given that
  * thread-safety is a technical issue and not a functional one, this is considered to be acceptable.
+ *
+ * The test cases are described <a href="https://github.com/plannerstack/testset">here</a>. and in
+ * <a href="./MMRI Testdocument.pdf">here</a>
  */
 package org.opentripplanner.mmri;
