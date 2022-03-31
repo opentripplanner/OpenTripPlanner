@@ -72,7 +72,6 @@
                   <FIELD>true</FIELD>
                   <FINAL>true</FINAL>
                   <STATIC>true</STATIC>
-                  <visibility />
                 </AND>
               </match>
             </rule>
@@ -83,7 +82,6 @@
                 <AND>
                   <FIELD>true</FIELD>
                   <STATIC>true</STATIC>
-                  <visibility />
                 </AND>
               </match>
             </rule>
@@ -94,7 +92,6 @@
                 <AND>
                   <FIELD>true</FIELD>
                   <FINAL>true</FINAL>
-                  <visibility />
                 </AND>
               </match>
             </rule>
@@ -102,10 +99,7 @@
           <section>
             <rule>
               <match>
-                <AND>
-                  <FIELD>true</FIELD>
-                  <visibility />
-                </AND>
+                <FIELD>true</FIELD>
               </match>
             </rule>
           </section>
@@ -129,9 +123,17 @@
           <section>
             <rule>
               <match>
+                <CONSTRUCTOR>true</CONSTRUCTOR>
+              </match>
+            </rule>
+          </section>
+          <section>
+            <rule>
+              <match>
                 <AND>
-                  <CONSTRUCTOR>true</CONSTRUCTOR>
-                  <visibility />
+                  <METHOD>true</METHOD>
+                  <PUBLIC>true</PUBLIC>
+                  <STATIC>true</STATIC>
                 </AND>
               </match>
             </rule>
@@ -141,8 +143,7 @@
               <match>
                 <AND>
                   <METHOD>true</METHOD>
-                  <STATIC>true</STATIC>
-                  <visibility />
+                  <PUBLIC>true</PUBLIC>
                 </AND>
               </match>
             </rule>
@@ -152,7 +153,8 @@
               <match>
                 <AND>
                   <METHOD>true</METHOD>
-                  <visibility />
+                  <PROTECTED>true</PROTECTED>
+                  <STATIC>true</STATIC>
                 </AND>
               </match>
             </rule>
@@ -161,8 +163,8 @@
             <rule>
               <match>
                 <AND>
-                  <ENUM>true</ENUM>
-                  <visibility />
+                  <METHOD>true</METHOD>
+                  <PROTECTED>true</PROTECTED>
                 </AND>
               </match>
             </rule>
@@ -171,9 +173,55 @@
             <rule>
               <match>
                 <AND>
-                  <INTERFACE>true</INTERFACE>
-                  <visibility />
+                  <METHOD>true</METHOD>
+                  <PACKAGE_PRIVATE>true</PACKAGE_PRIVATE>
+                  <STATIC>true</STATIC>
                 </AND>
+              </match>
+            </rule>
+          </section>
+          <section>
+            <rule>
+              <match>
+                <AND>
+                  <METHOD>true</METHOD>
+                  <PACKAGE_PRIVATE>true</PACKAGE_PRIVATE>
+                </AND>
+              </match>
+            </rule>
+          </section>
+          <section>
+            <rule>
+              <match>
+                <AND>
+                  <METHOD>true</METHOD>
+                  <PRIVATE>true</PRIVATE>
+                  <STATIC>true</STATIC>
+                </AND>
+              </match>
+            </rule>
+          </section>
+          <section>
+            <rule>
+              <match>
+                <AND>
+                  <METHOD>true</METHOD>
+                  <PRIVATE>true</PRIVATE>
+                </AND>
+              </match>
+            </rule>
+          </section>
+          <section>
+            <rule>
+              <match>
+                <ENUM>true</ENUM>
+              </match>
+            </rule>
+          </section>
+          <section>
+            <rule>
+              <match>
+                <INTERFACE>true</INTERFACE>
               </match>
             </rule>
           </section>
@@ -183,7 +231,6 @@
                 <AND>
                   <CLASS>true</CLASS>
                   <STATIC>true</STATIC>
-                  <visibility />
                 </AND>
               </match>
             </rule>
@@ -191,10 +238,7 @@
           <section>
             <rule>
               <match>
-                <AND>
-                  <CLASS>true</CLASS>
-                  <visibility />
-                </AND>
+                <CLASS>true</CLASS>
               </match>
             </rule>
           </section>
