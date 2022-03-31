@@ -12,29 +12,29 @@ import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 
 public class RaptorTransferIndex {
 
-    private final List<List<RaptorTransfer>> forwardTransfers;
+    private final List<RaptorTransfer[]> forwardTransfers;
 
-    private final List<List<RaptorTransfer>> reversedTransfers;
+    private final List<RaptorTransfer[]> reversedTransfers;
 
     public RaptorTransferIndex(
             List<List<RaptorTransfer>> forwardTransfers,
             List<List<RaptorTransfer>> reversedTransfers
     ) {
-        // Create immutable copies of the lists for each stop to make them immutable and faster to iterate
+        // Create arrays of the lists for each stop to make them faster to iterate
         this.forwardTransfers = forwardTransfers.stream()
-                .map(List::copyOf)
+                .map(l -> l.toArray(new RaptorTransfer[0]))
                 .collect(Collectors.toList());
 
         this.reversedTransfers = reversedTransfers.stream()
-                .map(List::copyOf)
+                .map(l -> l.toArray(new RaptorTransfer[0]))
                 .collect(Collectors.toList());
     }
 
-    public List<List<RaptorTransfer>> getForwardTransfers() {
+    public List<RaptorTransfer[]> getForwardTransfers() {
         return forwardTransfers;
     }
 
-    public List<List<RaptorTransfer>> getReversedTransfers() {
+    public List<RaptorTransfer[]> getReversedTransfers() {
         return reversedTransfers;
     }
 

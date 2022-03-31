@@ -2,20 +2,7 @@ package org.opentripplanner.transit.raptor.util;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
-public class ReversedRaptorTransfer implements RaptorTransfer {
-
-    private final int stopIndex;
-    private final RaptorTransfer transfer;
-
-    public ReversedRaptorTransfer(int fromStopIndex, RaptorTransfer transfer) {
-        this.stopIndex = fromStopIndex;
-        this.transfer = transfer;
-    }
-
-    @Override
-    public int stop() {
-        return stopIndex;
-    }
+public record ReversedRaptorTransfer(int stop, RaptorTransfer transfer) implements RaptorTransfer {
 
     @Override
     public int generalizedCost() {

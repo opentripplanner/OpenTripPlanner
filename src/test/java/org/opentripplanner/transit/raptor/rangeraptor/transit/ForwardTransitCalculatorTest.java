@@ -95,11 +95,11 @@ public class ForwardTransitCalculatorTest {
 
         // Expect transfer from stop A to stop B
         var transfersFromStopA = subject.getTransfers(transitData, STOP_A);
-        assertTrue(transfersFromStopA.hasNext());
-        assertEquals(STOP_B, transfersFromStopA.next().stop());
+        assertEquals(1, transfersFromStopA.length);
+        assertEquals(STOP_B, transfersFromStopA[0].stop());
 
         // No transfer for stop B expected
-        assertFalse(subject.getTransfers(transitData, STOP_B).hasNext());
+        assertEquals(0, subject.getTransfers(transitData, STOP_B).length);
     }
 
     private void assertIntIterator(IntIterator it, int ... values) {

@@ -48,13 +48,13 @@ public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedu
   private final McCostParamsBuilder costParamsBuilder = new McCostParamsBuilder();
 
   @Override
-  public Iterator<? extends RaptorTransfer> getTransfersFromStop(int fromStop) {
-    return transfersFromStop.get(fromStop).iterator();
+  public RaptorTransfer[] getTransfersFromStop(int fromStop) {
+    return transfersFromStop.get(fromStop).toArray(new RaptorTransfer[0]);
   }
 
   @Override
-  public Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop) {
-    return transfersToStop.get(toStop).iterator();
+  public RaptorTransfer[] getTransfersToStop(int toStop) {
+    return transfersToStop.get(toStop).toArray(new RaptorTransfer[0]);
   }
 
   @Override

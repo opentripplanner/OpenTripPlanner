@@ -162,10 +162,10 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
      * Set the arrival time at all transit stop if time is optimal for the given list of transfers.
      */
     @Override
-    public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+    public void transferToStops(int fromStop, RaptorTransfer[] transfers) {
         int arrivalTimeTransit = bestTimes.onBoardTime(fromStop);
-        while (transfers.hasNext()) {
-            transferToStop(arrivalTimeTransit, fromStop, transfers.next());
+        for (var transfer: transfers) {
+            transferToStop(arrivalTimeTransit, fromStop, transfer);
         }
     }
 

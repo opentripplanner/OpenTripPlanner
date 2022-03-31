@@ -152,10 +152,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
   private Collection<? extends TripToTripTransfer<T>> findStandardTransfers(TripStopTime<T> from) {
     final List<TripToTripTransfer<T>> result = new ArrayList<>();
-    Iterator<? extends RaptorTransfer> transfers = stdTransfers.getTransfersFromStop(from.stop());
-
-    while (transfers.hasNext()) {
-      var it = transfers.next();
+    for (var it : stdTransfers.getTransfersFromStop(from.stop())) {
       int toStop = it.stop();
 
       ConstrainedTransfer tx = transferServiceAdaptor.findTransfer(from, toTrip, toStop);

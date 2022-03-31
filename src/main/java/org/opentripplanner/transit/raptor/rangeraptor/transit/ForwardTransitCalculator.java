@@ -109,7 +109,7 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule>
     }
 
     @Override
-    public Iterator<? extends RaptorTransfer> getTransfers(RaptorTransitDataProvider<T> transitDataProvider, int fromStop) {
+    public RaptorTransfer[] getTransfers(RaptorTransitDataProvider<T> transitDataProvider, int fromStop) {
         return transitDataProvider.getTransfersFromStop(fromStop);
     }
 

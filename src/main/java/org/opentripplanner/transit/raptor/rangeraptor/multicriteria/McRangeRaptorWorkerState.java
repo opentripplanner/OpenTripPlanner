@@ -95,11 +95,11 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
      * Set the time at a transit stops iff it is optimal.
      */
     @Override
-    public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+    public void transferToStops(int fromStop, RaptorTransfer[] transfers) {
         Iterable<? extends AbstractStopArrival<T>> fromArrivals = arrivals.listArrivalsAfterMarker(fromStop);
 
-        while (transfers.hasNext()) {
-            transferToStop(fromArrivals, transfers.next());
+        for (var transfer : transfers) {
+            transferToStop(fromArrivals, transfer);
         }
     }
 

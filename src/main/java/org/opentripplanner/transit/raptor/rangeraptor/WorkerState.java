@@ -48,7 +48,7 @@ public interface WorkerState<T extends RaptorTripSchedule> {
     /**
      *  Update state with a new transfer.
      */
-    void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers);
+    void transferToStops(int fromStop, RaptorTransfer[] transfers);
 
     /**
      * Extract paths after the search is complete. This method is optional,
