@@ -23,11 +23,11 @@ public class RaptorTransferIndex {
         // Create arrays of the lists for each stop to make them faster to iterate
         this.forwardTransfers = forwardTransfers.stream()
                 .map(l -> l.toArray(new RaptorTransfer[0]))
-                .collect(Collectors.toList());
+                .toList();
 
         this.reversedTransfers = reversedTransfers.stream()
                 .map(l -> l.toArray(new RaptorTransfer[0]))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<RaptorTransfer[]> getForwardTransfers() {
