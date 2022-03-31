@@ -50,7 +50,6 @@ public class StateData implements Cloneable {
 
     public StateData(RoutingRequest options) {
         this.opt = options;
-        this.rctx = options.getRoutingContext();
         TraverseModeSet modes = options.streetSubRequestModes;
         if (modes.getCar())
             currentMode = TraverseMode.CAR;

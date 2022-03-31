@@ -31,6 +31,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -365,10 +366,9 @@ public class WalkableAreaBuilder {
         options.dominanceFunction = new DominanceFunction.EarliestArrival();
         Set<Edge> usedEdges = new HashSet<>();
         for (Vertex vertex : startingVertices) {
-            options.setRoutingContext(graph, vertex, null);
             ShortestPathTree spt = AStarBuilder
                     .allDirections(new ListedEdgesOnly(edges))
-                    .setRoutingRequest(options)
+                    .setContext(new RoutingContext(options, graph, vertex, null))
                     .getShortestPathTree();
 
             for (Vertex endVertex : startingVertices) {

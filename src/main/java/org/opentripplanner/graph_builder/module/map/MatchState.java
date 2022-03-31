@@ -53,7 +53,7 @@ public abstract class MatchState {
 
     protected boolean carsCanTraverse(Edge edge) {
         // should be done with a method on edge (canTraverse already exists on turnEdge) 
-        State s0 = new State(edge.getFromVertex(), traverseOptions);
+        State s0 = new State(edge.getFromVertex(), traverseOptions, null);
         State s1 = edge.traverse(s0);
         return s1 != null;
     }

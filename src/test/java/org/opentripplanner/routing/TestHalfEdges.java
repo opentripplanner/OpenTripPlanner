@@ -10,15 +10,17 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
+import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -157,22 +159,25 @@ public class TestHalfEdges {
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.setDateTime(Instant.ofEpochSecond(startTime));
-        options.setRoutingContext(graph, br, end);
-        ShortestPathTree spt1 = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        ShortestPathTree spt1 = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, br, end))
+                .getShortestPathTree();
 
         GraphPath pathBr = spt1.getPath(end);
         assertNotNull("There must be a path from br to end", pathBr);
 
-        options.setRoutingContext(graph, tr, end);
-        ShortestPathTree spt2 = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        ShortestPathTree spt2 = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, tr, end))
+                .getShortestPathTree();
 
         GraphPath pathTr = spt2.getPath(end);
         assertNotNull("There must be a path from tr to end", pathTr);
         assertTrue("path from bottom to end must be longer than path from top to end",
                 pathBr.getWeight() > pathTr.getWeight());
 
-        options.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        ShortestPathTree spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, start, end))
+                .getShortestPathTree();
 
         GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);
@@ -184,8 +189,9 @@ public class TestHalfEdges {
         }
 
         options.setArriveBy(true);
-        options.setRoutingContext(graph, start, end);
-        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, start, end))
+                .getShortestPathTree();
 
         path = spt.getPath(start);
         assertNotNull("There must be a path from start to end (looking back)", path);
@@ -197,7 +203,6 @@ public class TestHalfEdges {
         }
 
         // Number of vertices and edges should be the same as before after a cleanup.
-        options.cleanup();
         tempEdges.disposeEdges();
         assertEquals(nVertices, graph.getVertices().size());
         assertEquals(nEdges, graph.getEdges().size());
@@ -217,8 +222,9 @@ public class TestHalfEdges {
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()), true, tempEdges);
 
-        options.setRoutingContext(graph, start, end);
-        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, start, end))
+                .getShortestPathTree();
 
         path = spt.getPath(start);
         assertNotNull("There must be a path from top to bottom along the right", path);
@@ -230,7 +236,6 @@ public class TestHalfEdges {
         }
 
         // Number of vertices and edges should be the same as before after a cleanup.
-        options.cleanup();
         tempEdges.disposeEdges();
         assertEquals(nVertices, graph.getVertices().size());
         assertEquals(nEdges, graph.getEdges().size());
@@ -244,8 +249,9 @@ public class TestHalfEdges {
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()), true, tempEdges);
 
-        options.setRoutingContext(graph, start, end);
-        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, start, end))
+                .getShortestPathTree();
 
         path = spt.getPath(start);
         assertNotNull("There must be a path from top to bottom", path);
@@ -257,7 +263,6 @@ public class TestHalfEdges {
         }
 
         // Number of vertices and edges should be the same as before after a cleanup.
-        options.cleanup();
         tempEdges.disposeEdges();
         assertEquals(nVertices, graph.getVertices().size());
         assertEquals(nEdges, graph.getEdges().size());
@@ -282,23 +287,26 @@ public class TestHalfEdges {
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(left.getGeometry()), true, tempEdges);
 
+        DisposableEdgeCollection connection =  SameEdgeAdjuster.adjust(start, end, graph);
+
         assertEquals(start.getX(), end.getX(), 0.0001);
         assertTrue(start.getY() < end.getY());
 
         Collection<Edge> edges = end.getIncoming();
 
-        assertEquals(2, edges.size());
+        assertEquals(3, edges.size());
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.setDateTime(Instant.ofEpochSecond(startTime));
-        options.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        ShortestPathTree spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, start, end))
+                .getShortestPathTree();
 
         GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);        
         assertEquals(1, path.edges.size());
-        options.cleanup();
         tempEdges.disposeEdges();
+        connection.disposeEdges();
     }
 
     @Test
@@ -320,6 +328,8 @@ public class TestHalfEdges {
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), true, tempEdges);
 
+        DisposableEdgeCollection connection =  SameEdgeAdjuster.adjust(start, end, graph);
+
         assertEquals(start.getX(), end.getX(),0.001);
         assertTrue(start.getY() > end.getY());
 
@@ -328,14 +338,15 @@ public class TestHalfEdges {
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.setDateTime(Instant.ofEpochSecond(startTime));
-        options.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        ShortestPathTree spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, start, end))
+                .getShortestPathTree();
 
         GraphPath path = spt.getPath(end);
         assertNotNull("There must be a path from start to end", path);        
         assertTrue(path.edges.size() > 1);
-        options.cleanup();
         tempEdges.disposeEdges();
+        connection.disposeEdges();
     }
 
     /**
@@ -365,7 +376,7 @@ public class TestHalfEdges {
         // The alert should be preserved
         // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
         RoutingRequest req = new RoutingRequest();
-        State traversedOne = new State(start, req);
+        State traversedOne = new State(start, req, null);
         State currentState;
         for (Edge e : start.getOutgoing()) {
             currentState = e.traverse(traversedOne);
@@ -398,7 +409,7 @@ public class TestHalfEdges {
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), false, tempEdges);
 
-        traversedOne = new State(start, req);
+        traversedOne = new State(start, req, null);
         for (Edge e : start.getOutgoing()) {
             currentState = e.traverse(traversedOne);
             if (currentState != null) {
@@ -445,23 +456,28 @@ public class TestHalfEdges {
         edges = end.getIncoming();
         assertEquals(2, edges.size());
 
+        tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
+    }
+
+    @Test
+    public void testTemporaryVerticesContainer() {
 
         // test that it is possible to travel between two splits on the same street
         RoutingRequest walking = new RoutingRequest(TraverseMode.WALK);
-        start = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
-                new GenericLocation(40.004, -74.0), walking, false, tempEdges);
-        end = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
-                new GenericLocation(40.008, -74.0), walking, true, tempEdges);
-        assertNotNull(end);
-        // The visibility for temp edges for start and end is set in the setRoutingContext call
-        walking.setRoutingContext(graph, start, end);
-        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(walking).getShortestPathTree();
-        GraphPath path = spt.getPath(end);
-        for (State s : path.states) {
-          assertNotSame(s.getBackEdge(), top);
+        walking.from = new GenericLocation(40.004, -74.0);
+        walking.to = new GenericLocation(40.008, -74.0);
+        try (var container = new TemporaryVerticesContainer(graph, walking)) {
+            assertNotNull(container.getFromVertices());
+            assertNotNull(container.getToVertices());
+            // The visibility for temp edges for start and end is set in the setRoutingContext call
+            ShortestPathTree spt = AStarBuilder.oneToOne()
+                    .setContext(new RoutingContext(walking, graph, container))
+                    .getShortestPathTree();
+            GraphPath path = spt.getPath(container.getToVertices().iterator().next());
+            for (State s : path.states) {
+              assertNotSame(s.getBackEdge(), top);
+            }
         }
-        walking.cleanup();
-        tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
     }
 
     @Test

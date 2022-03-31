@@ -5,7 +5,9 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -1383,36 +1385,37 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
         long t0 = System.currentTimeMillis();
         // TODO: check options properly intialized (AMB)
-        List<GraphPath> paths = finder.graphPathFinderEntryPoint(options);
-        long dt = System.currentTimeMillis() - t0;
-        searchTimeElapsedLabel.setText( "search time elapsed: "+dt+"ms" );
-        
-        // grab the spt from the visitor
-        // TODO somehow yank the SPT out of the depths of the call stack... but there multiple SPTs here.
-        // This is why we should probably just use AStar directly.
-        /*
-        spt = vis.spt;
-        showGraph.setSPT(spt);
-        System.out.println( "got spt:"+spt );
-        */
+        try (var temporaryVertices = new TemporaryVerticesContainer(graph, options)) {
+            var routingContext = new RoutingContext(options, graph, temporaryVertices);
+            List<GraphPath> paths = finder.graphPathFinderEntryPoint(routingContext);
+            long dt = System.currentTimeMillis() - t0;
+            searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");
 
-        if (paths == null) {
-            System.out.println("no path");
-            showGraph.highlightGraphPath(null);
-            return;
+            // grab the spt from the visitor
+            // TODO somehow yank the SPT out of the depths of the call stack... but there multiple SPTs here.
+            // This is why we should probably just use AStar directly.
+            /*
+            spt = vis.spt;
+            showGraph.setSPT(spt);
+            System.out.println( "got spt:"+spt );
+            */
+
+            if (paths == null) {
+                System.out.println("no path");
+                showGraph.highlightGraphPath(null);
+                return;
+            }
+
+            // now's a convenient time to set graphical SPT weights
+            showGraph.simpleSPT.setWeights();
+
+            showPathsInPanel(paths);
+
+            // now's a good time to set showGraph's SPT drawing weights
+            showGraph.setSPTFlattening(Float.parseFloat(sptFlattening.getText()));
+            showGraph.setSPTThickness(Float.parseFloat(sptThickness.getText()));
+            showGraph.redraw();
         }
-        
-        // now's a convenient time to set graphical SPT weights
-        showGraph.simpleSPT.setWeights();
-                        
-        showPathsInPanel(paths);
-        
-        // now's a good time to set showGraph's SPT drawing weights
-        showGraph.setSPTFlattening( Float.parseFloat(sptFlattening.getText()) );
-        showGraph.setSPTThickness( Float.parseFloat(sptThickness.getText()) );
-        showGraph.redraw();
-        
-        options.cleanup();
     }
     
 	private void showPathsInPanel(List<GraphPath> paths) {

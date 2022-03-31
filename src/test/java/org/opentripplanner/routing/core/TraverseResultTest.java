@@ -16,7 +16,7 @@ public class TraverseResultTest {
         /* note: times are rounded to seconds toward zero */
         
         for (int i = 0; i < 4; i++) {
-            State r = new State(null, i * 1000, new RoutingRequest());
+            State r = new State(null, i * 1000, new RoutingRequest(), null);
             resultChain = r.addToExistingResultChain(resultChain);
         }
 

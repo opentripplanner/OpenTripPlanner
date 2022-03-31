@@ -24,6 +24,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -142,9 +143,8 @@ public class TimetableTest {
         options.setDateTime(Instant.ofEpochSecond(startTime));
 
         //---
-        options.setRoutingContext(graph, stop_a, stop_c);
         spt = AStarBuilder.oneToOne()
-                .setRoutingRequest(options)
+                .setContext(new RoutingContext(options, graph, stop_a, stop_c))
                 .getShortestPathTree();
 
         path = spt.getPath(stop_c);
@@ -178,10 +178,9 @@ public class TimetableTest {
         assertEquals(20*60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
 
         //---
-        options.setRoutingContext(graph, stop_a, stop_c);
 
         spt = AStarBuilder.oneToOne()
-                .setRoutingRequest(options)
+                .setContext(new RoutingContext(options, graph, stop_a, stop_c))
                 .getShortestPathTree();
 
         path = spt.getPath(stop_c);
@@ -211,10 +210,9 @@ public class TimetableTest {
         }
 
         //---
-        options.setRoutingContext(graph, stop_a, stop_c);
 
         spt = AStarBuilder.oneToOne()
-                .setRoutingRequest(options)
+                .setContext(new RoutingContext(options, graph, stop_a, stop_c))
                 .getShortestPathTree();
 
         path = spt.getPath(stop_c);

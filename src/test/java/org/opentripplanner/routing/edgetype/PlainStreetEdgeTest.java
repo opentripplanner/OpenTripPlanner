@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -72,9 +73,8 @@ public class PlainStreetEdgeTest {
 
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.WALK);
-        options.setRoutingContext(graph, v1, v2);
-        
-        State s0 = new State(options);
+
+        State s0 = new State(new RoutingContext(options, graph, v1, v2));
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
@@ -91,9 +91,8 @@ public class PlainStreetEdgeTest {
 
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(graph, v1, v2);
-        
-        State s0 = new State(options);
+
+        State s0 = new State(new RoutingContext(options, graph, v1, v2));
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
@@ -136,20 +135,18 @@ public class PlainStreetEdgeTest {
 
         RoutingRequest forward = proto.clone();
         forward.bikeSpeed = 3.0f;
-        forward.setRoutingContext(graph, v0, v2);
         forward.setMode(TraverseMode.BICYCLE);
 
-        State s0 = new State(forward);
+        State s0 = new State(new RoutingContext(forward, graph, v0, v2));
         State s1 = e0.traverse(s0);
         State s2 = e1.traverse(s1);
 
         RoutingRequest reverse = proto.clone();
         reverse.setArriveBy(true);
         reverse.bikeSpeed = 3.0f;
-        reverse.setRoutingContext(graph, v0, v2);
         reverse.setMode(TraverseMode.BICYCLE);
 
-        State s3 = new State(reverse);
+        State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
         State s4 = e1.traverse(s3);
         State s5 = e0.traverse(s4);
 
@@ -173,18 +170,16 @@ public class PlainStreetEdgeTest {
 
         RoutingRequest forward = proto.clone();
         forward.setMode(TraverseMode.BICYCLE);
-        forward.setRoutingContext(graph, v0, v2);
 
-        State s0 = new State(forward);
+        State s0 = new State(new RoutingContext(forward, graph, v0, v2));
         State s1 = e0.traverse(s0);
         State s2 = e1.traverse(s1);
 
         RoutingRequest reverse = proto.clone();
         reverse.setMode(TraverseMode.BICYCLE);
         reverse.setArriveBy(true);
-        reverse.setRoutingContext(graph, v0, v2);
 
-        State s3 = new State(reverse);
+        State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
         State s4 = e1.traverse(s3);
         State s5 = e0.traverse(s4);
 
@@ -205,9 +200,8 @@ public class PlainStreetEdgeTest {
         noPenalty.bikeSwitchTime = 0;
         noPenalty.bikeSwitchCost = 0;
         noPenalty.setMode(TraverseMode.BICYCLE);
-        noPenalty.setRoutingContext(graph, v0, v0);
 
-        State s0 = new State(noPenalty);
+        State s0 = new State(new RoutingContext(noPenalty, graph, v0, v0));
         State s1 = e0.traverse(s0);
         State s2 = e1.traverse(s1);
         State s3 = e2.traverse(s2);
@@ -216,9 +210,8 @@ public class PlainStreetEdgeTest {
         withPenalty.bikeSwitchTime = 42;
         withPenalty.bikeSwitchCost = 23;
         withPenalty.setMode(TraverseMode.BICYCLE);
-        withPenalty.setRoutingContext(graph, v0, v0);
 
-        State s4 = new State(withPenalty);
+        State s4 = new State(new RoutingContext(withPenalty, graph, v0, v0));
         State s5 = e0.traverse(s4);
         State s6 = e1.traverse(s5);
         State s7 = e2.traverse(s6);
@@ -259,8 +252,8 @@ public class PlainStreetEdgeTest {
         StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
         StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
         RoutingRequest routingRequest = proto.clone();
-        routingRequest.setRoutingContext(graph, v0, v2);
-        State state = new State(v2, 0, routingRequest);
+        RoutingContext routingContext = new RoutingContext(routingRequest, graph, v0, v2);
+        State state = new State(v2, 0, routingRequest, routingContext);
 
         state.getOptions().setArriveBy(true);
         e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));

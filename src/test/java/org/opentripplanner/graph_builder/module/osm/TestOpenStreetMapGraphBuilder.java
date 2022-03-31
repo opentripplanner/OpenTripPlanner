@@ -9,6 +9,7 @@ import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -180,10 +181,10 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         Vertex bottomV = graph.getVertex("osm:node:580290955");
         Vertex topV = graph.getVertex("osm:node:559271124");
 
-        request.setRoutingContext(router.graph, bottomV, topV);
+        RoutingContext routingContext = new RoutingContext(request, router.graph, bottomV, topV);
 
         GraphPathFinder graphPathFinder = new GraphPathFinder(router);
-        List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(request);
+        List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);
 
         assertNotNull(pathList);
         assertFalse(pathList.isEmpty());

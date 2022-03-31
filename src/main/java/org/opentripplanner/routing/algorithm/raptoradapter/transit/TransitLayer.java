@@ -15,7 +15,7 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TripPatternMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 
 public class TransitLayer {
 
@@ -138,8 +138,8 @@ public class TransitLayer {
     return transferService;
   }
 
-  public RaptorTransferIndex getRaptorTransfersForRequest(RoutingRequest routingRequest) {
-    return transferCache.get(transfersByStopIndex, routingRequest);
+  public RaptorTransferIndex getRaptorTransfersForRequest(RoutingContext routingContext) {
+    return transferCache.get(transfersByStopIndex, routingContext);
   }
 
   public RaptorRequestTransferCache getTransferCache() {

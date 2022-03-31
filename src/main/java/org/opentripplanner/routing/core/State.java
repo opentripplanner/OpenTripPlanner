@@ -47,9 +47,10 @@ public class State implements Cloneable {
      * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
      * states must be created from a parent and associated with an edge.
      */
-    public static Collection<State> getInitialStates(RoutingRequest request) {
+    public static Collection<State> getInitialStates(RoutingContext routingContext) {
+        RoutingRequest request = routingContext.opt;
         Collection<State> states = new ArrayList<>();
-        for (Vertex vertex : request.getRoutingContext().fromVertices) {
+        for (Vertex vertex : routingContext.fromVertices) {
             /* carPickup searches may end in two distinct states: IN_CAR and WALK_FROM_DROP_OFF/WALK_TO_PICKUP
                for forward/reverse searches to be symmetric both initial states need to be created. */
             if (request.carPickup) {
@@ -58,6 +59,7 @@ public class State implements Cloneable {
                     vertex,
                     request.getDateTime().getEpochSecond(),
                     request,
+                    routingContext,
                     true,
                     false,
                     false
@@ -72,6 +74,7 @@ public class State implements Cloneable {
                         vertex,
                         request.getDateTime().getEpochSecond(),
                         request,
+                        routingContext,
                         false,
                         true,
                         false
@@ -83,6 +86,7 @@ public class State implements Cloneable {
                                     vertex,
                                     request.getDateTime().getEpochSecond(),
                                     request,
+                                    routingContext,
                                     false,
                                     true,
                                     true
@@ -90,34 +94,36 @@ public class State implements Cloneable {
                 }
             }
 
-            states.add(new State(vertex, request.getDateTime().getEpochSecond(), request));
+            states.add(new State(vertex, request.getDateTime().getEpochSecond(), request, routingContext));
         }
         return states;
     }
 
-    public State(RoutingRequest opt) {
+    public State(RoutingContext rctx) {
         this(
-                opt.getRoutingContext().fromVertices == null ? null : opt.getRoutingContext().fromVertices.iterator().next(),
-                opt.getDateTime().getEpochSecond(),
-                opt
+                rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(),
+                rctx.opt.getDateTime().getEpochSecond(),
+                rctx.opt,
+                rctx
         );
     }
+
 
     /**
      * Create an initial state, forcing vertex to the specified value. Useful for reusing a 
      * RoutingContext in TransitIndex, tests, etc.
      */
-    public State(Vertex vertex, RoutingRequest opt) {
+    public State(Vertex vertex, RoutingRequest opt, RoutingContext routingContext) {
         // Since you explicitly specify, the vertex, we don't set the backEdge.
-        this(vertex, opt.getDateTime().getEpochSecond(), opt);
+        this(vertex, opt.getDateTime().getEpochSecond(), opt, routingContext);
     }
 
     /**
      * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing 
      * a RoutingContext in TransitIndex, tests, etc.
      */
-    public State(Vertex vertex, long timeSeconds, RoutingRequest options) {
-        this(vertex, timeSeconds, timeSeconds, options, false, false, false);
+    public State(Vertex vertex, long timeSeconds, RoutingRequest options, RoutingContext routingContext) {
+        this(vertex, timeSeconds, timeSeconds, options, routingContext,false, false, false);
     }
 
     /**
@@ -128,10 +134,11 @@ public class State implements Cloneable {
         Vertex vertex,
         long timeSeconds,
         RoutingRequest options,
+        RoutingContext routingContext,
         boolean carPickupStateInCar,
         boolean bikeRentalFloatingState,
         boolean keptRentedVehicleAtDestination) {
-        this(vertex, timeSeconds, timeSeconds, options, carPickupStateInCar, bikeRentalFloatingState, keptRentedVehicleAtDestination);
+        this(vertex, timeSeconds, timeSeconds, options, routingContext, carPickupStateInCar, bikeRentalFloatingState, keptRentedVehicleAtDestination);
     }
 
     /**
@@ -143,6 +150,7 @@ public class State implements Cloneable {
         long timeSeconds,
         long startTime,
         RoutingRequest options,
+        RoutingContext routingContext,
         boolean carPickupStateInCar,
         boolean vehicleRentalFloatingState,
         boolean keptRentedVehicleAtDestination
@@ -151,6 +159,7 @@ public class State implements Cloneable {
         this.vertex = vertex;
         this.backState = null;
         this.stateData = new StateData(options);
+        this.stateData.rctx = routingContext;
         this.stateData.startTime = startTime;
         if (options.vehicleRental) {
             if (options.arriveBy) {
@@ -429,7 +438,7 @@ public class State implements Cloneable {
     private State reversedClone() {
         // We no longer compensate for schedule slack (minTransferTime) here.
         // It is distributed symmetrically over all preboard and prealight edges.
-        State newState = new State(this.vertex, getTimeSeconds(), stateData.opt.reversedClone());
+        State newState = new State(this.vertex, getTimeSeconds(), stateData.opt.reversedClone(), stateData.rctx);
         // TODO Check if those two lines are needed:
         newState.stateData.vehicleRentalState = stateData.vehicleRentalState;
         newState.stateData.vehicleParked = stateData.vehicleParked;
