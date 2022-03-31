@@ -13,6 +13,8 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
@@ -151,12 +153,11 @@ public class SplitEdgeTurnRestrictionsTest {
 
         request.streetSubRequestModes = new TraverseModeSet(TraverseMode.CAR);
 
-        request.setRoutingContext(graph);
+        var temporaryVertices = new TemporaryVerticesContainer(graph, request);
+        RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
-        var gpf = new GraphPathFinder(
-                new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry)
-        );
-        var paths = gpf.graphPathFinderEntryPoint(request);
+        var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry));
+        var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
         GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
                 graph.getTimeZone(),
@@ -166,6 +167,8 @@ public class SplitEdgeTurnRestrictionsTest {
         );
 
         var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
+        temporaryVertices.close();
+
         // make sure that we only get CAR legs
         itineraries.forEach(
                 i -> i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.CAR)));

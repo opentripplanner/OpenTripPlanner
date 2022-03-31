@@ -22,25 +22,18 @@ public class AccessEgressRouter {
 
     /**
      *
-     * @param rr the current routing request
+     * @param rctx the current routing context
      * @param fromTarget whether to route from or towards the point provided in the routing request
      *                   (access or egress)
      * @return Transfer objects by access/egress stop
      */
     public static Collection<NearbyStop> streetSearch(
-        RoutingRequest rr, StreetMode streetMode, boolean fromTarget
+        RoutingContext rctx, StreetMode streetMode, boolean fromTarget
     ) {
-        // TODO OTP2 This has to be done because we have not separated the main RoutingRequest from
-        //      the subrequest for street searches. From/to vertices are already set based on the main
-        //      request being arriveBy or not, but here we are actually setting arriveBy based on
-        //      whether we are doing an access or egress search, regardless of the direction of the
-        //      main request.
-        final RoutingContext rctx = rr.getRoutingContext();
+        final RoutingRequest rr = rctx.opt;
         Set<Vertex> vertices = fromTarget != rr.arriveBy ? rctx.toVertices : rctx.fromVertices;
 
-        // A new RoutingRequest needs to be constructed, because findNearbyStopsViaStreets() resets
-        // the routingContext (rctx), which results in the created temporary edges being removed prematurely.
-        // findNearbyStopsViaStreets() will call cleanup() on the created routing request.
+        //TODO: Investigate why this is needed for flex
         RoutingRequest nearbyRequest = rr.getStreetSearchRequest(streetMode);
 
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
@@ -51,7 +44,6 @@ public class AccessEgressRouter {
         List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
             vertices,
             fromTarget,
-            true,
             nearbyRequest
         );
 

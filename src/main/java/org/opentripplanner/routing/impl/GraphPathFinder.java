@@ -6,6 +6,7 @@ import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.spt.DominanceFunction;
@@ -50,33 +51,30 @@ public class GraphPathFinder {
      * This no longer does "trip banning" to find multiple itineraries.
      * It just searches once trying to find a non-transit path.
      */
-    public List<GraphPath> getPaths(RoutingRequest options) {
-        if (options == null) {
-            LOG.error("PathService was passed a null routing request.");
+    public List<GraphPath> getPaths(RoutingContext routingContext) {
+        if (routingContext == null) {
+            LOG.error("PathService was passed a null routing context.");
             return null;
         }
+
+        RoutingRequest options = routingContext.opt;
+
         if (options.streetSubRequestModes.isTransit()) {
             throw new UnsupportedOperationException("Transit search not supported");
         }
 
-        // Reuse one instance of AStar for all N requests, which are carried out sequentially
         AStarBuilder aStar = AStarBuilder
-                .oneToOneMaxDuration(Duration.ofSeconds((long) options.maxDirectStreetDurationSeconds));
-        if (options.getRoutingContext() == null) {
-            options.setRoutingContext(router.graph);
-            // The special long-distance heuristic should be sufficient to constrain the search to the right area.
-        }
+            .oneToOneMaxDuration(Duration.ofSeconds((long) options.maxDirectStreetDurationSeconds))
+            .setContext(routingContext)
+            .setTimeout(Duration.ofMillis((long) (router.streetRoutingTimeoutSeconds() * 1000)));
+
         // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
         if (router.graphVisualizer != null) {
             aStar.setTraverseVisitor(router.graphVisualizer.traverseVisitor);
-            // options.disableRemainingWeightHeuristic = true; // DEBUG
         }
 
         options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
-
-        aStar.setRoutingRequest(options);
-        aStar.setTimeout(Duration.ofMillis((long) (router.streetRoutingTimeoutSeconds() * 1000)));
 
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
@@ -92,7 +90,8 @@ public class GraphPathFinder {
     /**
      *  Try to find N paths through the Graph
      */
-    public List<GraphPath> graphPathFinderEntryPoint (RoutingRequest request) {
+    public List<GraphPath> graphPathFinderEntryPoint (RoutingContext routingContext) {
+        RoutingRequest request = routingContext.opt;
         long reqTime = request.getDateTime().getEpochSecond();
 
         // We used to perform a protective clone of the RoutingRequest here.
@@ -101,14 +100,15 @@ public class GraphPathFinder {
 
         List<GraphPath> paths;
         try {
-            paths = getPaths(request);
+            paths = getPaths(routingContext);
             if (paths == null && request.wheelchairAccessible) {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions, and warn the user in the response.
                 RoutingRequest relaxedRequest = request.clone();
                 relaxedRequest.maxWheelchairSlope = Double.MAX_VALUE;
-                request.getRoutingContext().slopeRestrictionRemoved = true;
-                paths = getPaths(relaxedRequest);
+                routingContext.slopeRestrictionRemoved = true;
+                var relaxedContext = new RoutingContext(relaxedRequest, routingContext.graph, routingContext.fromVertices, routingContext.toVertices);
+                paths = getPaths(relaxedContext);
             }
         } catch (RoutingValidationException e) {
             if (e.getRoutingErrors().get(0).code.equals(RoutingErrorCode.LOCATION_NOT_FOUND))

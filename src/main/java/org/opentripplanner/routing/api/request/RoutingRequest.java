@@ -19,12 +19,9 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DurationComparator;
 import org.opentripplanner.routing.impl.PathComparator;
@@ -77,7 +74,7 @@ import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
  *           class, but we want to keep it in the RoutingResource as long as we support the
  *           REST API.
  */
-public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
+public class RoutingRequest implements Cloneable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -669,21 +666,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public boolean includePlannedCancellations = false;
 
     /**
-     * The routing context used to actually carry out this search. It is important to build States from TraverseOptions
-     * rather than RoutingContexts,and just keep a reference to the context in the TraverseOptions, rather than using
-     * RoutingContexts for everything because in some testing and graph building situations we need to build a bunch of
-     * initial states with different times and vertices from a single TraverseOptions, without setting all the transit
-     * context or building temporary vertices (with all the exception-throwing checks that entails).
-     *
-     * While they are conceptually separate, TraverseOptions does maintain a reference to its accompanying
-     * RoutingContext (and vice versa) so that both do not need to be passed/injected separately into tight inner loops
-     * within routing algorithms. These references should be set to null when the request scope is torn down -- the
-     * routing context becomes irrelevant at that point, since temporary graph elements have been removed and the graph
-     * may have been reloaded.
-     */
-    private RoutingContext rctx;
-
-    /**
      * A transit stop that this trip must start from
      *
      * @deprecated TODO OTP2 Is this in use, what is is used for. It seems to overlap with
@@ -1177,14 +1159,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             }
         }
 
-        // TODO OTP2 This is needed in order to find the correct from/to vertices for the mode
-        if (streetRequest.rctx != null) {
-            Graph graph = streetRequest.rctx.graph;
-            streetRequest.rctx = new RoutingContext(streetRequest, graph);
-            // check after back reference is established, to allow temp edge cleanup on exceptions
-            streetRequest.rctx.checkIfVerticesFound();
-        }
-
         return streetRequest;
     }
 
@@ -1229,63 +1203,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         ret.setArriveBy(!ret.arriveBy);
         ret.useVehicleRentalAvailabilityInformation = false;
         return ret;
-    }
-
-    public void setRoutingContext(Graph graph) {
-        if (rctx == null) {
-            // graphService.getGraph(routerId)
-            this.rctx = new RoutingContext(this, graph);
-            // check after back reference is established, to allow temp edge cleanup on exceptions
-            this.rctx.checkIfVerticesFound();
-        } else {
-            if (rctx.graph == graph) {
-                LOG.debug("keeping existing routing context");
-            } else {
-                LOG.error("attempted to reset routing context using a different graph");
-            }
-        }
-    }
-
-    /**
-     * For use in tests. Force RoutingContext to specific vertices rather than making temp edges.
-     * TODO rename - this is not a "setter", it creates a new routingContext, which has side effects on Graph
-     *               (Constructors with side effects on their parameters are a bad design).
-     */
-    public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
-        if (rctx != null) {
-            this.rctx.close();
-        }
-        this.rctx = new RoutingContext(this, graph, from, to);
-    }
-
-    public void setRoutingContext(Graph graph, Set<Vertex> from, Set<Vertex> to) {
-        // normally you would want to tear down the routing context...
-        // but this method is mostly used in tests, and teardown interferes with testHalfEdges
-        // FIXME here, or in test, and/or in other places like TSP that use this method
-        if (rctx != null)
-            this.rctx.close();
-        this.rctx = new RoutingContext(this, graph, from, to);
-    }
-
-    public RoutingContext getRoutingContext() {
-        return this.rctx;
-    }
-
-    /** Tear down any routing context (remove temporary edges from edge lists) */
-    public void cleanup() {
-        if (this.rctx != null) {
-            try {
-                rctx.close();
-            }
-            catch (Exception e) {
-                LOG.error("Could not destroy the routing context", e);
-            }
-        }
-    }
-
-    @Override
-    public void close() {
-        cleanup();
     }
 
     /**

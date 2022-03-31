@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 
@@ -40,7 +41,7 @@ public class RaptorTransferIndex {
 
     public static RaptorTransferIndex create(
             List<List<Transfer>> transfersByStopIndex,
-            RoutingRequest routingRequest
+            RoutingContext routingContext
     ) {
         var forwardTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
         var reversedTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
@@ -55,7 +56,7 @@ public class RaptorTransferIndex {
             // for a stop pair.
             var transfers = transfersByStopIndex.get(fromStop)
                     .stream()
-                    .flatMap(s -> s.asRaptorTransfer(routingRequest).stream())
+                    .flatMap(s -> s.asRaptorTransfer(routingContext).stream())
                     .collect(toMap(
                             RaptorTransfer::stop,
                             Function.identity(),

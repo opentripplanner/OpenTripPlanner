@@ -6,6 +6,8 @@ import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -26,14 +28,15 @@ public class DirectStreetRouter {
       return Collections.emptyList();
     }
 
-    try (RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode)) {
-      directRequest.setRoutingContext(router.graph);
+    RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
+    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, directRequest)) {
+      final RoutingContext routingContext = new RoutingContext(directRequest, router.graph, temporaryVertices);
 
-      if(!straightLineDistanceIsWithinLimit(directRequest)) { return Collections.emptyList(); }
+      if (!straightLineDistanceIsWithinLimit(routingContext)) {return Collections.emptyList();}
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(router);
-      List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(directRequest);
+      List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(routingContext);
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
@@ -43,7 +46,7 @@ public class DirectStreetRouter {
               router.graph.ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
-      ItinerariesHelper.decorateItinerariesWithRequestData(response, directRequest);
+      ItinerariesHelper.decorateItinerariesWithRequestData(response, routingContext);
       return response;
     }
     catch (PathNotFoundException e) {
@@ -51,17 +54,17 @@ public class DirectStreetRouter {
     }
   }
 
-  private static boolean straightLineDistanceIsWithinLimit(RoutingRequest request) {
+  private static boolean straightLineDistanceIsWithinLimit(RoutingContext routingContext) {
     // TODO This currently only calculates the distances between the first fromVertex
     //      and the first toVertex
     double distance = SphericalDistanceLibrary.distance(
-        request.getRoutingContext().fromVertices
+        routingContext.fromVertices
             .iterator()
             .next()
             .getCoordinate(),
-        request.getRoutingContext().toVertices.iterator().next().getCoordinate()
+        routingContext.toVertices.iterator().next().getCoordinate()
     );
-    return distance < calculateDistanceMaxLimit(request);
+    return distance < calculateDistanceMaxLimit(routingContext.opt);
   }
 
   /**

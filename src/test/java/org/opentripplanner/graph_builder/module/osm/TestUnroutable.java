@@ -5,9 +5,9 @@ import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
-import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -57,10 +57,9 @@ public class TestUnroutable {
 
         Vertex from = graph.getVertex("osm:node:2003617278");
         Vertex to = graph.getVertex("osm:node:40446276");
-        options.setRoutingContext(graph, from, to);
         options.setMode(TraverseMode.BICYCLE);
         ShortestPathTree spt = AStarBuilder.oneToOne()
-                .setRoutingRequest(options)
+                .setContext(new RoutingContext(options, graph, from, to))
                 .getShortestPathTree();
 
         GraphPath path = spt.getPath(to);

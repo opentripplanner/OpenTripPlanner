@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -540,10 +541,9 @@ public class BikeRentalTest extends GraphRoutingTest {
             StreetMode streetMode
     ) {
         var bikeRentalOptions = options.getStreetSearchRequest(streetMode);
-        bikeRentalOptions.setRoutingContext(graph, fromVertex, toVertex);
 
         var tree = AStarBuilder.oneToOne()
-                .setRoutingRequest(bikeRentalOptions)
+                .setContext(new RoutingContext(bikeRentalOptions, graph, fromVertex, toVertex))
                 .getShortestPathTree();
 
         var path = tree.getPath(arriveBy ? fromVertex : toVertex);

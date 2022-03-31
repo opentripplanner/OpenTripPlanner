@@ -9,6 +9,8 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.server.Router;
 
@@ -22,18 +24,18 @@ public class DirectFlexRouter {
     if (!StreetMode.FLEXIBLE.equals(request.modes.directMode)) {
       return Collections.emptyList();
     }
-
-    try (RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode)) {
-      directRequest.setRoutingContext(router.graph);
+      RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
+      try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, directRequest)) {
+          RoutingContext routingContext = new RoutingContext(directRequest, router.graph, temporaryVertices);
 
       // Prepare access/egress transfers
       Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-              directRequest,
+              routingContext,
               StreetMode.WALK,
               false
       );
       Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
-              directRequest,
+              routingContext,
               StreetMode.WALK,
               true
       );
