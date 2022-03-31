@@ -340,11 +340,6 @@
                 <version>${plugin.prettier.version}</version>
                 <configuration>
                     <prettierJavaVersion>1.6.1</prettierJavaVersion>
-                    <printWidth>90</printWidth>
-                    <tabWidth>2</tabWidth>
-                    <useTabs>false</useTabs>
-                    <ignoreConfigFile>true</ignoreConfigFile>
-                    <ignoreEditorConfig>true</ignoreEditorConfig>
                     <inputGlobs>
                         <inputGlob>src/main/java/**/*.java</inputGlob>
                         <inputGlob>src/test/java/**/*.java</inputGlob>
