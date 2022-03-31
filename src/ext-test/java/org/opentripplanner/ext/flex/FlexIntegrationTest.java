@@ -170,7 +170,7 @@ public class FlexIntegrationTest {
         var req = new RoutingRequest();
 
         // we don't have a complete coverage of the entire area so use straight lines for transfers
-        var transfers = new DirectTransferGenerator(600, List.of(req));
+        var transfers = new DirectTransferGenerator(Duration.ofMinutes(10), List.of(req));
         transfers.buildGraph(graph, extra);
 
         graph.index();

@@ -24,7 +24,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DurationComparator;
@@ -96,17 +95,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     /** The end location */
     public GenericLocation to;
-
-    /**
-     * If true, the tree will be allowed to grow in all directions, rather than being directed
-     * toward a single target. This parameter only apply to access/egress AStar searches,
-     * not transit searches in Raptor.
-     *
-     * @deprecated TODO OTP2 - This looks like an A Star implementation detail. Should be moved to
-     *                       - an A Star specific request class
-     */
-    @Deprecated
-    public boolean oneToMany = false;
 
     /**
      * An ordered list of intermediate locations to be visited.
@@ -681,16 +669,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public boolean includePlannedCancellations = false;
 
     /**
-     * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
-     * distance path service.
-     *
-     * This is used by the Street search only.
-     *
-     * TODO OTP2 Can we merge this with the 'oneToMany' option?
-     */
-    public boolean disableRemainingWeightHeuristic = false;
-
-    /**
      * The routing context used to actually carry out this search. It is important to build States from TraverseOptions
      * rather than RoutingContexts,and just keep a reference to the context in the TraverseOptions, rather than using
      * RoutingContexts for everything because in some testing and graph building situations we need to build a bunch of
@@ -703,7 +681,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * routing context becomes irrelevant at that point, since temporary graph elements have been removed and the graph
      * may have been reloaded.
      */
-    public RoutingContext rctx;
+    private RoutingContext rctx;
 
     /**
      * A transit stop that this trip must start from
@@ -1038,13 +1016,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return Duration.between(dateTime, Instant.now()).abs().toSeconds() < NOW_THRESHOLD_SEC;
     }
 
-    /**
-     * Currently only one itinerary is returned for a direct street search
-     */
-    public int getNumItinerariesForDirectStreetSearch() {
-        return 1;
-    }
-
     public void setPageCursor(String pageCursor) {
         this.pageCursor = PageCursor.decode(pageCursor);
     }
@@ -1118,8 +1089,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
 
     public String toString(String sep) {
         return from + sep + to + sep + dateTime + sep
-                + arriveBy + sep + bicycleOptimizeType + sep + streetSubRequestModes.getAsStr() + sep
-                + getNumItinerariesForDirectStreetSearch();
+                + arriveBy + sep + bicycleOptimizeType + sep + streetSubRequestModes.getAsStr();
     }
 
     public void removeMode(TraverseMode mode) {
@@ -1207,21 +1177,17 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             }
         }
 
-        streetRequest.resetRoutingContext();
+        // TODO OTP2 This is needed in order to find the correct from/to vertices for the mode
+        if (streetRequest.rctx != null) {
+            Graph graph = streetRequest.rctx.graph;
+            streetRequest.rctx = new RoutingContext(streetRequest, graph);
+            // check after back reference is established, to allow temp edge cleanup on exceptions
+            streetRequest.rctx.checkIfVerticesFound();
+        }
 
         return streetRequest;
     }
 
-    // TODO OTP2 This is needed in order to find the correct from/to vertices for the mode
-    private void resetRoutingContext() {
-        if (rctx != null) {
-            Graph graph = rctx.graph;
-            rctx = null;
-            setRoutingContext(graph);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     public RoutingRequest clone() {
         try {
@@ -1277,7 +1243,6 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
             } else {
                 LOG.error("attempted to reset routing context using a different graph");
             }
-            return;
         }
     }
 
@@ -1286,40 +1251,20 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
      * TODO rename - this is not a "setter", it creates a new routingContext, which has side effects on Graph
      *               (Constructors with side effects on their parameters are a bad design).
      */
-    public void setRoutingContext(Graph graph, Edge fromBackEdge, Vertex from, Vertex to) {
+    public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
         if (rctx != null) {
-            this.rctx.destroy();
+            this.rctx.close();
         }
         this.rctx = new RoutingContext(this, graph, from, to);
-        this.rctx.originBackEdge = fromBackEdge;
-    }
-
-    public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
-        setRoutingContext(graph, null, from, to);
     }
 
     public void setRoutingContext(Graph graph, Set<Vertex> from, Set<Vertex> to) {
-        setRoutingContext(graph, null, from, to);
-    }
-
-    public void setRoutingContext(Graph graph, Edge fromBackEdge, Set<Vertex> from, Set<Vertex> to) {
         // normally you would want to tear down the routing context...
         // but this method is mostly used in tests, and teardown interferes with testHalfEdges
         // FIXME here, or in test, and/or in other places like TSP that use this method
         if (rctx != null)
-            this.rctx.destroy();
+            this.rctx.close();
         this.rctx = new RoutingContext(this, graph, from, to);
-        this.rctx.originBackEdge = fromBackEdge;
-    }
-
-    /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
-    public void setRoutingContext(Graph graph, String from, String to) {
-        this.setRoutingContext(graph, graph.getVertex(from), graph.getVertex(to));
-    }
-
-    /** Used in internals API. Make a RoutingContext with no origin or destination vertices specified. */
-    public void setDummyRoutingContext(Graph graph) {
-        this.setRoutingContext(graph, "", "");
     }
 
     public RoutingContext getRoutingContext() {
@@ -1330,7 +1275,7 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
     public void cleanup() {
         if (this.rctx != null) {
             try {
-                rctx.destroy();
+                rctx.close();
             }
             catch (Exception e) {
                 LOG.error("Could not destroy the routing context", e);
@@ -1444,11 +1389,12 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         return bannedRoutes;
     }
 
-    public double getMaxAccessEgressDurationSecondsForMode(StreetMode mode) {
-        return maxAccessEgressDurationSecondsForMode.getOrDefault(
+    public Duration getMaxAccessEgressDuration(StreetMode mode) {
+        Double seconds = maxAccessEgressDurationSecondsForMode.getOrDefault(
             mode,
             maxAccessEgressDurationSeconds
         );
+        return Duration.ofSeconds(seconds.longValue());
     }
 
     /**
@@ -1627,18 +1573,5 @@ public class RoutingRequest implements AutoCloseable, Cloneable, Serializable {
         }
 
         return env;
-    }
-
-    /**
-     * This method is needed because we sometimes traverse edges with no graph. It returns a
-     * default intersection traversal model if no graph is present.
-     */
-    public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-        if (this.rctx != null && this.rctx.graph != null) {
-            return this.rctx.graph.getIntersectionTraversalModel();
-        } else {
-            // This is only to maintain compatibility with existing tests
-            return Graph.DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
-        }
     }
 }

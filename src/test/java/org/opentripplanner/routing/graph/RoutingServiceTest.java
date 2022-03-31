@@ -1,6 +1,11 @@
 package org.opentripplanner.routing.graph;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.GtfsTest;
@@ -26,6 +31,7 @@ public class RoutingServiceTest extends GtfsTest {
         return "testagency";
     }
 
+    @Test
     public void testIdLookup() {
 
         /* Graph vertices */
@@ -57,6 +63,7 @@ public class RoutingServiceTest extends GtfsTest {
     }
 
     /** Check that bidirectional relationships between TripPatterns and Trips, Routes, and Stops are coherent. */
+    @Test
     public void testPatternsCoherent() {
         for (Trip trip : graph.index.getTripForId().values()) {
             TripPattern pattern = graph.index.getPatternForTrip().get(trip);
@@ -71,11 +78,12 @@ public class RoutingServiceTest extends GtfsTest {
         for (var stop : graph.index.getAllStops()) {
             for (TripPattern pattern : graph.index.getPatternsForStop(stop)) {
                 int stopPos = pattern.findStopPosition(stop);
-                assertTrue("Stop position exist", stopPos >= 0);
+                assertTrue(stopPos >= 0, "Stop position exist");
             }
         }
     }
 
+    @Test
     public void testSpatialIndex() {
         String feedId = graph.getFeedIds().iterator().next();
         var stopJ = graph.index.getStopForId(new FeedScopedId(feedId, "J"));
@@ -95,10 +103,12 @@ public class RoutingServiceTest extends GtfsTest {
         assertTrue(stops.size() >= 3); // Query can overselect
     }
 
+    @Test
     public void testParentStations() {
         // graph.index.stopsForParentStation;
     }
 
+    @Test
     public void testLucene() {
         // graph.index.luceneIndex
     }

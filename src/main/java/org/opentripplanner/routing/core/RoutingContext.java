@@ -1,21 +1,24 @@
 package org.opentripplanner.routing.core;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -24,13 +27,6 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
-
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
  * Includes things like (temporary) endpoint vertices, transfer tables, service day caches, etc.
@@ -38,13 +34,13 @@ import java.util.function.Predicate;
  * In addition, while the RoutingRequest should only carry parameters _in_ to the routing operation, the routing context
  * should be used to carry information back out, such as debug figures or flags that certain thresholds have been exceeded.
  */
-public class RoutingContext implements Cloneable {
+public class RoutingContext implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
 
     /* FINAL FIELDS */
 
-    public RoutingRequest opt; // not final so we can reverse-clone
+    public final RoutingRequest opt;
 
     public final Graph graph;
 
@@ -52,16 +48,7 @@ public class RoutingContext implements Cloneable {
 
     public final Set<Vertex> toVertices;
 
-    public final Set<FeedScopedId> bannedRoutes;
-
     private final Set<DisposableEdgeCollection> tempEdges;
-    
-    // The back edge associated with the origin - i.e. continuing a previous search.
-    // NOTE: not final so that it can be modified post-construction for testing.
-    // TODO(flamholz): figure out a better way.
-    public Edge originBackEdge;
-
-    public RemainingWeightHeuristic remainingWeightHeuristic;
 
     /** Indicates that the search timed out or was otherwise aborted. */
     public boolean aborted;
@@ -145,12 +132,6 @@ public class RoutingContext implements Cloneable {
         this.fromVertices = routingRequest.arriveBy ? toVertices : fromVertices;
         this.toVertices = routingRequest.arriveBy ? fromVertices : toVertices;
 
-        if (graph.index != null) {
-            this.bannedRoutes = routingRequest.getBannedRoutes(graph.index.getAllRoutes());
-        } else {
-            this.bannedRoutes = Collections.emptySet();
-        }
-
         if (fromVertices != null && toVertices != null) {
             for (Vertex fromVertex : fromVertices) {
                 for (Vertex toVertex : toVertices) {
@@ -158,9 +139,8 @@ public class RoutingContext implements Cloneable {
                 }
             }
         }
-
-        remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
     }
+
     private RoutingContext(
             RoutingRequest routingRequest,
             Graph graph,
@@ -208,7 +188,7 @@ public class RoutingContext implements Cloneable {
      * the "permanent" graph objects. This enables all temporary objects
      * for garbage collection.
      */
-    public void destroy() {
+    public void close() {
         this.tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
     }
 

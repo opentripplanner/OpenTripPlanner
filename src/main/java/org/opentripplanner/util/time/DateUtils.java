@@ -1,5 +1,6 @@
 package org.opentripplanner.util.time;
 
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -243,12 +244,12 @@ public class DateUtils implements DateConstants {
         return null;
     }
     
-    public static long absoluteTimeout(double relativeTimeoutSeconds) {
-        if (relativeTimeoutSeconds <= 0) {
+    public static long absoluteTimeout(Duration timeout) {
+        if (timeout == null) {
             return Long.MAX_VALUE;
         }
         else {
-            return System.currentTimeMillis() + (long) (relativeTimeoutSeconds * 1000.0);
+            return System.currentTimeMillis() + timeout.toMillis();
         }
     }
 }

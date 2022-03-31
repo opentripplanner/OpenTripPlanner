@@ -2520,7 +2520,7 @@ type QueryType {
         ~~If true, the remaining weight heuristic is disabled. Currently only
         implemented for the long distance path service. Default value: false.~~
         """
-        disableRemainingWeightHeuristic: Boolean
+        disableRemainingWeightHeuristic: Boolean @deprecated(reason: "Removed in OTP 2.2")
 
         """
         Two-letter language code (ISO 639-1) used for returned text.

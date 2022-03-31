@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(DirectTransferGenerator.class);
 
-    final double radiusByDurationInSeconds;
+    private final Duration radiusByDuration;
 
     private final List<RoutingRequest> transferRequests;
 
@@ -48,8 +49,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         return List.of("street to transit");
     }
 
-    public DirectTransferGenerator (double radiusByDurationInSeconds, List<RoutingRequest> transferRequests) {
-        this.radiusByDurationInSeconds = radiusByDurationInSeconds;
+    public DirectTransferGenerator (Duration radiusByDuration, List<RoutingRequest> transferRequests) {
+        this.radiusByDuration = radiusByDuration;
         this.transferRequests = transferRequests;
     }
 
@@ -65,7 +66,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         }
 
         /* The linker will use streets if they are available, or straight-line distance otherwise. */
-        NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(graph, radiusByDurationInSeconds);
+        NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(graph, radiusByDuration);
         if (nearbyStopFinder.useStreets) {
             LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
         } else {

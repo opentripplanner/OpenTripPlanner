@@ -29,7 +29,8 @@ class MeterRegistrySetup {
 
             @Override
             public Duration step() {
-                return Duration.ofMinutes(10);
+                // we don't want to periodically send results, we do it manually at the end of the test
+                return Duration.ofDays(365);
             }
 
             @Override

@@ -1,13 +1,9 @@
 package org.opentripplanner.routing.impl;
 
-import java.util.Collections;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
-import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -64,8 +60,9 @@ public class GraphPathFinder {
         }
 
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
-        AStar aStar = new AStar();
-        if (options.rctx == null) {
+        AStarBuilder aStar = AStarBuilder
+                .oneToOneMaxDuration(Duration.ofSeconds((long) options.maxDirectStreetDurationSeconds));
+        if (options.getRoutingContext() == null) {
             options.setRoutingContext(router.graph);
             // The special long-distance heuristic should be sufficient to constrain the search to the right area.
         }
@@ -78,37 +75,17 @@ public class GraphPathFinder {
         options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
-        // Choose an appropriate heuristic for goal direction.
-        RemainingWeightHeuristic heuristic;
-        if (options.disableRemainingWeightHeuristic || options.oneToMany) {
-            heuristic = new TrivialRemainingWeightHeuristic();
-        } else {
-            heuristic = new EuclideanRemainingWeightHeuristic();
-        }
-        options.rctx.remainingWeightHeuristic = heuristic;
-        
+        aStar.setRoutingRequest(options);
+        aStar.setTimeout(Duration.ofMillis((long) (router.streetRoutingTimeoutSeconds() * 1000)));
+
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
-
-        double timeout = searchBeginTime + router.streetRoutingTimeoutSeconds() * 1000;
-        timeout -= System.currentTimeMillis(); // Convert from absolute to relative time
-        timeout /= 1000; // Convert milliseconds to seconds
-        if (timeout <= 0) {
-            // Catch the case where advancing to the next (lower) timeout value means the search is timed out
-            // before it even begins. Passing a negative relative timeout in the SPT call would mean "no timeout".
-            options.rctx.aborted = true;
-            return null;
-        }
-        // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
-        // Use the maxDirectStreetDurationSeconds as the limit here, as this class is used for point-to-point routing
-        aStar.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(options.maxDirectStreetDurationSeconds));
-        aStar.getShortestPathTree(options, timeout, null);
 
         List<GraphPath> paths = aStar.getPathsToTarget();
 
         LOG.debug("we have {} paths", paths.size());
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        Collections.sort(paths, options.getPathComparator(options.arriveBy));
+        paths.sort(options.getPathComparator(options.arriveBy));
         return paths;
     }
 
@@ -130,7 +107,7 @@ public class GraphPathFinder {
                 // Try again without slope restrictions, and warn the user in the response.
                 RoutingRequest relaxedRequest = request.clone();
                 relaxedRequest.maxWheelchairSlope = Double.MAX_VALUE;
-                request.rctx.slopeRestrictionRemoved = true;
+                request.getRoutingContext().slopeRestrictionRemoved = true;
                 paths = getPaths(relaxedRequest);
             }
         } catch (RoutingValidationException e) {

@@ -75,7 +75,7 @@ public class RoutingContextDestroyTest {
         originAndDestinationInsertedCorrect();
 
         // And When:
-        subject.destroy();
+        subject.close();
 
         // Then - permanent vertexes
         for (Vertex v : permanentVertexes) {

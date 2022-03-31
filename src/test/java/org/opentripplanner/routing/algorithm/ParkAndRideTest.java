@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
-import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -113,7 +113,10 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
         options.arriveBy = arriveBy;
         options.setRoutingContext(graph, fromVertex, toVertex);
 
-        var tree = new AStar().getShortestPathTree(options);
+        var tree = AStarBuilder.oneToOne()
+                .setRoutingRequest(options)
+                .getShortestPathTree();
+
         var path = tree.getPath(
                 arriveBy ? fromVertex : toVertex
         );

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.slf4j.Logger;
@@ -34,7 +35,8 @@ public class AccessEgressRouter {
         //      request being arriveBy or not, but here we are actually setting arriveBy based on
         //      whether we are doing an access or egress search, regardless of the direction of the
         //      main request.
-        Set<Vertex> vertices = fromTarget ^ rr.arriveBy ? rr.rctx.toVertices : rr.rctx.fromVertices;
+        final RoutingContext rctx = rr.getRoutingContext();
+        Set<Vertex> vertices = fromTarget != rr.arriveBy ? rctx.toVertices : rctx.fromVertices;
 
         // A new RoutingRequest needs to be constructed, because findNearbyStopsViaStreets() resets
         // the routingContext (rctx), which results in the created temporary edges being removed prematurely.
@@ -42,8 +44,8 @@ public class AccessEgressRouter {
         RoutingRequest nearbyRequest = rr.getStreetSearchRequest(streetMode);
 
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
-            rr.rctx.graph,
-            rr.getMaxAccessEgressDurationSecondsForMode(streetMode),
+            rctx.graph,
+            rr.getMaxAccessEgressDuration(streetMode),
             true
         );
         List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(

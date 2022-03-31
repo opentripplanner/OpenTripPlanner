@@ -55,11 +55,11 @@ public class DirectStreetRouter {
     // TODO This currently only calculates the distances between the first fromVertex
     //      and the first toVertex
     double distance = SphericalDistanceLibrary.distance(
-        request.rctx.fromVertices
+        request.getRoutingContext().fromVertices
             .iterator()
             .next()
             .getCoordinate(),
-        request.rctx.toVertices.iterator().next().getCoordinate()
+        request.getRoutingContext().toVertices.iterator().next().getCoordinate()
     );
     return distance < calculateDistanceMaxLimit(request);
   }

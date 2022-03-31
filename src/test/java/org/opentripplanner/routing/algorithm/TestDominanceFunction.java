@@ -21,8 +21,8 @@ public class TestDominanceFunction extends TestCase {
 
         // Test if domination works in the general case
 
-        State stateA = new State(fromVertex, null, 0, request);
-        State stateB = new State(toVertex, null, 0, request);
+        State stateA = new State(fromVertex, 0, request);
+        State stateB = new State(toVertex, 0, request);
         stateA.weight = 1;
         stateB.weight = 2;
 

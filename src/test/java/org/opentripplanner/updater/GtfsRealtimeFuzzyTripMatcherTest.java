@@ -1,12 +1,17 @@
 package org.opentripplanner.updater;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.routing.RoutingService;
 
 public class GtfsRealtimeFuzzyTripMatcherTest extends GtfsTest {
 
-    public void testMatch() throws Exception {
+    @Test
+    public void testMatch() {
         String feedId = graph.getFeedIds().iterator().next();
 
         GtfsRealtimeFuzzyTripMatcher matcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(

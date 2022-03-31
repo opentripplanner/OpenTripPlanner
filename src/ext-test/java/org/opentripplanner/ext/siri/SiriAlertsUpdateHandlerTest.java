@@ -1,6 +1,12 @@
 package org.opentripplanner.ext.siri;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -87,8 +93,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     final String reportType = "incident";
     ptSituation.setReportType(reportType);
-
-    final SeverityEnumeration severity = SeverityEnumeration.SEVERE;
     ptSituation.setSeverity(SeverityEnumeration.SEVERE);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
@@ -206,14 +210,14 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   }
 
   private ServiceDelivery createServiceDelivery(PtSituationElement situationElement) {
-    return createServiceDelivery(Arrays.asList(situationElement));
+    return createServiceDelivery(List.of(situationElement));
   }
 
-  private boolean containsOnlyEntitiesOfClass(TransitAlert transitAlert, Class cls) {
+  private boolean containsOnlyEntitiesOfClass(TransitAlert transitAlert, Class<?> cls) {
     long totalEntityCount = transitAlert.getEntities().size();
     long clsEntityCount = transitAlert.getEntities()
             .stream()
-            .filter(entitySelector -> cls.isInstance(entitySelector))
+            .filter(cls::isInstance)
             .count();
     return clsEntityCount > 0 && clsEntityCount == totalEntityCount;
   }
@@ -285,8 +289,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     final String reportType = "incident";
     ptSituation.setReportType(reportType);
-
-    final SeverityEnumeration severity = SeverityEnumeration.SEVERE;
     ptSituation.setSeverity(SeverityEnumeration.SEVERE);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
@@ -314,47 +316,47 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   ) {
     // TimePeriod ends BEFORE first validityPeriod starts
     assertFalse(
-        "TimePeriod ends BEFORE first validityPeriod starts: " + label,
-        transitAlert.displayDuring(
-            startTimePeriod_1.toEpochSecond() - 200,
-            startTimePeriod_1.toEpochSecond() - 100
-        )
+            transitAlert.displayDuring(
+                    startTimePeriod_1.toEpochSecond() - 200,
+                    startTimePeriod_1.toEpochSecond() - 100
+            ),
+            "TimePeriod ends BEFORE first validityPeriod starts: " + label
     );
 
     // TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends
     assertTrue(
-        "TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends: " + label,
-        transitAlert.displayDuring(
-            startTimePeriod_1.toEpochSecond() - 1000,
-            endTimePeriod_1.toEpochSecond() - 100
-        )
+            transitAlert.displayDuring(
+                    startTimePeriod_1.toEpochSecond() - 1000,
+                    endTimePeriod_1.toEpochSecond() - 100
+            ),
+            "TimePeriod ends AFTER first validityPeriod starts, BEFORE it ends: " + label
     );
 
     // TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends
     assertTrue(
-        "TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends: " + label,
-        transitAlert.displayDuring(
-            startTimePeriod_1.toEpochSecond() + 100,
-            endTimePeriod_1.toEpochSecond() - 100
-        )
+            transitAlert.displayDuring(
+                    startTimePeriod_1.toEpochSecond() + 100,
+                    endTimePeriod_1.toEpochSecond() - 100
+            ),
+            "TimePeriod starts AFTER first validityPeriod starts, BEFORE it ends: " + label
     );
 
     // TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends
     assertTrue(
-        "TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends: " + label,
-        transitAlert.displayDuring(
-            startTimePeriod_1.toEpochSecond() + 100,
-            endTimePeriod_1.toEpochSecond() + 100
-        )
+            transitAlert.displayDuring(
+                    startTimePeriod_1.toEpochSecond() + 100,
+                    endTimePeriod_1.toEpochSecond() + 100
+            ),
+            "TimePeriod starts AFTER first validityPeriod starts, ends AFTER it ends: " + label
     );
 
     // TimePeriod starts AFTER first validityPeriod ends
     assertFalse(
-        "TimePeriod starts AFTER first validityPeriod ends: " + label,
-        transitAlert.displayDuring(
-            endTimePeriod_1.toEpochSecond() + 100,
-            endTimePeriod_1.toEpochSecond() + 200
-        )
+            transitAlert.displayDuring(
+                    endTimePeriod_1.toEpochSecond() + 100,
+                    endTimePeriod_1.toEpochSecond() + 200
+            ),
+            "TimePeriod starts AFTER first validityPeriod ends: " + label
     );
   }
 
@@ -378,7 +380,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     ptSituation.setReportType(reportType);
 
     final SeverityEnumeration severity = SeverityEnumeration.SEVERE;
-    ptSituation.setSeverity(SeverityEnumeration.SEVERE);
+    ptSituation.setSeverity(severity);
 
     final ServiceDelivery serviceDelivery = createServiceDelivery(ptSituation);
     alertsUpdateHandler.update(serviceDelivery);
@@ -394,12 +396,12 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, stopId0));
 
     assertTrue(
-        "Alert does not contain default condition START_POINT",
-        transitAlert.getStopConditions().contains(StopCondition.START_POINT)
+            transitAlert.getStopConditions().contains(StopCondition.START_POINT),
+            "Alert does not contain default condition START_POINT"
     );
     assertTrue(
-        "Alert does not contain default condition DESTINATION",
-        transitAlert.getStopConditions().contains(StopCondition.DESTINATION)
+            transitAlert.getStopConditions().contains(StopCondition.DESTINATION),
+            "Alert does not contain default condition DESTINATION"
     );
 
     stopPatches = transitAlertService.getStopAlerts(stopId1);
@@ -412,12 +414,12 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, stopId1));
 
     assertTrue(
-        "Alert does not contain default condition START_POINT",
-        transitAlert.getStopConditions().contains(StopCondition.START_POINT)
+            transitAlert.getStopConditions().contains(StopCondition.START_POINT),
+            "Alert does not contain default condition START_POINT"
     );
     assertTrue(
-        "Alert does not contain default condition DESTINATION",
-        transitAlert.getStopConditions().contains(StopCondition.DESTINATION)
+            transitAlert.getStopConditions().contains(StopCondition.DESTINATION),
+            "Alert does not contain default condition DESTINATION"
     );
   }
 
@@ -1019,7 +1021,10 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertNotNull(transitAlert.getEffectiveStartDate());
 
-    assertEquals(period_1.getStartTime().toEpochSecond(), (transitAlert.getEffectiveStartDate().getTime()/1000));
+    assertEquals(
+            period_1.getStartTime().toEpochSecond(),
+            (transitAlert.getEffectiveStartDate().getTime() / 1000)
+    );
 
     assertNull(transitAlert.getEffectiveEndDate());
   }

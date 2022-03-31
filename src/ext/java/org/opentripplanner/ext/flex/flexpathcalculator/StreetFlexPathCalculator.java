@@ -1,8 +1,9 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
-import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -10,10 +11,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
@@ -31,7 +28,7 @@ import java.util.Map;
  */
 public class StreetFlexPathCalculator implements FlexPathCalculator {
 
-  private static final long MAX_FLEX_TRIP_DURATION_SECONDS = Duration.ofMinutes(45).toSeconds();
+  private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
 
   private final Graph graph;
   private final Map<Vertex, ShortestPathTree> cache = new HashMap<>();
@@ -80,13 +77,13 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     } else {
       routingRequest.setRoutingContext(graph, vertex, null);
     }
-    routingRequest.disableRemainingWeightHeuristic = true;
-    routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
     routingRequest.dominanceFunction = new DominanceFunction.EarliestArrival();
-    routingRequest.oneToMany = true;
-    AStar search = new AStar();
-    search.setSkipEdgeStrategy(new DurationSkipEdgeStrategy(MAX_FLEX_TRIP_DURATION_SECONDS));
-    ShortestPathTree spt = search.getShortestPathTree(routingRequest);
+
+    ShortestPathTree spt = AStarBuilder
+            .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
+            .setRoutingRequest(routingRequest)
+            .getShortestPathTree();
+
     routingRequest.cleanup();
     return spt;
   }

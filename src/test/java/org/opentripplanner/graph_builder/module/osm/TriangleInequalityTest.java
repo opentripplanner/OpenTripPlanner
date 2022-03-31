@@ -1,5 +1,14 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -7,7 +16,7 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
-import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -19,19 +28,8 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
-import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 public class TriangleInequalityTest {
-    
-    private static HashMap<Class<?>, Object> extra;
+
     private static Graph graph;
 
     private Vertex start;
@@ -40,7 +38,7 @@ public class TriangleInequalityTest {
     @BeforeClass
     public static void onlyOnce() {
 
-        extra = new HashMap<>();
+        HashMap<Class<?>, Object> extra = new HashMap<>();
         graph = new Graph();
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
@@ -65,11 +63,15 @@ public class TriangleInequalityTest {
         end = graph.getVertex("osm:node:42448554");
     }
 
-    private GraphPath getPath(AStar aStar, RoutingRequest proto,
-            Edge startBackEdge, Vertex u, Vertex v) {
+    private GraphPath getPath(RoutingRequest proto, Edge startBackEdge, Vertex u, Vertex v) {
         RoutingRequest options = proto.clone();
-        options.setRoutingContext(graph, startBackEdge, u, v);
-        ShortestPathTree tree = aStar.getShortestPathTree(options);
+        options.setRoutingContext(graph, u, v);
+
+        ShortestPathTree tree = AStarBuilder.oneToOne()
+                .setOriginBackEdge(startBackEdge)
+                .setRoutingRequest(options)
+                .getShortestPathTree();
+
         GraphPath path = tree.getPath(v);
         options.cleanup();
         return path;
@@ -104,9 +106,10 @@ public class TriangleInequalityTest {
         RoutingRequest options = prototypeOptions.clone();
         options.setRoutingContext(graph, start, end);
         
-        AStar aStar = new AStar();
-        
-        ShortestPathTree tree = aStar.getShortestPathTree(options);
+        ShortestPathTree tree = AStarBuilder.oneToOne()
+                .setRoutingRequest(options)
+                .getShortestPathTree();
+
         GraphPath path = tree.getPath(end);
         options.cleanup();
         assertNotNull(path);
@@ -114,7 +117,7 @@ public class TriangleInequalityTest {
         double startEndWeight = path.getWeight();
         int startEndDuration = path.getDuration();
         assertTrue(startEndWeight > 0);
-        assertEquals(startEndWeight, (double) startEndDuration, 1.0 * path.edges.size());
+        assertEquals(startEndWeight, startEndDuration, 1.0 * path.edges.size());
         
         // Try every vertex in the graph as an intermediate.
         boolean violated = false;
@@ -123,13 +126,13 @@ public class TriangleInequalityTest {
                 continue;
             }
             
-            GraphPath startIntermediatePath = getPath(aStar, prototypeOptions, null, start, intermediate);
+            GraphPath startIntermediatePath = getPath(prototypeOptions, null, start, intermediate);
             if (startIntermediatePath == null) {
                 continue;
             }
             
             Edge back = startIntermediatePath.states.getLast().getBackEdge();
-            GraphPath intermediateEndPath = getPath(aStar, prototypeOptions, back, intermediate, end);
+            GraphPath intermediateEndPath = getPath(prototypeOptions, back, intermediate, end);
             if (intermediateEndPath == null) {
                 continue;
             }
@@ -140,9 +143,9 @@ public class TriangleInequalityTest {
             int intermediateEndDuration = intermediateEndPath.getDuration();
             
             // TODO(flamholz): fix traversal so that there's no rounding at the second resolution.
-            assertEquals(startIntermediateWeight, (double) startIntermediateDuration,
+            assertEquals(startIntermediateWeight, startIntermediateDuration,
                     1.0 * startIntermediatePath.edges.size());            
-            assertEquals(intermediateEndWeight, (double) intermediateEndDuration,
+            assertEquals(intermediateEndWeight, intermediateEndDuration,
                     1.0 * intermediateEndPath.edges.size());
             
             double diff = startIntermediateWeight + intermediateEndWeight - startEndWeight;

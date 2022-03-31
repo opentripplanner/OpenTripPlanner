@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.Lists;
+import java.time.Duration;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
@@ -217,7 +218,8 @@ public class GraphBuilder implements Runnable {
             }
 
             // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-            graphBuilder.addModule(new DirectTransferGenerator(config.maxTransferDurationSeconds, config.transferRequests));
+            graphBuilder.addModule(new DirectTransferGenerator(Duration.ofSeconds(
+                    (long) config.maxTransferDurationSeconds), config.transferRequests));
 
             // Analyze routing between stops to generate report
             if (OTPFeature.TransferAnalyzer.isOn()) {

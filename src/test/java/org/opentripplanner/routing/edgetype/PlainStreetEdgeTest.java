@@ -32,7 +32,6 @@ public class PlainStreetEdgeTest {
         v2 = vertex("maple_2nd", 1.0, 2.0);
         
         proto = new RoutingRequest();
-        proto.setDummyRoutingContext(graph);
         proto.carSpeed = 15.0f;
         proto.walkSpeed = 1.0;
         proto.bikeSpeed = 5.0f;
@@ -259,7 +258,9 @@ public class PlainStreetEdgeTest {
     public void testTurnRestriction() {
         StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
         StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
-        State state = new State(v2, 0, proto.clone());
+        RoutingRequest routingRequest = proto.clone();
+        routingRequest.setRoutingContext(graph, v0, v2);
+        State state = new State(v2, 0, routingRequest);
 
         state.getOptions().setArriveBy(true);
         e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
