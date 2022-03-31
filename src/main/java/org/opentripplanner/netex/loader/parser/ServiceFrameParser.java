@@ -244,9 +244,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
             if (element.getValue() instanceof Line) {
                 this.lines.add((Line) element.getValue());
             } else if (element.getValue() instanceof FlexibleLine) {
-                if(OTPFeature.FlexRouting.isOn()) {
-                    this.flexibleLines.add((FlexibleLine) element.getValue());
-                }
+                this.flexibleLines.add((FlexibleLine) element.getValue());
             }
             else {
                 warnOnMissingMapping(LOG, element.getValue());
