@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev-2.x
-      - otp2_move_speed_test_to_routing_worker
 
 jobs:
   perf-test:
