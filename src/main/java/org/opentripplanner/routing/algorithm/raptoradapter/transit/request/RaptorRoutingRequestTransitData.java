@@ -91,7 +91,6 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
     var mcCostParams = McCostParamsMapper.map(routingContext.opt);
     var defaultCostCalculator = new DefaultCostCalculator(
-            McCostParamsMapper.map(routingContext.opt),
             mcCostParams,
             transitLayer.getStopIndex().stopBoardAlightCosts
     );

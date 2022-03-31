@@ -15,6 +15,7 @@ import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
@@ -65,9 +66,10 @@ class StreetTransitEntityLinkTest {
         var to = new TransitStopVertex(graph, stop, Set.of(TransitMode.RAIL));
 
         var req = new RoutingRequest();
-        req.setRoutingContext(graph, from, to);
         req.accessibilityRequirements = AccessibilityRequirements.makeDefault(evaluation);
-        var state = new State(req);
+
+        var ctx = new RoutingContext(req, graph, from, to);
+        var state = new State(ctx);
 
         var edge = new StreetTransitStopLink(from, to);
 
