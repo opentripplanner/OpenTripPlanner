@@ -462,12 +462,12 @@ public class OSMDatabase {
                     if (checkIntersectionDistance(p, nA, epsilon)) {
                     	// insert node A into the ring segment
                         splitNode = nA;
-                        
-                        if (ringSegment.ring.nodes.contains(splitNode))
-                        	// This node is already a part of this ring (perhaps we inserted it previously). No need to connect again.
-                        	// Note that this may not be a safe assumption to make in all cases; suppose a way were to cross exactly over a node *twice*,
-                        	// we would only add it the first time.
-                        {
+
+                        // This node is already a part of this ring (perhaps we inserted it
+                        // previously). No need to connect again. Note that this may not be a safe
+                        // assumption to make in all cases; suppose a way were to cross exactly
+                        // over a node *twice*, we would only add it the first time.
+                        if (ringSegment.ring.nodes.contains(splitNode)) {
                             continue;
                         }
                         
