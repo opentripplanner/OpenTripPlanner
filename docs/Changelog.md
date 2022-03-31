@@ -28,6 +28,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - New Norwegian way properties profile  [#3728](https://github.com/opentripplanner/OpenTripPlanner/pull/3728)
 - Elevation handling improvements [#4033](https://github.com/opentripplanner/OpenTripPlanner/pull/4033)
 - NeTEx mapping of WheelchairBoarding from ServiceJourney to Trip [#4043](https://github.com/opentripplanner/OpenTripPlanner/pull/4043)
+- Always parse Netex flexible lines [#4049](https://github.com/opentripplanner/OpenTripPlanner/pull/4049)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
