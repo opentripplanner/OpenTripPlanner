@@ -190,7 +190,7 @@ example:
 {
     "otpFeatures" : {
         "APIBikeRental" : false,
-        "SandboxExampleAPIGraphStatistics" : true
+        "ActuatorAPI" : true
     }
 }
 ```

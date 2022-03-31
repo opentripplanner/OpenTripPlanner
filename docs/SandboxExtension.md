@@ -9,7 +9,6 @@
 Here is a list of features implemented as OTP Sandbox Extensions. The Sandbox extensions are 
 provided "as is". 
 
-- [Examples](sandbox/Examples.md) - Sandbox examples on how to implement extensions.
 - [Google Cloud Storage](sandbox/GoogleCloudStorage.md) - Enable Google Cloud Storage as a OTP Data Source
 - [Actuator API](sandbox/ActuatorAPI.md) - API used to check the health status of the OTP instance.
 - [Transfer analyser](sandbox/transferanalyzer.md) - Module used for analyzing the transfers between 
