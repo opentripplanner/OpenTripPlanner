@@ -28,9 +28,9 @@ public record AccessibilityConfig(Evaluation evaluation,
     /**
      * What wheelchair=true means is configurable.
      * <p>
-     * I can mean that you only want to use stops and trips that are known to be accessible.
+     * It can mean that you only want to use stops and trips that are known to be accessible.
      * <p>
-     * I can also be configured to allow unknown information or even stops/trips that are known to
+     * It can also be configured to allow unknown information or even stops/trips that are known to
      * be inaccessible as a last resort.
      * <p>
      * Here we take the level of wheelchair accessibility that the user has selected (on/off) and
