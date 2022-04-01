@@ -1,10 +1,8 @@
 package org.opentripplanner.routing.api.request;
 
-import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.LocationStringParser;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.FeedScopedId;
@@ -35,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
@@ -1470,24 +1466,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
         Envelope env = new Envelope(c);
         env.expandBy(lon, lat);
-
-        if (LOG.isDebugEnabled()) {
-
-            var geom = GeometryUtils.getGeometryFactory().toGeometry(env);
-            var geoJson = new GeometryJSON();
-
-            try {
-                var stream = new ByteArrayOutputStream();
-                geoJson.write(geom, stream);
-                LOG.debug(
-                        "Computing {}m envelope around coordinate {}. GeoJSON: {}", meters, c,
-                        stream.toString()
-                );
-            }
-            catch (IOException e) {
-                LOG.error("Could not build debug GeoJSON", e);
-            }
-        }
 
         return env;
     }
