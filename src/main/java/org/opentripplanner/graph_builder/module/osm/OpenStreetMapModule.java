@@ -30,7 +30,6 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
@@ -421,10 +420,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             var creativeName = nameParkAndRideEntity(entity);
 
             // Check P+R accessibility by walking and driving.
-            TraversalRequirements walkReq = new TraversalRequirements(new RoutingRequest(
-                    TraverseMode.WALK));
-            TraversalRequirements driveReq = new TraversalRequirements(new RoutingRequest(
-                    TraverseMode.CAR));
+            RoutingRequest walkReq = new RoutingRequest(TraverseMode.WALK);
+            RoutingRequest driveReq = new RoutingRequest(TraverseMode.CAR);
             boolean walkAccessibleIn = false;
             boolean carAccessibleIn = false;
             boolean walkAccessibleOut = false;
@@ -432,19 +429,23 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             for (VertexAndName access : accessVertices) {
                 var accessVertex = access.getVertex();
                 for (Edge incoming : accessVertex.getIncoming()) {
-                    if (incoming instanceof StreetEdge) {
-                        if (walkReq.canBeTraversed((StreetEdge)incoming))
+                    if (incoming instanceof StreetEdge streetEdge) {
+                        if (streetEdge.canTraverse(walkReq, TraverseMode.WALK)) {
                             walkAccessibleIn = true;
-                        if (driveReq.canBeTraversed((StreetEdge)incoming))
+                        }
+                        if (streetEdge.canTraverse(driveReq, TraverseMode.CAR)) {
                             carAccessibleIn = true;
+                        }
                     }
                 }
                 for (Edge outgoing : accessVertex.getOutgoing()) {
-                    if (outgoing instanceof StreetEdge) {
-                        if (walkReq.canBeTraversed((StreetEdge)outgoing))
+                    if (outgoing instanceof StreetEdge streetEdge) {
+                        if (streetEdge.canTraverse(walkReq, TraverseMode.WALK)) {
                             walkAccessibleOut = true;
-                        if (driveReq.canBeTraversed((StreetEdge)outgoing))
+                        }
+                        if (streetEdge.canTraverse(driveReq, TraverseMode.CAR)) {
                             carAccessibleOut = true;
+                        }
                     }
                 }
             }

@@ -218,7 +218,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * @param mode
      * @return
      */
-    private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
+    public boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (mode.isWalking() && options.wheelchairAccessible) {
             if (!isWheelchairAccessible()) {
                 return false;
