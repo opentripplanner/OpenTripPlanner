@@ -162,18 +162,8 @@ public class TripPatternForDates
 
 
     // Implementing RaptorTimeTable
-
     @Override public TripSchedule getTripSchedule(int index) {
-        for (int i = 0; i < tripPatternForDates.length; i++) {
-            TripPatternForDate tripPatternForDate = tripPatternForDates[i];
-
-            if (index < tripPatternForDate.numberOfTripSchedules()) {
-                return new TripScheduleWithOffset(this, tripPatternForDate.getLocalDate(),
-                        tripPatternForDate.getTripTimes(index), offsets[i]);
-            }
-            index -= tripPatternForDate.numberOfTripSchedules();
-        }
-        throw new IndexOutOfBoundsException("Index out of bound: " + index);
+        return new TripScheduleWithOffset(this, index);
     }
 
     @Override
