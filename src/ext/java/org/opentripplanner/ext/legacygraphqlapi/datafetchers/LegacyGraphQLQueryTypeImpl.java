@@ -693,6 +693,7 @@ public class LegacyGraphQLQueryTypeImpl
 
         return vehicleRentalStationService.getVehicleRentalVehicles()
                 .stream()
+                .filter(v -> v.vehicleType != null)
                 .filter(v -> requiredFormFactors.contains(v.vehicleType.formFactor))
                 .toList();
       }
