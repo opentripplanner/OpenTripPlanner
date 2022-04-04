@@ -273,6 +273,9 @@ class TripPatternMapper {
       .map(datedServiceJourneyById::lookup)
       .filter(Objects::nonNull)
       .map(replacement -> {
+        if (datedServiceJourney.equals(replacement)) {
+          return null;
+        }
         String serviceJourneyRef = replacement.getJourneyRef().get(0).getValue().getRef();
         ServiceJourney serviceJourney = serviceJourneyById.lookup(serviceJourneyRef);
         if (serviceJourney == null) {
