@@ -217,6 +217,15 @@ public class LegacyGraphQLTypes {
 
     }
 
+    public enum LegacyGraphQLFormFactor {
+        BICYCLE,
+        CAR,
+        MOPED,
+        OTHER,
+        SCOOTER
+
+    }
+
 
     public static class LegacyGraphQLInputBannedInput {
 
@@ -598,6 +607,14 @@ public class LegacyGraphQLTypes {
 
     }
 
+
+    public enum LegacyGraphQLPropulsionType {
+        COMBUSTION,
+        ELECTRIC,
+        ELECTRIC_ASSIST,
+        HUMAN
+
+    }
 
     /**
      * Additional qualifier for a transport mode. Note that qualifiers can only be used with certain

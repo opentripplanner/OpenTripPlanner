@@ -618,6 +618,9 @@ type RentalVehicle implements Node & PlaceInterface {
     If true, vehicle is not disabled.
     """
     operative: Boolean
+
+    """The type of the rental vehicle (scooter, bicycle, car...)"""
+    vehicleType: RentalVehicleType
 }
 
 type BikeRentalStationUris {
@@ -661,6 +664,38 @@ type VehicleRentalUris {
     May be {@code null} if a rental URL does not exist.
     """
     web: String
+}
+
+type RentalVehicleType {
+    """The vehicle's general form factor"""
+    formFactor: FormFactor
+
+    """The primary propulsion type of the vehicle"""
+    propulsionType: PropulsionType
+}
+
+enum FormFactor {
+    """A bicycle"""
+    BICYCLE
+    """An automobile"""
+    CAR
+    """A moped that the rider sits on. For a disambiguation see https://github.com/NABSA/gbfs/pull/370#issuecomment-982631989"""
+    MOPED
+    """A scooter that the rider stands on. For a disambiguation see https://github.com/NABSA/gbfs/pull/370#issuecomment-982631989"""
+    SCOOTER
+    """A vehicle that doesn't fit into any other category"""
+    OTHER
+}
+
+enum PropulsionType {
+    """Pedal or foot propulsion"""
+    HUMAN
+    """Provides power only alongside human propulsion"""
+    ELECTRIC_ASSIST
+    """Contains throttle mode with a battery-powered motor"""
+    ELECTRIC
+    """Contains throttle mode with a gas engine-powered motor"""
+    COMBUSTION
 }
 
 enum BikesAllowed {
