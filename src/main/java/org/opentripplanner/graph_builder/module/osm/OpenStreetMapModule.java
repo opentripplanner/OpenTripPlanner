@@ -847,10 +847,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             for (Long nodeId : multiLevelNodes.keySet()) {
                 OSMNode node = osmdb.getNode(nodeId);
 
-                // Use the first elevator node as the elevator label suffix
-                // Prevent duplicated vertex for elevator using the sames stops (chained elevator)
-                String elevatorLabelSuffix = getNodeLabel(node);
-
                 // this allows skipping levels, e.g., an elevator that stops
                 // at floor 0, 2, 3, and 5.
                 // Converting to an Array allows us to
@@ -880,7 +876,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     String levelName = level.longName;
 
                     createElevatorVertices(
-                            graph, onboardVertices, sourceVertex, elevatorLabelSuffix + "_" + sourceVertexLabel,
+                            graph, onboardVertices, sourceVertex, sourceVertexLabel,
                             levelName
                     );
                 }
@@ -908,12 +904,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                         .boxed()
                         .collect(Collectors.toList());
 
-                if(nodes.isEmpty()) {
-                    continue;
-                }
-
-
-                String elevatorLabelSuffix = getNodeLabel(osmdb.getNode(nodes.get(0)));
                 ArrayList<Vertex> onboardVertices = new ArrayList<>();
                 for (int i = 0; i < nodes.size(); i++) {
                     Long node = nodes.get(i);
@@ -922,7 +912,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     String sourceVertexLabel = sourceVertex.getLabel();
                     String levelName = elevatorWay.getId() + " / " + i;
                     createElevatorVertices(
-                            graph, onboardVertices, sourceVertex, elevatorLabelSuffix + "_" + sourceVertexLabel, levelName
+                            graph, onboardVertices, sourceVertex, elevatorWay.getId() + "_" + sourceVertexLabel, levelName
                     );
                 }
 
