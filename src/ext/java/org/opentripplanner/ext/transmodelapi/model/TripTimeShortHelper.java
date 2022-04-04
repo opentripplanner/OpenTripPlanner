@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -29,6 +30,7 @@ public class TripTimeShortHelper {
       transitLeg.getTripTimes(),
       transitLeg.getBoardStopPosInPattern(),
       transitLeg.getTripPattern(),
+      transitLeg.getServiceDate(),
       transitLeg.getServiceDateMidnight()
     );
     /* TODO OTP2 This method is only used for EstimatedCalls for from place. We have to decide
@@ -56,6 +58,7 @@ public class TripTimeShortHelper {
       transitLeg.getTripTimes(),
       transitLeg.getAlightStopPosInPattern(),
       transitLeg.getTripPattern(),
+      transitLeg.getServiceDate(),
       transitLeg.getServiceDateMidnight()
     );
     /* TODO OTP2 This method is only used for EstimatedCalls for to place. We have to decide
@@ -82,9 +85,18 @@ public class TripTimeShortHelper {
     TripTimes tripTimes = transitLeg.getTripTimes();
     TripPattern tripPattern = transitLeg.getTripPattern();
     Instant serviceDateMidnight = transitLeg.getServiceDateMidnight();
+    ServiceDate serviceDate = transitLeg.getServiceDate();
     return IntStream
       .range(0, tripPattern.numberOfStops())
-      .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDateMidnight))
+      .mapToObj(i ->
+        new TripTimeOnDate(
+          tripTimes,
+          i,
+          tripPattern,
+          serviceDate,
+          serviceDateMidnight
+        )
+      )
       .collect(Collectors.toList());
   }
 
@@ -99,9 +111,18 @@ public class TripTimeShortHelper {
     TripTimes tripTimes = transitLeg.getTripTimes();
     TripPattern tripPattern = transitLeg.getTripPattern();
     Instant serviceDateMidnight = transitLeg.getServiceDateMidnight();
+    ServiceDate serviceDate = transitLeg.getServiceDate();
     return IntStream
       .range(leg.getBoardStopPosInPattern() + 1, leg.getAlightStopPosInPattern())
-      .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDateMidnight))
+      .mapToObj(i ->
+        new TripTimeOnDate(
+          tripTimes,
+          i,
+          tripPattern,
+          serviceDate,
+          serviceDateMidnight
+        )
+      )
       .collect(Collectors.toList());
   }
 }

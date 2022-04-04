@@ -240,7 +240,7 @@ public class StopTimesHelper {
     MinMaxPriorityQueue<TripTimeOnDate> pq = MinMaxPriorityQueue
       .orderedBy(
         Comparator.comparing((TripTimeOnDate tts) ->
-          tts.getServiceDay() + tts.getRealtimeDeparture()
+          tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
         )
       )
       .maximumSize(numberOfDepartures)
