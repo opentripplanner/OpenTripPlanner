@@ -283,16 +283,18 @@ public class AddTransitModelEntitiesToGraph {
             levels = Math.abs(fromVertexLevelIndex - toVertexLevelIndex);
         }
 
+        String elevatorLabel = fromVertex.getLabel() + "-" + toVertex.getLabel();
+
         ElevatorOffboardVertex fromOffboardVertex = new ElevatorOffboardVertex(
             graph,
-            fromVertex.getLabel() + "_" + pathway.getId() + "_offboard",
+            fromVertex.getLabel() + "(" + elevatorLabel +")" + "_" + pathway.getId() + "_offboard",
             fromVertex.getX(),
             fromVertex.getY(),
             fromVertexLevelName
         );
         ElevatorOffboardVertex toOffboardVertex = new ElevatorOffboardVertex(
             graph,
-            toVertex.getLabel() + "_" + pathway.getId() + "_offboard",
+            toVertex.getLabel() + "(" + elevatorLabel +")"  + "_" + pathway.getId() + "_offboard",
             toVertex.getX(),
             toVertex.getY(),
             toVertexLevelName
@@ -303,14 +305,14 @@ public class AddTransitModelEntitiesToGraph {
 
         ElevatorOnboardVertex fromOnboardVertex = new ElevatorOnboardVertex(
             graph,
-            fromVertex.getLabel() + "_" + pathway.getId() + "_onboard",
+            fromVertex.getLabel() + "(" + elevatorLabel +")"  + "_" + pathway.getId() + "_onboard",
             fromVertex.getX(),
             fromVertex.getY(),
             fromVertexLevelName
         );
         ElevatorOnboardVertex toOnboardVertex = new ElevatorOnboardVertex(
             graph,
-            toVertex.getLabel() + "_" + pathway.getId() + "_onboard",
+            toVertex.getLabel() + "(" + elevatorLabel +")"  + "_" + pathway.getId() + "_onboard",
             toVertex.getX(),
             toVertex.getY(),
             toVertexLevelName
