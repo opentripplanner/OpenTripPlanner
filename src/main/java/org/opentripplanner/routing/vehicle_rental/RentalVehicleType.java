@@ -81,7 +81,7 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
                 case CAR -> CAR;
                 case MOPED -> MOPED;
                 case SCOOTER -> SCOOTER;
-                default -> OTHER;
+                case OTHER -> OTHER;
             };
         }
     }
