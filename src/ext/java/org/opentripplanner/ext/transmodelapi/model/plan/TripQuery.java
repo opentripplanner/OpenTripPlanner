@@ -141,7 +141,7 @@ public class TripQuery {
                 + "the search, not implemented for the transit jet."
             )
             .type(Scalars.GraphQLBoolean)
-            .defaultValue(routing.request.accessibilityRequirements)
+            .defaultValue(routing.request.accessibilityRequest)
             .build()
         )
         .argument(GraphQLArgument.newArgument()

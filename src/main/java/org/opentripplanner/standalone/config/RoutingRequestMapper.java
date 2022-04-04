@@ -100,7 +100,9 @@ public class RoutingRequestMapper {
         request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
         request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
 
-        boolean wheelchairAccessible = c.asBoolean("wheelchair", dft.accessibilityRequirements.requestsWheelchair());
+        boolean wheelchairAccessible = c.asBoolean("wheelchair",
+                dft.accessibilityRequest.enabled()
+        );
         request.setAccessibility(wheelchairAccessible);
 
         mapTransferOptimization(

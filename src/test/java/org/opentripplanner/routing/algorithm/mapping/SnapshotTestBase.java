@@ -45,8 +45,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
@@ -253,7 +251,7 @@ public abstract class SnapshotTestBase {
                 dateTime.toLocalTime().format(apiTimeFormatter),
                 modes,
                 request.arriveBy,
-                request.accessibilityRequirements
+                request.accessibilityRequest
         );
     }
 

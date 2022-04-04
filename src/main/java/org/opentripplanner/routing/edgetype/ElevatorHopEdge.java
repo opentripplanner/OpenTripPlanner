@@ -43,7 +43,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
 
-        if (options.accessibilityRequirements.requestsWheelchair() && !wheelchairAccessible) {
+        if (options.accessibilityRequest.enabled() && !wheelchairAccessible) {
             return null;
         }
 

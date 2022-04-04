@@ -3,9 +3,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.AccessibilityRequirements;
-import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 public class WheelchairCostCalculatorTest {
@@ -15,12 +15,18 @@ public class WheelchairCostCalculatorTest {
 
     private final WheelchairCostCalculator subject = new WheelchairCostCalculator(
             new DummyCostCalculator(),
-            new AccessibilityRequirements(
-                    EvaluationType.ALLOW_UNKNOWN_INFORMATION,
-                    UNKNOWN_ACCESSIBILITY_COST,
-                    INACCESSIBLE_TRIP_COST,
-                    UNKNOWN_ACCESSIBILITY_COST,
-                    INACCESSIBLE_TRIP_COST
+            new WheelchairAccessibilityRequest(
+                    true,
+                    new WheelchairAccessibilityFeature(
+                            false,
+                            UNKNOWN_ACCESSIBILITY_COST,
+                            INACCESSIBLE_TRIP_COST
+                    ),
+                    new WheelchairAccessibilityFeature(
+                            false,
+                            UNKNOWN_ACCESSIBILITY_COST,
+                            INACCESSIBLE_TRIP_COST
+                    )
             )
     );
 

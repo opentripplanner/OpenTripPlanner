@@ -98,7 +98,7 @@ public class Transfer {
         transferRoutingRequest.bikeSwitchCost = roundTo100(request.bikeSwitchCost);
         transferRoutingRequest.bikeSwitchTime = roundTo100(request.bikeSwitchTime);
 
-        transferRoutingRequest.accessibilityRequirements = request.accessibilityRequirements;
+        transferRoutingRequest.accessibilityRequest = request.accessibilityRequest;
         transferRoutingRequest.maxWheelchairSlope = request.maxWheelchairSlope;
 
         transferRoutingRequest.walkSpeed = roundToHalf(request.walkSpeed);

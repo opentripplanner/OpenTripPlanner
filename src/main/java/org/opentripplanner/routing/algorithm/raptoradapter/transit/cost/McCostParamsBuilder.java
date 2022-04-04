@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 
-import org.opentripplanner.model.AccessibilityRequirements;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 
 /**
  * Mutable version of the {@link McCostParams}.
@@ -12,7 +12,7 @@ public class McCostParamsBuilder {
     private int transferCost;
     private double[] transitReluctanceFactors;
     private double waitReluctanceFactor;
-    private AccessibilityRequirements accessibilityRequirements;
+    private WheelchairAccessibilityRequest accessibilityRequest;
 
     public McCostParamsBuilder() {
         this(McCostParams.DEFAULTS);
@@ -23,7 +23,7 @@ public class McCostParamsBuilder {
         this.transferCost = other.transferCost();
         this.transitReluctanceFactors = other.transitReluctanceFactors();
         this.waitReluctanceFactor = other.waitReluctanceFactor();
-        this.accessibilityRequirements = other.accessibilityRequirements();
+        this.accessibilityRequest = other.accessibilityRequirements();
     }
 
     public int boardCost() {
@@ -62,12 +62,12 @@ public class McCostParamsBuilder {
         return this;
     }
 
-    public AccessibilityRequirements accessibilityMode() {
-        return accessibilityRequirements;
+    public WheelchairAccessibilityRequest accessibilityMode() {
+        return accessibilityRequest;
     }
 
-    public McCostParamsBuilder accessibilityMode(AccessibilityRequirements mode) {
-        accessibilityRequirements = mode;
+    public McCostParamsBuilder accessibilityMode(WheelchairAccessibilityRequest mode) {
+        accessibilityRequest = mode;
         return this;
     }
 

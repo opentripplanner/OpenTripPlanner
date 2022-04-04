@@ -4,17 +4,16 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.model.AccessibilityRequirements;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -22,7 +21,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final boolean requireBikesAllowed;
 
-  private final AccessibilityRequirements.EvaluationType accessibility;
+  private final WheelchairAccessibilityRequest wheelchairAccessibility;
 
   private final boolean includePlannedCancellations;
 
@@ -34,14 +33,14 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   public RoutingRequestTransitDataProviderFilter(
       boolean requireBikesAllowed,
-      AccessibilityRequirements.EvaluationType accessibility,
+      WheelchairAccessibilityRequest accessibility,
       boolean includePlannedCancellations,
       Set<AllowedTransitMode> allowedTransitModes,
       Set<FeedScopedId> bannedRoutes,
       Set<FeedScopedId> bannedTrips
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
-    this.accessibility = accessibility;
+    this.wheelchairAccessibility = accessibility;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
     this.bannedTrips = bannedTrips;
@@ -70,7 +69,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   ) {
     this(
         request.modes.transferMode == StreetMode.BIKE,
-        request.accessibilityRequirements.evaluationType(),
+        request.accessibilityRequest,
         request.includePlannedCancellations,
         request.modes.transitModes,
         request.getBannedRoutes(graphIndex.getAllRoutes()),
@@ -98,9 +97,11 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (accessibility == EvaluationType.KNOWN_INFORMATION_ONLY
-            && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE) {
-      return false;
+    if(wheelchairAccessibility.enabled()) {
+      if(wheelchairAccessibility.trips().onlyConsiderAccessible()
+              && trip.getWheelchairBoarding() != WheelChairBoarding.POSSIBLE) {
+          return false;
+      }
     }
 
     //noinspection RedundantIfStatement

@@ -1,8 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.opentripplanner.model.AccessibilityRequirements.EvaluationType.ALLOW_UNKNOWN_INFORMATION;
-import static org.opentripplanner.model.AccessibilityRequirements.EvaluationType.KNOWN_INFORMATION_ONLY;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -86,15 +83,17 @@ public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge imp
         // This allows searching for nearby transit stops using walk-only options.
         StateEditor s1 = s0.edit(this);
 
-        var accessibility = s0.getOptions().accessibilityRequirements.evaluationType();
-        if (accessibility == KNOWN_INFORMATION_ONLY && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
-            return null;
-        }
-        else if(accessibility == ALLOW_UNKNOWN_INFORMATION && wheelchairBoarding == WheelChairBoarding.NO_INFORMATION) {
-            s1.incrementWeight(req.accessibilityRequirements.unknownStopAccessibilityCost());
-        }
-        else if(accessibility == ALLOW_UNKNOWN_INFORMATION && wheelchairBoarding == WheelChairBoarding.NOT_POSSIBLE) {
-            s1.incrementWeight(req.accessibilityRequirements.inaccessibleStopCost());
+        var accessibility = s0.getOptions().accessibilityRequest;
+        if (accessibility.enabled()) {
+            if(accessibility.stops().onlyConsiderAccessible() && wheelchairBoarding != WheelChairBoarding.POSSIBLE) {
+                return null;
+            }
+            else if(wheelchairBoarding == WheelChairBoarding.NO_INFORMATION) {
+                s1.incrementWeight(req.accessibilityRequest.stops().unknownCost());
+            }
+            else if(wheelchairBoarding == WheelChairBoarding.NOT_POSSIBLE) {
+                s1.incrementWeight(req.accessibilityRequest.stops().inaccessibleCost());
+            }
         }
 
         switch (s0.getNonTransitMode()) {

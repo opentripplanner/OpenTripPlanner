@@ -65,7 +65,8 @@ public class VehicleParkingEdge extends Edge {
 
     private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
         RoutingRequest options = s0.getOptions();
-        if (!vehicleParking.hasSpacesAvailable(mode, options.accessibilityRequirements.requestsWheelchair(), options.useVehicleParkingAvailabilityInformation)) {
+        if (!vehicleParking.hasSpacesAvailable(mode,
+                options.accessibilityRequest.enabled(), options.useVehicleParkingAvailabilityInformation)) {
             return null;
         }
 
@@ -101,7 +102,7 @@ public class VehicleParkingEdge extends Edge {
         RoutingRequest options = s0.getOptions();
 
         if (!vehicleParking.hasSpacesAvailable(
-                s0.getNonTransitMode(), options.accessibilityRequirements.requestsWheelchair(),
+                s0.getNonTransitMode(), options.accessibilityRequest.enabled(),
                 options.useVehicleParkingAvailabilityInformation
         )) {
             return null;

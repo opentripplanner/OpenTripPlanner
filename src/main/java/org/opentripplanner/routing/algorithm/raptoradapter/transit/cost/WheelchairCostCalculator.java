@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.Nonnull;
-import org.opentripplanner.model.AccessibilityRequirements;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -22,13 +22,13 @@ public class WheelchairCostCalculator implements CostCalculator {
 
     public WheelchairCostCalculator(
             @Nonnull CostCalculator delegate,
-            @Nonnull AccessibilityRequirements requirements
+            @Nonnull WheelchairAccessibilityRequest requirements
     ) {
         // assign the costs for boarding a trip with the following accessibility values
         wheelchairBoardingCost = Map.of(
-                        NO_INFORMATION, requirements.unknownAccessibilityTripCost() * 100,
+                        NO_INFORMATION, RaptorCostConverter.toRaptorCost(requirements.trips().unknownCost()),
                         POSSIBLE, 0,
-                        NOT_POSSIBLE, requirements.inaccessibleTripCost() * 100
+                        NOT_POSSIBLE, RaptorCostConverter.toRaptorCost(requirements.trips().inaccessibleCost())
                 )
                 .entrySet()
                 .stream()

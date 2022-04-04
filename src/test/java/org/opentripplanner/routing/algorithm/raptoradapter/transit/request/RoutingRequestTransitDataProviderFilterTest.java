@@ -12,7 +12,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
-import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -27,7 +26,7 @@ import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.model.AccessibilityRequirements;
+import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -39,7 +38,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   private static final Stop STOP_FOR_TEST = Stop.stopForTest("TEST:STOP", 0, 0);
 
-  private static final AccessibilityRequirements.EvaluationType DEFAULT_ACCESSIBILITY = EvaluationType.NOT_REQUIRED;
+  private static final WheelchairAccessibilityRequest DEFAULT_ACCESSIBILITY = WheelchairAccessibilityRequest.DEFAULTS;
 
   @Test
   public void notFilteringExpectedTripPatternForDateTest() {
@@ -178,7 +177,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
-        EvaluationType.KNOWN_INFORMATION_ONLY,
+        DEFAULT_ACCESSIBILITY,
         false,
         AllowedTransitMode.getAllTransitModes(),
         Set.of(),
@@ -198,7 +197,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
             false,
-            EvaluationType.KNOWN_INFORMATION_ONLY,
+            DEFAULT_ACCESSIBILITY,
             false,
             Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
             Set.of(),
@@ -303,7 +302,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
             true,
-            EvaluationType.KNOWN_INFORMATION_ONLY,
+            DEFAULT_ACCESSIBILITY,
             false,
             Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
             Set.of(),

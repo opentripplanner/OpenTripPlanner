@@ -24,9 +24,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -219,7 +217,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
      * @return
      */
     public boolean canTraverse(RoutingRequest options, TraverseMode mode) {
-        if (mode.isWalking() && options.accessibilityRequirements.requestsWheelchair()) {
+        if (mode.isWalking() && options.accessibilityRequest.enabled()) {
             if (!isWheelchairAccessible()) {
                 return false;
             }
@@ -400,7 +398,7 @@ public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, Car
                 }
                 break;
             case WALK:
-                if (options.accessibilityRequirements.requestsWheelchair()) {
+                if (options.accessibilityRequest.enabled()) {
                     time = getEffectiveWalkDistance() / speed;
                     weight = getEffectiveBikeDistance() / speed;
                 } else if (walkingBike) {

@@ -55,7 +55,7 @@ public class DefaultRoutingRequestType {
                         .name("wheelChairAccessible")
                         .description("Whether the trip must be wheelchair accessible.")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.accessibilityRequirements)
+                        .dataFetcher(env -> request.accessibilityRequest)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()

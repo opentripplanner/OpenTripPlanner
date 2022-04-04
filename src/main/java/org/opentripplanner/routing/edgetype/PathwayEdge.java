@@ -129,7 +129,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge {
 
         /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
         int time = traversalTime;
-        if (s0.getOptions().accessibilityRequirements.requestsWheelchair()) {
+        s0.getOptions();
+        if (s0.getOptions().accessibilityRequest.enabled()) {
             if (!this.wheelchairAccessible) {
                 return null;
             }

@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.model.AccessibilityRequirements.EvaluationType.ALLOW_UNKNOWN_INFORMATION;
-import static org.opentripplanner.model.AccessibilityRequirements.EvaluationType.NOT_REQUIRED;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 import java.io.Serializable;
@@ -26,8 +24,6 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
-import org.opentripplanner.model.AccessibilityRequirements;
-import org.opentripplanner.model.AccessibilityRequirements.EvaluationType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -241,8 +237,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
      */
-    public AccessibilityRequirements accessibilityRequirements = AccessibilityRequirements.makeDefault(
-            NOT_REQUIRED);
+    public WheelchairAccessibilityRequest accessibilityRequest = WheelchairAccessibilityRequest.DEFAULTS;
 
     /**
      * The maximum number of itineraries to return. In OTP1 this parameter terminates the search,
@@ -807,13 +802,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setAccessibility(boolean wheelchair) {
-        EvaluationType evaluationType = NOT_REQUIRED;
-
-        if (wheelchair) {
-            evaluationType = ALLOW_UNKNOWN_INFORMATION;
-        }
-
-        this.accessibilityRequirements = AccessibilityRequirements.makeDefault(evaluationType);
+        this.accessibilityRequest = WheelchairAccessibilityRequest.makeDefault(wheelchair);
     }
 
     public void setTransitReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
@@ -1194,7 +1183,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
 
             // is immutable so can safely use the same reference
-            clone.accessibilityRequirements = accessibilityRequirements;
+            clone.accessibilityRequest = accessibilityRequest;
 
             return clone;
         } catch (CloneNotSupportedException e) {
