@@ -846,7 +846,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             /* build elevator edges */
             for (Long nodeId : multiLevelNodes.keySet()) {
                 OSMNode node = osmdb.getNode(nodeId);
-
                 // this allows skipping levels, e.g., an elevator that stops
                 // at floor 0, 2, 3, and 5.
                 // Converting to an Array allows us to
@@ -908,7 +907,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 for (int i = 0; i < nodes.size(); i++) {
                     Long node = nodes.get(i);
                     OsmVertex sourceVertex = intersectionNodes.get(node);
-
                     String sourceVertexLabel = sourceVertex.getLabel();
                     String levelName = elevatorWay.getId() + " / " + i;
                     createElevatorVertices(
