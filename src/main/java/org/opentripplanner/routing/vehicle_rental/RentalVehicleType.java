@@ -76,14 +76,13 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
         }
 
         public static FormFactor fromGbfs(GBFSVehicleType.FormFactor formFactor) {
-            switch (formFactor) {
-                case BICYCLE: return BICYCLE;
-                case CAR: return CAR;
-                case MOPED: return MOPED;
-                case SCOOTER: return SCOOTER;
-                case OTHER: return OTHER;
-            }
-            throw new IllegalArgumentException();
+            return switch (formFactor) {
+                case BICYCLE -> BICYCLE;
+                case CAR -> CAR;
+                case MOPED -> MOPED;
+                case SCOOTER -> SCOOTER;
+                case OTHER -> OTHER;
+            };
         }
     }
 
@@ -91,13 +90,12 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
         HUMAN, ELECTRIC_ASSIST, ELECTRIC, COMBUSTION;
 
         public static PropulsionType fromGbfs(GBFSVehicleType.PropulsionType propulsionType) {
-            switch (propulsionType) {
-                case HUMAN: return HUMAN;
-                case ELECTRIC_ASSIST: return ELECTRIC_ASSIST;
-                case ELECTRIC: return ELECTRIC;
-                case COMBUSTION: return COMBUSTION;
-            }
-            throw new IllegalArgumentException();
+            return switch (propulsionType) {
+                case HUMAN -> HUMAN;
+                case ELECTRIC_ASSIST -> ELECTRIC_ASSIST;
+                case ELECTRIC -> ELECTRIC;
+                case COMBUSTION -> COMBUSTION;
+            };
         }
     }
 }

@@ -21,6 +21,7 @@
 - Add RouteType and Unknown entities and implement alerts fields (add add alerts field to Feed) (December 2021, https://github.com/opentripplanner/OpenTripPlanner/pull/3780)
 - Take free-floating vehicles into account when computing state (February 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3857)
 - Fix issue with GraphQL code generator (February 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3881)
+- Add GBFS form factors for `rentalVehicle` (April 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4062)
 
 ## Documentation
 
