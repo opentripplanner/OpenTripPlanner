@@ -2127,8 +2127,15 @@ type QueryType {
         Return rental vehicles with these ids, i.e. value of field `vehicleId`.
         **Note:** if an id is invalid (or the rental service is unavailable)
         the returned list will contain `null` values.
+
+        If this is provided all other filters are ignored.
         """
-        ids: [String]
+        ids: [String],
+
+        """
+        Return only rental vehicles that have this form factor.
+        """
+        formFactors: [FormFactor]
     ): [RentalVehicle]
 
     """
