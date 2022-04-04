@@ -910,7 +910,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     String sourceVertexLabel = sourceVertex.getLabel();
                     String levelName = elevatorWay.getId() + " / " + i;
                     createElevatorVertices(
-                            graph, onboardVertices, sourceVertex, sourceVertexLabel, levelName
+                            graph, onboardVertices, sourceVertex, elevatorWay.getId() + "_" + sourceVertexLabel, levelName
                     );
                 }
 
