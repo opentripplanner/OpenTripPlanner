@@ -70,7 +70,9 @@ public class TestRouteData {
     var patternForDates = new TripPatternForDates(
       raptorTripPattern,
       listOfTripPatternForDates,
-      List.of(OFFSET)
+      List.of(OFFSET),
+      null,
+      null
     );
     int id = 0;
     for (Trip trip : trips) {

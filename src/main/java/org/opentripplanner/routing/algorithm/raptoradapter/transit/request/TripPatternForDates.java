@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.base.ToStringBuilder;
@@ -46,15 +47,22 @@ public class TripPatternForDates
    * arrivalTimes.
    */
   private final int[] departureTimes;
+  // bit arrays with boarding/alighting information for all stops on trip pattern
+  private final BitSet boardingPossible;
+  private final BitSet alightingPossible;
 
   TripPatternForDates(
     TripPatternWithRaptorStopIndexes tripPattern,
     List<TripPatternForDate> tripPatternForDates,
-    List<Integer> offsets
+    List<Integer> offsets,
+    BitSet boardingPossible,
+    BitSet alightningPossible
   ) {
     this.tripPattern = tripPattern;
     this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[] {});
     this.offsets = offsets.stream().mapToInt(i -> i).toArray();
+    this.boardingPossible = boardingPossible;
+    this.alightingPossible = alightningPossible;
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
@@ -138,12 +146,12 @@ public class TripPatternForDates
 
   @Override
   public boolean boardingPossibleAt(int stopPositionInPattern) {
-    return tripPattern.boardingPossibleAt(stopPositionInPattern);
+    return boardingPossible.get(stopPositionInPattern);
   }
 
   @Override
   public boolean alightingPossibleAt(int stopPositionInPattern) {
-    return tripPattern.alightingPossibleAt(stopPositionInPattern);
+    return alightingPossible.get(stopPositionInPattern);
   }
 
   @Override
