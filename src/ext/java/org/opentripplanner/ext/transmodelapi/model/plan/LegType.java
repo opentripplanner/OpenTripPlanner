@@ -10,6 +10,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -19,9 +20,14 @@ import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.plan.legreference.LegReference;
+import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class LegType {
+
+  private static final String NAME = "Leg";
+  public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
   public static GraphQLObjectType create(
     GraphQLOutputType bookingArrangementType,
@@ -44,6 +50,15 @@ public class LegType {
       .name("Leg")
       .description(
         "Part of a trip pattern. Either a ride on a public transport vehicle or access or path link to/from/between places"
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("id")
+          .description("An identifier for the leg, which can be used to re-fetch the information.")
+          .type(Scalars.GraphQLID)
+          .dataFetcher(env -> LegReferenceSerializer.encode(leg(env).getLegReference()))
+          .build()
       )
       .field(
         GraphQLFieldDefinition

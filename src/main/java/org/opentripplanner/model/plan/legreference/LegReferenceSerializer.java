@@ -70,7 +70,7 @@ public class LegReferenceSerializer {
   static void writeScheduledTransitLeg(LegReference ref, ObjectOutputStream out)
     throws IOException {
     if (ref instanceof ScheduledTransitLegReference s) {
-      out.writeUTF(s.trip().toString());
+      out.writeUTF(s.tripId().toString());
       out.writeUTF(s.serviceDate().asCompactString());
       out.writeInt(s.fromStopPositionInPattern());
       out.writeInt(s.toStopPositionInPattern());
