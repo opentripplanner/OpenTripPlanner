@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.LocalDate;
+import java.util.function.IntUnaryOperator;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
@@ -21,6 +22,8 @@ public final class TripScheduleWithOffset implements TripSchedule {
     private final int sortIndex;
     private final int transitReluctanceIndex;
     private final int tripIndexForDates;
+    private final IntUnaryOperator arrivalTimes;
+    private final IntUnaryOperator departureTimes;
 
     // Computed when needed later for RaptorPathToItineraryMapper
     private int index;
@@ -31,10 +34,15 @@ public final class TripScheduleWithOffset implements TripSchedule {
     TripScheduleWithOffset(TripPatternForDates pattern, int tripIndexForDates) {
         this.tripIndexForDates = tripIndexForDates;
         this.pattern = pattern;
-        // Trip times are sorted based on the arrival times at stop 0,
-        this.sortIndex = arrival(0);
         // Mode ordinal is used to index the transit factor/reluctance
         this.transitReluctanceIndex = pattern.getTripPattern().getPattern().getMode().ordinal();
+
+        // get arrival/departures lambda
+        this.arrivalTimes = pattern.getArrivalTimesForTrip(tripIndexForDates);
+        this.departureTimes = pattern.getDepartureTimesForTrip(tripIndexForDates);
+
+        // Trip times are sorted based on the arrival times at stop 0,
+        this.sortIndex = arrivalTimes.applyAsInt(0);
     }
 
     @Override
@@ -44,12 +52,12 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
     @Override
     public int arrival(int stopPosInPattern) {
-        return this.pattern.getArrivalTimes(stopPosInPattern).applyAsInt(tripIndexForDates);
+        return this.arrivalTimes.applyAsInt(stopPosInPattern);
     }
 
     @Override
     public int departure(int stopPosInPattern) {
-        return this.pattern.getDepartureTimes(stopPosInPattern).applyAsInt(tripIndexForDates);
+        return this.departureTimes.applyAsInt(stopPosInPattern);
     }
 
     @Override

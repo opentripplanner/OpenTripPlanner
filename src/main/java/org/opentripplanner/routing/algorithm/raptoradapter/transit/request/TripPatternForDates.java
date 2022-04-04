@@ -169,13 +169,21 @@ public class TripPatternForDates
     @Override
     public IntUnaryOperator getArrivalTimes(int stopPositionInPattern) {
         final int base = stopPositionInPattern * numberOfTripSchedules;
-        return (int i) -> arrivalTimes[base + i];
+        return (int index) -> arrivalTimes[base + index];
     }
 
     @Override
     public IntUnaryOperator getDepartureTimes(int stopPositionInPattern) {
         final int base = stopPositionInPattern * numberOfTripSchedules;
-        return (int i) -> departureTimes[base + i];
+        return (int index) -> departureTimes[base + index];
+    }
+
+    public IntUnaryOperator getArrivalTimesForTrip(int index) {
+        return (int stopPositionInPattern) -> arrivalTimes[stopPositionInPattern * numberOfTripSchedules + index];
+    }
+
+    public IntUnaryOperator getDepartureTimesForTrip(int index) {
+        return (int stopPositionInPattern) -> departureTimes[stopPositionInPattern * numberOfTripSchedules + index];
     }
 
     @Override public int numberOfTripSchedules() {
