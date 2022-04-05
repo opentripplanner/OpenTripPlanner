@@ -32,7 +32,7 @@ public class VehiclePositionsMatcherTest {
     }
 
     @Test
-    @DisplayName("If the vehicle position has not start_date we need to guess the service day")
+    @DisplayName("If the vehicle position has no start_date we need to guess the service day")
     public void inferServiceDate() {
 
         var posWithoutServiceDate = VehiclePosition.newBuilder()

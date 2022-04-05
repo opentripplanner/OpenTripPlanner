@@ -9,7 +9,9 @@ import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatu
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -158,7 +160,7 @@ public class VehiclePositionPatternMatcher {
     private ServiceDate inferServiceDate(Trip trip) {
         var staticTripTimes =
                 getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
-        return new ServiceDate(inferServiceDate(staticTripTimes, timeZoneId));
+        return new ServiceDate(inferServiceDate(staticTripTimes, timeZoneId, Instant.now()));
     }
 
     /**
@@ -166,12 +168,13 @@ public class VehiclePositionPatternMatcher {
      * <p>
      * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
      */
-    private static LocalDate inferServiceDate(TripTimes staticTripTimes, ZoneId timeZoneId) {
+    private static LocalDate inferServiceDate(TripTimes staticTripTimes, ZoneId timeZoneId, Instant now) {
         var start = staticTripTimes.getScheduledDepartureTime(0);
+        var today = now.atZone(timeZoneId).toLocalDate();
         // if we have a trip that starts before 24:00 and finishes the next day, we have to figure out
         // the correct service day
         if (crossesMidnight(staticTripTimes)) {
-            var nowSeconds = LocalTime.now(timeZoneId).toSecondOfDay();
+            var nowSeconds = LocalTime.ofInstant(now, timeZoneId).toSecondOfDay();
             // when nowSeconds is less than the start we are already at the next day
             // (because nowSeconds can never be greater than MIDNIGHT_SECONDS but stop times can)
             // so we have to select yesterday as the service day
@@ -182,23 +185,23 @@ public class VehiclePositionPatternMatcher {
             // i will ignore this. if this is problematic then you should put the start_date in the
             // vehicle position.
             if (nowSeconds < start) {
-                return LocalDate.now(timeZoneId).minusDays(1);
+                return today.minusDays(1);
             }
             // if we are before midnight
             else {
-                return LocalDate.now(timeZoneId);
+                return today;
             }
         }
         // if we have a trip that starts after midnight but is associated with the previous service
         // day. the start time would be something like 25:10.
         else if (start > MIDNIGHT_SECONDS) {
-            return LocalDate.now(timeZoneId).minusDays(1);
+            return today.minusDays(1);
         }
         // here is another edge case: if the trip finished at close to midnight but for some reason
         // is still sending updates after midnight then we are guessing the wrong day.
         // if this concerns you, then you should really put the start_date into your feed.
         else {
-            return LocalDate.now(timeZoneId);
+            return today;
         }
     }
 
