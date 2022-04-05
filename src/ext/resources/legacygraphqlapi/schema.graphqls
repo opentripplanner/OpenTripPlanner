@@ -1440,7 +1440,7 @@ type VehiclePosition {
     """Longitude of the vehicle"""
     lon: Float
     """The current stop where the vehicle will be or is currently arriving."""
-    stopRelationship: StopRelationship!
+    stopRelationship: StopRelationship
     """Speed of the vehicle in meters/second"""
     speed: Float
     """
