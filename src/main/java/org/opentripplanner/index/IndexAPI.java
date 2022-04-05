@@ -31,6 +31,7 @@ import org.opentripplanner.api.mapping.StopTimesInPatternMapper;
 import org.opentripplanner.api.mapping.TransferMapper;
 import org.opentripplanner.api.mapping.TripMapper;
 import org.opentripplanner.api.mapping.TripPatternMapper;
+import org.opentripplanner.api.mapping.TripTimeMapper;
 import org.opentripplanner.api.model.ApiAgency;
 import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiFeedInfo;
@@ -43,6 +44,7 @@ import org.opentripplanner.api.model.ApiStopTimesInPattern;
 import org.opentripplanner.api.model.ApiTransfer;
 import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
+import org.opentripplanner.api.model.ApiTripTimeShort;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -440,13 +442,14 @@ public class IndexAPI {
 
     @GET
     @Path("/trips/{tripId}/stoptimes")
-    public List<TripTimeOnDate> getStoptimesForTrip(@PathParam("tripId") String tripId) {
+    public List<ApiTripTimeShort> getStoptimesForTrip(@PathParam("tripId") String tripId) {
         RoutingService routingService = createRoutingService();
         Trip trip = getTrip(routingService, tripId);
         TripPattern pattern = getTripPattern(routingService, trip);
         // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
         Timetable table = routingService.getTimetableForTripPattern(pattern, null);
-        return TripTimeOnDate.fromTripTimes(table, trip);
+        var tripTimesOnDate = TripTimeOnDate.fromTripTimes(table, trip);
+        return TripTimeMapper.mapToApi(tripTimesOnDate);
     }
 
     /** Return geometry for the trip as a packed coordinate sequence */
