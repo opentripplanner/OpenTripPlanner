@@ -4,8 +4,9 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 
 public class LegacyGraphQLRentalVehicleImpl
         implements LegacyGraphQLDataFetchers.LegacyGraphQLRentalVehicle {
@@ -21,6 +22,11 @@ public class LegacyGraphQLRentalVehicleImpl
     @Override
     public DataFetcher<String> vehicleId() {
         return environment -> getSource(environment).getId().toString();
+    }
+
+    @Override
+    public DataFetcher<RentalVehicleType> vehicleType() {
+        return environment -> getSource(environment).vehicleType;
     }
 
     @Override
@@ -58,7 +64,7 @@ public class LegacyGraphQLRentalVehicleImpl
         return environment -> getSource(environment).getRentalUris();
     }
 
-    private VehicleRentalPlace getSource(DataFetchingEnvironment environment) {
+    private VehicleRentalVehicle getSource(DataFetchingEnvironment environment) {
         return environment.getSource();
     }
 }

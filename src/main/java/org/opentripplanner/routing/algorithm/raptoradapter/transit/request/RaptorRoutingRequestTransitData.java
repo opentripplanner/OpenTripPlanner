@@ -13,6 +13,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
@@ -66,7 +67,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       int additionalPastSearchDays,
       int additionalFutureSearchDays,
       TransitDataProviderFilter filter,
-      RoutingRequest routingRequest
+      RoutingContext routingContext
   ) {
 
     this.transferService = transferService;
@@ -85,9 +86,9 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
         filter
     );
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(patternIndex);
-    this.transfers = transitLayer.getRaptorTransfersForRequest(routingRequest);
+    this.transfers = transitLayer.getRaptorTransfersForRequest(routingContext);
     this.generalizedCostCalculator = new DefaultCostCalculator(
-            McCostParamsMapper.map(routingRequest),
+            McCostParamsMapper.map(routingContext.opt),
             transitLayer.getStopIndex().stopBoardAlightCosts
     );
     this.validTransitDataStartTime = DateMapper.secondsSinceStartOfTime(

@@ -7,9 +7,9 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -54,8 +54,9 @@ public class TestHopFactory extends TestCase {
 
         RoutingRequest options = new RoutingRequest();
         options.setDateTime(ZonedDateTime.of(2009, 8, 7, 8, 0, 0, 0, zoneId).toInstant());
-        options.setRoutingContext(graph, stop_a, stop_c);
-        ShortestPathTree spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        ShortestPathTree spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, stop_a, stop_c))
+                .getShortestPathTree();
 
         GraphPath path = spt.getPath(stop_c);
         assertNotNull(path);
@@ -79,8 +80,9 @@ public class TestHopFactory extends TestCase {
         GraphPath path;
 
         // A to B
-        options.setRoutingContext(graph, stop_a, stop_b);
-        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, stop_a, stop_b))
+                .getShortestPathTree();
 
         path = spt.getPath(stop_b);
         assertNotNull(path);
@@ -88,8 +90,9 @@ public class TestHopFactory extends TestCase {
 
 
         // A to C
-        options.setRoutingContext(graph, stop_a, stop_c);
-        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, stop_a, stop_c))
+                .getShortestPathTree();
 
         path = spt.getPath(stop_c);
         assertNotNull(path);
@@ -97,8 +100,9 @@ public class TestHopFactory extends TestCase {
 
 
         // A to D
-        options.setRoutingContext(graph, stop_a, stop_d);
-        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, stop_a, stop_d))
+                .getShortestPathTree();
 
         path = spt.getPath(stop_d);
         assertNotNull(path);
@@ -107,8 +111,9 @@ public class TestHopFactory extends TestCase {
         assertEquals(endTime, path.getEndTime());
 
         // A to E
-        options.setRoutingContext(graph, stop_a, stop_e);
-        spt = AStarBuilder.oneToOne().setRoutingRequest(options).getShortestPathTree();
+        spt = AStarBuilder.oneToOne()
+                .setContext(new RoutingContext(options, graph, stop_a, stop_e))
+                .getShortestPathTree();
 
         path = spt.getPath(stop_e);
         assertNotNull(path);

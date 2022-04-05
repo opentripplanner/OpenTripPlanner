@@ -103,15 +103,9 @@ public class RoutingService {
 
     // TODO We should probably not have the Router as a parameter here
     public RoutingResponse route(RoutingRequest request, Router router) {
-        try {
-            var zoneId = graph.getTimeZone().toZoneId();
-            RoutingWorker worker = new RoutingWorker(router, request, zoneId);
-            return worker.route();
-        } finally {
-            if (request != null) {
-                request.cleanup();
-            }
-        }
+        var zoneId = graph.getTimeZone().toZoneId();
+        RoutingWorker worker = new RoutingWorker(router, request, zoneId);
+        return worker.route();
     }
 
     /**

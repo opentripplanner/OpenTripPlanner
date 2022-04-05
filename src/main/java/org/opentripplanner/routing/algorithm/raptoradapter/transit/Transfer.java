@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -54,7 +55,8 @@ public class Transfer {
         return edges;
     }
 
-    public Optional<RaptorTransfer> asRaptorTransfer(RoutingRequest routingRequest) {
+    public Optional<RaptorTransfer> asRaptorTransfer(RoutingContext routingContext) {
+        RoutingRequest routingRequest = routingContext.opt;
         if (edges == null || edges.isEmpty()) {
             double durationSeconds = distanceMeters / routingRequest.walkSpeed;
             return Optional.of(new TransferWithDuration(
@@ -64,7 +66,7 @@ public class Transfer {
             ));
         }
 
-        StateEditor se = new StateEditor(routingRequest, edges.get(0).getFromVertex());
+        StateEditor se = new StateEditor(routingContext, edges.get(0).getFromVertex());
         se.setTimeSeconds(0);
 
         State s = se.makeState();

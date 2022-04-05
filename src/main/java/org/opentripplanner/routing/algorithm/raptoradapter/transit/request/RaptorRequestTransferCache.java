@@ -11,6 +11,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.RoutingContext;
 
 public class RaptorRequestTransferCache {
 
@@ -28,12 +29,12 @@ public class RaptorRequestTransferCache {
 
     public RaptorTransferIndex get(
         List<List<Transfer>> transfersByStopIndex,
-        RoutingRequest routingRequest
+        RoutingContext routingContext
     ) {
         try {
             return transferCache.get(new CacheKey(
                     transfersByStopIndex,
-                    routingRequest
+                    routingContext
             ));
         } catch (ExecutionException e) {
             throw new RuntimeException("Failed to get item from transfer cache", e);
@@ -46,7 +47,7 @@ public class RaptorRequestTransferCache {
             public RaptorTransferIndex load(@javax.annotation.Nonnull CacheKey cacheKey) {
                 return RaptorTransferIndex.create(
                         cacheKey.transfersByStopIndex,
-                        cacheKey.routingRequest
+                        cacheKey.routingContext
                 );
             }
         };
@@ -55,16 +56,16 @@ public class RaptorRequestTransferCache {
     private static class CacheKey {
 
         private final List<List<Transfer>> transfersByStopIndex;
-        private final RoutingRequest routingRequest;
+        private final RoutingContext routingContext;
         private final StreetRelevantOptions options;
 
         private CacheKey(
                 List<List<Transfer>> transfersByStopIndex,
-                RoutingRequest routingRequest
+                RoutingContext routingContext
         ) {
             this.transfersByStopIndex = transfersByStopIndex;
-            this.routingRequest = routingRequest;
-            this.options = new StreetRelevantOptions(routingRequest);
+            this.routingContext = routingContext;
+            this.options = new StreetRelevantOptions(routingContext.opt);
         }
 
         @Override

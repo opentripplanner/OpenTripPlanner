@@ -2,15 +2,13 @@ package org.opentripplanner.routing.algorithm.astar;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -20,7 +18,7 @@ public class AStarBuilder {
     private final RemainingWeightHeuristic heuristic;
     private final SkipEdgeStrategy skipEdgeStrategy;
     private TraverseVisitor traverseVisitor;
-    private RoutingRequest options;
+    private RoutingContext routingContext;
     private SearchTerminationStrategy terminationStrategy;
     private Duration timeout;
     private Edge originBackEdge;
@@ -57,8 +55,8 @@ public class AStarBuilder {
         return this;
     }
 
-    public AStarBuilder setRoutingRequest(RoutingRequest options) {
-        this.options = options;
+    public AStarBuilder setContext(RoutingContext routingContext) {
+        this.routingContext = routingContext;
         return this;
     }
 
@@ -82,7 +80,7 @@ public class AStarBuilder {
                 heuristic,
                 skipEdgeStrategy,
                 traverseVisitor,
-                options,
+                routingContext,
                 terminationStrategy,
                 timeout,
                 originBackEdge

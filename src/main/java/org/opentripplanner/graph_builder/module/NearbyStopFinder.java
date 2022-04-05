@@ -20,6 +20,7 @@ import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeSt
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -133,7 +134,7 @@ public class NearbyStopFinder {
         Vertex vertex, RoutingRequest routingRequest, boolean reverseDirection
     ) {
         if (useStreets) {
-            return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, true, routingRequest);
+            return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, routingRequest);
         }
         // It make sense for the directGraphFinder to use meters as a limit, so we convert first
         double limitMeters = durationLimit.toSeconds() * new RoutingRequest(TraverseMode.WALK).walkSpeed;
@@ -149,19 +150,23 @@ public class NearbyStopFinder {
      * @param originVertices the origin point of the street search
      * @param reverseDirection if true the paths returned instead originate at the nearby stops and have the
      *                         originVertex as the destination
-     * @param removeTempEdges after creating a new routing request and routing context, remove all the temporary
-     *                        edges that are part of that context. NOTE: this will remove _all_ temporary edges
-     *                        coming out of the origin and destination vertices, including those in any other
-     *                        RoutingContext referencing them, making routing from/to them totally impossible.
-     *                        This is a stopgap solution until we rethink the lifecycle of RoutingContext.
      */
     public List<NearbyStop> findNearbyStopsViaStreets (
             Set<Vertex> originVertices,
             boolean reverseDirection,
-            boolean removeTempEdges,
             RoutingRequest routingRequest
     ) {
         List<NearbyStop> stopsFound = Lists.newArrayList();
+
+        routingRequest.setArriveBy(reverseDirection);
+        routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
+
+        RoutingContext routingContext;
+        if (!reverseDirection) {
+            routingContext = new RoutingContext(routingRequest, graph, originVertices, null);
+        } else {
+            routingContext = new RoutingContext(routingRequest, graph, null, originVertices);
+        }
 
         /* Add the origin vertices if they are stops */
         for (Vertex vertex : originVertices) {
@@ -171,7 +176,7 @@ public class NearbyStopFinder {
                         (TransitStopVertex) vertex,
                         0,
                         Collections.emptyList(),
-                        new State(vertex, routingRequest)
+                        new State(vertex, routingRequest, routingContext)
                     ));
             }
         }
@@ -179,18 +184,10 @@ public class NearbyStopFinder {
         // Return only the origin vertices if there are no valid street modes
         if (!routingRequest.streetSubRequestModes.isValid()) { return stopsFound; }
 
-        routingRequest.setArriveBy(reverseDirection);
-        if (!reverseDirection) {
-            routingRequest.setRoutingContext(graph, originVertices, null);
-        } else {
-            routingRequest.setRoutingContext(graph, null, originVertices);
-        }
-        routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
-
         var skipEdgeStrategy = getSkipEdgeStrategy(reverseDirection, routingRequest);
         ShortestPathTree spt = AStarBuilder
                 .allDirections(skipEdgeStrategy)
-                .setRoutingRequest(routingRequest)
+                .setContext(routingContext)
                 .getShortestPathTree();
 
         // Only used if OTPFeature.FlexRouting.isOn()
@@ -237,9 +234,6 @@ public class NearbyStopFinder {
             }
         }
 
-        if (removeTempEdges) {
-            routingRequest.cleanup();
-        }
         return stopsFound;
     }
 

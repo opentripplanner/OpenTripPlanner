@@ -86,3 +86,7 @@ config:
     VehiclePosition: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition#RealtimeVehiclePosition
     StopRelationship: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship#StopRelationship
     WheelchairBoarding: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding
+    FormFactor: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor
+    PropulsionType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType
+    RentalVehicleType: org.opentripplanner.routing.vehicle_rental.RentalVehicleType#RentalVehicleType
+

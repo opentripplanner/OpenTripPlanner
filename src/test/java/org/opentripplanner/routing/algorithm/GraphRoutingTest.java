@@ -12,9 +12,9 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
@@ -34,7 +34,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
@@ -407,9 +406,9 @@ public abstract class GraphRoutingTest {
 
     protected GraphPath routeParkAndRide(Graph graph, StreetVertex from, StreetVertex to, TraverseModeSet traverseModeSet) {
         RoutingRequest request = new RoutingRequest(traverseModeSet);
-        request.setRoutingContext(graph, from, to);
+        RoutingContext rctx = new RoutingContext(request, graph, from, to);
         request.parkAndRide = true;
 
-        return AStarBuilder.oneToOne().setRoutingRequest(request).getShortestPathTree().getPath(to);
+        return AStarBuilder.oneToOne().setContext(rctx).getShortestPathTree().getPath(to);
     }
 }

@@ -28,7 +28,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
@@ -268,14 +270,17 @@ public class ScheduledDeviatedTripTest extends FlexTest {
                 .findFirst()
                 .get();
         var r = new RoutingRequest();
-        r.setRoutingContext(graph);
-        return new NearbyStop(
-                stopLocation,
-                0,
-                List.of(),
-                null,
-                new State(new StreetLocation(id, new Coordinate(0, 0), id), r)
-        );
+        try(var temporaryVertices = new TemporaryVerticesContainer(graph, r)) {
+            RoutingContext routingContext = new RoutingContext(r, graph, temporaryVertices);
+
+            return new NearbyStop(
+                    stopLocation,
+                    0,
+                    List.of(),
+                    null,
+                    new State(new StreetLocation(id, new Coordinate(0, 0), id), r, routingContext)
+            );
+        }
     }
 
     private static FlexTrip getFlexTrip() {

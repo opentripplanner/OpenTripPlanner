@@ -9,6 +9,7 @@ import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -101,9 +102,9 @@ public class TurnCostTest {
         graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(0.0));
     }
     
-    private GraphPath checkForwardRouteDuration(RoutingRequest options, int expectedDuration) {
+    private GraphPath checkForwardRouteDuration(RoutingContext context, int expectedDuration) {
         ShortestPathTree tree = AStarBuilder.oneToOne()
-                .setRoutingRequest(options)
+                .setContext(context)
                 .getShortestPathTree();
         GraphPath path = tree.getPath(bottomLeft);
         assertNotNull(path);
@@ -123,22 +124,24 @@ public class TurnCostTest {
     
     @Test
     public void testForwardDefaultNoTurnCosts() {
-        RoutingRequest options = proto.clone();
-        options.setRoutingContext(graph, topRight, bottomLeft);
-        
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
-        checkForwardRouteDuration(options, 300);
+        checkForwardRouteDuration(
+                new RoutingContext(proto, graph, topRight, bottomLeft),
+                300
+        );
     }
     
     @Test
     public void testForwardDefaultConstTurnCosts() {
         RoutingRequest options = proto.clone();
         graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
-        options.setRoutingContext(graph, topRight, bottomLeft);
-        
+
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
         // Since we traverse 3 intersections, the total cost should be 330.
-        GraphPath path = checkForwardRouteDuration(options, 330);
+        GraphPath path = checkForwardRouteDuration(
+                new RoutingContext(options, graph, topRight, bottomLeft),
+                330
+        );
         
         // The intersection traversal cost should be applied to the state *after*
         // the intersection itself.
@@ -162,10 +165,12 @@ public class TurnCostTest {
     public void testForwardCarNoTurnCosts() {
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(graph, topRight, bottomLeft);
-        
+
         // Without turn costs, this path costs 3x100 + 1x50 = 300.
-        GraphPath path = checkForwardRouteDuration(options, 350);
+        GraphPath path = checkForwardRouteDuration(
+                new RoutingContext(options, graph, topRight, bottomLeft),
+                350
+        );
         
         List<State> states = path.states;
         assertEquals(5, states.size());
@@ -182,11 +187,13 @@ public class TurnCostTest {
         RoutingRequest options = proto.clone();
         graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
         options.setMode(TraverseMode.CAR);
-        options.setRoutingContext(graph, topRight, bottomLeft);
-        
+
         // Without turn costs, this path costs 3x100 + 1x50 = 350.
         // Since there are 3 turns, the total cost should be 380.
-        GraphPath path = checkForwardRouteDuration(options, 380);
+        GraphPath path = checkForwardRouteDuration(
+                new RoutingContext(options, graph, topRight, bottomLeft),
+                380
+        );
         
         List<State> states = path.states;
         assertEquals(5, states.size());

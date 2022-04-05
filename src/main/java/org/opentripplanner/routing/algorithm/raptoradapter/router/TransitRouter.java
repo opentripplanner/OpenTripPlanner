@@ -25,6 +25,8 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
@@ -197,15 +199,16 @@ public class TransitRouter {
         var mode = isEgress ? request.modes.egressMode : request.modes.accessMode;
 
         // Prepare access/egress lists
-        try (RoutingRequest accessRequest = request.getStreetSearchRequest(mode)) {
-            accessRequest.setRoutingContext(router.graph);
+        RoutingRequest accessRequest = request.getStreetSearchRequest(mode);
+        try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, accessRequest)) {
+            var routingContext = new RoutingContext(accessRequest, router.graph, temporaryVertices);
 
             if (!isEgress) {
                 accessRequest.allowKeepingRentedVehicleAtDestination = false;
             }
 
             var nearbyStops = AccessEgressRouter.streetSearch(
-                    accessRequest,
+                    routingContext,
                     mode,
                     isEgress
             );
@@ -215,7 +218,7 @@ public class TransitRouter {
             // Special handling of flex accesses
             if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
                 var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
-                        accessRequest,
+                        routingContext,
                         additionalSearchDays,
                         router.routerConfig.flexParameters(request),
                         isEgress
@@ -233,20 +236,17 @@ public class TransitRouter {
     ) {
         var graph = router.graph;
 
+        RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 
-        try (RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request)) {
-            transferRoutingRequest.setRoutingContext(graph, (Vertex) null, null);
-
-            return new RaptorRoutingRequestTransitData(
-                    graph.getTransferService(),
-                    transitLayer,
-                    transitSearchTimeZero,
-                    additionalSearchDays.additionalSearchDaysInPast(),
-                    additionalSearchDays.additionalSearchDaysInFuture(),
-                    createRequestTransitDataProviderFilter(graph.index),
-                    transferRoutingRequest
-            );
-        }
+        return new RaptorRoutingRequestTransitData(
+                graph.getTransferService(),
+                transitLayer,
+                transitSearchTimeZero,
+                additionalSearchDays.additionalSearchDaysInPast(),
+                additionalSearchDays.additionalSearchDaysInFuture(),
+                createRequestTransitDataProviderFilter(graph.index),
+                new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
+        );
     }
 
     private TransitDataProviderFilter createRequestTransitDataProviderFilter(GraphIndex graphIndex) {

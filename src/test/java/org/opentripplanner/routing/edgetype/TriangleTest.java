@@ -114,14 +114,14 @@ public class TriangleTest {
         options.setNonTransitReluctance(1);
 
         options.setTriangleNormalized(0, 0, 1);
-        State startState = new State(v1, options);
+        State startState = new State(v1, options, null);
         State result = testStreet.traverse(startState);
         double timeWeight = result.getWeight();
         double expectedTimeWeight = slopeSpeedLength / options.getSpeed(TraverseMode.BICYCLE, false);
         assertTrue(Math.abs(expectedTimeWeight - timeWeight) < 0.00001);
 
         options.setTriangleNormalized(0, 1, 0);
-        startState = new State(v1, options);
+        startState = new State(v1, options, null);
         result = testStreet.traverse(startState);
         double slopeWeight = result.getWeight();
         double expectedSlopeWeight = slopeWorkLength / options.getSpeed(TraverseMode.BICYCLE, false);
@@ -130,7 +130,7 @@ public class TriangleTest {
         assertTrue(length * 1.5 * 10 / options.getSpeed(TraverseMode.BICYCLE, false) > slopeWeight);
 
         options.setTriangleNormalized(1, 0, 0);
-        startState = new State(v1, options);
+        startState = new State(v1, options, null);
         result = testStreet.traverse(startState);
         double safetyWeight = result.getWeight();
         double slopeSafety = costs.slopeSafetyCost;
@@ -141,7 +141,7 @@ public class TriangleTest {
 
         final double ONE_THIRD = 1/3.0;
         options.setTriangleNormalized(ONE_THIRD, ONE_THIRD, ONE_THIRD);
-        startState = new State(v1, options);
+        startState = new State(v1, options, null);
         result = testStreet.traverse(startState);
         double averageWeight = result.getWeight();
         assertTrue(Math.abs(safetyWeight * ONE_THIRD + slopeWeight * ONE_THIRD + timeWeight * ONE_THIRD - averageWeight) < 0.00000001);

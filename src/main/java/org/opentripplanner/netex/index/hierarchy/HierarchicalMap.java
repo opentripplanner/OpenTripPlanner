@@ -24,6 +24,7 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
     }
 
     /** Return a reference to the parent. */
+    @Override
     public HierarchicalMap<K,V> parent() {
         return (HierarchicalMap<K, V>) super.parent();
     }
@@ -45,6 +46,7 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
     }
 
     /** @return return all keys in the local map */
+    @Override
     public Collection<K> localKeys() {
         return map.keySet();
     }
@@ -53,8 +55,14 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
      * @return a collection of all values hold in the local map, all values added to one of the
      * parents are excluded from the collection.
      */
+    @Override
     public Collection<V> localValues() {
         return map.values();
+    }
+
+    @Override
+    public boolean localIsEmpty() {
+        return map.isEmpty();
     }
 
     @Override

@@ -45,6 +45,8 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
@@ -151,12 +153,9 @@ public abstract class SnapshotTestBase {
     }
 
     private List<Itinerary> retrieveItineraries(RoutingRequest request, Router router) {
-        request.setRoutingContext(router.graph);
-
         long startMillis = System.currentTimeMillis();
         RoutingService routingService = new RoutingService(router.graph);
         RoutingResponse response = routingService.route(request, router);
-        request.cleanup();
 
         List<Itinerary> itineraries = response.getTripPlan().itineraries;
 

@@ -34,7 +34,7 @@ import org.opentripplanner.routing.vertextype.TemporaryVertex;
 @Ignore
 public class RoutingContextDestroyTest {
     private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
-    private RoutingContext subject;
+    private TemporaryVerticesContainer subject;
 
     // Given:
     // - a graph with 3 intersections/vertexes
@@ -69,7 +69,7 @@ public class RoutingContextDestroyTest {
         request.to = to;
 
         // When - the context is created
-        subject = new RoutingContext(request, g);
+        subject = new TemporaryVerticesContainer(g, request);
 
         // Then:
         originAndDestinationInsertedCorrect();
@@ -91,12 +91,12 @@ public class RoutingContextDestroyTest {
 
     private void originAndDestinationInsertedCorrect() {
         // Then - the origin and destination is
-        assertEquals("Origin", subject.fromVertices.iterator().next().getDefaultName());
-        assertEquals("Destination", subject.toVertices.iterator().next().getDefaultName());
+        assertEquals("Origin", subject.getFromVertices().iterator().next().getDefaultName());
+        assertEquals("Destination", subject.getToVertices().iterator().next().getDefaultName());
 
         // And - from the origin
         Collection<String> vertexesReachableFromOrigin = findAllReachableVertexes(
-                subject.fromVertices.iterator().next(), true, new ArrayList<>());
+                subject.getFromVertices().iterator().next(), true, new ArrayList<>());
         String msg = "All reachable vertexes from origin: " + vertexesReachableFromOrigin;
 
         // it is possible to reach the A, B, C and the Destination Vertex
@@ -107,7 +107,7 @@ public class RoutingContextDestroyTest {
 
         // And - from the destination we can backtrack
         Collection<String> vertexesReachableFromDestination = findAllReachableVertexes(
-                subject.toVertices.iterator().next(), false, new ArrayList<>());
+                subject.getToVertices().iterator().next(), false, new ArrayList<>());
         msg = "All reachable vertexes back from destination: " + vertexesReachableFromDestination;
 
         // and reach the A, B and the Origin Vertex

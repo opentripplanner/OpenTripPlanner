@@ -223,7 +223,7 @@ public class TransmodelGraphQLSchema {
 
 
       GraphQLOutputType datedServiceJourneyType =
-              DatedServiceJourneyType.create(serviceJourneyType);
+              DatedServiceJourneyType.create(serviceJourneyType, gqlUtil);
 
       GraphQLOutputType timetabledPassingTime  = TimetabledPassingTimeType.create(
           bookingArrangementType,
@@ -1150,6 +1150,7 @@ public class TransmodelGraphQLSchema {
             .dataFetcher(e -> projectInfo())
             .build())
         .field(DatedServiceJourneyQuery.createGetById(datedServiceJourneyType))
+        .field(DatedServiceJourneyQuery.createQuery(datedServiceJourneyType, gqlUtil))
         .build();
 
         Set<GraphQLType> dictionary = new HashSet<>();

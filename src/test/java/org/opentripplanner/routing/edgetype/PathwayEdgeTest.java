@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -115,8 +116,7 @@ class PathwayEdgeTest {
 
     private State assertThatEdgeIsTraversable(PathwayEdge edge) {
         var req = new RoutingRequest();
-        req.setRoutingContext(graph, from, to);
-        var state = new State(req);
+        var state = new State(new RoutingContext(req, graph, from, to));
 
         var afterTraversal = edge.traverse(state);
         assertNotNull(afterTraversal);

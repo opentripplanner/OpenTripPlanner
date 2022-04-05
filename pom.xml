@@ -389,31 +389,26 @@
             <version>1.7.36</version>
         </dependency>
 
+        <!-- JSON AST, not used much and is a good candidate for removal -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+            <exclusions>
+                <!-- This includes a dependency on an ancient version of Junit which we want to exclude -->
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
         <!-- GEOTOOLS includes JTS as a transitive dependency. -->
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-main</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geojson</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-referencing</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-coverage</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-shapefile</artifactId>
             <version>${geotools.version}</version>
         </dependency>
         <dependency>
@@ -434,12 +429,6 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojsondatastore</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <!-- provides EPSG database for projections (shapefile loading) -->
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools.version}</version>
         </dependency>
 
@@ -648,24 +637,6 @@
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
             <version>2.12.3</version>
-        </dependency>
-        <!-- OTHER DEPENDENCIES -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <!-- this dependency is provided by the servlet container, but we want to ensure the expected version. -->
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>jsr250-api</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>1</version>
         </dependency>
         <!-- OBA GTFS loader -->
         <dependency>

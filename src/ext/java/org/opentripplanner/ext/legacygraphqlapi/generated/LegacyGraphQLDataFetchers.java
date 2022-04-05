@@ -32,6 +32,7 @@ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
@@ -664,6 +665,15 @@ public class LegacyGraphQLDataFetchers {
         public DataFetcher<VehicleRentalStationUris> rentalUris();
 
         public DataFetcher<String> vehicleId();
+
+        public DataFetcher<RentalVehicleType> vehicleType();
+    }
+
+    public interface LegacyGraphQLRentalVehicleType {
+
+        public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor> formFactor();
+
+        public DataFetcher<org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType> propulsionType();
     }
 
     /**

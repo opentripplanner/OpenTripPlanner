@@ -23,6 +23,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Trans
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -255,32 +256,31 @@ public class RaptorPathToItineraryMapper {
         } else {
             // A RoutingRequest with a RoutingContext must be constructed so that the edges
             // may be re-traversed to create the leg(s) from the list of edges.
-            try (RoutingRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request)) {
-                traverseRequest.setRoutingContext(graph, (Vertex) null, null);
-                traverseRequest.arriveBy = false;
+            RoutingRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
+            traverseRequest.arriveBy = false;
+            RoutingContext routingContext = new RoutingContext(request, graph, (Vertex) null, null);
 
-                StateEditor se = new StateEditor(traverseRequest, edges.get(0).getFromVertex());
-                se.setTimeSeconds(createCalendar(pathLeg.fromTime()).getTimeInMillis() / 1000);
+            StateEditor se = new StateEditor(routingContext, edges.get(0).getFromVertex());
+            se.setTimeSeconds(createCalendar(pathLeg.fromTime()).getTimeInMillis() / 1000);
 
-                State s = se.makeState();
-                ArrayList<State> transferStates = new ArrayList<>();
+            State s = se.makeState();
+            ArrayList<State> transferStates = new ArrayList<>();
+            transferStates.add(s);
+            for (Edge e : edges) {
+                s = e.traverse(s);
                 transferStates.add(s);
-                for (Edge e : edges) {
-                    s = e.traverse(s);
-                    transferStates.add(s);
-                }
-
-                State[] states = transferStates.toArray(new State[0]);
-                GraphPath graphPath = new GraphPath(states[states.length - 1]);
-
-                Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
-
-                if (subItinerary.legs.isEmpty()) {
-                    return List.of();
-                }
-
-                return subItinerary.legs;
             }
+
+            State[] states = transferStates.toArray(new State[0]);
+            GraphPath graphPath = new GraphPath(states[states.length - 1]);
+
+            Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
+
+            if (subItinerary.legs.isEmpty()) {
+                return List.of();
+            }
+
+            return subItinerary.legs;
         }
     }
 

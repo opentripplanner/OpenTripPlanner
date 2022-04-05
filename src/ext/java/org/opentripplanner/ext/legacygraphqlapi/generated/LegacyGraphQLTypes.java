@@ -217,6 +217,15 @@ public class LegacyGraphQLTypes {
 
     }
 
+    public enum LegacyGraphQLFormFactor {
+        BICYCLE,
+        CAR,
+        MOPED,
+        OTHER,
+        SCOOTER
+
+    }
+
 
     public static class LegacyGraphQLInputBannedInput {
 
@@ -598,6 +607,14 @@ public class LegacyGraphQLTypes {
 
     }
 
+
+    public enum LegacyGraphQLPropulsionType {
+        COMBUSTION,
+        ELECTRIC,
+        ELECTRIC_ASSIST,
+        HUMAN
+
+    }
 
     /**
      * Additional qualifier for a transport mode. Note that qualifiers can only be used with certain
@@ -1545,15 +1562,30 @@ public class LegacyGraphQLTypes {
 
     public static class LegacyGraphQLQueryTypeRentalVehiclesArgs {
 
+        private Iterable<LegacyGraphQLFormFactor> formFactors;
         private Iterable<String> ids;
 
         public LegacyGraphQLQueryTypeRentalVehiclesArgs(Map<String, Object> args) {
             if (args != null) {
+                if (args.get("formFactors") != null) {
+                    this.formFactors = ((List<Object>) args.get("formFactors")).stream()
+                            .map(item -> item instanceof LegacyGraphQLFormFactor
+                                    ? item
+                                    : LegacyGraphQLFormFactor.valueOf((String) item))
+                            .map(LegacyGraphQLFormFactor.class::cast)
+                            .collect(Collectors.toList());
+                }
                 this.ids = (Iterable<String>) args.get("ids");
             }
         }
 
+        public Iterable<LegacyGraphQLFormFactor> getLegacyGraphQLFormFactors() {return this.formFactors;}
+
         public Iterable<String> getLegacyGraphQLIds() {return this.ids;}
+
+        public void setLegacyGraphQLFormFactors(Iterable<LegacyGraphQLFormFactor> formFactors) {
+            this.formFactors = formFactors;
+        }
 
         public void setLegacyGraphQLIds(Iterable<String> ids) {this.ids = ids;}
     }

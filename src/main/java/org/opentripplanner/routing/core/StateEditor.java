@@ -32,8 +32,8 @@ public class StateEditor {
     protected StateEditor() {
     }
 
-    public StateEditor(RoutingRequest options, Vertex v) {
-        child = new State(v, options);
+    public StateEditor(RoutingContext routingContext, Vertex v) {
+        child = new State(v, routingContext.opt, routingContext);
     }
 
     public StateEditor(State parent, Edge e) {

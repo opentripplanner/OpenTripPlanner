@@ -18,6 +18,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
@@ -65,16 +66,13 @@ public class TriangleInequalityTest {
 
     private GraphPath getPath(RoutingRequest proto, Edge startBackEdge, Vertex u, Vertex v) {
         RoutingRequest options = proto.clone();
-        options.setRoutingContext(graph, u, v);
 
         ShortestPathTree tree = AStarBuilder.oneToOne()
                 .setOriginBackEdge(startBackEdge)
-                .setRoutingRequest(options)
+                .setContext(new RoutingContext(options, graph, u, v))
                 .getShortestPathTree();
 
-        GraphPath path = tree.getPath(v);
-        options.cleanup();
-        return path;
+        return tree.getPath(v);
     }
     
     private void checkTriangleInequality() {
@@ -104,14 +102,12 @@ public class TriangleInequalityTest {
         }
         
         RoutingRequest options = prototypeOptions.clone();
-        options.setRoutingContext(graph, start, end);
-        
+
         ShortestPathTree tree = AStarBuilder.oneToOne()
-                .setRoutingRequest(options)
+                .setContext(new RoutingContext(options, graph, start, end))
                 .getShortestPathTree();
 
         GraphPath path = tree.getPath(end);
-        options.cleanup();
         assertNotNull(path);
         
         double startEndWeight = path.getWeight();

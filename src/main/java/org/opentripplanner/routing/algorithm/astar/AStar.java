@@ -9,7 +9,6 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -49,7 +48,7 @@ public class AStar {
             RemainingWeightHeuristic heuristic,
             SkipEdgeStrategy skipEdgeStrategy,
             TraverseVisitor traverseVisitor,
-            RoutingRequest options,
+            RoutingContext rctx,
             SearchTerminationStrategy terminationStrategy,
             Duration timeout,
             Edge originBackEdge
@@ -57,12 +56,12 @@ public class AStar {
         this.heuristic = heuristic;
         this.skipEdgeStrategy = skipEdgeStrategy;
         this.traverseVisitor = traverseVisitor;
-        this.arriveBy = options.arriveBy;
+        this.arriveBy = rctx.opt.arriveBy;
         this.terminationStrategy = terminationStrategy;
         this.timeout = timeout;
 
-        this.rctx = options.getRoutingContext();
-        this.spt = options.getNewShortestPathTree();
+        this.rctx = rctx;
+        this.spt = rctx.opt.getNewShortestPathTree();
         this.heuristic.initialize(rctx);
 
         // Priority Queue.
@@ -75,7 +74,7 @@ public class AStar {
         this.nVisited = 0;
         this.targetAcceptedStates = Lists.newArrayList();
 
-        for (State initialState : State.getInitialStates(options)) {
+        for (State initialState : State.getInitialStates(rctx)) {
             if (originBackEdge != null) {
                 initialState.backEdge = originBackEdge;
             }
@@ -147,8 +146,6 @@ public class AStar {
 
                 double remaining_w = heuristic.estimateRemainingWeight(v);
 
-//                LOG.info("{} {}", v, remaining_w);
-
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;
                 }
@@ -167,7 +164,6 @@ public class AStar {
                     if (traverseVisitor != null) {
                         traverseVisitor.visitEnqueue();
                     }
-                    //LOG.info("u.w={} v.w={} h={}", runState.u.weight, v.weight, remaining_w);
                     pq.insert(v, estimate);
                 } 
             }

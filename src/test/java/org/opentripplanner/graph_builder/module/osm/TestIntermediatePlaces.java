@@ -22,6 +22,8 @@ import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
@@ -46,11 +48,13 @@ public class TestIntermediatePlaces {
 
     private static GraphPathFinder graphPathFinder;
 
+    private static Graph graph;
+
     private static GraphPathToItineraryMapper graphPathToItineraryMapper;
 
     @BeforeClass public static void setUp() {
         try {
-            Graph graph = FakeGraph.buildGraphNoTransit();
+            graph = FakeGraph.buildGraphNoTransit();
             FakeGraph.addPerpendicularRoutes(graph);
             FakeGraph.link(graph);
             graph.index();
@@ -149,22 +153,25 @@ public class TestIntermediatePlaces {
         for (GenericLocation intermediateLocation : via) {
             request.addIntermediatePlace(intermediateLocation);
         }
-        List<GraphPath> paths = graphPathFinder.graphPathFinderEntryPoint(request);
+        try (var temporaryVertices = new TemporaryVerticesContainer(graph, request)) {
+            var routingContext = new RoutingContext(request, graph, temporaryVertices);
+            List<GraphPath> paths = graphPathFinder.graphPathFinderEntryPoint(routingContext);
 
-        assertNotNull(paths);
-        assertFalse(paths.isEmpty());
-        List<Itinerary> itineraries = graphPathToItineraryMapper.mapItineraries(paths);
-        TripPlan plan = TripPlanMapper.mapTripPlan(request, itineraries);
-        assertLocationIsVeryCloseToPlace(from, plan.from);
-        assertLocationIsVeryCloseToPlace(to, plan.to);
-        assertTrue(1 <= plan.itineraries.size());
-        for (Itinerary itinerary : plan.itineraries) {
-            validateIntermediatePlacesVisited(itinerary, via);
-            assertTrue(via.length < itinerary.legs.size());
-            validateLegsTemporally(request, itinerary);
-            validateLegsSpatially(plan, itinerary);
-            if (modes.contains(TraverseMode.TRANSIT)) {
-                assert itinerary.transitTimeSeconds > 0;
+            assertNotNull(paths);
+            assertFalse(paths.isEmpty());
+            List<Itinerary> itineraries = graphPathToItineraryMapper.mapItineraries(paths);
+            TripPlan plan = TripPlanMapper.mapTripPlan(request, itineraries);
+            assertLocationIsVeryCloseToPlace(from, plan.from);
+            assertLocationIsVeryCloseToPlace(to, plan.to);
+            assertTrue(1 <= plan.itineraries.size());
+            for (Itinerary itinerary : plan.itineraries) {
+                validateIntermediatePlacesVisited(itinerary, via);
+                assertTrue(via.length < itinerary.legs.size());
+                validateLegsTemporally(request, itinerary);
+                validateLegsSpatially(plan, itinerary);
+                if (modes.contains(TraverseMode.TRANSIT)) {
+                    assertTrue(itinerary.transitTimeSeconds > 0);
+                }
             }
         }
     }
