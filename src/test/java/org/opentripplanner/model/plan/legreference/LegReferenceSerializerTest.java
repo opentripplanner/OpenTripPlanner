@@ -23,4 +23,16 @@ class LegReferenceSerializerTest {
 
     assertEquals(ref, ref2);
   }
+
+  @Test
+  void testScheduledTransitLegReferenceDeserialize() {
+    var in = "rO0ABXc3ABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjEACUZlZWQ6VHJpcAAIMjAyMjAxMzEAAAABAAAAAw==";
+
+    var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(in);
+
+    assertEquals(new FeedScopedId("Feed", "Trip"), ref.tripId());
+    assertEquals(new ServiceDate(2022, 1, 31), ref.serviceDate());
+    assertEquals(1, ref.fromStopPositionInPattern());
+    assertEquals(3, ref.toStopPositionInPattern());
+  }
 }

@@ -108,9 +108,9 @@ public class AlternativeLegs {
     ServiceDate originalDate,
     boolean searchBackward
   ) {
-    var pattern = patternWithBoardAlightPositions.first;
-    var boardingPosition = patternWithBoardAlightPositions.second.first;
-    var alightingPosition = patternWithBoardAlightPositions.second.second;
+    TripPattern pattern = patternWithBoardAlightPositions.first;
+    int boardingPosition = patternWithBoardAlightPositions.second.first;
+    int alightingPosition = patternWithBoardAlightPositions.second.second;
 
     // TODO: What should we have here
     ZoneId timeZone = routingService.getTimeZone().toZoneId();
@@ -178,8 +178,8 @@ public class AlternativeLegs {
   private static ScheduledTransitLeg mapToLeg(
     ZoneId timeZone,
     TripPattern pattern,
-    Integer boardingPosition,
-    Integer alightingPosition,
+    int boardingPosition,
+    int alightingPosition,
     TripTimeOnDate tripTimeOnDate
   ) {
     ServiceDate serviceDay = tripTimeOnDate.getServiceDay();
