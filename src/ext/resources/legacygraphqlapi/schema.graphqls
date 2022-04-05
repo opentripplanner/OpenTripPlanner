@@ -1430,6 +1430,7 @@ type PageInfo {
     endCursor: String
 }
 
+"""Realtime vehicle position"""
 type VehiclePosition {
     """Feed-scoped ID that uniquely identifies the vehicle in the format FeedId:VehicleId"""
     vehicleId: String,
@@ -1454,12 +1455,14 @@ type VehiclePosition {
     trip: Trip!
 }
 
+"""Upcoming or current stop and how close the vehicle is to it."""
 type StopRelationship {
     """How close the vehicle is to `stop`"""
     status: VehicleStopStatus!
     stop: Stop!
 }
 
+"""How close the vehicle is to the stop."""
 enum VehicleStopStatus {
     """
     The vehicle is standing at the stop.
