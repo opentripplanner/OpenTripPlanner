@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
@@ -10,6 +10,8 @@ import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
 public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
@@ -43,10 +45,13 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
   private static final int TIME_C1 = 2000;
   private static final int TIME_C2 = 2500;
+
+  private final TestTripPattern pattern = TestTripPattern.pattern("R1", STOP_A, STOP_B);
+
   private static final int TRIP_A = 0;
   private static final int TRIP_B = 1;
   private static final int TRIP_C = 2;
-  private final TestTripPattern pattern = TestTripPattern.pattern("R1", STOP_A, STOP_B);
+
   // Route with trip A, B, C.
   private TestRoute route = TestRoute
     .route(pattern)
@@ -61,9 +66,8 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
   private final TestTripSchedule tripB = route.timetable().getTripSchedule(TRIP_B);
 
   // The service under test - the subject
-  private TripScheduleBoardSearch<TestTripSchedule> subject = new TripScheduleBoardSearch<>(
-    TRIPS_BINARY_SEARCH_THRESHOLD,
-    route.timetable()
+  private RaptorTripScheduleSearch<TestTripSchedule> subject = route.tripSearch(
+    SearchDirection.FORWARD
   );
 
   @Test
@@ -173,8 +177,7 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
 
   private void useTripPattern(TestRoute route) {
     this.route = route;
-    this.subject =
-      new TripScheduleBoardSearch<>(TRIPS_BINARY_SEARCH_THRESHOLD, this.route.timetable());
+    this.subject = route.tripSearch(SearchDirection.FORWARD);
   }
 
   private TripAssert searchForTrip(int arrivalTime, int stopPosition) {
