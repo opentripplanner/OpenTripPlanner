@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.locationtech.jts.geom.Coordinate;
@@ -58,6 +59,7 @@ import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
@@ -1013,6 +1015,63 @@ public class Graph implements Serializable {
 
     public Collection<Station> getStations() {
         return stationById.values();
+    }
+
+    /**
+     * Finds a {@link StopLocation} by id.
+     */
+    public StopLocation getStopLocationById(FeedScopedId id) {
+        var stop = index.getStopForId(id);
+        if (stop != null) {
+            return stop;
+        }
+
+        return getAllFlexStopsFlat()
+                .stream()
+                .filter(stopLocation -> stopLocation.getId().equals(id))
+                .findAny()
+                .orElse(null);
+    }
+
+    /**
+     * Finds a {@link StopCollection} by id.
+     */
+    public StopCollection getStopCollectionById(FeedScopedId id) {
+        var station = stationById.get(id);
+        if (station != null) {
+            return station;
+        }
+
+        var groupOfStations = groupOfStationsById.get(id);
+        if (groupOfStations != null) {
+            return groupOfStations;
+        }
+
+        return multiModalStationById.get(id);
+    }
+
+    /**
+     * Returns all {@link StopLocation}s present in this graph, including normal and flex locations.
+     */
+    public Stream<StopLocation> getAllStopLocations() {
+        return Stream.concat(
+                index.getAllStops().stream(),
+                getAllFlexStopsFlat().stream()
+        );
+    }
+
+    /**
+     * Returns all {@link StopCollection}s present in this graph, including stations, group of
+     * stations and multimodal stations.
+     */
+    public Stream<StopCollection> getAllStopCollections() {
+        return Stream.concat(
+                stationById.values().stream(),
+                Stream.concat(
+                        groupOfStationsById.values().stream(),
+                        multiModalStationById.values().stream()
+                )
+        );
     }
 
     public Map<FeedScopedId, Integer> getServiceCodes() {

@@ -8,6 +8,7 @@ import ch.qos.logback.core.FileAppender;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.util.Locale;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
@@ -120,6 +121,11 @@ public class Router {
                 graph,
                 defaultRoutingRequest
             );
+        }
+
+        if (OTPFeature.SandboxAPIGeocoder.isOn()) {
+            LOG.info("Creating debug client geocoder lucene index");
+            LuceneIndex.forServer(this);
         }
     }
 

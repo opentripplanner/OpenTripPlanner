@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.util.I18NString;
 
 /**
  * A grouping that can contain a mix of Stations and MultiModalStations. It can be used to link
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 public class GroupOfStations extends TransitEntity implements StopCollection {
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    private I18NString name;
 
     // TODO Map from NeTEx
     private PurposeOfGrouping purposeOfGrouping;
@@ -28,20 +29,17 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
     }
 
 
-    public String getName() {
+    public I18NString getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(I18NString name) {
         this.name = name;
     }
 
-    public double getLat() {
-        return coordinate.latitude();
-    }
-
-    public double getLon() {
-        return coordinate.longitude();
+    @Override
+    public WgsCoordinate getCoordinate() {
+        return coordinate;
     }
 
     public void setCoordinate(WgsCoordinate coordinate) {
