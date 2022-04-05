@@ -88,14 +88,7 @@ public class TripTimeShortHelper {
     ServiceDate serviceDate = transitLeg.getServiceDate();
     return IntStream
       .range(0, tripPattern.numberOfStops())
-      .mapToObj(i ->
-        new TripTimeOnDate(
-          tripTimes,
-          i,
-          tripPattern,
-          serviceDate,
-          serviceDateMidnight
-        )
+      .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)
       )
       .collect(Collectors.toList());
   }
@@ -114,14 +107,7 @@ public class TripTimeShortHelper {
     ServiceDate serviceDate = transitLeg.getServiceDate();
     return IntStream
       .range(leg.getBoardStopPosInPattern() + 1, leg.getAlightStopPosInPattern())
-      .mapToObj(i ->
-        new TripTimeOnDate(
-          tripTimes,
-          i,
-          tripPattern,
-          serviceDate,
-          serviceDateMidnight
-        )
+      .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)
       )
       .collect(Collectors.toList());
   }

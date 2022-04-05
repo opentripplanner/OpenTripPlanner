@@ -95,6 +95,10 @@ public class TripTimeOnDate {
     return stopIndex;
   }
 
+  public TripTimes getTripTimes() {
+    return tripTimes;
+  }
+
   public int getStopCount() {
     return tripTimes.getNumStops();
   }

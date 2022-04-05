@@ -330,7 +330,7 @@ public class StopTimesHelper {
     return replacement != null && !replacement.equals(pattern);
   }
 
-  private static boolean skipByTripCancellation(TripTimes tripTimes, boolean includeCancellations) {
+  static boolean skipByTripCancellation(TripTimes tripTimes, boolean includeCancellations) {
     return (
       (tripTimes.isCanceled() || tripTimes.getTrip().getTripAlteration().isCanceledOrReplaced()) &&
       !includeCancellations

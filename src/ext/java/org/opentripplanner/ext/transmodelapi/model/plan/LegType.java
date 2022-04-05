@@ -5,6 +5,7 @@ import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
 import graphql.Scalars;
 import graphql.scalars.ExtendedScalars;
 import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -20,8 +21,9 @@ import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
-import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
+import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.stoptimes.AlternativeLegs;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class LegType {
@@ -414,6 +416,60 @@ public class LegType {
               ? List.of()
               : List.of(leg(env).getVehicleRentalNetwork())
           )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("previousLegs")
+          .description(
+            "Fetch the previous legs, which can be used to replace this leg. The replacement legs do arrive/depart from/to the same stop places. It might be necessary to change other legs in an itinerary in order to be able to ride the returned legs."
+          )
+          .type(new GraphQLList(new GraphQLNonNull(REF)))
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("previous")
+              .description("Number of earlier legs to return.")
+              .defaultValueProgrammatic(1)
+              .type(Scalars.GraphQLInt)
+          )
+          .dataFetcher(env -> {
+            Leg leg = leg(env);
+            if (!leg.isScheduledTransitLeg()) {
+              return null;
+            }
+            int previous = env.getArgument("previous");
+            RoutingService routingService = GqlUtil.getRoutingService(env);
+            return AlternativeLegs.getAlternativeLegs(leg, previous, routingService, true);
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("nextLegs")
+          .description(
+            "Fetch the next legs, which can be used to replace this leg. The replacement legs do arrive/depart from/to the same stop places. It might be necessary to change other legs in an itinerary in order to be able to ride the returned legs."
+          )
+          .type(new GraphQLList(new GraphQLNonNull(REF)))
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("next")
+              .description("Number of later legs to return.")
+              .defaultValueProgrammatic(1)
+              .type(Scalars.GraphQLInt)
+          )
+          .dataFetcher(env -> {
+            Leg leg = leg(env);
+            if (!leg.isScheduledTransitLeg()) {
+              return null;
+            }
+            int next = env.getArgument("next");
+            RoutingService routingService = GqlUtil.getRoutingService(env);
+            return AlternativeLegs.getAlternativeLegs(leg, next, routingService, false);
+          })
           .build()
       )
       .build();
