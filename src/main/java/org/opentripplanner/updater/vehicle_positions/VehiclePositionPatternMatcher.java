@@ -2,6 +2,8 @@ package org.opentripplanner.updater.vehicle_positions;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
 import java.time.Instant;
@@ -111,7 +113,10 @@ public class VehiclePositionPatternMatcher {
             VehiclePosition vehiclePosition
     ) {
         if (!vehiclePosition.hasTrip()) {
-            LOG.warn("Realtime vehicle positions {} has no trip ID. Ignoring.", vehiclePosition);
+            LOG.warn(
+                    "Realtime vehicle positions {} has no trip ID. Ignoring.",
+                    toString(vehiclePosition)
+            );
             return null;
         }
 
@@ -150,6 +155,17 @@ public class VehiclePositionPatternMatcher {
         return new T2<>(pattern, newPosition);
     }
 
+    private static String toString(VehiclePosition vehiclePosition) {
+        String message;
+        try {
+            message = JsonFormat.printer().omittingInsignificantWhitespace().print(vehiclePosition);
+        }
+        catch (InvalidProtocolBufferException ignored) {
+            message = vehiclePosition.toString();
+        }
+        return message;
+    }
+
     /**
      * When a vehicle position doesn't state the service date of its trip then we need to infer it.
      * <p>
@@ -182,7 +198,7 @@ public class VehiclePositionPatternMatcher {
         }
         // if we have a trip that starts after midnight but is associated with the previous service
         // day. the start time would be something like 25:10.
-        else if(start > MIDNIGHT_SECONDS) {
+        else if (start > MIDNIGHT_SECONDS) {
             return LocalDate.now(timeZoneId).minusDays(1);
         }
         // here is another edge case: if the trip finished at close to midnight but for some reason
@@ -197,7 +213,7 @@ public class VehiclePositionPatternMatcher {
      * If the trip times starts before 24:00 and finishes after 24:00. In other words if the
      * calendar date changes when the trip runs.
      */
-    private boolean crossesMidnight(TripTimes tripTimes) {
+    private static boolean crossesMidnight(TripTimes tripTimes) {
         var start = tripTimes.getScheduledDepartureTime(0);
         var end = tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1);
         return start < MIDNIGHT_SECONDS && end > MIDNIGHT_SECONDS;
@@ -245,12 +261,18 @@ public class VehiclePositionPatternMatcher {
 
         // we prefer the to get the current stop from the stop_id
         if (vehiclePosition.hasStopId()) {
-            List<StopLocation> matchedStops = stopsOnVehicleTrip
+            var matchedStops = stopsOnVehicleTrip
                     .stream()
                     .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
                     .toList();
             if (matchedStops.size() == 1) {
                 newPosition.setStop(matchedStops.get(0));
+            }
+            else {
+                LOG.warn(
+                        "Stop ID {} is not in trip {}. Not setting stopRelationship.",
+                        vehiclePosition.getStopId(), trip.getId()
+                );
             }
         }
         // but if stop_id isn't there we try current_stop_sequence
