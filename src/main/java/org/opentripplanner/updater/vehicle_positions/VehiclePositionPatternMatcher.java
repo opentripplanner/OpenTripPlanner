@@ -168,7 +168,7 @@ public class VehiclePositionPatternMatcher {
      * <p>
      * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
      */
-    private static LocalDate inferServiceDate(TripTimes staticTripTimes, ZoneId timeZoneId, Instant now) {
+    protected static LocalDate inferServiceDate(TripTimes staticTripTimes, ZoneId timeZoneId, Instant now) {
         var start = staticTripTimes.getScheduledDepartureTime(0);
         var today = now.atZone(timeZoneId).toLocalDate();
         // if we have a trip that starts before 24:00 and finishes the next day, we have to figure out

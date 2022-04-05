@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
@@ -21,9 +24,10 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 
 public class VehiclePositionsMatcherTest {
 
-    ZoneId ZONE_ID = ZoneId.of("Europe/Berlin");
+    ZoneId zoneId = ZoneId.of("Europe/Berlin");
     String feedId = "feed1";
     String tripId = "trip1";
+    FeedScopedId scopedTripId = new FeedScopedId(feedId, tripId);
 
     @Test
     public void matchRealtimePositionsToTrip() {
@@ -33,7 +37,7 @@ public class VehiclePositionsMatcherTest {
 
     @Test
     @DisplayName("If the vehicle position has no start_date we need to guess the service day")
-    public void inferServiceDate() {
+    public void inferStartDate() {
 
         var posWithoutServiceDate = VehiclePosition.newBuilder()
                 .setTrip(TripDescriptor.newBuilder()
@@ -46,9 +50,6 @@ public class VehiclePositionsMatcherTest {
 
     private void testVehiclePositions(VehiclePosition pos) {
         var service = new RealtimeVehiclePositionService();
-
-        var scopedTripId = new FeedScopedId(feedId, tripId);
-
         var trip = new Trip(scopedTripId);
         var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
         var stopPattern = new StopPattern(stopTimes);
@@ -71,7 +72,7 @@ public class VehiclePositionsMatcherTest {
                         patternForTrip::get,
                         (id, time) -> patternForTrip.get(id),
                         service,
-                        ZONE_ID
+                        zoneId
                 );
 
         var positions = List.of(pos);
@@ -135,7 +136,7 @@ public class VehiclePositionsMatcherTest {
                         patternForTrip::get,
                         (id, time) -> patternForTrip.get(id),
                         service,
-                        ZONE_ID
+                        zoneId
                 );
 
         var pos1 = vehiclePosition(tripId1);
@@ -157,7 +158,40 @@ public class VehiclePositionsMatcherTest {
         assertEquals(0, service.getVehiclePositions(pattern2).size());
     }
 
-    private VehiclePosition vehiclePosition(String tripId1) {
+    @Test
+    void inferServiceDateAtMiddleOfDay() {
+        var trip = new Trip(scopedTripId);
+        var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1));
+
+        var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+
+        var time = OffsetDateTime.parse("2022-04-05T15:26:04+02:00").toInstant();
+        var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
+
+        assertEquals(LocalDate.parse("2022-04-05"), inferredDate);
+    }
+
+    @Test
+    void inferServiceDateCloseToMidnight() {
+        var trip = new Trip(scopedTripId);
+
+        var fiveToMidnight = LocalTime.parse("23:55").toSecondOfDay();
+        var fivePastMidnight = fiveToMidnight + (10 * 60);
+        var stopTimes =
+                List.of(stopTime(trip, 0, fiveToMidnight), stopTime(trip, 1, fivePastMidnight));
+
+        var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+
+        var time = OffsetDateTime.parse("2022-04-05T00:04:00+02:00").toInstant();
+
+        // because the trip "crosses" midnight and we are already on the next day, we infer the service date to be
+        // yesterday
+        var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
+
+        assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
+    }
+
+    private static VehiclePosition vehiclePosition(String tripId1) {
         return VehiclePosition.newBuilder()
                 .setTrip(TripDescriptor.newBuilder()
                         .setTripId(tripId1)
@@ -168,7 +202,14 @@ public class VehiclePositionsMatcherTest {
     }
 
 
-    private StopTime stopTime(Trip trip, int seq) {
+    private static StopTime stopTime(Trip trip, int seq, int time) {
+        var stopTime = stopTime(trip, seq);
+        stopTime.setArrivalTime(time);
+        stopTime.setDepartureTime(time);
+        return stopTime;
+    }
+
+    private static StopTime stopTime(Trip trip, int seq) {
         var stopTime = new StopTime();
         stopTime.setTrip(trip);
         stopTime.setStopSequence(seq);
