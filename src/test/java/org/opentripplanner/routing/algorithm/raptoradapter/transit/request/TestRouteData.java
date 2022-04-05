@@ -66,10 +66,12 @@ public class TestRouteData {
         var patternForDates = new TripPatternForDates(
                 raptorTripPattern, listOfTripPatternForDates, List.of(OFFSET)
         );
+        int id = 0;
         for (Trip trip : trips) {
             var tripSchedule = new TripScheduleWithOffset(
-                    patternForDates, DATE, tripTimesByTrip.get(trip), OFFSET
+                    patternForDates, id
             );
+            id += 1;
             tripSchedulesByTrip.put(trip, tripSchedule);
         }
 
