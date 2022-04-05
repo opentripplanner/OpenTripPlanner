@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 
 public class VehiclePositionsMatcherTest {
 
+    ZoneId ZONE_ID = ZoneId.of("Europe/Berlin");
     String feedId = "feed1";
 
     @Test
@@ -45,8 +47,10 @@ public class VehiclePositionsMatcherTest {
                 new VehiclePositionPatternMatcher(
                         feedId,
                         tripForId::get,
+                        patternForTrip::get,
                         (id, time) -> patternForTrip.get(id),
-                        service
+                        service,
+                        ZONE_ID
                 );
 
         var pos = vehiclePosition(tripId);
@@ -109,8 +113,10 @@ public class VehiclePositionsMatcherTest {
                 new VehiclePositionPatternMatcher(
                         feedId,
                         tripForId::get,
+                        patternForTrip::get,
                         (id, time) -> patternForTrip.get(id),
-                        service
+                        service,
+                        ZONE_ID
                 );
 
         var pos1 = vehiclePosition(tripId1);

@@ -5,6 +5,9 @@ import com.google.common.collect.Sets;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition.VehicleStopStatus;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -23,6 +26,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,22 +41,30 @@ public class VehiclePositionPatternMatcher {
 
     private final String feedId;
     private final RealtimeVehiclePositionService service;
+    private final ZoneId timeZoneId;
 
     private final Function<FeedScopedId, Trip> getTripForId;
-    private final BiFunction<Trip, ServiceDate, TripPattern> getPatternForTrip;
+    private final Function<Trip, TripPattern> getStaticPattern;
+    private final BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern;
+
+    private static final int MIDNIGHT_SECONDS = 60 * 60 * 24;
 
     private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
     public VehiclePositionPatternMatcher(
             String feedId,
             Function<FeedScopedId, Trip> getTripForId,
-            BiFunction<Trip, ServiceDate, TripPattern> getPatternForTrip,
-            RealtimeVehiclePositionService service
+            Function<Trip, TripPattern> getStaticPattern,
+            BiFunction<Trip, ServiceDate, TripPattern> getRealtimePattern,
+            RealtimeVehiclePositionService service,
+            ZoneId timeZoneId
     ) {
         this.feedId = feedId;
         this.getTripForId = getTripForId;
-        this.getPatternForTrip = getPatternForTrip;
+        this.getStaticPattern = getStaticPattern;
+        this.getRealtimePattern = getRealtimePattern;
         this.service = service;
+        this.timeZoneId = timeZoneId;
     }
 
     /**
@@ -103,8 +115,8 @@ public class VehiclePositionPatternMatcher {
             return null;
         }
 
-        String tripId = vehiclePosition.getTrip().getTripId();
-        Trip trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
+        var tripId = vehiclePosition.getTrip().getTripId();
+        var trip = getTripForId.apply(new FeedScopedId(feedId, tripId));
         if (trip == null) {
             LOG.warn(
                     "Unable to find trip ID in feed '{}' for vehicle position with trip ID {}",
@@ -113,20 +125,13 @@ public class VehiclePositionPatternMatcher {
             return null;
         }
 
-        var localDate =
+        var serviceDate =
                 Optional.of(vehiclePosition.getTrip().getStartDate())
                         .map(Strings::emptyToNull)
-                        .flatMap(ServiceDate::parseStringToOptional);
+                        .flatMap(ServiceDate::parseStringToOptional)
+                        .orElseGet(() -> new ServiceDate(this.inferServiceDate(trip)));
 
-        if (localDate.isEmpty()) {
-            LOG.warn(
-                    "Trip with id {} doesn't contain a valid start_data which is required. Ignoring.",
-                    vehiclePosition.getTrip().getTripId()
-            );
-            return null;
-        }
-
-        TripPattern pattern = getPatternForTrip.apply(trip, localDate.get());
+        var pattern = getRealtimePattern.apply(trip, serviceDate);
         if (pattern == null) {
             LOG.warn(
                     "Unable to match OTP pattern ID for vehicle position with trip ID {}",
@@ -143,6 +148,59 @@ public class VehiclePositionPatternMatcher {
         );
 
         return new T2<>(pattern, newPosition);
+    }
+
+    /**
+     * When a vehicle position doesn't state the service date of its trip then we need to infer it.
+     * <p>
+     * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
+     */
+    private LocalDate inferServiceDate(Trip trip) {
+        var staticTripTimes =
+                getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
+        var start = staticTripTimes.getScheduledDepartureTime(0);
+        // if we have a trip that starts before 24:00 and finishes the next day, we have to figure out
+        // the correct service day
+        if (crossesMidnight(staticTripTimes)) {
+            var nowSeconds = LocalTime.now(timeZoneId).toSecondOfDay();
+            // when nowSeconds is less than the start we are already at the next day
+            // (because nowSeconds can never be greater than MIDNIGHT_SECONDS but stop times can)
+            // so we have to select yesterday as the service day
+            //
+            // there is an edge case here: if we receive a position before the trip has even started
+            // (according to the schedule) then we give it the wrong service day.
+            // since this an edge case (update before start) of an edge case (trip that crosses midnight),
+            // i will ignore this. if this is problematic then you should put the start_date in the
+            // vehicle position.
+            if (nowSeconds < start) {
+                return LocalDate.now(timeZoneId).minusDays(1);
+            }
+            // if we are before midnight
+            else {
+                return LocalDate.now(timeZoneId);
+            }
+        }
+        // if we have a trip that starts after midnight but is associated with the previous service
+        // day. the start time would be something like 25:10.
+        else if(start > MIDNIGHT_SECONDS) {
+            return LocalDate.now(timeZoneId).minusDays(1);
+        }
+        // here is another edge case: if the trip finished at close to midnight but for some reason
+        // is still sending updates after midnight then we are guessing the wrong day.
+        // if this concerns you, then you should really put the start_date into your feed.
+        else {
+            return LocalDate.now(timeZoneId);
+        }
+    }
+
+    /**
+     * If the trip times starts before 24:00 and finishes after 24:00. In other words if the
+     * calendar date changes when the trip runs.
+     */
+    private boolean crossesMidnight(TripTimes tripTimes) {
+        var start = tripTimes.getScheduledDepartureTime(0);
+        var end = tripTimes.getScheduledArrivalTime(tripTimes.getNumStops() - 1);
+        return start < MIDNIGHT_SECONDS && end > MIDNIGHT_SECONDS;
     }
 
     /**
