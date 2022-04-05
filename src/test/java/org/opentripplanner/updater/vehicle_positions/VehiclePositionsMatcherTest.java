@@ -7,6 +7,7 @@ import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -15,26 +16,46 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
+import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 public class VehiclePositionsMatcherTest {
 
     ZoneId ZONE_ID = ZoneId.of("Europe/Berlin");
     String feedId = "feed1";
+    String tripId = "trip1";
 
     @Test
     public void matchRealtimePositionsToTrip() {
+        var pos = vehiclePosition(tripId);
+        testVehiclePositions(pos);
+    }
 
+    @Test
+    @DisplayName("If the vehicle position has not start_date we need to guess the service day")
+    public void inferServiceDate() {
+
+        var posWithoutServiceDate = VehiclePosition.newBuilder()
+                .setTrip(TripDescriptor.newBuilder()
+                        .setTripId(tripId)
+                        .build())
+                .setStopId("stop-1")
+                .build();
+        testVehiclePositions(posWithoutServiceDate);
+    }
+
+    private void testVehiclePositions(VehiclePosition pos) {
         var service = new RealtimeVehiclePositionService();
 
-        var tripId = "trip1";
         var scopedTripId = new FeedScopedId(feedId, tripId);
 
         var trip = new Trip(scopedTripId);
-
-        var stopPattern =
-                new StopPattern(List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2)));
+        var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
+        var stopPattern = new StopPattern(stopTimes);
 
         var pattern = new TripPattern(new FeedScopedId(feedId, tripId), null, stopPattern);
+        pattern.getScheduledTimetable()
+                .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
 
         var tripForId = Map.of(scopedTripId, trip);
         var patternForTrip = Map.of(trip, pattern);
@@ -52,8 +73,6 @@ public class VehiclePositionsMatcherTest {
                         service,
                         ZONE_ID
                 );
-
-        var pos = vehiclePosition(tripId);
 
         var positions = List.of(pos);
 

@@ -134,7 +134,7 @@ public class VehiclePositionPatternMatcher {
                 Optional.of(vehiclePosition.getTrip().getStartDate())
                         .map(Strings::emptyToNull)
                         .flatMap(ServiceDate::parseStringToOptional)
-                        .orElseGet(() -> new ServiceDate(this.inferServiceDate(trip)));
+                        .orElseGet(() -> inferServiceDate(trip));
 
         var pattern = getRealtimePattern.apply(trip, serviceDate);
         if (pattern == null) {
@@ -155,15 +155,10 @@ public class VehiclePositionPatternMatcher {
         return new T2<>(pattern, newPosition);
     }
 
-    private static String toString(VehiclePosition vehiclePosition) {
-        String message;
-        try {
-            message = JsonFormat.printer().omittingInsignificantWhitespace().print(vehiclePosition);
-        }
-        catch (InvalidProtocolBufferException ignored) {
-            message = vehiclePosition.toString();
-        }
-        return message;
+    private ServiceDate inferServiceDate(Trip trip) {
+        var staticTripTimes =
+                getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
+        return new ServiceDate(inferServiceDate(staticTripTimes, timeZoneId));
     }
 
     /**
@@ -171,9 +166,7 @@ public class VehiclePositionPatternMatcher {
      * <p>
      * {@see https://github.com/opentripplanner/OpenTripPlanner/issues/4058}
      */
-    private LocalDate inferServiceDate(Trip trip) {
-        var staticTripTimes =
-                getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
+    private static LocalDate inferServiceDate(TripTimes staticTripTimes, ZoneId timeZoneId) {
         var start = staticTripTimes.getScheduledDepartureTime(0);
         // if we have a trip that starts before 24:00 and finishes the next day, we have to figure out
         // the correct service day
@@ -292,5 +285,16 @@ public class VehiclePositionPatternMatcher {
             case INCOMING_AT -> StopStatus.INCOMING_AT;
             case STOPPED_AT -> StopStatus.STOPPED_AT;
         };
+    }
+
+    private static String toString(VehiclePosition vehiclePosition) {
+        String message;
+        try {
+            message = JsonFormat.printer().omittingInsignificantWhitespace().print(vehiclePosition);
+        }
+        catch (InvalidProtocolBufferException ignored) {
+            message = vehiclePosition.toString();
+        }
+        return message;
     }
 }
