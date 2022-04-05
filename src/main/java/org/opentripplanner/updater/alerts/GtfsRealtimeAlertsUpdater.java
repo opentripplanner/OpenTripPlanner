@@ -95,7 +95,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
             long feedTimestamp = feed.getHeader().getTimestamp();
             if (feedTimestamp <= lastTimestamp) {
-                LOG.info("Ignoring feed with an old timestamp.");
+                LOG.debug("Ignoring feed with an old timestamp from " + url);
                 return;
             }
 
