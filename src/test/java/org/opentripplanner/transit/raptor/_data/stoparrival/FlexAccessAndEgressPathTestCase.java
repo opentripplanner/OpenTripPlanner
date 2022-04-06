@@ -47,7 +47,6 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     public static final double WAIT_RELUCTANCE = 0.8;
     public static final int BOARD_COST_SEC = 60;
     public static final int TRANSFER_COST_SEC = 120;
-
     // The COST_CALCULATOR is not under test, so we use it to calculate correct cost values.
     public static final DefaultCostCalculator COST_CALCULATOR = new DefaultCostCalculator(
             BOARD_COST_SEC, TRANSFER_COST_SEC, WAIT_RELUCTANCE, null, null

@@ -1,0 +1,3 @@
+{
+  "transferRequests": [ { "modes": "WALK" }, { "modes": "WALK", "wheelchair": true } ]
+}
