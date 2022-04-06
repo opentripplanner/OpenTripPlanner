@@ -18,19 +18,19 @@ import org.opentripplanner.model.TripPattern;
  */
 class TripPatternMapperResult {
 
-    /**
-     * A map from trip/serviceJourney id to an ordered list of scheduled stop point ids.
-     */
-    final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
+  /**
+   * A map from trip/serviceJourney id to an ordered list of scheduled stop point ids.
+   */
+  final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
 
-    final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
+  final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
 
-    final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
+  final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-    /**
-     * stopTimes by the timetabled-passing-time id
-     */
-    final Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
+  /**
+   * stopTimes by the timetabled-passing-time id
+   */
+  final Map<String, StopTime> stopTimeByNetexId = new HashMap<>();
 
-    final ArrayList<TripOnServiceDate> tripOnServiceDates = new ArrayList<>();
+  final ArrayList<TripOnServiceDate> tripOnServiceDates = new ArrayList<>();
 }

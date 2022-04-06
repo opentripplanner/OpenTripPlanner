@@ -10,7 +10,6 @@ public final class StationTransferPoint implements TransferPoint, Serializable {
 
   private final Station station;
 
-
   public StationTransferPoint(Station station) {
     this.station = station;
   }
@@ -30,13 +29,16 @@ public final class StationTransferPoint implements TransferPoint, Serializable {
   }
 
   @Override
-  public boolean isStationTransferPoint() { return true; }
+  public boolean isStationTransferPoint() {
+    return true;
+  }
 
   public String toString() {
-    return ValueObjectToStringBuilder.of()
-            .addText("<Station ")
-            .addObj(station.getId())
-            .addText(">")
-            .toString();
+    return ValueObjectToStringBuilder
+      .of()
+      .addText("<Station ")
+      .addObj(station.getId())
+      .addText(">")
+      .toString();
   }
 }

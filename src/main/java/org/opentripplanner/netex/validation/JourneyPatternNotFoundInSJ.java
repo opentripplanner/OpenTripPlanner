@@ -8,7 +8,9 @@ class JourneyPatternNotFoundInSJ extends AbstractHMapValidationRule<String, Serv
 
   @Override
   public Status validate(ServiceJourney sj) {
-    return index.getJourneyPatternsById().lookup(getPatternId(sj)) == null ? Status.DISCARD : Status.OK;
+    return index.getJourneyPatternsById().lookup(getPatternId(sj)) == null
+      ? Status.DISCARD
+      : Status.OK;
   }
 
   @Override

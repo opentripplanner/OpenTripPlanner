@@ -16,8 +16,8 @@ public class RemoveWalkOnlyFilterTest {
 
   private static final int D5m = DurationUtils.durationInSeconds("5m");
 
-  private static final int T10_10 = TimeUtils.hm2time(10,10);
-  private static final int T10_20 = TimeUtils.hm2time(10,20);
+  private static final int T10_10 = TimeUtils.hm2time(10, 10);
+  private static final int T10_20 = TimeUtils.hm2time(10, 20);
 
   private final RemoveWalkOnlyFilter subject = new RemoveWalkOnlyFilter();
 
@@ -39,8 +39,8 @@ public class RemoveWalkOnlyFilterTest {
     var expected = List.of(t1, t2, t3, t4);
 
     assertEquals(
-            Itinerary.toStr(expected),
-            Itinerary.toStr(DeletionFlaggerTestHelper.process(input, subject))
+      Itinerary.toStr(expected),
+      Itinerary.toStr(DeletionFlaggerTestHelper.process(input, subject))
     );
   }
 }

@@ -1,17 +1,19 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import org.opentripplanner.ext.interactivelauncher.Model;
-
-import javax.swing.*;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
 
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import javax.swing.Box;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import org.opentripplanner.ext.interactivelauncher.Model;
+
 class OptionsView {
+
   private final Box panel = Box.createVerticalBox();
   private final JCheckBox buildStreetGraphChk;
   private final JCheckBox buildTransitGraphChk;
@@ -58,6 +60,10 @@ class OptionsView {
     onBuildGraphChkChanged();
   }
 
+  void bind(JCheckBox box, Consumer<Boolean> modelUpdate) {
+    box.addActionListener(l -> modelUpdate.accept(box.isSelected() && box.isEnabled()));
+  }
+
   private void addDebugCheckBoxes(Model model) {
     addSectionSpace(panel);
     addComp(new JLabel("Debug logging"), panel);
@@ -65,7 +71,7 @@ class OptionsView {
     var entries = model.getDebugLogging();
     List<String> keys = entries.keySet().stream().sorted().collect(Collectors.toList());
     for (String name : keys) {
-      JCheckBox box =  new JCheckBox(name, entries.get(name));
+      JCheckBox box = new JCheckBox(name, entries.get(name));
       box.addActionListener(l -> model.getDebugLogging().put(name, box.isSelected()));
       addComp(box, panel);
     }
@@ -77,10 +83,6 @@ class OptionsView {
     bind(saveGraphChk, model::setSaveGraph);
     bind(startOptServerChk, model::setServeGraph);
     bind(startOptVisualizerChk, model::setVisualizer);
-  }
-
-  void bind(JCheckBox box, Consumer<Boolean> modelUpdate) {
-    box.addActionListener(l -> modelUpdate.accept(box.isSelected() && box.isEnabled()));
   }
 
   private boolean buildStreet() {
@@ -98,6 +100,8 @@ class OptionsView {
   }
 
   private void onStartOptServerChkChanged() {
-    startOptVisualizerChk.setEnabled(startOptServerChk.isEnabled() && startOptServerChk.isSelected());
+    startOptVisualizerChk.setEnabled(
+      startOptServerChk.isEnabled() && startOptServerChk.isSelected()
+    );
   }
 }

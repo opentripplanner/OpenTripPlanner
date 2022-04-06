@@ -6,19 +6,19 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 
 public class GbfsVehicleTypeMapper {
 
-    private final String systemId;
+  private final String systemId;
 
-    public GbfsVehicleTypeMapper(String systemId) {
-        this.systemId = systemId;
-    }
+  public GbfsVehicleTypeMapper(String systemId) {
+    this.systemId = systemId;
+  }
 
-    public RentalVehicleType mapRentalVehicleType(GBFSVehicleType vehicleType) {
-        return new RentalVehicleType(
-                new FeedScopedId(systemId, vehicleType.getVehicleTypeId()),
-                vehicleType.getName(),
-                RentalVehicleType.FormFactor.fromGbfs(vehicleType.getFormFactor()),
-                RentalVehicleType.PropulsionType.fromGbfs(vehicleType.getPropulsionType()),
-                vehicleType.getMaxRangeMeters()
-        );
-    }
+  public RentalVehicleType mapRentalVehicleType(GBFSVehicleType vehicleType) {
+    return new RentalVehicleType(
+      new FeedScopedId(systemId, vehicleType.getVehicleTypeId()),
+      vehicleType.getName(),
+      RentalVehicleType.FormFactor.fromGbfs(vehicleType.getFormFactor()),
+      RentalVehicleType.PropulsionType.fromGbfs(vehicleType.getPropulsionType()),
+      vehicleType.getMaxRangeMeters()
+    );
+  }
 }

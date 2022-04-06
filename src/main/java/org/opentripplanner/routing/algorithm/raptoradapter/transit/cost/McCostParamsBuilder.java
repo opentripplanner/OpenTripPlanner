@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 
 /**
@@ -8,70 +7,71 @@ import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class McCostParamsBuilder {
-    private int boardCost;
-    private int transferCost;
-    private double[] transitReluctanceFactors;
-    private double waitReluctanceFactor;
-    private WheelchairAccessibilityRequest accessibilityRequest;
 
-    public McCostParamsBuilder() {
-        this(McCostParams.DEFAULTS);
-    }
+  private int boardCost;
+  private int transferCost;
+  private double[] transitReluctanceFactors;
+  private double waitReluctanceFactor;
+  private WheelchairAccessibilityRequest accessibilityRequest;
 
-    private McCostParamsBuilder(McCostParams other) {
-        this.boardCost = other.boardCost();
-        this.transferCost = other.transferCost();
-        this.transitReluctanceFactors = other.transitReluctanceFactors();
-        this.waitReluctanceFactor = other.waitReluctanceFactor();
-        this.accessibilityRequest = other.accessibilityRequirements();
-    }
+  public McCostParamsBuilder() {
+    this(McCostParams.DEFAULTS);
+  }
 
-    public int boardCost() {
-        return boardCost;
-    }
+  private McCostParamsBuilder(McCostParams other) {
+    this.boardCost = other.boardCost();
+    this.transferCost = other.transferCost();
+    this.transitReluctanceFactors = other.transitReluctanceFactors();
+    this.waitReluctanceFactor = other.waitReluctanceFactor();
+    this.accessibilityRequest = other.accessibilityRequirements();
+  }
 
-    public McCostParamsBuilder boardCost(int boardCost) {
-        this.boardCost = boardCost;
-        return this;
-    }
+  public int boardCost() {
+    return boardCost;
+  }
 
-    public int transferCost() {
-        return transferCost;
-    }
+  public McCostParamsBuilder boardCost(int boardCost) {
+    this.boardCost = boardCost;
+    return this;
+  }
 
-    public McCostParamsBuilder transferCost(int transferCost) {
-        this.transferCost = transferCost;
-        return this;
-    }
+  public int transferCost() {
+    return transferCost;
+  }
 
-    public double[] transitReluctanceFactors() {
-        return transitReluctanceFactors;
-    }
+  public McCostParamsBuilder transferCost(int transferCost) {
+    this.transferCost = transferCost;
+    return this;
+  }
 
-    public McCostParamsBuilder transitReluctanceFactors(double[] transitReluctanceFactors) {
-        this.transitReluctanceFactors = transitReluctanceFactors;
-        return this;
-    }
+  public double[] transitReluctanceFactors() {
+    return transitReluctanceFactors;
+  }
 
-    public double waitReluctanceFactor() {
-        return waitReluctanceFactor;
-    }
+  public McCostParamsBuilder transitReluctanceFactors(double[] transitReluctanceFactors) {
+    this.transitReluctanceFactors = transitReluctanceFactors;
+    return this;
+  }
 
-    public McCostParamsBuilder waitReluctanceFactor(double waitReluctanceFactor) {
-        this.waitReluctanceFactor = waitReluctanceFactor;
-        return this;
-    }
+  public double waitReluctanceFactor() {
+    return waitReluctanceFactor;
+  }
 
-    public WheelchairAccessibilityRequest wheelchairAccessibility() {
-        return accessibilityRequest;
-    }
+  public McCostParamsBuilder waitReluctanceFactor(double waitReluctanceFactor) {
+    this.waitReluctanceFactor = waitReluctanceFactor;
+    return this;
+  }
 
-    public McCostParamsBuilder wheelchairAccessibility(WheelchairAccessibilityRequest mode) {
-        accessibilityRequest = mode;
-        return this;
-    }
+  public WheelchairAccessibilityRequest wheelchairAccessibility() {
+    return accessibilityRequest;
+  }
 
-    public McCostParams build() {
-        return new McCostParams(this);
-    }
+  public McCostParamsBuilder wheelchairAccessibility(WheelchairAccessibilityRequest mode) {
+    accessibilityRequest = mode;
+    return this;
+  }
+
+  public McCostParams build() {
+    return new McCostParams(this);
+  }
 }

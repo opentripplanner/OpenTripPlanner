@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 
 class RoutingRequestMapperTest {
 
-    @Test
-    public void loadFromJson() {
-        var nodeAdapter = newNodeAdapterForTest(
-                """
+  @Test
+  public void loadFromJson() {
+    var nodeAdapter = newNodeAdapterForTest(
+      """
                         {
                           "wheelchairAccessibility": {
                             "enabled": true,
@@ -28,19 +28,20 @@ class RoutingRequestMapperTest {
                             }
                           }
                         }
-                        """);
+                        """
+    );
 
-        var subject = RoutingRequestMapper.mapRoutingRequest(nodeAdapter);
+    var subject = RoutingRequestMapper.mapRoutingRequest(nodeAdapter);
 
-        var accessibility = subject.accessibilityRequest;
-        assertTrue(accessibility.enabled());
+    var accessibility = subject.accessibilityRequest;
+    assertTrue(accessibility.enabled());
 
-        assertFalse(accessibility.trips().onlyConsiderAccessible());
-        assertEquals(1, accessibility.trips().unknownCost());
-        assertEquals(2, accessibility.trips().inaccessibleCost());
+    assertFalse(accessibility.trips().onlyConsiderAccessible());
+    assertEquals(1, accessibility.trips().unknownCost());
+    assertEquals(2, accessibility.trips().inaccessibleCost());
 
-        assertFalse(accessibility.stops().onlyConsiderAccessible());
-        assertEquals(3, accessibility.stops().unknownCost());
-        assertEquals(4, accessibility.stops().inaccessibleCost());
-    }
+    assertFalse(accessibility.stops().onlyConsiderAccessible());
+    assertEquals(3, accessibility.stops().unknownCost());
+    assertEquals(4, accessibility.stops().inaccessibleCost());
+  }
 }

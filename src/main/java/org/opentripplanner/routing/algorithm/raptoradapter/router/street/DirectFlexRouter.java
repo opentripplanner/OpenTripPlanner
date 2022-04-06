@@ -17,38 +17,42 @@ import org.opentripplanner.standalone.server.Router;
 public class DirectFlexRouter {
 
   public static List<Itinerary> route(
-      Router router,
-      RoutingRequest request,
-      AdditionalSearchDays additionalSearchDays
+    Router router,
+    RoutingRequest request,
+    AdditionalSearchDays additionalSearchDays
   ) {
     if (!StreetMode.FLEXIBLE.equals(request.modes.directMode)) {
       return Collections.emptyList();
     }
-      RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
-      try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, directRequest)) {
-          RoutingContext routingContext = new RoutingContext(directRequest, router.graph, temporaryVertices);
+    RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
+    try (var temporaryVertices = new TemporaryVerticesContainer(router.graph, directRequest)) {
+      RoutingContext routingContext = new RoutingContext(
+        directRequest,
+        router.graph,
+        temporaryVertices
+      );
 
       // Prepare access/egress transfers
       Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-              routingContext,
-              StreetMode.WALK,
-              false
+        routingContext,
+        StreetMode.WALK,
+        false
       );
       Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
-              routingContext,
-              StreetMode.WALK,
-              true
+        routingContext,
+        StreetMode.WALK,
+        true
       );
 
       FlexRouter flexRouter = new FlexRouter(
-              router.graph,
-              router.routerConfig.flexParameters(request),
-              directRequest.getDateTime(),
-              directRequest.arriveBy,
-              additionalSearchDays.additionalSearchDaysInPast(),
-              additionalSearchDays.additionalSearchDaysInFuture(),
-              accessStops,
-              egressStops
+        router.graph,
+        router.routerConfig.flexParameters(request),
+        directRequest.getDateTime(),
+        directRequest.arriveBy,
+        additionalSearchDays.additionalSearchDaysInPast(),
+        additionalSearchDays.additionalSearchDaysInFuture(),
+        accessStops,
+        egressStops
       );
 
       return new ArrayList<>(flexRouter.createFlexOnlyItineraries());

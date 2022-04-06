@@ -32,149 +32,147 @@ import org.slf4j.LoggerFactory;
  */
 public class Router {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
-    private final RoutingRequest defaultRoutingRequest;
-    public final Graph graph;
-    public final RouterConfig routerConfig;
-    public final MeterRegistry meterRegistry;
-    public final RaptorConfig<TripSchedule> raptorConfig;
+  private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
+  private final RoutingRequest defaultRoutingRequest;
+  public final Graph graph;
+  public final RouterConfig routerConfig;
+  public final MeterRegistry meterRegistry;
+  public final RaptorConfig<TripSchedule> raptorConfig;
 
-    /**
-     *  Separate logger for incoming requests. This should be handled with a Logback logger
-     *  rather than something simple like a PrintStream because requests come in multi-threaded.
-     */
-    public ch.qos.logback.classic.Logger requestLogger = null;
+  /**
+   * Separate logger for incoming requests. This should be handled with a Logback logger rather than
+   * something simple like a PrintStream because requests come in multi-threaded.
+   */
+  public ch.qos.logback.classic.Logger requestLogger = null;
 
-    /* TODO The fields for "components" are slowly disappearing... maybe at some point a router
+  /* TODO The fields for "components" are slowly disappearing... maybe at some point a router
         will be nothing but configuration values tied to a Graph. */
 
-    /** Inspector/debug services */
-    public TileRendererManager tileRendererManager;
+  /** Inspector/debug services */
+  public TileRendererManager tileRendererManager;
 
-    /** A graphical window that is used for visualizing search progress (debugging). */
-    public GraphVisualizer graphVisualizer = null;
+  /** A graphical window that is used for visualizing search progress (debugging). */
+  public GraphVisualizer graphVisualizer = null;
 
-    public Router(Graph graph, RouterConfig routerConfig, MeterRegistry meterRegistry) {
-        this.graph = graph;
-        this.routerConfig = routerConfig;
-        this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
-        this.meterRegistry = meterRegistry;
-        this.raptorConfig = new RaptorConfig<>(
-            routerConfig.raptorTuningParameters(),
-            meterRegistry
-        );
+  public Router(Graph graph, RouterConfig routerConfig, MeterRegistry meterRegistry) {
+    this.graph = graph;
+    this.routerConfig = routerConfig;
+    this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
+    this.meterRegistry = meterRegistry;
+    this.raptorConfig = new RaptorConfig<>(routerConfig.raptorTuningParameters(), meterRegistry);
+  }
+
+  /*
+   * Below is functionality moved into Router from the "router lifecycle manager" interface and implementation.
+   * Current responsibilities are: 1) Binding proper services (depending on the configuration from command-line or
+   * JSON config files) and 2) starting / stopping real-time updaters (delegated to the GraphUpdaterConfigurator class).
+   */
+
+  /**
+   * Start up a new router once it has been created.
+   */
+  public void startup() {
+    this.tileRendererManager = new TileRendererManager(this.graph);
+
+    if (routerConfig.requestLogFile() != null) {
+      this.requestLogger = createLogger(routerConfig.requestLogFile());
+      LOG.info("Logging incoming requests at '{}'", routerConfig.requestLogFile());
+    } else {
+      LOG.info("Incoming requests will not be logged.");
     }
 
-    /*
-     * Below is functionality moved into Router from the "router lifecycle manager" interface and implementation.
-     * Current responsibilities are: 1) Binding proper services (depending on the configuration from command-line or
-     * JSON config files) and 2) starting / stopping real-time updaters (delegated to the GraphUpdaterConfigurator class).
-     */
-
-    /**
-     * Start up a new router once it has been created.
-     */
-    public void startup() {
-        this.tileRendererManager = new TileRendererManager(this.graph);
-
-        if (routerConfig.requestLogFile() != null) {
-            this.requestLogger = createLogger(routerConfig.requestLogFile());
-            LOG.info("Logging incoming requests at '{}'", routerConfig.requestLogFile());
-        } else {
-            LOG.info("Incoming requests will not be logged.");
-        }
-
-        /* Create transit layer for Raptor routing. Here we map the scheduled timetables. */
-        /* Realtime updates can be mapped similarly by a recurring operation in a GraphUpdater below. */
-        LOG.info("Creating transit layer for Raptor routing.");
-        if (graph.hasTransit && graph.index != null) {
-            graph.setTransitLayer(TransitLayerMapper.map(routerConfig.transitTuningParameters(), graph));
-            graph.setRealtimeTransitLayer(new TransitLayer(graph.getTransitLayer()));
-            graph.transitLayerUpdater = new TransitLayerUpdater(
-                graph,
-                graph.index.getServiceCodesRunningForDate()
-            );
-        } else {
-            LOG.warn("Cannot create Raptor data, that requires the graph to have transit data and be indexed.");
-        }
-
-        /* Create Graph updater modules from JSON config. */
-        GraphUpdaterConfigurator.setupGraph(
-            this.graph,
-            routerConfig.updaterConfig()
-        );
-
-        /* Compute ellipsoidToGeoidDifference for this Graph */
-        try {
-            WorldEnvelope env = graph.getEnvelope();
-            double lat = (env.getLowerLeftLatitude() + env.getUpperRightLatitude()) / 2;
-            double lon = (env.getLowerLeftLongitude() + env.getUpperRightLongitude()) / 2;
-            graph.ellipsoidToGeoidDifference = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
-            LOG.info("Computed ellipsoid/geoid offset at (" + lat + ", " + lon + ") as " + graph.ellipsoidToGeoidDifference);
-        } catch (Exception e) {
-            LOG.error("Error computing ellipsoid/geoid difference");
-        }
-
-        if(OTPFeature.SandboxAPITransmodelApi.isOn()) {
-            TransmodelAPI.setUp(
-                routerConfig.transmodelApi(),
-                graph,
-                defaultRoutingRequest
-            );
-        }
-
-        if (OTPFeature.SandboxAPIGeocoder.isOn()) {
-            LOG.info("Creating debug client geocoder lucene index");
-            LuceneIndex.forServer(this);
-        }
+    /* Create transit layer for Raptor routing. Here we map the scheduled timetables. */
+    /* Realtime updates can be mapped similarly by a recurring operation in a GraphUpdater below. */
+    LOG.info("Creating transit layer for Raptor routing.");
+    if (graph.hasTransit && graph.index != null) {
+      graph.setTransitLayer(TransitLayerMapper.map(routerConfig.transitTuningParameters(), graph));
+      graph.setRealtimeTransitLayer(new TransitLayer(graph.getTransitLayer()));
+      graph.transitLayerUpdater =
+        new TransitLayerUpdater(graph, graph.index.getServiceCodesRunningForDate());
+    } else {
+      LOG.warn(
+        "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
+      );
     }
 
-    /**
-     * A RoutingRequest containing default parameters that will be cloned when handling each
-     * request.
-     */
-    public RoutingRequest copyDefaultRoutingRequest() {
-        var copy = this.defaultRoutingRequest.clone();
-        copy.setDateTime(Instant.now());
-        return copy;
+    /* Create Graph updater modules from JSON config. */
+    GraphUpdaterConfigurator.setupGraph(this.graph, routerConfig.updaterConfig());
+
+    /* Compute ellipsoidToGeoidDifference for this Graph */
+    try {
+      WorldEnvelope env = graph.getEnvelope();
+      double lat = (env.getLowerLeftLatitude() + env.getUpperRightLatitude()) / 2;
+      double lon = (env.getLowerLeftLongitude() + env.getUpperRightLongitude()) / 2;
+      graph.ellipsoidToGeoidDifference = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
+      LOG.info(
+        "Computed ellipsoid/geoid offset at (" +
+        lat +
+        ", " +
+        lon +
+        ") as " +
+        graph.ellipsoidToGeoidDifference
+      );
+    } catch (Exception e) {
+      LOG.error("Error computing ellipsoid/geoid difference");
     }
 
-    /**
-     * Return the default routing request locale(without cloning the request).
-     */
-    public Locale getDefaultLocale() {
-        return this.defaultRoutingRequest.locale;
+    if (OTPFeature.SandboxAPITransmodelApi.isOn()) {
+      TransmodelAPI.setUp(routerConfig.transmodelApi(), graph, defaultRoutingRequest);
     }
 
-    /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */
-    public void shutdown() {
-        GraphUpdaterConfigurator.shutdownGraph(this.graph);
-        raptorConfig.shutdown();
+    if (OTPFeature.SandboxAPIGeocoder.isOn()) {
+      LOG.info("Creating debug client geocoder lucene index");
+      LuceneIndex.forServer(this);
     }
+  }
 
-    /**
-     * Programmatically (i.e. not in XML) create a Logback logger for requests happening on this router.
-     * http://stackoverflow.com/a/17215011/778449
-     */
-    private static ch.qos.logback.classic.Logger createLogger(String file) {
-        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-        PatternLayoutEncoder ple = new PatternLayoutEncoder();
-        ple.setPattern("%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %msg%n");
-        ple.setContext(lc);
-        ple.start();
-        FileAppender<ILoggingEvent> fileAppender = new FileAppender<>();
-        fileAppender.setFile(file);
-        fileAppender.setEncoder(ple);
-        fileAppender.setContext(lc);
-        fileAppender.start();
-        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("REQ_LOG");
-        logger.addAppender(fileAppender);
-        logger.setLevel(Level.INFO);
-        logger.setAdditive(false);
-        return logger;
-    }
+  /**
+   * A RoutingRequest containing default parameters that will be cloned when handling each request.
+   */
+  public RoutingRequest copyDefaultRoutingRequest() {
+    var copy = this.defaultRoutingRequest.clone();
+    copy.setDateTime(Instant.now());
+    return copy;
+  }
 
-    public double streetRoutingTimeoutSeconds() {
-        return  routerConfig.streetRoutingTimeoutSeconds();
-    }
+  /**
+   * Return the default routing request locale(without cloning the request).
+   */
+  public Locale getDefaultLocale() {
+    return this.defaultRoutingRequest.locale;
+  }
+
+  /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */
+  public void shutdown() {
+    GraphUpdaterConfigurator.shutdownGraph(this.graph);
+    raptorConfig.shutdown();
+  }
+
+  public double streetRoutingTimeoutSeconds() {
+    return routerConfig.streetRoutingTimeoutSeconds();
+  }
+
+  /**
+   * Programmatically (i.e. not in XML) create a Logback logger for requests happening on this
+   * router. http://stackoverflow.com/a/17215011/778449
+   */
+  private static ch.qos.logback.classic.Logger createLogger(String file) {
+    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+    PatternLayoutEncoder ple = new PatternLayoutEncoder();
+    ple.setPattern("%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %msg%n");
+    ple.setContext(lc);
+    ple.start();
+    FileAppender<ILoggingEvent> fileAppender = new FileAppender<>();
+    fileAppender.setFile(file);
+    fileAppender.setEncoder(ple);
+    fileAppender.setContext(lc);
+    fileAppender.start();
+    ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(
+      "REQ_LOG"
+    );
+    logger.addAppender(fileAppender);
+    logger.setLevel(Level.INFO);
+    logger.setAdditive(false);
+    return logger;
+  }
 }

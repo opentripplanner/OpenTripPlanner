@@ -22,21 +22,17 @@ import org.slf4j.LoggerFactory;
 class FlexStopLocationMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexStopLocationMapper.class);
-
-  private final FeedScopedIdFactory idFactory;
-
-  private final HashGridSpatialIndex<Stop> stopsSpatialIndex;
-
-
   /**
    * Key-value pair used until proper NeTEx support is added
    */
   private static final String FLEXIBLE_STOP_AREA_TYPE_KEY = "FlexibleStopAreaType";
-
   /**
    * Key-value pair used until proper NeTEx support is added
    */
-  private static final String UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE = "UnrestrictedPublicTransportAreas";
+  private static final String UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE =
+    "UnrestrictedPublicTransportAreas";
+  private final FeedScopedIdFactory idFactory;
+  private final HashGridSpatialIndex<Stop> stopsSpatialIndex;
 
   FlexStopLocationMapper(FeedScopedIdFactory idFactory, Collection<Stop> stops) {
     this.idFactory = idFactory;
@@ -52,22 +48,22 @@ class FlexStopLocationMapper {
    * dependent on a key/value in the NeTEx file, until proper NeTEx support is added.
    */
   StopLocation map(FlexibleStopPlace flexibleStopPlace) {
-
     Object area = flexibleStopPlace
-        .getAreas()
-        .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
-        .get(0);
+      .getAreas()
+      .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
+      .get(0);
     if (!(area instanceof FlexibleArea)) {
       LOG.warn(
-          "FlexibleStopPlace {} not mapped. Hail and ride areas are not currently supported.",
-          flexibleStopPlace.getId()
+        "FlexibleStopPlace {} not mapped. Hail and ride areas are not currently supported.",
+        flexibleStopPlace.getId()
       );
       return null;
     }
 
     Optional<KeyValueStructure> flexibleAreaType = Optional.empty();
     if (flexibleStopPlace.getKeyList() != null) {
-      flexibleAreaType = flexibleStopPlace
+      flexibleAreaType =
+        flexibleStopPlace
           .getKeyList()
           .getKeyValue()
           .stream()
@@ -75,12 +71,12 @@ class FlexStopLocationMapper {
           .findFirst();
     }
 
-    if (flexibleAreaType.isPresent()
-        && flexibleAreaType.get().getValue().equals(UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE)
+    if (
+      flexibleAreaType.isPresent() &&
+      flexibleAreaType.get().getValue().equals(UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE)
     ) {
       return mapStopsInFlexArea(flexibleStopPlace, (FlexibleArea) area);
-    }
-    else {
+    } else {
       return mapFlexArea(flexibleStopPlace, (FlexibleArea) area);
     }
   }
@@ -105,8 +101,8 @@ class FlexStopLocationMapper {
 
     for (Stop stop : stopsSpatialIndex.query(geometry.getEnvelopeInternal())) {
       Point p = GeometryUtils
-          .getGeometryFactory()
-          .createPoint(stop.getCoordinate().asJtsCoordinate());
+        .getGeometryFactory()
+        .createPoint(stop.getCoordinate().asJtsCoordinate());
       if (geometry.contains(p)) {
         result.addLocation(stop);
       }

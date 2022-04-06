@@ -5,10 +5,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.EgressPathView;
 
-
 /**
- * The purpose of this class is hold information about a destination arrival and
- * compute the values for arrival time and cost.
+ * The purpose of this class is hold information about a destination arrival and compute the values
+ * for arrival time and cost.
  * <p/>
  * Compared with the ParetoSet of each stop we need two extra criteria:
  * <ul>
@@ -27,63 +26,63 @@ import org.opentripplanner.transit.raptor.api.view.EgressPathView;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
-    private final ArrivalView<T> previous;
-    private final RaptorTransfer egress;
-    private final int arrivalTime;
-    private final int numberOfTransfers;
-    private final int cost;
 
+  private final ArrivalView<T> previous;
+  private final RaptorTransfer egress;
+  private final int arrivalTime;
+  private final int numberOfTransfers;
+  private final int cost;
 
-    public DestinationArrival(
-        RaptorTransfer egress,
-        ArrivalView<T> previous,
-        int arrivalTime,
-        int additionalCost
-    ) {
-        this.previous = previous;
-        this.egress = egress;
-        this.arrivalTime = arrivalTime;
-        this.numberOfTransfers = previous.round() - 1;
-        this.cost = previous.cost() + additionalCost;
-    }
+  public DestinationArrival(
+    RaptorTransfer egress,
+    ArrivalView<T> previous,
+    int arrivalTime,
+    int additionalCost
+  ) {
+    this.previous = previous;
+    this.egress = egress;
+    this.arrivalTime = arrivalTime;
+    this.numberOfTransfers = previous.round() - 1;
+    this.cost = previous.cost() + additionalCost;
+  }
 
-    @Override
-    public int stop() {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public int stop() {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public int round() {
-        return 1 + numberOfTransfers + egress.numberOfRides();
-    }
+  @Override
+  public int round() {
+    return 1 + numberOfTransfers + egress.numberOfRides();
+  }
 
-    @Override
-    public int arrivalTime() {
-        return arrivalTime;
-    }
+  @Override
+  public int arrivalTime() {
+    return arrivalTime;
+  }
 
-    @Override
-    public int cost() {
-        return cost;
-    }
+  @Override
+  public int cost() {
+    return cost;
+  }
 
-    @Override
-    public ArrivalView<T> previous() {
-        return previous;
-    }
+  @Override
+  public ArrivalView<T> previous() {
+    return previous;
+  }
 
-    @Override
-    public boolean arrivedAtDestination() {
-        return true;
-    }
+  @Override
+  public boolean arrivedAtDestination() {
+    return true;
+  }
 
-    @Override
-    public EgressPathView egressPath() {
-        return () -> egress;
-    }
+  @Override
+  public EgressPathView egressPath() {
+    return () -> egress;
+  }
 
-    @Override
-    public String toString() {
-        return asString();
-    }
+  @Override
+  public String toString() {
+    return asString();
+  }
 }

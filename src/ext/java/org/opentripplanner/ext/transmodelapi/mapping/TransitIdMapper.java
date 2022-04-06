@@ -1,17 +1,17 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.TransitEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.TransitEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransitIdMapper {
+
   private static final Logger LOG = LoggerFactory.getLogger(TransitIdMapper.class);
 
   private static String fixedFeedId = null;
@@ -37,7 +37,9 @@ public class TransitIdMapper {
   }
 
   public static List<FeedScopedId> mapIDsToDomain(Collection<String> ids) {
-    if (ids == null) { return null; }
+    if (ids == null) {
+      return null;
+    }
     List<FeedScopedId> list = new ArrayList<>();
     for (String id : ids) {
       list.add(mapIDToDomain(id));
@@ -73,27 +75,26 @@ public class TransitIdMapper {
 
     // Count each feedId
     Map<String, Integer> feedIds = entities
-        .stream()
-        .map(a -> a.getId().getFeedId())
-        .collect(Collectors.groupingBy(it -> it, Collectors.reducing(0, i -> 1, Integer::sum)));
+      .stream()
+      .map(a -> a.getId().getFeedId())
+      .collect(Collectors.groupingBy(it -> it, Collectors.reducing(0, i -> 1, Integer::sum)));
 
     if (feedIds.isEmpty()) {
       LOG.warn("No data, unable to resolve fixedFeedScope to use in the Transmodel GraphQL API.");
-    }
-    else if (feedIds.size() == 1) {
+    } else if (feedIds.size() == 1) {
       fixedFeedId = feedIds.keySet().iterator().next();
-    }
-    else {
+    } else {
       //noinspection OptionalGetWithoutIsPresent
       fixedFeedId = feedIds.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
       LOG.warn(
-          "More than one feedId exist in the list of agencies. The feed-id used by"
-          + "most agencies will be picked."
+        "More than one feedId exist in the list of agencies. The feed-id used by" +
+        "most agencies will be picked."
       );
     }
     LOG.info(
-        "Starting Transmodel GraphQL Schema with fixed FeedId: '" + fixedFeedId
-        + "'. All FeedScopedIds in API will be assumed to belong to this agency."
+      "Starting Transmodel GraphQL Schema with fixed FeedId: '" +
+      fixedFeedId +
+      "'. All FeedScopedIds in API will be assumed to belong to this agency."
     );
     return fixedFeedId;
   }

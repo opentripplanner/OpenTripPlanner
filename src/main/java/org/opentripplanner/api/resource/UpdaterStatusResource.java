@@ -20,42 +20,44 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 @Produces(MediaType.APPLICATION_JSON)
 public class UpdaterStatusResource {
 
-    private final Router router;
+  private final Router router;
 
-    public UpdaterStatusResource (
-            @Context OTPServer otpServer,
-            /**
-             * @deprecated The support for multiple routers are removed from OTP2.
-             * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-             */
-            @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
-    ) {
-        router = otpServer.getRouter();
+  public UpdaterStatusResource(
+    @Context OTPServer otpServer,
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+  ) {
+    router = otpServer.getRouter();
+  }
+
+  /** Return a list of all agencies in the graph. */
+  @GET
+  public Response getUpdaters() {
+    GraphUpdaterManager updaterManager = router.graph.updaterManager;
+    if (updaterManager == null) {
+      return Response.status(Response.Status.NOT_FOUND).entity("No updaters running.").build();
     }
+    return Response
+      .status(Response.Status.OK)
+      .entity(updaterManager.getUpdaterDescriptions())
+      .build();
+  }
 
-    /** Return a list of all agencies in the graph. */
-    @GET
-    public Response getUpdaters () {
-        GraphUpdaterManager updaterManager = router.graph.updaterManager;
-        if (updaterManager == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("No updaters running.").build();
-        }
-        return Response.status(Response.Status.OK).entity(updaterManager.getUpdaterDescriptions()).build();
+  /** Return status for a specific updater. */
+  @GET
+  @Path("/{updaterId}")
+  public Response getUpdaters(@PathParam("updaterId") int updaterId) {
+    GraphUpdaterManager updaterManager = router.graph.updaterManager;
+    if (updaterManager == null) {
+      return Response.status(Response.Status.NOT_FOUND).entity("No updaters running.").build();
     }
-
-    /** Return status for a specific updater. */
-    @GET
-    @Path("/{updaterId}")
-    public Response getUpdaters (@PathParam("updaterId") int updaterId) {
-        GraphUpdaterManager updaterManager = router.graph.updaterManager;
-        if (updaterManager == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("No updaters running.").build();
-        }
-        GraphUpdater updater = updaterManager.getUpdater(updaterId);
-        if (updater == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("No updater with that ID.").build();
-        }
-        return Response.status(Response.Status.OK).entity(updater.getClass()).build();
+    GraphUpdater updater = updaterManager.getUpdater(updaterId);
+    if (updater == null) {
+      return Response.status(Response.Status.NOT_FOUND).entity("No updater with that ID.").build();
     }
-
+    return Response.status(Response.Status.OK).entity(updater.getClass()).build();
+  }
 }

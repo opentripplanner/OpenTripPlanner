@@ -1,5 +1,10 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.BookingRule;
 import org.opentripplanner.model.BookingInfo;
@@ -7,78 +12,81 @@ import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.model.ContactInfo;
 
-import java.time.Duration;
-import java.time.LocalTime;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
 /** Responsible for mapping GTFS BookingRule into the OTP model. */
 class BookingRuleMapper {
 
-    private final Map<AgencyAndId, BookingInfo> cachedBookingInfos = new HashMap<>();
+  private final Map<AgencyAndId, BookingInfo> cachedBookingInfos = new HashMap<>();
 
-    /** Map from GTFS to OTP model, {@code null} safe.  */
-    BookingInfo map(
-            BookingRule rule
-    ) {
-        if (rule == null) {
-            return null;
-        }
-
-        return cachedBookingInfos.computeIfAbsent(rule.getId(), k -> new BookingInfo(
-                contactInfo(rule),
-                bookingMethods(),
-                earliestBookingTime(rule),
-                latestBookingTime(rule),
-                minimumBookingNotice(rule),
-                maximumBookingNotice(rule),
-                message(rule),
-                pickupMessage(rule),
-                dropOffMessage(rule)
-
-        ));
+  /** Map from GTFS to OTP model, {@code null} safe. */
+  BookingInfo map(BookingRule rule) {
+    if (rule == null) {
+      return null;
     }
 
-    private ContactInfo contactInfo(BookingRule rule) {
-        return new ContactInfo(null,
-                rule.getPhoneNumber(),
-                null,
-                null,
-                rule.getInfoUrl(),
-                rule.getUrl(),
-                null);
-    }
+    return cachedBookingInfos.computeIfAbsent(
+      rule.getId(),
+      k ->
+        new BookingInfo(
+          contactInfo(rule),
+          bookingMethods(),
+          earliestBookingTime(rule),
+          latestBookingTime(rule),
+          minimumBookingNotice(rule),
+          maximumBookingNotice(rule),
+          message(rule),
+          pickupMessage(rule),
+          dropOffMessage(rule)
+        )
+    );
+  }
 
-    private EnumSet<BookingMethod> bookingMethods() {
-        return null;
-    }
+  private ContactInfo contactInfo(BookingRule rule) {
+    return new ContactInfo(
+      null,
+      rule.getPhoneNumber(),
+      null,
+      null,
+      rule.getInfoUrl(),
+      rule.getUrl(),
+      null
+    );
+  }
 
-    private BookingTime earliestBookingTime(BookingRule rule) {
-        return new BookingTime(LocalTime.ofSecondOfDay(rule.getPriorNoticeStartTime()), rule.getPriorNoticeStartDay());
-    }
+  private EnumSet<BookingMethod> bookingMethods() {
+    return null;
+  }
 
-    private BookingTime latestBookingTime(BookingRule rule) {
-        return new BookingTime(LocalTime.ofSecondOfDay(rule.getPriorNoticeLastTime()), rule.getPriorNoticeLastDay());
-    }
+  private BookingTime earliestBookingTime(BookingRule rule) {
+    return new BookingTime(
+      LocalTime.ofSecondOfDay(rule.getPriorNoticeStartTime()),
+      rule.getPriorNoticeStartDay()
+    );
+  }
 
-    private Duration minimumBookingNotice(BookingRule rule) {
-        return Duration.ofSeconds(rule.getPriorNoticeDurationMin());
-    }
+  private BookingTime latestBookingTime(BookingRule rule) {
+    return new BookingTime(
+      LocalTime.ofSecondOfDay(rule.getPriorNoticeLastTime()),
+      rule.getPriorNoticeLastDay()
+    );
+  }
 
-    private Duration maximumBookingNotice(BookingRule rule) {
-        return Duration.ofSeconds(rule.getPriorNoticeDurationMax());
-    }
+  private Duration minimumBookingNotice(BookingRule rule) {
+    return Duration.ofSeconds(rule.getPriorNoticeDurationMin());
+  }
 
-    private String message(BookingRule rule) {
-        return rule.getMessage();
-    }
+  private Duration maximumBookingNotice(BookingRule rule) {
+    return Duration.ofSeconds(rule.getPriorNoticeDurationMax());
+  }
 
-    private String pickupMessage(BookingRule rule) {
-        return rule.getPickupMessage();
-    }
+  private String message(BookingRule rule) {
+    return rule.getMessage();
+  }
 
-    private String dropOffMessage(BookingRule rule) {
-        return rule.getDropOffMessage();
-    }
+  private String pickupMessage(BookingRule rule) {
+    return rule.getPickupMessage();
+  }
+
+  private String dropOffMessage(BookingRule rule) {
+    return rule.getDropOffMessage();
+  }
 }

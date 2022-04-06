@@ -5,5 +5,5 @@ public enum BookingMethod {
   CALL_OFFICE,
   ONLINE,
   PHONE_AT_STOP,
-  TEXT_MESSAGE
+  TEXT_MESSAGE,
 }

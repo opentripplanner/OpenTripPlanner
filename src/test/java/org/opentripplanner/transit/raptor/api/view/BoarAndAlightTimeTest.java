@@ -11,13 +11,10 @@ public class BoarAndAlightTimeTest {
   @Test
   public void testToString() {
     RaptorTripSchedule trip = TestTripSchedule
-            .schedule("11:30 11:40 11:50")
-            .pattern("L1", 2, 5, 3)
-            .build();
+      .schedule("11:30 11:40 11:50")
+      .pattern("L1", 2, 5, 3)
+      .build();
 
-    assertEquals(
-            "[5 ~ 11:40 11:50(10m) ~ 3]",
-            new BoardAndAlightTime(trip, 1, 2).toString()
-    );
+    assertEquals("[5 ~ 11:40 11:50(10m) ~ 3]", new BoardAndAlightTime(trip, 1, 2).toString());
   }
 }

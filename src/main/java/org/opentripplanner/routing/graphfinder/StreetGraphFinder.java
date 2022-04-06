@@ -32,51 +32,62 @@ public class StreetGraphFinder implements GraphFinder {
 
   @Override
   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
-      StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(radiusMeters);
-      findClosestUsingStreets(lat, lon, visitor, visitor.getSkipEdgeStrategy());
-      return visitor.stopsFound;
+    StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(radiusMeters);
+    findClosestUsingStreets(lat, lon, visitor, visitor.getSkipEdgeStrategy());
+    return visitor.stopsFound;
   }
 
   @Override
   public List<PlaceAtDistance> findClosestPlaces(
-    double lat, double lon, double radiusMeters, int maxResults, List<TransitMode> filterByModes,
-    List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
-    List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
+    double lat,
+    double lon,
+    double radiusMeters,
+    int maxResults,
+    List<TransitMode> filterByModes,
+    List<PlaceType> filterByPlaceTypes,
+    List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByRoutes,
+    List<String> filterByBikeRentalStations,
     RoutingService routingService
   ) {
-      PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(
-          routingService,
-          filterByModes,
-          filterByPlaceTypes,
-          filterByStops,
-          filterByRoutes,
-          filterByBikeRentalStations,
-          maxResults,
-          radiusMeters
-      );
-      SkipEdgeStrategy terminationStrategy = visitor.getSkipEdgeStrategy();
-      findClosestUsingStreets(lat, lon, visitor, terminationStrategy);
-      List<PlaceAtDistance> results = visitor.placesFound;
-      results.sort(Comparator.comparingDouble(pad -> pad.distance));
-      return results.subList(0, min(results.size(), maxResults));
+    PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(
+      routingService,
+      filterByModes,
+      filterByPlaceTypes,
+      filterByStops,
+      filterByRoutes,
+      filterByBikeRentalStations,
+      maxResults,
+      radiusMeters
+    );
+    SkipEdgeStrategy terminationStrategy = visitor.getSkipEdgeStrategy();
+    findClosestUsingStreets(lat, lon, visitor, terminationStrategy);
+    List<PlaceAtDistance> results = visitor.placesFound;
+    results.sort(Comparator.comparingDouble(pad -> pad.distance));
+    return results.subList(0, min(results.size(), maxResults));
   }
 
-    private void findClosestUsingStreets(
-            double lat, double lon, TraverseVisitor visitor, SkipEdgeStrategy skipEdgeStrategy
-    ) {
-        // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-        // TODO make a function that builds normal routing requests from profile requests
-        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        rr.from = new GenericLocation(null, null, lat, lon);rr.walkSpeed = 1;
-        rr.dominanceFunction = new DominanceFunction.LeastWalk();
-        rr.setNumItineraries(1);
-        // RR dateTime defaults to currentTime.
-        // If elapsed time is not capped, searches are very slow.
-        try (var temporaryVertices = new TemporaryVerticesContainer(graph, rr)) {
-            AStarBuilder.allDirections(skipEdgeStrategy)
-                .setTraverseVisitor(visitor)
-                .setContext(new RoutingContext(rr, graph, temporaryVertices))
-                .getShortestPathTree();
-        }
+  private void findClosestUsingStreets(
+    double lat,
+    double lon,
+    TraverseVisitor visitor,
+    SkipEdgeStrategy skipEdgeStrategy
+  ) {
+    // Make a normal OTP routing request so we can traverse edges and use GenericAStar
+    // TODO make a function that builds normal routing requests from profile requests
+    RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+    rr.from = new GenericLocation(null, null, lat, lon);
+    rr.walkSpeed = 1;
+    rr.dominanceFunction = new DominanceFunction.LeastWalk();
+    rr.setNumItineraries(1);
+    // RR dateTime defaults to currentTime.
+    // If elapsed time is not capped, searches are very slow.
+    try (var temporaryVertices = new TemporaryVerticesContainer(graph, rr)) {
+      AStarBuilder
+        .allDirections(skipEdgeStrategy)
+        .setTraverseVisitor(visitor)
+        .setContext(new RoutingContext(rr, graph, temporaryVertices))
+        .getShortestPathTree();
     }
+  }
 }

@@ -4,16 +4,16 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 
 public class QuayWithoutCoordinates implements DataImportIssue {
 
-    public static final String FMT = "Quay %s does not contain any coordinates.";
+  public static final String FMT = "Quay %s does not contain any coordinates.";
 
-    final String quayId;
+  final String quayId;
 
-    public QuayWithoutCoordinates(String quayId) {
-        this.quayId = quayId;
-    }
+  public QuayWithoutCoordinates(String quayId) {
+    this.quayId = quayId;
+  }
 
-    @Override
-    public String getMessage() {
-        return String.format(FMT, quayId);
-    }
+  @Override
+  public String getMessage() {
+    return String.format(FMT, quayId);
+  }
 }

@@ -9,37 +9,35 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
  */
 public class BrandingMapper {
 
-    private final FeedScopedIdFactory idFactory;
+  private final FeedScopedIdFactory idFactory;
 
-    public BrandingMapper(FeedScopedIdFactory idFactory) {
-        this.idFactory = idFactory;
-    }
+  public BrandingMapper(FeedScopedIdFactory idFactory) {
+    this.idFactory = idFactory;
+  }
 
-    /**
-     * Convert NeTEx Branding entity into OTP model.
-     *
-     * @param branding NeTEx branding entity
-     * @return OTP Branding model
-     */
-    public Branding mapBranding(org.rutebanken.netex.model.Branding branding) {
-        final FeedScopedId id = idFactory.createId(branding.getId());
+  /**
+   * Convert NeTEx Branding entity into OTP model.
+   *
+   * @param branding NeTEx branding entity
+   * @return OTP Branding model
+   */
+  public Branding mapBranding(org.rutebanken.netex.model.Branding branding) {
+    final FeedScopedId id = idFactory.createId(branding.getId());
 
-        final String shortName = branding.getShortName() != null ?
-                branding.getShortName().getValue()
-                : null;
+    final String shortName = branding.getShortName() != null
+      ? branding.getShortName().getValue()
+      : null;
 
-        final String name = branding.getName() != null ?
-                branding.getName().getValue()
-                : null;
+    final String name = branding.getName() != null ? branding.getName().getValue() : null;
 
-        final String description = branding.getDescription() != null ?
-                branding.getDescription().getValue()
-                : null;
+    final String description = branding.getDescription() != null
+      ? branding.getDescription().getValue()
+      : null;
 
-        final String url = branding.getUrl();
+    final String url = branding.getUrl();
 
-        final String image = branding.getImage();
+    final String image = branding.getImage();
 
-        return new Branding(id, shortName, name, url, description, image);
-    }
+    return new Branding(id, shortName, name, url, description, image);
+  }
 }

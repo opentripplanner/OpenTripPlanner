@@ -7,10 +7,10 @@ public class WFSNotePollingGraphUpdaterConfig {
 
   public static WFSNotePollingGraphUpdaterParameters create(String configRef, NodeAdapter c) {
     return new WFSNotePollingGraphUpdaterParameters(
-        configRef,
-        c.asText("url"),
-        c.asText("featureType"),
-        c.asInt("frequencySec", 60)
+      configRef,
+      c.asText("url"),
+      c.asText("featureType"),
+      c.asInt("frequencySec", 60)
     );
   }
 }

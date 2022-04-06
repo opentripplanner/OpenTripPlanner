@@ -11,66 +11,66 @@ import org.opentripplanner.model.StopLocation;
  */
 public class Ride {
 
-    FeedScopedId agency; // route agency
+  FeedScopedId agency; // route agency
 
-    FeedScopedId route;
+  FeedScopedId route;
 
-    FeedScopedId trip;
+  FeedScopedId trip;
 
-    Set<String> zones;
+  Set<String> zones;
 
-    String startZone;
+  String startZone;
 
-    String endZone;
+  String endZone;
 
-    ZonedDateTime startTime;
+  ZonedDateTime startTime;
 
-    ZonedDateTime endTime;
+  ZonedDateTime endTime;
 
-    // in DefaultFareServiceImpl classifier is just the TraverseMode
-    // it can be used differently in custom fare services
-    public Object classifier;
+  // in DefaultFareServiceImpl classifier is just the TraverseMode
+  // it can be used differently in custom fare services
+  public Object classifier;
 
-    public StopLocation firstStop;
+  public StopLocation firstStop;
 
-    public StopLocation lastStop;
+  public StopLocation lastStop;
 
-    public Ride() {
-        zones = new HashSet<>();
+  public Ride() {
+    zones = new HashSet<>();
+  }
+
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Ride");
+    if (startZone != null) {
+      builder.append("(from zone ");
+      builder.append(startZone);
     }
-
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Ride");
-        if (startZone != null) {
-            builder.append("(from zone ");
-            builder.append(startZone);
-        }
-        if (endZone != null) {
-            builder.append(" to zone ");
-            builder.append(endZone);
-        }
-        builder.append(" on route ");
-        builder.append(route);
-        if (zones.size() > 0) {
-            builder.append(" through zones ");
-            boolean first = true;
-            for (String zone : zones) {
-                if (first) {
-                    first = false;
-                } else {
-                    builder.append(",");
-                }
-                builder.append(zone);
-            }
-        }
-        builder.append(" at ");
-        builder.append(startTime);
-        if (classifier != null) {
-            builder.append(", classified by ");
-            builder.append(classifier.toString());
-        }
-        builder.append(")");
-        return builder.toString();
+    if (endZone != null) {
+      builder.append(" to zone ");
+      builder.append(endZone);
     }
+    builder.append(" on route ");
+    builder.append(route);
+    if (zones.size() > 0) {
+      builder.append(" through zones ");
+      boolean first = true;
+      for (String zone : zones) {
+        if (first) {
+          first = false;
+        } else {
+          builder.append(",");
+        }
+        builder.append(zone);
+      }
+    }
+    builder.append(" at ");
+    builder.append(startTime);
+    if (classifier != null) {
+      builder.append(", classified by ");
+      builder.append(classifier.toString());
+    }
+    builder.append(")");
+    return builder.toString();
+  }
 }

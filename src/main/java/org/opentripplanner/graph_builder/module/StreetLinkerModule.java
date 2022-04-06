@@ -28,18 +28,17 @@ import org.slf4j.LoggerFactory;
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links various
  * objects in the graph to the street network. It should be run after both the transit network and
  * street network are loaded. It links four things: transit stops, transit entrances, bike rental
- * stations, and bike parks. Therefore it should be run even when there's no GTFS data present
- * to make bike rental services and bike parks usable.
+ * stations, and bike parks. Therefore it should be run even when there's no GTFS data present to
+ * make bike rental services and bike parks usable.
  */
 public class StreetLinkerModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetLinkerModule.class);
+  private Boolean addExtraEdgesToAreas = true;
 
   public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
   }
-
-  private Boolean addExtraEdgesToAreas = true;
 
   public List<String> provides() {
     return Arrays.asList("street to transit", "linking");
@@ -53,7 +52,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph(
-      Graph graph, HashMap<Class<?>, Object> extra, DataImportIssueStore issueStore
+    Graph graph,
+    HashMap<Class<?>, Object> extra,
+    DataImportIssueStore issueStore
   ) {
     graph.getLinker().setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
 
@@ -67,6 +68,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.calculateConvexHull();
   }
 
+  @Override
+  public void checkInputs() {
+    //no inputs
+  }
 
   public void linkTransitStops(Graph graph) {
     List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
@@ -74,7 +79,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info(progress.startMessage());
 
     for (TransitStopVertex tStop : vertices) {
-
       // Stops with pathways do not need to be connected to the street network, since there are explicit entraces defined for that
       if (tStop.hasPathways()) {
         continue;
@@ -93,33 +97,74 @@ public class StreetLinkerModule implements GraphBuilderModule {
         }
       }
 
-      graph.getLinker().linkVertexPermanently(
+      graph
+        .getLinker()
+        .linkVertexPermanently(
           tStop,
           modes,
           LinkingDirection.BOTH_WAYS,
-          (vertex, streetVertex) -> List.of(
+          (vertex, streetVertex) ->
+            List.of(
               new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
               new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
-          )
-      );
+            )
+        );
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
   }
 
+  private static void linkVehicleParkingWithLinker(
+    Graph graph,
+    VehicleParkingEntranceVertex vehicleParkingVertex
+  ) {
+    if (vehicleParkingVertex.isWalkAccessible()) {
+      graph
+        .getLinker()
+        .linkVertexPermanently(
+          vehicleParkingVertex,
+          new TraverseModeSet(TraverseMode.WALK),
+          LinkingDirection.BOTH_WAYS,
+          (vertex, streetVertex) ->
+            List.of(
+              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
+              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+            )
+        );
+    }
+
+    if (vehicleParkingVertex.isCarAccessible()) {
+      graph
+        .getLinker()
+        .linkVertexPermanently(
+          vehicleParkingVertex,
+          new TraverseModeSet(TraverseMode.CAR),
+          LinkingDirection.BOTH_WAYS,
+          (vertex, streetVertex) ->
+            List.of(
+              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
+              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+            )
+        );
+    }
+  }
+
   private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
-      graph.getLinker().linkVertexPermanently(
+      graph
+        .getLinker()
+        .linkVertexPermanently(
           tEntrance,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BOTH_WAYS,
-          (vertex, streetVertex) -> List.of(
+          (vertex, streetVertex) ->
+            List.of(
               new StreetTransitEntranceLink((TransitEntranceVertex) vertex, streetVertex),
               new StreetTransitEntranceLink(streetVertex, (TransitEntranceVertex) vertex)
-          )
-      );
+            )
+        );
     }
   }
 
@@ -130,8 +175,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
     LOG.info("Linking vehicle parks to graph...");
     for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
-        VehicleParkingEntranceVertex.class)) {
-
+      VehicleParkingEntranceVertex.class
+    )) {
       if (vehicleParkingEntranceHasLinks(vehicleParkingEntranceVertex)) {
         continue;
       }
@@ -146,61 +191,52 @@ public class StreetLinkerModule implements GraphBuilderModule {
         continue;
       }
 
-      issueStore.add(new ParkAndRideEntranceRemoved(vehicleParkingEntranceVertex.getParkingEntrance()));
+      issueStore.add(
+        new ParkAndRideEntranceRemoved(vehicleParkingEntranceVertex.getParkingEntrance())
+      );
       removeVehicleParkingEntranceVertexFromGraph(vehicleParkingEntranceVertex, graph);
-
     }
     graph.hasLinkedBikeParks = true;
   }
 
-  private boolean vehicleParkingEntranceHasLinks(VehicleParkingEntranceVertex vehicleParkingEntranceVertex) {
-    return !(vehicleParkingEntranceVertex.getIncoming().stream().allMatch(VehicleParkingEdge.class::isInstance)
-            && vehicleParkingEntranceVertex.getOutgoing().stream().allMatch(VehicleParkingEdge.class::isInstance));
+  private boolean vehicleParkingEntranceHasLinks(
+    VehicleParkingEntranceVertex vehicleParkingEntranceVertex
+  ) {
+    return !(
+      vehicleParkingEntranceVertex
+        .getIncoming()
+        .stream()
+        .allMatch(VehicleParkingEdge.class::isInstance) &&
+      vehicleParkingEntranceVertex
+        .getOutgoing()
+        .stream()
+        .allMatch(VehicleParkingEdge.class::isInstance)
+    );
   }
 
-  private static void linkVehicleParkingWithLinker(Graph graph, VehicleParkingEntranceVertex vehicleParkingVertex) {
-    if (vehicleParkingVertex.isWalkAccessible()) {
-      graph.getLinker().linkVertexPermanently(
-              vehicleParkingVertex,
-              new TraverseModeSet(TraverseMode.WALK),
-              LinkingDirection.BOTH_WAYS, (vertex, streetVertex) -> List.of(
-                      new StreetVehicleParkingLink(
-                              (VehicleParkingEntranceVertex) vertex, streetVertex),
-                      new StreetVehicleParkingLink(
-                              streetVertex, (VehicleParkingEntranceVertex) vertex)
-              )
+  private void removeVehicleParkingEntranceVertexFromGraph(
+    VehicleParkingEntranceVertex vehicleParkingEntranceVertex,
+    Graph graph
+  ) {
+    var vehicleParkingEdge = vehicleParkingEntranceVertex
+      .getOutgoing()
+      .stream()
+      .filter(VehicleParkingEdge.class::isInstance)
+      .map(VehicleParkingEdge.class::cast)
+      .findFirst()
+      .orElseThrow(() ->
+        new IllegalStateException(
+          "VehicleParkingEdge missing from vertex: " + vehicleParkingEntranceVertex
+        )
       );
-    }
-
-    if (vehicleParkingVertex.isCarAccessible()) {
-      graph.getLinker().linkVertexPermanently(
-              vehicleParkingVertex,
-              new TraverseModeSet(TraverseMode.CAR),
-              LinkingDirection.BOTH_WAYS,
-              (vertex, streetVertex) -> List.of(
-                      new StreetVehicleParkingLink(
-                              (VehicleParkingEntranceVertex) vertex, streetVertex),
-                      new StreetVehicleParkingLink(
-                              streetVertex, (VehicleParkingEntranceVertex) vertex)
-              )
-      );
-    }
-  }
-
-  private void removeVehicleParkingEntranceVertexFromGraph(VehicleParkingEntranceVertex vehicleParkingEntranceVertex, Graph graph) {
-    var vehicleParkingEdge =
-        vehicleParkingEntranceVertex.getOutgoing().stream()
-            .filter(VehicleParkingEdge.class::isInstance)
-            .map(VehicleParkingEdge.class::cast)
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("VehicleParkingEdge missing from vertex: " + vehicleParkingEntranceVertex));
 
     var entrance = vehicleParkingEntranceVertex.getParkingEntrance();
 
     var vehicleParking = vehicleParkingEdge.getVehicleParking();
 
-    boolean removeVehicleParking = vehicleParking.getEntrances().size() == 1
-        && vehicleParking.getEntrances().get(0).equals(entrance);
+    boolean removeVehicleParking =
+      vehicleParking.getEntrances().size() == 1 &&
+      vehicleParking.getEntrances().get(0).equals(entrance);
 
     vehicleParkingEntranceVertex.getIncoming().forEach(graph::removeEdge);
     vehicleParkingEntranceVertex.getOutgoing().forEach(graph::removeEdge);
@@ -212,10 +248,5 @@ public class StreetLinkerModule implements GraphBuilderModule {
     } else {
       vehicleParking.getEntrances().remove(entrance);
     }
-  }
-
-  @Override
-  public void checkInputs() {
-    //no inputs
   }
 }

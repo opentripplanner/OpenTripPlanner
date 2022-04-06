@@ -7,19 +7,19 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripMod
 import org.opentripplanner.model.Trip;
 
 public class LegacyGraphQLStopOnTripImpl
-        implements LegacyGraphQLDataFetchers.LegacyGraphQLStopOnTrip {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLStopOnTrip {
 
-    @Override
-    public DataFetcher<Object> stop() {
-        return environment -> getSource(environment).getStop();
-    }
+  @Override
+  public DataFetcher<Object> stop() {
+    return environment -> getSource(environment).getStop();
+  }
 
-    @Override
-    public DataFetcher<Trip> trip() {
-        return environment -> getSource(environment).getTrip();
-    }
+  @Override
+  public DataFetcher<Trip> trip() {
+    return environment -> getSource(environment).getTrip();
+  }
 
-    private LegacyGraphQLStopOnTripModel getSource(DataFetchingEnvironment environment) {
-        return environment.getSource();
-    }
+  private LegacyGraphQLStopOnTripModel getSource(DataFetchingEnvironment environment) {
+    return environment.getSource();
+  }
 }

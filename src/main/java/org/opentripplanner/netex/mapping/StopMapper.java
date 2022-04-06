@@ -20,10 +20,7 @@ class StopMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  StopMapper(
-          FeedScopedIdFactory idFactory,
-          DataImportIssueStore issueStore
-  ) {
+  StopMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
   }
@@ -33,11 +30,11 @@ class StopMapper {
    */
   @Nullable
   Stop mapQuayToStop(
-          Quay quay,
-          Station parentStation,
-          Collection<FareZone> fareZones,
-          T2<TransitMode, String> transitMode,
-          WheelChairBoarding wheelChairBoarding
+    Quay quay,
+    Station parentStation,
+    Collection<FareZone> fareZones,
+    T2<TransitMode, String> transitMode,
+    WheelChairBoarding wheelChairBoarding
   ) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
@@ -47,25 +44,23 @@ class StopMapper {
     }
 
     Stop stop = new Stop(
-            idFactory.createId(quay.getId()),
-            parentStation.getName(),
-            quay.getPublicCode(),
-            quay.getDescription() != null ? quay.getDescription().getValue() : null,
-            WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
-            wheelChairBoarding,
-            null,
-            null,
-            fareZones,
-            null,
-            null,
-            transitMode.first,
-            transitMode.second
+      idFactory.createId(quay.getId()),
+      parentStation.getName(),
+      quay.getPublicCode(),
+      quay.getDescription() != null ? quay.getDescription().getValue() : null,
+      WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
+      wheelChairBoarding,
+      null,
+      null,
+      fareZones,
+      null,
+      null,
+      transitMode.first,
+      transitMode.second
     );
 
     stop.setParentStation(parentStation);
 
     return stop;
   }
-
-
 }

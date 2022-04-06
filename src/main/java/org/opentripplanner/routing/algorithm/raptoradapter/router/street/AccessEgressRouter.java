@@ -16,39 +16,41 @@ import org.slf4j.LoggerFactory;
  * This uses a street search to find paths to all the access/egress stop within range
  */
 public class AccessEgressRouter {
-    private static final Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
 
-    private AccessEgressRouter() {}
+  private static final Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
 
-    /**
-     *
-     * @param rctx the current routing context
-     * @param fromTarget whether to route from or towards the point provided in the routing request
-     *                   (access or egress)
-     * @return Transfer objects by access/egress stop
-     */
-    public static Collection<NearbyStop> streetSearch(
-        RoutingContext rctx, StreetMode streetMode, boolean fromTarget
-    ) {
-        final RoutingRequest rr = rctx.opt;
-        Set<Vertex> vertices = fromTarget != rr.arriveBy ? rctx.toVertices : rctx.fromVertices;
+  private AccessEgressRouter() {}
 
-        //TODO: Investigate why this is needed for flex
-        RoutingRequest nearbyRequest = rr.getStreetSearchRequest(streetMode);
+  /**
+   * @param rctx       the current routing context
+   * @param fromTarget whether to route from or towards the point provided in the routing request
+   *                   (access or egress)
+   * @return Transfer objects by access/egress stop
+   */
+  public static Collection<NearbyStop> streetSearch(
+    RoutingContext rctx,
+    StreetMode streetMode,
+    boolean fromTarget
+  ) {
+    final RoutingRequest rr = rctx.opt;
+    Set<Vertex> vertices = fromTarget != rr.arriveBy ? rctx.toVertices : rctx.fromVertices;
 
-        NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
-            rctx.graph,
-            rr.getMaxAccessEgressDuration(streetMode),
-            true
-        );
-        List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
-            vertices,
-            fromTarget,
-            nearbyRequest
-        );
+    //TODO: Investigate why this is needed for flex
+    RoutingRequest nearbyRequest = rr.getStreetSearchRequest(streetMode);
 
-        LOG.debug("Found {} {} stops", nearbyStopList.size(), fromTarget ? "egress" : "access");
+    NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
+      rctx.graph,
+      rr.getMaxAccessEgressDuration(streetMode),
+      true
+    );
+    List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
+      vertices,
+      fromTarget,
+      nearbyRequest
+    );
 
-        return nearbyStopList;
-    }
+    LOG.debug("Found {} {} stops", nearbyStopList.size(), fromTarget ? "egress" : "access");
+
+    return nearbyStopList;
+  }
 }

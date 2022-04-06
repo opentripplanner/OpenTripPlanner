@@ -8,15 +8,15 @@ import org.opentripplanner.routing.graph.Edge;
  * of stops visited. Only one needs to be skipped in order for {@link
  * SkipEdgeStrategy#shouldSkipEdge(State, Edge)} to return null.
  */
-public record ComposingSkipEdgeStrategy(SkipEdgeStrategy... strategies) implements SkipEdgeStrategy {
-
-    @Override
-    public boolean shouldSkipEdge(State current, Edge edge) {
-        for (var strategy : strategies) {
-            if (strategy.shouldSkipEdge(current, edge)) {
-                return true;
-            }
-        }
-        return false;
+public record ComposingSkipEdgeStrategy(SkipEdgeStrategy... strategies)
+  implements SkipEdgeStrategy {
+  @Override
+  public boolean shouldSkipEdge(State current, Edge edge) {
+    for (var strategy : strategies) {
+      if (strategy.shouldSkipEdge(current, edge)) {
+        return true;
+      }
     }
+    return false;
+  }
 }

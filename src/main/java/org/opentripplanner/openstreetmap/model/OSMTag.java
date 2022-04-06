@@ -5,8 +5,7 @@ public class OSMTag {
   private String k;
   private String v;
 
-  public OSMTag() {
-  }
+  public OSMTag() {}
 
   public OSMTag(String k, String v) {
     this.k = k;

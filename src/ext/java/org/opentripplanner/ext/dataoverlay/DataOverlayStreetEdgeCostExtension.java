@@ -22,123 +22,127 @@ import org.slf4j.LoggerFactory;
  */
 class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Serializable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataOverlayStreetEdgeCostExtension.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+    DataOverlayStreetEdgeCostExtension.class
+  );
 
-    private final long dataStartTime;
-    private final Map<String, float[]> variableValues;
-    private final TimeUnit timeUnit;
+  private final long dataStartTime;
+  private final Map<String, float[]> variableValues;
+  private final TimeUnit timeUnit;
 
-    /**
-     * Sets the abstract grid data
-     *
-     * @param dataStartTime  the time when the grid records start
-     * @param variableValues map of variable names and arrays of their values
-     * @param timeUnit       time unit of the data overlay
-     */
-    DataOverlayStreetEdgeCostExtension(
-            long dataStartTime,
-            Map<String, float[]> variableValues,
-            TimeUnit timeUnit
-    ) {
-        this.dataStartTime = dataStartTime;
-        this.variableValues = variableValues;
-        this.timeUnit = timeUnit;
+  /**
+   * Sets the abstract grid data
+   *
+   * @param dataStartTime  the time when the grid records start
+   * @param variableValues map of variable names and arrays of their values
+   * @param timeUnit       time unit of the data overlay
+   */
+  DataOverlayStreetEdgeCostExtension(
+    long dataStartTime,
+    Map<String, float[]> variableValues,
+    TimeUnit timeUnit
+  ) {
+    this.dataStartTime = dataStartTime;
+    this.variableValues = variableValues;
+    this.timeUnit = timeUnit;
+  }
+
+  @Override
+  public double calculateExtraCost(
+    RoutingContext context,
+    int edgeLength,
+    TraverseMode traverseMode
+  ) {
+    if (traverseMode.isWalking() || traverseMode.isCycling()) {
+      return calculateDataOverlayPenalties(context) * edgeLength / 1000;
     }
+    return 0d;
+  }
 
-    @Override
-    public double calculateExtraCost(
-            RoutingContext context,
-            int edgeLength,
-            TraverseMode traverseMode
-    ) {
-        if (traverseMode.isWalking() || traverseMode.isCycling()) {
-            return calculateDataOverlayPenalties(context) * edgeLength/1000;
-        }
-        return 0d;
+  /**
+   * Calculates the total penalties based on request parameters and overlay data
+   *
+   * @return total penalty
+   */
+  private double calculateDataOverlayPenalties(RoutingContext routingContext) {
+    if (variableValues == null) {
+      return 0d;
     }
+    double totalPenalty = 0d;
+    Instant requestInstant = routingContext.opt.getDateTime();
+    var context = routingContext.dataOverlayContext;
 
-    /**
-     * Calculates the total penalties based on request parameters and overlay data
-     *
-     * @return total penalty
-     */
-    private double calculateDataOverlayPenalties(RoutingContext routingContext) {
-        if(variableValues == null) { return 0d; }
-        double totalPenalty = 0d;
-        Instant requestInstant = routingContext.opt.getDateTime();
-        var context = routingContext.dataOverlayContext;
+    for (Parameter parameter : context.getParameters()) {
+      var threshold = parameter.getThreshold();
+      var penalty = parameter.getPenalty();
+      String indexVariableName = parameter.getVariable();
 
-        for (Parameter parameter : context.getParameters()) {
-            var threshold = parameter.getThreshold();
-            var penalty = parameter.getPenalty();
-            String indexVariableName = parameter.getVariable();
+      long dataStartTime = 0;
+      float[] genDataValuesForTime = new float[0];
 
-            long dataStartTime = 0;
-            float[] genDataValuesForTime = new float[0];
+      if (variableValues.containsKey(indexVariableName)) {
+        dataStartTime = this.dataStartTime;
+        genDataValuesForTime = variableValues.get(indexVariableName);
+      }
 
-            if (variableValues.containsKey(indexVariableName)) {
-                dataStartTime = this.dataStartTime;
-                genDataValuesForTime = variableValues.get(indexVariableName);
-            }
+      //calculate time format based on the input file settings
+      Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
+      int dataQualityRequestedTime = timeUnit.between(aqiTimeInstant, requestInstant);
 
-            //calculate time format based on the input file settings
-            Instant aqiTimeInstant = Instant.ofEpochMilli(dataStartTime);
-            int dataQualityRequestedTime = timeUnit.between(aqiTimeInstant, requestInstant);
+      if (dataQualityRequestedTime >= 0) {
+        if (dataQualityRequestedTime < genDataValuesForTime.length) {
+          float value = genDataValuesForTime[dataQualityRequestedTime];
+          String penaltyFormulaString = parameter.getFormula();
 
-            if (dataQualityRequestedTime >= 0) {
-                if (dataQualityRequestedTime < genDataValuesForTime.length) {
-                    float value = genDataValuesForTime[dataQualityRequestedTime];
-                    String penaltyFormulaString = parameter.getFormula();
+          double penaltyForParameters = calculatePenaltyFromParameters(
+            penaltyFormulaString,
+            value,
+            threshold,
+            penalty
+          );
 
-                    double penaltyForParameters =
-                            calculatePenaltyFromParameters(
-                                    penaltyFormulaString,
-                                    value,
-                                    threshold,
-                                    penalty
-                            );
-
-                    if (penaltyForParameters >= 0) {
-                        totalPenalty += penaltyForParameters;
-                    }
-                }
-                else {
-                    LOG.warn("No available data overlay for the given time");
-                }
-            }
+          if (penaltyForParameters >= 0) {
+            totalPenalty += penaltyForParameters;
+          }
+        } else {
+          LOG.warn("No available data overlay for the given time");
         }
-        return totalPenalty;
+      }
     }
+    return totalPenalty;
+  }
 
+  /**
+   * Uses the formula from the penalty parameter and calculates the penalty based on that
+   *
+   * @param formula   penalty formula
+   * @param value     data
+   * @param threshold threshold parameter value
+   * @param penalty   penalty parameter value
+   * @return penalty
+   */
+  private double calculatePenaltyFromParameters(
+    String formula,
+    float value,
+    double threshold,
+    double penalty
+  ) {
+    Map<String, Double> variables = new HashMap<>();
 
-    /**
-     * Uses the formula from the penalty parameter and calculates the penalty based on that
-     *
-     * @param formula penalty formula
-     * @param value data
-     * @param threshold threshold parameter value
-     * @param penalty penalty parameter value
-     * @return penalty
-     */
-    private double calculatePenaltyFromParameters (
-            String formula, float value, double threshold, double penalty
-    ){
-        Map<String, Double> variables = new HashMap<>();
+    variables.put("THRESHOLD", threshold);
+    variables.put("PENALTY", penalty);
+    variables.put("VALUE", (double) value);
 
-        variables.put("THRESHOLD", threshold);
-        variables.put("PENALTY", penalty);
-        variables.put("VALUE", (double) value);
-
-        try {
-            Expression expression = new ExpressionBuilder(formula)
-                    .variables(variables.keySet().toArray(new String[0]))
-                    .build()
-                    .setVariables(variables);
-            return expression.evaluate();
-
-        }
-        catch (UnknownFunctionOrVariableException ex){
-            throw new IllegalArgumentException(String.format("Formula %s did not receive all the required parameters", formula));
-        }
+    try {
+      Expression expression = new ExpressionBuilder(formula)
+        .variables(variables.keySet().toArray(new String[0]))
+        .build()
+        .setVariables(variables);
+      return expression.evaluate();
+    } catch (UnknownFunctionOrVariableException ex) {
+      throw new IllegalArgumentException(
+        String.format("Formula %s did not receive all the required parameters", formula)
+      );
     }
+  }
 }

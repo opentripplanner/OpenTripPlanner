@@ -8,13 +8,13 @@ import org.opentripplanner.model.plan.Itinerary;
  */
 public class RemoveWalkOnlyFilter implements ItineraryDeletionFlagger {
 
-    @Override
-    public String name() {
-        return "remove-walk-only-filter";
-    }
+  @Override
+  public String name() {
+    return "remove-walk-only-filter";
+  }
 
-    @Override
-    public Predicate<Itinerary> predicate() {
-        return Itinerary::isWalkingAllTheWay;
-    }
+  @Override
+  public Predicate<Itinerary> predicate() {
+    return Itinerary::isWalkingAllTheWay;
+  }
 }

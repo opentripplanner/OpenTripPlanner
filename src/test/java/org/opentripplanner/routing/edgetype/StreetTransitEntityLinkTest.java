@@ -21,61 +21,62 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 class StreetTransitEntityLinkTest {
 
-    Graph graph = new Graph();
+  Graph graph = new Graph();
 
-    Stop inaccessibleStop =
-            Stop.stopForTest("A:inaccessible", "wheelchair inaccessible stop", 10.001,
-                    10.001, null, NOT_POSSIBLE
-            );
-    Stop accessibleStop =
-            Stop.stopForTest("A:accessible", "wheelchair accessible stop", 10.001,
-                    10.001, null, POSSIBLE
-            );
+  Stop inaccessibleStop = Stop.stopForTest(
+    "A:inaccessible",
+    "wheelchair inaccessible stop",
+    10.001,
+    10.001,
+    null,
+    NOT_POSSIBLE
+  );
+  Stop accessibleStop = Stop.stopForTest(
+    "A:accessible",
+    "wheelchair accessible stop",
+    10.001,
+    10.001,
+    null,
+    POSSIBLE
+  );
 
-    Stop unknownStop =
-            Stop.stopForTest("A:unknown", "unknown", 10.001,
-                    10.001, null, NO_INFORMATION
-            );
+  Stop unknownStop = Stop.stopForTest("A:unknown", "unknown", 10.001, 10.001, null, NO_INFORMATION);
 
-    @Test
-    void disallowInaccessibleStop() {
-        var afterTraversal = traverse(inaccessibleStop, true);
-        assertNull(afterTraversal);
-    }
+  @Test
+  void disallowInaccessibleStop() {
+    var afterTraversal = traverse(inaccessibleStop, true);
+    assertNull(afterTraversal);
+  }
 
-    @Test
-    void allowAccessibleStop() {
-        State afterTraversal = traverse(accessibleStop, true);
+  @Test
+  void allowAccessibleStop() {
+    State afterTraversal = traverse(accessibleStop, true);
 
-        assertNotNull(afterTraversal);
-    }
+    assertNotNull(afterTraversal);
+  }
 
-    @Test
-    void unknownStop() {
-        var afterTraversal = traverse(unknownStop, false);
-        assertNotNull(afterTraversal);
+  @Test
+  void unknownStop() {
+    var afterTraversal = traverse(unknownStop, false);
+    assertNotNull(afterTraversal);
 
-        var afterStrictTraversal = traverse(unknownStop, true);
-        assertNull(afterStrictTraversal);
-    }
+    var afterStrictTraversal = traverse(unknownStop, true);
+    assertNull(afterStrictTraversal);
+  }
 
-    private State traverse(Stop stop, boolean onlyAccessible) {
-        var from = new SimpleVertex(graph, "A", 10, 10);
-        var to = new TransitStopVertex(graph, stop, Set.of(TransitMode.RAIL));
+  private State traverse(Stop stop, boolean onlyAccessible) {
+    var from = new SimpleVertex(graph, "A", 10, 10);
+    var to = new TransitStopVertex(graph, stop, Set.of(TransitMode.RAIL));
 
-        var req = new RoutingRequest();
-        var feature = new WheelchairAccessibilityFeature(
-                onlyAccessible,
-                100,
-                100
-        );
-        req.accessibilityRequest = new WheelchairAccessibilityRequest(  true, feature, feature);
+    var req = new RoutingRequest();
+    var feature = new WheelchairAccessibilityFeature(onlyAccessible, 100, 100);
+    req.accessibilityRequest = new WheelchairAccessibilityRequest(true, feature, feature);
 
-        var ctx = new RoutingContext(req, graph, from, to);
-        var state = new State(ctx);
+    var ctx = new RoutingContext(req, graph, from, to);
+    var state = new State(ctx);
 
-        var edge = new StreetTransitStopLink(from, to);
+    var edge = new StreetTransitStopLink(from, to);
 
-        return edge.traverse(state);
-    }
+    return edge.traverse(state);
+  }
 }
