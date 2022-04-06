@@ -24,6 +24,7 @@ import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.model.modes.AllowedTransitMode;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
@@ -177,7 +178,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
         false,
-        DEFAULT_ACCESSIBILITY,
+        WheelchairAccessibilityRequest.makeDefault(true),
         false,
         AllowedTransitMode.getAllTransitModes(),
         Set.of(),
@@ -302,7 +303,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
             true,
-            DEFAULT_ACCESSIBILITY,
+            WheelchairAccessibilityRequest.makeDefault(true),
             false,
             Set.of(AllowedTransitMode.fromMainModeEnum(TransitMode.BUS)),
             Set.of(),
