@@ -750,6 +750,11 @@
         </profile>
         <profile>
             <id>prettierSkip</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
