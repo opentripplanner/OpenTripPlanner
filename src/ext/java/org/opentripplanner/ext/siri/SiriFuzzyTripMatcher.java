@@ -12,6 +12,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
@@ -191,6 +192,16 @@ public class SiriFuzzyTripMatcher {
     Trip trip = vehicleJourneyTripCache.get(vehicleJourney);
     if (trip != null) {
       return trip.getId();
+    } else {
+      //Attempt to find trip using datedServiceJourneys
+      for (String feedId : routingService.getFeedIds()) {
+        TripOnServiceDate tripOnServiceDate = routingService
+          .getTripOnServiceDateById()
+          .get(new FeedScopedId(feedId, vehicleJourney));
+        if (tripOnServiceDate != null) {
+          return tripOnServiceDate.getTrip().getId();
+        }
+      }
     }
     //Fallback to handle extrajourneys
     for (String feedId : routingService.getFeedIds()) {
@@ -275,6 +286,14 @@ public class SiriFuzzyTripMatcher {
         Trip trip = routingService.getTripForId().get(new FeedScopedId(feedId, serviceJourneyId));
         if (trip != null) {
           return trip;
+        } else {
+          //Attempt to find trip using datedServiceJourneyId
+          TripOnServiceDate tripOnServiceDate = routingService
+            .getTripOnServiceDateById()
+            .get(new FeedScopedId(feedId, serviceJourneyId));
+          if (tripOnServiceDate != null) {
+            return tripOnServiceDate.getTrip();
+          }
         }
       }
     }
