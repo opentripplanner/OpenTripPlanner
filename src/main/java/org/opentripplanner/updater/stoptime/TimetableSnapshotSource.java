@@ -235,7 +235,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           case CANCELED:
             applied = handleCanceledTrip(tripDescriptor, feedId, serviceDate);
             break;
-          case MODIFIED:
+          case REPLACEMENT:
             applied =
               validateAndHandleModifiedTrip(
                 calendarService,
