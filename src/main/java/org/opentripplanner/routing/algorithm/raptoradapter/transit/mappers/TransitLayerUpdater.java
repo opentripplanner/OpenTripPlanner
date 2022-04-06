@@ -1,19 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import gnu.trove.set.TIntSet;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.util.OTPFeature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +8,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.util.OTPFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Update the TransitLayer from a set of TimeTables. A shallow copy is made of the TransitLayer
@@ -45,16 +44,15 @@ public class TransitLayerUpdater {
 
   private final Map<LocalDate, Set<TripPatternForDate>> tripPatternsRunningOnDateMapCache = new HashMap<>();
 
-  public TransitLayerUpdater(
-      Graph graph,
-      Map<ServiceDate, TIntSet> serviceCodesRunningForDate
-  ) {
+  public TransitLayerUpdater(Graph graph, Map<ServiceDate, TIntSet> serviceCodesRunningForDate) {
     this.graph = graph;
     this.serviceCodesRunningForDate = serviceCodesRunningForDate;
   }
 
   public void update(Set<Timetable> updatedTimetables) {
-    if (!graph.hasRealtimeTransitLayer()) { return; }
+    if (!graph.hasRealtimeTransitLayer()) {
+      return;
+    }
 
     long startTime = System.currentTimeMillis();
 
@@ -63,17 +61,17 @@ public class TransitLayerUpdater {
     TransitLayer realtimeTransitLayer = new TransitLayer(graph.getRealtimeTransitLayer());
 
     // Map TripPatterns for this update to Raptor TripPatterns
-    final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld =
-        realtimeTransitLayer.getTripPatternMapper().mapOldTripPatternToRaptorTripPattern(
-          realtimeTransitLayer.getStopIndex(),
-          updatedTimetables.stream().map(Timetable::getPattern).collect(Collectors.toSet()
-        )
-    );
+    final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = realtimeTransitLayer
+      .getTripPatternMapper()
+      .mapOldTripPatternToRaptorTripPattern(
+        realtimeTransitLayer.getStopIndex(),
+        updatedTimetables.stream().map(Timetable::getPattern).collect(Collectors.toSet())
+      );
 
     // Instantiate a TripPatternForDateMapper with the new TripPattern mappings
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-        serviceCodesRunningForDate,
-        newTripPatternForOld
+      serviceCodesRunningForDate,
+      newTripPatternForOld
     );
 
     Set<LocalDate> datesToBeUpdated = new HashSet<>();
@@ -90,38 +88,44 @@ public class TransitLayerUpdater {
       @SuppressWarnings("ConstantConditions")
       LocalDate date = ServiceCalendarMapper.localDateFromServiceDate(timetable.getServiceDate());
 
-      if(!tripPatternsStartingOnDateMapCache.containsKey(date)) {
+      if (!tripPatternsStartingOnDateMapCache.containsKey(date)) {
         Map<TripPattern, TripPatternForDate> map = realtimeTransitLayer
-            .getTripPatternsStartingOnDateCopy(date)
-            .stream()
-            .collect(Collectors.toMap(t -> t.getTripPattern().getPattern(), t -> t));
+          .getTripPatternsStartingOnDateCopy(date)
+          .stream()
+          .collect(Collectors.toMap(t -> t.getTripPattern().getPattern(), t -> t));
         tripPatternsStartingOnDateMapCache.put(date, map);
       }
 
       TripPatternForDate oldTripPatternForDate = tripPatternsStartingOnDateMapCache
-          .get(date)
-          .get(timetable.getPattern());
+        .get(date)
+        .get(timetable.getPattern());
 
       if (oldTripPatternForDate != null) {
-        tripPatternsStartingOnDateMapCache.get(date).remove(timetable.getPattern(), oldTripPatternForDate);
+        tripPatternsStartingOnDateMapCache
+          .get(date)
+          .remove(timetable.getPattern(), oldTripPatternForDate);
         oldTripPatternsForDate.put(timetable.getPattern(), oldTripPatternForDate);
         datesToBeUpdated.addAll(oldTripPatternForDate.getRunningPeriodDates());
       }
 
       TripPatternForDate newTripPatternForDate = tripPatternForDateMapper.map(
-          timetable, timetable.getServiceDate()
+        timetable,
+        timetable.getServiceDate()
       );
 
       if (newTripPatternForDate != null) {
-        tripPatternsStartingOnDateMapCache.get(date).put(timetable.getPattern(), newTripPatternForDate);
+        tripPatternsStartingOnDateMapCache
+          .get(date)
+          .put(timetable.getPattern(), newTripPatternForDate);
         newTripPatternsForDate.put(timetable.getPattern(), newTripPatternForDate);
         datesToBeUpdated.addAll(newTripPatternForDate.getRunningPeriodDates());
-        if (transferIndexGenerator != null &&
-            newTripPatternForDate.getTripPattern().getPattern().isCreatedByRealtimeUpdater()
+        if (
+          transferIndexGenerator != null &&
+          newTripPatternForDate.getTripPattern().getPattern().isCreatedByRealtimeUpdater()
         ) {
           transferIndexGenerator.addRealtimeTrip(
-              newTripPatternForDate.getTripPattern(),
-              timetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList())
+            newTripPatternForDate.getTripPattern(),
+            timetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList())
           );
         }
       }
@@ -130,8 +134,9 @@ public class TransitLayerUpdater {
     // Now loop through all running period dates of old and new TripPatternsForDate and update
     // the tripPatternsByRunningPeriodDate accordingly
     for (LocalDate date : datesToBeUpdated) {
-      tripPatternsRunningOnDateMapCache.computeIfAbsent(date,
-          p -> new HashSet<>(realtimeTransitLayer.getTripPatternsRunningOnDateCopy(date))
+      tripPatternsRunningOnDateMapCache.computeIfAbsent(
+        date,
+        p -> new HashSet<>(realtimeTransitLayer.getTripPatternsRunningOnDateCopy(date))
       );
 
       Set<TripPatternForDate> patternsForDate = tripPatternsRunningOnDateMapCache.get(date);
@@ -171,9 +176,9 @@ public class TransitLayerUpdater {
     graph.setRealtimeTransitLayer(realtimeTransitLayer);
 
     LOG.debug(
-        "UPDATING {} tripPatterns took {} ms",
-        updatedTimetables.size(),
-        System.currentTimeMillis() - startTime
+      "UPDATING {} tripPatterns took {} ms",
+      updatedTimetables.size(),
+      System.currentTimeMillis() - startTime
     );
   }
 }

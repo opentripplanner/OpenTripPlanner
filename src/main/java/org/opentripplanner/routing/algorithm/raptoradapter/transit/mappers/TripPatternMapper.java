@@ -9,24 +9,27 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWi
 
 public class TripPatternMapper {
 
-    private final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = new HashMap<>();
+  private final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = new HashMap<>();
 
-    /**
-     * Convert all old TripPatterns into new ones, keeping a Map between the two. Do this conversion
-     * up front (rather than lazily on demand) to ensure pattern IDs match the sequence of patterns
-     * in source data.
-     */
-    Map<TripPattern, TripPatternWithRaptorStopIndexes> mapOldTripPatternToRaptorTripPattern(
-            StopIndexForRaptor stopIndex, Collection<TripPattern> oldTripPatterns
-    ) {
-        for (TripPattern oldTripPattern : oldTripPatterns) {
-            if (newTripPatternForOld.containsKey(oldTripPattern)) {continue;}
-            TripPatternWithRaptorStopIndexes newTripPattern = new TripPatternWithRaptorStopIndexes(
-                    oldTripPattern,
-                    stopIndex.listStopIndexesForStops(oldTripPattern.getStops())
-            );
-            newTripPatternForOld.put(oldTripPattern, newTripPattern);
-        }
-        return newTripPatternForOld;
+  /**
+   * Convert all old TripPatterns into new ones, keeping a Map between the two. Do this conversion
+   * up front (rather than lazily on demand) to ensure pattern IDs match the sequence of patterns in
+   * source data.
+   */
+  Map<TripPattern, TripPatternWithRaptorStopIndexes> mapOldTripPatternToRaptorTripPattern(
+    StopIndexForRaptor stopIndex,
+    Collection<TripPattern> oldTripPatterns
+  ) {
+    for (TripPattern oldTripPattern : oldTripPatterns) {
+      if (newTripPatternForOld.containsKey(oldTripPattern)) {
+        continue;
+      }
+      TripPatternWithRaptorStopIndexes newTripPattern = new TripPatternWithRaptorStopIndexes(
+        oldTripPattern,
+        stopIndex.listStopIndexesForStops(oldTripPattern.getStops())
+      );
+      newTripPatternForOld.put(oldTripPattern, newTripPattern);
     }
+    return newTripPatternForOld;
+  }
 }

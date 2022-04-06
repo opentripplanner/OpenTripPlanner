@@ -1,22 +1,20 @@
 package org.opentripplanner.util.time;
 
-import org.opentripplanner.model.calendar.ServiceDate;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
-
+import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
- * This class extend the Java {@link LocalTime} and with the ability
- * to span multiple days and be negative.
+ * This class extend the Java {@link LocalTime} and with the ability to span multiple days and be
+ * negative.
  * <p>
  * The class is used to track time relative to a {@link ServiceDate}.
  * <p>
- * The primary usage of this class is to convert "number of seconds" into a string
- * in the given context. Here is some examples:
+ * The primary usage of this class is to convert "number of seconds" into a string in the given
+ * context. Here is some examples:
  * <pre>
  *   Service date time:
  *   23:59:59     // One second to midnight
@@ -24,9 +22,9 @@ import java.util.Calendar;
  *   12:05-3d     // 5 past noon on service-date minus 3 days
  *   11:00+1d     // 1 day and 11 hours after midnight service-date
  * </pre>
- *
  */
 class RelativeTime {
+
   private final int days;
   private final LocalTime time;
 
@@ -40,7 +38,21 @@ class RelativeTime {
   }
 
   /**
+   * Convert to ZonedDateTime. Follow the GTFS spec for resolving the absolute time from a relative
+   * time(11:00), date(2020-03-12) and time-zone. The time is relative to "noon - 12 hours", which
+   * for most days are midnight, but in when time is adjusted for day-light-saving it is not.
+   */
+  public ZonedDateTime toZonedDateTime(LocalDate date, ZoneId zoneId) {
+    return ZonedDateTime
+      .of(date, LocalTime.NOON, zoneId)
+      .minusHours(12)
+      .plusDays(days)
+      .plusSeconds(time.toSecondOfDay());
+  }
+
+  /**
    * Create time based on given number of seconds past midnight.
+   *
    * @param secondsPastMidnight can be negative.
    */
   static RelativeTime ofSeconds(int secondsPastMidnight) {
@@ -48,34 +60,21 @@ class RelativeTime {
     int days = secondsPastMidnight / DateConstants.ONE_DAY_SECONDS;
     int secondsOfDay = secondsPastMidnight % DateConstants.ONE_DAY_SECONDS;
 
-    if(negative) {
+    if (negative) {
       // The days and secondsOfDay are both negative numbers
-      return new RelativeTime(days-1, LocalTime.MIDNIGHT.plusSeconds(secondsOfDay));
-    }
-    else {
+      return new RelativeTime(days - 1, LocalTime.MIDNIGHT.plusSeconds(secondsOfDay));
+    } else {
       return new RelativeTime(days, LocalTime.ofSecondOfDay(secondsOfDay));
     }
   }
 
   static RelativeTime from(Calendar time) {
     return new RelativeTime(
-        0,
-        time.get(Calendar.HOUR_OF_DAY),
-        time.get(Calendar.MINUTE),
-        time.get(Calendar.SECOND)
+      0,
+      time.get(Calendar.HOUR_OF_DAY),
+      time.get(Calendar.MINUTE),
+      time.get(Calendar.SECOND)
     );
-  }
-
-  /**
-   * Convert to ZonedDateTime. Follow the GTFS spec for resolving the absolute time from a relative
-   * time(11:00), date(2020-03-12) and time-zone. The time is relative to "noon - 12 hours", which
-   * for most days are midnight, but in when time is adjusted for day-light-saving it is not.
-   */
-  public ZonedDateTime toZonedDateTime(LocalDate date, ZoneId zoneId) {
-    return ZonedDateTime.of(date, LocalTime.NOON, zoneId)
-        .minusHours(12)
-        .plusDays(days)
-        .plusSeconds(time.toSecondOfDay());
   }
 
   String toLongStr() {
@@ -88,8 +87,8 @@ class RelativeTime {
 
   private String timeStrCompact() {
     return time.getSecond() == 0
-        ? String.format("%d:%02d", time.getHour(), time.getMinute())
-        : String.format("%d:%02d:%02d", time.getHour(), time.getMinute(), time.getSecond());
+      ? String.format("%d:%02d", time.getHour(), time.getMinute())
+      : String.format("%d:%02d:%02d", time.getHour(), time.getMinute(), time.getSecond());
   }
 
   private String timeStrLong() {

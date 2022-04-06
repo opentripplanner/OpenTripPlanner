@@ -16,82 +16,81 @@ import org.opentripplanner.util.I18NString;
  */
 public class StreetVehicleParkingLink extends Edge {
 
-    private final VehicleParkingEntranceVertex vehicleParkingEntranceVertex;
+  private final VehicleParkingEntranceVertex vehicleParkingEntranceVertex;
 
-    public StreetVehicleParkingLink(StreetVertex fromv, VehicleParkingEntranceVertex tov) {
-        super(fromv, tov);
-        vehicleParkingEntranceVertex = tov;
+  public StreetVehicleParkingLink(StreetVertex fromv, VehicleParkingEntranceVertex tov) {
+    super(fromv, tov);
+    vehicleParkingEntranceVertex = tov;
+  }
+
+  public StreetVehicleParkingLink(VehicleParkingEntranceVertex fromv, StreetVertex tov) {
+    super(fromv, tov);
+    vehicleParkingEntranceVertex = fromv;
+  }
+
+  public String getDirection() {
+    return null;
+  }
+
+  public String toString() {
+    return "StreetVehicleParkingLink(" + fromv + " -> " + tov + ")";
+  }
+
+  public State traverse(State s0) {
+    final var options = s0.getOptions();
+
+    // Disallow traversing two StreetBikeParkLinks in a row.
+    // Prevents router using bike rental stations as shortcuts to get around
+    // turn restrictions.
+    if (s0.getBackEdge() instanceof StreetVehicleParkingLink) {
+      return null;
     }
 
-    public StreetVehicleParkingLink(VehicleParkingEntranceVertex fromv, StreetVertex tov) {
-        super(fromv, tov);
-        vehicleParkingEntranceVertex = fromv;
-    }
-
-    public String getDirection() {
+    var entrance = vehicleParkingEntranceVertex.getParkingEntrance();
+    if (s0.getNonTransitMode() == TraverseMode.CAR) {
+      if (!entrance.isCarAccessible()) {
         return null;
+      }
+    } else if (!entrance.isWalkAccessible()) {
+      return null;
     }
 
-    public double getDistanceMeters() {
-        return 0;
+    var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
+    if (hasMissingRequiredTags(options, vehicleParking) || hasBannedTags(options, vehicleParking)) {
+      return null;
     }
 
-    public LineString getGeometry() {
-        return null;
+    StateEditor s1 = s0.edit(this);
+    s1.incrementWeight(1);
+    s1.setBackMode(null);
+    return s1.makeState();
+  }
+
+  public I18NString getName() {
+    return vehicleParkingEntranceVertex.getName();
+  }
+
+  public LineString getGeometry() {
+    return null;
+  }
+
+  public double getDistanceMeters() {
+    return 0;
+  }
+
+  private boolean hasBannedTags(RoutingRequest options, VehicleParking vehicleParking) {
+    if (options.bannedVehicleParkingTags.isEmpty()) {
+      return false;
     }
 
-    public I18NString getName() {
-        return vehicleParkingEntranceVertex.getName();
+    return vehicleParking.getTags().stream().anyMatch(options.bannedVehicleParkingTags::contains);
+  }
+
+  private boolean hasMissingRequiredTags(RoutingRequest options, VehicleParking vehicleParking) {
+    if (options.requiredVehicleParkingTags.isEmpty()) {
+      return false;
     }
 
-    public State traverse(State s0) {
-        final var options = s0.getOptions();
-
-        // Disallow traversing two StreetBikeParkLinks in a row.
-        // Prevents router using bike rental stations as shortcuts to get around
-        // turn restrictions.
-        if (s0.getBackEdge() instanceof StreetVehicleParkingLink) {
-            return null;
-        }
-
-        var entrance = vehicleParkingEntranceVertex.getParkingEntrance();
-        if (s0.getNonTransitMode() == TraverseMode.CAR) {
-            if (!entrance.isCarAccessible()) {
-                return null;
-            }
-        }
-        else if (!entrance.isWalkAccessible()) {
-            return null;
-        }
-
-        var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
-        if (hasMissingRequiredTags(options, vehicleParking) || hasBannedTags(options, vehicleParking)) {
-            return null;
-        }
-
-        StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(1);
-        s1.setBackMode(null);
-        return s1.makeState();
-    }
-
-    private boolean hasBannedTags(RoutingRequest options, VehicleParking vehicleParking) {
-        if (options.bannedVehicleParkingTags.isEmpty()) {
-            return false;
-        }
-
-        return vehicleParking.getTags().stream().anyMatch(options.bannedVehicleParkingTags::contains);
-    }
-
-    private boolean hasMissingRequiredTags(RoutingRequest options, VehicleParking vehicleParking) {
-        if (options.requiredVehicleParkingTags.isEmpty()) {
-            return false;
-        }
-
-        return !vehicleParking.getTags().containsAll(options.requiredVehicleParkingTags);
-    }
-
-    public String toString() {
-        return "StreetVehicleParkingLink(" + fromv + " -> " + tov + ")";
-    }
+    return !vehicleParking.getTags().containsAll(options.requiredVehicleParkingTags);
+  }
 }

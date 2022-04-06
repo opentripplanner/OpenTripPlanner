@@ -14,8 +14,8 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Double> lon() {
-    return environment -> getSource(environment).startLocation.longitude();
+  public DataFetcher<Iterable<P2<Double>>> elevationProfile() {
+    return environment -> getSource(environment).elevation;
   }
 
   @Override
@@ -24,8 +24,8 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Iterable<P2<Double>>> elevationProfile() {
-    return environment -> getSource(environment).elevation;
+  public DataFetcher<Double> lon() {
+    return environment -> getSource(environment).startLocation.longitude();
   }
 
   private WalkStep getSource(DataFetchingEnvironment environment) {

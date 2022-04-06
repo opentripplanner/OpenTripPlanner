@@ -48,7 +48,13 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   @Test
   public void realtimeAvailableCarPlacesTest() {
-    initEdgeAndRequest(TraverseMode.CAR, false, true, VehicleParkingSpaces.builder().carSpaces(1).build(), true);
+    initEdgeAndRequest(
+      TraverseMode.CAR,
+      false,
+      true,
+      VehicleParkingSpaces.builder().carSpaces(1).build(),
+      true
+    );
 
     State s0 = new State(routingContext);
 
@@ -70,7 +76,13 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   @Test
   public void realtimeNotAvailableCarPlacesTest() {
-    initEdgeAndRequest(TraverseMode.CAR, false, true, VehicleParkingSpaces.builder().carSpaces(0).build(), true);
+    initEdgeAndRequest(
+      TraverseMode.CAR,
+      false,
+      true,
+      VehicleParkingSpaces.builder().carSpaces(0).build(),
+      true
+    );
 
     State s0 = new State(routingContext);
 
@@ -103,7 +115,13 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   @Test
   public void realtimeAvailableBicyclePlacesTest() {
-    initEdgeAndRequest(TraverseMode.BICYCLE, true, false, VehicleParkingSpaces.builder().bicycleSpaces(1).build(), true);
+    initEdgeAndRequest(
+      TraverseMode.BICYCLE,
+      true,
+      false,
+      VehicleParkingSpaces.builder().bicycleSpaces(1).build(),
+      true
+    );
 
     State s0 = new State(routingContext);
 
@@ -125,7 +143,13 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   @Test
   public void realtimeNotAvailableBicyclePlacesTest() {
-    initEdgeAndRequest(TraverseMode.BICYCLE, true, false, VehicleParkingSpaces.builder().bicycleSpaces(0).build(), true);
+    initEdgeAndRequest(
+      TraverseMode.BICYCLE,
+      true,
+      false,
+      VehicleParkingSpaces.builder().bicycleSpaces(0).build(),
+      true
+    );
 
     State s0 = new State(routingContext);
 
@@ -134,11 +158,21 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
     assertNull(s1);
   }
 
-  private void initEdgeAndRequest(TraverseMode parkingMode, boolean bicyclePlaces, boolean carPlaces) {
+  private void initEdgeAndRequest(
+    TraverseMode parkingMode,
+    boolean bicyclePlaces,
+    boolean carPlaces
+  ) {
     initEdgeAndRequest(parkingMode, bicyclePlaces, carPlaces, null, false);
   }
 
-  private void initEdgeAndRequest(TraverseMode parkingMode, boolean bicyclePlaces, boolean carPlaces, VehicleParkingSpaces availability, boolean realtime) {
+  private void initEdgeAndRequest(
+    TraverseMode parkingMode,
+    boolean bicyclePlaces,
+    boolean carPlaces,
+    VehicleParkingSpaces availability,
+    boolean realtime
+  ) {
     graph = new Graph();
 
     var vehicleParking = createVehicleParking(bicyclePlaces, carPlaces, availability);
@@ -153,25 +187,28 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
     routingContext = new RoutingContext(routingRequest, graph, vertex, vertex);
   }
 
-  private VehicleParking createVehicleParking(boolean bicyclePlaces, boolean carPlaces, VehicleParkingSpaces availability) {
-    return VehicleParking.builder()
-        .id(new FeedScopedId(TEST_FEED_ID, "VehicleParking"))
-        .bicyclePlaces(bicyclePlaces)
-        .carPlaces(carPlaces)
-        .availability(availability)
-        .entrances(
-            List.of(vehicleParkingEntrance())
-        )
-        .build();
+  private VehicleParking createVehicleParking(
+    boolean bicyclePlaces,
+    boolean carPlaces,
+    VehicleParkingSpaces availability
+  ) {
+    return VehicleParking
+      .builder()
+      .id(new FeedScopedId(TEST_FEED_ID, "VehicleParking"))
+      .bicyclePlaces(bicyclePlaces)
+      .carPlaces(carPlaces)
+      .availability(availability)
+      .entrances(List.of(vehicleParkingEntrance()))
+      .build();
   }
 
   private VehicleParking.VehicleParkingEntranceCreator vehicleParkingEntrance() {
     String id = "Entrance";
-    return builder -> builder
+    return builder ->
+      builder
         .entranceId(new FeedScopedId(TEST_FEED_ID, id))
         .name(new NonLocalizedString(id))
         .x(0)
         .y(0);
   }
-
 }

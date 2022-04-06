@@ -33,119 +33,125 @@ import org.opentripplanner.routing.vertextype.TemporaryVertex;
  */
 @Ignore
 public class RoutingContextDestroyTest {
-    private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
-    private TemporaryVerticesContainer subject;
 
-    // Given:
-    // - a graph with 3 intersections/vertexes
-    private final Graph g = new Graph();
+  private final GeometryFactory gf = GeometryUtils.getGeometryFactory();
+  // Given:
+  // - a graph with 3 intersections/vertexes
+  private final Graph g = new Graph();
+  private final StreetVertex a = new IntersectionVertex(g, "A", 1.0, 1.0);
+  private final StreetVertex b = new IntersectionVertex(g, "B", 0.0, 1.0);
+  private final StreetVertex c = new IntersectionVertex(g, "C", 1.0, 0.0);
+  private final List<Vertex> permanentVertexes = Arrays.asList(a, b, c);
+  // - And travel *origin* is 0,4 degrees on the road from B to A
+  private final GenericLocation from = new GenericLocation(1.0, 0.4);
+  // - and *destination* is slightly off 0.7 degrees on road from C to A
+  private final GenericLocation to = new GenericLocation(0.701, 1.001);
+  private TemporaryVerticesContainer subject;
 
-    private final StreetVertex a = new IntersectionVertex(g, "A", 1.0, 1.0);
+  // - and some roads
+  @Before
+  public void setup() {
+    createStreetEdge(a, b, "a -> b");
+    createStreetEdge(b, a, "b -> a");
+    createStreetEdge(a, c, "a -> c");
+    g.index();
+  }
 
-    private final StreetVertex b = new IntersectionVertex(g, "B", 0.0, 1.0);
+  @Test
+  public void temporaryChangesRemovedOnContextDestroy() {
+    // Given - A request
+    RoutingRequest request = new RoutingRequest();
+    request.from = from;
+    request.to = to;
 
-    private final StreetVertex c = new IntersectionVertex(g, "C", 1.0, 0.0);
+    // When - the context is created
+    subject = new TemporaryVerticesContainer(g, request);
 
-    private final List<Vertex> permanentVertexes = Arrays.asList(a, b, c);
+    // Then:
+    originAndDestinationInsertedCorrect();
 
-    // - And travel *origin* is 0,4 degrees on the road from B to A
-    private final GenericLocation from = new GenericLocation(1.0, 0.4);
+    // And When:
+    subject.close();
 
-    // - and *destination* is slightly off 0.7 degrees on road from C to A
-    private final GenericLocation to = new GenericLocation(0.701, 1.001);
+    // Then - permanent vertexes
+    for (Vertex v : permanentVertexes) {
+      // - does not reference the any temporary nodes any more
+      for (Edge e : v.getIncoming()) {
+        assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getFromVertex());
+      }
+      for (Edge e : v.getOutgoing()) {
+        assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getToVertex());
+      }
+    }
+  }
 
-    // - and some roads
-    @Before public void setup() {
-        createStreetEdge(a, b, "a -> b");
-        createStreetEdge(b, a, "b -> a");
-        createStreetEdge(a, c, "a -> c");
-        g.index();
+  private static <T extends Collection<String>> T findAllReachableVertexes(
+    Vertex vertex,
+    boolean forward,
+    T list
+  ) {
+    if (list.contains(vertex.getDefaultName())) {
+      return list;
     }
 
-    @Test public void temporaryChangesRemovedOnContextDestroy() {
-        // Given - A request
-        RoutingRequest request = new RoutingRequest();
-        request.from = from;
-        request.to = to;
-
-        // When - the context is created
-        subject = new TemporaryVerticesContainer(g, request);
-
-        // Then:
-        originAndDestinationInsertedCorrect();
-
-        // And When:
-        subject.close();
-
-        // Then - permanent vertexes
-        for (Vertex v : permanentVertexes) {
-            // - does not reference the any temporary nodes any more
-            for (Edge e : v.getIncoming()) {
-                assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getFromVertex());
-            }
-            for (Edge e : v.getOutgoing()) {
-                assertVertexEdgeIsNotReferencingTemporaryElements(v, e, e.getToVertex());
-            }
-        }
+    list.add(vertex.getDefaultName());
+    if (forward) {
+      vertex.getOutgoing().forEach(it -> findAllReachableVertexes(it.getToVertex(), forward, list));
+    } else {
+      vertex
+        .getIncoming()
+        .forEach(it -> findAllReachableVertexes(it.getFromVertex(), forward, list));
     }
+    return list;
+  }
 
-    private void originAndDestinationInsertedCorrect() {
-        // Then - the origin and destination is
-        assertEquals("Origin", subject.getFromVertices().iterator().next().getDefaultName());
-        assertEquals("Destination", subject.getToVertices().iterator().next().getDefaultName());
+  private void originAndDestinationInsertedCorrect() {
+    // Then - the origin and destination is
+    assertEquals("Origin", subject.getFromVertices().iterator().next().getDefaultName());
+    assertEquals("Destination", subject.getToVertices().iterator().next().getDefaultName());
 
-        // And - from the origin
-        Collection<String> vertexesReachableFromOrigin = findAllReachableVertexes(
-                subject.getFromVertices().iterator().next(), true, new ArrayList<>());
-        String msg = "All reachable vertexes from origin: " + vertexesReachableFromOrigin;
+    // And - from the origin
+    Collection<String> vertexesReachableFromOrigin = findAllReachableVertexes(
+      subject.getFromVertices().iterator().next(),
+      true,
+      new ArrayList<>()
+    );
+    String msg = "All reachable vertexes from origin: " + vertexesReachableFromOrigin;
 
-        // it is possible to reach the A, B, C and the Destination Vertex
-        assertTrue(msg, vertexesReachableFromOrigin.contains("A"));
-        assertTrue(msg, vertexesReachableFromOrigin.contains("B"));
-        assertTrue(msg, vertexesReachableFromOrigin.contains("C"));
-        assertTrue(msg, vertexesReachableFromOrigin.contains("Destination"));
+    // it is possible to reach the A, B, C and the Destination Vertex
+    assertTrue(msg, vertexesReachableFromOrigin.contains("A"));
+    assertTrue(msg, vertexesReachableFromOrigin.contains("B"));
+    assertTrue(msg, vertexesReachableFromOrigin.contains("C"));
+    assertTrue(msg, vertexesReachableFromOrigin.contains("Destination"));
 
-        // And - from the destination we can backtrack
-        Collection<String> vertexesReachableFromDestination = findAllReachableVertexes(
-                subject.getToVertices().iterator().next(), false, new ArrayList<>());
-        msg = "All reachable vertexes back from destination: " + vertexesReachableFromDestination;
+    // And - from the destination we can backtrack
+    Collection<String> vertexesReachableFromDestination = findAllReachableVertexes(
+      subject.getToVertices().iterator().next(),
+      false,
+      new ArrayList<>()
+    );
+    msg = "All reachable vertexes back from destination: " + vertexesReachableFromDestination;
 
-        // and reach the A, B and the Origin Vertex
-        assertTrue(msg, vertexesReachableFromDestination.contains("A"));
-        assertTrue(msg, vertexesReachableFromDestination.contains("B"));
-        assertTrue(msg, vertexesReachableFromDestination.contains("Origin"));
+    // and reach the A, B and the Origin Vertex
+    assertTrue(msg, vertexesReachableFromDestination.contains("A"));
+    assertTrue(msg, vertexesReachableFromDestination.contains("B"));
+    assertTrue(msg, vertexesReachableFromDestination.contains("Origin"));
 
-        // But - not the C Vertex
-        assertFalse(msg, vertexesReachableFromDestination.contains("C"));
-    }
+    // But - not the C Vertex
+    assertFalse(msg, vertexesReachableFromDestination.contains("C"));
+  }
 
-    private void createStreetEdge(StreetVertex v0, StreetVertex v1, String name) {
-        LineString geom = gf
-                .createLineString(new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() });
-        double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
-        new StreetEdge(v0, v1, geom, name, dist, StreetTraversalPermission.ALL, false);
-    }
+  private void createStreetEdge(StreetVertex v0, StreetVertex v1, String name) {
+    LineString geom = gf.createLineString(
+      new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
+    );
+    double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
+    new StreetEdge(v0, v1, geom, name, dist, StreetTraversalPermission.ALL, false);
+  }
 
-    private static <T extends Collection<String>> T findAllReachableVertexes(Vertex vertex,
-            boolean forward, T list) {
-        if (list.contains(vertex.getDefaultName())) {
-            return list;
-        }
-
-        list.add(vertex.getDefaultName());
-        if (forward) {
-            vertex.getOutgoing()
-                    .forEach(it -> findAllReachableVertexes(it.getToVertex(), forward, list));
-        } else {
-            vertex.getIncoming()
-                    .forEach(it -> findAllReachableVertexes(it.getFromVertex(), forward, list));
-        }
-        return list;
-    }
-
-    private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {
-        String sourceName = src.getDefaultName();
-        assertFalse(sourceName + " -> " + e.getDefaultName(), e instanceof TemporaryEdge);
-        assertFalse(sourceName + " -> " + v.getDefaultName(), v instanceof TemporaryVertex);
-    }
+  private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {
+    String sourceName = src.getDefaultName();
+    assertFalse(sourceName + " -> " + e.getDefaultName(), e instanceof TemporaryEdge);
+    assertFalse(sourceName + " -> " + v.getDefaultName(), v instanceof TemporaryVertex);
+  }
 }

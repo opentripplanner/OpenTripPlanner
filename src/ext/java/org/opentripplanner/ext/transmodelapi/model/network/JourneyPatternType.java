@@ -9,116 +9,145 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.util.BitSet;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.util.PolylineEncoder;
 
-import java.util.BitSet;
-import java.util.stream.Collectors;
-
 public class JourneyPatternType {
+
   private static final String NAME = "JourneyPattern";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
   public static GraphQLObjectType create(
-      GraphQLOutputType linkGeometryType,
-      GraphQLOutputType noticeType,
-      GraphQLOutputType quayType,
-      GraphQLOutputType lineType,
-      GraphQLOutputType serviceJourneyType,
-      GraphQLNamedOutputType ptSituationElementType,
-      GqlUtil gqlUtil
+    GraphQLOutputType linkGeometryType,
+    GraphQLOutputType noticeType,
+    GraphQLOutputType quayType,
+    GraphQLOutputType lineType,
+    GraphQLOutputType serviceJourneyType,
+    GraphQLNamedOutputType ptSituationElementType,
+    GqlUtil gqlUtil
   ) {
-    return GraphQLObjectType.newObject()
-        .name("JourneyPattern")
-        .field(GqlUtil.newTransitIdField())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("line")
-            .type(new GraphQLNonNull(lineType))
-            .dataFetcher(environment -> ((TripPattern) environment.getSource()).getRoute())
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("directionType")
-            .type(EnumTypes.DIRECTION_TYPE)
-            .dataFetcher(environment -> ((TripPattern) environment.getSource()).getDirection())
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("name")
-            .type(Scalars.GraphQLString)
-            .dataFetcher(environment -> ((TripPattern) environment.getSource()).getName())
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("serviceJourneys")
-            .withDirective(gqlUtil.timingData)
-            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
-            .dataFetcher(e -> ((TripPattern) e.getSource()).scheduledTripsAsStream().collect(Collectors.toList()))
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("serviceJourneysForDate")
-            .withDirective(gqlUtil.timingData)
-            .description("List of service journeys for the journey pattern for a given date")
-            .argument(GraphQLArgument.newArgument()
-                .name("date")
-                .type(gqlUtil.dateScalar)
-                .build())
-            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
-            .dataFetcher(environment -> {
-
-              BitSet services = GqlUtil.getRoutingService(environment)
-                  .getServicesRunningForDate(
-                      gqlUtil.serviceDateMapper.secondsSinceEpochToServiceDate(
-                          environment.getArgument("date")
-                      )
-                  );
-              return ((TripPattern) environment.getSource()).getScheduledTimetable().getTripTimes()
-                  .stream()
-                  .filter(times -> services.get(times.getServiceCode()))
-                  .map(times -> times.getTrip())
-                  .collect(Collectors.toList());
-            })
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("quays")
-            .description("Quays visited by service journeys for this journey patterns")
-            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
-            .dataFetcher(environment -> ((TripPattern) environment.getSource()).getStops())
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("pointsOnLink")
-            .type(linkGeometryType)
-            .dataFetcher(environment -> {
-              LineString geometry = ((TripPattern) environment.getSource()).getGeometry();
-              if (geometry == null) {
-                return null;
-              } else {
-                return PolylineEncoder.createEncodings(geometry);
-              }
-            })
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("situations")
-            .description("Get all situations active for the journey pattern.")
-            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
-            .dataFetcher(environment -> {
-                TripPattern tripPattern = environment.getSource();
-                return GqlUtil.getRoutingService(environment)
-                        .getTransitAlertService()
-                        .getDirectionAndRouteAlerts(
-                                tripPattern.getDirection().gtfsCode,
-                                tripPattern.getRoute().getId()
-                        );
-            })
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("notices")
-            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
-            .dataFetcher(environment -> {
-              TripPattern tripPattern = environment.getSource();
-              return GqlUtil.getRoutingService(environment).getNoticesByEntity(tripPattern);
-            })
-            .build())
-        .build();
+    return GraphQLObjectType
+      .newObject()
+      .name("JourneyPattern")
+      .field(GqlUtil.newTransitIdField())
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("line")
+          .type(new GraphQLNonNull(lineType))
+          .dataFetcher(environment -> ((TripPattern) environment.getSource()).getRoute())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("directionType")
+          .type(EnumTypes.DIRECTION_TYPE)
+          .dataFetcher(environment -> ((TripPattern) environment.getSource()).getDirection())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("name")
+          .type(Scalars.GraphQLString)
+          .dataFetcher(environment -> ((TripPattern) environment.getSource()).getName())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("serviceJourneys")
+          .withDirective(gqlUtil.timingData)
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
+          .dataFetcher(e ->
+            ((TripPattern) e.getSource()).scheduledTripsAsStream().collect(Collectors.toList())
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("serviceJourneysForDate")
+          .withDirective(gqlUtil.timingData)
+          .description("List of service journeys for the journey pattern for a given date")
+          .argument(GraphQLArgument.newArgument().name("date").type(gqlUtil.dateScalar).build())
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
+          .dataFetcher(environment -> {
+            BitSet services = GqlUtil
+              .getRoutingService(environment)
+              .getServicesRunningForDate(
+                gqlUtil.serviceDateMapper.secondsSinceEpochToServiceDate(
+                  environment.getArgument("date")
+                )
+              );
+            return ((TripPattern) environment.getSource()).getScheduledTimetable()
+              .getTripTimes()
+              .stream()
+              .filter(times -> services.get(times.getServiceCode()))
+              .map(times -> times.getTrip())
+              .collect(Collectors.toList());
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("quays")
+          .description("Quays visited by service journeys for this journey patterns")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
+          .dataFetcher(environment -> ((TripPattern) environment.getSource()).getStops())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("pointsOnLink")
+          .type(linkGeometryType)
+          .dataFetcher(environment -> {
+            LineString geometry = ((TripPattern) environment.getSource()).getGeometry();
+            if (geometry == null) {
+              return null;
+            } else {
+              return PolylineEncoder.createEncodings(geometry);
+            }
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("situations")
+          .description("Get all situations active for the journey pattern.")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
+          .dataFetcher(environment -> {
+            TripPattern tripPattern = environment.getSource();
+            return GqlUtil
+              .getRoutingService(environment)
+              .getTransitAlertService()
+              .getDirectionAndRouteAlerts(
+                tripPattern.getDirection().gtfsCode,
+                tripPattern.getRoute().getId()
+              );
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("notices")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
+          .dataFetcher(environment -> {
+            TripPattern tripPattern = environment.getSource();
+            return GqlUtil.getRoutingService(environment).getNoticesByEntity(tripPattern);
+          })
+          .build()
+      )
+      .build();
   }
 }

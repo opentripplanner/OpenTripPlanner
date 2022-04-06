@@ -8,6 +8,7 @@ import java.time.LocalTime;
  * of the trip.
  */
 public class BookingTime implements Serializable {
+
   private final LocalTime time;
 
   private final int daysPrior;

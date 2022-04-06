@@ -8,29 +8,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface VehiclePositionSource {
-    /**
-     * Parses GTFS-RT for vehicle positions
-     */
-    List<VehiclePosition> getPositions();
+  /**
+   * Parses GTFS-RT for vehicle positions
+   */
+  List<VehiclePosition> getPositions();
 
-    default List<VehiclePosition> getPositions(InputStream is) throws IOException {
-        List<VehiclePosition> positions = null;
-        List<GtfsRealtime.FeedEntity> feedEntityList ;
-        GtfsRealtime.FeedMessage feedMessage;
+  default List<VehiclePosition> getPositions(InputStream is) throws IOException {
+    List<VehiclePosition> positions = null;
+    List<GtfsRealtime.FeedEntity> feedEntityList;
+    GtfsRealtime.FeedMessage feedMessage;
 
-        if (is != null) {
-            // Decode message
-            feedMessage = GtfsRealtime.FeedMessage.parseFrom(is);
-            feedEntityList = feedMessage.getEntityList();
+    if (is != null) {
+      // Decode message
+      feedMessage = GtfsRealtime.FeedMessage.parseFrom(is);
+      feedEntityList = feedMessage.getEntityList();
 
-            // Create List of TripUpdates
-            positions = new ArrayList<>(feedEntityList.size());
-            for (GtfsRealtime.FeedEntity feedEntity : feedEntityList) {
-                if (feedEntity.hasVehicle()) { positions.add(feedEntity.getVehicle()); }
-            }
+      // Create List of TripUpdates
+      positions = new ArrayList<>(feedEntityList.size());
+      for (GtfsRealtime.FeedEntity feedEntity : feedEntityList) {
+        if (feedEntity.hasVehicle()) {
+          positions.add(feedEntity.getVehicle());
         }
-
-        return positions;
+      }
     }
 
+    return positions;
+  }
 }

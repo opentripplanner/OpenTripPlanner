@@ -17,12 +17,22 @@ public class TransferConstraintTest {
   private final TransferConstraint STAY_SEATED = TransferConstraint.create().staySeated().build();
   private final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
   private final TransferConstraint NOT_ALLOWED = TransferConstraint.create().notAllowed().build();
-  private final TransferConstraint MAX_WAIT_TIME = TransferConstraint.create()
-          .guaranteed().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
-  private final TransferConstraint EVERYTHING = TransferConstraint.create()
-          .staySeated().guaranteed().preferred().maxWaitTime(MAX_WAIT_TIME_ONE_HOUR).build();
-  private final TransferConstraint MIN_TRANSFER_TIME = TransferConstraint.create()
-          .minTransferTime(600).build();
+  private final TransferConstraint MAX_WAIT_TIME = TransferConstraint
+    .create()
+    .guaranteed()
+    .maxWaitTime(MAX_WAIT_TIME_ONE_HOUR)
+    .build();
+  private final TransferConstraint EVERYTHING = TransferConstraint
+    .create()
+    .staySeated()
+    .guaranteed()
+    .preferred()
+    .maxWaitTime(MAX_WAIT_TIME_ONE_HOUR)
+    .build();
+  private final TransferConstraint MIN_TRANSFER_TIME = TransferConstraint
+    .create()
+    .minTransferTime(600)
+    .build();
 
   @Test
   public void getPriority() {
@@ -103,8 +113,8 @@ public class TransferConstraintTest {
   public void testToString() {
     assertEquals("{no constraints}", NO_CONSTRAINS.toString());
     assertEquals(
-            "{priority: PREFERRED, staySeated, guaranteed, maxWaitTime: 1h}",
-            EVERYTHING.toString()
+      "{priority: PREFERRED, staySeated, guaranteed, maxWaitTime: 1h}",
+      EVERYTHING.toString()
     );
   }
 

@@ -6,14 +6,9 @@ import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
 public class LegacyGraphQLdebugOutputImpl
-    implements LegacyGraphQLDataFetchers.LegacyGraphQLDebugOutput {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLDebugOutput {
 
   private static final long nanosToMillis = 1000000;
-
-  @Override
-  public DataFetcher<Long> totalTime() {
-    return environment -> getSource(environment).totalTime / nanosToMillis;
-  }
 
   @Override
   public DataFetcher<Long> pathCalculationTime() {
@@ -33,6 +28,11 @@ public class LegacyGraphQLdebugOutputImpl
   @Override
   public DataFetcher<Boolean> timedOut() {
     return environment -> false;
+  }
+
+  @Override
+  public DataFetcher<Long> totalTime() {
+    return environment -> getSource(environment).totalTime / nanosToMillis;
   }
 
   private DebugOutput getSource(DataFetchingEnvironment environment) {

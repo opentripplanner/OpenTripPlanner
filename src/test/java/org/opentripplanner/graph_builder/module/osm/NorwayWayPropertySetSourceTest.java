@@ -1,12 +1,13 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
-import static org.junit.Assert.assertEquals;
-
 public class NorwayWayPropertySetSourceTest {
+
   static WayPropertySet wps = new WayPropertySet();
 
   static {
@@ -21,15 +22,13 @@ public class NorwayWayPropertySetSourceTest {
     way1.addTag("highway", "path");
     way1.addTag("mtb:scale", "3");
 
-    assertEquals(
-            StreetTraversalPermission.NONE, wps.getDataForWay(way1).getPermission());
+    assertEquals(StreetTraversalPermission.NONE, wps.getDataForWay(way1).getPermission());
 
     var way2 = new OSMWithTags();
     way2.addTag("highway", "track");
     way2.addTag("mtb:scale", "3");
 
-    assertEquals(
-            StreetTraversalPermission.NONE, wps.getDataForWay(way2).getPermission());
+    assertEquals(StreetTraversalPermission.NONE, wps.getDataForWay(way2).getPermission());
   }
 
   @Test
@@ -38,15 +37,13 @@ public class NorwayWayPropertySetSourceTest {
     way1.addTag("highway", "path");
     way1.addTag("mtb:scale", "1");
 
-    assertEquals(
-            StreetTraversalPermission.PEDESTRIAN, wps.getDataForWay(way1).getPermission());
+    assertEquals(StreetTraversalPermission.PEDESTRIAN, wps.getDataForWay(way1).getPermission());
 
     var way2 = new OSMWithTags();
     way2.addTag("highway", "track");
     way2.addTag("mtb:scale", "1");
 
-    assertEquals(
-            StreetTraversalPermission.PEDESTRIAN, wps.getDataForWay(way2).getPermission());
+    assertEquals(StreetTraversalPermission.PEDESTRIAN, wps.getDataForWay(way2).getPermission());
   }
 
   @Test
@@ -55,14 +52,12 @@ public class NorwayWayPropertySetSourceTest {
     way1.addTag("highway", "trunk");
     way1.addTag("motorroad", "yes");
 
-    assertEquals(
-            StreetTraversalPermission.CAR, wps.getDataForWay(way1).getPermission());
+    assertEquals(StreetTraversalPermission.CAR, wps.getDataForWay(way1).getPermission());
 
     var way2 = new OSMWithTags();
     way2.addTag("highway", "primary");
     way2.addTag("motorroad", "yes");
 
-    assertEquals(
-            StreetTraversalPermission.CAR, wps.getDataForWay(way2).getPermission());
+    assertEquals(StreetTraversalPermission.CAR, wps.getDataForWay(way2).getPermission());
   }
 }

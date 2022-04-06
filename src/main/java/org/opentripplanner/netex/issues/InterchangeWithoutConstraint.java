@@ -4,17 +4,18 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 
 public class InterchangeWithoutConstraint implements DataImportIssue {
-    private static final String MSG
-            = "Interchange dropped. The interchange have no effect on routing. Interchange: %s";
 
-    private final ConstrainedTransfer transfer;
+  private static final String MSG =
+    "Interchange dropped. The interchange have no effect on routing. Interchange: %s";
 
-    public InterchangeWithoutConstraint(ConstrainedTransfer transfer) {
-        this.transfer = transfer;
-    }
+  private final ConstrainedTransfer transfer;
 
-    @Override
-    public String getMessage() {
-        return String.format(MSG, transfer);
-    }
+  public InterchangeWithoutConstraint(ConstrainedTransfer transfer) {
+    this.transfer = transfer;
+  }
+
+  @Override
+  public String getMessage() {
+    return String.format(MSG, transfer);
+  }
 }

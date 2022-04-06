@@ -1,31 +1,31 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
+import java.time.Instant;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 
-import java.time.Instant;
-
 public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
-    public static final String TAG = "latest-departure-time-limit";
 
-    private final long limitMs;
+  public static final String TAG = "latest-departure-time-limit";
 
-    public LatestDepartureTimeFilter(Instant latestDepartureTime) {
-        this.limitMs = latestDepartureTime.toEpochMilli();
-    }
+  private final long limitMs;
 
-    @Override
-    public String name() {
-        return TAG;
-    }
+  public LatestDepartureTimeFilter(Instant latestDepartureTime) {
+    this.limitMs = latestDepartureTime.toEpochMilli();
+  }
 
-    @Override
-    public boolean skipAlreadyFlaggedItineraries() {
-        return false;
-    }
+  @Override
+  public String name() {
+    return TAG;
+  }
 
-    @Override
-    public Predicate<Itinerary> predicate() {
-        return it -> it.startTime().getTimeInMillis() > limitMs;
-    }
+  @Override
+  public Predicate<Itinerary> predicate() {
+    return it -> it.startTime().getTimeInMillis() > limitMs;
+  }
+
+  @Override
+  public boolean skipAlreadyFlaggedItineraries() {
+    return false;
+  }
 }

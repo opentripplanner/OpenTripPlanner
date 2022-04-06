@@ -3,33 +3,33 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.vie
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
-
 /**
  * Implement the {@link ArrivalView}.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements ArrivalView<T> {
-    private final int round;
-    private final int stop;
 
-    StopArrivalViewAdapter(int round, int stop) {
-        this.round = round;
-        this.stop = stop;
-    }
+  private final int round;
+  private final int stop;
 
-    @Override
-    public int stop() {
-        return stop;
-    }
+  StopArrivalViewAdapter(int round, int stop) {
+    this.round = round;
+    this.stop = stop;
+  }
 
-    @Override
-    public int round() {
-        return round;
-    }
+  @Override
+  public int stop() {
+    return stop;
+  }
 
-    @Override
-    public String toString() {
-        return asString();
-    }
+  @Override
+  public int round() {
+    return round;
+  }
+
+  @Override
+  public String toString() {
+    return asString();
+  }
 }

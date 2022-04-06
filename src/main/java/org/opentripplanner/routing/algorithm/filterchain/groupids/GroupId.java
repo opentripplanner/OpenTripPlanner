@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.filterchain.groupids;
 
-
 /**
  * A group-id identify a group of elements(itineraries). Group-ids can be arranged in a hierarchy
  * where the top level groups match all elements for all decedent group-ids of children,
@@ -48,38 +47,38 @@ package org.opentripplanner.routing.algorithm.filterchain.groupids;
  * </pre>
  */
 public interface GroupId<T extends GroupId<T>> {
-    /**
-     * @see GroupId for description on the match method.
-     */
-    boolean match(T other);
+  /**
+   * @see GroupId for description on the match method.
+   */
+  boolean match(T other);
 
-    /**
-     * There are cases where two groupIds A and B is no symmetrical. Let say A can be used as
-     * a group-id for both itinerary I and II, but B is only valid as a groupId for II. Then
-     * this method should return A for both: {@code  A.merge(B)} and {@code B.merge(A)}. If both
-     * group-ids can be used or are identical, any of them can be returned.
-     * <p>
-     * The reason why we need this is best explained with an example: We want to group by the
-     * legs that pose 80% of the distance traveled. We have the following possible itineraries:
-     * <pre>
-     *   I : Origin ~ Bus A 100 km ~ Destination
-     *  II : Origin ~ Bus B 15 km ~ Bus A 85 km ~ Destination
-     * III : Origin ~ Bus B 25 km ~ Bus A 75 km ~ Destination
-     *  IV : Origin ~ Bus A 75 km ~ Bus D 25 km ~ Destination
-     * </pre>
-     * Concatenating the trip-ids(A,B,C,D) ordered by distance gives us the following group-ids:
-     * <pre>
-     *   I : "A"
-     *  II : "A"    // B account for less than 20% of the distance
-     * III : "AB"   // A (75%) is longer; hence comes first and than B (25%) > 80%
-     *  IV : "AD"   // A is longer, then D
-     * </pre>
-     * So all of these trips have the same main part "A" and we want to group them together.
-     * We do so by comparing the keys, if one is a prefix of another then they belong to the same
-     * group. But what about III and IV? By them self they are not the same group, but if we use
-     * the groupId for A or B ad a key to the group, both fall into the same group. So, to be
-     * deterministic we use this {@code merge(..)} method to return the group-id that is the
-     * most general one - the id able to represent the biggest set of trips.
-     */
-    T merge(T other);
+  /**
+   * There are cases where two groupIds A and B is no symmetrical. Let say A can be used as a
+   * group-id for both itinerary I and II, but B is only valid as a groupId for II. Then this method
+   * should return A for both: {@code  A.merge(B)} and {@code B.merge(A)}. If both group-ids can be
+   * used or are identical, any of them can be returned.
+   * <p>
+   * The reason why we need this is best explained with an example: We want to group by the legs
+   * that pose 80% of the distance traveled. We have the following possible itineraries:
+   * <pre>
+   *   I : Origin ~ Bus A 100 km ~ Destination
+   *  II : Origin ~ Bus B 15 km ~ Bus A 85 km ~ Destination
+   * III : Origin ~ Bus B 25 km ~ Bus A 75 km ~ Destination
+   *  IV : Origin ~ Bus A 75 km ~ Bus D 25 km ~ Destination
+   * </pre>
+   * Concatenating the trip-ids(A,B,C,D) ordered by distance gives us the following group-ids:
+   * <pre>
+   *   I : "A"
+   *  II : "A"    // B account for less than 20% of the distance
+   * III : "AB"   // A (75%) is longer; hence comes first and than B (25%) > 80%
+   *  IV : "AD"   // A is longer, then D
+   * </pre>
+   * So all of these trips have the same main part "A" and we want to group them together. We do so
+   * by comparing the keys, if one is a prefix of another then they belong to the same group. But
+   * what about III and IV? By them self they are not the same group, but if we use the groupId for
+   * A or B ad a key to the group, both fall into the same group. So, to be deterministic we use
+   * this {@code merge(..)} method to return the group-id that is the most general one - the id able
+   * to represent the biggest set of trips.
+   */
+  T merge(T other);
 }

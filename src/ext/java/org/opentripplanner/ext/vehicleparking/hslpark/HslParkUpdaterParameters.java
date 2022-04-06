@@ -9,41 +9,40 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParamete
  */
 public class HslParkUpdaterParameters extends VehicleParkingUpdaterParameters {
 
-    private final int facilitiesFrequencySec;
-    private final String facilitiesUrl;
-    private final String feedId;
-    private final String utilizationsUrl;
+  private final int facilitiesFrequencySec;
+  private final String facilitiesUrl;
+  private final String feedId;
+  private final String utilizationsUrl;
 
-    public HslParkUpdaterParameters(
-            String configRef,
-            int facilitiesFrequencySec,
-            String facilitiesUrl,
-            String feedId,
-            DataSourceType sourceType,
-            int utilizationsFrequencySec,
-            String utilizationsUrl
+  public HslParkUpdaterParameters(
+    String configRef,
+    int facilitiesFrequencySec,
+    String facilitiesUrl,
+    String feedId,
+    DataSourceType sourceType,
+    int utilizationsFrequencySec,
+    String utilizationsUrl
+  ) {
+    super(configRef, utilizationsFrequencySec, sourceType);
+    this.facilitiesFrequencySec = facilitiesFrequencySec;
+    this.facilitiesUrl = facilitiesUrl;
+    this.feedId = feedId;
+    this.utilizationsUrl = utilizationsUrl;
+  }
 
-    ) {
-        super(configRef, utilizationsFrequencySec, sourceType);
-        this.facilitiesFrequencySec = facilitiesFrequencySec;
-        this.facilitiesUrl = facilitiesUrl;
-        this.feedId = feedId;
-        this.utilizationsUrl = utilizationsUrl;
-    }
+  public int getFacilitiesFrequencySec() {
+    return facilitiesFrequencySec;
+  }
 
-    public int getFacilitiesFrequencySec() {
-        return facilitiesFrequencySec;
-    }
+  public String getFeedId() {
+    return feedId;
+  }
 
-    public String getFeedId() {
-        return feedId;
-    }
+  public String getFacilitiesUrl() {
+    return facilitiesUrl;
+  }
 
-    public String getFacilitiesUrl() {
-        return facilitiesUrl;
-    }
-
-    public String getUtilizationsUrl() {
-        return utilizationsUrl;
-    }
+  public String getUtilizationsUrl() {
+    return utilizationsUrl;
+  }
 }

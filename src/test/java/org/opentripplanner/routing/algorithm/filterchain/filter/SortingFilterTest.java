@@ -12,18 +12,17 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 
 public class SortingFilterTest implements PlanTestConstants {
 
-    @Test
-    public void sortWorksWithOneOrEmptyList() {
-        SortingFilter filter = new SortingFilter(generalizedCostComparator());
+  @Test
+  public void sortWorksWithOneOrEmptyList() {
+    SortingFilter filter = new SortingFilter(generalizedCostComparator());
 
-        // Expect sort to no fail on an empty list
-        assertEquals(List.of(), filter.filter(List.of()));
+    // Expect sort to no fail on an empty list
+    assertEquals(List.of(), filter.filter(List.of()));
 
+    // Given a list with one itinerary
+    List<Itinerary> list = List.of(newItinerary(A).bus(31, 0, 30, E).build());
 
-        // Given a list with one itinerary
-        List<Itinerary> list = List.of(newItinerary(A).bus(31, 0, 30, E).build());
-
-        // Then: expect nothing to happen to it
-        assertEquals(toStr(list), toStr(filter.filter(list)));
-    }
+    // Then: expect nothing to happen to it
+    assertEquals(toStr(list), toStr(filter.filter(list)));
+  }
 }

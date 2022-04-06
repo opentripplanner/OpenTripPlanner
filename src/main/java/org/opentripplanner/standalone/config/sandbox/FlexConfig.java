@@ -5,6 +5,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
 public class FlexConfig {
+
   public static final int DEFAULT_MAX_TRANSFER_SECONDS = 60 * 5; // 5 minutes
   public final int maxTransferSeconds;
 

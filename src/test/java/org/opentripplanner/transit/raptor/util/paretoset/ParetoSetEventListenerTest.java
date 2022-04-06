@@ -1,105 +1,112 @@
 package org.opentripplanner.transit.raptor.util.paretoset;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ParetoSetEventListenerTest {
-    private final List<Vector> accepted = new ArrayList<>();
-    private final List<Vector> rejected = new ArrayList<>();
-    private final List<Vector> dropped = new ArrayList<>();
 
-    // Given a set and function
+  private final List<Vector> accepted = new ArrayList<>();
+  private final List<Vector> rejected = new ArrayList<>();
+  private final List<Vector> dropped = new ArrayList<>();
 
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final ParetoSet<Vector> subject = new ParetoSet<>((l, r) -> l.v1 < r.v1 || l.v2 < r.v2, eventListener());
+  // Given a set and function
 
-    @Before
-    public void setup() {
-        subject.clear();
-        clearResult();
-    }
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+  private final ParetoSet<Vector> subject = new ParetoSet<>(
+    (l, r) -> l.v1 < r.v1 || l.v2 < r.v2,
+    eventListener()
+  );
 
-    @Test
-    public void testAccept() {
-        // Add a value
-        subject.add(vector(5, 1));
-        assertAcceptedRejectedAndDropped("[5, 1]", "", "");
+  @Before
+  public void setup() {
+    subject.clear();
+    clearResult();
+  }
 
-        // Add another accepted value
-        subject.add(vector( 4, 2));
-        assertAcceptedRejectedAndDropped("[4, 2]", "", "");
-    }
+  @Test
+  public void testAccept() {
+    // Add a value
+    subject.add(vector(5, 1));
+    assertAcceptedRejectedAndDropped("[5, 1]", "", "");
 
-    @Test
-    public void testReject() {
-        // Add a initial value
-        subject.add(vector(5, 1));
-        clearResult();
+    // Add another accepted value
+    subject.add(vector(4, 2));
+    assertAcceptedRejectedAndDropped("[4, 2]", "", "");
+  }
 
-        // Add another value -> expect rejected
-        subject.add(vector( 6, 2));
-        assertAcceptedRejectedAndDropped("", "[6, 2]", "");
-    }
+  @Test
+  public void testReject() {
+    // Add a initial value
+    subject.add(vector(5, 1));
+    clearResult();
 
-    @Test
-    public void testDropped() {
-        // Add a initial value
-        subject.add(vector(2, 5));
-        subject.add(vector(4, 4));
-        subject.add(vector(5, 3));
-        clearResult();
+    // Add another value -> expect rejected
+    subject.add(vector(6, 2));
+    assertAcceptedRejectedAndDropped("", "[6, 2]", "");
+  }
 
-        // Add another value -> expect rejected
-        subject.add(vector( 1, 5));
-        assertAcceptedRejectedAndDropped("[1, 5]", "", "[2, 5]");
+  @Test
+  public void testDropped() {
+    // Add a initial value
+    subject.add(vector(2, 5));
+    subject.add(vector(4, 4));
+    subject.add(vector(5, 3));
+    clearResult();
 
-        subject.add(vector( 1, 0));
-        assertAcceptedRejectedAndDropped("[1, 0]", "", "[4, 4] [5, 3] [1, 5]");
-    }
+    // Add another value -> expect rejected
+    subject.add(vector(1, 5));
+    assertAcceptedRejectedAndDropped("[1, 5]", "", "[2, 5]");
 
-    private Vector vector(int u, int v) {
-        return new Vector("", u, v);
-    }
+    subject.add(vector(1, 0));
+    assertAcceptedRejectedAndDropped("[1, 0]", "", "[4, 4] [5, 3] [1, 5]");
+  }
 
-    private void clearResult() {
-        accepted.clear();
-        rejected.clear();
-        dropped.clear();
-    }
+  private Vector vector(int u, int v) {
+    return new Vector("", u, v);
+  }
 
-    private void assertAcceptedRejectedAndDropped(String expAccepted, String expRejected, String expDropped) {
-        assertEquals(expAccepted, toString(accepted));
-        assertEquals(expRejected, toString(rejected));
-        assertEquals(expDropped, toString(dropped));
-        clearResult();
-    }
+  private void clearResult() {
+    accepted.clear();
+    rejected.clear();
+    dropped.clear();
+  }
 
-    private String toString(List<Vector> list) {
-        return list.stream().map(Vector::toString).collect(Collectors.joining(" "));
-    }
+  private void assertAcceptedRejectedAndDropped(
+    String expAccepted,
+    String expRejected,
+    String expDropped
+  ) {
+    assertEquals(expAccepted, toString(accepted));
+    assertEquals(expRejected, toString(rejected));
+    assertEquals(expDropped, toString(dropped));
+    clearResult();
+  }
 
-    private ParetoSetEventListener<Vector> eventListener() {
-        return new ParetoSetEventListener<>() {
-          @Override
-          public void notifyElementAccepted(Vector newElement) {
-            accepted.add(newElement);
-          }
+  private String toString(List<Vector> list) {
+    return list.stream().map(Vector::toString).collect(Collectors.joining(" "));
+  }
 
-          @Override
-          public void notifyElementDropped(Vector element, Vector droppedByElement) {
-            dropped.add(element);
-          }
+  private ParetoSetEventListener<Vector> eventListener() {
+    return new ParetoSetEventListener<>() {
+      @Override
+      public void notifyElementAccepted(Vector newElement) {
+        accepted.add(newElement);
+      }
 
-          @Override
-          public void notifyElementRejected(Vector element, Vector rejectedByElement) {
-            rejected.add(element);
-          }
-        };
-    }
+      @Override
+      public void notifyElementDropped(Vector element, Vector droppedByElement) {
+        dropped.add(element);
+      }
+
+      @Override
+      public void notifyElementRejected(Vector element, Vector rejectedByElement) {
+        rejected.add(element);
+      }
+    };
+  }
 }

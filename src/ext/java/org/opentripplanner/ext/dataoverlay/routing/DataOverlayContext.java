@@ -15,53 +15,56 @@ import org.slf4j.LoggerFactory;
 
 public class DataOverlayContext {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataOverlayContext.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DataOverlayContext.class);
 
-    private final List<Parameter> parameters = new ArrayList<>();
+  private final List<Parameter> parameters = new ArrayList<>();
 
-    public DataOverlayContext(
-            DataOverlayParameterBindings parameterBindings,
-            DataOverlayParameters requestParameters
-    ) {
-        for (ParameterName paramName : requestParameters.listParameterNames()) {
-            addParameter(paramName, parameterBindings, requestParameters);
-        }
+  public DataOverlayContext(
+    DataOverlayParameterBindings parameterBindings,
+    DataOverlayParameters requestParameters
+  ) {
+    for (ParameterName paramName : requestParameters.listParameterNames()) {
+      addParameter(paramName, parameterBindings, requestParameters);
+    }
+  }
+
+  public Iterable<? extends Parameter> getParameters() {
+    return parameters;
+  }
+
+  private void addParameter(
+    ParameterName paramName,
+    DataOverlayParameterBindings parameterBindings,
+    DataOverlayParameters requestParameters
+  ) {
+    var penalty = requestParameters.get(paramName, PENALTY);
+
+    if (isParameterValueInvalid(penalty, paramName, PENALTY)) {
+      return;
     }
 
-    private void addParameter(
-            ParameterName paramName,
-            DataOverlayParameterBindings parameterBindings,
-            DataOverlayParameters requestParameters
-    ) {
-        var penalty = requestParameters.get(paramName, PENALTY);
+    var threshold = requestParameters.get(paramName, THRESHOLD);
 
-        if(isParameterValueInvalid(penalty, paramName, PENALTY)) { return; }
-
-        var threshold = requestParameters.get(paramName, THRESHOLD);
-
-        if(isParameterValueInvalid(threshold, paramName, THRESHOLD)) { return; }
-
-        var binding = parameterBindings.getParameterBinding(paramName);
-
-        if(binding.isEmpty()) {
-            LOG.warn("Request parameter config not found. Parameter: {}", paramName);
-            return;
-        }
-
-        this.parameters.add(new Parameter(binding.get(), threshold, penalty));
+    if (isParameterValueInvalid(threshold, paramName, THRESHOLD)) {
+      return;
     }
 
-    public Iterable<? extends Parameter> getParameters() {
-        return parameters;
+    var binding = parameterBindings.getParameterBinding(paramName);
+
+    if (binding.isEmpty()) {
+      LOG.warn("Request parameter config not found. Parameter: {}", paramName);
+      return;
     }
 
-    private boolean isParameterValueInvalid(Double value, ParameterName name, ParameterType type) {
-        if(value == null || value < 0d) {
-            LOG.warn("Request parameter required. Parameter: {}", toStringKey(name, type));
-            return true;
-        }
-        else {
-            return false;
-        }
+    this.parameters.add(new Parameter(binding.get(), threshold, penalty));
+  }
+
+  private boolean isParameterValueInvalid(Double value, ParameterName name, ParameterType type) {
+    if (value == null || value < 0d) {
+      LOG.warn("Request parameter required. Parameter: {}", toStringKey(name, type));
+      return true;
+    } else {
+      return false;
     }
+  }
 }

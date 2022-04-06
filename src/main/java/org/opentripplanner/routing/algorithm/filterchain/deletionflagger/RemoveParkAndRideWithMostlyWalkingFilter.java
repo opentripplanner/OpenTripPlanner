@@ -16,40 +16,45 @@ import org.opentripplanner.routing.core.TraverseMode;
  */
 public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryDeletionFlagger {
 
-    private final double parkAndRideDurationRatio;
+  private final double parkAndRideDurationRatio;
 
-    public RemoveParkAndRideWithMostlyWalkingFilter(double ratio) {
-        this.parkAndRideDurationRatio = ratio;
+  public RemoveParkAndRideWithMostlyWalkingFilter(double ratio) {
+    this.parkAndRideDurationRatio = ratio;
+  }
+
+  @Override
+  public String name() {
+    return "park-and-ride-vs-walk-filter";
+  }
+
+  @Override
+  public Predicate<Itinerary> predicate() {
+    return itinerary -> {
+      var containsTransit = itinerary.legs
+        .stream()
+        .anyMatch(l -> l != null && l.getMode().isTransit());
+
+      double carDuration = itinerary.legs
+        .stream()
+        .filter(l -> l.getMode() == TraverseMode.CAR)
+        .mapToDouble(Leg::getDuration)
+        .sum();
+      double totalDuration = itinerary.durationSeconds;
+
+      return (
+        !containsTransit &&
+        carDuration != 0 &&
+        (carDuration / totalDuration) <= parkAndRideDurationRatio
+      );
+    };
+  }
+
+  @Override
+  public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
+    if (itineraries.size() == 1) {
+      return List.of();
     }
 
-    @Override
-    public String name() {
-        return "park-and-ride-vs-walk-filter";
-    }
-
-    @Override
-    public Predicate<Itinerary> predicate() {
-        return itinerary -> {
-            var containsTransit =
-                    itinerary.legs.stream().anyMatch(l -> l != null && l.getMode().isTransit());
-
-            double carDuration = itinerary.legs
-                    .stream()
-                    .filter(l -> l.getMode() == TraverseMode.CAR)
-                    .mapToDouble(Leg::getDuration)
-                    .sum();
-            double totalDuration = itinerary.durationSeconds;
-
-            return !containsTransit
-                    && carDuration != 0
-                    && (carDuration / totalDuration) <= parkAndRideDurationRatio;
-        };
-    }
-
-    @Override
-    public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
-        if (itineraries.size() == 1) { return List.of(); }
-
-        return itineraries.stream().filter(predicate()).collect(Collectors.toList());
-    }
+    return itineraries.stream().filter(predicate()).collect(Collectors.toList());
+  }
 }

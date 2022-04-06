@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.stoptime;
 
 public class MqttGtfsRealtimeUpdaterParameters {
+
   private final String configRef;
   private final String feedId;
   private final String url;
@@ -8,9 +9,13 @@ public class MqttGtfsRealtimeUpdaterParameters {
   private final int qos;
   private final boolean fuzzyTripMatching;
 
-
   public MqttGtfsRealtimeUpdaterParameters(
-      String configRef, String feedId, String url, String topic, int qos, boolean fuzzyTripMatching
+    String configRef,
+    String feedId,
+    String url,
+    String topic,
+    int qos,
+    boolean fuzzyTripMatching
   ) {
     this.configRef = configRef;
     this.feedId = feedId;

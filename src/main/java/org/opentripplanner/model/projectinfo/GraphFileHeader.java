@@ -1,13 +1,11 @@
 package org.opentripplanner.model.projectinfo;
 
-import org.opentripplanner.util.OtpAppException;
-
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.opentripplanner.util.OtpAppException;
 
 /**
  * The Graph.obj file start with file header. The header have two things:
@@ -15,7 +13,7 @@ import java.util.regex.Pattern;
  *   <li>Magic number: {@code "OpenTripPlannerGraph"}</li>
  *   <li>The graph file serialization compatibility id</li>
  * </ol>
- *
+ * <p>
  * This class represent the header and contain logic to parse and validate it.
  */
 public class GraphFileHeader implements Serializable {
@@ -29,7 +27,7 @@ public class GraphFileHeader implements Serializable {
   private static final int HEADER_LENGTH = MAGIC_NUMBER.length() + ID_LENGTH + 2;
 
   private static final Pattern HEADER_PATTERN = Pattern.compile(
-      MAGIC_NUMBER + DELIMITER + "([-\\w.:+/]{7})" + DELIMITER
+    MAGIC_NUMBER + DELIMITER + "([-\\w.:+/]{7})" + DELIMITER
   );
 
   public static final Charset CHARSET = StandardCharsets.ISO_8859_1;
@@ -52,19 +50,24 @@ public class GraphFileHeader implements Serializable {
   }
 
   public static GraphFileHeader parse(byte[] buf) {
-    if(buf.length < HEADER_LENGTH) {
+    if (buf.length < HEADER_LENGTH) {
       throw new OtpAppException(
-          "Input file header is not large enough. At least " + HEADER_LENGTH + " bytes is needed. "
-              + "Input: " + prettyBytesToString(buf)
+        "Input file header is not large enough. At least " +
+        HEADER_LENGTH +
+        " bytes is needed. " +
+        "Input: " +
+        prettyBytesToString(buf)
       );
     }
     String header = new String(buf, 0, HEADER_LENGTH, CHARSET);
 
     Matcher m = HEADER_PATTERN.matcher(header);
-    if(!m.matches()) {
+    if (!m.matches()) {
       throw new OtpAppException(
-          "The file is no recognized as an OTP Graph file. The header do not match \""
-              + HEADER_PATTERN.pattern() + "\".\n\tInput: " + prettyBytesToString(buf)
+        "The file is no recognized as an OTP Graph file. The header do not match \"" +
+        HEADER_PATTERN.pattern() +
+        "\".\n\tInput: " +
+        prettyBytesToString(buf)
       );
     }
     return new GraphFileHeader(m.group(1));
@@ -80,11 +83,11 @@ public class GraphFileHeader implements Serializable {
   }
 
   /**
-   * The OTP serialization version id. If OTP and a Graph.obj file have the same id,
-   * then OTP is compatible with the graph and should be able to deserialize it.
+   * The OTP serialization version id. If OTP and a Graph.obj file have the same id, then OTP is
+   * compatible with the graph and should be able to deserialize it.
    * <p>
-   * The returned id do NOT include the prefix '0's. In the serialized form as bytes
-   * it have a fixed length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
+   * The returned id do NOT include the prefix '0's. In the serialized form as bytes it have a fixed
+   * length {@link #ID_LENGTH} and is padded with {@link #ID_PREFIX}.
    */
   public String otpSerializationVersionId() {
     return otpSerializationVersionId;
@@ -103,16 +106,20 @@ public class GraphFileHeader implements Serializable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) { return true; }
-    if (o == null || getClass() != o.getClass()) { return false; }
-    GraphFileHeader that = (GraphFileHeader) o;
-    return otpSerializationVersionId.equals(that.otpSerializationVersionId);
+  public int hashCode() {
+    return otpSerializationVersionId.hashCode();
   }
 
   @Override
-  public int hashCode() {
-    return otpSerializationVersionId.hashCode();
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    GraphFileHeader that = (GraphFileHeader) o;
+    return otpSerializationVersionId.equals(that.otpSerializationVersionId);
   }
 
   @Override
@@ -121,12 +128,14 @@ public class GraphFileHeader implements Serializable {
   }
 
   /**
-   * Pad the given text until it have the expected length {@link #ID_LENGTH}
-   * using the {@link #ID_PREFIX}.
+   * Pad the given text until it have the expected length {@link #ID_LENGTH} using the {@link
+   * #ID_PREFIX}.
    */
   static String padId(String text) {
     StringBuilder buf = new StringBuilder();
-    while (buf.length() + text.length() < ID_LENGTH) { buf.append(ID_PREFIX); }
+    while (buf.length() + text.length() < ID_LENGTH) {
+      buf.append(ID_PREFIX);
+    }
     buf.append(text);
     return buf.toString();
   }
@@ -136,13 +145,15 @@ public class GraphFileHeader implements Serializable {
    */
   static String stripId(String text) {
     int pos = 0;
-    while (pos < text.length() && text.charAt(pos) == ID_PREFIX) { ++pos; }
+    while (pos < text.length() && text.charAt(pos) == ID_PREFIX) {
+      ++pos;
+    }
     return text.substring(pos);
   }
 
   /** Example: 41 6C 66 61 2D 31  "Alfa-1" */
   static String prettyBytesToString(byte[] text) {
-    if(text == null || text.length == 0) {
+    if (text == null || text.length == 0) {
       return "<empty>";
     }
     StringBuilder buf = new StringBuilder();

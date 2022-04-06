@@ -8,38 +8,38 @@ import org.opentripplanner.model.calendar.ServiceDate;
  */
 public class TripOnServiceDate extends TransitEntity {
 
-    private final Trip trip;
-    private final ServiceDate serviceDate;
-    private final TripAlteration tripAlteration;
-    private final List<TripOnServiceDate> replacementFor;
+  private final Trip trip;
+  private final ServiceDate serviceDate;
+  private final TripAlteration tripAlteration;
+  private final List<TripOnServiceDate> replacementFor;
 
-    public TripOnServiceDate(
-            FeedScopedId id,
-            Trip trip,
-            ServiceDate serviceDate,
-            TripAlteration tripAlteration,
-            List<TripOnServiceDate> replacementFor
-    ) {
-        super(id);
-        this.trip = trip;
-        this.serviceDate = serviceDate;
-        this.tripAlteration = tripAlteration;
-        this.replacementFor = replacementFor;
-    }
+  public TripOnServiceDate(
+    FeedScopedId id,
+    Trip trip,
+    ServiceDate serviceDate,
+    TripAlteration tripAlteration,
+    List<TripOnServiceDate> replacementFor
+  ) {
+    super(id);
+    this.trip = trip;
+    this.serviceDate = serviceDate;
+    this.tripAlteration = tripAlteration;
+    this.replacementFor = replacementFor;
+  }
 
-    public Trip getTrip() {
-        return trip;
-    }
+  public Trip getTrip() {
+    return trip;
+  }
 
-    public ServiceDate getServiceDate() {
-        return serviceDate;
-    }
+  public ServiceDate getServiceDate() {
+    return serviceDate;
+  }
 
-    public TripAlteration getTripAlteration() {
-        return tripAlteration;
-    }
+  public TripAlteration getTripAlteration() {
+    return tripAlteration;
+  }
 
-    public List<TripOnServiceDate> getReplacementFor() {
-        return replacementFor;
-    }
+  public List<TripOnServiceDate> getReplacementFor() {
+    return replacementFor;
+  }
 }

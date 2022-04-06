@@ -1,21 +1,21 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.util.TranslationHelper;
-
-import java.util.Collection;
-import java.util.Collections;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
+import java.util.Collections;
+import org.junit.Test;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.util.TranslationHelper;
+
 public class PathwayNodeMapperTest {
+
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "N1");
 
   private static final String CODE = "Code";
@@ -43,6 +43,7 @@ public class PathwayNodeMapperTest {
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
+  private final PathwayNodeMapper subject = new PathwayNodeMapper(new TranslationHelper());
 
   static {
     STOP.setLocationType(Stop.LOCATION_TYPE_NODE);
@@ -59,8 +60,6 @@ public class PathwayNodeMapperTest {
     STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING);
     STOP.setZoneId(ZONE_ID);
   }
-
-  private final PathwayNodeMapper subject = new PathwayNodeMapper(new TranslationHelper());
 
   @Test
   public void testMapCollection() throws Exception {

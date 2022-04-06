@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.util.paretoset;
 
 /**
- * Comparator used by the {@link ParetoSet} to compare to elements for dominance. There is 4 outcomes
- * of a comparison between a left and right vector:
+ * Comparator used by the {@link ParetoSet} to compare to elements for dominance. There is 4
+ * outcomes of a comparison between a left and right vector:
  * <ul>
  *     <li>Left dominates right - At least one left criteria dominates, and no right dominance exist
  *     <li>Right dominates left - At least one right criteria dominates, and no left dominance exist
@@ -15,9 +15,8 @@ package org.opentripplanner.transit.raptor.util.paretoset;
  */
 @FunctionalInterface
 public interface ParetoComparator<T> {
-
-    /**
-     * At least one of the left criteria dominates one of the corresponding right criteria.
-     */
-    boolean leftDominanceExist(T left, T right);
+  /**
+   * At least one of the left criteria dominates one of the corresponding right criteria.
+   */
+  boolean leftDominanceExist(T left, T right);
 }

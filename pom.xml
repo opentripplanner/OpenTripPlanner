@@ -31,6 +31,7 @@
         <micrometer.version>1.8.3</micrometer.version>
         <netcdf4.version>5.5.2</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
+        <lucene.version>9.1.0</lucene.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -38,6 +39,8 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
+        <plugin.prettier.version>0.17</plugin.prettier.version>
+        <plugin.prettier.goal>write</plugin.prettier.goal>
     </properties>
 
     <distributionManagement>
@@ -331,6 +334,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>prettier-maven-plugin</artifactId>
+                <version>${plugin.prettier.version}</version>
+                <configuration>
+                    <prettierJavaVersion>1.6.1</prettierJavaVersion>
+                    <inputGlobs>
+                        <inputGlob>src/main/java/**/*.java</inputGlob>
+                        <inputGlob>src/test/java/**/*.java</inputGlob>
+                        <inputGlob>src/ext/java/**/*.java</inputGlob>
+                        <inputGlob>src/ext-test/java/**/*.java</inputGlob>
+                    </inputGlobs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>${plugin.prettier.goal}</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -429,6 +454,23 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojsondatastore</artifactId>
             <version>${geotools.version}</version>
+        </dependency>
+
+        <!-- Lucene is used by the Debug Client Geocode API -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+             <groupId>org.apache.lucene</groupId>
+             <artifactId>lucene-queryparser</artifactId>
+             <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+             <groupId>org.apache.lucene</groupId>
+             <artifactId>lucene-suggest</artifactId>
+             <version>${lucene.version}</version>
         </dependency>
 
         <dependency>
@@ -699,6 +741,33 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>prettierCheck</id>
+            <properties>
+                <!-- In the CI environment we want to validate that code is formatted -->
+                <plugin.prettier.goal>check</plugin.prettier.goal>
+            </properties>
+        </profile>
+        <profile>
+            <id>prettierSkip</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.hubspot.maven.plugins</groupId>
+                        <artifactId>prettier-maven-plugin</artifactId>
+                        <version>${plugin.prettier.version}</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>clean-test-snapshots</id>
             <build>

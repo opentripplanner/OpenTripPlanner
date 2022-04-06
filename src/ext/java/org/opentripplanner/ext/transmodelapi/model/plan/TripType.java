@@ -14,114 +14,161 @@ import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
 public class TripType {
-  public static GraphQLObjectType create(
-      GraphQLObjectType placeType,
-      GraphQLObjectType tripPatternType,
-      GraphQLObjectType tripMetadataType,
-      GraphQLObjectType routingErrorType,
-      GqlUtil gqlUtil
 
+  public static GraphQLObjectType create(
+    GraphQLObjectType placeType,
+    GraphQLObjectType tripPatternType,
+    GraphQLObjectType tripMetadataType,
+    GraphQLObjectType routingErrorType,
+    GqlUtil gqlUtil
   ) {
-    return GraphQLObjectType.newObject()
-        .name("Trip")
-        .description("Description of a travel between two places.")
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("dateTime")
-            .description("The time and date of travel")
-            .type(gqlUtil.dateTimeScalar)
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.date.getTime())
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("metadata")
-            .description("The trip request metadata.")
-            .type(tripMetadataType)
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).metadata)
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("fromPlace")
-            .description("The origin")
-            .type(new GraphQLNonNull(placeType))
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.from)
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("toPlace")
-            .description("The destination")
-            .type(new GraphQLNonNull(placeType))
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.to)
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("tripPatterns")
-            .description("A list of possible trip patterns")
-            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(tripPatternType))))
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.itineraries)
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("messageEnums")
-            .description("A list of possible error messages as enum")
-            .deprecate("Use routingErrors instead")
-            .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages.stream()
-                    .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
-                    .map(Enum::name)
-                    .collect(Collectors.toList()))
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("messageStrings")
-            .deprecate("Use routingErrors instead")
-            .description("A list of possible error messages in cleartext")
-            .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages.stream()
-                    .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
-                    .map(message -> message.get(ResourceBundleSingleton.INSTANCE.getLocale(env.getArgument("locale"))))
-                    .collect(Collectors.toList())
-            )
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("routingErrors")
-            .description("A list of routing errors, and fields which caused them")
-            .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(routingErrorType))))
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).messages)
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("debugOutput")
-            .description("Information about the timings for the trip generation")
-            .type(new GraphQLNonNull(GraphQLObjectType.newObject()
+    return GraphQLObjectType
+      .newObject()
+      .name("Trip")
+      .description("Description of a travel between two places.")
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("dateTime")
+          .description("The time and date of travel")
+          .type(gqlUtil.dateTimeScalar)
+          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.date.getTime())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("metadata")
+          .description("The trip request metadata.")
+          .type(tripMetadataType)
+          .dataFetcher(env -> ((PlanResponse) env.getSource()).metadata)
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("fromPlace")
+          .description("The origin")
+          .type(new GraphQLNonNull(placeType))
+          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.from)
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("toPlace")
+          .description("The destination")
+          .type(new GraphQLNonNull(placeType))
+          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.to)
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("tripPatterns")
+          .description("A list of possible trip patterns")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(tripPatternType))))
+          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.itineraries)
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("messageEnums")
+          .description("A list of possible error messages as enum")
+          .deprecate("Use routingErrors instead")
+          .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+          .dataFetcher(env ->
+            ((PlanResponse) env.getSource()).messages.stream()
+              .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
+              .map(Enum::name)
+              .collect(Collectors.toList())
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("messageStrings")
+          .deprecate("Use routingErrors instead")
+          .description("A list of possible error messages in cleartext")
+          .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+          .dataFetcher(env ->
+            ((PlanResponse) env.getSource()).messages.stream()
+              .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
+              .map(message ->
+                message.get(ResourceBundleSingleton.INSTANCE.getLocale(env.getArgument("locale")))
+              )
+              .collect(Collectors.toList())
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("routingErrors")
+          .description("A list of routing errors, and fields which caused them")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(routingErrorType))))
+          .dataFetcher(env -> ((PlanResponse) env.getSource()).messages)
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("debugOutput")
+          .description("Information about the timings for the trip generation")
+          .type(
+            new GraphQLNonNull(
+              GraphQLObjectType
+                .newObject()
                 .name("debugOutput")
-                .field(GraphQLFieldDefinition.newFieldDefinition()
+                .field(
+                  GraphQLFieldDefinition
+                    .newFieldDefinition()
                     .name("totalTime")
                     .type(ExtendedScalars.GraphQLLong)
-                    .build())
-                .build()))
-            .dataFetcher(env -> ((PlanResponse) env.getSource()).debugOutput)
-            .build())
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("previousPageCursor")
-                .description("Use the cursor to get the previous page of results. Use this cursor for "
-                    + "the pageCursor parameter in the trip query in order to get the previous page.\n"
-                    + "The previous page is a set of itineraries departing BEFORE the first itinerary"
-                    + " in this result.")
-                .type(Scalars.GraphQLString)
-                .dataFetcher(env -> {
-                    final PageCursor pageCursor =
-                            ((PlanResponse) env.getSource()).previousPageCursor;
-                    return pageCursor != null ? pageCursor.encode() : null;
-                })
+                    .build()
+                )
                 .build()
             )
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("nextPageCursor")
-                .description("Use the cursor to get the next page of results. Use this cursor for "
-                    + "the pageCursor parameter in the trip query in order to get the next page.\n"
-                    + "The next page is a set of itineraries departing AFTER the last "
-                    + "itinerary in this result.")
-                .type(Scalars.GraphQLString)
-                .dataFetcher(env -> {
-                    final PageCursor pageCursor =
-                            ((PlanResponse) env.getSource()).nextPageCursor;
-                    return pageCursor != null ? pageCursor.encode() : null;
-                })
-                .build()
-            )
-        .build();
+          )
+          .dataFetcher(env -> ((PlanResponse) env.getSource()).debugOutput)
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("previousPageCursor")
+          .description(
+            "Use the cursor to get the previous page of results. Use this cursor for " +
+            "the pageCursor parameter in the trip query in order to get the previous page.\n" +
+            "The previous page is a set of itineraries departing BEFORE the first itinerary" +
+            " in this result."
+          )
+          .type(Scalars.GraphQLString)
+          .dataFetcher(env -> {
+            final PageCursor pageCursor = ((PlanResponse) env.getSource()).previousPageCursor;
+            return pageCursor != null ? pageCursor.encode() : null;
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("nextPageCursor")
+          .description(
+            "Use the cursor to get the next page of results. Use this cursor for " +
+            "the pageCursor parameter in the trip query in order to get the next page.\n" +
+            "The next page is a set of itineraries departing AFTER the last " +
+            "itinerary in this result."
+          )
+          .type(Scalars.GraphQLString)
+          .dataFetcher(env -> {
+            final PageCursor pageCursor = ((PlanResponse) env.getSource()).nextPageCursor;
+            return pageCursor != null ? pageCursor.encode() : null;
+          })
+          .build()
+      )
+      .build();
   }
 }
