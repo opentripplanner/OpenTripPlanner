@@ -10,21 +10,21 @@ import org.opentripplanner.standalone.config.NodeAdapter;
  */
 public class TransmodelAPIConfig implements TransmodelAPIParameters {
 
-    private final boolean hideFeedId;
-    private final Collection<String> tracingHeaderTags;
+  private final boolean hideFeedId;
+  private final Collection<String> tracingHeaderTags;
 
-    public TransmodelAPIConfig(NodeAdapter node) {
-        hideFeedId = node.asBoolean("hideFeedId", false);
-        tracingHeaderTags = node.asTextSet("tracingHeaderTags", Set.of());
-    }
+  public TransmodelAPIConfig(NodeAdapter node) {
+    hideFeedId = node.asBoolean("hideFeedId", false);
+    tracingHeaderTags = node.asTextSet("tracingHeaderTags", Set.of());
+  }
 
-    @Override
-    public boolean hideFeedId() {
-        return hideFeedId;
-    }
+  @Override
+  public boolean hideFeedId() {
+    return hideFeedId;
+  }
 
-    @Override
-    public Collection<String> tracingHeaderTags() {
-        return tracingHeaderTags;
-    }
+  @Override
+  public Collection<String> tracingHeaderTags() {
+    return tracingHeaderTags;
+  }
 }

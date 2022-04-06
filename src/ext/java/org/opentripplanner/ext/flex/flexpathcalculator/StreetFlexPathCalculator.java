@@ -16,11 +16,11 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 /**
  * StreetFlexPathCalculator calculates the driving times and distances based on the street network
  * using the AStar algorithm.
- *
+ * <p>
  * Note that it caches the whole ShortestPathTree the first time it encounters a new fromVertex.
- * Subsequent requests from the same fromVertex can fetch the path to the toVertex from the
- * existing ShortestPathTree. This one-to-many approach is needed to make the performance acceptable.
- *
+ * Subsequent requests from the same fromVertex can fetch the path to the toVertex from the existing
+ * ShortestPathTree. This one-to-many approach is needed to make the performance acceptable.
+ * <p>
  * Because we will have lots of searches with the same origin when doing access searches and a lot
  * of searches with the same destination when doing egress searches, the calculator needs to be
  * configured so that the caching is done with either the origin or destination vertex as the key.
@@ -42,7 +42,6 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   @Override
   public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex) {
-
     // These are the origin and destination vertices from the perspective of the one-to-many search,
     // which may be reversed
     Vertex originVertex = reverseDirection ? tov : fromv;
@@ -82,8 +81,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     routingRequest.dominanceFunction = new DominanceFunction.EarliestArrival();
 
     return AStarBuilder
-            .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
-            .setContext(rctx)
-            .getShortestPathTree();
+      .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
+      .setContext(rctx)
+      .getShortestPathTree();
   }
 }

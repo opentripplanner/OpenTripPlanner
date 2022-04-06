@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-
 import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 
@@ -15,8 +14,9 @@ public class ItineraryFilterParameters {
   public boolean debug;
 
   /**
-   * Keep ONE itinerary for each group with at least this part of the legs in common.
-   * Default value is 0.85 (85%), use a value less than 0.50 to turn off.
+   * Keep ONE itinerary for each group with at least this part of the legs in common. Default value
+   * is 0.85 (85%), use a value less than 0.50 to turn off.
+   *
    * @see ItineraryListFilterChainBuilder#addGroupBySimilarity(org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity)
    */
   public double groupSimilarityKeepOne;
@@ -37,11 +37,11 @@ public class ItineraryFilterParameters {
 
   /**
    * A relative maximum limit for the generalized cost for transit itineraries. The limit is a
-   * linear function of the minimum generalized-cost. The minimum cost is lowest cost from the
-   * set of all returned transit itineraries. The function is used to calculate a max-limit. The
-   * max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost
-   * higher than the max-limit is dropped from the result set. None transit itineraries is
-   * excluded from the filter.
+   * linear function of the minimum generalized-cost. The minimum cost is lowest cost from the set
+   * of all returned transit itineraries. The function is used to calculate a max-limit. The
+   * max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher
+   * than the max-limit is dropped from the result set. None transit itineraries is excluded from
+   * the filter.
    * <ul>
    * <li>To set a filter to be 1 hours plus 2 times the lowest cost use:
    * {@code 3600 + 2.0 x}
@@ -55,37 +55,35 @@ public class ItineraryFilterParameters {
    * This is used to filter out bike rental itineraries that contain mostly walking. The value
    * describes the ratio of the total itinerary that has to consist of bike rental to allow the
    * itinerary.
-   *
+   * <p>
    * Default value is off (0). If you want a minimum of 30% cycling, use a value of 0.3.
    */
   public double bikeRentalDistanceRatio;
 
   /**
-   * This is used to filter out park and ride itineraries that contain only driving plus a very
-   * long walk. The value describes the ratio of the total itinerary duration that has to consist
-   * of driving to allow the itinerary.
-   *
+   * This is used to filter out park and ride itineraries that contain only driving plus a very long
+   * walk. The value describes the ratio of the total itinerary duration that has to consist of
+   * driving to allow the itinerary.
+   * <p>
    * Default value is 0.3 (30%), use a value of 0 to turn off.
    */
   public double parkAndRideDurationRatio;
 
   /**
-   * This is a a bit similar to {@link #transitGeneralizedCostLimit}, with
-   * a few important differences.
-   *
-   * This function is used to compute a max-limit for generalized-cost. The limit
-   * is applied to itineraries with no transit legs, however ALL itineraries (including those with
-   * transit legs) are considered when calculating the minimum cost.
+   * This is a a bit similar to {@link #transitGeneralizedCostLimit}, with a few important
+   * differences.
    * <p>
-   * The smallest generalized-cost value is used as input to the function.
-   * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
-   * {@code 5000}, then all non-transit itineraries with a cost larger than
-   * {@code 1800 + 2 * 5000 = 11 800} is dropped.
-   *
+   * This function is used to compute a max-limit for generalized-cost. The limit is applied to
+   * itineraries with no transit legs, however ALL itineraries (including those with transit legs)
+   * are considered when calculating the minimum cost.
+   * <p>
+   * The smallest generalized-cost value is used as input to the function. For example if the
+   * function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is {@code 5000}, then all
+   * non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
+   * <p>
    * The default is {@code 3600 + 2x} - 1 hours plus 2 times the lowest cost.
    */
   public DoubleFunction<Double> nonTransitGeneralizedCostLimit;
-
 
   private ItineraryFilterParameters() {
     this.debug = false;
@@ -94,25 +92,19 @@ public class ItineraryFilterParameters {
     this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
     this.bikeRentalDistanceRatio = 0.0;
     this.parkAndRideDurationRatio = 0.0;
-    this.transitGeneralizedCostLimit =
-        RequestFunctions.createLinearFunction(3600, 2);
-    this.nonTransitGeneralizedCostLimit =
-        RequestFunctions.createLinearFunction(3600, 2);
-  }
-
-  public static ItineraryFilterParameters createDefault() {
-    return new ItineraryFilterParameters();
+    this.transitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
+    this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
   }
 
   public ItineraryFilterParameters(
-      boolean debug,
-      double groupSimilarityKeepOne,
-      double groupSimilarityKeepThree,
-      double groupedOtherThanSameLegsMaxCostMultiplier,
-      DoubleFunction<Double> transitGeneralizedCostLimit,
-      DoubleFunction<Double> nonTransitGeneralizedCostLimit,
-      double bikeRentalDistanceRatio,
-      double parkAndRideDurationRatio
+    boolean debug,
+    double groupSimilarityKeepOne,
+    double groupSimilarityKeepThree,
+    double groupedOtherThanSameLegsMaxCostMultiplier,
+    DoubleFunction<Double> transitGeneralizedCostLimit,
+    DoubleFunction<Double> nonTransitGeneralizedCostLimit,
+    double bikeRentalDistanceRatio,
+    double parkAndRideDurationRatio
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -122,5 +114,9 @@ public class ItineraryFilterParameters {
     this.nonTransitGeneralizedCostLimit = nonTransitGeneralizedCostLimit;
     this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
     this.parkAndRideDurationRatio = parkAndRideDurationRatio;
+  }
+
+  public static ItineraryFilterParameters createDefault() {
+    return new ItineraryFilterParameters();
   }
 }

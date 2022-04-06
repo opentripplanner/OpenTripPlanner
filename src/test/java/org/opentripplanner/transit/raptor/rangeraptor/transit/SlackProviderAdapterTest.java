@@ -17,9 +17,9 @@ public class SlackProviderAdapterTest implements RaptorTestConstants {
   public static final int ALIGHT_SLACK = D10s;
   public static final int TRANSFER_SLACK = D1m;
   public static final RaptorSlackProvider EXTERNAL_SLACK_PROVIDER = defaultSlackProvider(
-      TRANSFER_SLACK,
-      BOARD_SLACK,
-      ALIGHT_SLACK
+    TRANSFER_SLACK,
+    BOARD_SLACK,
+    ALIGHT_SLACK
   );
   public static final TestTripPattern PATTERN = TestTripPattern.pattern("R1");
 
@@ -27,8 +27,8 @@ public class SlackProviderAdapterTest implements RaptorTestConstants {
   public void forwardSlackProvider() {
     LifeCycleSubscriptions subscriptions = new LifeCycleSubscriptions();
     SlackProvider subject = SlackProviderAdapter.forwardSlackProvider(
-        EXTERNAL_SLACK_PROVIDER,
-        subscriptions
+      EXTERNAL_SLACK_PROVIDER,
+      subscriptions
     );
     var lifeCycle = new LifeCycleEventPublisher(subscriptions);
 
@@ -49,8 +49,8 @@ public class SlackProviderAdapterTest implements RaptorTestConstants {
   public void reverseSlackProvider() {
     LifeCycleSubscriptions subscriptions = new LifeCycleSubscriptions();
     SlackProvider subject = SlackProviderAdapter.reverseSlackProvider(
-        EXTERNAL_SLACK_PROVIDER,
-        subscriptions
+      EXTERNAL_SLACK_PROVIDER,
+      subscriptions
     );
     var lifeCycle = new LifeCycleEventPublisher(subscriptions);
 

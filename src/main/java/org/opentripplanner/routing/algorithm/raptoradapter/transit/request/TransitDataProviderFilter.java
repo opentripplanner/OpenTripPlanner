@@ -14,7 +14,6 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  * @see RoutingRequestTransitDataProviderFilter
  */
 public interface TransitDataProviderFilter {
-
   boolean tripPatternPredicate(TripPatternForDate tripPatternForDate);
 
   boolean tripTimesPredicate(TripTimes tripTimes);

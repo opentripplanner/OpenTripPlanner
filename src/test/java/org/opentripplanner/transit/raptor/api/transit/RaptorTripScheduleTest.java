@@ -10,10 +10,10 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 public class RaptorTripScheduleTest {
 
   private final TestTripSchedule subject = TestTripSchedule
-      .schedule(TestTripPattern.pattern("L23", 1,1,2,3,5,8,1))
-      .arrivals("10:00 10:05 10:15 10:25 10:35 10:45 10:55")
-      .departures("10:01 10:06 10:16 10:26 10:36 10:46 10:56")
-      .build();
+    .schedule(TestTripPattern.pattern("L23", 1, 1, 2, 3, 5, 8, 1))
+    .arrivals("10:00 10:05 10:15 10:25 10:35 10:45 10:55")
+    .departures("10:01 10:06 10:16 10:26 10:36 10:46 10:56")
+    .build();
 
   @Test
   public void arrival() {
@@ -39,7 +39,7 @@ public class RaptorTripScheduleTest {
   @Test
   public void findDepartureStopPosition() {
     assertEquals("10:01:00", timeToStrLong(subject.departure(0, 1)));
-    assertEquals("10:46:00", timeToStrLong(subject.departure(0,8)));
+    assertEquals("10:46:00", timeToStrLong(subject.departure(0, 8)));
     assertEquals("10:56:00", timeToStrLong(subject.departure(2, 1)));
   }
 }

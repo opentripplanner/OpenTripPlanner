@@ -8,86 +8,81 @@ import org.opentripplanner.util.I18NString;
 
 /**
  * A grouping that can contain a mix of Stations and MultiModalStations. It can be used to link
- * several StopPlaces into a hub. It can be a grouping of major stops within a city or a cluster
- * of stops that naturally belong together.
+ * several StopPlaces into a hub. It can be a grouping of major stops within a city or a cluster of
+ * stops that naturally belong together.
  */
 public class GroupOfStations extends TransitEntity implements StopCollection {
-    private static final long serialVersionUID = 1L;
 
-    private I18NString name;
+  private static final long serialVersionUID = 1L;
+  private final Set<StopCollection> childStations = new HashSet<>();
+  private I18NString name;
+  // TODO Map from NeTEx
+  private PurposeOfGrouping purposeOfGrouping;
+  private WgsCoordinate coordinate;
 
-    // TODO Map from NeTEx
-    private PurposeOfGrouping purposeOfGrouping;
+  public GroupOfStations(FeedScopedId id) {
+    super(id);
+  }
 
-    private WgsCoordinate coordinate;
+  public I18NString getName() {
+    return name;
+  }
 
-    private final Set<StopCollection> childStations = new HashSet<>();
+  public void setName(I18NString name) {
+    this.name = name;
+  }
 
+  public Collection<StopLocation> getChildStops() {
+    return this.childStations.stream()
+      .flatMap(s -> s.getChildStops().stream())
+      .collect(Collectors.toUnmodifiableList());
+  }
 
-    public GroupOfStations(FeedScopedId id) {
-        super(id);
-    }
+  @Override
+  public WgsCoordinate getCoordinate() {
+    return coordinate;
+  }
 
+  public void setCoordinate(WgsCoordinate coordinate) {
+    this.coordinate = coordinate;
+  }
 
-    public I18NString getName() {
-        return name;
-    }
+  public Collection<StopCollection> getChildStations() {
+    return this.childStations;
+  }
 
-    public void setName(I18NString name) {
-        this.name = name;
-    }
+  public void addChildStation(StopCollection station) {
+    this.childStations.add(station);
+  }
 
-    @Override
-    public WgsCoordinate getCoordinate() {
-        return coordinate;
-    }
+  /**
+   * Categorization for the grouping
+   */
+  public PurposeOfGrouping getPurposeOfGrouping() {
+    return purposeOfGrouping;
+  }
 
-    public void setCoordinate(WgsCoordinate coordinate) {
-        this.coordinate = coordinate;
-    }
+  public void setPurposeOfGrouping(PurposeOfGrouping purposeOfGrouping) {
+    this.purposeOfGrouping = purposeOfGrouping;
+  }
 
-    public Collection<StopLocation> getChildStops() {
-        return this.childStations.stream()
-                .flatMap(s -> s.getChildStops().stream())
-                .collect(Collectors.toUnmodifiableList());
-    }
+  @Override
+  public String toString() {
+    return "<GroupOfStations " + getId() + ">";
+  }
 
-    public Collection<StopCollection> getChildStations() {
-        return this.childStations;
-    }
-
-    public void addChildStation(StopCollection station) {
-        this.childStations.add(station);
-    }
-
+  /**
+   * Categorization for the grouping
+   */
+  public enum PurposeOfGrouping {
     /**
-     * Categorization for the grouping
+     * Group of prominent stop places within a town or city(centre)
      */
-    public PurposeOfGrouping getPurposeOfGrouping() {
-        return purposeOfGrouping;
-    }
-
-    public void setPurposeOfGrouping(PurposeOfGrouping purposeOfGrouping) {
-        this.purposeOfGrouping = purposeOfGrouping;
-    }
-
-    @Override
-    public String toString() {
-        return "<GroupOfStations " + getId() + ">";
-    }
-
+    GENERALIZATION,
     /**
-     * Categorization for the grouping
+     * Stop places in proximity to each other which have a natural geospatial- or public transport
+     * related relationship.
      */
-    public enum PurposeOfGrouping {
-        /**
-         * Group of prominent stop places within a town or city(centre)
-         */
-        GENERALIZATION,
-        /**
-         * Stop places in proximity to each other which have a natural geospatial- or
-         * public transport related relationship.
-         */
-        CLUSTER
-    }
+    CLUSTER,
+  }
 }

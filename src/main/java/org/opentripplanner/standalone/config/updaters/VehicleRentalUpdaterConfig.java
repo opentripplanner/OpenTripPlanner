@@ -9,9 +9,9 @@ public class VehicleRentalUpdaterConfig {
   public static VehicleRentalUpdaterParameters create(String configRef, NodeAdapter c) {
     String sourceType = c.asText("sourceType");
     return new VehicleRentalUpdaterParameters(
-        configRef + "." + sourceType,
-        c.asInt("frequencySec", 60),
-        VehicleRentalSourceFactory.create(sourceType, c)
+      configRef + "." + sourceType,
+      c.asInt("frequencySec", 60),
+      VehicleRentalSourceFactory.create(sourceType, c)
     );
   }
 }

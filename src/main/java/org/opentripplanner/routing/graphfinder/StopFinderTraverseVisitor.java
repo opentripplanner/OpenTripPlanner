@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.graphfinder;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.State;
@@ -7,29 +9,23 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
-import java.util.ArrayList;
-import java.util.List;
-
 // TODO Seems like this should be merged with the PlaceFinderTraverseVisitor
+
 /**
  * A TraverseVisitor used in finding stops while walking the street graph.
  */
 public class StopFinderTraverseVisitor implements TraverseVisitor {
 
   private final double radiusMeters;
+  /** A list of closest stops found while walking the graph */
+  public final List<NearbyStop> stopsFound = new ArrayList<>();
 
   public StopFinderTraverseVisitor(double radiusMeters) {
     this.radiusMeters = radiusMeters;
   }
 
-  /** A list of closest stops found while walking the graph */
-  public final List<NearbyStop> stopsFound = new ArrayList<>();
-
   @Override
-  public void visitEdge(Edge edge) { }
-
-  @Override
-  public void visitEnqueue() { }
+  public void visitEdge(Edge edge) {}
 
   // Accumulate stops into ret as the search runs.
   @Override
@@ -40,9 +36,12 @@ public class StopFinderTraverseVisitor implements TraverseVisitor {
     }
   }
 
+  @Override
+  public void visitEnqueue() {}
+
   /**
    * @return A SkipEdgeStrategy that will stop exploring edges after the distance radius has been
-   *          reached.
+   * reached.
    */
   public SkipEdgeStrategy getSkipEdgeStrategy() {
     return (current, edge) -> current.getWalkDistance() > radiusMeters;

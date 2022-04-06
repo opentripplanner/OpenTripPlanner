@@ -16,7 +16,6 @@ import org.opentripplanner.updater.vehicle_positions.VehiclePositionsUpdaterPara
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 
 public interface UpdatersParameters {
-
   VehicleRentalServiceDirectoryFetcherParameters getVehicleRentalServiceDirectoryFetcherParameters();
 
   List<VehicleRentalUpdaterParameters> getVehicleRentalParameters();

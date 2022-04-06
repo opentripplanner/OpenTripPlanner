@@ -1,12 +1,12 @@
 package org.opentripplanner.model.projectinfo;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 public class OtpProjectInfoTest {
 
@@ -28,8 +28,7 @@ public class OtpProjectInfoTest {
       assertNotNull(p.versionControl.branch);
       assertNotNull(p.versionControl.buildTime);
       assertNotNull(p.versionControl.commitTime);
-    }
-    else {
+    } else {
       assertEquals("UNKNOWN", p.graphFileHeaderInfo.otpSerializationVersionIdPadded());
       assertEquals("UNKNOWN", p.versionControl.commit);
       assertEquals("UNKNOWN", p.versionControl.branch);

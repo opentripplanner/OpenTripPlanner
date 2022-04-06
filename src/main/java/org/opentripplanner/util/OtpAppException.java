@@ -1,11 +1,9 @@
 package org.opentripplanner.util;
 
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.IllegalFormatException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * When an error situation happens inside OTP this exception can be used to terminate OTP or the
@@ -33,26 +31,26 @@ import java.util.IllegalFormatException;
  * should be used. These will be logged with a stacktrace.
  */
 public class OtpAppException extends RuntimeException {
-    private static final Logger LOG = LoggerFactory.getLogger(OtpAppException.class);
 
-    public OtpAppException(String message) {
-        super(message);
-    }
+  private static final Logger LOG = LoggerFactory.getLogger(OtpAppException.class);
 
-    /**
-     * This method uses {@link String#format(String, Object...)} to format the message.
-     */
-    public OtpAppException(String message, Object... args) {
-        super(format(message, args));
-    }
+  public OtpAppException(String message) {
+    super(message);
+  }
 
-    public static String format(String message, Object ... args) {
-        try {
-            return String.format(message, args);
-        }
-        catch (IllegalFormatException e) {
-            LOG.error(e.getMessage(), e);
-            return message + " " + Arrays.toString(args);
-        }
+  /**
+   * This method uses {@link String#format(String, Object...)} to format the message.
+   */
+  public OtpAppException(String message, Object... args) {
+    super(format(message, args));
+  }
+
+  public static String format(String message, Object... args) {
+    try {
+      return String.format(message, args);
+    } catch (IllegalFormatException e) {
+      LOG.error(e.getMessage(), e);
+      return message + " " + Arrays.toString(args);
     }
+  }
 }

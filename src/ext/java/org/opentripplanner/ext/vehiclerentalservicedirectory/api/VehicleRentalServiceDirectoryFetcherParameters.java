@@ -36,19 +36,19 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
   /**
    * Json tag name for http headers
    * <p>
- *   Optional, default value is null
+   * Optional, default value is null
    */
   private final Map<String, String> headers;
 
   private final String language;
 
   public VehicleRentalServiceDirectoryFetcherParameters(
-      URI url,
-      String sourcesName,
-      String updaterUrlName,
-      String networkName,
-      String language,
-      Map<String, String> headers
+    URI url,
+    String sourcesName,
+    String updaterUrlName,
+    String networkName,
+    String language,
+    Map<String, String> headers
   ) {
     this.url = url;
     this.sourcesName = sourcesName;
@@ -78,7 +78,7 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     return headers;
   }
 
-    public String getLanguage() {
-        return language;
-    }
+  public String getLanguage() {
+    return language;
+  }
 }

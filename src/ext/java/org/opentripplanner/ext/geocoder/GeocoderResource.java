@@ -27,129 +27,129 @@ import org.opentripplanner.standalone.server.Router;
 @Produces(MediaType.APPLICATION_JSON)
 public class GeocoderResource {
 
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2. See
-     * https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated
-    @PathParam("ignoreRouterId")
-    private String ignoreRouterId;
+  private final Router router;
 
-    private final Router router;
+  /**
+   * @deprecated The support for multiple routers are removed from OTP2. See
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+   */
+  @Deprecated
+  @PathParam("ignoreRouterId")
+  private String ignoreRouterId;
 
-    public GeocoderResource(@Context OTPServer otpServer) {
-        router = otpServer.getRouter();
+  public GeocoderResource(@Context OTPServer otpServer) {
+    router = otpServer.getRouter();
+  }
+
+  /**
+   * Geocode using data using the OTP graph for stops, clusters and street names
+   *
+   * @param query        The query string we want to geocode
+   * @param autocomplete Whether we should use the query string to do a prefix match
+   * @param stops        Search for stops, either by name or stop code
+   * @param clusters     Search for clusters by their name
+   * @param corners      Search for street corners using at least one of the street names
+   * @return list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet
+   * client
+   */
+  @GET
+  public Response textSearch(
+    @QueryParam("query") String query,
+    @QueryParam("autocomplete") @DefaultValue("false") boolean autocomplete,
+    @QueryParam("stops") @DefaultValue("true") boolean stops,
+    @QueryParam("clusters") @DefaultValue("false") boolean clusters,
+    @QueryParam("corners") @DefaultValue("true") boolean corners
+  ) {
+    return Response
+      .status(Response.Status.OK)
+      .entity(query(query, autocomplete, stops, clusters, corners))
+      .build();
+  }
+
+  private List<SearchResult> query(
+    String query,
+    boolean autocomplete,
+    boolean stops,
+    boolean clusters,
+    boolean corners
+  ) {
+    List<SearchResult> results = new ArrayList<>();
+
+    if (stops) {
+      results.addAll(queryStopLocations(query, autocomplete));
     }
 
-    /**
-     * Geocode using data using the OTP graph for stops, clusters and street names
-     *
-     * @param query        The query string we want to geocode
-     * @param autocomplete Whether we should use the query string to do a prefix match
-     * @param stops        Search for stops, either by name or stop code
-     * @param clusters     Search for clusters by their name
-     * @param corners      Search for street corners using at least one of the street names
-     * @return list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet
-     * client
-     */
-    @GET
-    public Response textSearch(
-            @QueryParam("query") String query,
-            @QueryParam("autocomplete") @DefaultValue("false") boolean autocomplete,
-            @QueryParam("stops") @DefaultValue("true") boolean stops,
-            @QueryParam("clusters") @DefaultValue("false") boolean clusters,
-            @QueryParam("corners") @DefaultValue("true") boolean corners
-    ) {
-        return Response.status(Response.Status.OK).entity(
-                query(query, autocomplete, stops, clusters, corners)
-        ).build();
+    if (clusters) {
+      results.addAll(queryStations(query, autocomplete));
     }
 
-    private List<SearchResult> query(
-            String query,
-            boolean autocomplete,
-            boolean stops,
-            boolean clusters,
-            boolean corners
-    ) {
-        List<SearchResult> results = new ArrayList<>();
-
-        if (stops) {
-            results.addAll(queryStopLocations(query, autocomplete));
-        }
-
-        if (clusters) {
-            results.addAll(queryStations(query, autocomplete));
-        }
-
-        if (corners) {
-            results.addAll(queryCorners(query, autocomplete));
-        }
-
-        return results;
+    if (corners) {
+      results.addAll(queryCorners(query, autocomplete));
     }
 
-    private Collection<SearchResult> queryStopLocations(
-            String query,
-            boolean autocomplete
-    ) {
-        return LuceneIndex.forServer(router)
-                .queryStopLocations(query, autocomplete)
-                .map(sl -> new SearchResult(
-                        sl.getCoordinate().latitude(),
-                        sl.getCoordinate().longitude(),
-                        stringifyStopLocation(sl),
-                        FeedScopedIdMapper.mapToApi(sl.getId())
-                ))
-                .collect(Collectors.toList());
+    return results;
+  }
+
+  private Collection<SearchResult> queryStopLocations(String query, boolean autocomplete) {
+    return LuceneIndex
+      .forServer(router)
+      .queryStopLocations(query, autocomplete)
+      .map(sl ->
+        new SearchResult(
+          sl.getCoordinate().latitude(),
+          sl.getCoordinate().longitude(),
+          stringifyStopLocation(sl),
+          FeedScopedIdMapper.mapToApi(sl.getId())
+        )
+      )
+      .collect(Collectors.toList());
+  }
+
+  private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
+    return LuceneIndex
+      .forServer(router)
+      .queryStopCollections(query, autocomplete)
+      .map(sc ->
+        new SearchResult(
+          sc.getCoordinate().latitude(),
+          sc.getCoordinate().longitude(),
+          Objects.toString(sc.getName()),
+          FeedScopedIdMapper.mapToApi(sc.getId())
+        )
+      )
+      .collect(Collectors.toList());
+  }
+
+  private Collection<? extends SearchResult> queryCorners(String query, boolean autocomplete) {
+    return LuceneIndex
+      .forServer(router)
+      .queryStreetVertices(query, autocomplete)
+      .map(v -> new SearchResult(v.getLat(), v.getLon(), stringifyStreetVertex(v), v.getLabel()))
+      .collect(Collectors.toList());
+  }
+
+  private String stringifyStreetVertex(StreetVertex v) {
+    return String.format("%s (%s)", v.getIntersectionName(), v.getLabel());
+  }
+
+  private String stringifyStopLocation(StopLocation sl) {
+    return sl.getCode() != null
+      ? String.format("%s (%s)", sl.getName(), sl.getCode())
+      : Objects.toString(sl.getName());
+  }
+
+  public static class SearchResult {
+
+    public double lat;
+    public double lng;
+    public String description;
+    public String id;
+
+    private SearchResult(double lat, double lng, String description, String id) {
+      this.lat = lat;
+      this.lng = lng;
+      this.description = description;
+      this.id = id;
     }
-
-    private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
-        return LuceneIndex.forServer(router)
-                .queryStopCollections(query, autocomplete)
-                .map(sc -> new SearchResult(
-                        sc.getCoordinate().latitude(),
-                        sc.getCoordinate().longitude(),
-                        Objects.toString(sc.getName()),
-                        FeedScopedIdMapper.mapToApi(sc.getId())
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private Collection<? extends SearchResult> queryCorners(String query, boolean autocomplete) {
-        return LuceneIndex.forServer(router)
-                .queryStreetVertices(query, autocomplete)
-                .map(v -> new SearchResult(
-                        v.getLat(),
-                        v.getLon(),
-                        stringifyStreetVertex(v),
-                        v.getLabel()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private String stringifyStreetVertex(StreetVertex v) {
-        return String.format("%s (%s)", v.getIntersectionName(), v.getLabel());
-    }
-
-    private String stringifyStopLocation(StopLocation sl) {
-        return sl.getCode() != null
-                ? String.format("%s (%s)", sl.getName(), sl.getCode())
-                : Objects.toString(sl.getName());
-    }
-
-    public static class SearchResult {
-
-        public double lat;
-        public double lng;
-        public String description;
-        public String id;
-
-        private SearchResult(double lat, double lng, String description, String id) {
-            this.lat = lat;
-            this.lng = lng;
-            this.description = description;
-            this.id = id;
-        }
-    }
+  }
 }

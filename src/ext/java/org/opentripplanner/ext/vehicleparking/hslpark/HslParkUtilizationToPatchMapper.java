@@ -9,27 +9,30 @@ import org.slf4j.LoggerFactory;
  */
 public class HslParkUtilizationToPatchMapper {
 
-    private static final Logger log =
-            LoggerFactory.getLogger(HslParkUtilizationToPatchMapper.class);
+  private static final Logger log = LoggerFactory.getLogger(HslParkUtilizationToPatchMapper.class);
 
-    private final String feedId;
+  private final String feedId;
 
-    public HslParkUtilizationToPatchMapper(String feedId) {
-        this.feedId = feedId;
+  public HslParkUtilizationToPatchMapper(String feedId) {
+    this.feedId = feedId;
+  }
+
+  public HslParkPatch parseUtilization(JsonNode jsonNode) {
+    var vehicleParkId = HslParkToVehicleParkingMapper.createIdForNode(
+      jsonNode,
+      "facilityId",
+      feedId
+    );
+    try {
+      String capacityType = jsonNode.path("capacityType").asText();
+      Integer spacesAvailable = HslParkToVehicleParkingMapper.parseIntegerValue(
+        jsonNode,
+        "spacesAvailable"
+      );
+      return new HslParkPatch(vehicleParkId, capacityType, spacesAvailable);
+    } catch (Exception e) {
+      log.warn("Error parsing park utilization" + vehicleParkId, e);
+      return null;
     }
-
-    public HslParkPatch parseUtilization(JsonNode jsonNode) {
-        var vehicleParkId =
-                HslParkToVehicleParkingMapper.createIdForNode(jsonNode, "facilityId", feedId);
-        try {
-            String capacityType = jsonNode.path("capacityType").asText();
-            Integer spacesAvailable =
-                    HslParkToVehicleParkingMapper.parseIntegerValue(jsonNode, "spacesAvailable");
-            return new HslParkPatch(vehicleParkId, capacityType, spacesAvailable);
-        }
-        catch (Exception e) {
-            log.warn("Error parsing park utilization" + vehicleParkId, e);
-            return null;
-        }
-    }
+  }
 }

@@ -4,7 +4,6 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
-
 /**
  * The main purpose of this class is to hold data for a given arrival at a stop and raptor round. It
  * should be as light-weight as possible to minimize memory consumption and cheap to create and
@@ -24,174 +23,167 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  */
 class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArrivalState<T> {
 
-    /**
-     * Used to initialize all none time based attributes.
-     */
-    static final int NOT_SET = -1;
+  /**
+   * Used to initialize all none time based attributes.
+   */
+  static final int NOT_SET = -1;
 
+  // Best time - access, transit or transfer
+  private int bestArrivalTime = NOT_SET;
 
-    // Best time - access, transit or transfer
-    private int bestArrivalTime = NOT_SET;
+  // Best on board time - access or transit
+  private int onBoardArrivalTime = NOT_SET;
 
-    // Best on board time - access or transit
-    private int onBoardArrivalTime = NOT_SET;
+  // Transit
+  private T trip = null;
+  private int boardTime = NOT_SET;
+  private int boardStop = NOT_SET;
 
-    // Transit
-    private T trip = null;
-    private int boardTime = NOT_SET;
-    private int boardStop = NOT_SET;
+  // Transfer
+  private int transferFromStop = NOT_SET;
+  private RaptorTransfer transferPath = null;
 
-    // Transfer
-    private int transferFromStop = NOT_SET;
-    private RaptorTransfer transferPath = null;
+  DefaultStopArrivalState() {}
 
-    DefaultStopArrivalState() { }
+  @Override
+  public final int time() {
+    return bestArrivalTime;
+  }
 
+  @Override
+  public final int onBoardArrivalTime() {
+    return onBoardArrivalTime;
+  }
 
-    @Override
-    public final int time() {
-        return bestArrivalTime;
+  @Override
+  public final boolean reachedOnBoard() {
+    return onBoardArrivalTime != NOT_SET;
+  }
+
+  @Override
+  public final boolean reachedOnStreet() {
+    return arrivedByTransfer();
+  }
+
+  /* Access */
+
+  @Override
+  public final boolean arrivedByAccessOnStreet() {
+    return false;
+  }
+
+  @Override
+  public final RaptorTransfer accessPathOnStreet() {
+    throw new IllegalStateException("This class do no handle access, see AccessStopArrivalState");
+  }
+
+  @Override
+  public final boolean arrivedByAccessOnBoard() {
+    return false;
+  }
+
+  @Override
+  public final RaptorTransfer accessPathOnBoard() {
+    throw new IllegalStateException("This class do no handle access, see AccessStopArrivalState");
+  }
+
+  /* Transit */
+
+  @Override
+  public boolean arrivedByTransit() {
+    return boardStop != NOT_SET;
+  }
+
+  @Override
+  public final T trip() {
+    return trip;
+  }
+
+  @Override
+  public final int boardTime() {
+    return boardTime;
+  }
+
+  @Override
+  public final int boardStop() {
+    return boardStop;
+  }
+
+  @Override
+  public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
+    this.onBoardArrivalTime = arrivalTime;
+    this.trip = trip;
+    this.boardTime = boardTime;
+    this.boardStop = boardStop;
+  }
+
+  @Override
+  public final void setBestTimeTransit(int time) {
+    this.bestArrivalTime = time;
+    // The transfer is cleared since it is not the fastest alternative any more.
+    this.transferFromStop = NOT_SET;
+  }
+
+  /* Transfer */
+
+  @Override
+  public final boolean arrivedByTransfer() {
+    return transferFromStop != NOT_SET;
+  }
+
+  @Override
+  public final int transferFromStop() {
+    return transferFromStop;
+  }
+
+  @Override
+  public final RaptorTransfer transferPath() {
+    return transferPath;
+  }
+
+  @Override
+  public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
+    this.bestArrivalTime = arrivalTime;
+    this.transferFromStop = fromStop;
+    this.transferPath = transferPath;
+  }
+
+  /* other methods */
+
+  @Override
+  public String toString() {
+    return toStringAddBody(ToStringBuilder.of(DefaultStopArrivalState.class)).toString();
+  }
+
+  /** This allows subclasses to attach content and type to their own toString() */
+  ToStringBuilder toStringAddBody(ToStringBuilder builder) {
+    builder
+      .addServiceTime("arrivalTime", bestArrivalTime, NOT_SET)
+      .addServiceTime("onBoardArrivalTime", onBoardArrivalTime, NOT_SET)
+      .addNum("boardStop", boardStop, NOT_SET)
+      .addServiceTime("boardTime", boardTime, NOT_SET)
+      .addObj("trip", trip == null ? null : trip.pattern().debugInfo())
+      .addNum("transferFromStop", transferFromStop, NOT_SET);
+
+    if (transferPath != null) {
+      builder.addDurationSec("transfer", transferPath.durationInSeconds());
     }
+    return builder;
+  }
 
-    @Override
-    public final int onBoardArrivalTime() {
-        return onBoardArrivalTime;
+  void setAccessTime(int time, boolean isBestTimeOverall, boolean onBoard) {
+    if (isBestTimeOverall) {
+      this.bestArrivalTime = time;
+      // Clear transit to avoid mistakes
+      this.transferFromStop = NOT_SET;
+      this.transferPath = null;
     }
-
-    @Override
-    public final boolean reachedOnBoard() {
-        return onBoardArrivalTime != NOT_SET;
+    if (onBoard) {
+      this.onBoardArrivalTime = time;
+      // Clear transit to avoid mistakes
+      this.trip = null;
+      this.boardTime = NOT_SET;
+      this.boardStop = NOT_SET;
     }
-
-    @Override
-    public final boolean reachedOnStreet() {
-        return arrivedByTransfer();
-    }
-
-
-    /* Access */
-
-    @Override
-    public final boolean arrivedByAccessOnStreet() { return false; }
-
-    @Override
-    public final RaptorTransfer accessPathOnStreet() {
-        throw new IllegalStateException(
-                "This class do no handle access, see AccessStopArrivalState"
-        );
-    }
-
-    @Override
-    public final boolean arrivedByAccessOnBoard() { return false; }
-
-    @Override
-    public final RaptorTransfer accessPathOnBoard() {
-        throw new IllegalStateException(
-                "This class do no handle access, see AccessStopArrivalState"
-        );
-    }
-
-
-    /* Transit */
-
-    @Override
-    public boolean arrivedByTransit() {
-        return boardStop != NOT_SET;
-    }
-
-    @Override
-    public final T trip() {
-        return trip;
-    }
-
-    @Override
-    public final int boardTime() {
-        return boardTime;
-    }
-
-    @Override
-    public final int boardStop() {
-        return boardStop;
-    }
-
-    @Override
-    public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
-        this.onBoardArrivalTime = arrivalTime;
-        this.trip = trip;
-        this.boardTime = boardTime;
-        this.boardStop = boardStop;
-    }
-
-    @Override
-    public final void setBestTimeTransit(int time) {
-        this.bestArrivalTime = time;
-        // The transfer is cleared since it is not the fastest alternative any more.
-        this.transferFromStop = NOT_SET;
-    }
-
-
-    /* Transfer */
-
-    @Override
-    public final boolean arrivedByTransfer() {
-        return transferFromStop != NOT_SET;
-    }
-
-    @Override
-    public final int transferFromStop() {
-        return transferFromStop;
-    }
-
-    @Override
-    public final RaptorTransfer transferPath() {
-        return transferPath;
-    }
-
-
-    @Override
-    public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
-        this.bestArrivalTime = arrivalTime;
-        this.transferFromStop = fromStop;
-        this.transferPath = transferPath;
-    }
-
-
-    /* other methods */
-
-    @Override
-    public String toString() {
-        return toStringAddBody(ToStringBuilder.of(DefaultStopArrivalState.class)).toString();
-    }
-
-    /** This allows subclasses to attach content and type to their own toString() */
-    ToStringBuilder toStringAddBody(ToStringBuilder builder) {
-        builder
-            .addServiceTime("arrivalTime", bestArrivalTime, NOT_SET)
-            .addServiceTime("onBoardArrivalTime", onBoardArrivalTime, NOT_SET)
-            .addNum("boardStop", boardStop, NOT_SET)
-            .addServiceTime("boardTime", boardTime, NOT_SET)
-            .addObj("trip", trip == null ? null : trip.pattern().debugInfo())
-            .addNum("transferFromStop", transferFromStop, NOT_SET);
-
-        if(transferPath != null) {
-            builder.addDurationSec("transfer", transferPath.durationInSeconds());
-        }
-        return builder;
-    }
-
-    void setAccessTime(int time, boolean isBestTimeOverall, boolean onBoard) {
-        if(isBestTimeOverall) {
-            this.bestArrivalTime = time;
-            // Clear transit to avoid mistakes
-            this.transferFromStop = NOT_SET;
-            this.transferPath = null;
-        }
-        if(onBoard) {
-            this.onBoardArrivalTime = time;
-            // Clear transit to avoid mistakes
-            this.trip = null;
-            this.boardTime = NOT_SET;
-            this.boardStop = NOT_SET;
-        }
-    }
+  }
 }

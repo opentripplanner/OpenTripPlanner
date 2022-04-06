@@ -7,59 +7,63 @@ import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 
 public class RoutingResponse {
-    private final TripPlan tripPlan;
-    private final PageCursor nextPageCursor;
-    private final PageCursor previousPageCursor;
-    private final TripSearchMetadata metadata;
-    private final List<RoutingError> routingErrors;
-    private final DebugTimingAggregator debugTimingAggregator;
 
-    public RoutingResponse(
-        TripPlan tripPlan,
-        PageCursor previousPageCursor,
-        PageCursor nextPageCursor,
-        TripSearchMetadata metadata,
-        List<RoutingError> routingErrors,
-        DebugTimingAggregator debugTimingAggregator
-    ) {
-        this.tripPlan = tripPlan;
-        this.nextPageCursor = nextPageCursor;
-        this.previousPageCursor = previousPageCursor;
-        this.metadata = metadata;
-        this.routingErrors = routingErrors;
-        this.debugTimingAggregator = debugTimingAggregator;
-    }
+  private final TripPlan tripPlan;
+  private final PageCursor nextPageCursor;
+  private final PageCursor previousPageCursor;
+  private final TripSearchMetadata metadata;
+  private final List<RoutingError> routingErrors;
+  private final DebugTimingAggregator debugTimingAggregator;
 
-    public TripPlan getTripPlan() {
-        return tripPlan;
-    }
+  public RoutingResponse(
+    TripPlan tripPlan,
+    PageCursor previousPageCursor,
+    PageCursor nextPageCursor,
+    TripSearchMetadata metadata,
+    List<RoutingError> routingErrors,
+    DebugTimingAggregator debugTimingAggregator
+  ) {
+    this.tripPlan = tripPlan;
+    this.nextPageCursor = nextPageCursor;
+    this.previousPageCursor = previousPageCursor;
+    this.metadata = metadata;
+    this.routingErrors = routingErrors;
+    this.debugTimingAggregator = debugTimingAggregator;
+  }
 
-    public PageCursor getNextPageCursor() {
-        return nextPageCursor;
-    }
+  public TripPlan getTripPlan() {
+    return tripPlan;
+  }
 
-    public PageCursor getPreviousPageCursor() {
-        return previousPageCursor;
-    }
+  public PageCursor getNextPageCursor() {
+    return nextPageCursor;
+  }
 
-    public TripSearchMetadata getMetadata() {
-        return metadata;
-    }
+  public PageCursor getPreviousPageCursor() {
+    return previousPageCursor;
+  }
 
-    public DebugTimingAggregator getDebugTimingAggregator() {
-        return debugTimingAggregator;
-    }
+  public TripSearchMetadata getMetadata() {
+    return metadata;
+  }
 
-    public List<RoutingError> getRoutingErrors() { return routingErrors; }
+  public DebugTimingAggregator getDebugTimingAggregator() {
+    return debugTimingAggregator;
+  }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(RoutingResponse.class)
-                .addObj("tripPlan", tripPlan)
-                .addObj("nextPageCursor", nextPageCursor)
-                .addObj("previousPageCursor", previousPageCursor)
-                .addObj("metadata", metadata)
-                .addObj("routingErrors", routingErrors)
-                .toString();
-    }
+  public List<RoutingError> getRoutingErrors() {
+    return routingErrors;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(RoutingResponse.class)
+      .addObj("tripPlan", tripPlan)
+      .addObj("nextPageCursor", nextPageCursor)
+      .addObj("previousPageCursor", previousPageCursor)
+      .addObj("metadata", metadata)
+      .addObj("routingErrors", routingErrors)
+      .toString();
+  }
 }

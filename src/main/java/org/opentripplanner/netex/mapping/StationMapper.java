@@ -11,7 +11,6 @@ import org.opentripplanner.util.TranslatedString;
 import org.rutebanken.netex.model.NameTypeEnumeration;
 import org.rutebanken.netex.model.StopPlace;
 
-
 class StationMapper {
 
   private final DataImportIssueStore issueStore;
@@ -33,8 +32,8 @@ class StationMapper {
       for (var translation : stopPlace.getAlternativeNames().getAlternativeName()) {
         if (translation.getNameType().equals(NameTypeEnumeration.TRANSLATION)) {
           String lang = translation.getLang() != null
-                  ? translation.getLang()
-                  : translation.getName().getLang();
+            ? translation.getLang()
+            : translation.getName().getLang();
           translations.put(lang, translation.getName().getValue());
         }
       }
@@ -45,21 +44,21 @@ class StationMapper {
     }
 
     Station station = new Station(
-        idFactory.createId(stopPlace.getId()),
-        name,
-        WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid()),
-        null,
-        stopPlace.getDescription() != null ? stopPlace.getDescription().getValue() : null,
-        null,
-        null,
-        StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting())
+      idFactory.createId(stopPlace.getId()),
+      name,
+      WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid()),
+      null,
+      stopPlace.getDescription() != null ? stopPlace.getDescription().getValue() : null,
+      null,
+      null,
+      StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting())
     );
 
     if (station.getCoordinate() == null) {
       issueStore.add(
-              "StationWithoutCoordinates",
-              "Station %s does not contain any coordinates.",
-              station.getId()
+        "StationWithoutCoordinates",
+        "Station %s does not contain any coordinates.",
+        station.getId()
       );
     }
     return station;

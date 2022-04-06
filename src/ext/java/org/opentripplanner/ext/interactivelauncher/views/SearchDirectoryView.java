@@ -1,14 +1,20 @@
 package org.opentripplanner.ext.interactivelauncher.views;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.util.function.Consumer;
-
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.BG_STATUS_BAR;
 import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.FG_STATUS_BAR;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.io.File;
+import java.util.function.Consumer;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+
 public class SearchDirectoryView {
+
   private final Box panel;
   private final JTextField fileTxt = new JTextField();
   private final JButton searchBtn = new JButton("Open");
@@ -46,6 +52,10 @@ public class SearchDirectoryView {
     return panel;
   }
 
+  Dimension minWidth(Dimension d, int minWidth) {
+    return new Dimension(Math.max(minWidth, d.width), d.height);
+  }
+
   private void onSelectSource() {
     JFileChooser chooser = new JFileChooser(new File(fileTxt.getText()));
     chooser.setBackground(ViewUtils.BACKGROUND);
@@ -55,17 +65,13 @@ public class SearchDirectoryView {
     chooser.setApproveButtonToolTipText("Select the directory to search for OTP data sources");
     int status = chooser.showDialog(panel, "Search");
 
-    if(status == JFileChooser.APPROVE_OPTION) {
+    if (status == JFileChooser.APPROVE_OPTION) {
       File dir = chooser.getSelectedFile();
-      if(!dir.exists()) {
+      if (!dir.exists()) {
         dir = dir.getParentFile();
       }
       fileTxt.setText(dir.getAbsolutePath());
       rootDirChangedListener.accept(dir.getAbsolutePath());
     }
-  }
-
-  Dimension minWidth(Dimension d, int minWidth) {
-    return new Dimension(Math.max(minWidth, d.width), d.height);
   }
 }

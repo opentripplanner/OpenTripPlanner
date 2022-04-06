@@ -1,8 +1,6 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-
 import javax.annotation.Nullable;
-
 
 /**
  * This interface enable the transit layer to override the normal trip search in Raptor. Each {@link
@@ -16,25 +14,25 @@ import javax.annotation.Nullable;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorConstrainedTripScheduleBoardingSearch<T extends RaptorTripSchedule> {
+  /**
+   * Check if the current pattern have any guaranteed transfers for the given stop position in
+   * pattern. If not, then Raptor will fall back to a regular trip search.
+   */
+  boolean transferExist(int targetStopPos);
 
-    /**
-     * Check if the current pattern have any guaranteed transfers for the given stop position in
-     * pattern. If not, then Raptor will fall back to a regular trip search.
-     */
-    boolean transferExist(int targetStopPos);
-
-    /**
-     * Get the board-/alight-event for the current pattern at the target stop position coming from
-     * the source stop and trip with the given source arrival board-/alight time (exclude slack).
-     * <p>
-     * @return {@code null} if no target trip is found
-     */
-    @Nullable
-    RaptorTripScheduleBoardOrAlightEvent<T> find(
-            RaptorTimeTable<T> targetTimetable,
-            T sourceTrip,
-            int sourceStopIndex,
-            int prevTransitArrivalTime,
-            int earliestBoardTime
-    );
+  /**
+   * Get the board-/alight-event for the current pattern at the target stop position coming from the
+   * source stop and trip with the given source arrival board-/alight time (exclude slack).
+   * <p>
+   *
+   * @return {@code null} if no target trip is found
+   */
+  @Nullable
+  RaptorTripScheduleBoardOrAlightEvent<T> find(
+    RaptorTimeTable<T> targetTimetable,
+    T sourceTrip,
+    int sourceStopIndex,
+    int prevTransitArrivalTime,
+    int earliestBoardTime
+  );
 }

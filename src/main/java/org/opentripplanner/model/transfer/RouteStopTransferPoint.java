@@ -31,19 +31,24 @@ public final class RouteStopTransferPoint implements TransferPoint, Serializable
   }
 
   @Override
-  public int getSpecificityRanking() { return 3; }
+  public int getSpecificityRanking() {
+    return 3;
+  }
 
   @Override
-  public boolean isRouteStopTransferPoint() { return true; }
+  public boolean isRouteStopTransferPoint() {
+    return true;
+  }
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder.of()
-            .addText("<Route ")
-            .addObj(route.getId())
-            .addText(", stop ")
-            .addObj(stop.getId())
-            .addText(">")
-            .toString();
+    return ValueObjectToStringBuilder
+      .of()
+      .addText("<Route ")
+      .addObj(route.getId())
+      .addText(", stop ")
+      .addObj(stop.getId())
+      .addText(">")
+      .toString();
   }
 }

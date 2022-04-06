@@ -9,7 +9,7 @@ import java.util.EnumSet;
  * misnamed (builder-config vs. build-config).
  */
 public enum FileType {
-  CONFIG( "⚙️", "Config file"),
+  CONFIG("⚙️", "Config file"),
   OSM("🌍", "OpenStreetMap data"),
   DEM("🏔", "Elevation data"),
   GTFS("🚌", "GTFS data"),

@@ -1,11 +1,11 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 
 public class VectorTileConfig implements VectorTilesResource.LayersParameters {
+
   public static final int MIN_ZOOM = 9;
   public static final int MAX_ZOOM = 20;
   public static final int CACHE_MAX_SECONDS = -1;
@@ -42,12 +42,39 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
       expansionFactor = node.asDouble("expansionFactor", EXPANSION_FACTOR);
     }
 
-    @Override public String name() { return name; }
-    @Override public String type() { return type; }
-    @Override public String mapper() { return mapper; }
-    @Override public int maxZoom() { return maxZoom; }
-    @Override public int minZoom() { return minZoom; }
-    @Override public int cacheMaxSeconds() {return cacheMaxSeconds; }
-    @Override public double expansionFactor() { return expansionFactor; }
+    @Override
+    public String name() {
+      return name;
+    }
+
+    @Override
+    public String type() {
+      return type;
+    }
+
+    @Override
+    public String mapper() {
+      return mapper;
+    }
+
+    @Override
+    public int maxZoom() {
+      return maxZoom;
+    }
+
+    @Override
+    public int minZoom() {
+      return minZoom;
+    }
+
+    @Override
+    public int cacheMaxSeconds() {
+      return cacheMaxSeconds;
+    }
+
+    @Override
+    public double expansionFactor() {
+      return expansionFactor;
+    }
   }
 }

@@ -8,7 +8,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 
 public class LegacyGraphQLStoptimesInPatternImpl
-    implements LegacyGraphQLDataFetchers.LegacyGraphQLStoptimesInPattern {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLStoptimesInPattern {
 
   @Override
   public DataFetcher<TripPattern> pattern() {

@@ -1,20 +1,19 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
+import java.util.Map;
+import javax.validation.constraints.NotNull;
 import org.opentripplanner.updater.DataSourceType;
 
-import javax.validation.constraints.NotNull;
-import java.util.Map;
-
 public class VehicleRentalDataSourceParameters {
+
   private final DataSourceType sourceType;
   private final String url;
   private final Map<String, String> httpHeaders;
 
   public VehicleRentalDataSourceParameters(
-      DataSourceType sourceType,
-      String url,
-      @NotNull
-      Map<String, String> httpHeaders
+    DataSourceType sourceType,
+    String url,
+    @NotNull Map<String, String> httpHeaders
   ) {
     this.sourceType = sourceType;
     this.url = url;
@@ -22,7 +21,9 @@ public class VehicleRentalDataSourceParameters {
   }
 
   @NotNull
-  public String getUrl() { return url; }
+  public String getUrl() {
+    return url;
+  }
 
   @NotNull
   public DataSourceType getSourceType() {

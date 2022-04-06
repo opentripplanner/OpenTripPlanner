@@ -34,259 +34,280 @@ import org.opentripplanner.util.time.TimeUtils;
  * this allows us to use the toString in unit tests.
  */
 public class ToStringBuilder {
-    /** A random in value, not expected to exist in data */
-    private static final int RANDOM_IGNORE_VALUE = -9_371_207;
-    private static final String FIELD_SEPARATOR = ", ";
-    private static final String FIELD_VALUE_SEP = ": ";
-    private static final String NULL_VALUE = "null";
 
-    private final StringBuilder sb = new StringBuilder();
-    private final OtpNumberFormat numFormat = new OtpNumberFormat();
+  /** A random in value, not expected to exist in data */
+  private static final int RANDOM_IGNORE_VALUE = -9_371_207;
+  private static final String FIELD_SEPARATOR = ", ";
+  private static final String FIELD_VALUE_SEP = ": ";
+  private static final String NULL_VALUE = "null";
 
-    private SimpleDateFormat calendarTimeFormat;
-    boolean first = true;
+  private final StringBuilder sb = new StringBuilder();
+  private final OtpNumberFormat numFormat = new OtpNumberFormat();
 
-    private ToStringBuilder(String name) {
-        sb.append(name).append("{");
+  private SimpleDateFormat calendarTimeFormat;
+  boolean first = true;
+
+  private ToStringBuilder(String name) {
+    sb.append(name).append("{");
+  }
+
+  /**
+   * Create a ToStringBuilder for a regular POJO type. This builder will include metadata(class and
+   * field names) when building the to string.
+   */
+  public static ToStringBuilder of(Class<?> clazz) {
+    return new ToStringBuilder(clazz.getSimpleName());
+  }
+
+  /**
+   * Create a ToStringBuilder for a regular POJO type without including the type in the name. Some
+   * classes are always embedded in other classes and the type is given, for these cases this
+   * builder make the toString a bit easier to read.
+   */
+  public static ToStringBuilder of() {
+    return new ToStringBuilder("");
+  }
+
+  /* General purpose formatters */
+
+  public ToStringBuilder addNum(String name, Number num) {
+    return addIfNotNull(name, num, numFormat::formatNumber);
+  }
+
+  public ToStringBuilder addNum(String name, Number value, Number ignoreValue) {
+    return addIfNotIgnored(name, value, ignoreValue, numFormat::formatNumber);
+  }
+
+  public ToStringBuilder addNum(String name, Number num, String unit) {
+    return addIfNotNull(name, num, n -> numFormat.formatNumber(n, unit));
+  }
+
+  public ToStringBuilder addBool(String name, Boolean value) {
+    return addIfNotNull(name, value);
+  }
+
+  public ToStringBuilder addBoolIfTrue(String name, Boolean value) {
+    if (TRUE.equals(value)) {
+      addLabel(name);
     }
+    return this;
+  }
 
-    /**
-     * Create a ToStringBuilder for a regular POJO type. This builder
-     * will include metadata(class and field names) when building the to string.
-     */
-    public static ToStringBuilder of(Class<?> clazz) {
-        return new ToStringBuilder(clazz.getSimpleName());
+  public ToStringBuilder addStr(String name, String value) {
+    return addIfNotNull(name, value, v -> "'" + v + "'");
+  }
+
+  public ToStringBuilder addEnum(String name, Enum<?> value) {
+    return addEnum(name, value, null);
+  }
+
+  public ToStringBuilder addEnum(String name, Enum<?> value, Enum<?> ignoreValue) {
+    return addIfNotIgnored(name, value, ignoreValue, Enum::name);
+  }
+
+  public ToStringBuilder addObj(String name, Object obj) {
+    return addObj(name, obj, null);
+  }
+
+  public ToStringBuilder addObj(String name, Object value, Object ignoreValue) {
+    return addIfNotIgnored(name, value, ignoreValue, Object::toString);
+  }
+
+  public ToStringBuilder addEntityId(String name, TransitEntity entity) {
+    return addIfNotNull(name, entity, e -> e.getId().toString());
+  }
+
+  public ToStringBuilder addInts(String name, int[] intArray) {
+    return addIfNotNull(name, intArray, Arrays::toString);
+  }
+
+  public ToStringBuilder addDoubles(String name, double[] value, double ignoreValue) {
+    if (value == null) {
+      return addIt(name, "null");
     }
-
-    /**
-     * Create a ToStringBuilder for a regular POJO type without including the type in the name.
-     * Some classes are always embedded in other classes and the type is given, for these cases
-     * this builder make the toString a bit easier to read.
-     */
-    public static ToStringBuilder of() {
-        return new ToStringBuilder("");
+    if (Arrays.stream(value).allMatch(it -> Objects.equals(it, ignoreValue))) {
+      return this;
     }
+    return addIt(name, Arrays.toString(value));
+  }
 
+  /** Add collection if not null or not empty, all elements are added */
+  public ToStringBuilder addCol(String name, Collection<?> c) {
+    return addIfNotNull(name, c == null || c.isEmpty() ? null : c);
+  }
 
-    /* General purpose formatters */
+  public ToStringBuilder addColSize(String name, Collection<?> c) {
+    return addIfNotNull(name, c, x -> String.format("%d items", x.size()));
+  }
 
-    public ToStringBuilder addNum(String name, Number num) {
-        return addIfNotNull(name, num, numFormat::formatNumber);
+  /** Add the collection, truncate the number of elements at given maxLimit. */
+  public ToStringBuilder addCollection(String name, Collection<?> c, int maxLimit) {
+    if (c == null) {
+      return this;
     }
-
-    public ToStringBuilder addNum(String name, Number value, Number ignoreValue) {
-        return addIfNotIgnored(name, value, ignoreValue, numFormat::formatNumber);
+    if (c.size() > maxLimit + 1) {
+      String value = c
+        .stream()
+        .limit(maxLimit)
+        .map(Object::toString)
+        .collect(Collectors.joining(", "));
+      return addIt(name + "(" + maxLimit + "/" + c.size() + ")", "[" + value + ", ..]");
     }
+    return addIfNotNull(name, c);
+  }
 
-    public ToStringBuilder addNum(String name, Number num, String unit) {
-        return addIfNotNull(name, num, n -> numFormat.formatNumber(n, unit));
+  /** Add the collection, truncate the number of elements at given maxLimit. */
+  public ToStringBuilder addIntArraySize(String name, int[] array, int notSet) {
+    if (array == null) {
+      return this;
     }
+    return addIt(name, Arrays.stream(array).filter(t -> t != notSet).count() + "/" + array.length);
+  }
 
-    public ToStringBuilder addBool(String name, Boolean value) {
-        return addIfNotNull(name, value);
+  /** Add the BitSet: name : {cardinality}/{logical size}/{size} */
+  public ToStringBuilder addBitSetSize(String name, BitSet bitSet) {
+    if (bitSet == null) {
+      return this;
     }
+    return addIt(name, bitSet.cardinality() + "/" + bitSet.length());
+  }
 
-    public ToStringBuilder addBoolIfTrue(String name, Boolean value) {
-        if(TRUE.equals(value)) { addLabel(name); }
-        return this;
+  /* Special purpose formatters */
+
+  /** Add a Coordinate location, longitude or latitude */
+  public ToStringBuilder addCoordinate(String name, Number num) {
+    return addIfNotNull(name, num, numFormat::formatCoordinate);
+  }
+
+  /**
+   * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss. Note! The
+   * DATE is not printed. {@code null} value is ignored.
+   */
+  public ToStringBuilder addTimeCal(String name, Calendar time) {
+    return addIfNotNull(name, time, t -> formatTime(t.getTime()));
+  }
+
+  /**
+   * Add time in seconds since midnight. Format:  hh:mm:ss. Ignore default values.
+   */
+  public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight, int ignoreValue) {
+    return addIfNotIgnored(name, timeSecondsPastMidnight, ignoreValue, TimeUtils::timeToStrCompact);
+  }
+
+  /**
+   * Add time in seconds since midnight. Format:  hh:mm:ss.
+   */
+  public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight) {
+    return addIfNotIgnored(
+      name,
+      timeSecondsPastMidnight,
+      RANDOM_IGNORE_VALUE,
+      TimeUtils::timeToStrCompact
+    );
+  }
+
+  /**
+   * Add times in seconds since midnight. Format:  hh:mm. {@code null} value is ignored.
+   */
+  public ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
+    return addIfNotNull(
+      name,
+      value,
+      a ->
+        Arrays
+          .stream(a)
+          .mapToObj(TimeUtils::timeToStrCompact)
+          .collect(Collectors.joining(" ", "[", "]"))
+    );
+  }
+
+  public ToStringBuilder addTime(String name, Instant time) {
+    return addIfNotNull(name, time, Instant::toString);
+  }
+
+  /**
+   * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
+   * Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
+   */
+  public ToStringBuilder addDurationSec(String name, Integer durationSeconds) {
+    return addDurationSec(name, durationSeconds, null);
+  }
+
+  /**
+   * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
+   * Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
+   */
+  public ToStringBuilder addDurationSec(String name, Integer durationSeconds, Integer ignoreValue) {
+    return addIfNotIgnored(name, durationSeconds, ignoreValue, DurationUtils::durationToStr);
+  }
+
+  public ToStringBuilder addDuration(String name, Duration duration) {
+    return addIfNotIgnored(
+      name,
+      duration,
+      null,
+      d -> DurationUtils.durationToStr((int) d.toSeconds())
+    );
+  }
+
+  @Override
+  public String toString() {
+    return sb.append("}").toString();
+  }
+
+  /** private methods */
+
+  private <T> ToStringBuilder addIfNotNull(String name, T value) {
+    return addIfNotIgnored(name, value, null, Object::toString);
+  }
+
+  private <T> ToStringBuilder addIfNotNull(String name, T value, Function<T, String> vToString) {
+    return addIfNotIgnored(name, value, null, vToString);
+  }
+
+  private <T> ToStringBuilder addIfNotIgnored(
+    String name,
+    T value,
+    T ignoreValue,
+    Function<T, String> mapToString
+  ) {
+    // 'ignoreValue' should be the first argument here to avoid calling equals when
+    // 'ignoreValue=null' and the type do not support equals(..).
+    if (Objects.equals(ignoreValue, value)) {
+      return this;
     }
-
-    public ToStringBuilder addStr(String name, String value) {
-        return addIfNotNull(name, value, v -> "'" + v + "'");
+    if (value == null) {
+      return addIt(name, NULL_VALUE);
     }
+    return addIt(name, mapToString.apply(value));
+  }
 
-    public ToStringBuilder addEnum(String name, Enum<?> value) {
-        return addEnum(name, value, null);
+  private ToStringBuilder addIt(String name, @NotNull String value) {
+    addLabel(name);
+    addValue(value);
+    return this;
+  }
+
+  private void addLabel(String name) {
+    if (first) {
+      first = false;
+    } else {
+      sb.append(FIELD_SEPARATOR);
     }
+    sb.append(name);
+  }
 
-    public ToStringBuilder addEnum(String name, Enum<?> value, Enum<?> ignoreValue) {
-        return addIfNotIgnored(name, value, ignoreValue, Enum::name);
+  private void addValue(@NotNull String value) {
+    sb.append(FIELD_VALUE_SEP);
+    sb.append(value);
+  }
+
+  private String formatTime(Date time) {
+    if (calendarTimeFormat == null) {
+      calendarTimeFormat = new SimpleDateFormat("HH:mm:ss");
     }
-
-    public ToStringBuilder addObj(String name, Object obj) {
-        return addObj(name, obj, null);
-    }
-
-    public ToStringBuilder addObj(String name, Object value, Object ignoreValue) {
-        return addIfNotIgnored(name, value, ignoreValue, Object::toString);
-    }
-
-    public ToStringBuilder addEntityId(String name, TransitEntity entity) {
-        return addIfNotNull(name, entity, e -> e.getId().toString());
-    }
-
-    public ToStringBuilder addInts(String name, int[] intArray) {
-        return addIfNotNull(name, intArray, Arrays::toString);
-    }
-
-    public ToStringBuilder addDoubles(String name, double[] value, double ignoreValue) {
-        if(value == null) { return addIt(name, "null"); }
-        if(Arrays.stream(value).allMatch(it -> Objects.equals(it, ignoreValue))) { return this; }
-        return addIt(name, Arrays.toString(value));
-    }
-
-    /** Add collection if not null or not empty, all elements are added */
-    public ToStringBuilder addCol(String name, Collection<?> c) {
-        return addIfNotNull(name, c==null || c.isEmpty() ? null : c);
-    }
-
-    public ToStringBuilder addColSize(String name, Collection<?> c) {
-        return addIfNotNull(name, c, x -> String.format("%d items", x.size()));
-    }
-
-    /** Add the collection, truncate the number of elements at given maxLimit. */
-    public ToStringBuilder addCollection(String name, Collection<?> c, int maxLimit) {
-        if(c == null) { return this; }
-        if(c.size() > maxLimit+1) {
-            String value = c.stream()
-                    .limit(maxLimit)
-                    .map(Object::toString)
-                    .collect(Collectors.joining(", "));
-            return addIt(
-                    name + "(" + maxLimit + "/" + c.size() + ")",
-                    "[" + value + ", ..]"
-
-            );
-        }
-        return addIfNotNull(name, c);
-    }
-
-    /** Add the collection, truncate the number of elements at given maxLimit. */
-    public ToStringBuilder addIntArraySize(String name, int[] array, int notSet) {
-        if(array == null) { return this; }
-        return addIt(
-            name,
-            Arrays.stream(array).filter(t -> t != notSet).count() + "/" + array.length
-        );
-    }
-
-    /** Add the BitSet: name : {cardinality}/{logical size}/{size} */
-    public ToStringBuilder addBitSetSize(String name, BitSet bitSet) {
-        if(bitSet == null) { return this; }
-        return addIt(name, bitSet.cardinality() + "/" + bitSet.length());
-    }
-
-    /* Special purpose formatters */
-
-    /** Add a Coordinate location, longitude or latitude */
-    public ToStringBuilder addCoordinate(String name, Number num) {
-        return addIfNotNull(name, num, numFormat::formatCoordinate);
-    }
-
-    /**
-     * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss.
-     * Note! The DATE is not printed. {@code null} value is ignored.
-     */
-    public ToStringBuilder addTimeCal(String name, Calendar time) {
-        return addIfNotNull(name, time, t -> formatTime(t.getTime()));
-    }
-
-    /**
-     * Add time in seconds since midnight. Format:  hh:mm:ss. Ignore default values.
-     */
-    public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight, int ignoreValue) {
-        return addIfNotIgnored(
-                name, timeSecondsPastMidnight, ignoreValue, TimeUtils::timeToStrCompact
-        );
-    }
-
-    /**
-     * Add time in seconds since midnight. Format:  hh:mm:ss.
-     */
-    public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight) {
-        return addIfNotIgnored(
-                name, timeSecondsPastMidnight, RANDOM_IGNORE_VALUE, TimeUtils::timeToStrCompact
-        );
-    }
-
-    /**
-     * Add times in seconds since midnight. Format:  hh:mm. {@code null} value is ignored.
-     */
-    public ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
-        return addIfNotNull(
-            name,
-            value,
-            a -> Arrays.stream(a)
-                .mapToObj(TimeUtils::timeToStrCompact)
-                .collect(Collectors.joining(" ", "[", "]"))
-        );
-    }
-
-    public ToStringBuilder addTime(String name, Instant time) {
-        return addIfNotNull(name, time, Instant::toString);
-    }
-
-    /**
-     * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-     * seconds) is only added if they are not zero {@code 0}. This is the same format as the
-     * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
-     */
-    public ToStringBuilder addDurationSec(String name, Integer durationSeconds) {
-        return addDurationSec(name, durationSeconds, null);
-    }
-
-    /**
-     * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-     * seconds) is only added if they are not zero {@code 0}. This is the same format as the
-     * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
-     */
-    public ToStringBuilder addDurationSec(String name, Integer durationSeconds, Integer ignoreValue) {
-        return addIfNotIgnored(name, durationSeconds, ignoreValue, DurationUtils::durationToStr);
-    }
-
-    public ToStringBuilder addDuration(String name, Duration duration) {
-        return addIfNotIgnored(
-            name,
-            duration,
-            null, d -> DurationUtils.durationToStr((int)d.toSeconds())
-        );
-    }
-
-    @Override
-    public String toString() {
-        return sb.append("}").toString();
-    }
-
-
-    /** private methods */
-
-    private <T> ToStringBuilder addIfNotNull(String name, T value) {
-        return addIfNotIgnored(name, value, null, Object::toString);
-    }
-
-    private <T> ToStringBuilder addIfNotNull(String name, T value, Function<T, String> vToString) {
-        return addIfNotIgnored(name, value, null, vToString);
-    }
-
-    private <T> ToStringBuilder addIfNotIgnored(String name, T value, T ignoreValue, Function<T, String> mapToString) {
-        // 'ignoreValue' should be the first argument here to avoid calling equals when
-        // 'ignoreValue=null' and the type do not support equals(..).
-        if(Objects.equals(ignoreValue, value)) { return this; }
-        if(value == null) { return addIt(name, NULL_VALUE); }
-        return addIt(name, mapToString.apply(value));
-    }
-
-    private ToStringBuilder addIt(String name, @NotNull String value) {
-        addLabel(name);
-        addValue(value);
-        return this;
-    }
-
-    private void addLabel(String name) {
-        if (first) { first = false; }
-        else { sb.append(FIELD_SEPARATOR); }
-        sb.append(name);
-    }
-
-    private void addValue(@NotNull String value) {
-        sb.append(FIELD_VALUE_SEP);
-        sb.append(value);
-    }
-
-    private String formatTime(Date time) {
-        if(calendarTimeFormat == null) {
-            calendarTimeFormat = new SimpleDateFormat("HH:mm:ss");
-        }
-        return calendarTimeFormat.format(time.getTime());
-    }
+    return calendarTimeFormat.format(time.getTime());
+  }
 }

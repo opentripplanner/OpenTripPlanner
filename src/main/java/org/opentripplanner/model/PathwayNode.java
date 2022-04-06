@@ -9,13 +9,13 @@ import org.opentripplanner.util.I18NString;
 public final class PathwayNode extends StationElement {
 
   public PathwayNode(
-          FeedScopedId id,
-          I18NString name,
-          String code,
-          String description,
-          WgsCoordinate coordinate,
-          WheelChairBoarding wheelchairBoarding,
-          StopLevel level
+    FeedScopedId id,
+    I18NString name,
+    String code,
+    String description,
+    WgsCoordinate coordinate,
+    WheelChairBoarding wheelchairBoarding,
+    StopLevel level
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
   }

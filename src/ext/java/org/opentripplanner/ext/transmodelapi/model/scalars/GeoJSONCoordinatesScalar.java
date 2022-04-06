@@ -19,66 +19,80 @@ import graphql.language.ArrayValue;
 import graphql.language.FloatValue;
 import graphql.schema.Coercing;
 import graphql.schema.GraphQLScalarType;
-import org.locationtech.jts.geom.Coordinate;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
 
 public class GeoJSONCoordinatesScalar {
-    private static final String DOCUMENTATION = "List of coordinates like: [[60.89, 11.12], [62.56, 12.10]]";
 
-    public static GraphQLScalarType getGraphQGeoJSONCoordinatesScalar() {
-        return INSTANCE;
-    }
-
-    private final static GraphQLScalarType INSTANCE = GraphQLScalarType.newScalar().name("Coordinates").description(DOCUMENTATION).coercing(new Coercing() {
+  private static final String DOCUMENTATION =
+    "List of coordinates like: [[60.89, 11.12], [62.56, 12.10]]";
+  private static final GraphQLScalarType INSTANCE = GraphQLScalarType
+    .newScalar()
+    .name("Coordinates")
+    .description(DOCUMENTATION)
+    .coercing(
+      new Coercing() {
         @Override
         public List<List<Double>> serialize(Object input) {
-            if (input instanceof Coordinate[]) {
-                Coordinate[] coordinates = ((Coordinate[]) input);
-                List<List<Double>> coordinateList = new ArrayList<>();
-                for (Coordinate coordinate : coordinates) {
-                    List<Double> coordinatePair = new ArrayList<>();
-                    coordinatePair.add(coordinate.x);
-                    coordinatePair.add(coordinate.y);
+          if (input instanceof Coordinate[]) {
+            Coordinate[] coordinates = ((Coordinate[]) input);
+            List<List<Double>> coordinateList = new ArrayList<>();
+            for (Coordinate coordinate : coordinates) {
+              List<Double> coordinatePair = new ArrayList<>();
+              coordinatePair.add(coordinate.x);
+              coordinatePair.add(coordinate.y);
 
-                    coordinateList.add(coordinatePair);
-                }
-                return coordinateList;
+              coordinateList.add(coordinatePair);
             }
-            return null;
+            return coordinateList;
+          }
+          return null;
         }
 
         @Override
         public Coordinate[] parseValue(Object input) {
-            List<List<? extends Number>> coordinateList = (List<List<? extends Number>>) input;
+          List<List<? extends Number>> coordinateList = (List<List<? extends Number>>) input;
 
-            Coordinate[] coordinates = new Coordinate[coordinateList.size()];
+          Coordinate[] coordinates = new Coordinate[coordinateList.size()];
 
-            for (int i = 0; i < coordinateList.size(); i++) {
-                coordinates[i] = new Coordinate(coordinateList.get(i).get(0).doubleValue(), coordinateList.get(i).get(1).doubleValue());
-            }
+          for (int i = 0; i < coordinateList.size(); i++) {
+            coordinates[i] =
+              new Coordinate(
+                coordinateList.get(i).get(0).doubleValue(),
+                coordinateList.get(i).get(1).doubleValue()
+              );
+          }
 
-            return coordinates;
+          return coordinates;
         }
 
         @Override
         public Object parseLiteral(Object input) {
-            if (input instanceof ArrayValue) {
-                ArrayList<ArrayValue> coordinateList = (ArrayList) ((ArrayValue) input).getValues();
-                Coordinate[] coordinates = new Coordinate[coordinateList.size()];
+          if (input instanceof ArrayValue) {
+            ArrayList<ArrayValue> coordinateList = (ArrayList) ((ArrayValue) input).getValues();
+            Coordinate[] coordinates = new Coordinate[coordinateList.size()];
 
-                for (int i = 0; i < coordinateList.size(); i++) {
-                    ArrayValue v = coordinateList.get(i);
+            for (int i = 0; i < coordinateList.size(); i++) {
+              ArrayValue v = coordinateList.get(i);
 
-                    FloatValue longitude = (FloatValue) v.getValues().get(0);
-                    FloatValue latitude = (FloatValue) v.getValues().get(1);
-                    coordinates[i] = new Coordinate(longitude.getValue().doubleValue(), latitude.getValue().doubleValue());
-
-                }
-                return coordinates;
+              FloatValue longitude = (FloatValue) v.getValues().get(0);
+              FloatValue latitude = (FloatValue) v.getValues().get(1);
+              coordinates[i] =
+                new Coordinate(
+                  longitude.getValue().doubleValue(),
+                  latitude.getValue().doubleValue()
+                );
             }
-            return null;
+            return coordinates;
+          }
+          return null;
         }
-    }).build();
+      }
+    )
+    .build();
+
+  public static GraphQLScalarType getGraphQGeoJSONCoordinatesScalar() {
+    return INSTANCE;
+  }
 }
